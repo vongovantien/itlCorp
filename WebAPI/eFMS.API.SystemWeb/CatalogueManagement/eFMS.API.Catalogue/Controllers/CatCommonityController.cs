@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Catalogue.Models;
-using eFMS.API.Catalogue.Resources;
-using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -33,7 +33,6 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatCommodityService catComonityService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
-        private string templateName = "ImportTemplate.xlsx";
         public CatCommonityController(IStringLocalizer<LanguageSub> localizer, ICatCommodityService service, IMapper iMapper, ICurrentUser user)
         {
             stringLocalizer = localizer;
@@ -80,8 +79,6 @@ namespace eFMS.API.Catalogue.Controllers
             }
             var commonity = mapper.Map<CatCommodityModel>(model);
             commonity.UserCreated = currentUser.UserID;
-            commonity.DatetimeCreated = DateTime.Now;
-            commonity.Inactive = false;
             var hs = catComonityService.Add(commonity);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -91,6 +88,13 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return Ok(result);
         }
+
+        /// <summary>
+        /// update an existed item
+        /// </summary>
+        /// <param name="id">id of data that need to retrieve</param>
+        /// <param name="model">object to update</param>
+        /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize]
         public IActionResult Put(short id, CatCommodityEditModel model)
@@ -101,15 +105,10 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            var commonity = mapper.Map<CatCommodityModel>(model);
-            commonity.UserModified = currentUser.UserID;
-            commonity.DatetimeModified = DateTime.Now;
-            commonity.Id = id;
-            if (commonity.Inactive == true)
-            {
-                commonity.InactiveOn = DateTime.Now;
-            }
-            var hs = catComonityService.Update(commonity, x => x.Id == id);
+            var commodity = mapper.Map<CatCommodityModel>(model);
+            commodity.Id = id;
+            commodity.UserModified = currentUser.UserID;
+            var hs = catComonityService.Update(commodity);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -118,12 +117,18 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return Ok(result);
         }
+
+        /// <summary>
+        /// delete an existed item
+        /// </summary>
+        /// <param name="id">id of data that need to delete</param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         [Authorize]
         public IActionResult Delete(short id)
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
-            var hs = catComonityService.Delete(x => x.Id == id);
+            var hs = catComonityService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -152,6 +157,11 @@ namespace eFMS.API.Catalogue.Controllers
             return message;
         }
 
+        /// <summary>
+        /// read commodities data from file excel
+        /// </summary>
+        /// <param name="uploadedFile">file to read data</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("uploadFile")]
         public IActionResult UploadFile(IFormFile uploadedFile)
@@ -163,19 +173,23 @@ namespace eFMS.API.Catalogue.Controllers
                 int rowCount = worksheet.Dimension.Rows;
                 int colCount = worksheet.Dimension.Columns;
                 if (rowCount < 2) return BadRequest();
-                if (worksheet.Cells[1, 1].Value?.ToString() != "English Name")
+                if (worksheet.Cells[1, 1].Value?.ToString() != "Code")
                 {
-                    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'English Name'" });
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Code'" });
                 }
-                if (worksheet.Cells[1, 2].Value?.ToString() != "Local Name")
+                if (worksheet.Cells[1, 2].Value?.ToString() != "English Name")
                 {
-                    return BadRequest(new ResultHandle { Status = false, Message = "Column 2 must have header is 'Local Name'" });
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 2 must have header is 'English Name'" });
                 }
-                if (worksheet.Cells[1, 3].Value?.ToString() != "Commodity Group ID")
+                if (worksheet.Cells[1, 3].Value?.ToString() != "Local Name")
                 {
-                    return BadRequest(new ResultHandle { Status = false, Message = "Column 3 must have header is 'Commodity Group ID'" });
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 3 must have header is 'Local Name'" });
                 }
-                if (worksheet.Cells[1, 4].Value?.ToString() != "Status")
+                if (worksheet.Cells[1, 4].Value?.ToString() != "Commodity Group ID")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 4 must have header is 'Commodity Group ID'" });
+                }
+                if (worksheet.Cells[1, 5].Value?.ToString() != "Status")
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = "Column 4 must have header is 'Status'" });
                 }
@@ -185,10 +199,11 @@ namespace eFMS.API.Catalogue.Controllers
                     var commodity = new CommodityImportModel
                     {
                         IsValid = true,
-                        CommodityNameEn = worksheet.Cells[row, 1].Value?.ToString(),
-                        CommodityNameVn = worksheet.Cells[row, 2].Value?.ToString(),
-                        CommodityGroupId = worksheet.Cells[row, 3].Value == null ? (short?)null : Convert.ToInt16(worksheet.Cells[row, 3].Value),
-                        Status = worksheet.Cells[row,4].Value?.ToString()
+                        Code = worksheet.Cells[row, 1].Value?.ToString(),
+                        CommodityNameEn = worksheet.Cells[row, 2].Value?.ToString(),
+                        CommodityNameVn = worksheet.Cells[row, 3].Value?.ToString(),
+                        CommodityGroupId = worksheet.Cells[row, 4].Value == null ? (short?)null : Convert.ToInt16(worksheet.Cells[row, 4].Value),
+                        Status = worksheet.Cells[row,5].Value?.ToString()
                     };
                     list.Add(commodity);
                 }
@@ -201,7 +216,11 @@ namespace eFMS.API.Catalogue.Controllers
             return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
         }
 
-
+        /// <summary>
+        /// import list commodities into database
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("import")]
         [Authorize]
@@ -219,15 +238,17 @@ namespace eFMS.API.Catalogue.Controllers
             }
         }
 
-
-
+        /// <summary>
+        /// download exel from server
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("downloadExcel")]
-        public async Task<ActionResult> DownloadExcel(CatPlaceTypeEnum type)
+        public async Task<ActionResult> DownloadExcel()
         {
 
             try
             {
-                templateName = "Commodity" + templateName;
+                var templateName = Templates.CatCommodity.ExelImportFileName + Templates.ExelImportEx;
                 var result = await new FileHelper().ExportExcel(templateName);
                 if (result != null)
                 {

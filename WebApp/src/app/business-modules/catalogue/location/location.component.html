@@ -255,12 +255,12 @@
                                         (click)="sort('code')">
                                         <span>City-Province Code</span>
                                     </th>
-                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameEN'), 'sorting_desc': (!isDesc && sortKey == 'nameEN') }"
-                                        (click)="sort('nameEN')">
+                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameEn'), 'sorting_desc': (!isDesc && sortKey == 'nameEn') }"
+                                        (click)="sort('nameEn')">
                                         <span>English Name</span>
                                     </th>
-                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameVN'), 'sorting_desc': (!isDesc && sortKey == 'nameVN') }"
-                                        (click)="sort('nameVN')">
+                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameVn'), 'sorting_desc': (!isDesc && sortKey == 'nameVn') }"
+                                        (click)="sort('nameVn')">
                                         <span>Local Name</span>
                                     </th>
                                     <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'countryName'), 'sorting_desc': (!isDesc && sortKey == 'countryName') }"
@@ -294,10 +294,10 @@
                                             <span>{{item.code}}</span>
                                         </td>
                                         <td>
-                                            <span>{{item.nameEN}}</span>
+                                            <span>{{item.nameEn}}</span>
                                         </td>
                                         <td>
-                                            <span>{{item.nameVN}}</span>
+                                            <span>{{item.nameVn}}</span>
                                         </td>
                                         <td>
                                             <span>{{item.countryName}}</span>
@@ -389,12 +389,12 @@
                                         (click)="sort('code')">
                                         <span>District Code</span>
                                     </th>
-                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameEN'), 'sorting_desc': (!isDesc && sortKey == 'nameEN') }"
-                                        (click)="sort('nameEN')">
+                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameEn'), 'sorting_desc': (!isDesc && sortKey == 'nameEn') }"
+                                        (click)="sort('nameEn')">
                                         <span>English Name</span>
                                     </th>
-                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameVN'), 'sorting_desc': (!isDesc && sortKey == 'nameVN') }"
-                                        (click)="sort('nameVN')">
+                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameVn'), 'sorting_desc': (!isDesc && sortKey == 'nameVN') }"
+                                        (click)="sort('nameVn')">
                                         <span>Local Name</span>
                                     </th>
                                     <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'provinceName'), 'sorting_desc': (!isDesc && sortKey == 'provinceName') }"
@@ -432,10 +432,10 @@
                                             <span>{{district.code}}</span>
                                         </td>
                                         <td>
-                                            <span>{{district.nameEN}}</span>
+                                            <span>{{district.nameEn}}</span>
                                         </td>
                                         <td>
-                                            <span>{{district.nameVN}}</span>
+                                            <span>{{district.nameVn}}</span>
                                         </td>
                                         <td>
                                             <span>{{district.provinceName}}</span>
@@ -533,12 +533,12 @@
                                         (click)="sort('code')">
                                         <span>Town-Ward Code</span>
                                     </th>
-                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameEN'), 'sorting_desc': (!isDesc && sortKey == 'nameEN') }"
-                                        (click)="sort('nameEN')">
+                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameEn'), 'sorting_desc': (!isDesc && sortKey == 'nameEn') }"
+                                        (click)="sort('nameEn')">
                                         <span>English Name</span>
                                     </th>
-                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameVN'), 'sorting_desc': (!isDesc && sortKey == 'nameVN') }"
-                                        (click)="sort('nameVN')">
+                                    <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameVn'), 'sorting_desc': (!isDesc && sortKey == 'nameVn') }"
+                                        (click)="sort('nameVn')">
                                         <span>Local Name</span>
                                     </th>
                                     <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'districtName'), 'sorting_desc': (!isDesc && sortKey == 'districtName') }"
@@ -580,10 +580,10 @@
                                             <span>{{ward.code}}</span>
                                         </td>
                                         <td>
-                                            <span>{{ward.nameEN}}</span>
+                                            <span>{{ward.nameEn}}</span>
                                         </td>
                                         <td>
-                                            <span>{{ward.nameVN}}</span>
+                                            <span>{{ward.nameVn}}</span>
                                         </td>
                                         <td>
                                             <span>{{ward.districtName}}</span>
@@ -899,7 +899,7 @@
                                 Country <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
-                                <ng-select [allowClear]="true" [items]="ngSelectDataCountries" [disabled]="disabled"
+                                <ng-select [allowClear]="true" [items]="ngSelectDataCountries" 
                                     *ngIf="resetNg2SelectCountry && ngSelectDataCountries.length>0" (data)="refreshValue($event)"
                                     (selected)="selectedCountry($event,'add','province-city')" (removed)="removed($event,'addCountryProvince')"
                                     (typed)="typed($event)" placeholder="Select department">
@@ -1008,7 +1008,7 @@
                             </label>
                             <div class="col-lg-8">
                                 <ng-select [allowClear]="true" [items]="ngSelectDataCountries" [active]="currentActiveCountry"
-                                    [disabled]="disabled" *ngIf="resetNg2SelectCountry && ngSelectDataCountries.length>0"
+                                    *ngIf="resetNg2SelectCountry && ngSelectDataCountries.length>0"
                                     (data)="refreshValue($event)" (selected)="selectedCountry($event,'update','province-city')"
                                     (removed)="removed($event,'updateCountryProvince')" (typed)="typed($event)"
                                     placeholder="Select department">
@@ -1097,7 +1097,7 @@
                                 English Name <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
-                                <input type="text" [(ngModel)]="DistrictToAdd.nameEN" (change)="DistrictToAdd.nameEN=DistrictToAdd.nameEN.trim()"
+                                <input type="text" [(ngModel)]="DistrictToAdd.nameEn" (change)="DistrictToAdd.nameEn=DistrictToAdd.nameEn.trim()"
                                     class="form-control m-input m-input--square" #english_name="ngModel" required
                                     minlength="3" name="english_name" placeholder="Please enter english name">
                                 <div class="form-control-feedback" *ngIf="addDistrictForm.submitted && english_name.invalid">
@@ -1113,7 +1113,7 @@
                                 Local Name <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
-                                <input type="text" [(ngModel)]="DistrictToAdd.nameVN" (change)="DistrictToAdd.nameVN=DistrictToAdd.nameVN.trim()"
+                                <input type="text" [(ngModel)]="DistrictToAdd.nameVn" (change)="DistrictToAdd.nameVn=DistrictToAdd.nameVn.trim()"
                                     class="form-control m-input m-input--square" #local_name="ngModel" required
                                     minlength="3" name="local_name" placeholder="Please enter local name">
                                 <div class="form-control-feedback" *ngIf="addDistrictForm.submitted && local_name.invalid">
@@ -1128,7 +1128,7 @@
                                 Country <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
-                                <ng-select [allowClear]="true" [items]="ngSelectDataCountries" [disabled]="disabled"
+                                <ng-select [allowClear]="true" [items]="ngSelectDataCountries" 
                                     *ngIf="resetNg2SelectCountry && ngSelectDataCountries.length>0" (data)="refreshValue($event)"
                                     (selected)="selectedCountry($event,'add','district')" (removed)="removed($event,'addCountryDistrict')"
                                     (typed)="typed($event)" placeholder="Select department">
@@ -1144,7 +1144,7 @@
                                 Province - City <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
-                                <ng-select [allowClear]="true" [items]="ngSelectDataProvinces" [disabled]="disabled"
+                                <ng-select [allowClear]="true" [items]="ngSelectDataProvinces"
                                     *ngIf="resetNg2SelectProvince" (data)="refreshValue($event)" (selected)="selectedProvince($event,'add','district')"
                                     (removed)="removed($event,'addProvinceDistrict')" (typed)="typed($event)"
                                     placeholder="Select department">
@@ -1256,7 +1256,7 @@
                             </label>
                             <div class="col-lg-8">
                                 <ng-select [allowClear]="true" [items]="ngSelectDataCountries" [active]="currentActiveCountry"
-                                    [disabled]="disabled" *ngIf="resetNg2SelectCountry && ngSelectDataCountries.length>0"
+                                    *ngIf="resetNg2SelectCountry && ngSelectDataCountries.length>0"
                                     (data)="refreshValue($event)" (selected)="selectedCountry($event,'update','district')"
                                     (removed)="removed($event,'updateCountryDistrict')" (typed)="typed($event)"
                                     placeholder="Select department">
@@ -1273,7 +1273,7 @@
                             </label>
                             <div class="col-lg-8">
                                 <ng-select [allowClear]="true" [items]="ngSelectDataProvinces" [active]="currentActiveProvince"
-                                    [disabled]="disabled" *ngIf="resetNg2SelectProvince" (data)="refreshValue($event)"
+                                    *ngIf="resetNg2SelectProvince" (data)="refreshValue($event)"
                                     (selected)="selectedProvince($event,'update','district')" (removed)="removed($event,'updateProvinceDistrict')"
                                     (typed)="typed($event)" placeholder="Select department">
                                 </ng-select>
@@ -1364,7 +1364,7 @@
                                 English Name
                             </label>
                             <div class="col-lg-8">
-                                <input type="text" [(ngModel)]="WardToAdd.nameEN" (change)="WardToAdd.nameEN=WardToAdd.nameEN.trim()"
+                                <input type="text" [(ngModel)]="WardToAdd.nameEn" (change)="WardToAdd.nameEn=WardToAdd.nameEn.trim()"
                                     class="form-control m-input m-input--square" #english_name="ngModel" required
                                     minlength="3" name="english_name" placeholder="Please enter english name">
                                 <div class="form-control-feedback" *ngIf="addWardForm.submitted && english_name.invalid">
@@ -1380,7 +1380,7 @@
                                 Local Name <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
-                                <input type="text" [(ngModel)]="WardToAdd.nameVN" (change)="WardToAdd.nameVN=WardToAdd.nameVN.trim()"
+                                <input type="text" [(ngModel)]="WardToAdd.nameVn" (change)="WardToAdd.nameVn=WardToAdd.nameVn.trim()"
                                     class="form-control m-input m-input--square" #local_name="ngModel" required
                                     minlength="3" name="local_name" placeholder="Please enter local name">
                                 <div class="form-control-feedback" *ngIf="addWardForm.submitted && local_name.invalid">
@@ -1395,7 +1395,7 @@
                                 Country <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
-                                <ng-select [allowClear]="true" [items]="ngSelectDataCountries" [disabled]="disabled"
+                                <ng-select [allowClear]="true" [items]="ngSelectDataCountries" 
                                     *ngIf="resetNg2SelectCountry && ngSelectDataCountries.length>0" (data)="refreshValue($event)"
                                     (selected)="selectedCountry($event,'add','ward')" (removed)="removed($event,'addCountryWard')"
                                     (typed)="typed($event)" placeholder="Select department">
@@ -1411,7 +1411,7 @@
                                 Province - City <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
-                                <ng-select [allowClear]="true" [items]="ngSelectDataProvinces" [disabled]="disabled"
+                                <ng-select [allowClear]="true" [items]="ngSelectDataProvinces"
                                     *ngIf="resetNg2SelectProvince" (data)="refreshValue($event)" (selected)="selectedProvince($event,'add','ward')"
                                     (removed)="removed($event,'addProvinceWard')" (typed)="typed($event)" placeholder="Select department">
                                 </ng-select>
@@ -1427,7 +1427,7 @@
                                 District <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
-                                <ng-select [allowClear]="true" [items]="ngSelectDataDistricts" [disabled]="disabled"
+                                <ng-select [allowClear]="true" [items]="ngSelectDataDistricts" 
                                     *ngIf="resetNg2SelectDistrict" (data)="refreshValue($event)" (selected)="selectedDistrict($event,'add','ward')"
                                     (removed)="removed($event,'addDistrictWard')" (typed)="typed($event)" placeholder="Select department">
                                 </ng-select>
@@ -1554,7 +1554,7 @@
                                 Province - City <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
-                                <ng-select [allowClear]="true" [items]="ngSelectDataProvinces" [disabled]="disabled"
+                                <ng-select [allowClear]="true" [items]="ngSelectDataProvinces" 
                                     [active]="currentActiveProvince" *ngIf="resetNg2SelectProvince && ngSelectDataCountries.length>0"
                                     (data)="refreshValue($event)" (selected)="selectedProvince($event,'update','ward')"
                                     (removed)="removed($event,'updateProvinceWard')" (typed)="typed($event)"
@@ -1572,7 +1572,7 @@
                                 District <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
-                                <ng-select [allowClear]="true" [items]="ngSelectDataDistricts" [disabled]="disabled"
+                                <ng-select [allowClear]="true" [items]="ngSelectDataDistricts" 
                                     [active]="currentActiveDistrict" *ngIf="resetNg2SelectDistrict" (data)="refreshValue($event)"
                                     (selected)="selectedDistrict($event,'update','ward')" (removed)="removed($event,'updateDistrictWard')"
                                     (typed)="typed($event)" placeholder="Select department">

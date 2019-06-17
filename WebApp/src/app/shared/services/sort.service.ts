@@ -43,8 +43,14 @@ export class SortService {
     // }
 
     private prepareStringToSort(str:any){
-        str = str.toString().toLowerCase();
-        return deburr(str);
+        if(typeof str === "string"){
+            str = str.toString().toLowerCase();
+            return  deburr(str);
+        }
+        if(typeof str === "number"){
+            return str
+        }
+       
     }
 
     private letterSort(lang:any, letters:any) {

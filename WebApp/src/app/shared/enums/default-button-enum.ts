@@ -45,9 +45,10 @@ export const SaveDefaultButton: ButtonAttributeSetting = {
   };
 export const CancelDefaultButton: ButtonAttributeSetting = {
     titleButton: "cancel",
-    classStyle: "btn m-btn--square m-btn--icon m-btn--uppercase",
+    classStyle: "btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase",
     //targetModal: "add-ware-house-modal",
-    icon: "la la-ban"
+    icon: "la la-ban",
+    type: "button"
   };
 
   export const ResetDefaultButton: ButtonAttributeSetting = {

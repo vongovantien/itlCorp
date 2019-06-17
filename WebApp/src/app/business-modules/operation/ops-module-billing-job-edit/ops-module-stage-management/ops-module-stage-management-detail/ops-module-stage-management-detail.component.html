@@ -1,0 +1,221 @@
+<div class="modal fade" id="ops-detail-stage-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Stage Detail</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--begin::Form-->
+                <div class="m-form m-form--state">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Stage name  <span class="m--font-danger">(*)</span>
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Role
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="" value="CS" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Process time (h)
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Deadline
+                                </label>
+                                <div class="m-input-icon m-input-icon--right down">
+                                    <input type="text" class="form-control m-input m-input--square" 
+                                        ngxDaterangepickerMd 
+                                        [autoApply]="true" 
+                                        [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                        [singleDatePicker]="true" 
+                                        name="singledater" readonly/>
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Main person incharge  <span class="m--font-danger">(*)</span>
+                                </label>
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" 
+                                        type="text"
+                                        readonly data-toggle="dropdown" 
+                                        placeholder="Please selected">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square"
+                                                            type="text" placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>User Name</th>
+                                                                <th>Full Name</th>
+                                                                <th>Role</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <tr class="data-row data-selected">
+                                                            <td>User Name</td>
+                                                            <td>Full Name</td>
+                                                            <td>Role</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Real person incharge
+                                </label>
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" 
+                                        type="text"
+                                        readonly data-toggle="dropdown" 
+                                        placeholder="Please selected">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square"
+                                                            type="text" placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>User Name</th>
+                                                                <th>Full Name</th>
+                                                                <th>Role</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <tr class="data-row data-selected">
+                                                            <td>User Name</td>
+                                                            <td>Full Name</td>
+                                                            <td>Role</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Description
+                                </label>
+                                <textarea class="form-control m-input m-input--square" name="" id="" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Comment
+                                </label>
+                                <textarea  class="form-control m-input m-input--square" name="" id="" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Status
+                                </label>
+                                <ng-select 
+                                    [allowClear]="false" 
+                                    [items]="statusStage" 
+                                    [active]="statusStageActive" 
+                                    [disabled]="disabled" 
+                                    (data)="refreshValue($event)"
+                                    (selected)="selected($event)" 
+                                    (removed)="removed($event)"
+                                    (typed)="typed($event)"
+                                    placeholder="Select filter">
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end::Form-->
+            </div>
+            <div class="modal-footer m--align-center">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Save
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -5,6 +5,7 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { NgForm } from '@angular/forms';
 import { CatChargeToAddOrUpdate } from 'src/app/shared/models/catalogue/catChargeToAddOrUpdate.model';
 import {CatChargeDefaultAccount} from 'src/app/shared/models/catalogue/catChargeDefaultAccount.model';
+import { Router } from '@angular/router';
 
 // import {DataHelper} from 'src/helper/data.helper';
 declare var $: any;
@@ -16,7 +17,7 @@ declare var $: any;
 })
 export class ChargeAddnewComponent implements OnInit {
 
-  constructor(private baseServices: BaseService,private api_menu: API_MENU,) { }
+  constructor(private baseServices: BaseService,private api_menu: API_MENU,private router:Router) { }
     ChargeToAdd : CatChargeToAddOrUpdate = new CatChargeToAddOrUpdate();
     isAddNewLine:boolean = false;
     isMaximumAccountRow:boolean =false;
@@ -113,7 +114,10 @@ export class ChargeAddnewComponent implements OnInit {
    
       if (form.form.status != "INVALID" && this.validatateDefaultAcountLine() && this.isSameVoucherType == false) {
         delete this.ChargeToAdd.charge.Id;
-        await this.baseServices.postAsync(this.api_menu.Catalogue.Charge.addNew,this.ChargeToAdd,true,true);
+        var response = await this.baseServices.postAsync(this.api_menu.Catalogue.Charge.addNew,this.ChargeToAdd,true,true);
+        if(response){
+          this.router.navigate(["/home/catalogue/charge"]);
+        }
         console.log(this.ChargeToAdd);
       }  
 

@@ -1,8 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-// import { ModalModule } from 'ngx-bootstrap';
-
 import { TableLayoutComponent } from './common/table-layout/table-layout.component';
 import { StyleCellDirective } from './directives/style-cell.directive';
 import { InputTableLayoutComponent } from './common/input-table-layout/input-table-layout.component';
@@ -22,8 +20,17 @@ import { NgProgressModule } from '@ngx-progressbar/core';
 import { TwoDigitDecimaNumberDirective } from './directives/two-digit-decima-number.directive';
 import { ThreeDigitDecimaNumberDirective } from './directives/three-digit-decima-number.directive';
 import { IntergerInputDirective } from './directives/interger-input.directive';
+import { ReportPreviewComponent } from './common/report-preview/report-preview.component';
+import { SpecialCharacterDirective } from './directives/specialChracter.directive';
+import {EcusSpecicalCharacterAllowSpaceDirective} from './directives/ecusSpecicalCharacterAllowSpace.directive';
+import {EcusSpecicalCharacterNoSpaceDirective} from './directives/ecusSpecicalCharacterNoSpace.directive';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import {ComboGridVirtualScrollComponent} from './common/combo-grid-virtual-scroll/combo-grid-virtual-scroll.component';
+import { RouterModule } from '@angular/router';
+import { CfBeforeLeaveModalComponent } from './common/cf-before-leave-modal/cf-before-leave-modal.component';
+import { PageSidebarComponent } from '../master-page/page-sidebar/page-sidebar.component';
 @NgModule({
-  imports: [CommonModule, FormsModule,SelectModule],
+  imports: [CommonModule, FormsModule,SelectModule,ScrollingModule,RouterModule],
   declarations: [
     TableLayoutComponent, 
     StyleCellDirective, 
@@ -38,10 +45,18 @@ import { IntergerInputDirective } from './directives/interger-input.directive';
     CloseModalButtonComponent,
     TwoDigitDecimaNumberDirective,
     ThreeDigitDecimaNumberDirective,
-    IntergerInputDirective
+    IntergerInputDirective,
+    ReportPreviewComponent,
+    SpecialCharacterDirective,
+    EcusSpecicalCharacterAllowSpaceDirective,
+    EcusSpecicalCharacterNoSpaceDirective,
+    ComboGridVirtualScrollComponent,
+    CfBeforeLeaveModalComponent,
+    
   ],
   exports: [
     CommonModule,
+    ScrollingModule,
     TwoDigitDecimaNumberDirective,
     ThreeDigitDecimaNumberDirective,
     IntergerInputDirective,
@@ -54,7 +69,14 @@ import { IntergerInputDirective } from './directives/interger-input.directive';
     InputFormComponent,
     TableDetailComponent,
     CloseModalButtonComponent,
-    NgProgressModule
+    NgProgressModule,
+    ReportPreviewComponent,
+    SpecialCharacterDirective,
+    EcusSpecicalCharacterAllowSpaceDirective,
+    EcusSpecicalCharacterNoSpaceDirective,
+    ComboGridVirtualScrollComponent,
+    CfBeforeLeaveModalComponent,
+    
   ],
   providers: [
     SortService,

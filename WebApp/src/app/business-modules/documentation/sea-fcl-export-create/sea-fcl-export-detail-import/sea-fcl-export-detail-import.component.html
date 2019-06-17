@@ -16,8 +16,8 @@
                               <label class="form-control-label" for="">
                                   Search text
                               </label>
-                              <input type="text" class="form-control m-input m-input--square" [(ngModel)]="searchString" class="form-control m-input m-input--square" autocomplete="nope"
-                              name="searchString" (change)="searchString = searchString.trim()"
+                              <input type="text" class="form-control m-input m-input--square" id="searchmasterbill" [(ngModel)]="searchString" class="form-control m-input m-input--square" autocomplete="nope"
+                              name="searchString" (change)="searchString = searchString.trim()" autofocus
                                   placeholder="Search text">
                           </div>
                       </div>
@@ -112,7 +112,7 @@
                           </th>
                       </tr>
                   </thead>
-                  <tbody *ngIf="shipments">
+                  <tbody *ngIf="shipments.length >0; else norecord">
                       <tr class="" *ngFor="let item of shipments; let i=index">
                           <td class="">
                               <div class="">
@@ -144,7 +144,17 @@
                               </span>
                           </td>
                       </tr>
-                  </tbody>
+                    </tbody>
+                    <ng-template #norecord>
+                        <tr>
+                            <td colspan="5">
+                                <div class="no-data">
+                                    <i class="flaticon-coins"></i>
+                                    <span class="no-data-text">No records found</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
               </table>
           </div>
           <!--end: Datatable-->

@@ -5,8 +5,7 @@ import { ButtonType } from '../../enums/type-button.enum';
 
 @Component({
   selector: 'app-table-layout',
-  templateUrl: './table-layout.component.html',
-  styleUrls: ['./table-layout.component.scss']
+  templateUrl: './table-layout.component.html'
 })
 export class TableLayoutComponent implements OnInit, OnChanges {
   @Input() records: any[];
@@ -14,6 +13,7 @@ export class TableLayoutComponent implements OnInit, OnChanges {
   @Input() settings: ColumnSetting[];
   @Input() nameEditModal: string;
   @Input() keySort: string = "";
+  @Input() id: string = "";
   @Output() sortChange: EventEmitter<number> = new EventEmitter<number>();
   @Output() edit = new EventEmitter<any>();
   @Output() delete = new EventEmitter<any>();
@@ -49,6 +49,7 @@ export class TableLayoutComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(): void {
+    console.log(this.records);
     if (this.settings) { // when settings provided
       this.columnMaps = this.settings;
       this.editButtonSetting.dataTarget = this.nameEditModal;

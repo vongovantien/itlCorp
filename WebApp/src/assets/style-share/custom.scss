@@ -139,6 +139,10 @@ a {
         }
     }
 }
+.btn-cancel {
+    background-color: #ddd;
+    border-color: #ddd;
+}
 .form-group {
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
@@ -174,7 +178,7 @@ a {
 }
 //typography
 .c-block-title {
-    font-size: 16px;
+    font-size: 1.2rem;
     margin: 0.5rem 0 0;
 }
 //header
@@ -260,6 +264,9 @@ a {
 .table {
     font-size: 12px;
     margin-bottom: 0;
+    * {
+        white-space: pre-wrap; // to fix trim white-space
+    }
     thead,
     tbody,
     tfoot {
@@ -341,7 +348,9 @@ a {
         tr {
             th,
             td {
-                background-color: #f2dedf;
+                color: white;
+                background-color: #53b0f8;
+                border-color: #45aaf8;
             }
         }
     }
@@ -427,6 +436,7 @@ table.dataTable {
                 span {
                     padding-right: 16px;
                     background: #3966b6 url(../app/component/datatable/images/sort_both.png) no-repeat center right;
+                    display: inline-block;
                 }
                
             }
@@ -434,6 +444,7 @@ table.dataTable {
                 span {
                     padding-right: 16px;
                     background: #3966b6 url(../app/component/datatable/images/sort_asc.png) no-repeat center right;
+                    display: inline-block;
                 }
                 
             }
@@ -441,6 +452,7 @@ table.dataTable {
                 span {
                     padding-right: 16px;
                     background: #3966b6 url(../app/component/datatable/images/sort_desc.png) no-repeat center right;
+                    display: inline-block;
                 }
             }
         }
@@ -451,18 +463,21 @@ table.dataTable {
                 span {
                     padding-right: 16px;
                     background: #f2dedf url(../app/component/datatable/images/sort_both_dark.png) no-repeat center right;
+                    display: inline-block;
                 }
             }
             .sorting_asc {
                 span {
                     padding-right: 16px;
                     background: #f2dedf url(../app/component/datatable/images/sort_asc.png) no-repeat center right;
+                    display: inline-block;
                 }
             }
             .sorting_desc {
                 span {
                     padding-right: 16px;
                     background: #f2dedf url(../app/component/datatable/images/sort_desc.png) no-repeat center right;
+                    display: inline-block;
                 }
             }
         }
@@ -941,30 +956,8 @@ table.dataTable {
         min-height: 400px;
     }
 }
-//modal fixed height
-// .modal-scrollable {
-//     .modal-content {
-//         height: auto;
-//         padding: 55px 0 65px;
-//         position: absolute;
-//         top: 0;
-//         bottom: 0;
-//     }
-//     .modal-header,
-//     .modal-footer {
-//         width: 100%;
-//         position: absolute;
-//         z-index: 99;
-//     }
-//     .modal-header {
-//         top: 0;
-//     }
-//     .modal-footer {
-//         bottom: 0;
-//     }
-// }
 .fit-height-div {
-    max-height: 250px;
+    height: 250px;
     overflow: auto;
 }
 .alert {

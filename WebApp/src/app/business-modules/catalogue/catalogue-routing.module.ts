@@ -32,35 +32,67 @@ const routes: Routes = [
   },
   {
     path:'location',
-    component:LocationComponent
+    component:LocationComponent,
+    data:{
+      name:"Location",
+      level:2
+    }
   },
   {
     path:'location-import',
-    component:LocationImportComponent
+    component:LocationImportComponent,
+    data:{
+      name:"Location Import",
+      level:3
+    }
   },
   {
     path:'ware-house',
-    component:WarehouseComponent
+    component:WarehouseComponent,
+    data:{
+      name:"Ware House",
+      level:2
+    }
   },
   {
     path:'ware-house-import',
-    component:WarehouseImportComponent
+    component:WarehouseImportComponent,
+    data:{
+      name:"Ware House Import",
+      level:3
+    }
   },
   {
     path:'charge',
-    component:ChargeComponent
+    component:ChargeComponent,
+    data:{
+      name:"Charge",
+      level:2
+    }
   },
   {
     path:'charge-addnew',
-    component:ChargeAddnewComponent
+    component:ChargeAddnewComponent,
+    data:{
+      name:"Addnew Charge",
+      level:3
+    }
   },
   {
     path:'charge-edit',
-    component:ChargeDetailsComponent
+    component:ChargeDetailsComponent,
+    data:{
+      name:"Edit Charge",
+      level:3
+    }
   },
   {
     path:'charge-import',
-    component:ChargeImportComponent
+    component:ChargeImportComponent,
+    data:{
+      name:"Edit Import",
+      level:3
+    }
   },
   {
     path:'charge-import-account-voucher',
@@ -68,55 +100,107 @@ const routes: Routes = [
   },
   {
     path:'commodity',
-    component:CommodityComponent
+    component:CommodityComponent,
+    data:{
+      name:"Commodity",
+      level:2
+    }
   },
   {
     path:'commodity-import',
-    component:CommodityImportComponent
+    component:CommodityImportComponent,
+    data:{
+      name:"Commodity Import",
+      level:3
+    }
   },
   {
     path:'commodity-group-import',
-    component:CommodityGroupImportComponent
+    component:CommodityGroupImportComponent,
+    data:{
+      name:"Commodity Group Import",
+      level:3
+    }
   },
   {
     path:'partner-data',
-    component:PartnerComponent
+    component:PartnerComponent,
+    data:{
+      name:"Partner Data",
+      level:2
+    }
   },
   {
     path: 'partner-data-import',
-    component: PartnerDataImportComponent
+    component: PartnerDataImportComponent,
+    data:{
+      name:"Partner Data Import",
+      level:3
+    }
   },
   {
     path:'port-index',
-    component:PortIndexComponent
+    component:PortIndexComponent,
+    data:{
+      name:"Port Index",
+      level:2
+    }
   },
   {
     path:'port-index-import',
-    component:PortIndexImportComponent
+    component:PortIndexImportComponent,
+    data:{
+      name:"Port Index Import",
+      level:3
+    }
   },
   {
     path:'stage-management',
-    component:StageManagementComponent
+    component:StageManagementComponent,
+    data:{
+      name:"Stage Management",
+      level:2
+    }
   },
   {
     path:'stage-import',
-    component:StageImportComponent
+    component:StageImportComponent,
+    data:{
+      name:"Stage Import",
+      level:3
+    }
   },
   {
     path:'unit',
-    component:UnitComponent
+    component:UnitComponent,
+    data:{
+      name:"Unit",
+      level:2
+    }
   },
   {
     path:'partner-data-addnew',
-    component:PartnerDataAddnewComponent
+    component:PartnerDataAddnewComponent,
+    data:{
+      name:"Partner Data Addnew",
+      level:3
+    }
   },
   {
     path:'partner-data-detail',
-    component:PartnerDataDetailComponent
+    component:PartnerDataDetailComponent,
+    data:{
+      name:"Partner Data Details",
+      level:3
+    }
   },
   {
     path:'currency',
-    component:CurrencyComponent
+    component:CurrencyComponent,
+    data:{
+      name:"Currency",
+      level:2
+    }
   }
 ];
 

@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
-using eFMS.API.Catalogue.Resources;
-using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
-using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -29,13 +26,12 @@ namespace eFMS.API.Catalogue.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatCountryService catCountryService;
-        private readonly ICurrentUser currentUser;
-        private string templateName = "ImportTemplate.xlsx";
-        public CatCountryController(IStringLocalizer<LanguageSub> localizer, ICatCountryService service, ICurrentUser user)
+        //private readonly ICurrentUser currentUser;
+        public CatCountryController(IStringLocalizer<LanguageSub> localizer, ICatCountryService service)
         {
             stringLocalizer = localizer;
             catCountryService = service;
-            currentUser = user;
+            //currentUser = user;
         }
 
         [HttpPost]
@@ -55,6 +51,7 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(data);
         }
 
+        
         [HttpGet]
         [Route("getById/{id}")]
         public IActionResult Get(int id)
@@ -62,7 +59,7 @@ namespace eFMS.API.Catalogue.Controllers
             var result = catCountryService.Get(x => x.Id == id).FirstOrDefault();
             return Ok(result);
         }
-
+        
         [HttpGet]
         [Route("getAll")]
         public IActionResult GetAll()
@@ -82,9 +79,7 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            catCountry.DatetimeCreated = DateTime.Now;
-            catCountry.UserCreated = currentUser.UserID;
-            catCountry.Inactive = false;
+            //catCountry.UserCreated = currentUser.UserID;
             var hs = catCountryService.Add(catCountry);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -98,7 +93,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpPut]
         [Route("update")]
         [Authorize]
-        public IActionResult Upadte(CatCountryModel catCountry)
+        public IActionResult Update(CatCountryModel catCountry)
         {
             if (!ModelState.IsValid) return BadRequest();
             var checkExistMessage = CheckExist(catCountry.Id, catCountry);
@@ -106,9 +101,8 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            catCountry.DatetimeModified = DateTime.Now;
-            catCountry.UserModified = currentUser.UserID;
-            var hs = catCountryService.Update(catCountry,x=>x.Id==catCountry.Id);
+            //catCountry.UserModified = currentUser.UserID;
+            var hs = catCountryService.Update(catCountry);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -121,10 +115,11 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpDelete]
         [Route("delete/{id}")]
         [Authorize]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(short id)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
-            var hs = catCountryService.Delete(x => x.Id == id);
+            //ChangeTrackerHelper.currentUser = currentUser.UserID;
+            //var hs = catCountryService.Delete(x => x.Id == id);
+            var hs = catCountryService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -145,7 +140,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("DownloadExcel")]
         public async Task<ActionResult> DownloadExcel()
         {
-            templateName = "Country" + templateName;
+            string templateName = "Country" + Templates.ExelImportEx;
             var result = await new FileHelper().ExportExcel(templateName);
             if (result != null)
             {
@@ -195,7 +190,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Import([FromBody]List<CatCountryImportModel> data)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
+            //ChangeTrackerHelper.currentUser = currentUser.UserID;
             var result = catCountryService.Import(data);
             if (result != null)
             {

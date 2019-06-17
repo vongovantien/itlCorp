@@ -25,7 +25,9 @@ export class ChargeComponent implements OnInit {
     private excelService: ExcelService,
     private api_menu: API_MENU,
     private router: Router,
-    private sortService: SortService) { }
+    private sortService: SortService) {
+
+     }
 
   listFilter = [
     { filter: "All", field: "all" }, { filter: "Code", field: "code" },
@@ -43,7 +45,7 @@ export class ChargeComponent implements OnInit {
   searchObject: any = {};
 
 
-  @ViewChild(PaginationComponent) child;
+  @ViewChild(PaginationComponent,{static:false}) child:any;
 
   async ngOnInit() {
     await this.getCharges();
@@ -90,7 +92,6 @@ export class ChargeComponent implements OnInit {
   }
 
   async getCharges() {
-    console.log(this.pager)
     var response = await this.baseServices.postAsync(this.api_menu.Catalogue.Charge.paging + "?pageNumber=" + this.pager.currentPage + "&pageSize=" + this.pager.pageSize, this.searchObject, false, true);
     if(response){
       this.ListCharges = response.data;

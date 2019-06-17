@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.IService;
@@ -44,6 +42,14 @@ namespace eFMS.API.Documentation.Controllers
             var result = csTransactionService.Count(x => x.CreatedDate == date);
             return Ok(result);
         }
+
+        [HttpGet]
+        [Route("GetTotalProfit")]
+        public List<object> GetTotalProfit(Guid JobId)
+        {
+            return csTransactionService.GetListTotalHB(JobId);
+        }
+
         [HttpPost]
         [Route("Query")]
         public IActionResult Query(CsTransactionCriteria criteria)

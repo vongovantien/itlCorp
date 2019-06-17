@@ -6,6 +6,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <OutputPath>..\bin\</OutputPath>
+    <DocumentationFile>eFMS.IdentityServer.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

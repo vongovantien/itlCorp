@@ -1,4 +1,5 @@
-﻿using eFMS.API.Documentation.DL.Models;
+﻿using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.Domain.Report;
@@ -17,8 +18,11 @@ namespace eFMS.API.Documentation.DL.IService
         List<CsTransactionDetailModel> GetByJob(CsTransactionDetailCriteria criteria);
         HandleState AddTransactionDetail(CsTransactionDetailModel model);
         HandleState UpdateTransactionDetail(CsTransactionDetailModel model);
-        CsTransactionDetailReport GetReportBy(Guid jobId);
+        HandleState DeleteTransactionDetail(Guid hbId);
+        //CsTransactionDetailReport GetReportBy(Guid jobId);
         List<CsTransactionDetailModel> Paging(CsTransactionDetailCriteria criteria, int page, int size, out int rowsCount);
         object ImportCSTransactionDetail(CsTransactionDetailModel model);
+        CsTransactionDetailModel GetHbDetails(Guid JobId, Guid HbId);
+        Crystal Preview(CsTransactionDetailModel model);
     }
 }

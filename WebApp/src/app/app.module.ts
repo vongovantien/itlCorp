@@ -28,11 +28,15 @@ import { NgProgressModule } from '@ngx-progressbar/core';
 import { AuthGuardService } from 'src/services-base/auth-guard.service';
 // import { ServiceWorkerModule } from '@angular/service-worker';
 // import { environment } from '../environments/environment';
-import { ServiceWorkerModule } from '@angular/service-worker';
-import { environment } from '../environments/environment';
+// import { ServiceWorkerModule } from '@angular/service-worker';
+// import { environment } from '../environments/environment';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { HighchartsChartModule } from "highcharts-angular";
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+
+import { DragDropModule } from '@angular/cdk/drag-drop';
+// import { ChartModule } from 'angular-highcharts';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   // wheelPropagation: true
 };
@@ -47,10 +51,12 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     PageSidebarComponent,
     SubheaderComponent,
     DashboardComponent
+     
     // TwoDigitDecimaNumberDirective
   ],
   imports: [    
    // ServiceWorkerModule.register('ngsw-worker.js', { enabled: true}),
+    ScrollingModule,
     SharedModule,
     CommonModule,
     BrowserModule,
@@ -66,7 +72,9 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     SelectModule, // Scrollbar
     OAuthModule.forRoot(),
     NgxDaterangepickerMd,
-    HighchartsChartModule
+    HighchartsChartModule,
+    DragDropModule
+    // ChartModule // add ChartModule to your imports
   ],
   providers: [
     AuthGuardService,
@@ -79,6 +87,6 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     }
   ],
   bootstrap: [AppComponent],
-  exports:[]
+  exports:[ScrollingModule]
 })
 export class AppModule { }

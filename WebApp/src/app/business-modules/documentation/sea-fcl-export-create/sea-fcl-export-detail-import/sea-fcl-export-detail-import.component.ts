@@ -35,6 +35,9 @@ export class SeaFclExportDetailImportComponent implements OnInit {
     this.pager.totalItems = 0;
     this.criteria.fromDate = this.selectedRange.startDate;
     this.criteria.toDate = this.selectedRange.endDate;
+    $('#import-job-detail-modal').on('shown.bs.modal', function() {
+      $('#searchmasterbill').trigger('focus');
+    });
     await this.getShipments();
   }
   searchShipment(){

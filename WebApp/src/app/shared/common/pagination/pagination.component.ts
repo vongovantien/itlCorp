@@ -4,8 +4,7 @@ import { PagingService } from './paging-service';
 
 @Component({
   selector: 'app-pagination',
-  templateUrl: './pagination.component.html',
-  styleUrls: ['./pagination.component.scss']
+  templateUrl: './pagination.component.html'
 })
 export class PaginationComponent implements OnInit {
    @Input() config: PagerSetting = {};
@@ -23,8 +22,8 @@ export class PaginationComponent implements OnInit {
   // pager object
   pager: any = {};
   ngOnInit() {   
-    this.setPage(1);
-    //this.getPages(1);
+    //this.setPage(1);
+    this.getPages(1);
   }
 
   sendBackData() {

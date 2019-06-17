@@ -1,32 +1,29 @@
 ﻿using AutoMapper;
-using eFMS.API.Common.Globals;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
-using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Service.Models;
-using eFMS.API.Catalogue.Service.ViewModels;
-using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using eFMS.API.Catalogue.DL.Common;
-using System.Linq.Expressions;
-using eFMS.API.Catalogue.DL.ViewModels;
-using System.Threading;
-using System.Globalization;
 using ITL.NetCore.Common;
-using eFMS.API.Catalogue.Service.Helpers;
+using Microsoft.Extensions.Localization;
+using eFMS.API.Catalogue.Service.Contexts;
+using eFMS.API.Common.NoSql;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
     public class CatChargeDefaultService:RepositoryBase<CatChargeDefaultAccount,CatChargeDefaultAccountModel>,ICatChargeDefaultAccountService
     {
-        public CatChargeDefaultService(IContextBase<CatChargeDefaultAccount> repository,IMapper mapper) : base(repository, mapper)
+        private readonly IStringLocalizer stringLocalizer;
+        private readonly ICurrentUser currentUser;
+        public CatChargeDefaultService(IContextBase<CatChargeDefaultAccount> repository,IMapper mapper, IStringLocalizer<LanguageSub> localizer, ICurrentUser user) : base(repository, mapper)
         {
-
+            stringLocalizer = localizer;
+            currentUser = user;
         }
 
         public List<CatChargeDefaultAccountImportModel> CheckValidImport(List<CatChargeDefaultAccountImportModel> list)
@@ -37,7 +34,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 if (string.IsNullOrEmpty(item.ChargeCode))
                 {
-                    item.ChargeCode = string.Format("Charge code is not allow to empty!|wrong");
+                    item.ChargeCode = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_CODE_EMPTY];
                     item.IsValid = false;
                 }
                 else
@@ -45,23 +42,23 @@ namespace eFMS.API.Catalogue.DL.Services
                     var charge = dc.CatCharge.FirstOrDefault(x => x.Code == item.ChargeCode);
                     if (charge == null)
                     {
-                        item.ChargeCode = string.Format("The charge with code {0} not found !|wrong", item.ChargeCode);
+                        item.ChargeCode = string.Format(stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_CODE_NOT_FOUND], item.ChargeCode);
                         item.IsValid = false;
                     }
                 }
 
                 if (string.IsNullOrEmpty(item.Type)){
-                    item.Type = string.Format("Voucher type is not allow to empty!|wrong");
+                    item.Type = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_VOUCHER_TYPE_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.DebitAccountNo.ToString()))
                 {
-                    item.DebitAccountNo = string.Format("Account debit no. is not allow to empty!|wrong");
+                    item.DebitAccountNo = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_ACCOUNT_DEBIT_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.CreditAccountNo.ToString()))
                 {
-                    item.CreditAccountNo = string.Format("Account credit no. is not allow to empty!|wrong");
+                    item.CreditAccountNo = stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_ACCOUNT_CREDIT_EMPTY];
                     item.IsValid = false;
                 }
                 if (item.DebitVat == null)
@@ -90,7 +87,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     {
                         ChargeId = charge.Id,
                         Inactive = (item.Status==null)?false:item.Status.ToString().ToLower() == "active" ? false : true,
-                        UserCreated = ChangeTrackerHelper.currentUser,
+                        UserCreated = currentUser.UserID,
+                        UserModified = currentUser.UserID,
                         DatetimeCreated = DateTime.Now,                        
                         Type = item.Type,
                         DebitAccountNo = item.DebitAccountNo,

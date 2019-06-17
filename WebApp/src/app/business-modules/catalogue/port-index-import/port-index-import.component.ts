@@ -26,9 +26,9 @@ export class PortIndexImportComponent implements OnInit {
   isShowInvalid: boolean = true;
   pager: PagerSetting = PAGINGSETTING;
   inProgress: boolean = false;
-  @ViewChild('form') form:any;
-  @ViewChild(PaginationComponent) child:any;
-  @ViewChild(NgProgressComponent) progressBar: NgProgressComponent;
+  @ViewChild('form',{static:false}) form:any;
+  @ViewChild(PaginationComponent,{static:false}) child:any;
+  @ViewChild(NgProgressComponent,{static:false}) progressBar: NgProgressComponent;
   
   constructor(
     private pagingService: PagingService,
@@ -40,7 +40,6 @@ export class PortIndexImportComponent implements OnInit {
     this.pager.totalItems = 0;
   }
   chooseFile(file: Event){
-    if(!this.baseService.checkLoginSession()) return;
     if(file.target['files'] == null) return;
     this.progressBar.start();
     this.baseService.uploadfile(this.api_menu.Catalogue.CatPlace.uploadExel + "?type=" + PlaceTypeEnum.Port, file.target['files'], "uploadedFile")
@@ -71,7 +70,6 @@ export class PortIndexImportComponent implements OnInit {
     }
     else{
       let data = this.data.filter(x => x.isValid);
-      if(!this.baseService.checkLoginSession()) return;
       var response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.import, data);
       if(response){
         this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);

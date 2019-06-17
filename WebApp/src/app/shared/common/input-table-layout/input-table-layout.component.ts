@@ -2,8 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
   selector: 'app-input-table-layout',
-  templateUrl: './input-table-layout.component.html',
-  styleUrls: ['./input-table-layout.component.scss']
+  templateUrl: './input-table-layout.component.html'
 })
 export class InputTableLayoutComponent implements OnInit {
   @Input() item:any;

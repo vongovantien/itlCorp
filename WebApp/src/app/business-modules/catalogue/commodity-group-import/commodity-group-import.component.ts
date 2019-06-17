@@ -34,16 +34,15 @@ export class CommodityGroupImportComponent implements OnInit {
     private sortService: SortService
   ) { }
 
-  @ViewChild(PaginationComponent) child: any;
-  @ViewChild('form') form: any;
-  @ViewChild(NgProgressComponent) progressBar: NgProgressComponent;
+  @ViewChild(PaginationComponent,{static:false}) child: any;
+  @ViewChild('form',{static:false}) form: any;
+  @ViewChild(NgProgressComponent,{static:false}) progressBar: NgProgressComponent;
 
   ngOnInit() {
     this.pager.totalItems =0 ;
   }
 
   chooseFile(file:Event){
-    if (!this.baseService.checkLoginSession()) return;
     if (file.target['files'] == null) return;
     this.progressBar.start();
     this.baseService.uploadfile(this.menu_api.Catalogue.CommodityGroup.uploadFile, file.target['files'], "uploadedFile")
@@ -113,7 +112,6 @@ export class CommodityGroupImportComponent implements OnInit {
     }
     else {      
       let validItems = this.data.filter(x => x.isValid);
-      if (!this.baseService.checkLoginSession()) return;
       var response = await this.baseService.postAsync(this.menu_api.Catalogue.CommodityGroup.import, validItems);
       if (response) {
         this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);       

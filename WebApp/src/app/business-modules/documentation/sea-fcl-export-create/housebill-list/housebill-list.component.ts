@@ -12,9 +12,8 @@ import { NgForm } from '@angular/forms';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
 import { SurchargeTypeEnum } from 'src/app/shared/enums/csShipmentSurchargeType-enum';
 import moment from 'moment/moment';
-
-declare var $: any;
-// import * as $ from 'jquery';
+import cloneDeep from 'lodash/cloneDeep';
+ declare var $: any;
 
 @Component({
   selector: 'app-housebill-list',
@@ -94,14 +93,14 @@ export class HousebillListComponent implements OnInit {
       if (this.BuyingRateChargeToEdit.vatrate >= 0) {
         this.BuyingRateChargeToEdit.total = this.BuyingRateChargeToEdit.quantity * this.BuyingRateChargeToEdit.unitPrice * (1 + (this.BuyingRateChargeToEdit.vatrate / 100));
       } else {
-        this.BuyingRateChargeToEdit.total = this.BuyingRateChargeToEdit.quantity * this.BuyingRateChargeToEdit.unitPrice + this.BuyingRateChargeToEdit.vatrate;
+        this.BuyingRateChargeToEdit.total = this.BuyingRateChargeToEdit.quantity * this.BuyingRateChargeToEdit.unitPrice + Math.abs(this.BuyingRateChargeToEdit.vatrate);
       }
     }
     else {
       if (this.BuyingRateChargeToAdd.vatrate >= 0) {
         this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice * (1 + (this.BuyingRateChargeToAdd.vatrate / 100));
       } else {
-        this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice + this.BuyingRateChargeToAdd.vatrate;
+        this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice + Math.abs(this.BuyingRateChargeToAdd.vatrate);
       }
     }
   }
@@ -111,13 +110,13 @@ export class HousebillListComponent implements OnInit {
       if (this.SellingRateChargeToEdit.vatrate >= 0) {
         this.SellingRateChargeToEdit.total = this.SellingRateChargeToEdit.quantity * this.SellingRateChargeToEdit.unitPrice * (1 + (this.SellingRateChargeToEdit.vatrate / 100));
       } else {
-        this.SellingRateChargeToEdit.total = this.SellingRateChargeToEdit.quantity * this.SellingRateChargeToEdit.unitPrice + this.SellingRateChargeToEdit.vatrate;
+        this.SellingRateChargeToEdit.total = this.SellingRateChargeToEdit.quantity * this.SellingRateChargeToEdit.unitPrice + Math.abs(this.SellingRateChargeToEdit.vatrate);
       }
     } else {
       if (this.SellingRateChargeToAdd.vatrate >= 0) {
         this.SellingRateChargeToAdd.total = this.SellingRateChargeToAdd.quantity * this.SellingRateChargeToAdd.unitPrice * (1 + (this.SellingRateChargeToAdd.vatrate / 100));
       } else {
-        this.SellingRateChargeToAdd.total = this.SellingRateChargeToAdd.quantity * this.SellingRateChargeToAdd.unitPrice + this.SellingRateChargeToAdd.vatrate;
+        this.SellingRateChargeToAdd.total = this.SellingRateChargeToAdd.quantity * this.SellingRateChargeToAdd.unitPrice + Math.abs(this.SellingRateChargeToAdd.vatrate);
       }
     }
   }
@@ -128,13 +127,13 @@ export class HousebillListComponent implements OnInit {
       if (this.OBHChargeToEdit.vatrate >= 0) {
         this.OBHChargeToEdit.total = this.OBHChargeToEdit.quantity * this.OBHChargeToEdit.unitPrice * (1 + (this.OBHChargeToEdit.vatrate / 100));
       } else {
-        this.OBHChargeToEdit.total = this.OBHChargeToEdit.quantity * this.OBHChargeToEdit.unitPrice + this.OBHChargeToEdit.vatrate;
+        this.OBHChargeToEdit.total = this.OBHChargeToEdit.quantity * this.OBHChargeToEdit.unitPrice + Math.abs(this.OBHChargeToEdit.vatrate);
       }
     } else {
       if (this.OBHChargeToAdd.vatrate >= 0) {
         this.OBHChargeToAdd.total = this.OBHChargeToAdd.quantity * this.OBHChargeToAdd.unitPrice * (1 + (this.OBHChargeToAdd.vatrate / 100));
       } else {
-        this.OBHChargeToAdd.total = this.OBHChargeToAdd.quantity * this.OBHChargeToAdd.unitPrice + this.OBHChargeToAdd.vatrate;
+        this.OBHChargeToAdd.total = this.OBHChargeToAdd.quantity * this.OBHChargeToAdd.unitPrice + Math.abs(this.OBHChargeToAdd.vatrate);
       }
     }
   }
@@ -150,8 +149,8 @@ export class HousebillListComponent implements OnInit {
 
       this.ListBuyingRateCharges.forEach(element => {
 
-        this.totalBuyingUSD += element.total;
-        this.totalBuyingLocal += element.total * 23000;
+        this.totalBuyingLocal += element.total * element.exchangeRate;
+        this.totalBuyingUSD += this.totalBuyingLocal/element.exchangeRateUSDToVND;
         this.totalProfit();
 
       });
@@ -165,10 +164,9 @@ export class HousebillListComponent implements OnInit {
     this.totalSellingLocal = 0;
     if (this.ListSellingRateCharges.length > 0) {
 
-      this.ListSellingRateCharges.forEach(element => {
-
-        this.totalSellingUSD += element.total;
-        this.totalSellingLocal += element.total * 23000;
+      this.ListSellingRateCharges.forEach(element => {        
+        this.totalSellingLocal += element.total * element.exchangeRate;
+        this.totalSellingUSD += this.totalSellingLocal/element.exchangeRateUSDToVND;
         this.totalProfit();
 
       });
@@ -186,8 +184,8 @@ export class HousebillListComponent implements OnInit {
 
       this.ListOBHCharges.forEach(element => {
 
-        this.totalOBHUSD += element.total;
-        this.totalOBHLocal += element.total * 23000;
+        this.totalOBHLocal += element.total * element.exchangeRate;
+        this.totalOBHUSD += this.totalOBHLocal/element.exchangeRateUSDToVND;
         this.totalProfit();
       });
 
@@ -228,9 +226,9 @@ export class HousebillListComponent implements OnInit {
   ]
 
   selectPartnerType() {
-    console.log(this.BuyingRateChargeToAdd);
-    console.log(this.houseBillSelected);
-    console.log(this.MasterBillData);
+    // console.log(this.BuyingRateChargeToAdd);
+    // console.log(this.houseBillSelected);
+    // console.log(this.MasterBillData);
   }
 
 
@@ -266,9 +264,10 @@ export class HousebillListComponent implements OnInit {
       key = search_key == null ? "" : search_key.trim();
     }
 
-    this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'CREDIT', serviceTypeId: 'SEF', all: key }).subscribe(res => {
+    this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'CREDIT', serviceTypeId: 'SEF', all: key }).subscribe(res => {
       this.lstBuyingRateChargesComboBox = res['data'];
     });
+
   }
 
   getListSellingRateCharges(search_key: string = null) {
@@ -278,7 +277,7 @@ export class HousebillListComponent implements OnInit {
     } else {
       key = search_key == null ? "" : search_key.trim();
     }
-    this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'DEBIT', serviceTypeId: 'SEF', all: key }).subscribe(res => {
+    this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'DEBIT', serviceTypeId: 'SEF', all: key }).subscribe(res => {
       this.lstSellingRateChargesComboBox = res['data'];
     });
   }
@@ -302,126 +301,178 @@ export class HousebillListComponent implements OnInit {
     } else {
       key = search_key == null ? "" : search_key.trim();
     }
-    this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging + "?page=" + 1 + "&size=" + 20, { partnerGroup: PartnerGroupEnum.ALL, inactive: false, all: key }).subscribe(res => {
+    this.baseServices.post(this.api_menu.Catalogue.PartnerData.paging + "?page=1&size=0", { partnerGroup: PartnerGroupEnum.ALL, inactive: false, all: key }).subscribe(res => {
       var data = res['data']
       this.comboBoxData.lstPartner = data;
     });
   }
 
-  async saveNewBuyingRateCharge(form: NgForm, IsContinue: boolean = false) {
-
-    if(form.submitted){
-      var error = $('#add-buying-rate-modal').find('div.has-danger');
-      if(error.length==0){
-        this.BuyingRateChargeToAdd.type = SurchargeTypeEnum.BUYING_RATE;
-        this.BuyingRateChargeToAdd.hblid = this.houseBillSelected.id;
-        var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.BuyingRateChargeToAdd);
-        this.getBuyingChargesOfHouseBill(this.houseBillSelected);
-        if (IsContinue && res.status) {
-          this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
-        } else if (res.status) {
-          this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
-          $('#add-buying-rate-modal').modal('hide');
-        } else {
-  
-        }
-      }
-    }
+  isDisplay:boolean = true;
+  resetDisplay(){
+    this.isDisplay = false;
+    setTimeout(() => {
+      this.isDisplay = true;
+    }, 30);
   }
+   saveNewBuyingRateCharge(form: NgForm, IsContinue: boolean = false) {
 
-  async saveNewSellingRateCharge(form: NgForm, IsContinue: boolean = false) {
-
-    if(form.submitted){
-      var error = $('#add-selling-rate-modal').find('div.has-danger');
-      if(error.length==0){
-        this.SellingRateChargeToAdd.type = SurchargeTypeEnum.SELLING_RATE;
-        this.SellingRateChargeToAdd.hblid = this.houseBillSelected.id;
-        var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.SellingRateChargeToAdd);
-        this.getSellingChargesOfHouseBill(this.houseBillSelected);
-        if (IsContinue && res.status) {
-          this.SellingRateChargeToAdd = new CsShipmentSurcharge();
-        } else if (res.status) {
-          this.SellingRateChargeToAdd = new CsShipmentSurcharge();
-          $('#add-selling-rate-modal').modal('hide');
-        } else {
-  
-        }
-      }
-    }
-  }
-
-
-  async saveNewOBHCharge(form: NgForm, IsContinue: boolean = false) {
-    if(form.submitted){
-      var error = $('#add-obh-charge-modal').find('div.has-danger');
-      if (error.length == 0) {
-        this.OBHChargeToAdd.type = SurchargeTypeEnum.OBH;
-        this.OBHChargeToAdd.hblid = this.houseBillSelected.id;
-        var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.OBHChargeToAdd);
-        this.getOBHChargesOfHouseBill(this.houseBillSelected);
-        if (IsContinue && res.status) {
-          this.OBHChargeToAdd = new CsShipmentSurcharge();
-        } else if (res.status) {
-          this.OBHChargeToAdd = new CsShipmentSurcharge();
-          $('#add-obh-charge-modal').modal('hide');
-        } else {
-
-        }
-      }
-    }
-  }
-
-  async editBuyingRateCharge(form: NgForm) {
-    if(form.submitted){
-      var error = $('#edit-buying-rate-modal').find('div.has-danger');
-      if(error.length==0){
-        var res = await this.baseServices.putAsync(this.api_menu.Documentation.CsShipmentSurcharge.update, this.BuyingRateChargeToEdit);
-        if (res.status) {
-          $('#edit-buying-rate-modal').modal('hide');
+    setTimeout(async () => {
+      if(form.submitted){
+        var error = $('#add-buying-rate-modal').find('div.has-danger');
+        if(error.length==0){
+          this.BuyingRateChargeToAdd.type = SurchargeTypeEnum.BUYING_RATE;
+          this.BuyingRateChargeToAdd.hblid = this.houseBillSelected.id;
+          var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.BuyingRateChargeToAdd);
           this.getBuyingChargesOfHouseBill(this.houseBillSelected);
+          this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
+
+          if(res.status){
+            form.onReset();
+            this.resetDisplay();
+            this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
+            if(!IsContinue)
+              $('#add-buying-rate-modal').modal('hide');
+          }
+
+          // if (IsContinue && res.status) {
+          //   this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
+          //   form.onReset()
+          //   this.resetDisplay();
+          // } else if (res.status) {
+          //   this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
+          //   form.onReset();
+          //   this.resetDisplay();
+          //   $('#add-buying-rate-modal').modal('hide');
+          // } else {
+    
+          // }
         }
       }
-    }
+    }, 300);
+
   }
 
-  async editSellingRateCharge(form: NgForm) {    
-    if (form.submitted) {
-      var error = $('#edit-selling-rate-modal').find('div.has-danger');
-      if(error.length==0){
-        var res = await this.baseServices.putAsync(this.api_menu.Documentation.CsShipmentSurcharge.update, this.SellingRateChargeToEdit);
-        if (res.status) {
-          $('#edit-selling-rate-modal').modal('hide');
+   saveNewSellingRateCharge(form: NgForm, IsContinue: boolean = false) {
+
+    setTimeout(async () => {
+      if(form.submitted){
+        var error = $('#add-selling-rate-modal').find('div.has-danger');
+        if(error.length==0){
+          this.SellingRateChargeToAdd.type = SurchargeTypeEnum.SELLING_RATE;
+          this.SellingRateChargeToAdd.hblid = this.houseBillSelected.id;
+          var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.SellingRateChargeToAdd);
           this.getSellingChargesOfHouseBill(this.houseBillSelected);
-        }
-      } 
-    }
-  }
-
-  async editOBHCharge(form: NgForm) {
-    console.log(this.OBHChargeToEdit);
-    if (form.submitted) {
-      var error = $('#edit-obh-rate-modal').find('div.has-danger');
-      if(error.length==0){
-        var res = await this.baseServices.putAsync(this.api_menu.Documentation.CsShipmentSurcharge.update, this.OBHChargeToEdit);
-        if (res.status) {
-          $('#edit-obh-rate-modal').modal('hide');
-          this.getOBHChargesOfHouseBill(this.houseBillSelected);
+          
+          if(res.status){
+            form.onReset();
+            this.resetDisplay();
+            this.SellingRateChargeToAdd = new CsShipmentSurcharge();
+            if(!IsContinue)
+              $('#add-selling-rate-modal').modal('hide');
+          }
         }
       }
-    }
+    }, 300);
+
   }
 
-  resetChargeForm(formId:string){
+
+  saveNewOBHCharge(form: NgForm, IsContinue: boolean = false) {
+    setTimeout( async() => {
+      if(form.submitted){
+        var error = $('#add-obh-charge-modal').find('div.has-danger');
+        if (error.length == 0) {
+          this.OBHChargeToAdd.type = SurchargeTypeEnum.OBH;
+          this.OBHChargeToAdd.hblid = this.houseBillSelected.id;
+          var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.OBHChargeToAdd);
+          this.getOBHChargesOfHouseBill(this.houseBillSelected);
+
+          if(res.status){
+            form.onReset();
+            this.resetDisplay();
+            this.OBHChargeToAdd = new CsShipmentSurcharge();
+            if(!IsContinue)
+              $('#add-obh-charge-modal').modal('hide');
+          }
+
+          // if (IsContinue && res.status) {
+          //   this.OBHChargeToAdd = new CsShipmentSurcharge();
+          //   form.onReset()
+          //   this.resetDisplay();
+          // } else if (res.status) {
+          //   this.OBHChargeToAdd = new CsShipmentSurcharge();
+          //   form.onReset()
+          //   this.resetDisplay();
+          //   $('#add-obh-charge-modal').modal('hide');
+          // } else {
+  
+          // }
+        }
+      }
+    }, 300);
+
+  }
+
+   editBuyingRateCharge(form: NgForm) {
+    setTimeout(async() => {
+      if(form.submitted){
+        var error = $('#edit-buying-rate-modal').find('div.has-danger');
+        if(error.length==0){
+          var res = await this.baseServices.putAsync(this.api_menu.Documentation.CsShipmentSurcharge.update, this.BuyingRateChargeToEdit);
+          if (res.status) {
+            $('#edit-buying-rate-modal').modal('hide');
+            this.getBuyingChargesOfHouseBill(this.houseBillSelected);
+          }
+        }
+      }
+    }, 300);
+
+  }
+
+  editSellingRateCharge(form: NgForm) {  
+    setTimeout(async() => {
+      if (form.submitted) {
+        var error = $('#edit-selling-rate-modal').find('div.has-danger');
+        if(error.length==0){
+          var res = await this.baseServices.putAsync(this.api_menu.Documentation.CsShipmentSurcharge.update, this.SellingRateChargeToEdit);
+          if (res.status) {
+            $('#edit-selling-rate-modal').modal('hide');
+            this.getSellingChargesOfHouseBill(this.houseBillSelected);
+          }
+        } 
+      }
+    }, 300);  
+
+  }
+
+   editOBHCharge(form: NgForm) {
+    setTimeout(async() => {
+      if (form.submitted) {
+        var error = $('#edit-obh-rate-modal').find('div.has-danger');
+        if(error.length==0){
+          var res = await this.baseServices.putAsync(this.api_menu.Documentation.CsShipmentSurcharge.update, this.OBHChargeToEdit);
+          if (res.status) {
+            $('#edit-obh-rate-modal').modal('hide');
+            this.getOBHChargesOfHouseBill(this.houseBillSelected);
+          }
+        }
+      }
+    }, 300);
+ 
+  }
+
+  resetChargeForm(formId:string,form:NgForm){
+    form.onReset();
+    this.resetDisplay();
     $('#'+formId).modal("hide");
-    // $('#'+formId).get(0).reset();
+  
     this.BuyingRateChargeToAdd= new CsShipmentSurcharge();
     this.SellingRateChargeToAdd= new CsShipmentSurcharge();
     this.OBHChargeToAdd = new CsShipmentSurcharge();  
-  
+    
     this.BuyingRateChargeToEdit= null;
     this.SellingRateChargeToEdit= null
     this.OBHChargeToEdit= null;
-    console.log(this.BuyingRateChargeToAdd);
   }
 
 
@@ -535,6 +586,7 @@ export class HousebillListComponent implements OnInit {
     this.baseServices.get(this.api_menu.Documentation.CsShipmentSurcharge.getByHBId + "?hbId=" + this.houseBillSelected.id + "&type=SELL").subscribe((res: any) => {
       this.ListSellingRateCharges = res;
       this.ConstListSellingRateCharges = res;
+      console.log({"LIST_SELLING_CHARGE":res});
       this.totalSellingCharge();
     })
   }
@@ -551,14 +603,29 @@ export class HousebillListComponent implements OnInit {
 
   emitSelectedHB(hb: any) {
     this.currentHouseBill.emit(hb);
+    setTimeout(() => {
+      this.currentHouseBill.emit(null);
+    }, 1000);    
   }
-  prepareEdit(type: string) {
 
-    /**
-     * format exchangeDate to binding to ngx-daterangepicker-material  
-     */
+  focusLine(event:any){
+    var currentSelected =  $(event.srcElement).closest("tbody").find("tr.selected-row").first();
+    currentSelected.removeClass("selected-row");
+    $(event.srcElement).closest("tr").addClass("selected-row");
+  }
+  prepareEdit(type: string,charge:any) {
+    
     if (type === "buy") {
+      this.BuyingRateChargeToEdit = cloneDeep(charge);
       this.BuyingRateChargeToEdit.exchangeDate = { startDate: moment(this.BuyingRateChargeToEdit.exchangeDate), endDate: moment(this.BuyingRateChargeToEdit.exchangeDate) };
+    }
+    if(type==="sell"){
+      this.SellingRateChargeToEdit = cloneDeep(charge);
+      this.SellingRateChargeToEdit.exchangeDate = { startDate: moment(this.SellingRateChargeToEdit.exchangeDate), endDate: moment(this.SellingRateChargeToEdit.exchangeDate) };
+    }
+    if(type==="obh"){
+      this.OBHChargeToEdit = cloneDeep(charge);
+      this.OBHChargeToEdit.exchangeDate = { startDate: moment(this.OBHChargeToEdit.exchangeDate), endDate: moment(this.OBHChargeToEdit.exchangeDate) };
     }
   }
 
@@ -617,6 +684,40 @@ export class HousebillListComponent implements OnInit {
   public refreshValue(value: any): void {
     this.value = value;
   }
+
+
+  houseBillIdToDelete:string = null
+  async DeleteHouseBill(stt:string,hbId:string=null){
+    if(stt=="confirm"){
+      console.log(hbId);
+      this.houseBillIdToDelete = hbId;      
+    }
+    if(stt=="ok"){
+      var res = await this.baseServices.deleteAsync(this.api_menu.Documentation.CsTransactionDetail.delete+"?hblId="+this.houseBillIdToDelete);
+      if(res.status){
+        this.getHouseBillsOfMaster();
+      }
+     
+    }
+  }
+
+
+  chargeIdToDelete:string=null;
+  async DeleteCharge(stt:string,chargeId:string=null){
+    if(stt=="confirm"){
+      console.log(chargeId);
+      this.chargeIdToDelete = chargeId;      
+    }
+    if(stt=="ok"){
+      var res = await this.baseServices.deleteAsync(this.api_menu.Documentation.CsShipmentSurcharge.delete+"?chargId="+this.chargeIdToDelete);
+      if(res.status){
+        this.getHouseBillsOfMaster();
+      }
+     
+    }
+  }
+
+
 }
 
 

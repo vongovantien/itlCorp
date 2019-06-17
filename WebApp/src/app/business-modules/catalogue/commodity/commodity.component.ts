@@ -32,11 +32,11 @@ export class CommodityComponent implements OnInit {
   /*
   declare variable
   */
-  @ViewChild(PaginationComponent) child; 
-  @ViewChild(SearchOptionsComponent) searchOption; 
-  @ViewChild('formCommodity') formCommodity: NgForm;
-  @ViewChild('formGroupCommodity') formGroupCommodity: NgForm;
-  @ViewChild('chooseGroup') public groupSelect: SelectComponent;
+  @ViewChild(PaginationComponent,{static:false}) child; 
+  @ViewChild(SearchOptionsComponent,{static:false}) searchOption; 
+  @ViewChild('formCommodity',{static:false}) formCommodity: NgForm;
+  @ViewChild('formGroupCommodity',{static:false}) formGroupCommodity: NgForm;
+  @ViewChild('chooseGroup',{static:false}) public groupSelect: SelectComponent;
   commodities: Array<Commodity>;
   commodity: Commodity;
   commodityGroups: Array<CommodityGroup>;
@@ -46,26 +46,18 @@ export class CommodityComponent implements OnInit {
   commodityGroupSettings: ColumnSetting[] = COMMODITYGROUPCOLUMNSETTING;
   groups: any[];
   criteria: any = {};
-  keyCommoditySortDefault = "code";
-  keygroupSortDefault = "groupNameEn";
-  nameGroupModal = "edit-commodity-group-modal";
-  nameCommodityModal = "edit-commodity-modal";
-  titleAddGroupModal = "Add New Commodity Group";
-  titleEditGroupModal = "Edit Commodity Group";
-  titleAddCommodityModal = "Add New Commodity";
-  titleEditCommodityModal = "Edit Commodity";
   tabName = {
     commodity: "commodity",
     commodityGroup: "commodityGroup"
   };
   activeTab: string = this.tabName.commodity;
-  groupActive: any;
+  groupActive: any[] = [];
   addCommodityButtonSetting: ButtonModalSetting = {
-    dataTarget: this.nameCommodityModal,
+    dataTarget: "edit-commodity-modal",
     typeButton: ButtonType.add
   };
   addGroupButtonSetting: ButtonModalSetting = {
-    dataTarget: this.nameGroupModal,
+    dataTarget: "edit-commodity-group-modal",
     typeButton: ButtonType.add
   };
   importButtonSetting: ButtonModalSetting = {
@@ -81,20 +73,16 @@ export class CommodityComponent implements OnInit {
   cancelButtonSetting: ButtonModalSetting = {
     typeButton: ButtonType.cancel
   };
-  selectedFilter = "All";
   configSearchGroup: any = {
-    selectedFilter: this.selectedFilter,
-    settingFields: this.commodityGroupSettings,
+    settingFields: this.commodityGroupSettings.filter(x => x.allowSearch == true).map(x=>({"fieldName": x.primaryKey,"displayName": x.header})),
     typeSearch: TypeSearch.intab,
     searchString: ''
   };
   configSearchCommonity: any = {
-    selectedFilter: this.selectedFilter,
-    settingFields: this.commoditySettings,
+    settingFields: this.commoditySettings.filter(x => x.allowSearch == true).map(x=>({"fieldName": x.primaryKey,"displayName": x.header})),
     typeSearch: TypeSearch.intab,
     searchString: ''
   };
-  titleConfirmDelete = "You want to delete this Commodity Group";
   isDesc = false;
   /*
   end declare variable
@@ -132,12 +120,6 @@ export class CommodityComponent implements OnInit {
     this.pager.currentPage = 1;
     this.pager.pageSize = 15;
     this.resetSearch({ field: "All", fieldDisplayName: "All" }, tabName);
-    // if(tabName == this.tabName.commodityGroup){
-    //   this.getGroupCommodities(this.pager);
-    // }
-    // if(tabName == this.tabName.commodity){
-    //   this.getCommodities(this.pager);
-    // }
   }
   async getCommodities(pager: PagerSetting) {
     const responses = await this.baseService.postAsync(this.api_menu.Catalogue.Commodity.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, true, true);
@@ -177,11 +159,17 @@ export class CommodityComponent implements OnInit {
       if(event.field == "commodityGroupNameEn"){
         this.criteria.commodityGroupNameEn = event.searchString;
       }
+      if(event.field == "code"){
+        this.criteria.code = event.searchString;
+      }
     }
-    this.pager.currentPage = 1;
+    this.pager.totalItems = 0;
     this.getCommodities(this.pager);
   }
   searchCommodityGroup(event: any): any {
+    if(event.searchString == ""){
+      event.searchString = null;
+    }
     if(event.field == "All"){
       this.criteria.all = event.searchString;
     }
@@ -230,7 +218,10 @@ export class CommodityComponent implements OnInit {
       this.commodity = item;
       const response = await this.baseService.getAsync(this.api_menu.Catalogue.Commodity.getById + item.id,false, false);
       this.commodity = response;
-      this.groupActive = this.groups.find(x => x.id == this.commodity.commodityGroupId);
+      let index = this.groups.findIndex(x => x.id == this.commodity.commodityGroupId);
+      if(index > -1){
+        this.groupActive = [this.groups[index]];
+      }
     }
   }
   async onDelete(event){
@@ -245,14 +236,12 @@ export class CommodityComponent implements OnInit {
   }
   async deleteCommodity() {
     await this.baseService.deleteAsync(this.api_menu.Catalogue.Commodity.delete + this.commodity.id, true, false);
-    //await this.getCommodities(this.pager);
     this.setPageAfterDelete();
   }
   async deleteGroupCommodity(){
     const response = await this.baseService.deleteAsync(this.api_menu.Catalogue.CommodityGroup.delete + this.commodityGroup.id, true, false);
     if(response){
       this.getGroups();
-      //await this.getGroupCommodities(this.pager);
       this.setPageAfterDelete();
     }
   }
@@ -277,6 +266,7 @@ export class CommodityComponent implements OnInit {
     }
     if(tabName == this.tabName.commodity){
       this.commodity = new Commodity();
+      this.commodity.commodityGroupId = null;
     }
   }
   onSubmit(){
@@ -307,60 +297,49 @@ export class CommodityComponent implements OnInit {
       }
     }
   }
-  updateCommodity(): any {
-    this.baseService.spinnerShow();
-    this.baseService.put(this.api_menu.Catalogue.Commodity.update + this.commodity.id, this.commodity).subscribe((response: any) => {
-      this.groupSelect.active = [];
-      this.formCommodity.onReset();
-      $('#' + this.nameCommodityModal).modal('hide');
-      this.setPage(this.pager);
-      this.baseService.successToast(response.message);
-      this.baseService.spinnerHide();
-    }, err => {
-      this.baseService.spinnerHide();
-      this.baseService.handleError(err);
-    });
+  async updateCommodity() {
+    let response = await this.baseService.putAsync(this.api_menu.Catalogue.Commodity.update + this.commodity.id, this.commodity, true, true);
+    if(response.status){
+      this.resetCommodityForm();
+      this.getCommodities(this.pager);
+    }
   }
   async addNewCommodity() {
       const res = await this.baseService.postAsync(this.api_menu.Catalogue.Commodity.add, this.commodity);
-      if(res){
-        this.formCommodity.onReset();
-        this.commodity = new Commodity();
-        $('#' + this.nameCommodityModal).modal('hide');
+      if(res.status){
+        this.resetCommodityForm();
+        this.pager.totalItems = 0;
+        this.pager.currentPage = 1;
         await this.getCommodities(this.pager);
-        this.setPageAfterAdd();
       }
   }
-  updateGroup(): any {
-    this.baseService.spinnerShow();
-    this.baseService.put(this.api_menu.Catalogue.CommodityGroup.update + this.commodityGroup.id, this.commodityGroup).subscribe((response: any) => {
-    if (response.status == true){
-      $('#' + this.nameGroupModal).modal('hide');
-      this.baseService.successToast(response.message);
-      this.baseService.spinnerHide();
-      this.setPage(this.pager);
+  resetCommodityForm() {
+    this.formCommodity.onReset();
+    this.groupSelect.active = [];
+    $('#edit-commodity-modal').modal('hide');
+  }
+  async updateGroup() {
+    var response = await this.baseService.putAsync(this.api_menu.Catalogue.CommodityGroup.update + this.commodityGroup.id, this.commodityGroup, true, true);
+    if(response.status){
+      this.resetCommodityGroupForm();
+      this.getCommodities(this.pager);
     }
-  }, err=>{
-     this.baseService.spinnerHide();
-     this.baseService.handleError(err);
-  });
+  }
+  resetCommodityGroupForm() {
+    this.formGroupCommodity.onReset();
+    $('#edit-commodity-group-modal').modal('hide');
   }
   async addNewGroup() {
     const response = await this.baseService.postAsync(this.api_menu.Catalogue.CommodityGroup.add, this.commodityGroup, true, false);
-    if (response){
+    if (response.status){
       this.getGroups();
-      //await this.getGroupCommodities(this.pager);
-      this.pager.totalItems = this.pager.totalItems + 1;
+      this.pager.totalItems = 0;
       this.pager.currentPage = 1;
-      this.child.setPage(this.pager.currentPage);
-      this.formGroupCommodity.onReset();
-      this.commodityGroup = new CommodityGroup();
-      $('#' + this.nameGroupModal).modal('hide');
-      // this.child.setPage(this.pager.currentPage);
-      // this.setPageAfterAdd();
+      this.getGroupCommodities(this.pager);
+      this.resetCommodityGroupForm();
     }
   }
-  showConfirmDelete(item, tabName) {
+  showConfirmDelete(item, tabName: string) {
     if(tabName == this.tabName.commodityGroup){
       this.commodityGroup = item;
     }
@@ -370,14 +349,10 @@ export class CommodityComponent implements OnInit {
   }
   onCancel(tabName){
     if(tabName == this.tabName.commodityGroup){
-      this.commodityGroup = new CommodityGroup();
-      this.formGroupCommodity.onReset();
-      this.setPage(this.pager);
+      this.resetCommodityGroupForm();
     }
     if(tabName == this.tabName.commodity){
-      this.commodity = new Commodity();
-      this.formCommodity.onReset();
-      this.setPage(this.pager);
+      this.resetCommodityForm();
     }
   }
   public removed(value:any):void {
@@ -387,16 +362,8 @@ export class CommodityComponent implements OnInit {
     console.log('New search input: ', value);
   }
   value: any
-  onGroupchange(value){
-    this.commodity.commodityGroupId = value.id;
-    console.log(this.commodity.commodityGroupId);
-  }
-  refreshGroupValue(value:any){
+  refreshValue(value:any){
     this.value = value;
-  }
-
-  async importCom(){
-
   }
   async exportCom(){
     var commodities = await this.baseService.postAsync(this.api_menu.Catalogue.Commodity.query,this.criteria);
@@ -443,11 +410,6 @@ export class CommodityComponent implements OnInit {
     this.excelService.generateExcel(exportModel);
 
   }
-
-  async importComGroup(){
-    
-  }
-
   async exportComGroup(){
     var commodities_group = await this.baseService.postAsync(this.api_menu.Catalogue.CommodityGroup.query,this.criteria);
     if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.ENGLISH_API){

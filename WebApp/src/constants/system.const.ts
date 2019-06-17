@@ -29,7 +29,9 @@ export class SystemConstants {
         CATALOUGE: "Catalogue",
         SYSTEM: "System",
         LOG: "auditlog",
-        Documentation: "Documentation"
+        Documentation: "Documentation",
+        Report: "ReportPreview",
+        SETTING:"Setting"
     }
     public static readonly LANGUAGES = {
         ENGLISH_API:  "en-US",  //SystemConstants.DEFAULT_LANGUAGE,

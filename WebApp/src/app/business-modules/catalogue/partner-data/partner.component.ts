@@ -27,15 +27,12 @@ import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-se
   styleUrls: ['./partner.component.sass']
 })
 export class PartnerComponent implements OnInit {
-  selectedFilter = "All";
   pager: PagerSetting = PAGINGSETTING;
   partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
   configSearch: any = {
-    selectedFilter: this.selectedFilter,
-    settingFields: this.partnerDataSettings,
+    settingFields: this.partnerDataSettings.filter(x => x.allowSearch == true).map(x=>({"fieldName": x.primaryKey,"displayName": x.header})),
     typeSearch: TypeSearch.intab
   };
-  titleConfirmDelete: string = "Do you want to delete this partner?";
   criteria: any = { partnerGroup: PartnerGroupEnum.CUSTOMER };
   partner: Partner;
   tabName = {
@@ -57,16 +54,16 @@ export class PartnerComponent implements OnInit {
     typeButton: ButtonType.export
   };
   activeTab: string = this.tabName.allTab;
-  @ViewChild(PaginationComponent) child;
+  @ViewChild(PaginationComponent,{static:false}) child:any;
   //partnerType: any;
 
-  @ViewChild(AgentComponent) agentComponent; 
-  @ViewChild(AllPartnerComponent) allPartnerComponent; 
-  @ViewChild(ConsigneeComponent) consigneeComponent; 
-  @ViewChild(CustomerComponent) customerComponent; 
-  @ViewChild(AirShipSupComponent) airShipSupComponent; 
-  @ViewChild(CarrierComponent) carrierComponent; 
-  @ViewChild(ShipperComponent) shipperComponent; 
+  @ViewChild(AgentComponent,{static:false}) agentComponent:any; 
+  @ViewChild(AllPartnerComponent,{static:true}) allPartnerComponent:any; 
+  @ViewChild(ConsigneeComponent,{static:false}) consigneeComponent:any; 
+  @ViewChild(CustomerComponent,{static:false}) customerComponent:any; 
+  @ViewChild(AirShipSupComponent,{static:false}) airShipSupComponent:any; 
+  @ViewChild(CarrierComponent,{static:false}) carrierComponent:any; 
+  @ViewChild(ShipperComponent,{static:false}) shipperComponent:any; 
 
   constructor(private baseService: BaseService, 
     private api_menu: API_MENU,
@@ -74,6 +71,7 @@ export class PartnerComponent implements OnInit {
 
   ngOnInit() {
     this.pager.totalItems = 0;
+    this.pager.totalItems = 1;
     this.baseService.spinnerShow();
     this.tabSelect(this.activeTab);
   }
@@ -81,6 +79,8 @@ export class PartnerComponent implements OnInit {
     this.onSearch(event);
   }
   onSearch(event){
+    this.pager.totalItems = 0;
+    this.pager.totalItems = 1;
     if(event.field == "All"){
       this.criteria.all = event.searchString;
     }
@@ -263,7 +263,7 @@ export class PartnerComponent implements OnInit {
       this.criteria.partnerGroup = PartnerGroupEnum.ALL;
       this.allPartnerComponent.getPartnerData(pager, this.criteria);
     }
-    this.pager.currentPage = pager.currentPage;
+    //this.pager.currentPage = pager.currentPage;
   }
 
   async export(){

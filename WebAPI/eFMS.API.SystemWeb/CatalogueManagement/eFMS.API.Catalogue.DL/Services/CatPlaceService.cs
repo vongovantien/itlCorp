@@ -11,26 +11,37 @@ using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using eFMS.API.Catalogue.DL.Common;
-using System.Linq.Expressions;
 using eFMS.API.Catalogue.DL.ViewModels;
 using System.Threading;
 using System.Globalization;
 using ITL.NetCore.Common;
-using eFMS.API.Catalogue.Service.Helpers;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Caching.Distributed;
+using System.Data.SqlClient;
+using eFMS.API.Catalogue.Service.Contexts;
+using eFMS.API.Common.NoSql;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
     public class CatPlaceService : RepositoryBase<CatPlace, CatPlaceModel>, ICatPlaceService
     {
-        public CatPlaceService(IContextBase<CatPlace> repository, IMapper mapper) : base(repository, mapper)
+        private readonly IStringLocalizer stringLocalizer;
+        private readonly IDistributedCache cache;
+        private ICurrentUser currentUser;
+        public CatPlaceService(IContextBase<CatPlace> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, IDistributedCache distributedCache, ICurrentUser user) : base(repository, mapper)
         {
+            stringLocalizer = localizer;
+            cache = distributedCache;
+            currentUser = user;
             SetChildren<CatCountry>("Id", "CountryId");
             SetChildren<CatPlace>("Id", "ProvinceId");
             SetChildren<CatPlace>("Id", "DistrictId");
-            SetChildren<CatPlace>("Id", "Pol");
-            SetChildren<CatPlace>("Id", "Pod");
+            SetChildren<CsTransaction>("Id", "Pol");
+            SetChildren<CsTransaction>("Id", "Pod");
+            SetChildren<CsTransactionDetail>("Id", "Pol");
+            SetChildren<CsTransactionDetail>("Id", "Pod");
         }
 
         public List<vw_catProvince> GetProvinces(short? countryId)
@@ -41,29 +52,33 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatPlaceViewModel> Paging(CatPlaceCriteria criteria, int page, int size, out int rowsCount)
         {
-            var list = Query(criteria);
-            rowsCount = list.Count;
+            List<CatPlaceViewModel> results = null;
+            var data = Query(criteria);
+            rowsCount = data.Count();
+            if (rowsCount == 0) return results;
             if (size > 1)
             {
+                data = data.OrderByDescending(x => x.DatetimeModified);
                 if (page < 1)
                 {
                     page = 1;
                 }
-                list = list.Skip((page-1)* size).Take(size).ToList();
+                data = data.Skip((page-1)* size).Take(size);
             }
-            return GetCulturalData(list);
+            results = GetCulturalData(data).ToList();
+            return results;
         }
 
-        public List<vw_catPlace> Query(CatPlaceCriteria criteria)
+        public IQueryable<sp_GetCatPlace> Query(CatPlaceCriteria criteria)
         {
             string placetype = PlaceTypeEx.GetPlaceType(criteria.PlaceType);
-            var list = GetView();//.Where(x => ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                   //&& (x.Inactive == criteria.Inactive || criteria.Inactive == null)).ToList();
+            var list = GetView(placetype);
+            IQueryable<sp_GetCatPlace> results = null;
             if (criteria.All == null)
             {
-                list = list.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                    && ((x.Name_EN ?? "").IndexOf(criteria.NameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                    && ((x.Name_VN ?? "").IndexOf(criteria.NameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                results = list.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && ((x.NameEn ?? "").IndexOf(criteria.NameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && ((x.NameVn ?? "").IndexOf(criteria.NameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && ((x.CountryNameEN ?? "").IndexOf(criteria.CountryNameEN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && ((x.CountryNameVN ?? "").IndexOf(criteria.CountryNameVN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && ((x.DistrictNameEN ?? "").IndexOf(criteria.DistrictNameEN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -74,17 +89,19 @@ namespace eFMS.API.Catalogue.DL.Services
                                     && ((x.ProvinceNameEN ?? "").IndexOf(criteria.ProvinceNameEN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && ((x.ProvinceNameVN ?? "").IndexOf(criteria.ProvinceNAmeVN ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && ((x.Address ?? "").IndexOf(criteria.Address ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                    && ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    //&& ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && ((x.ModeOfTransport ?? "").IndexOf(criteria.ModeOfTransport ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && (x.AreaNameEN ?? "").IndexOf(criteria.AreaNameEN ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                    && (x.AreaNameVN ?? "").IndexOf(criteria.AreaNameVN ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                                     && (x.Inactive == criteria.Inactive || criteria.Inactive == null)
-                    ).OrderBy(x => x.Code).ToList();
+                    ).AsQueryable();
             }
             else
             {
-                list = list.Where(x => (
+                results = list.Where(x => (
                                       ((x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                   || ((x.Name_EN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                   || ((x.Name_VN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   || ((x.NameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   || ((x.NameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    || ((x.CountryNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    || ((x.CountryNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    || ((x.DistrictNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -92,16 +109,48 @@ namespace eFMS.API.Catalogue.DL.Services
                                    || ((x.ProvinceNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    || ((x.ProvinceNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    || ((x.Address ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                   && ((x.ModeOfTransport ?? "").IndexOf(criteria.ModeOfTransport ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   || (x.AreaNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                   || (x.AreaNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                   && ((x.ModeOfTransport ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    )
-                                   && ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                   //&& ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                    && (x.Inactive == criteria.Inactive || criteria.Inactive == null)
-                                   ).OrderBy(x => x.Code).ToList();
+                                   ).AsQueryable();
             }
-            return list;
+            return results;
         }
-
-        private List<CatPlaceViewModel> GetCulturalData(List<vw_catPlace> list)
+        public override HandleState Add(CatPlaceModel model)
+        {
+            var entity = mapper.Map<CatPlace>(model);
+            entity.Id = Guid.NewGuid();
+            entity.UserCreated = entity.UserModified = currentUser.UserID;
+            entity.DatetimeCreated = entity.DatetimeModified = DateTime.Now;
+            entity.Inactive = false;
+            var result = DataContext.Add(entity, true);
+            if (result.Success)
+            {
+                RedisCacheHelper.SetObject(cache, Templates.CatPlace.NameCaching.ListName, DataContext.Get());
+            }
+            return result;
+        }
+        public HandleState Update(CatPlaceModel model)
+        {
+            var entity = mapper.Map<CatPlace>(model);
+            entity.DatetimeModified = DateTime.Now;
+            entity.UserModified = currentUser.UserID;
+            if (entity.Inactive == true)
+            {
+                entity.InactiveOn = DateTime.Now;
+            }
+            var result = DataContext.Update(entity, x => x.Id == model.Id);
+            if (result.Success)
+            {
+                Func<CatPlace, bool> predicate = x => x.Id == entity.Id;
+                RedisCacheHelper.ChangeItemInList(cache, Templates.CatPlace.NameCaching.ListName, entity, predicate);
+            }
+            return result;
+        }
+        private IQueryable<CatPlaceViewModel> GetCulturalData(IQueryable<sp_GetCatPlace> list)
         {
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             if (currentCulture.Name == "vi-VN")
@@ -110,8 +159,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     ID = x.ID,
                     Code = x.Code,
-                    NameEN = x.Name_EN,
-                    NameVN = x.Name_VN,
+                    NameEn = x.NameEn,
+                    NameVn = x.NameVn,
                     DisplayName = x.DisplayName,
                     Address = x.Address,
                     DistrictID = x.DistrictID,
@@ -134,7 +183,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     CountryName = x.CountryNameVN,
                     AreaName = x.AreaNameVN,
                     LocalAreaName = x.LocalAreaNameVN
-                }).ToList();
+                });
             }
             else
             {
@@ -142,8 +191,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     ID = x.ID,
                     Code = x.Code,
-                    NameEN = x.Name_EN,
-                    NameVN = x.Name_VN,
+                    NameEn = x.NameEn,
+                    NameVn = x.NameVn,
                     DisplayName = x.DisplayName,
                     Address = x.Address,
                     DistrictID = x.DistrictID,
@@ -166,14 +215,19 @@ namespace eFMS.API.Catalogue.DL.Services
                     CountryName = x.CountryNameEN,
                     AreaName = x.AreaNameEN,
                     LocalAreaName = x.LocalAreaNameEN
-                }).ToList();
+                });
             }
         }
 
-        private List<vw_catPlace> GetView()
+        private List<sp_GetCatPlace> GetView(string placeTypeID)
         {
-            List<vw_catPlace> lvCatPlace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_catPlace>();
-            return lvCatPlace;
+            //List<vw_catPlace> lvCatPlace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_catPlace>();
+            //return lvCatPlace;
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName="@placeTypeID", Value = placeTypeID }
+            };
+            var list = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetCatPlace>(parameters);
+            return list;
         }
 
         private List<vw_catProvince> GetProvinces()
@@ -234,31 +288,36 @@ namespace eFMS.API.Catalogue.DL.Services
             var results = new List<CatPlaceImportModel>();
             list.ForEach(item =>
             {
-
-                //var result = CheckCatplaceValidImport(districts, results, item);
                 item.PlaceTypeId = placeTypeName;
 
                 if (string.IsNullOrEmpty(item.NameEn))
                 {
-                    item.NameEn = string.Format("NameEn is not allow empty!|wrong");
+                    item.NameEn = stringLocalizer[LanguageSub.MSG_PLACE_NAME_EN_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.NameVn))
                 {
-                    item.NameVn = string.Format("NameVn is not allow empty!|wrong");
-                    item.IsValid = false;
-                }
-                if (string.IsNullOrEmpty(item.CountryName))
-                {
-                    item.CountryName = string.Format("Country name is not allow empty!|wrong");
-                    item.ProvinceName = item.ProvinceName ?? string.Format("Province name is not allow empty!|wrong");
-                    item.DistrictName = item.ProvinceName ?? string.Format("District name is not allow empty!|wrong");
-
+                    item.NameVn = stringLocalizer[LanguageSub.MSG_PLACE_NAME_LOCAL_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.Code))
                 {
-                    item.Code = string.Format("Ward code is not allow empty!|wrong");
+                    item.Code = stringLocalizer[LanguageSub.MSG_PLACE_CODE_EMPTY];
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.CountryName))
+                {
+                    item.CountryName = stringLocalizer[LanguageSub.MSG_PLACE_COUNTRY_NAME_EMPTY];
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.ProvinceName))
+                {
+                    item.ProvinceName = stringLocalizer[LanguageSub.MSG_PLACE_PROVINCE_NAME_EMPTY];
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.DistrictName))
+                {
+                    item.DisplayName = stringLocalizer[LanguageSub.MSG_PLACE_DISTRICT_NAME_EMPTY];
                     item.IsValid = false;
                 }
                 else
@@ -267,60 +326,41 @@ namespace eFMS.API.Catalogue.DL.Services
 
                     if (country == null)
                     {
-                        item.CountryName = string.Format("Country '{0}' is not found!|wrong", item.CountryName);
-                        item.ProvinceName = item.ProvinceName ?? string.Format("Province name is not allow empty!|wrong");
-                        item.DistrictName = item.DisplayName ?? string.Format("District name is not allow empty!|wrong");
+                        item.CountryName = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_COUNTRY_NOT_FOUND], item.CountryName);
                         item.IsValid = false;
                     }
                     else
                     {
                         item.CountryId = country.Id;
-                        if (string.IsNullOrEmpty(item.ProvinceName))
+                        var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.ProvinceName.ToLower() && (i.CountryId == country.Id || country == null));
+                        if (province == null)
                         {
-                            item.ProvinceName = item.ProvinceName ?? string.Format("Province name is not allow empty!|wrong");
-                            item.DistrictName = item.DistrictName ?? string.Format("District name is not allow empty!|wrong");
+                            item.ProvinceName = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_PROVINCE_NOT_FOUND], item.ProvinceName, item.CountryName);
                             item.IsValid = false;
                         }
                         else
                         {
-                            var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.ProvinceName.ToLower() && (i.CountryId == country.Id || country == null));
-                            if (province == null)
+                            item.ProvinceId = province.Id;
+                            var district = districts.FirstOrDefault(i => i.NameEn.ToLower() == item.DistrictName.ToLower() && i.ProvinceId == province.Id);
+                            if (district == null)
                             {
-                                item.ProvinceName = string.Format("Province name '{0}' is not found!|wrong", item.ProvinceName);
+                                item.DistrictName = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_DISTRICT_NOT_FOUND], item.DistrictName, item.ProvinceName);
                                 item.IsValid = false;
                             }
-
                             else
                             {
-                                item.ProvinceId = province.Id;
-                                if (string.IsNullOrEmpty(item.DistrictName))
-                                {
-                                    item.DistrictName = string.Format("District name is not allow empty!|wrong");
-                                    item.IsValid = false;
-                                }
-                                else
-                                {
-                                    var district = districts.FirstOrDefault(i => i.NameEn.ToLower() == item.DistrictName.ToLower() && i.ProvinceId == province.Id);
-                                    if (district == null)
-                                    {
-                                        item.DistrictName = string.Format("District name {0} is not found!|wrong", item.DistrictName);
-                                        item.IsValid = false;
-                                    }
-                                    if(!string.IsNullOrEmpty(item.Code))
-                                    {
-                                        if (list.Count(x => x.Code.ToLower() == item.Code.ToLower()) > 1)
-                                        {
-                                            item.Code = string.Format("Ward code {0} has been duplicate!|wrong", item.Code);
-                                            item.IsValid = false;
-                                        }
-                                        var ward = wards.FirstOrDefault(x => x.Code.ToLower() == item.Code.ToLower());
-                                        if (ward != null)
-                                        {
-                                            item.Code = string.Format("Ward code {0} has been existed!|wrong", item.Code);
-                                            item.IsValid = false;
-                                        }
-                                    }
-                                }
+                                item.DistrictId = district.Id;
+                            }
+                            if (list.Count(x => x.Code.ToLower() == item.Code.ToLower()) > 1)
+                            {
+                                item.Code = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_CODE_DUPLICATE], item.Code);
+                                item.IsValid = false;
+                            }
+                            var ward = wards.FirstOrDefault(x => x.Code.ToLower() == item.Code.ToLower());
+                            if (ward != null)
+                            {
+                                item.Code = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_CODE_EXISTED], item.Code);
+                                item.IsValid = false;
                             }
                         }
                     }
@@ -337,27 +377,30 @@ namespace eFMS.API.Catalogue.DL.Services
             list.ForEach(item =>
             {
                 item.PlaceTypeId = placeTypeName;
-                //item = CheckCatplaceValidImport(districts, list, item);
                 if (string.IsNullOrEmpty(item.Code))
                 {
-                    item.Code = string.Format("Code is not allow empty!|wrong");
+                    item.Code = stringLocalizer[LanguageSub.MSG_PLACE_CODE_EMPTY];
                     item.IsValid = false;
                 }
 
                 if (string.IsNullOrEmpty(item.NameEn))
                 {
-                    item.NameEn = string.Format("NameEn is not allow empty!|wrong");
+                    item.NameEn = stringLocalizer[LanguageSub.MSG_PLACE_NAME_EN_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.NameVn))
                 {
-                    item.NameVn = string.Format("NameVn is not allow empty!|wrong");
+                    item.NameVn = stringLocalizer[LanguageSub.MSG_PLACE_NAME_LOCAL_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.CountryName))
                 {
-                    item.CountryName = string.Format("Country name is not allow empty!|wrong");
-                    item.ProvinceName = item.ProvinceName??string.Format("Province name is not allow empty!|wrong");
+                    item.CountryName = stringLocalizer[LanguageSub.MSG_PLACE_COUNTRY_NAME_EMPTY];
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.ProvinceName))
+                {
+                    item.ProvinceName = stringLocalizer[LanguageSub.MSG_PLACE_PROVINCE_NAME_EMPTY];
                     item.IsValid = false;
                 }
                 else
@@ -365,49 +408,36 @@ namespace eFMS.API.Catalogue.DL.Services
                     var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryName.ToLower());
                     if (country == null)
                     {
-                        item.CountryName = string.Format("Country '{0}' is not found!|wrong", item.CountryName);
-                        item.ProvinceName = item.ProvinceName ?? string.Format("Province name is not allow empty!|wrong");
+                        item.CountryName = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_COUNTRY_NOT_FOUND], item.CountryName);
                         item.IsValid = false;
                     }
                     else
                     {
                         item.CountryId = country.Id;
-                        if (string.IsNullOrEmpty(item.ProvinceName))
+                        var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.ProvinceName.ToLower() && (i.CountryId == country.Id || country == null));
+
+                        if (province == null)
                         {
-                            item.ProvinceName = string.Format("Province name is not allow empty!|wrong");
+                            item.ProvinceName = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_PROVINCE_NOT_FOUND], item.ProvinceName, item.CountryName);
                             item.IsValid = false;
                         }
                         else
                         {
-                            var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.ProvinceName.ToLower() && (i.CountryId == country.Id || country == null));
+                            item.ProvinceId = province.Id;
 
-                            if (province == null)
+                            var district = districts.FirstOrDefault(i => i.Code.ToLower() == item.Code);
+                            if (district != null)
                             {
-                                item.ProvinceName = string.Format("Province name '{0}' is not found!|wrong", item.ProvinceName);
+                                item.Code = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_CODE_EXISTED], item.Code);
                                 item.IsValid = false;
                             }
                             else
                             {
-                                item.ProvinceId = province.Id;
-
-                                if(!string.IsNullOrEmpty(item.Code))
+                                var countNew = list.Count(i => i.Code.ToLower() == item.Code.ToLower());
+                                if(countNew > 1)
                                 {
-
-                                    var district = districts.FirstOrDefault(i => i.Code.ToLower() == item.Code && i.ProvinceId == province.Id);
-                                    if (district != null)
-                                    {
-                                        item.Code = string.Format("Code {0} is existed!|wrong", item.Code);
-                                        item.IsValid = false;
-                                    }
-                                    else
-                                    {
-                                        var countNew = list.Count(i => i.Code.ToLower() == item.Code.ToLower() && i.ProvinceId == province.Id);
-                                        if(countNew > 1)
-                                        {
-                                            item.Code = string.Format("Code {0} has been duplicate!|wrong", item.Code);
-                                            item.IsValid = false;
-                                        }
-                                    }
+                                    item.Code = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_CODE_DUPLICATE], item.Code);
+                                    item.IsValid = false;
                                 }
                             }
                         }
@@ -428,7 +458,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 result.PlaceTypeId = placeTypeName;
                 if (string.IsNullOrEmpty(item.CountryName))
                 {
-                    result.CountryName = string.Format("Country name is not allow empty!|wrong");
+                    result.CountryName = stringLocalizer[LanguageSub.MSG_PLACE_COUNTRY_NAME_EMPTY];
                     result.IsValid = false;
                 }
                 else
@@ -436,7 +466,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryName.ToLower());
                     if (country == null)
                     {
-                        result.CountryName = string.Format("Country '{0}' is not found!|wrong", item.CountryName);
+                        result.CountryName = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_COUNTRY_NOT_FOUND], item.CountryName);
                         result.IsValid = false;
                     }
                     else
@@ -453,30 +483,30 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             if (string.IsNullOrEmpty(item.Code))
             {
-                item.Code = string.Format("Code is not allow empty!|wrong");
+                item.Code = stringLocalizer[LanguageSub.MSG_PLACE_CODE_EMPTY];
                 item.IsValid = false;
             }
-            else if (newList.Count(x => (x.Code ?? "").ToLower() == (item.Code ?? "").ToLower()) > 1)
+            else if (newList.Count(x => (x.Code ?? "").ToLower() == item.Code.ToLower()) > 1)
             {
-                item.Code = string.Format("Code {0} has been duplicate!|wrong", item.Code);
+                item.Code = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_CODE_DUPLICATE], item.Code);
                 item.IsValid = false;
             }
             else
             {
-                if(places.Any(i => (i.Code ?? "").ToLower() == (item.Code ?? "").ToLower()))
+                if(places.Any(i => (i.Code ?? "").ToLower() == item.Code.ToLower()))
                 {
-                    item.Code = string.Format("Code '{0}' has been existed!|wrong", item.Code);
+                    item.Code = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_CODE_EXISTED], item.Code);
                     item.IsValid = false;
                 }
             }
             if (string.IsNullOrEmpty(item.NameEn))
             {
-                item.NameEn = string.Format("NameEn is not allow empty!|wrong");
+                item.NameEn = stringLocalizer[LanguageSub.MSG_PLACE_NAME_EN_EMPTY];
                 item.IsValid = false;
             }
             if (string.IsNullOrEmpty(item.NameVn))
             {
-                item.NameVn = string.Format("NameVn is not allow empty!|wrong");
+                item.NameVn = stringLocalizer[LanguageSub.MSG_PLACE_NAME_LOCAL_EMPTY];
                 item.IsValid = false;
             }
             return item;
@@ -495,15 +525,15 @@ namespace eFMS.API.Catalogue.DL.Services
                 result.PlaceTypeId = placeTypeName;
                 if (string.IsNullOrEmpty(item.CountryName))
                 {
-                    result.CountryName = string.Format("Country name is not allow empty!|wrong");
+                    result.CountryName = stringLocalizer[LanguageSub.MSG_PLACE_COUNTRY_NAME_EMPTY];
                     result.IsValid = false;
                 }
                 else
                 {
-                    var country = countries.FirstOrDefault(i => (i.NameEn ??"")==(item.CountryName ?? "").ToLower());
+                    var country = countries.FirstOrDefault(i => (i.NameEn ??"") == item.CountryName.ToLower());
                     if (country == null)
                     {
-                        result.CountryName = string.Format("Country '{0}' is not found!|wrong", item.CountryName);
+                        result.CountryName = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_COUNTRY_NOT_FOUND], item.CountryName);
                         result.IsValid = false;
                     }
                     else
@@ -513,7 +543,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 if (string.IsNullOrEmpty(item.ModeOfTransport))
                 {
-                    result.ModeOfTransport = string.Format("Mode of transport is not allow empty!|wrong");
+                    result.ModeOfTransport = stringLocalizer[LanguageSub.MSG_PLACE_PORTINDEX_MODE_EMPTY];
                     result.IsValid = false;
                 }
                 else
@@ -523,7 +553,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                     else
                     {
-                        result.ModeOfTransport = string.Format("Mode of transport {0} is not found!|wrong", item.ModeOfTransport);
+                        result.ModeOfTransport = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_PORTINDEX_MODE_NOT_FOUND], item.ModeOfTransport);
                         result.IsValid = false;
                     }
                 }
@@ -532,7 +562,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     var area = areas.FirstOrDefault(i => i.NameEn.ToLower() == item.AreaName.ToLower());
                     if (area == null)
                     {
-                        result.AreaName = string.Format("Area '{0}' is not found!|wrong", item.CountryName);
+                        result.AreaName = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_PORTINDEX_AREA_NOT_FOUND], item.CountryName);
                         result.IsValid = false;
                     }
                     else
@@ -562,7 +592,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 result.PlaceTypeId = placeTypeName;
                 if (string.IsNullOrEmpty(item.Address))
                 {
-                    result.Address = string.Format("Address is not allow empty!|wrong");
+                    result.Address = stringLocalizer[LanguageSub.MSG_PLACE_ADDRESS_EMPTY];
                     result.IsValid = false;
                 }
                 else
@@ -571,74 +601,64 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 if (string.IsNullOrEmpty(item.CountryName))
                 {
-                    result.CountryName = string.Format("Country name is not allow empty!|wrong");
-                    result.ProvinceName = result.ProvinceName??string.Format("Province name is not allow empty!|wrong");
-                    result.DistrictName = result.DistrictName??string.Format("District name is not allow empty!|wrong");
+                    result.CountryName = stringLocalizer[LanguageSub.MSG_PLACE_COUNTRY_NAME_EMPTY];
+                    result.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.ProvinceName))
+                {
+                    result.ProvinceName = stringLocalizer[LanguageSub.MSG_PLACE_PROVINCE_NAME_EMPTY];
+                    result.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.DistrictName))
+                {
+                    result.DistrictName = stringLocalizer[LanguageSub.MSG_PLACE_DISTRICT_NAME_EMPTY];
                     result.IsValid = false;
                 }
                 else
                 {
                     var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryName.ToLower());
-
                     if (country == null)
                     {
-                        result.CountryName = string.Format("Country '{0}' is not found!|wrong", item.CountryName);
-                        result.ProvinceName = result.ProvinceName??string.Format("Province name is not allow empty!|wrong");
-                        result.DistrictName = result.DistrictName??string.Format("District name is not allow empty!|wrong");
+                        result.CountryName = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_COUNTRY_NOT_FOUND], item.CountryName);
                         result.IsValid = false;
                     }
                     else
                     {
                         result.CountryId = country.Id;
                         var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.ProvinceName.ToLower() && (i.CountryId == country.Id || country == null));
-                        if (string.IsNullOrEmpty(item.ProvinceName))
+                        if (province == null)
                         {
-                            result.ProvinceName = string.Format("Province name is not allow empty!|wrong");
-                            result.DistrictName = result.DistrictName??string.Format("District name is not allow empty!|wrong");
-                            result.IsValid = false;
-                        }
-                        else if (province == null)
-                        {
-                            result.ProvinceName = string.Format("Province name '{0}' is not found!|wrong", item.ProvinceName);
+                            result.ProvinceName = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_PROVINCE_NOT_FOUND], item.ProvinceName, item.CountryName);
                             result.IsValid = false;
                         }
                         else
                         {
                             result.ProvinceId = province.Id;
-                            if (string.IsNullOrEmpty(item.DistrictName))
+                            var district = districts.FirstOrDefault(i => i.NameEn.ToLower() == item.DistrictName.ToLower() && (i.ProvinceId == province.Id || province == null));
+                            if (district == null)
                             {
-                                result.DistrictName = string.Format("District name is not allow empty!|wrong");
+                                result.DistrictName = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_DISTRICT_NOT_FOUND], item.DistrictName, item.ProvinceName);
                                 result.IsValid = false;
                             }
                             else
                             {
-                                var district = districts.FirstOrDefault(i => i.NameEn.ToLower() == item.DistrictName.ToLower() && (i.ProvinceId == province.Id || province == null));
-                                if (district == null)
-                                {
-                                    result.DistrictName = string.Format("District name '{0}' is not found!|wrong", item.DistrictName);
-                                    result.IsValid = false;
-                                }
-                                else
-                                {
-                                    result.DistrictId = district.Id;
-                                }
+                                result.DistrictId = district.Id;
                             }
                         }
                     }
                 }
                 result.PlaceTypeId = placeTypeName;
-                //result.Status = DataEnums.EnActive;
-                //result.Status = item.Inactive == false ? DataEnums.EnInActive : DataEnums.EnActive;
                 results.Add(result);
             }
             return results;
         }
-
+        
         public HandleState Import(List<CatPlaceImportModel> data)
         {
             try
             {
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                var newList = new List<CatPlace>();
                 foreach (var item in data)
                 {
                     bool inactive = string.IsNullOrEmpty(item.Status) ? false : (item.Status.Trim().ToLower() == "inactive" ? true : false);
@@ -653,22 +673,46 @@ namespace eFMS.API.Catalogue.DL.Services
                         DistrictId = item.DistrictId,
                         Address = item.Address,
                         DatetimeCreated = DateTime.Now,
-                        UserCreated = ChangeTrackerHelper.currentUser,
+                        UserCreated = currentUser.UserID,
+                        UserModified = currentUser.UserID,
                         PlaceTypeId = item.PlaceTypeId,
                         Inactive = inactive,
                         InactiveOn = inactiveDate,
                         ModeOfTransport = item.ModeOfTransport,
                         AreaId = item.AreaId
                     };
-                    dc.CatPlace.Add(catPlace);
+                    newList.Add(catPlace);
                 }
+                dc.CatPlace.AddRange(newList);
                 dc.SaveChanges();
+                var lstPlaces = RedisCacheHelper.GetObject<List<CatPlace>>(cache, Templates.CatPlace.NameCaching.ListName);
+                if (lstPlaces.Count == 0)
+                {
+                    lstPlaces = dc.CatPlace.ToList();
+                }
+                else
+                {
+                    lstPlaces.AddRange(newList);
+                }
+                RedisCacheHelper.SetObject(cache, Templates.CatPlace.NameCaching.ListName, lstPlaces);
                 return new HandleState();
             }
             catch (Exception ex)
             {
                 return new HandleState(ex.Message);
             }
+        }
+
+        public HandleState Delete(Guid id)
+        {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
+            var hs = DataContext.Delete(x => x.Id == id);
+            if (hs.Success)
+            {
+                Func<CatPlace, bool> predicate = x => x.Id == id;
+                RedisCacheHelper.RemoveItemInList(cache, Templates.CatPlace.NameCaching.ListName, predicate);
+            }
+            return hs;
         }
     }
 }

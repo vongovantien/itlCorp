@@ -1,11 +1,11 @@
 ﻿using System;
 using AutoMapper;
+using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
-using eFMS.API.Catalogue.Resources;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.IdentityServer.DL.UserManager;
@@ -48,9 +48,9 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
         [HttpGet("GetNewest")]
-        public IActionResult GetNewest()
+        public IActionResult GetNewest(string currencyToId)
         {
-            var result = catCurrencyExchangeService.GetCurrencyExchangeNewest();
+            var result = catCurrencyExchangeService.GetCurrencyExchangeNewest(currencyToId);
             return Ok(result);
         }
         [HttpGet("GetExchangeRatesBy")]
@@ -71,22 +71,6 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Get(int id)
         {
             var result = catCurrencyExchangeService.Get(x => x.Id == id);
-            return Ok(result);
-        }
-
-        [HttpPost]
-        [Route("Add")]
-        public IActionResult Post(CatCurrencyExchangeModel model)
-        {
-            if (!ModelState.IsValid) return BadRequest();
-            model.Inactive = false;
-            var hs = catCurrencyExchangeService.Add(model);
-            var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            if (!hs.Success)
-            {
-                return BadRequest(result);
-            }
             return Ok(result);
         }
 

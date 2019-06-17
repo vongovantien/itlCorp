@@ -16,8 +16,8 @@
                                 <label class="form-control-label" for="">
                                     Search text
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" [(ngModel)]="searchString" class="form-control m-input m-input--square" autocomplete="nope"
-                                    name="searchString" (change)="searchString = searchString.trim()"
+                                <input type="text" class="form-control m-input m-input--square" id="searchTextHouseBill" [(ngModel)]="searchString" class="form-control m-input m-input--square" autocomplete="nope"
+                                    name="searchString" (change)="searchString = searchString.trim()" autofocus
                                     placeholder="Search text">
                             </div>
                         </div>
@@ -36,12 +36,12 @@
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label class="form-control-label" for="">
-                                    Create date: From - To
+                                    Shipment date: From - To
                                 </label>
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                        [(ngModel)]="selectedRange" [ranges]="ranges" [maxDate]="maxDate"
+                                        [(ngModel)]="selectedRange" [ranges]="ranges"
                                         [alwaysShowCalendars]="true" name="daterange" placeholder="From date - to date"
                                         readonly />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
@@ -113,7 +113,7 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody *ngIf="shipmentDetails">
+                    <tbody *ngIf="shipmentDetails.length > 0; else norecord">
                         <tr class="" *ngFor="let item of shipmentDetails;let i=index;" >
                             <td class="">
                                 <div class="">
@@ -151,6 +151,16 @@
                             </td>
                         </tr>
                     </tbody>
+                    <ng-template #norecord>
+                        <tr>
+                            <td colspan="6">
+                                <div class="no-data">
+                                    <i class="flaticon-coins"></i>
+                                    <span class="no-data-text">No records found</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
                 </table>
             </div>
             <!--end: Datatable-->

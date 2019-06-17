@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import moment from 'moment/moment';
 import { ActivatedRoute } from '@angular/router';
 import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
@@ -11,6 +11,9 @@ import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { CsManifest } from 'src/app/shared/models/document/manifest.model';
 import { NgForm } from '@angular/forms';
+import * as stringHelper from 'src/helper/string.helper';
+declare var $: any;
+import { DomSanitizer, SafeResourceUrl, SafeUrl} from '@angular/platform-browser';
 
 @Component({
     selector: 'app-manifest',
@@ -18,8 +21,9 @@ import { NgForm } from '@angular/forms';
     styleUrls: ['./manifest.component.scss']
 })
 export class ManifestComponent implements OnInit {
+    // @ViewChild('formReport',{static:false}) frm:ElementRef;
     shipment: CsTransaction = new CsTransaction();
-    manifest: CsManifest = new CsManifest();
+    manifest: CsManifest;// = new CsManifest();
     paymentTerms: any[] = [];
     paymentTermActive: any[] = [];
     etdSelected: any;
@@ -34,11 +38,14 @@ export class ManifestComponent implements OnInit {
     totalCBM = 0;
     searchHouse = '';
     searchHouseRemoved = '';
+    dataReport: any;
+    previewModalId = "preview-modal";
 
     constructor(private baseServices: BaseService,
         private route: ActivatedRoute,
         private api_menu: API_MENU,
-        private sortService: SortService) {
+        private sortService: SortService,
+        private sanitizer: DomSanitizer) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
@@ -66,13 +73,24 @@ export class ManifestComponent implements OnInit {
                     } 
                     this.etdSelected = this.manifest.invoiceDate == null? null: { startDate: moment(this.manifest.invoiceDate), endDate: moment(this.manifest.invoiceDate) };
                     index = this.portOfLadings.findIndex(x => x.id == this.manifest.pol);
-                    if(index > -1) this.manifest.pol = this.portOfLadings[index].id;
+                    if(index > -1) {
+                        this.manifest.pol = this.portOfLadings[index].id;
+                        this.manifest.polName = this.portOfLadings[index].nameEn;
+                    }
                     index = this.portOfDestinations.findIndex(x => x.id == this.manifest.pod);
-                    if(index > -1) this.manifest.pod = this.portOfDestinations[index].id;
+                    if(index > -1) {
+                        this.manifest.pod = this.portOfDestinations[index].id;
+                        this.manifest.podName = this.portOfDestinations[index].nameEn;
+                    }
                 }
+                await this.getContainerList(prams.id);
                 this.isLoad = true;
             }
         });
+    }
+    async getContainerList(id: any) {
+        let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, { mblid: id }, false, false);
+        this.manifest.csMawbcontainers = responses;
     }
     async getManifest(id: any) {
         this.manifest = await this.baseServices.getAsync(this.api_menu.Documentation.CsManifest.get + "?jobId=" + id, false, true);
@@ -89,6 +107,31 @@ export class ManifestComponent implements OnInit {
             });
         }
     }
+    async previewReport(){
+        this.dataReport = null;
+        this.manifest.jobId = this.shipment.id;
+        this.manifest.csTransactionDetails = this.housebills.filter(x => x.isRemoved == false);
+        this.manifest.invoiceDate = dataHelper.dateTimeToUTC(this.etdSelected["startDate"]);
+        if(this.manifest.csTransactionDetails.length == 0)
+        {
+            this.baseServices.errorToast("This manifest must have at least 1 housebilll.");
+        }
+        else{
+            var id = this.previewModalId;
+            var _this = this;
+            var response = await this.baseServices.postAsync(this.api_menu.Documentation.CsManifest.preview, this.manifest, false, true);
+            console.log(response);
+            this.dataReport = response;
+            var checkExist = setInterval(function() {
+                if ($('#frame').length) {
+                    console.log("Exists!");
+                    $('#' + id).modal('show');
+                    clearInterval(checkExist);
+                }
+             }, 100);
+        }
+    }
+    
     removeAllChecked(){
         this.checkAll = false;
     }
@@ -116,14 +159,14 @@ export class ManifestComponent implements OnInit {
         }
         this.getPortOfDestination(keySearch);
     }
-    getNewManifest(){
+    async getNewManifest(){
         //MSEYYMM/#####: YYYY-MM-DDTHH:mm:ss.sssZ
         this.manifest = new CsManifest();
-        this.manifest.jobId = this.shipment.id;
         let date = new Date().toISOString().substr(0, 19);
         let jobNo = this.shipment.jobNo;
         this.manifest.refNo = "MSE" + date.substring(2, 4) + date.substring(5,7) + jobNo.substring(jobNo.length-5, jobNo.length);
         this.manifest.supplier = this.shipment["supplierName"];
+        this.manifest.voyNo = this.shipment.flightVesselName;
         let index = this.paymentTerms.findIndex(x => x.id == this.shipment.paymentTerm);
         if(index > -1){
             this.paymentTermActive = [this.paymentTerms[index]];
@@ -133,16 +176,20 @@ export class ManifestComponent implements OnInit {
         index = this.portOfLadings.findIndex(x => x.id == this.shipment.pol);
         if(index > -1){
             this.manifest.pol = this.portOfLadings[index].id;
-            this.manifest.polName = this.portOfLadings[index].nameEN;
+            this.manifest.polName = this.portOfLadings[index].nameEn;
         } 
         index = this.portOfDestinations.findIndex(x => x.id == this.shipment.pod);
         if(index > -1)
         {
             this.manifest.pod = this.portOfDestinations[index].id;
-            this.manifest.podName = this.portOfDestinations[index].nameEN;
+            this.manifest.podName = this.portOfDestinations[index].nameEn;
         }
     }
-    refreshManifest(){
+    removeChecked(){
+        this.checkAll = false;
+        //this.checkAllChange();
+    }
+    async refreshManifest(){
         this.manifest.refNo = null;
         this.manifest.supplier = null;
         this.manifest.attention = null;
@@ -153,13 +200,25 @@ export class ManifestComponent implements OnInit {
         this.manifest.weight = null;
         this.manifest.volume = null;
         this.manifest.manifestIssuer = null;
+        await this.getShipmentDetail(this.shipment.id);
         this.getNewManifest();
-        this.getHouseBillList(this.shipment.id);
+        this.housebills = [];
+        this.housebillsRemoved = [];
+        //this.getHouseBillList(this.shipment.id);
+        this.housebillsTemp.forEach(x => {
+            var item = x;
+            item.isRemoved = false;
+            this.housebills.push(item);
+        });
+        console.log(this.housebillsTemp);
     }
     async saveManifest(form: NgForm){
+        this.manifest.jobId = this.shipment.id;
         this.manifest.csTransactionDetails = this.housebills;
         this.manifest.invoiceDate = dataHelper.dateTimeToUTC(this.etdSelected["startDate"]);
-        if(form.valid){
+        if(form.valid 
+            && this.manifest.pod != null
+            && this.manifest.paymentTerm != null){
             let response = await this.baseServices.postAsync(this.api_menu.Documentation.CsManifest.update, this.manifest, true, true);
         }
         console.log(this.manifest);
@@ -196,9 +255,9 @@ export class ManifestComponent implements OnInit {
     }
     async getPortOfLading(searchText: any) {
         let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', all: searchText };
-        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
+        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, portSearchIndex, false, false);
         if (portIndexs != null) {
-            this.portOfLadings = portIndexs.data;
+            this.portOfLadings = portIndexs;
             console.log(this.portOfLadings);
         }
         else{
@@ -207,10 +266,10 @@ export class ManifestComponent implements OnInit {
     }
     async getPortOfDestination(searchText: any) {
         let portSearchIndex = { placeType: PlaceTypeEnum.Port, modeOfTransport: 'SEA', all: searchText };
-        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=1&size=20", portSearchIndex, false, false);
+        const portIndexs = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, portSearchIndex, false, false);
         if (portIndexs != null) {
-            this.portOfDestinations = portIndexs.data;
-            console.log(this.portOfLadings);
+            this.portOfDestinations = portIndexs;
+            console.log(this.portOfDestinations);
         }
         else{
             this.portOfDestinations = [];
@@ -222,11 +281,12 @@ export class ManifestComponent implements OnInit {
         if(responses != null){
             responses.forEach((element: { isChecked: boolean; isRemoved: boolean }) => {
                 element.isChecked = false;
-                if(element["manifestRefNo"] != null){
-                    element.isRemoved = false;
+                element["packageTypes"] = stringHelper.subStringComma(element["packageTypes"]);
+                if(element["manifestRefNo"] == null){
+                    element.isRemoved = true;
                 }
                 else{
-                    element.isRemoved = true;
+                    element.isRemoved = false;
                 }
             });
             this.housebills = responses;

@@ -1,6 +1,5 @@
 import { SystemConstants } from "./system.const";
 import {environment} from 'src/environments/environment';
-import { CsTransactionDetail } from "../app/shared/models/document/csTransactionDetail";
 
 export class API_MENU {
     private HOST = {
@@ -13,8 +12,9 @@ export class API_MENU {
         System: 44360,
         Catalogue: 44361,
         Department: 44242,
-        auditlog: 44363,
-        Documentation: 44366
+        Setting: 44363,
+        Documentation: 44366,
+        ReportPreview: 53717,
     }
 
     private PROTOCOL = "http://";
@@ -35,7 +35,7 @@ export class API_MENU {
     }
 
 
-    private getUrlMainPath(Module: String) {
+    private getUrlMainPath(Module: string) {
 
         if (this.CURRENT_HOST == this.HOST.Local) {
             return this.PROTOCOL + this.HOST.Local + this.getPort(Module) + "/api/v" + this.getCurrentVersion() + "/" + this.getCurrentLanguage() + "/";
@@ -47,9 +47,19 @@ export class API_MENU {
             return this.PROTOCOL + this.HOST.Staging + "/" + Module + "/api/v" + this.getCurrentVersion() + "/" + this.getCurrentLanguage() + "/";
         }
     }
-
-    private getPort(Module: String) {
-        return eval("this.PORT." + Module);
+    private getReportPath(Module){
+        if (this.CURRENT_HOST == this.HOST.Local) {
+            return this.PROTOCOL + this.HOST.Local + this.getPort(Module) + "/Default.aspx";
+        }
+        if (this.CURRENT_HOST == this.HOST.Test) {
+            return this.PROTOCOL + this.HOST.Test + "/" + Module + "/Default.aspx";
+        }
+        if (this.CURRENT_HOST == this.HOST.Staging) {
+            return this.PROTOCOL + this.HOST.Staging + "/" + Module + "/Default.aspx";
+        }
+    }
+    private getPort(Module: string) {
+        return this.PORT[Module]; //eval("this.PORT." + Module);
     }
 
 
@@ -61,6 +71,7 @@ export class API_MENU {
             query: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) +  "CatPlace/Query",
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) +  "CatPlace/Paging",
             getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) +  "CatPlace/",
+            //getBy: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/GetBy",
             add: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) +  "CatPlace/Add",
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/",
             delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/",
@@ -220,55 +231,85 @@ export class API_MENU {
             removeExchangeCurrency: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrencyExchange/RemoveExchangeCurrency"
         },
         CatalogueLogViewer: {
-            getCategory: this.getUrlMainPath(SystemConstants.MODULE_NAME.LOG) + "CategoryLog/GetCategory",
-            paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.LOG) + "CategoryLog/Paging"
+            getCategory: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CategoryLog/GetCategory",
+            paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CategoryLog/Paging"
+        },
+        EcusConnection:{
+            getAll:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/GetAll",
+            details:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/GetDetails",
+            addNew:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/Add",
+            update:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/Update",
+            delete:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/Delete",
+            paging:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/Paging"
         }
     }
 
     public Documentation = {
         Terminology: {
             getShipmentCommonData : this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "Terminology/getShipmentCommonData",
+            getOPSShipmentCommonData: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "Terminology/GetOPSShipmentCommonData"
         },
         CsTransaction: {
             post: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction",
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction",
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/Paging",
             getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/",
+            getTotalProfit: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/GetTotalProfit",
             import: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/Import",
             delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/",
             checkAllowDelete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransaction/CheckAllowDelete/"
         },
         CsTransactionDetail: {
             getByJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/GetByJob",
+            getHBDetails: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/GetHbDetails",
             addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/addNew",
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/update",
+            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/delete",
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/Paging",
             import: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsTransactionDetail/Import"
         },
         CsMawbcontainer: {
             query: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsMawbcontainer/Query",
-            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsMawbcontainer/Update"
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsMawbcontainer/Update",
+            getHBLConts: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsMawbcontainer/GetHBConts",
         },
         CsShipmentSurcharge:{
             addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/Add",
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/Update",
+            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/Delete",
             getByHBId: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/GetByHB",
-            getPartnerByJobId: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/GetPartnersByJob",
+            getPartners: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/GetPartners",
             getChargesByPartner: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/GroupByListHB",
         },
         AcctSOA: {
             addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/Add",
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/Update",
+            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/Delete",
             getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/Get",
             getDetails: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/GetDetails",
         },
         CsManifest: {
             get: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsManifest/",
-            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsManifest/AddOrUpdateManifest"
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsManifest/AddOrUpdateManifest",
+            preview: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsManifest/PreviewFCLManifest"
         },
         CsShippingInstruction: {
             get: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShippingInstruction/",
-            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShippingInstruction"
-        }
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShippingInstruction",
+            previewSI: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShippingInstruction/PreviewFCLShippingInstruction",
+            previewOCL: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShippingInstruction/PreviewFCLOCL"
+        },
+        Operation:{
+            paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/Paging",
+            addNew:this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/Add",
+            update:this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/Update",
+            delete:this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/Delete/",
+            getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction",
+            checkAllowDelete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/CheckAllowDelete/"
+        },
+        CustomClearance: {
+            getByJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CustomsDeclaration/GetByJob"
+        }   
     }
+    public Report = this.getReportPath(SystemConstants.MODULE_NAME.Report);
 }

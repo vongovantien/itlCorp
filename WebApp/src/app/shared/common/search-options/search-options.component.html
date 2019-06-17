@@ -5,7 +5,7 @@
                 <div class="input-group-prepend">
                     <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false">
-                        {{searchObject.fieldDisplayName}}
+                        {{searchObject.displayName}}
                     </button>
                     <div class="dropdown-menu">
                         
@@ -18,8 +18,9 @@
                             </a>
                         </ng-container> -->
                         <ng-container *ngFor="let item of settingFields">
-                            <a class="dropdown-item" [ngClass]="{ 'active': item.header == searchObject.fieldDisplayName}"  href="javascript:void(0)" (click)="searchTypeChange(item,$event)" attr.id="{{item.header}}Field">
-                                {{ item.header }}
+                            <a class="dropdown-item" [ngClass]="{ 'active': item.displayName == searchObject.displayName}"
+                                href="javascript:void(0)" (click)="searchTypeChange(item,$event)" attr.id="{{item.fieldName}}Field">
+                                {{ item.displayName }}
                             </a>
                         </ng-container>
                     </div>
@@ -38,7 +39,7 @@
                 <div class="input-group-prepend">
                     <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false">
-                        {{searchObject.fieldDisplayName}}
+                        {{searchObject.displayName}}
                     </button>
                     <div class="dropdown-menu">
                         
@@ -51,8 +52,8 @@
                             </a>
                         </ng-container> -->
                         <ng-container *ngFor="let item of settingFields">
-                            <a class="dropdown-item"  href="javascript:void(0)" (click)="searchTypeChange(item,$event)" attr.id="{{item.header}}Field">
-                                {{ item.header }}
+                            <a class="dropdown-item"  href="javascript:void(0)" (click)="searchTypeChange(item,$event)" attr.id="{{item.fieldName}}Field">
+                                {{ item.displayName }}
                             </a>
                         </ng-container>
                     </div>

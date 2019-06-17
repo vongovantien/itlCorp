@@ -86,7 +86,7 @@
                                                         title="Edit" data-toggle="modal" data-target="#detail-credit-debit-note-modal" (click)="openEdit(s.soa.code)">
                                                         <i class="la la-list"></i>
                                                     </button>
-                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" (click)="DeleteCDNote('confirm',s.soa.id)"
                                                         title="Remove" data-toggle="modal" data-target="#confirm-delete-CDnote-modal">
                                                         <i class="la la-trash"></i>
                                                     </button>
@@ -131,7 +131,7 @@
 <!--end:: m-portlet-->
 
 <!--begin:: add-credit-debit-note-modal-->
-<app-credit-and-debit-note-addnew [chargesFromRemaining]="ListChargesFromRemaining" (addNewRemainingCharges)="addNewRemainingChargesCatcher($event)" (currentPartnerIdEmit)="currentPartnerIdCatcher($event)"></app-credit-and-debit-note-addnew>
+<app-credit-and-debit-note-addnew (newCDNote)="getCDNotesAfterAdd($event)" [chargesFromRemaining]="ListChargesFromRemaining" (addNewRemainingCharges)="addNewRemainingChargesCatcher($event)" (currentPartnerIdEmit)="currentPartnerIdCatcher($event)"></app-credit-and-debit-note-addnew>
 <!--end:: add-credit-debit-note-modal-->
 
 <!--begin:: detail-credit-debit-note-modal-->
@@ -162,7 +162,7 @@
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="deleteCharge()"> 
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="DeleteCDNote('ok')"> 
                     <span>
                         <i class="la la-save"></i>
                         <span>

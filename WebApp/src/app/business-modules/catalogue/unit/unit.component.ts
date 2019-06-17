@@ -22,7 +22,7 @@ declare var $: any;
 export class UnitComponent implements OnInit {
   listUnitFilter = [
     { filter: "All", field: "all" }, { filter: "Code", field: "code" },
-    { filter: "English Name", field: "nameEn" }, { filter: "Local Name", field: "nameVn" }];
+    { filter: "English Name", field: "unitNameEn" }, { filter: "Local Name", field: "unitNameVn" }];
   selectedUnitFilter = this.listUnitFilter[0].filter;
   pager: PagerSetting = PAGINGSETTING;
   searchKey: string = "";
@@ -34,23 +34,35 @@ export class UnitComponent implements OnInit {
   searchObject: any = {};
   unitTypes: any[];
   currentUnitType: any = [];
+  titleConfirmDelete = "Do you want to delete this unit";
+  @ViewChild(PaginationComponent,{static:false}) child;
 
-  @ViewChild(PaginationComponent) child;
-
-  constructor(
+    constructor (
     private excelService: ExcelService,
     private baseServices: BaseService,
     private api_menu: API_MENU,
-    private sortService: SortService) { }
+    private sortService: SortService) { 
+      // this.sourceData = this.baseServices.dataStorage.subscribe(data=>{
+      //   this.sourceData = data;
+      //   console.log(this.sourceData);
+      // });
+      
+    }
 
   async ngOnInit() {
-    this.pager.totalItems = 0;
+    this.initPager();
     this.getUnitTypes();
     await this.getUnits();
+    // this.sourceData = await this.baseServices.getDataStorageByKey("default");
+    // console.log(this.sourceData)
+  }
+  initPager(): any {
+    this.pager.totalItems = 0;
+    this.pager.currentPage = 1;
   }
 
   async searchUnit() {
-
+    this.initPager();
     this.searchObject = {};
     if (this.selectedUnitFilter == "All") {
       this.searchObject.All = this.searchKey;
@@ -72,6 +84,7 @@ export class UnitComponent implements OnInit {
     this.searchKey = "";
     this.searchObject = {};
     this.selectedUnitFilter = this.listUnitFilter[0].filter;
+    this.initPager();
     await this.getUnits();
   }
 
@@ -128,6 +141,7 @@ export class UnitComponent implements OnInit {
       if (form.form.status != "INVALID") {
         const res = await this.baseServices.putAsync(this.api_menu.Catalogue.Unit.update, this.UnitToUpdate);
         if(res){
+          this.initPager();
           await this.getUnits();
           form.onReset();
           $('#update-unit-modal').modal('hide');
@@ -145,9 +159,11 @@ export class UnitComponent implements OnInit {
       delete this.UnitToAdd.id;
       if (form.form.status != "INVALID" && this.UnitToAdd.unitType != null) {
         const respone = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.addNew, this.UnitToAdd, true, true);
-        await this.getUnits();
+        //await this.getUnits();
         if (respone) {
-          this.setPageAfterAdd();
+          //this.setPageAfterAdd();
+          this.initPager();
+          this.getUnits();
           form.onReset();
           $('#add-unit-modal').modal('hide');
         }
@@ -162,15 +178,22 @@ export class UnitComponent implements OnInit {
   prepareDeleteUnit(id: any) {
     this.idUnitToDelete = id;
   }
-
-  async delete() {
-    await this.baseServices.deleteAsync(this.api_menu.Catalogue.Unit.delete + this.idUnitToDelete, true, true);
-    await this.getUnits();
-    this.setPageAfterDelete();
-
+  async onDelete(event: any) {
+    console.log(event);
+    if (event) {
+      await this.baseServices.deleteAsync(this.api_menu.Catalogue.Unit.delete + this.idUnitToDelete, true, true);
+      await this.getUnits();
+      this.setPageAfterDelete();
+    }
   }
+  // async delete() {
+  //   await this.baseServices.deleteAsync(this.api_menu.Catalogue.Unit.delete + this.idUnitToDelete, true, true);
+  //   await this.getUnits();
+  //   this.setPageAfterDelete();
+
+  // }
   isDesc = true;
-  sortKey: string = "code";
+  sortKey: string = "";
   sort(property) {
     this.isDesc = !this.isDesc;
     this.sortKey = property;

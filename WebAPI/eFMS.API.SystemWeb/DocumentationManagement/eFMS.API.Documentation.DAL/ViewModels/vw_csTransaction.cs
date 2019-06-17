@@ -23,7 +23,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public Nullable<DateTime> RequestedDate { get; set; }
         public string FlightVesselName { get; set; }
         public string VoyNo { get; set; }
-        public Nullable<DateTime> FlightVesselConfirmedDate { get; set; }
+        //public Nullable<System.DateTime> FlightVesselConfirmedDate { get; set; }
         public string ShipmentType { get; set; }
         public string ServiceMode { get; set; }
         public string Commodity { get; set; }
@@ -36,6 +36,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string RouteShipment { get; set; }
         public Nullable<int> Quantity { get; set; }
         public Nullable<int> Unit { get; set; }
+        public Nullable<decimal> NetWeight { get; set; }
         public Nullable<decimal> GrossWeight { get; set; }
         public Nullable<decimal> ChargeWeight { get; set; }
         public Nullable<decimal> CBM { get; set; }
@@ -44,13 +45,15 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string WareHouseID { get; set; }
         public string Notes { get; set; }
         public Nullable<bool> Locked { get; set; }
-        public Nullable<DateTime> LockedDate { get; set; }
+        public string LockedDate { get; set; }
+        //public Nullable<System.DateTime> LockedDate { get; set; }
         public string UserCreated { get; set; }
         public Nullable<DateTime> CreatedDate { get; set; }
         public string UserModified { get; set; }
         public Nullable<DateTime> ModifiedDate { get; set; }
         public Nullable<bool> Inactive { get; set; }
-        public Nullable<DateTime> InactiveOn { get; set; }
+        //public Nullable<System.DateTime> InactiveOn { get; set; }
+        public string InactiveOn { get; set; }
         public string SupplierName { get; set; }
         public string AgentName { get; set; }
         public string HWBNo { get; set; }
@@ -62,6 +65,5 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string CreatorName { get; set; }
         public Nullable<int> SumCont { get; set; }
         public Nullable<decimal> SumCBM { get; set; }
-        public Nullable<decimal> NetWeight { get; set; }
     }
 }

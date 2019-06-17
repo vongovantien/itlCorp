@@ -33,7 +33,8 @@ export const language = {
       childs: [
         { name: "Quản Lý Job", route_child: "job-management",display:true  },
         { name: "Điều Phối", route_child: "assigment",display:true  },
-        { name: "Điều Phối Xe", route_child: "trucking-assigment",display:true  }
+        { name: "Điều Phối Xe", route_child: "trucking-assigment",display:true  },
+        { name: "Custom Clearance", route_child: "custom-clearance",display:true }
       ]
     },
    

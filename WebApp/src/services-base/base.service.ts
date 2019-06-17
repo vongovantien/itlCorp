@@ -5,15 +5,32 @@ import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { language } from 'src/languages/language.en';
 
+import { BehaviorSubject, Observable } from 'rxjs';
+
 @Injectable({
   providedIn: 'root'
 })
 
-export class BaseService implements ErrorHandler {
+export class  BaseService implements ErrorHandler {
 
   private headers: HttpHeaders;
   protected baseUrl: string;
   protected showError: boolean;
+
+  /**
+   * 
+   */
+  private _DataStorage: BehaviorSubject<Object> = new BehaviorSubject({ "default": "hello world !" });
+  public dataStorage = this._DataStorage.asObservable();
+  public setData(key: string, value: any) {
+    this._DataStorage.next({ ...this._DataStorage.value, [key]: value });
+  }
+
+
+  /**
+   * 
+   */
+
 
   public LANG = language;
 
@@ -34,8 +51,8 @@ export class BaseService implements ErrorHandler {
    * you must handle error or state by yourself
    * @param url 
    */
-  public get(url: string) {
-  
+  public get(url: string){
+
     var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);
     return this._http.get(url, { headers: this.headers });
@@ -135,7 +152,6 @@ export class BaseService implements ErrorHandler {
       this.spinnerShow();
     try {
       const res = await this._http.put(url, data, { headers: this.headers }).toPromise();
-      console.log(res)
       this.spinnerHide();
       this.handleState(res, display_notify);
       return res;
@@ -182,22 +198,32 @@ export class BaseService implements ErrorHandler {
       return false;
     }
   }
-
-  public async downloadfile(url: string,saveAsFileName:string):Promise<any> {    
+  public async previewfile(url: string, data?: any): Promise<any> {
     var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);
     this.spinnerShow();
     try {
       this.spinnerHide();
-      const res = await this._http.get(url,{responseType:'blob'}).toPromise();
-      saveAs(res,saveAsFileName);
+      const res = await this._http.post(url, data, { responseType: "blob" }).toPromise();
+      return res;
     } catch (error) {
-      console.log({DOWNLOAD_ERROR_LOG:error});
+      this.errorToast(this.LANG.NOTIFI_MESS.FILE_NOT_FOUND, this.LANG.NOTIFI_MESS.DOWNLOAD_ERR);
+    }
+  }
+  public async downloadfile(url: string, saveAsFileName: string): Promise<any> {
+    var token = 'Bearer ' + localStorage.getItem("access_token");
+    this.headers = this.headers.set("Authorization", token);
+    this.spinnerShow();
+    try {
+      this.spinnerHide();
+      const res = await this._http.get(url, { responseType: 'blob' }).toPromise();
+      saveAs(res, saveAsFileName);
+    } catch (error) {
       this.errorToast(this.LANG.NOTIFI_MESS.FILE_NOT_FOUND, this.LANG.NOTIFI_MESS.DOWNLOAD_ERR);
     }
   }
 
-  uploadfile(url: any, files: any, name: string = null) {   
+  uploadfile(url: any, files: any, name: string = null) {
     var token = 'Bearer ' + localStorage.getItem("access_token");
     if (files.length === 0)
 
@@ -234,8 +260,6 @@ export class BaseService implements ErrorHandler {
    * @param error 
    */
   handleError(error: HttpErrorResponse) {
-
-    console.log(error)
     if (error.status === 400) {
       this.errorToast(error.error.message, this.LANG.NOTIFI_MESS.CLIENT_ERR_TITLE);
     }
@@ -254,6 +278,16 @@ export class BaseService implements ErrorHandler {
       }, 400);
     }
 
+  }
+
+  public logOut() {
+    localStorage.clear();
+
+    setTimeout(() => {
+      this.warningToast(this.LANG.NOTIFI_MESS.EXPIRED_SESSION_MESS, this.LANG.NOTIFI_MESS.EXPIRED_SESSION_TITLE);
+    }, 1000);
+
+    this.reloadPage();
   }
 
   /**
@@ -291,20 +325,20 @@ export class BaseService implements ErrorHandler {
     this.spinnerService.hide();
   }
 
-  checkLoginSession(display_warning = true): boolean {
+  checkLoginSession(): boolean {
     if (this.hasValidAccessToken() == false) {
-      if (display_warning) {
-        this.warningToast(this.LANG.NOTIFI_MESS.EXPIRED_SESSION_MESS, this.LANG.NOTIFI_MESS.EXPIRED_SESSION_TITLE);
-      }
-      this.router.navigateByUrl('/login');
+      localStorage.clear();
       return false;
     } else {
       return true;
     }
-
   }
 
-  reloadPage() {
+
+  /**
+   * Use to hot reload all app 
+   */
+  public reloadPage() {
     if (window.location.hostname === 'localhost') {
       window.location.href = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port;
     } else {
@@ -319,15 +353,36 @@ export class BaseService implements ErrorHandler {
       var expiresAt = localStorage.getItem('expires_at');
       var now = new Date();
       if (expiresAt && parseInt(expiresAt, 10) < now.getTime()) {
+        localStorage.clear();
         return false;
       }
       return true;
     }
+    localStorage.clear();
     return false;
   };
 
+  /**
+   * Return true if access token will be expire time after 3 minutes
+   */
+  public remainingExpireTimeToken(): number {
+    if (this.getAccessToken()) {
+      var expiresAt = localStorage.getItem('expires_at');
+      var expTime = +new Date(parseInt(expiresAt, 10));
+      var nowTime = +new Date();
+      const remainingMinutes = new Date(expTime - nowTime).getMinutes();
+      const remainingHours = new Date(expTime).getHours() - new Date(nowTime).getHours();
+      if (remainingHours == 0) {
+        return remainingMinutes;
+      } else {
+        return -1;
+      }
+    }
+    return -1;
+  };
 
-  private getAccessToken() {
+
+  public getAccessToken() {
     return localStorage.getItem('access_token');
   }
 

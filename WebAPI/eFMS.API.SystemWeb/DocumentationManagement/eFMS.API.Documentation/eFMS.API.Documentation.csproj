@@ -2,6 +2,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <OutputPath>..\bin</OutputPath>
+    <DocumentationFile>eFMS.API.Documentation.xml</DocumentationFile>
   </PropertyGroup>
 <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
@@ -41,14 +42,14 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" />
-    <PackageReference Include="MongoDB.Driver" Version="2.7.2" />
+    <PackageReference Include="MongoDB.Driver" Version="2.8.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="4.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="4.0.1" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="eFMS.API.Common">
-      <HintPath>..\..\..\eFMS.API.Common\obj\Debug\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
+      <HintPath>..\..\..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.API.Documentation.DL">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Documentation.DL.dll</HintPath>
@@ -84,6 +85,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <None Update="eFMS.API.Documentation.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Files\CountryImportTemplate.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

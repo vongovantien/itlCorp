@@ -31,6 +31,9 @@ export class HousebillImportDetailComponent implements OnInit {
 
     ngOnInit() {
         this.selectFilter = 'HBL No';
+        $('#import-housebill-detail-modal').on('shown.bs.modal', function() {
+            $('#searchTextHouseBill').trigger('focus');
+          });
     }
 
     async getShipmentDetails(){
@@ -97,7 +100,7 @@ export class HousebillImportDetailComponent implements OnInit {
     selectedRange: any;
     selectedDate: any;
     keepCalendarOpeningWithRange: true;
-    maxDate: moment.Moment = moment();
+    //maxDate: moment.Moment = moment();
     ranges: any = {
         Today: [moment(), moment()],
         Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],

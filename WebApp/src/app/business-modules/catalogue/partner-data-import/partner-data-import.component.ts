@@ -25,8 +25,8 @@ export class PartnerDataImportComponent implements OnInit {
   isShowInvalid: boolean = true;
   pager: PagerSetting = PAGINGSETTING;
   inProgress: boolean = false;
-  @ViewChild(PaginationComponent) child;
-  @ViewChild(NgProgressComponent) progressBar: NgProgressComponent;
+  @ViewChild(PaginationComponent,{static:false}) child;
+  @ViewChild(NgProgressComponent,{static:false}) progressBar: NgProgressComponent;
   
   constructor(
     private pagingService: PagingService,
@@ -38,7 +38,6 @@ export class PartnerDataImportComponent implements OnInit {
     this.pager.totalItems = 0;
   }
   chooseFile(file: Event){
-    if(!this.baseService.checkLoginSession()) return;
     if(file.target['files'] == null) return;
     this.progressBar.start();
     this.baseService.uploadfile(this.api_menu.Catalogue.PartnerData.uploadExel, file.target['files'], "uploadedFile")
@@ -72,7 +71,6 @@ export class PartnerDataImportComponent implements OnInit {
       //this.inProgress = true;
       this.progressBar.start();
       let data = this.data.filter(x => x.isValid);
-      if(!this.baseService.checkLoginSession()) return;
       var response = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.import, data, true, false);
       if(response){
         this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);

@@ -1,9 +1,11 @@
 import { Container } from "src/app/shared/models/document/container.model";
 import { CsTransactionDetail } from "src/app/shared/models/document/csTransactionDetail";
+import { TransactionTypeEnum } from "../../enums/transaction-type.enum";
 
 export class CsTransaction {
   id: string = "00000000-0000-0000-0000-000000000000";
   branchId: String = "00000000-0000-0000-0000-000000000000";
+  transactionTypeEnum: TransactionTypeEnum;
   jobNo: String = null;
   mawb: String = null;
   typeOfService: String = null;

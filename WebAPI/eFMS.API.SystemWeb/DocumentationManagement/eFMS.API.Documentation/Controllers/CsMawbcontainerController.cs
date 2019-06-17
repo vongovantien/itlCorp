@@ -7,6 +7,8 @@ using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using System;
+using System.Collections.Generic;
 using SystemManagementAPI.Infrastructure.Middlewares;
 using SystemManagementAPI.Resources;
 
@@ -48,5 +50,12 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+
+        [HttpGet]
+        [Route("GetHBConts")]
+        public List<object> GetHBContainers(Guid JobId)
+        {
+            return csContainerService.ListContOfHB(JobId);
+    }
     }
 }

@@ -1,20 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Catalogue.Models;
-using eFMS.API.Catalogue.Resources;
-using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
-using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -32,16 +29,19 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatPartnerService catPartnerService;
         private readonly IMapper mapper;
-        private readonly ICurrentUser currentUser;
-        private string templateName = "ImportTemplate.xlsx";
-        public CatPartnerController(IStringLocalizer<LanguageSub> localizer, ICatPartnerService service, IMapper iMapper, ICurrentUser user)
+        public CatPartnerController(IStringLocalizer<LanguageSub> localizer, ICatPartnerService service, IMapper iMapper)
         {
             stringLocalizer = localizer;
             catPartnerService = service;
             mapper = iMapper;
-            currentUser = user;
         }
 
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var results = catPartnerService.GetPartners();
+            return Ok(results);
+        }
         [HttpPost]
         [Route("Query")]
         public IActionResult Get(CatPartnerCriteria criteria)
@@ -86,10 +86,6 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var partner = mapper.Map<CatPartnerModel>(model);
-            partner.UserCreated = currentUser.UserID;
-            partner.DatetimeCreated = DateTime.Now;
-            partner.Inactive = false;
-            //partner.PartnerGroup = PlaceTypeEx.GetPartnerGroup(model.PartnerGroup);
             var hs = catPartnerService.Add(partner);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -110,15 +106,8 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var partner = mapper.Map<CatPartnerModel>(model);
-            partner.UserModified = currentUser.UserID;
-            partner.DatetimeModified = DateTime.Now;
             partner.Id = id;
-            //partner.PartnerGroup = PlaceTypeEx.GetPartnerGroup(model.PartnerGroup);
-            if (partner.Inactive == true)
-            {
-                partner.InactiveOn = DateTime.Now;
-            }
-            var hs = catPartnerService.Update(partner, x => x.Id == id);
+            var hs = catPartnerService.Update(partner);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -131,7 +120,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
-            var hs = catPartnerService.Delete(x => x.Id == id);
+            var hs = catPartnerService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -171,7 +160,6 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Import([FromBody] List<CatPartnerImportModel> data)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var result = catPartnerService.Import(data);
             if (result.Success)
             {
@@ -182,7 +170,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("DownloadExcel")]
         public async Task<ActionResult> DownloadExcel()
         {
-            templateName = "Partner" + templateName;
+            string templateName = Templates.CatPartner.ExelImportFileName + Templates.ExelImportEx;
             var result = await new FileHelper().ExportExcel(templateName);
             if (result != null)
             {

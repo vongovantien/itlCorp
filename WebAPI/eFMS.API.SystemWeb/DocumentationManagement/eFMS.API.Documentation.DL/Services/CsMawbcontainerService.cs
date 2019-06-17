@@ -2,6 +2,7 @@
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Documentation.Service.ViewModels;
 using ITL.NetCore.Common;
@@ -19,6 +20,22 @@ namespace eFMS.API.Documentation.DL.Services
     {
         public CsMawbcontainerService(IContextBase<CsMawbcontainer> repository, IMapper mapper) : base(repository, mapper)
         {
+        }
+
+        public List<object> ListContOfHB(Guid JobId)
+        {
+            var houseBills = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == JobId).ToList();
+            List<object> returnList = new List<object>();
+            foreach(var item in houseBills)
+            {
+                var conts = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == item.Id).ToList();
+                foreach(var c in conts)
+                {
+                    var obj = new { c.ContainerTypeId, c.Quantity,hblid=item.Id };
+                    returnList.Add(obj);
+                }
+            }
+            return returnList;
         }
 
         public IQueryable<CsMawbcontainerModel> Query(CsMawbcontainerCriteria criteria)
@@ -63,14 +80,14 @@ namespace eFMS.API.Documentation.DL.Services
                 if (masterId != null)
                 {
                     oldList = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Mblid == masterId).ToList();
-                    foreach(var item in oldList)
+                    foreach (var item in oldList)
                     {
-                        if(list.FirstOrDefault(x => x.Id == item.Id) == null)
+                        if (list.FirstOrDefault(x => x.Id == item.Id) == null)
                         {
                             dc.CsMawbcontainer.Remove(item);
                         }
                     }
-                    dc.SaveChanges();
+                    //dc.SaveChanges();
                 }
                 foreach (var item in list)
                 {

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Threading;
-using AutoMapper;
+﻿using AutoMapper;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
@@ -13,9 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System.Linq;
 using eFMS.IdentityServer.DL.UserManager;
-using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
-using eFMS.API.Catalogue.Resources;
+using eFMS.API.Catalogue.DL.Common;
+using eFMS.API.Common.NoSql;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -83,12 +80,8 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            var catCurrencyModel = mapper.Map<CatCurrencyModel>(model);
-            catCurrencyModel.UserCreated = currentUser.UserID;
-            catCurrencyModel.DatetimeCreated = DateTime.Now;
-            catCurrencyModel.Inactive = false;
-            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
-            var hs = catCurrencyService.Add(catCurrencyModel);
+            model.UserCreated = currentUser.UserID;
+            var hs = catCurrencyService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -109,15 +102,8 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            var catCurrencyModel = mapper.Map<CatCurrencyModel>(model);
-            catCurrencyModel.UserModified = currentUser.UserID;
-            catCurrencyModel.DatetimeModified = DateTime.Now;         
-            if(catCurrencyModel.Inactive == true)
-            {
-                catCurrencyModel.InactiveOn = DateTime.Now;
-            }
-            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
-            var hs = catCurrencyService.Update(catCurrencyModel);
+            model.UserModified = currentUser.UserID;
+            var hs = catCurrencyService.Update(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

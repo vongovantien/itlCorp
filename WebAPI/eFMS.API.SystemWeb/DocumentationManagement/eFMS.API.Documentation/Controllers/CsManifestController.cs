@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.IService;
@@ -56,6 +53,14 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(result);
             }
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("PreviewFCLManifest")]
+        public IActionResult PreviewFCLManifest(ManifestReportModel model)
+        {
+            var result = manifestService.Preview(model);
             return Ok(result);
         }
     }

@@ -7,20 +7,27 @@ using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 using eFMS.API.Catalogue.DL.ViewModels;
 using System.Globalization;
 using System.Threading;
 using ITL.NetCore.Common;
-using eFMS.API.Catalogue.Service.Helpers;
+using Microsoft.Extensions.Localization;
+using eFMS.API.Catalogue.DL.Common;
+using eFMS.API.Catalogue.Service.Contexts;
+using eFMS.API.Common.NoSql;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
     public class CatCommodityGroupService : RepositoryBase<CatCommodityGroup, CatCommodityGroupModel>, ICatCommodityGroupService
     {
-        public CatCommodityGroupService(IContextBase<CatCommodityGroup> repository, IMapper mapper) : base(repository, mapper)
+        private readonly IStringLocalizer stringLocalizer;
+        private readonly ICurrentUser currentUser;
+        public CatCommodityGroupService(IContextBase<CatCommodityGroup> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, ICurrentUser user) : base(repository, mapper)
         {
+            stringLocalizer = localizer;
+            currentUser = user;
             SetChildren<CatCommodity>("Id", "CommodityGroupId");
         }
 
@@ -75,35 +82,39 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatCommodityGroupModel> Paging(CatCommodityGroupCriteria criteria, int page, int size, out int rowsCount)
         {
+            List<CatCommodityGroupModel> results = null;
             var list = Query(criteria);
-            rowsCount = list.Count;
+            rowsCount = list.Count();
+            if (rowsCount == 0) return results;
+            else list = list.OrderByDescending(x => x.DatetimeModified);
             if (size > 1)
             {
                 if (page < 1)
                 {
                     page = 1;
                 }
-                list = list.Skip((page - 1) * size).Take(size).ToList();
+                list = list.OrderByDescending(x => x.DatetimeModified);
+                results = list.Skip((page - 1) * size).Take(size).ToList();
             }
-            return list;
+            return results;
         }
 
-        public List<CatCommodityGroupModel> Query(CatCommodityGroupCriteria criteria)
+        public IQueryable<CatCommodityGroupModel> Query(CatCommodityGroupCriteria criteria)
         {
             IQueryable<CatCommodityGroupModel> results = Get(x => x.Inactive == criteria.Inactive || criteria.Inactive == null);
             if (criteria.All == null)
             {
                 results = Get(x =>((x.GroupNameEn ?? "").IndexOf(criteria.GroupNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                         && ((x.GroupNameVn ?? "").IndexOf(criteria.GroupNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                    ).OrderBy(x => x.GroupNameEn).OrderBy(x => x.GroupNameVn);
+                    );
             }
             else
             {
                 results = Get(x => ((x.GroupNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                         || ((x.GroupNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                    ).OrderBy(x => x.GroupNameEn).OrderBy(x => x.GroupNameVn);
+                    );
             }
-            return results?.ToList();
+            return results;
         }
 
         public List<CommodityGroupImportModel> CheckValidImport(List<CommodityGroupImportModel> list)
@@ -114,17 +125,48 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 if (string.IsNullOrEmpty(item.GroupNameEn))
                 {
-                    item.GroupNameEn = string.Format("Name En is not allow empty!|wrong");
+                    item.GroupNameEn = stringLocalizer[LanguageSub.MSG_COMMOIDITY_NAME_EN_EMPTY];
                     item.IsValid = false;
                 }
+                else
+                {
+                    var commodityGr = commodityGroups.FirstOrDefault(x => x.GroupNameEn.ToLower() == item.GroupNameEn.ToLower());
+                    if (commodityGr != null)
+                    {
+                        item.GroupNameEn = string.Format(stringLocalizer[LanguageSub.MSG_STAGE_EXISTED], item.GroupNameEn);
+                        item.IsValid = false;
+                    }
+                    if (list.Count(x => x.GroupNameEn.ToLower() == item.GroupNameEn.ToLower()) > 1){
+                        item.GroupNameEn = string.Format(stringLocalizer[LanguageSub.MSG_STAGE_CODE_DUPLICATE], item.GroupNameEn);
+                        item.IsValid = false;
+                    }
+                }
+
+
                 if (string.IsNullOrEmpty(item.GroupNameVn))
                 {
-                    item.GroupNameVn = string.Format("Name Vn is not allow empty!|wrong");
+                    item.GroupNameVn = stringLocalizer[LanguageSub.MSG_COMMOIDITY_NAME_LOCAL_EMPTY];
                     item.IsValid = false;
                 }
+                else
+                {
+                    var commodityGr = commodityGroups.FirstOrDefault(x => x.GroupNameVn.ToLower() == item.GroupNameVn.ToLower());
+                    if (commodityGr != null)
+                    {
+                        item.GroupNameVn = string.Format(stringLocalizer[LanguageSub.MSG_STAGE_EXISTED], item.GroupNameVn);
+                        item.IsValid = false;
+                    }
+                    if (list.Count(x => x.GroupNameVn.ToLower() == item.GroupNameVn.ToLower()) > 1)
+                    {
+                        item.GroupNameVn = string.Format(stringLocalizer[LanguageSub.MSG_STAGE_CODE_DUPLICATE], item.GroupNameVn);
+                        item.IsValid = false;
+                    }
+                }
+
+
                 if (string.IsNullOrEmpty(item.Status))
                 {
-                    item.Status = string.Format("Status is not allow empty!|wrong");
+                    item.Status = stringLocalizer[LanguageSub.MSG_COMMOIDITY_STATUS_EMPTY];
                     item.IsValid = false;
                 }
             });
@@ -142,9 +184,10 @@ namespace eFMS.API.Catalogue.DL.Services
                     {
                         GroupNameEn = item.GroupNameEn,
                         GroupNameVn = item.GroupNameVn,
-                        Inactive = item.Status.ToString().ToLower() == "active" ? false : true,
+                        Inactive = item.Status.ToLower() != "active",
                         DatetimeCreated = DateTime.Now,
-                        UserCreated = ChangeTrackerHelper.currentUser
+                        UserCreated = currentUser.UserID,
+                        UserModified = currentUser.UserID
                     };
                     dc.CatCommodityGroup.Add(commodityGroup);
                 }

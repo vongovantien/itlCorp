@@ -86,3 +86,17 @@ bin
 /WebAPI/eFMS.API.SystemWeb/Reportmanagement/APIReport/.vs
 /WebAPI/eFMS.API.SystemWeb/Reportmanagement/APIReport/packages/Autofac.WebApi2.4.2.0
 /WebAPI/eFMS.API.SystemWeb/Reportmanagement/APIReport/packages/Autofac.4.9.1
+/WebAPI/eFMS.API.SystemWeb/ReportPreview/packages
+/WebAPI/eFMS.API.SystemWeb/ReportPreview/.vs
+/WebAPI/ITL.NetCoreBase/.vs
+/WebAPI/ITL.NetCoreBase/bin
+/WebAPI/eFMS.API.SystemWeb/ReportPerview/obj
+/WebAPI/eFMS.API.SystemWeb/ReportPerview/.vs
+/WebAPI/eFMS.API.SystemWeb/SettingManagement/.vs
+/WebAPI/eFMS.API.SystemWeb/SettingManagement/eFMS.API.Setting/obj
+/WebAPI/eFMS.API.SystemWeb/SettingManagement/eFMS.API.Setting.DAL/obj
+/WebAPI/eFMS.API.SystemWeb/SettingManagement/eFMS.API.Setting.DL/obj
+/WebAPI/eFMS.API.Common/eFMS.API.Common/.vs
+/WebAPI/eFMS.API.Common/eFMS.API.Common/obj
+/WebAPI/eFMS.API.Common/eFMS.API.Provider/obj
+/WebAPI/eFMS.API.Common/packages

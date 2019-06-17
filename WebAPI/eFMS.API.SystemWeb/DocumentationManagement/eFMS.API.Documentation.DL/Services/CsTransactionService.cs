@@ -13,6 +13,8 @@ using eFMS.API.Documentation.Service.ViewModels;
 using ITL.NetCore.Connection;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Common;
+using System.Data.SqlClient;
+using eFMS.API.Documentation.Service.Contexts;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -26,6 +28,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             try
             {
+                model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var transaction = mapper.Map<CsTransaction>(model);
                 transaction.Id = Guid.NewGuid();
@@ -90,16 +93,13 @@ namespace eFMS.API.Documentation.DL.Services
             var query = (from detail in ((eFMSDataContext)DataContext.DC).CsTransactionDetail
                          where detail.JobId == jobId
                          join surcharge in ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge on detail.Id equals surcharge.Hblid
-                         where surcharge.Soano != null
+                         where surcharge.Soano != null || surcharge.OtherSoa != null
                          select detail);
             if (query.Any())
             {
                 return false;
             }
-            else
-            {
-                return true;
-            }
+            return true;
         }
 
         public HandleState DeleteCSTransaction(Guid jobId)
@@ -138,10 +138,60 @@ namespace eFMS.API.Documentation.DL.Services
                 var result = mapper.Map<CsTransactionModel>(data);
                 if (result.ColoaderId != null) result.SupplierName = ((eFMSDataContext)DataContext.DC).CatPartner.FirstOrDefault(x => x.Id == result.ColoaderId).PartnerNameEn;
                 if (result.AgentId != null) result.AgentName = ((eFMSDataContext)DataContext.DC).CatPartner.FirstOrDefault(x => x.Id == result.AgentId).PartnerNameEn;
-                if (result.Pod != null) result.PODName = ((eFMSDataContext)DataContext.DC).CatPlace.FirstOrDefault(x => x.Id == result.Pod).NameEn;
-                if (result.Pol != null) result.POLName = ((eFMSDataContext)DataContext.DC).CatPlace.FirstOrDefault(x => x.Id == result.Pol).NameEn;
+                if (result.Pod != null) result.PODName = ((eFMSDataContext)DataContext.DC).CatPlace.FirstOrDefault(x => x.Id == result.Pod)?.NameEn;
+                if (result.Pol != null) result.POLName = ((eFMSDataContext)DataContext.DC).CatPlace.FirstOrDefault(x => x.Id == result.Pol)?.NameEn;
                 return result;
             }
+        }
+
+        public List<object> GetListTotalHB(Guid JobId)
+        {
+            List<object> returnList = new List<object>();
+            var housebills = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == JobId).ToList();
+            foreach(var item in housebills)
+            {
+                var totalBuying = (decimal?)0;
+                var totalSelling = (decimal?)0;
+                var totalobh = (decimal?)0;
+                var totallogistic = (decimal?)0;
+
+
+                var totalBuyingUSD = (decimal?)0;
+                var totalSellingUSD = (decimal?)0;
+                var totalobhUSD = (decimal?)0;
+                var totallogisticUSD = (decimal?)0;
+
+                var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Hblid == item.Id).ToList();
+
+                foreach (var c in charges)
+                {
+                    var exchangeRate = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == c.ExchangeDate.Value.Date && x.CurrencyFromId == c.CurrencyId && x.CurrencyToId == "VND" && x.Inactive == false)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                    var UsdToVnd = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == c.ExchangeDate.Value.Date && x.CurrencyFromId == "USD" && x.CurrencyToId == "VND" && x.Inactive == false)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                    var rate = exchangeRate == null ? 1 : exchangeRate.Rate;
+                    var usdToVndRate = UsdToVnd == null ? 1 : UsdToVnd.Rate;
+                    if (c.Type.ToLower() == "buy")
+                    {
+                        totalBuying += c.Total * rate;
+                        totalBuyingUSD += (totalBuying / usdToVndRate);
+                    }
+                    if (c.Type.ToLower()== "sell")
+                    {
+                        totalSelling += c.Total * rate;
+                        totalSellingUSD +=(totalSelling / usdToVndRate);
+                    }
+                    if (c.Type.ToLower() == "obh")
+                    {
+                        totalobh += c.Total * rate;
+                        totalobhUSD += (totalobh / usdToVndRate);
+                    }
+                }
+
+                var totalVND = totalSelling - totalBuying - totallogistic;
+                var totalUSD = totalSellingUSD - totalBuyingUSD - totallogisticUSD;
+                var obj = new { item.Hwbno, totalVND, totalUSD };
+                returnList.Add(obj);
+            }
+            return returnList;
         }
 
         public object ImportCSTransaction(CsTransactionEditModel model)
@@ -290,7 +340,7 @@ namespace eFMS.API.Documentation.DL.Services
                 x.RequestedDate,
                 x.FlightVesselName,
                 x.VoyNo,
-                x.FlightVesselConfirmedDate,
+                //x.FlightVesselConfirmedDate,
                 x.ShipmentType,
                 x.ServiceMode,
                 x.Commodity,
@@ -333,7 +383,7 @@ namespace eFMS.API.Documentation.DL.Services
                 RequestedDate = x.Key.RequestedDate,
                 FlightVesselName = x.Key.FlightVesselName,
                 VoyNo = x.Key.VoyNo,
-                FlightVesselConfirmedDate = x.Key.FlightVesselConfirmedDate,
+                //FlightVesselConfirmedDate = x.Key.FlightVesselConfirmedDate,
                 ShipmentType = x.Key.ShipmentType,
                 ServiceMode = x.Key.ServiceMode,
                 Commodity = x.Key.Commodity,
@@ -344,12 +394,12 @@ namespace eFMS.API.Documentation.DL.Services
                 RouteShipment = x.Key.RouteShipment,
                 Notes = x.Key.Notes,
                 Locked = x.Key.Locked,
-                LockedDate = x.Key.LockedDate,
+                //LockedDate = x.Key.LockedDate,
                 UserCreated = x.Key.UserCreated,
                 CreatedDate = x.Key.CreatedDate,
                 ModifiedDate = x.Key.ModifiedDate,
                 Inactive = x.Key.Inactive,
-                InactiveOn = x.Key.InactiveOn,
+                //InactiveOn = x.Key.InactiveOn,
                 SupplierName = x.Key.SupplierName,
                 CreatorName = x.Key.CreatorName,
                 SumCont = x.Key.SumCont,
@@ -367,16 +417,18 @@ namespace eFMS.API.Documentation.DL.Services
             return results;
         }
 
-        public IQueryable<vw_csTransaction> Query(CsTransactionCriteria criteria)
+        public IQueryable<sp_GetTransaction> Query(CsTransactionCriteria criteria)
         {
-            var list = GetView();
+            var transactionType = DataTypeEx.GetType(criteria.TransactionType);
+            var list = GetView(transactionType);
+            if (list.Count == 0) return null;
             var containers = ((eFMSDataContext)DataContext.DC).CsMawbcontainer;
             
             var query = (from transaction in list
                          join container in containers on transaction.ID equals container.Mblid into containerTrans
                          from cont in containerTrans.DefaultIfEmpty()
                          select new { transaction, cont?.ContainerNo, cont?.SealNo });
-            IQueryable<vw_csTransaction> results = null;
+            IQueryable<sp_GetTransaction> results = null;
 
             if (criteria.All == null)
             {
@@ -418,29 +470,35 @@ namespace eFMS.API.Documentation.DL.Services
         {
             try
             {
+                //model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var transaction = mapper.Map<CsTransaction>(model);
                 //transaction.UserModified = "01";
                 transaction.ModifiedDate = DateTime.Now;
-                var hsTrans = DataContext.Update(transaction, x => x.Id == transaction.Id);
+                var hsTrans = DataContext.Update(transaction, x => x.Id == transaction.Id, false);
                 if (hsTrans.Success)
                 {
-                    foreach (var container in model.CsMawbcontainers)
+                    if(model.CsMawbcontainers != null)
                     {
-                        if (container.Id == Guid.Empty)
+                        var containers = mapper.Map<List<CsMawbcontainer>>(model.CsMawbcontainers);
+
+                        foreach (var container in containers)
                         {
-                            container.Id = Guid.NewGuid();
-                            container.Mblid = transaction.Id;
-                            container.UserModified = transaction.UserModified;
-                            container.DatetimeModified = DateTime.Now;
-                            dc.CsMawbcontainer.Add(container);
-                        }
-                        else
-                        {
-                            container.Mblid = transaction.Id;
-                            container.UserModified = transaction.UserModified;
-                            container.DatetimeModified = DateTime.Now;
-                            dc.CsMawbcontainer.Update(container);
+                            if (container.Id == Guid.Empty)
+                            {
+                                container.Id = Guid.NewGuid();
+                                container.Mblid = transaction.Id;
+                                container.UserModified = transaction.UserModified;
+                                container.DatetimeModified = DateTime.Now;
+                                dc.CsMawbcontainer.Add(container);
+                            }
+                            else
+                            {
+                                container.Mblid = transaction.Id;
+                                container.UserModified = transaction.UserModified;
+                                container.DatetimeModified = DateTime.Now;
+                                dc.CsMawbcontainer.Update(container);
+                            }
                         }
                     }
                     dc.SaveChanges();
@@ -453,10 +511,15 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
-        private List<vw_csTransaction> GetView()
+        private List<sp_GetTransaction> GetView(string transactionType)
         {
-            List<vw_csTransaction> lvCatPlace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_csTransaction>();
-            return lvCatPlace;
+            //string transactionType = "SeaFCLExport";
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName="@transactionType", Value = transactionType }
+            };
+            //List<vw_csTransaction> lvCatPlace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_csTransaction>();
+            var list = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetTransaction>(parameters);
+            return list;
         }
     }
 }

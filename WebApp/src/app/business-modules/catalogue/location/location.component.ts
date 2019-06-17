@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import * as lodash from 'lodash';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
@@ -16,6 +16,7 @@ import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
+import { ActivatedRoute } from '@angular/router';
 declare var $: any;
 
 @Component({
@@ -23,7 +24,11 @@ declare var $: any;
   templateUrl: './location.component.html',
   styleUrls: ['./location.component.sass']
 })
-export class LocationComponent implements OnInit {
+export class LocationComponent implements OnInit,AfterViewInit {
+  ngAfterViewInit(): void {
+   
+
+  }
 
   /**
    *START VARIABLES DEFINITIONS
@@ -111,17 +116,20 @@ export class LocationComponent implements OnInit {
     condition: "OR",
   }
   searchObject: any = { condition: "OR" };
-  @ViewChild(PaginationComponent) child;
+  @ViewChild(PaginationComponent,{static:false}) child;
 
   /**
    * END OF VARIABLES DEFINITIONS
    */
 
   constructor(
+    private route:ActivatedRoute,
     private excelService: ExcelService,
     private baseServices: BaseService,
     private api_menu: API_MENU,
-    private sortService: SortService) { }
+    private sortService: SortService) { 
+
+    }
 
   resetNg2SelectCountry = true;
   resetNg2SelectProvince = true;
@@ -176,13 +184,13 @@ export class LocationComponent implements OnInit {
       if(isCountry){
         dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.nameEn, "id": x.id }));    
       }else{
-        dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.name_EN, "id": x.id }));    
+        dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.nameEn, "id": x.id }));    
       }  
     } else {
       if(isCountry){
         dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.nameVn, "id": x.id }));    
       }else{
-        dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.name_VN, "id": x.id }));     
+        dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.nameVn, "id": x.id }));     
       }      
     }
     return dataReturn;
@@ -274,7 +282,8 @@ export class LocationComponent implements OnInit {
     if (this.selectedFilterCountryTab == "All") {
       this.searchObject.condition = "OR";
       for (var i = 1; i < this.listFilterCountryTab.length; i++) {
-        eval("this.searchObject[this.listFilterCountryTab[i].field]=this.searchKeyCountryTab");
+        this.searchObject[this.listFilterCountryTab[i].field] = this.searchKeyCountryTab;
+        // eval("this.searchObject[this.listFilterCountryTab[i].field]=this.searchKeyCountryTab");
       }
 
     } else {
@@ -283,7 +292,8 @@ export class LocationComponent implements OnInit {
       for (var i = 1; i < this.listFilterCountryTab.length; i++) {
         console.log(this.listFilterCountryTab[i].field);
         if (this.selectedFilterCountryTab == this.listFilterCountryTab[i].filter) {
-          eval("this.searchObject[this.listFilterCountryTab[i].field]=this.searchKeyCountryTab");
+          this.searchObject[this.listFilterCountryTab[i].field] = this.searchKeyCountryTab;
+          // eval("this.searchObject[this.listFilterCountryTab[i].field]=this.searchKeyCountryTab");
         }
 
       }
@@ -292,6 +302,8 @@ export class LocationComponent implements OnInit {
   }
 
   async resetCountryTab() {
+    this.pager.totalItems = 0;
+    this.pager.currentPage = 1;
     this.searchKeyCountryTab = "";
     this.searchObject = {};
     this.selectedFilterCountryTab = this.listFilterCountryTab[0].filter;
@@ -317,9 +329,11 @@ export class LocationComponent implements OnInit {
       delete this.CountryToAdd.id;
       if (form.form.status != "INVALID") {
         const response = await this.baseServices.postAsync(this.api_menu.Catalogue.Country.addNew, this.CountryToAdd, true, true);
+        this.pager.totalItems = 0;
         await this.getCountries();
+        this.getAllCountries();
         if(response){
-          this.setPageAfterAdd();
+          //this.setPageAfterAdd();
           form.onReset();
           $('#add-country-modal').modal('hide');
         }
@@ -399,7 +413,7 @@ export class LocationComponent implements OnInit {
    */
 
   async searchInProvinceCityTab() {
-
+    this.pager.currentPage = 1;
     this.searchObject = {};
     this.searchObject.placeType = PlaceTypeEnum.Province; //9;
     if (this.selectedFilterProvinceCityTab == "All") {
@@ -407,9 +421,9 @@ export class LocationComponent implements OnInit {
     } else {
       this.searchObject = {};
       for (var i = 1; i < this.listFilterProvinceCityTab.length; i++) {
-        console.log(this.listFilterProvinceCityTab[i].field);
         if (this.selectedFilterProvinceCityTab == this.listFilterProvinceCityTab[i].filter) {
-          eval("this.searchObject[this.listFilterProvinceCityTab[i].field]=this.searchKeyProvinceTab");
+          this.searchObject[this.listFilterProvinceCityTab[i].field] = this.searchKeyProvinceTab;
+          // eval("this.searchObject[this.listFilterProvinceCityTab[i].field]=this.searchKeyProvinceTab");
         }
 
       }
@@ -418,6 +432,8 @@ export class LocationComponent implements OnInit {
   }
 
   async resetProvinceCityTab() {
+    this.pager.totalItems = 0;
+    this.pager.currentPage = 1;
     this.searchKeyProvinceTab = "";
     this.searchObject = {};
     this.selectedFilterProvinceCityTab = this.listFilterProvinceCityTab[0].filter;
@@ -439,10 +455,11 @@ export class LocationComponent implements OnInit {
       if (form.form.status != "INVALID" && this.ProvinceCityToAdd.countryId != null) {
         this.ProvinceCityToAdd.placeType = PlaceTypeEnum.Province;
         const response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.add, this.ProvinceCityToAdd);
+        this.pager.totalItems = 0;
         await this.getProvinceCities();
         console.log(response);
         if(response){
-          this.setPageAfterAdd();
+          //this.setPageAfterAdd();
           form.onReset();
           this.resetNgSelect("all");
           $('#add-city-province-modal').modal('hide');
@@ -516,7 +533,8 @@ export class LocationComponent implements OnInit {
       for (var i = 1; i < this.listFilterDistrictTab.length; i++) {
         console.log(this.listFilterDistrictTab[i].field);
         if (this.selectedFilterDistrictTab == this.listFilterDistrictTab[i].filter) {
-          eval("this.searchObject[this.listFilterDistrictTab[i].field]=this.searchKeyDistrictTab");
+          this.searchObject[this.listFilterDistrictTab[i].field] = this.searchKeyDistrictTab;
+          // eval("this.searchObject[this.listFilterDistrictTab[i].field]=this.searchKeyDistrictTab");
         }
 
       }
@@ -525,6 +543,8 @@ export class LocationComponent implements OnInit {
   }
 
   async resetDistrictTab() {
+    this.pager.totalItems = 0;
+    this.pager.currentPage = 1;
     this.searchKeyDistrictTab = "";
     this.searchObject = {};
     this.selectedFilterDistrictTab = this.listFilterDistrictTab[0].filter;
@@ -546,6 +566,7 @@ export class LocationComponent implements OnInit {
       if (form.form.status != "INVALID" && this.DistrictToAdd.countryId != null && this.DistrictToAdd.provinceId != null) {
         this.DistrictToAdd.placeType = PlaceTypeEnum.District;
         const response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.add, this.DistrictToAdd);
+        this.pager.totalItems = 0;
         await this.getDistrict();
         if(response){
           this.setPageAfterAdd();
@@ -640,7 +661,8 @@ export class LocationComponent implements OnInit {
       this.searchObject = {};
       for (var i = 1; i < this.listFilterWardTab.length; i++) {
         if (this.selectedFilterWardTab == this.listFilterWardTab[i].filter) {
-          eval("this.searchObject[this.listFilterWardTab[i].field]=this.searchKeyWardTab");
+          this.searchObject[this.listFilterWardTab[i].field] = this.searchKeyWardTab;
+          // eval("this.searchObject[this.listFilterWardTab[i].field]=this.searchKeyWardTab");
         }
 
       }
@@ -650,6 +672,8 @@ export class LocationComponent implements OnInit {
   }
 
   async resetWardTab() {
+    this.pager.totalItems = 0;
+    this.pager.currentPage = 1;
     this.searchKeyWardTab = "";
     this.searchObject = {};
     this.selectedFilterWardTab = this.listFilterWardTab[0].filter;
@@ -675,9 +699,10 @@ export class LocationComponent implements OnInit {
       if (form.form.status != "INVALID" && this.WardToAdd.countryId != null && this.WardToAdd.provinceId != null && this.WardToAdd.districtId != null) {
         this.WardToAdd.placeType = PlaceTypeEnum.Ward;
         const response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.add, this.WardToAdd);
+        this.pager.totalItems = 0;
         await this.getWards();        
         if(response){
-          this.setPageAfterAdd();
+          //this.setPageAfterAdd();
           form.onReset();
           this.resetNgSelect("all");
           $('#add-ward-modal').modal('hide');

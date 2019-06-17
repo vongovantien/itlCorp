@@ -57,7 +57,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpPut]
         [Route("Update")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Update(AcctSOAModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -73,12 +73,27 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        [HttpDelete]
+        [Route("Delete")]
+        [Authorize]
+        public IActionResult Delete(Guid cdNoteId)
+        {
+            var hs = acctSOAServices.DeleteSOA(cdNoteId);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
         [HttpGet]
         [Route("Get")]
         //[Authorize]
-        public List<object> Get(Guid JobId)
+        public List<object> Get(Guid Id,bool IsHouseBillID)
         {
-            return acctSOAServices.GroupSOAByPartner(JobId);
+            return acctSOAServices.GroupSOAByPartner(Id, IsHouseBillID);
         }
 
         [HttpGet]

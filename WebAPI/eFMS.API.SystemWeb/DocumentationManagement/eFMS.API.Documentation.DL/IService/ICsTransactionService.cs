@@ -14,7 +14,7 @@ namespace eFMS.API.Documentation.DL.IService
 {
     public interface ICsTransactionService : IRepositoryBase<CsTransaction, CsTransactionModel>
     {
-        IQueryable<vw_csTransaction> Query(CsTransactionCriteria criteria);
+        IQueryable<sp_GetTransaction> Query(CsTransactionCriteria criteria);
         List<CsTransactionModel> Paging(CsTransactionCriteria criteria, int page, int size, out int rowsCount);
         CsTransactionModel GetById(Guid id);
         object AddCSTransaction(CsTransactionEditModel model);
@@ -22,5 +22,6 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState UpdateCSTransaction(CsTransactionEditModel model);
         bool CheckAllowDelete(Guid jobId);
         HandleState DeleteCSTransaction(Guid jobId);
+        List<object> GetListTotalHB(Guid JobId);
     }
 }

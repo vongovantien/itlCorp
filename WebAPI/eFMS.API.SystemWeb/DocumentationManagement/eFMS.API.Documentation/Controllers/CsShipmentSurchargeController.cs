@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
-using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
@@ -44,18 +41,18 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpGet]
         [Route("GroupByListHB")]
-        public List<object> GetByListHouseBill(Guid JobId,string partnerID,bool getAll=false)
+        public List<object> GetByListHouseBill(Guid Id,string partnerID,bool IsHouseBillID,bool getAll=false)
         {
 
-            return csShipmentSurchargeService.GroupChargeByHB(JobId, partnerID,getAll);
+            return csShipmentSurchargeService.GroupChargeByHB(Id, partnerID,IsHouseBillID,getAll);
         }
 
         [HttpGet]
-        [Route("GetPartnersByJob")]
-        public List<CatPartner> GetPartnersByListHB(Guid JobId)
+        [Route("GetPartners")]
+        public List<CatPartner> GetPartners(Guid Id,bool IsHouseBillID)
         {
 
-            return csShipmentSurchargeService.GetAllParnerByJob(JobId);
+            return csShipmentSurchargeService.GetAllParner(Id, IsHouseBillID);
         }
 
 
@@ -64,11 +61,8 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult AddNew(CsShipmentSurchargeModel model)
         {
-            model.Id = Guid.NewGuid();
-            model.ExchangeDate = DateTime.Now;
             if (!ModelState.IsValid) return BadRequest();
             model.UserCreated = currentUser.UserID;
-            model.DatetimeCreated = DateTime.Now;
             var hs = csShipmentSurchargeService.Add(model);           
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -96,6 +90,21 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
 
+        }
+
+        [HttpDelete]
+        [Route("Delete")]
+        //[Authorize]
+        public IActionResult Delete(Guid chargId)
+        {
+            var hs = csShipmentSurchargeService.DeleteCharge(chargId);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
     }
 }

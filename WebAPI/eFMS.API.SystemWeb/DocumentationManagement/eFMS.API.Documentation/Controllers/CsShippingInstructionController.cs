@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
-using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
@@ -46,12 +42,27 @@ namespace eFMS.API.Documentation.Controllers
             model.UserCreated = currentUser.UserID;
             model.CreatedDate = DateTime.Now;
             var hs = shippingInstructionService.AddOrUpdate(model);
-            var message = HandleError.GetMessage(hs, Crud.Insert);
+            var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);
             }
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("PreviewFCLShippingInstruction")]
+        public IActionResult PreviewFCLShippingInstruction(CsShippingInstructionReportModel model)
+        {
+            var result = shippingInstructionService.PreviewFCLShippingInstruction(model);
+            return Ok(result);
+        }
+        [HttpPost]
+        [Route("PreviewFCLOCL")]
+        public IActionResult PreviewFCLOCL(CsShippingInstructionReportModel model)
+        {
+            var result = shippingInstructionService.PreviewOCL(model);
             return Ok(result);
         }
     }

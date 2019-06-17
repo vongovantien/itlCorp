@@ -1,17 +1,12 @@
-﻿using System;
-using System.Globalization;
-using System.Threading;
-using AutoMapper;
+﻿using AutoMapper;
+using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
-using eFMS.API.Catalogue.Resources;
-using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
-using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -27,14 +22,12 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatUnitService catUnitService;
         private readonly IMapper mapper;
-        private readonly ICurrentUser currentUser;
 
-        public CatUnitController(IStringLocalizer<LanguageSub> localizer,ICatUnitService service, IMapper imapper, ICurrentUser user)
+        public CatUnitController(IStringLocalizer<LanguageSub> localizer,ICatUnitService service, IMapper imapper)
         {
             stringLocalizer = localizer;
             catUnitService = service;
             mapper = imapper;
-            currentUser = user;
         }
 
         [HttpGet]
@@ -85,12 +78,8 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            var catUnit = mapper.Map<CatUnitModel>(model);
-            catUnit.UserCreated = currentUser.UserID;
-            catUnit.DatetimeCreated = DateTime.Now;
-            catUnit.Inactive = false;
-            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
-            var hs = catUnitService.Add(catUnit);
+            //var catUnit = mapper.Map<CatUnitModel>(model);
+            var hs = catUnitService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -112,10 +101,7 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var catUnit = mapper.Map<CatUnitModel>(model);
-            catUnit.UserModified = currentUser.UserID;
-            catUnit.DatetimeModified = DateTime.Now;
-            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
-            var hs = catUnitService.Update(catUnit,x=>x.Id==model.Id);
+            var hs = catUnitService.Update(catUnit);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -129,10 +115,10 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpDelete]
         [Route("Delete/{id}")]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(short id)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
-            var hs = catUnitService.Delete(x => x.Id == id);
+            //var hs = catUnitService.Delete(x => x.Id == id);
+            var hs = catUnitService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -148,16 +134,30 @@ namespace eFMS.API.Catalogue.Controllers
             string message = string.Empty;
             if (id == 0)
             {
-                if (catUnitService.Any(x => (x.Code.ToLower() == model.Code.ToLower()) || (x.UnitNameEn.ToLower() == model.UnitNameEn.ToLower()) || (x.UnitNameVn.ToLower() == model.UnitNameEn.ToLower())))
+                if (catUnitService.Any(x => (x.Code.ToLower() == model.Code.ToLower()) || string.IsNullOrEmpty(model.Code)))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
+                }
+                else if(catUnitService.Any(x => x.UnitNameEn.ToLower() == model.UnitNameEn.ToLower() || string.IsNullOrEmpty(model.UnitNameEn))){
+                    message = stringLocalizer[LanguageSub.MSG_NAME_EN_EXISTED].Value;
+                }
+                else if(catUnitService.Any(x => x.UnitNameVn.ToLower() == model.UnitNameVn.ToLower() || string.IsNullOrEmpty(model.UnitNameVn))){
+                    message = stringLocalizer[LanguageSub.MSG_NAME_LOCAL_EXISTED].Value;
                 }
             }
             else
             {
-                if (catUnitService.Any(x => ((x.Code.ToLower() == model.Code.ToLower()) || (x.UnitNameEn.ToLower() == model.UnitNameEn.ToLower()) || (x.UnitNameVn.ToLower() == model.UnitNameVn.ToLower())) && x.Id != id))
+                if (catUnitService.Any(x => (x.Code.ToLower() == model.Code.ToLower() && x.Id != id) || string.IsNullOrEmpty(model.Code)))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
+                }
+                else if(catUnitService.Any(x => (x.UnitNameEn.ToLower() == model.UnitNameEn.ToLower() && x.Id != id) || string.IsNullOrEmpty(model.UnitNameEn)))
+                {
+                    message = stringLocalizer[LanguageSub.MSG_NAME_EN_EXISTED].Value;
+                }
+                else if(catUnitService.Any(x => (x.UnitNameVn.ToLower() == model.UnitNameVn.ToLower() && x.Id != id) || string.IsNullOrEmpty(model.UnitNameVn)))
+                {
+                    message = stringLocalizer[LanguageSub.MSG_NAME_LOCAL_EXISTED].Value;
                 }
             }
             return message;

@@ -5,15 +5,15 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
+using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
-using eFMS.API.Catalogue.Resources;
-using eFMS.API.Catalogue.Service.Helpers;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -33,7 +33,6 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatChargeDefaultAccountService catChargeDefaultAccountService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
-        private string templateName = "ImportTemplate.xlsx";
         public CatChargeDefaultAccountController(IStringLocalizer<LanguageSub> localizer, ICatChargeDefaultAccountService service, IMapper imapper, ICurrentUser user)
         {
             stringLocalizer = localizer;
@@ -42,6 +41,10 @@ namespace eFMS.API.Catalogue.Controllers
             currentUser = user;
         }
 
+        /// <summary>
+        /// get all charge default
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("getAll")]
         public IActionResult Get()
@@ -50,6 +53,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(results);
         }
 
+        /// <summary>
+        /// add new charge default
+        /// </summary>
+        /// <param name="model">object to add</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("addNew")]
         [Authorize]
@@ -63,10 +71,9 @@ namespace eFMS.API.Catalogue.Controllers
             }
 
             var catChargeDefaultAccount = mapper.Map<CatChargeDefaultAccountModel>(model);
-            catChargeDefaultAccount.UserCreated = currentUser.UserID;
+            catChargeDefaultAccount.UserCreated = catChargeDefaultAccount.UserModified = currentUser.UserID;
             catChargeDefaultAccount.DatetimeCreated = DateTime.Now;
             catChargeDefaultAccount.Inactive = false;
-            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             var hs = catChargeDefaultAccountService.Add(catChargeDefaultAccount);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -77,6 +84,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// update an existed item
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPut]
         [Route("update")]
         [Authorize]
@@ -92,7 +104,6 @@ namespace eFMS.API.Catalogue.Controllers
             var catChargeDefaultAccount = mapper.Map<CatChargeDefaultAccountModel>(model);
             catChargeDefaultAccount.UserModified = currentUser.UserID;
             catChargeDefaultAccount.DatetimeModified = DateTime.Now;
-            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             var hs = catChargeDefaultAccountService.Update(catChargeDefaultAccount,x=>x.Id==model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -104,6 +115,11 @@ namespace eFMS.API.Catalogue.Controllers
 
         }
 
+        /// <summary>
+        /// delete an existed item
+        /// </summary>
+        /// <param name="id">id of data that need to delete</param>
+        /// <returns></returns>
         [HttpDelete]
         [Route("delete/{id}")]
         [Authorize]
@@ -140,6 +156,11 @@ namespace eFMS.API.Catalogue.Controllers
             return message;
         }
 
+        /// <summary>
+        /// read charge default data from file excel 
+        /// </summary>
+        /// <param name="uploadedFile">file to read data</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("uploadFile")]
         public IActionResult UploadFile(IFormFile uploadedFile)
@@ -203,12 +224,16 @@ namespace eFMS.API.Catalogue.Controllers
             return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
         }
 
+        /// <summary>
+        /// import list charge default into database
+        /// </summary>
+        /// <param name="data">list of data</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("import")]
         //[Authorize]
         public IActionResult Import([FromBody] List<CatChargeDefaultAccountImportModel> data)
         {
-            //ChangeTrackerHelper.currentUser = currentUser.UserID;
             var result = catChargeDefaultAccountService.Import(data);
             if (result.Success)
             {
@@ -219,13 +244,18 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = result.Exception.Message });
             }
         }
+
+        /// <summary>
+        /// download exel from server
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("downloadExcel")]
         public async Task<ActionResult> DownloadExcel()
         {
 
             try
             {
-                templateName = "VoucherTypeAccount" + templateName;
+                string templateName = "VoucherTypeAccount" + Templates.ExelImportEx;
                 var result = await new FileHelper().ExportExcel(templateName);
                 if (result != null)
                 {
@@ -243,7 +273,5 @@ namespace eFMS.API.Catalogue.Controllers
 
 
         }
-
-
     }
 }

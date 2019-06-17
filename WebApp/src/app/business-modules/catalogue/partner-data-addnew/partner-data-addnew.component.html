@@ -45,6 +45,7 @@
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="" disabled name="partnerAccountNo" autocomplete="nope" minlength="3" maxlength="20"
                              [(ngModel)]="partner.accountNo" #partnerAccountNo="ngModel" (change)="partner.accountNo = partner.taxCode.trim()" 
+                             specialIsAlphaNumeric
                              [ngClass]="{ 'm-input--square': formAddEdit.submitted && partnerAccountNo.invalid }" required >
                              <div class="form-control-feedback" *ngIf="formAddEdit.submitted && partnerAccountNo.invalid" >
                                 Partner ID  required least 3 characters
@@ -98,7 +99,7 @@
                                 Tax Code <span class="m--font-danger">(*)</span>
                             </label>
                             <input type="number" min="0" class="form-control m-input m-input--square" title="Tax code must be number" placeholder="Please enter Tax Code" autocomplete="nope" minlength="3" maxlength="100"
-                                name="partnerTaxCode"  [(ngModel)]="partner.taxCode" #partnerTaxCode="ngModel" oninput="validity.valid||(value='');"
+                                name="partnerTaxCode"  [(ngModel)]="partner.taxCode" #partnerTaxCode="ngModel" oninput="validity.valid||(value='');" specialIsAlphaNumeric
                                 [ngClass]="{ 'm-input--square': formAddEdit.submitted && partnerTaxCode.invalid }" required>
                             <div class="form-control-feedback" *ngIf="formAddEdit.submitted && partnerTaxCode.invalid" >
                                 Partner Tax Code is required and must be number
@@ -315,7 +316,7 @@
                                     Saleman <span class="m--font-danger" *ngIf="partner.salePersonId == null && isRequiredSaleman">(*)</span>
                                 </label>
                                 <ng-select #chooseSaleman [allowClear]="true" [items]="saleMans" [disabled]="disabled" (data)="refreshValue($event)" name="partnerSaleman"
-                                    (selected)="selected($event, 'saleman')" (removed)="removed($event,'saleman')" (typed)="typed($event)"
+                                    (selected)="partner.salePersonId = $event.id" (removed)="partner.salePersonId = null" (typed)="typed($event)"
                                     placeholder="">
                                 </ng-select>
                                 <div class="form-control-feedback" *ngIf="(partner.salePersonId == null && isRequiredSaleman)" >
@@ -372,14 +373,14 @@
             <div class="m-portlet__body">
                 <div class="row">
                     <div class="col-lg-4">
-                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && this.partner.departmentId == null }">
+                        <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && partner.departmentId == null }">
                             <label class="form-control-label" for="">
                                 Department <span class="m--font-danger">(*)</span>
                             </label>
                             <ng-select #chooseDepartment [allowClear]="true" [items]="departments" [active]="departmentActive" [disabled]="disabled" (data)="refreshValue($event)" name="partnerAccountRef"
-                                (selected)="selected($event, 'department')" (removed)="removed($event,'department')" placeholder="Select filter">
+                                (selected)="partner.departmentId = $event.id" (removed)="partner.departmentId = null" placeholder="Select filter">
                             </ng-select>
-                            <div class="form-control-feedback" *ngIf="formAddEdit.submitted && this.partner.departmentId == null" >
+                            <div class="form-control-feedback" *ngIf="formAddEdit.submitted && partner.departmentId == null" >
                                 Department is required
                             </div>
                         </div>
@@ -390,7 +391,7 @@
                                 A/C Ref
                             </label>
                             <ng-select #chooseAccountRef [allowClear]="true" [items]="parentCustomers" [disabled]="disabled" (data)="refreshValue($event)" name="partnerAccountRef"
-                                (selected)="selected($event, 'accountRef')" (removed)="removed($event)" placeholder="Select A/C Ref">
+                                (selected)="partner.parentId = $event.id" (removed)="partner.parentId = null" placeholder="Select A/C Ref">
                             </ng-select>
                         </div>
                     </div>
@@ -429,7 +430,7 @@
                                 Profile
                             </label>
                             <ng-select #chooseWorkplace [allowClear]="true" [items]="workPlaces" [disabled]="disabled" (data)="refreshValue($event)" name="partnerAccountRef"
-                                (selected)="selected($event, 'workplace')" (removed)="removed($event)" placeholder="Select filter">
+                                (selected)="partner.workPlaceId = $event.id" (removed)="partner.workPlaceId = null" placeholder="Select filter">
                             </ng-select>
                         </div>
                     </div>

@@ -32,14 +32,13 @@ export class StageManagementComponent implements OnInit {
     index_stage_edit = null;
     index_current_department = null;
 
-    @ViewChild(PaginationComponent) child;
+    @ViewChild(PaginationComponent,{static:false}) child;
 
     constructor(
         private excelService: ExcelService,
         private baseServices: BaseService,
         private api_menu: API_MENU,
         private sortService: SortService) {
-
     }
 
     async ngOnInit() {
@@ -73,7 +72,7 @@ export class StageManagementComponent implements OnInit {
         }
 
         if (action == 'yes') {
-            var id_stage = this.ListStages[this.index_stage_remove].stage.id;
+            var id_stage = this.ListStages[this.index_stage_remove].id;
             await this.baseServices.deleteAsync(this.api_menu.Catalogue.Stage_Management.delete + id_stage, true, true)
             // await this.setPage(this.pager);
             await this.getStages(this.pager);
@@ -94,19 +93,25 @@ export class StageManagementComponent implements OnInit {
         if (action == "confirm") {
 
             this.index_stage_edit = index;
-            var currentStage = this.ListStages[this.index_stage_edit].stage;
+            var currentStage = this.ListStages[this.index_stage_edit];
             this.index_current_department = lodash.findIndex(this.ListDepartment,function(d){
                 return d['id']==currentStage.departmentId; 
             });
 
         } else {
             if (form.form.status != "INVALID") {
-                this.StageToUpdate = this.ListStages[this.index_stage_edit].stage;
+                this.StageToUpdate = this.ListStages[this.index_stage_edit];
                 var res = await this.baseServices.putAsync(this.api_menu.Catalogue.Stage_Management.update, this.StageToUpdate, true, true);
                 if(res){
                     this.StageToUpdate = new StageModel();
                     $('#edit-stage-management-modal').modal('hide');
-                    //await this.setPage(this.pager);
+                    
+                    //this.pager.currentPage = 1;
+                    //this.child.setPage(this.pager.currentPage);
+                    this.pager.totalItems = 0;
+                    // this.getStages(this.pager);
+                    //await this.getStages(this.pager);
+                    await this.setPage(this.pager);
                 }
             }
         }
@@ -128,12 +133,15 @@ export class StageManagementComponent implements OnInit {
             if (form.form.status != "INVALID") {
                 await this.baseServices.postAsync(this.api_menu.Catalogue.Stage_Management.addNew, this.StageToAdd, true, true);
                 this.StageToAdd = new StageModel();
-                await this.getStages(this.pager);
+                this.pager.currentPage = 1;
+                this.pager.totalItems = 0;
                 this.child.setPage(this.pager.currentPage);
-                if (this.pager.currentPage < this.pager.totalPages) {
-                    this.pager.currentPage = this.pager.totalPages;
-                    this.child.setPage(this.pager.currentPage);
-                }
+                //await this.getStages(this.pager);
+                // this.child.setPage(this.pager.currentPage);
+                // if (this.pager.currentPage < this.pager.totalPages) {
+                //     this.pager.currentPage = this.pager.totalPages;
+                //     this.child.setPage(this.pager.currentPage);
+                // }
 
                 this.resetNgSelect();
                 form.onReset();
@@ -269,7 +277,7 @@ export class StageManagementComponent implements OnInit {
 
     isDesc = true;
     sortKey: string = "id";
-    sort(property) {
+    sort(property:any) {
         this.sortKey = property;
         this.isDesc = !this.isDesc;
         if (property === 'deptName') {

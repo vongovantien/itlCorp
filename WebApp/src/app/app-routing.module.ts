@@ -32,40 +32,93 @@ const routes: Routes = [
                 component:DashboardComponent
             },
             {
-                path: 'system',
-                loadChildren: './business-modules/system/system.module#SystemModule'
+                path: 'system',  
+                loadChildren:() => import('./business-modules/system/system.module').then(m => m.SystemModule),
+                data:{
+                    name:"System",
+                    path:"system",
+                    level:1
+                }
             },
             {
                 path: 'catalogue',
-                loadChildren: './business-modules/catalogue/catalogue.module#CatalogueModule'
+                // loadChildren: './business-modules/catalogue/catalogue.module#CatalogueModule',
+                loadChildren:() => import('./business-modules/catalogue/catalogue.module').then(m => m.CatalogueModule),
+                data:{
+                    name:"Catalogue",
+                    path:"catalogue",
+                    level:1
+                }
             },        
             {
                 path:'accounting',
-                loadChildren:'./business-modules/accounting/accounting.module#AccountingModule'
+                // loadChildren:'./business-modules/accounting/accounting.module#AccountingModule',
+                loadChildren:() => import('./business-modules/accounting/accounting.module').then(m => m.AccountingModule),
+                data:{
+                    name:"Accounting",
+                    path:"accounting",
+                    level:1
+                }
             },
             {
                 path:'documentation',
-                loadChildren:'./business-modules/documentation/documentation.module#DocumentationModule'
+                // loadChildren:'./business-modules/documentation/documentation.module#DocumentationModule',
+                loadChildren:() => import('./business-modules/documentation/documentation.module').then(m => m.DocumentationModule),
+                data:{
+                    name:"Documentation",
+                    path:"documentation",
+                    level:1
+                }
             },
             {
                 path:'operation',
-                loadChildren:'./business-modules/operation/operation.module#OperationModule'
+                // loadChildren:'./business-modules/operation/operation.module#OperationModule',
+                loadChildren:() => import('./business-modules/operation/operation.module').then(m => m.OperationModule),
+                data:{
+                    name:"Operation",
+                    path:"operation",
+                    level:1
+                }
             },
             {
                 path:'report',
-                loadChildren:'./business-modules/report/report.module#ReportModule'
+                // loadChildren:'./business-modules/report/report.module#ReportModule',
+                loadChildren:() => import('./business-modules/report/report.module').then(m => m.ReportModule),
+                data:{
+                    name:"Report",
+                    path:"report",
+                    level:1
+                }
             },
             {
                 path:'support',
-                loadChildren:'./business-modules/support/support.module#SupportModule'
+                // loadChildren:'./business-modules/support/support.module#SupportModule',
+                loadChildren:() => import('./business-modules/support/support.module').then(m => m.SupportModule),
+                data:{
+                    name:"Support",
+                    path:"support",
+                    level:1
+                }
             },
             {
                 path:'tool',
-                loadChildren:'./business-modules/tool-setting/tool.module#ToolModule'
+                // loadChildren:'./business-modules/tool-setting/tool.module#ToolModule',
+                loadChildren:() => import('./business-modules/tool-setting/tool.module').then(m => m.ToolModule),
+                data:{
+                    name:"Tool",
+                    path:"tool",
+                    level:1
+                }
             },
             {
                 path:'designs-zone',
-                loadChildren:'./design-modules/design-modules.module#DesignModulesModule'
+                // loadChildren:'./design-modules/design-modules.module#DesignModulesModule',
+                loadChildren:() => import('./design-modules/design-modules.module').then(m => m.DesignModulesModule),
+                data:{
+                    name:"Design Zone",
+                    path:"design-zone",
+                    level:1
+                }
             }
         ]
 

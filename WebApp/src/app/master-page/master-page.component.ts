@@ -1,8 +1,8 @@
-import { Component, OnInit,ViewChild,AfterViewInit, ChangeDetectorRef } from '@angular/core';
-import {PageSidebarComponent} from './page-sidebar/page-sidebar.component';
+import { Component, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { PageSidebarComponent } from './page-sidebar/page-sidebar.component';
 import { Router } from '@angular/router';
-import { CookieService } from 'ngx-cookie-service';
 import { OAuthService } from 'angular-oauth2-oidc';
+import { BaseService } from 'src/services-base/base.service';
 
 
 @Component({
@@ -10,33 +10,45 @@ import { OAuthService } from 'angular-oauth2-oidc';
   templateUrl: './master-page.component.html',
   styleUrls: ['./master-page.component.css']
 })
-export class MasterPageComponent implements OnInit,AfterViewInit {
+export class MasterPageComponent implements OnInit, AfterViewInit {
 
-  @ViewChild(PageSidebarComponent) Page_side_bar;
-  Page_Info ={};
-  Component_name:"no-name";
+  @ViewChild(PageSidebarComponent,{static:false}) Page_side_bar;
+  Page_Info = {};
+  Component_name: "no-name";
 
 
   ngAfterViewInit(): void {
-   this.Page_Info = this.Page_side_bar.Page_Info;  
+    this.Page_Info = this.Page_side_bar.Page_Info;
   }
 
-  constructor(private router: Router,private cdRef:ChangeDetectorRef,private cookieService: CookieService,private oauthService: OAuthService, ) { }
+  constructor(private baseServices: BaseService, private router: Router, private cdRef: ChangeDetectorRef, private oauthService: OAuthService, ) { }
 
-   ngOnInit() {
+  ngOnInit() {
     this.cdRef.detectChanges();
-  }
+    setInterval(() => {
+      var remainingMinutes: number = this.baseServices.remainingExpireTimeToken();
+      
+      if (!this.baseServices.checkLoginSession()) {
+        this.router.navigate(['/login', { isEndSession: true }]);
+      }
+
+      if (remainingMinutes <= 3 && remainingMinutes > 0) {
+        this.baseServices.warningToast("Phiên đăng nhập sẽ hết hạn sau " + remainingMinutes + " phút nữa, hãy lưu công việc hiện tại hoặc đăng nhập lại để tiếp tục công việc.", "Cảnh Báo !")
+      }
 
 
-  MenuChanged(event){
-    this.Page_Info = event;      
-    this.Component_name = event.children; 
+    }, 15000);
   }
- 
-  logout(){
-    this.oauthService.logOut(true);  
+
+  MenuChanged(event: any) {
+    this.Page_Info = event;
+    this.Component_name = event.children;
+  }
+
+  logout() {
+    this.oauthService.logOut(true);
     this.router.navigateByUrl("/login");
-    localStorage.clear()   
+    localStorage.clear();
   }
 
 
