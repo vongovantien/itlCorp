@@ -24,6 +24,7 @@ import { OpsModuleStageManagementDetailComponent } from './ops-module-billing-jo
 import { CustomClearanceComponent } from './custom-clearance/custom-clearance.component';
 import { CustomClearanceAddnewComponent } from './custom-clearance-addnew/custom-clearance-addnew.component';
 import { CustomClearanceEditComponent } from './custom-clearance-edit/custom-clearance-edit.component';
+import { CustomClearanceImportComponent } from './custom-clearance-import/custom-clearance-import.component';
 
 @NgModule({
     imports: [
@@ -53,7 +54,7 @@ import { CustomClearanceEditComponent } from './custom-clearance-edit/custom-cle
         OpsModuleStageManagementDetailComponent, 
         CustomClearanceComponent, 
         CustomClearanceAddnewComponent, 
-        CustomClearanceEditComponent
+        CustomClearanceEditComponent, CustomClearanceImportComponent
     ],
 })
 export class OperationModule { }
