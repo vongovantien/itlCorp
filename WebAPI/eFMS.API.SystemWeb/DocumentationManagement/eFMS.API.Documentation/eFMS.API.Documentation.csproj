@@ -85,6 +85,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <None Update="eFMS.API.Documentation.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Files\CountryImportTemplate.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
