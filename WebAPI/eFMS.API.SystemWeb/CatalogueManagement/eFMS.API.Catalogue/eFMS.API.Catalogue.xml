@@ -191,19 +191,54 @@
         </member>
         <member name="M:eFMS.API.Catalogue.Controllers.CatCommodityGroupController.UploadFile(Microsoft.AspNetCore.Http.IFormFile)">
             <summary>
-            read commodity data from file excel
+            read commodity group data from file excel
             </summary>
             <param name="uploadedFile">file to read data</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Catalogue.Controllers.CatCommodityGroupController.Import(System.Collections.Generic.List{eFMS.API.Catalogue.DL.Models.CommodityGroupImportModel})">
             <summary>
-            import list commodities into database
+            import list commodity groups into database
             </summary>
             <param name="data">list of data</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Catalogue.Controllers.CatCommodityGroupController.DownloadExcel">
+            <summary>
+            download exel from server
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatCommonityController.Put(System.Int16,eFMS.API.Catalogue.Models.CatCommodityEditModel)">
+            <summary>
+            update an existed item
+            </summary>
+            <param name="id">id of data that need to retrieve</param>
+            <param name="model">object to update</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatCommonityController.Delete(System.Int16)">
+            <summary>
+            delete an existed item
+            </summary>
+            <param name="id">id of data that need to delete</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatCommonityController.UploadFile(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            read commodities data from file excel
+            </summary>
+            <param name="uploadedFile">file to read data</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatCommonityController.Import(System.Collections.Generic.List{eFMS.API.Catalogue.DL.Models.CommodityImportModel})">
+            <summary>
+            import list commodities into database
+            </summary>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatCommonityController.DownloadExcel">
             <summary>
             download exel from server
             </summary>

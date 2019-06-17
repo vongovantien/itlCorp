@@ -200,7 +200,7 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         /// <summary>
-        /// read commodity data from file excel
+        /// read commodity group data from file excel
         /// </summary>
         /// <param name="uploadedFile">file to read data</param>
         /// <returns></returns>
