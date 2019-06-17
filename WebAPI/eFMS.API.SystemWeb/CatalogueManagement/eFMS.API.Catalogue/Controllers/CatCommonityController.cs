@@ -88,6 +88,13 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return Ok(result);
         }
+
+        /// <summary>
+        /// update an existed item
+        /// </summary>
+        /// <param name="id">id of data that need to retrieve</param>
+        /// <param name="model">object to update</param>
+        /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize]
         public IActionResult Put(short id, CatCommodityEditModel model)
@@ -110,6 +117,12 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return Ok(result);
         }
+
+        /// <summary>
+        /// delete an existed item
+        /// </summary>
+        /// <param name="id">id of data that need to delete</param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         [Authorize]
         public IActionResult Delete(short id)
@@ -144,6 +157,11 @@ namespace eFMS.API.Catalogue.Controllers
             return message;
         }
 
+        /// <summary>
+        /// read commodities data from file excel
+        /// </summary>
+        /// <param name="uploadedFile">file to read data</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("uploadFile")]
         public IActionResult UploadFile(IFormFile uploadedFile)
@@ -198,7 +216,11 @@ namespace eFMS.API.Catalogue.Controllers
             return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
         }
 
-
+        /// <summary>
+        /// import list commodities into database
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("import")]
         [Authorize]
@@ -216,10 +238,12 @@ namespace eFMS.API.Catalogue.Controllers
             }
         }
 
-
-
+        /// <summary>
+        /// download exel from server
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("downloadExcel")]
-        public async Task<ActionResult> DownloadExcel(CatPlaceTypeEnum type)
+        public async Task<ActionResult> DownloadExcel()
         {
 
             try

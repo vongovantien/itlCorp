@@ -16,6 +16,7 @@ namespace eFMS.API.Catalogue.DL.Common
         }
         public struct CatCharge
         {
+            public static string ExelImportFileName = "Charge";
             public struct NameCaching
             {
                 public static string ListName = "CatCharge";
