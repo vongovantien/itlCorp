@@ -39,7 +39,8 @@ export const language = {
       "childs": [
         { name: "Job Management", route_child: "job-management",display:true },
         { name: "Assignment", route_child: "assigment",display:true },
-        { name: "Trucking Assigment", route_child: "trucking-assigment",display:true }
+        { name: "Trucking Assigment", route_child: "trucking-assigment",display:true },
+        { name: "Custom Clearance", route_child: "custom-clearance",display:true }
       ]
     },
 
