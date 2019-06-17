@@ -5,7 +5,7 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-target="modal" data-toggle="#custom-clearance-create-modal">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" routerLink="/home/operation/custom-clearance-addnew">
                 <span>
                     <i class="la la-plus"></i>
                     <span>
@@ -45,51 +45,19 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Ecus Data
+                                Person Handle
                             </label>
-                            <div class="dropdown e--combogrid">
-                                <input class="form-control m-input m-input--square dropdown-toggle" 
-                                    type="text"
-                                    readonly data-toggle="dropdown" 
-                                    placeholder="Please selected">
-                                <div class="dropdown-menu e--combogrid-content">
-                                    <div class="tabel-wrapper table-fixed">
-                                        <div class="table-head-fixed">
-                                            <div class="table-filter-block">
-                                                <div class="search-field">
-                                                    <input class="form-control m-input m-input--square"
-                                                        type="text" placeholder="Search...">
-                                                    <i class="icon-search"></i>
-                                                </div>
-                                            </div>
-                                            <div class="table-header">
-                                                <table class="table table-hover">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Connection Name</th>
-                                                            <th>User Name</th>
-                                                            <th>Serve Name</th>
-                                                            <th>Database Name</th>
-                                                        </tr>
-                                                    </thead>
-                                                </table>
-                                            </div>
-                                        </div>
-                                        <div class="table-body-scroll">
-                                            <table class="table table-hover">
-                                                <tbody>
-                                                    <tr class="data-row data-selected">
-                                                        <td>Connection Name</td>
-                                                        <td>User Name</td>
-                                                        <td>Serve Name</td>
-                                                        <td>Database Name</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <ng-select 
+                                [allowClear]="false" 
+                                [items]="userList" 
+                                [active]="currentUser"
+                                disabled="true" 
+                                (data)="refreshValue($event)"
+                                (selected)="selected($event)" 
+                                (removed)="removed($event)" 
+                                (typed)="typed($event)"
+                                placeholder="Select filter">
+                            </ng-select>
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -208,7 +176,7 @@
         <!--end::Form-->
     </div>
     <!--end:: m-portlets-->
-    <!--begin:: m-portlet of trucking-table-->
+    <!--begin:: m-portlet-->
     <div class="m-portlet">
         <div class="m-portlet__body">
             <div class="m--margin-bottom-15">
@@ -245,7 +213,7 @@
             </div>
             <!--begin: Datatable of trucking-table -->
             <div class="table-wrapper" id="">
-                <table class="table table-striped table-brand">
+                <table class="table table-striped table-brand dataTable">
                     <thead>
                         <tr>
                             <th class="table-actions-col"></th>
@@ -270,11 +238,17 @@
                             <th class="sorting">
                                 <span>Port</span>
                             </th>
+                            <th class="sorting">
+                                <span>JOBID</span>
+                            </th>
                             <th>
                                 <span>Clearance Date</span>
                             </th>
                             <th>
                                 <span>Status</span>
+                            </th>
+                            <th>
+                                <span>Import Date</span>
                             </th>
                         </tr>
                     </thead>
@@ -283,13 +257,16 @@
                             <td class="table-actions-col">
                                 <div class="table-actions">
                                     <label class="m-checkbox">
-                                        <input type="checkbox">
+                                        <input type="checkbox" disabled="disabled">
                                         <span></span>
                                     </label>
                                 </div>
                             </td>
                             <td>
-                                <a href="">123456789</a>
+                                <a href="javascript:void(0)"  routerLink="/home/operation/custom-clearnce-edit">123456789</a>
+                            </td>
+                            <td>
+                                <span>text</span>
                             </td>
                             <td>
                                 <span>text</span>
@@ -315,6 +292,9 @@
                             <td>
                                 <span class="m--font-success">Imported</span>
                             </td>
+                            <td>
+                                <span>text</span>
+                            </td>
                         </tr>
                         <tr>
                             <td class="table-actions-col">
@@ -326,7 +306,10 @@
                                 </div>
                             </td>
                             <td>
-                                <a href="">123456789</a>
+                                <a href="javascript:void(0)"  routerLink="/home/operation/custom-clearnce-edit">123456789</a>
+                            </td>
+                            <td>
+                                <span>text</span>
                             </td>
                             <td>
                                 <span>text</span>
@@ -351,6 +334,9 @@
                             </td>
                             <td>
                                 <span class="m--font-danger">Not Imported</span>
+                            </td>
+                            <td>
+                                <span>text</span>
                             </td>
                         </tr>
                     </tbody>
@@ -389,51 +375,6 @@
             <!--end::pagination-->
         </div>
     </div>
-    <!--end::  m-portlet of trucking-table-->
+    <!--end::  m-portlet-->
 </div>
 <!--end:: m-content-->
-
-<div class="modal fade" id="custom-clearance-create-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
-    <div class="modal-dialog c-modal-fullscreen" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add custom clearance no</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!--begin::Form-->
-                <div class="m-form m-form--state">
-                </div>
-                <!--end::Form-->
-            </div>
-            <div class="modal-footer m--align-center">
-                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span>
-                            save 
-                        </span>
-                    </span>
-                </button>
-                <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span>
-                            save and convert
-                        </span>
-                    </span>
-                </button>
-                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            cancel
-                        </span>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
