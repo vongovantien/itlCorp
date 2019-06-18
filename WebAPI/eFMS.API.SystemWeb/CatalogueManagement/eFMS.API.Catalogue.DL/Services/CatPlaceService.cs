@@ -44,6 +44,23 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<CsTransactionDetail>("Id", "Pod");
         }
 
+        public IQueryable<CatPlaceModel> GetCatPlaces()
+        {
+            var places = RedisCacheHelper.GetObject<List<CatPlace>>(cache, Templates.CatPlace.NameCaching.ListName);
+            IQueryable<CatPlace> data = null;
+            if (places != null)
+            {
+                data = places.AsQueryable();
+            }
+            else
+            {
+                data = DataContext.Get();
+                RedisCacheHelper.SetObject(cache, Templates.CatPlace.NameCaching.ListName, data);
+            }
+            var results = data?.Select(x => mapper.Map<CatPlaceModel>(x));
+            return results;
+        }
+
         public List<vw_catProvince> GetProvinces(short? countryId)
         {
             var data = GetProvinces().Where(x => x.CountryID == countryId || countryId == null).ToList();

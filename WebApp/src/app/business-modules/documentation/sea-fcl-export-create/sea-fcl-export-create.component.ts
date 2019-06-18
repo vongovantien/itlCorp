@@ -474,6 +474,7 @@ export class SeaFclExportCreateComponent implements OnInit {
         this.housebillTabviewHref = '#';//'#confirm-create-job-modal';
         this.housebillRoleToggle = 'modal';
         this.isLoaded = false;
+        this.isImport = true;
         setTimeout(() => {
             this.isLoaded = true;
             this.inEditing = false;

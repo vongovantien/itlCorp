@@ -35,6 +35,23 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<CsTransaction>("Id", "AgentId");
             SetChildren<SysUser>("Id", "PersonIncharge");
         }
+
+        public IQueryable<CatPartner> GetPartners()
+        {
+            var lstPartner = RedisCacheHelper.GetObject<List<CatPartner>>(cache, Templates.CatPartner.NameCaching.ListName);
+            IQueryable<CatPartner> data = null;
+            if (lstPartner != null)
+            {
+                data = lstPartner.AsQueryable();
+            }
+            else
+            {
+                data = DataContext.Get();
+                RedisCacheHelper.SetObject(cache, Templates.CatPartner.NameCaching.ListName, data);
+            }
+            var results = data?.Select(x => mapper.Map<CatPartnerModel>(x));
+            return results;
+        }
         public List<DepartmentPartner> GetDepartments()
         {
             return DataEnums.Departments;
@@ -180,21 +197,6 @@ namespace eFMS.API.Catalogue.DL.Services
                 results.Add(partner);
             }
             return results;
-        }
-
-        public IQueryable<CatPartner> GetPartners()
-        {
-            var lstPartner = RedisCacheHelper.GetObject<List<CatPartner>>(cache, Templates.CatPartner.NameCaching.ListName);
-            IQueryable<CatPartner> data = null;
-            if (lstPartner != null)
-            {
-                data = lstPartner.AsQueryable();
-            }
-            else
-            {
-                data = DataContext.Get();
-            }
-            return data?.OrderByDescending(x => x.DatetimeModified);
         }
         public List<CatPartnerViewModel> Query(CatPartnerCriteria criteria)
         {
