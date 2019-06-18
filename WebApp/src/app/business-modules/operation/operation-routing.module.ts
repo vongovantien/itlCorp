@@ -6,6 +6,9 @@ import { OpsModuleBillingJobCreateComponent } from './ops-module-billing-job-cre
 import { OpsModuleBillingComponent } from './ops-module-billing/ops-module-billing.component';
 import { OpsModuleBillingJobEditComponent } from './ops-module-billing-job-edit/ops-module-billing-job-edit.component';
 import { CustomClearanceComponent } from './custom-clearance/custom-clearance.component';
+import { CustomClearanceAddnewComponent } from './custom-clearance-addnew/custom-clearance-addnew.component';
+import { CustomClearanceEditComponent } from './custom-clearance-edit/custom-clearance-edit.component';
+import { CustomClearanceImportComponent } from './custom-clearance-import/custom-clearance-import.component';
 
 const routes: Routes = [
     {
@@ -62,6 +65,30 @@ const routes: Routes = [
         component: CustomClearanceComponent,
         data:{
             name:"Custom Clearance",
+            level:2
+        }
+    },
+    {
+        path: 'custom-clearance-addnew',
+        component: CustomClearanceAddnewComponent,
+        data:{
+            name:"Add Custom Clearance",
+            level:2
+        }
+    },
+    {
+        path: 'custom-clearance-edit',
+        component: CustomClearanceEditComponent,
+        data:{
+            name:"Detail/Edit Custom Clearance",
+            level:2
+        }
+    },
+    {
+        path: 'custom-clearance-import',
+        component: CustomClearanceImportComponent,
+        data:{
+            name:"Import Custom Clearance",
             level:2
         }
     }
