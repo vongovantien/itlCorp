@@ -17,15 +17,26 @@ using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Setting.DL.Common;
 using eFMS.API.Setting.DL.Models.Ecus;
+using eFMS.API.Provider.Services.IService;
 
 namespace eFMS.API.Setting.DL.Services
 {
     public class CustomsDeclarationService : RepositoryBase<CustomsDeclaration, CustomsDeclarationModel>, ICustomsDeclarationService
     {
+        private readonly ICatPartnerApiService catPartnerApi;
+        private readonly ICatPlaceApiService catPlaceApi;
         private readonly IEcusConnectionService ecusCconnectionService;
-        public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, IMapper mapper, IEcusConnectionService ecusCconnection) : base(repository, mapper)
+        private readonly ICatCountryApiService countryApi;
+        public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, IMapper mapper, 
+            IEcusConnectionService ecusCconnection
+            , ICatPartnerApiService catPartner
+            , ICatPlaceApiService catPlace
+            , ICatCountryApiService country) : base(repository, mapper)
         {
             ecusCconnectionService = ecusCconnection;
+            catPartnerApi = catPartner;
+            catPlaceApi = catPlace;
+            countryApi = country;
         }
 
         public HandleState ImportClearancesFromEcus()
@@ -158,23 +169,25 @@ namespace eFMS.API.Setting.DL.Services
         private List<CustomsDeclarationModel> MapClearancesToClearanceModels(IQueryable<CustomsDeclaration> list)
         {
             List<CustomsDeclarationModel> results = new List<CustomsDeclarationModel>();
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var countries = dc.CatCountry;
-            var portIndexs = dc.CatPlace.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port));
-            var customers = dc.CatPartner.Where(x => x.PartnerGroup == GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER));
-
+            //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var countries = countryApi.Getcountries().Result != null? countryApi.Getcountries().Result.ToList(): new List<Provider.Models.CatCountryApiModel>(); //dc.CatCountry;
+            var portIndexs = catPlaceApi.GetPlaces().Result != null? catPlaceApi.GetPlaces().Result.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port)).ToList(): new List<Provider.Models.CatPlaceApiModel>(); //dc.CatPlace.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port));
+            var customers = catPartnerApi.GetPartners().Result != null?catPartnerApi.GetPartners().Result.Where(x => x.PartnerGroup == GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER)).ToList(): new List<Provider.Models.CatPartnerApiModel>(); //dc.CatPartner.Where(x => x.PartnerGroup == GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER));
             var clearances = (from clearance in list
                               join importCountry in countries on clearance.ImportcountryCode equals importCountry.Code into grpImports
                               from imCountry in grpImports.DefaultIfEmpty()
                               join exportCountry in countries on clearance.ExportCountryCode equals exportCountry.Code into grpExports
                               from exCountry in grpExports.DefaultIfEmpty()
-                              join port in portIndexs on clearance.Gateway equals port.Code
-                              join customer in customers on clearance.PartnerTaxCode equals customer.TaxCode
+                              join portIndex in portIndexs on clearance.Gateway equals portIndex.Code into grpPorts
+                              from port in grpPorts.DefaultIfEmpty()
+                              join partner in customers on clearance.PartnerTaxCode equals partner.TaxCode into grpCustomers
+                              from customer in grpCustomers.DefaultIfEmpty()
                               select new { clearance, ImportCountryName = imCountry.NameEn, ExportCountryName = exCountry.NameEn, GatewayName = port.NameEn, CustomerName = customer.PartnerNameEn }
                        );
+            if(clearances == null) return results;
             foreach (var item in clearances)
             {
-                var clearance = mapper.Map<CustomsDeclarationModel>(item);
+                var clearance = mapper.Map<CustomsDeclarationModel>(item.clearance);
                 clearance.ImportCountryName = item.ImportCountryName;
                 clearance.ExportCountryName = item.ExportCountryName;
                 clearance.CustomerName = item.CustomerName;

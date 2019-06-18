@@ -30,7 +30,8 @@ namespace eFMS.API.Provider.Services.ServiceImpl
                 if (!String.IsNullOrEmpty(strResponse))
                     return JsonConvert.DeserializeObject<TResponse>(strResponse);
             }
-            catch { }
+            catch {
+            }
             return default(TResponse);
         }
         protected async Task<TResponse> PostApi<TResponse, TDataModel>(string strUri, TDataModel data) where TDataModel : new()
