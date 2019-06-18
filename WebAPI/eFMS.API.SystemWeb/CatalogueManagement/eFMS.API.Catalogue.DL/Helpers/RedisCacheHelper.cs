@@ -13,14 +13,14 @@ namespace eFMS.API.Catalogue.DL
         // save 
         public static async Task SetObjectAsync<T>(IDistributedCache cache, string key, T value)
         {
-            await cache.SetStringAsync(key, JsonConvert.SerializeObject(value), new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromDays(1) });
+            await cache.SetStringAsync(key, JsonConvert.SerializeObject(value));
         }
         public static void SetObject<T>(IDistributedCache cache, string key, T value)
         {
             var field = cache.GetType().GetField("_connection", BindingFlags.NonPublic | BindingFlags.Instance);
             if (field.GetValue(cache) != null)
             {
-                cache.SetString(key, JsonConvert.SerializeObject(value), new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromMinutes(1) });
+                cache.SetString(key, JsonConvert.SerializeObject(value));
             }
         }
         // get

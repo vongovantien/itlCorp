@@ -18,11 +18,15 @@ using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Localization;
 using OfficeOpenXml;
 
 namespace eFMS.API.Catalogue.Controllers
 {
+    /// <summary>
+    /// A base class for an MVC controller without view support.
+    /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
@@ -32,15 +36,25 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatCommodityService catComonityService;
         private readonly IMapper mapper;
-        private readonly ICurrentUser currentUser;
-        public CatCommonityController(IStringLocalizer<LanguageSub> localizer, ICatCommodityService service, IMapper iMapper, ICurrentUser user)
+
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="localizer">inject interface IStringLocalizer</param>
+        /// <param name="service">inject interface ICatAreaService</param>
+        /// <param name="iMapper">inject interface IMapper</param>
+        public CatCommonityController(IStringLocalizer<LanguageSub> localizer, ICatCommodityService service, IMapper iMapper)
         {
             stringLocalizer = localizer;
             catComonityService = service;
             mapper = iMapper;
-            currentUser = user;
         }
 
+        /// <summary>
+        /// get the list of commodities
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Query")]
         public IActionResult Get(CatCommodityCriteria criteria)
@@ -49,6 +63,13 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(results);
         }
 
+        /// <summary>
+        /// get and paging the list of commodities by conditions
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <param name="page">page to retrieve data</param>
+        /// <param name="size">number items per page</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
         public IActionResult Get(CatCommodityCriteria criteria, int page, int size)
@@ -58,6 +79,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// get commodity by id
+        /// </summary>
+        /// <param name="id">id of data that need to retrieve</param>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public IActionResult Get(short id)
         {
@@ -65,6 +91,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// add a new commodity
+        /// </summary>
+        /// <param name="model">object to add</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Add")]
         [Authorize]
@@ -78,7 +109,6 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var commonity = mapper.Map<CatCommodityModel>(model);
-            commonity.UserCreated = currentUser.UserID;
             var hs = catComonityService.Add(commonity);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -107,7 +137,6 @@ namespace eFMS.API.Catalogue.Controllers
             }
             var commodity = mapper.Map<CatCommodityModel>(model);
             commodity.Id = id;
-            commodity.UserModified = currentUser.UserID;
             var hs = catComonityService.Update(commodity);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -127,7 +156,6 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Delete(short id)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = catComonityService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -226,7 +254,6 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Import([FromBody] List<CommodityImportModel> data)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var result = catComonityService.Import(data);
             if (result.Success)
             {

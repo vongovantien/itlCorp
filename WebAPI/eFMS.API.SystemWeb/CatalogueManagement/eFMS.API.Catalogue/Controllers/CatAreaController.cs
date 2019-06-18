@@ -18,6 +18,12 @@ namespace eFMS.API.Catalogue.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatAreaService catAreaService;
+
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="localizer">inject interface IStringLocalizer</param>
+        /// <param name="service">inject interface ICatAreaService</param>
         public CatAreaController(IStringLocalizer<LanguageSub> localizer, ICatAreaService service)
         {
             stringLocalizer = localizer;

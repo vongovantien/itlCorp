@@ -15,6 +15,9 @@ using Microsoft.Extensions.Localization;
 
 namespace eFMS.API.Catalogue.Controllers
 {
+    /// <summary>
+    /// A base class for an MVC controller without view support.
+    /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
@@ -25,6 +28,14 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatCurrencyExchangeService catCurrencyExchangeService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
+
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="localizer">inject interface IStringLocalizer</param>
+        /// <param name="service">inject interface ICatCurrencyExchangeService</param>
+        /// <param name="imapper">inject interface IMapper</param>
+        /// <param name="user">inject interface ICurrentUser</param>
         public CatCurrencyExchangeController(IStringLocalizer<LanguageSub> localizer, ICatCurrencyExchangeService service, IMapper imapper, ICurrentUser user)
         {
             stringLocalizer = localizer;
@@ -33,6 +44,13 @@ namespace eFMS.API.Catalogue.Controllers
             currentUser = user;
         }
 
+        /// <summary>
+        /// get and paging currency exchage rate
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <param name="page">page to retrieve dat</param>
+        /// <param name="size">number items per page</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("GetExchangeRateHistory/Paging")]
         public IActionResult GetExchangeRateHistory(CatCurrencyExchangeCriteria criteria, int page, int size)
@@ -41,18 +59,37 @@ namespace eFMS.API.Catalogue.Controllers
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
         }
+
+        /// <summary>
+        /// get currnecy
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("GetCurrencies")]
         public IActionResult GetCurrencies()
         {
             var result = catCurrencyExchangeService.GetCurrency();
             return Ok(result);
         }
+
+        /// <summary>
+        /// get newest exchage rate
+        /// </summary>
+        /// <param name="currencyToId"></param>
+        /// <returns></returns>
         [HttpGet("GetNewest")]
         public IActionResult GetNewest(string currencyToId)
         {
             var result = catCurrencyExchangeService.GetCurrencyExchangeNewest(currencyToId);
             return Ok(result);
         }
+
+        /// <summary>
+        /// get exchange rate by condition
+        /// </summary>
+        /// <param name="date"></param>
+        /// <param name="localCurrency"></param>
+        /// <param name="fromCurrency"></param>
+        /// <returns></returns>
         [HttpGet("GetExchangeRatesBy")]
         public IActionResult GetExchangeRates(DateTime date, string localCurrency, string fromCurrency)
         {
@@ -67,6 +104,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// get data by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
@@ -74,6 +116,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// update exchange rate
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPut]
         [Route("UpdateRate")]
         [Authorize]
@@ -91,6 +138,12 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPut("{id}")]
         public IActionResult Put(int id, CatCurrencyExchangeModel model)
         {
@@ -107,6 +160,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// delete an existed item
+        /// </summary>
+        /// <param name="id">id of data that need to delete</param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
@@ -120,6 +178,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// remove an exchange rate
+        /// </summary>
+        /// <param name="currencyFrom"></param>
+        /// <returns></returns>
         [HttpDelete("RemoveExchangeCurrency")]
         [Authorize]
         public IActionResult RemoveExchangeCurrency(string currencyFrom)

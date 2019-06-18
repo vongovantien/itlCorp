@@ -56,33 +56,20 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             return DataEnums.Departments;
         }
-        public override HandleState Add(CatPartnerModel model)
+
+        #region CRUD
+        public override HandleState Add(CatPartnerModel entity)
         {
-            var entity = mapper.Map<CatPartner>(model);
-            entity.DatetimeCreated = DateTime.Now;
-            entity.DatetimeModified = DateTime.Now;
-            entity.UserCreated = entity.UserModified = currentUser.UserID;
-            entity.Inactive = false;
+            var partner = mapper.Map<CatPartner>(entity);
+            partner.DatetimeCreated = DateTime.Now;
+            partner.DatetimeModified = DateTime.Now;
+            partner.UserCreated = partner.UserModified = currentUser.UserID;
+            partner.Inactive = false;
             var hs = DataContext.Add(entity);
             if (hs.Success)
             {
-                RedisCacheHelper.SetObject(cache, Templates.CatPartner.NameCaching.ListName, DataContext.Get().ToList());
-            }
-            return hs;
-        }
-        public HandleState Delete(string id)
-        {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
-            var hs = DataContext.Delete(x => x.Id == id);
-            if (hs.Success)
-            {
-                var lstPartner = RedisCacheHelper.GetObject<List<CatPartner>>(cache, Templates.CatPartner.NameCaching.ListName);
-                var index = lstPartner.FindIndex(x => x.Id ==id);
-                if (index > -1)
-                {
-                    lstPartner.RemoveAt(index);
-                    RedisCacheHelper.SetObject<List<CatPartner>>(cache, Templates.CatPartner.NameCaching.ListName, lstPartner);
-                }
+                cache.Remove(Templates.CatPartner.NameCaching.ListName);
+                //RedisCacheHelper.SetObject(cache, Templates.CatPartner.NameCaching.ListName, DataContext.Get().ToList());
             }
             return hs;
         }
@@ -98,52 +85,22 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
             if (hs.Success)
             {
-                var lstPartner = RedisCacheHelper.GetObject<List<CatPartner>>(cache, Templates.CatPartner.NameCaching.ListName);
-                var index = lstPartner.FindIndex(x => x.Id == entity.Id);
-                if(index > -1)
-                {
-                    lstPartner[index] = entity;
-                    RedisCacheHelper.SetObject<List<CatPartner>>(cache, Templates.CatPartner.NameCaching.ListName, lstPartner);
-                }
+                cache.Remove(Templates.CatPartner.NameCaching.ListName);
             }
             return hs;
         }
-        public HandleState Import(List<CatPartnerImportModel> data)
+        public HandleState Delete(string id)
         {
-            try
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
+            var hs = DataContext.Delete(x => x.Id == id);
+            if (hs.Success)
             {
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-                var newList = new List<CatPartner>();
-                foreach (var item in data)
-                {
-                    var partner = mapper.Map<CatPartner>(item);
-                    partner.UserCreated = currentUser.UserID;
-                    partner.UserModified = currentUser.UserID;
-                    partner.DatetimeCreated = DateTime.Now;
-                    partner.Id = partner.AccountNo = partner.TaxCode;
-                    partner.Inactive = false;
-                    newList.Add(partner);
-                }
-                dc.CatPartner.AddRange(newList);
-                dc.SaveChanges();
-                var lstPartner = RedisCacheHelper.GetObject<List<CatPartner>>(cache, Templates.CatPartner.NameCaching.ListName);
-                if (lstPartner.Count == 0)
-                {
-                    lstPartner = dc.CatPartner.ToList();
-                }
-                else
-                {
-                    lstPartner.AddRange(newList);
-                }
-                RedisCacheHelper.SetObject(cache, Templates.CatPartner.NameCaching.ListName, lstPartner);
-                return new HandleState();
+                cache.Remove(Templates.CatPartner.NameCaching.ListName);
             }
-            catch (Exception ex)
-            {
-                return new HandleState(ex.Message);
-            }
+            return hs;
         }
-
+        #endregion
+        
         public List<CatPartnerViewModel> Paging(CatPartnerCriteria criteria, int page, int size, out int rowsCount)
         {
             List<CatPartnerViewModel> results = null;
@@ -254,6 +211,31 @@ namespace eFMS.API.Catalogue.DL.Services
             return results;
         }
 
+        #region import
+        public HandleState Import(List<CatPartnerImportModel> data)
+        {
+            try
+            {
+                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                foreach (var item in data)
+                {
+                    var partner = mapper.Map<CatPartner>(item);
+                    partner.UserCreated = currentUser.UserID;
+                    partner.DatetimeModified = DateTime.Now;
+                    partner.DatetimeCreated = DateTime.Now;
+                    partner.Id = partner.AccountNo = partner.TaxCode;
+                    partner.Inactive = false;
+                    dc.CatPartner.Add(partner);
+                }
+                dc.SaveChanges();
+                cache.Remove(Templates.CatPartner.NameCaching.ListName);
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
         public List<CatPartnerImportModel> CheckValidImport(List<CatPartnerImportModel> list)
         {
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
@@ -454,6 +436,7 @@ namespace eFMS.API.Catalogue.DL.Services
             });
             return list;
         }
+        #endregion
 
         private Expression<Func<CatPartnerModel, bool>> GetQueryExpression(CatPartnerCriteria criteria)
         {

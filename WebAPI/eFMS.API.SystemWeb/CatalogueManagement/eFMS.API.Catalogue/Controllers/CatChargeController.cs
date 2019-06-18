@@ -150,7 +150,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <summary>
         /// delete an existed item
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">id of data that need to delete</param>
         /// <returns></returns>
         [HttpDelete]
         [Route("delete/{id}")]

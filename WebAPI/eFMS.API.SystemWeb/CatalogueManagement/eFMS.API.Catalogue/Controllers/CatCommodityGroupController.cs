@@ -23,6 +23,9 @@ using OfficeOpenXml;
 
 namespace eFMS.API.Catalogue.Controllers
 {
+    /// <summary>
+    /// A base class for an MVC controller without view support.
+    /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
@@ -33,6 +36,14 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatCommodityGroupService catComonityGroupService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
+
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="localizer">inject interface IStringLocalizer</param>
+        /// <param name="service">inject interface ICatCommodityGroupService</param>
+        /// <param name="iMapper">inject interface IMapper</param>
+        /// <param name="user"></param>
         public CatCommodityGroupController(IStringLocalizer<LanguageSub> localizer, ICatCommodityGroupService service, IMapper iMapper,
             ICurrentUser user)
         {

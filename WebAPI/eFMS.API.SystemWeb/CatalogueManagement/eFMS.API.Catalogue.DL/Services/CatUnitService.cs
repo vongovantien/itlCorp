@@ -31,16 +31,17 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<CsShipmentSurcharge>("Id", "UnitId");
         }
 
-        public override HandleState Add(CatUnitModel model)
+        #region CRUD
+        public override HandleState Add(CatUnitModel entity)
         {
-            model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
-            model.Inactive = false;
-            model.UserCreated = model.UserModified = currentUser.UserID;
-            var entitty = mapper.Map<CatUnit>(model);
-            var hs = DataContext.Add(entitty);
+            entity.DatetimeCreated = entity.DatetimeModified = DateTime.Now;
+            entity.Inactive = false;
+            entity.UserCreated = entity.UserModified = currentUser.UserID;
+            var unit = mapper.Map<CatUnit>(entity);
+            var hs = DataContext.Add(unit);
             if (hs.Success)
             {
-                RedisCacheHelper.SetObject(cache, Templates.CatUnit.NameCaching.ListName, DataContext.Get());
+                cache.Remove(Templates.CatUnit.NameCaching.ListName);
             }
             return hs;
         }
@@ -56,8 +57,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
             if (hs.Success)
             {
-                Func<CatUnit, bool> predicate = x => x.Id == model.Id;
-                RedisCacheHelper.ChangeItemInList(cache, Templates.CatUnit.NameCaching.ListName, entity, predicate);
+                cache.Remove(Templates.CatUnit.NameCaching.ListName);
             }
             return hs;
         }
@@ -67,11 +67,12 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
-                Func<CatUnit, bool> predicate = x => x.Id == id;
-                RedisCacheHelper.RemoveItemInList(cache, Templates.CatCountry.NameCaching.ListName, predicate);
+                cache.Remove(Templates.CatUnit.NameCaching.ListName);
             }
             return hs;
         }
+        #endregion
+
         public List<UnitType> GetUnitTypes()
         {
             return DataEnums.UnitTypes;

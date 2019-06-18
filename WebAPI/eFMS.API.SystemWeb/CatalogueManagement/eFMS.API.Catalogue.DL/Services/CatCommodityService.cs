@@ -14,6 +14,7 @@ using eFMS.API.Catalogue.DL.Common;
 using Microsoft.Extensions.Caching.Distributed;
 using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Common.NoSql;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -22,131 +23,27 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IStringLocalizer stringLocalizer;
         private readonly IContextBase<CatCommodityGroup> catCommonityGroupRepo;
         private readonly IDistributedCache cache;
-        public CatCommodityService(IContextBase<CatCommodity> repository, IMapper mapper, IContextBase<CatCommodityGroup> catCommonityGroup, IStringLocalizer<LanguageSub> localizer, IDistributedCache distributedCache) : base(repository, mapper)
+        private readonly ICurrentUser currentUser;
+
+        public CatCommodityService(IContextBase<CatCommodity> repository, 
+            IMapper mapper, 
+            IContextBase<CatCommodityGroup> catCommonityGroup, 
+            IStringLocalizer<LanguageSub> localizer, 
+            IDistributedCache distributedCache,
+            ICurrentUser user) : base(repository, mapper)
         {
             stringLocalizer = localizer;
             cache = distributedCache;
             SetChildren<CsMawbcontainer>("Id", "CommodityId");
             catCommonityGroupRepo = catCommonityGroup;
-        }
-
-        public override HandleState Add(CatCommodityModel model)
-        {
-            var commonity = mapper.Map<CatCommodity>(model);
-            commonity.DatetimeCreated = commonity.DatetimeModified = DateTime.Now;
-            commonity.Inactive = false;
-            var result = DataContext.Add(commonity);
-            if (result.Success)
-            {
-                RedisCacheHelper.SetObject(cache, Templates.CatCommodity.NameCaching.ListName, DataContext.Get());
-            }
-            return result;
-        }
-        public List<CommodityImportModel> CheckValidImport(List<CommodityImportModel> list)
-        {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var commodities = dc.CatCommodity.ToList();
-            list.ForEach(item =>
-            {
-                if (string.IsNullOrEmpty(item.Code))
-                {
-                    item.Code = stringLocalizer[LanguageSub.MSG_COMMOIDITY_CODE_EMPTY];
-                    item.IsValid = false;
-                }
-                else
-                {
-                    if(commodities.Any(x => x.Code.ToLower() == item.Code.ToLower()))
-                    {
-                        item.Code = stringLocalizer[LanguageSub.MSG_COMMOIDITY_CODE_EMPTY];
-                        item.IsValid = false;
-                    }
-                    if(list.Count(x => x.Code.ToLower() == item.Code.ToLower()) > 1)
-                    {
-                        item.Code = stringLocalizer[LanguageSub.MSG_COMMOIDITY_CODE_DUPLICATED];
-                        item.IsValid = false;
-                    }
-                }
-                if (string.IsNullOrEmpty(item.CommodityNameEn))
-                {
-                    item.CommodityNameEn = stringLocalizer[LanguageSub.MSG_COMMOIDITY_NAME_EN_EMPTY];
-                    item.IsValid = false;
-                }
-                if (string.IsNullOrEmpty(item.CommodityNameVn))
-                {
-                    item.CommodityNameVn = stringLocalizer[LanguageSub.MSG_COMMOIDITY_NAME_LOCAL_EMPTY];
-                    item.IsValid = false;
-                }
-                if (item.CommodityGroupId == null)
-                {
-                    item.CommodityGroupId = -1;
-                    item.IsValid = false;
-                }
-                if (string.IsNullOrEmpty(item.Status))
-                {
-                    item.Status = stringLocalizer[LanguageSub.MSG_COMMOIDITY_STATUS_EMPTY];
-                    item.IsValid = false;
-                }
-            });
-            return list;
-        }
-
-        public HandleState Delete(int id)
-        {
-            var hs = DataContext.Delete(x => x.Id == id);
-            if (hs.Success)
-            {
-                Func<CatCommodity, bool> predicate = x => x.Id == id;
-                RedisCacheHelper.RemoveItemInList(cache, Templates.CatCommodity.NameCaching.ListName, predicate);
-            }
-            return hs;
-        }
-
-        public HandleState Import(List<CommodityImportModel> data)
-        {
-            try
-            {
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-                var newList = new List<CatCommodity>();
-                foreach (var item in data)
-                {
-                    var commodity = new CatCommodity
-                    {
-                        CommodityNameEn = item.CommodityNameEn,
-                        CommodityNameVn = item.CommodityNameVn,
-                        CommodityGroupId = item.CommodityGroupId,
-                        Code = item.Code,
-                        Inactive = item.Status.ToLower() != "active",
-                        DatetimeCreated = DateTime.Now,
-                        DatetimeModified = DateTime.Now,
-                        UserCreated = ChangeTrackerHelper.currentUser
-                    };
-                    newList.Add(commodity);
-                }
-                dc.CatCommodity.AddRange(newList);
-                dc.SaveChanges();
-                var lstCommodity = RedisCacheHelper.GetObject<List<CatCommodity>>(cache, Templates.CatCommodity.NameCaching.ListName);
-                if (lstCommodity == null)
-                {
-                    lstCommodity = dc.CatCommodity.ToList();
-                }
-                else
-                {
-                    lstCommodity.AddRange(newList);
-                }
-                RedisCacheHelper.SetObject(cache, Templates.CatCommodity.NameCaching.ListName, lstCommodity);
-                return new HandleState();
-            }
-            catch(Exception ex)
-            {
-                return new HandleState(ex.Message);
-            }
+            currentUser = user;
         }
 
         public List<CatCommodityModel> Paging(CatCommodityCriteria criteria, int page, int size, out int rowsCount)
         {
             List<CatCommodityModel> results = null;
             var data = Query(criteria);
-            if(data == null)
+            if (data == null)
             {
                 rowsCount = 0;
                 return results;
@@ -163,21 +60,6 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             return results;
         }
-        private IQueryable<CatCommodity> GetCommodities(CatCommodityCriteria criteria)
-        {
-            var commonitiesCaching = RedisCacheHelper.GetObject<List<CatCommodity>>(cache, Templates.CatCommodity.NameCaching.ListName);
-            IQueryable<CatCommodity> commodities = null;
-            if (commonitiesCaching == null)
-            {
-                RedisCacheHelper.SetObject(cache, Templates.CatCommodity.NameCaching.ListName, DataContext.Get());
-                commodities = DataContext.Get(x => x.Inactive == criteria.Inactive || criteria.Inactive == null);
-            }
-            else
-            {
-                commodities = commonitiesCaching.Where(x => x.Inactive == criteria.Inactive || criteria.Inactive == null).AsQueryable();
-            }
-            return commodities;
-        }
         public IQueryable<CatCommodityModel> Query(CatCommodityCriteria criteria)
         {
             IQueryable<CatCommodityModel> results = null;
@@ -192,7 +74,8 @@ namespace eFMS.API.Catalogue.DL.Services
                                               && (x.group.GroupNameEn ?? "").IndexOf(criteria.CommodityGroupNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                               && (x.group.GroupNameVn ?? "").IndexOf(criteria.CommodityGroupNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                               && (x.com.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                     ).Select(x => new CatCommodityModel {
+                                     ).Select(x => new CatCommodityModel
+                                     {
                                          Id = x.com.Id,
                                          Code = x.com.Code,
                                          CommodityNameVn = x.com.CommodityNameVn,
@@ -207,7 +90,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                          InactiveOn = x.com.InactiveOn,
                                          CommodityGroupNameEn = x.group.GroupNameEn,
                                          CommodityGroupNameVn = x.group.GroupNameVn
-                                    });
+                                     });
             }
             else
             {
@@ -238,10 +121,25 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             return results;
         }
-
+        
+        #region CRUD
+        public override HandleState Add(CatCommodityModel entity)
+        {
+            var commonity = mapper.Map<CatCommodity>(entity);
+            commonity.UserCreated = commonity.UserModified = currentUser.UserID;
+            commonity.DatetimeCreated = commonity.DatetimeModified = DateTime.Now;
+            commonity.Inactive = false;
+            var result = DataContext.Add(commonity);
+            if (result.Success)
+            {
+                cache.Remove(Templates.CatCommodity.NameCaching.ListName);
+            }
+            return result;
+        }
         public HandleState Update(CatCommodityModel model)
         {
             var entity = mapper.Map<CatCommodity>(model);
+            entity.UserModified = currentUser.UserID;
             entity.DatetimeModified = DateTime.Now;
             if (entity.Inactive == true)
             {
@@ -250,10 +148,116 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
             if (hs.Success)
             {
-                Func<CatCommodity, bool> predicate = x => x.Id == model.Id;
-                RedisCacheHelper.ChangeItemInList(cache, Templates.CatCommodity.NameCaching.ListName, entity, predicate);
+                cache.Remove(Templates.CatCommodity.NameCaching.ListName);
             }
             return hs;
         }
+        public HandleState Delete(int id)
+        {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
+            var hs = DataContext.Delete(x => x.Id == id);
+            if (hs.Success)
+            {
+                cache.Remove(Templates.CatCommodity.NameCaching.ListName);
+            }
+            return hs;
+        }
+        #endregion
+
+        #region Import
+        public HandleState Import(List<CommodityImportModel> data)
+        {
+            try
+            {
+                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                foreach (var item in data)
+                {
+                    var commodity = new CatCommodity
+                    {
+                        CommodityNameEn = item.CommodityNameEn,
+                        CommodityNameVn = item.CommodityNameVn,
+                        CommodityGroupId = item.CommodityGroupId,
+                        Code = item.Code,
+                        Inactive = item.Status.ToLower() != "active",
+                        DatetimeCreated = DateTime.Now,
+                        DatetimeModified = DateTime.Now,
+                        UserCreated = currentUser.UserID
+                    };
+                    dc.CatCommodity.Add(commodity);
+                }
+                dc.SaveChanges();
+                cache.Remove(Templates.CatCommodity.NameCaching.ListName);
+                return new HandleState();
+            }
+            catch(Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
+        public List<CommodityImportModel> CheckValidImport(List<CommodityImportModel> list)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var commodities = dc.CatCommodity.ToList();
+            list.ForEach(item =>
+            {
+                if (string.IsNullOrEmpty(item.Code))
+                {
+                    item.Code = stringLocalizer[LanguageSub.MSG_COMMOIDITY_CODE_EMPTY];
+                    item.IsValid = false;
+                }
+                else
+                {
+                    if (commodities.Any(x => x.Code.ToLower() == item.Code.ToLower()))
+                    {
+                        item.Code = stringLocalizer[LanguageSub.MSG_COMMOIDITY_CODE_EMPTY];
+                        item.IsValid = false;
+                    }
+                    if (list.Count(x => x.Code.ToLower() == item.Code.ToLower()) > 1)
+                    {
+                        item.Code = stringLocalizer[LanguageSub.MSG_COMMOIDITY_CODE_DUPLICATED];
+                        item.IsValid = false;
+                    }
+                }
+                if (string.IsNullOrEmpty(item.CommodityNameEn))
+                {
+                    item.CommodityNameEn = stringLocalizer[LanguageSub.MSG_COMMOIDITY_NAME_EN_EMPTY];
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.CommodityNameVn))
+                {
+                    item.CommodityNameVn = stringLocalizer[LanguageSub.MSG_COMMOIDITY_NAME_LOCAL_EMPTY];
+                    item.IsValid = false;
+                }
+                if (item.CommodityGroupId == null)
+                {
+                    item.CommodityGroupId = -1;
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.Status))
+                {
+                    item.Status = stringLocalizer[LanguageSub.MSG_COMMOIDITY_STATUS_EMPTY];
+                    item.IsValid = false;
+                }
+            });
+            return list;
+        }
+        #endregion
+
+        private IQueryable<CatCommodity> GetCommodities(CatCommodityCriteria criteria)
+        {
+            var commonitiesCaching = RedisCacheHelper.GetObject<List<CatCommodity>>(cache, Templates.CatCommodity.NameCaching.ListName);
+            IQueryable<CatCommodity> commodities = null;
+            if (commonitiesCaching == null)
+            {
+                RedisCacheHelper.SetObject(cache, Templates.CatCommodity.NameCaching.ListName, DataContext.Get());
+                commodities = DataContext.Get(x => x.Inactive == criteria.Inactive || criteria.Inactive == null);
+            }
+            else
+            {
+                commodities = commonitiesCaching.Where(x => x.Inactive == criteria.Inactive || criteria.Inactive == null).AsQueryable();
+            }
+            return commodities;
+        }
+
     }
 }

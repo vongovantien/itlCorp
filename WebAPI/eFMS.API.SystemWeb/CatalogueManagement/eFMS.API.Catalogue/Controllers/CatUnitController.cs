@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using eFMS.API.Catalogue.DL.Common;
+﻿using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
@@ -13,6 +12,9 @@ using Microsoft.Extensions.Localization;
 
 namespace eFMS.API.Catalogue.Controllers
 {
+    /// <summary>
+    /// A base class for an MVC controller without view support.
+    /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
@@ -21,15 +23,22 @@ namespace eFMS.API.Catalogue.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatUnitService catUnitService;
-        private readonly IMapper mapper;
 
-        public CatUnitController(IStringLocalizer<LanguageSub> localizer,ICatUnitService service, IMapper imapper)
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="localizer">inject IStringLocalizer service</param>
+        /// <param name="service">inject ICatUnitService service</param>
+        public CatUnitController(IStringLocalizer<LanguageSub> localizer,ICatUnitService service)
         {
             stringLocalizer = localizer;
             catUnitService = service;
-            mapper = imapper;
         }
 
+        /// <summary>
+        /// get all units
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Get()
         {
@@ -37,12 +46,21 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// get all unit types
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("GetUnitTypes")]
         public IActionResult GetUnitTypes()
         {
             return Ok(catUnitService.GetUnitTypes());
         }
 
+        /// <summary>
+        /// get the list of units
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Query")]
         public IActionResult Get(CatUnitCriteria criteria)
@@ -51,6 +69,13 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// get and paging the list of units by conditions
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <param name="page">page to retrieve data</param>
+        /// <param name="size">number items per page</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
         public IActionResult Get(CatUnitCriteria criteria,int page,int size)
@@ -60,6 +85,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// get unit by id
+        /// </summary>
+        /// <param name="id">id of data that need to retrieve</param>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
@@ -67,6 +97,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// add new unit
+        /// </summary>
+        /// <param name="model">object to delete</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Add")]
         [Authorize]
@@ -78,7 +113,6 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            //var catUnit = mapper.Map<CatUnitModel>(model);
             var hs = catUnitService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -89,6 +123,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);  
         }
 
+        /// <summary>
+        /// update an existed item
+        /// </summary>
+        /// <param name="model">object to update</param>
+        /// <returns></returns>
         [HttpPut]
         [Route("Update")]
         [Authorize]
@@ -100,8 +139,7 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            var catUnit = mapper.Map<CatUnitModel>(model);
-            var hs = catUnitService.Update(catUnit);
+            var hs = catUnitService.Update(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -112,7 +150,11 @@ namespace eFMS.API.Catalogue.Controllers
 
         }
 
-
+        /// <summary>
+        /// delete an existed item
+        /// </summary>
+        /// <param name="id">id of data that want to delete</param>
+        /// <returns></returns>
         [HttpDelete]
         [Route("Delete/{id}")]
         public IActionResult Delete(short id)
