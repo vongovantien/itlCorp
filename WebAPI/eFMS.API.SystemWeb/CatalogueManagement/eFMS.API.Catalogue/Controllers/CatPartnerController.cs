@@ -20,6 +20,9 @@ using OfficeOpenXml;
 
 namespace eFMS.API.Catalogue.Controllers
 {
+    /// <summary>
+    /// A base class for an MVC controller without view support.
+    /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
@@ -29,6 +32,13 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatPartnerService catPartnerService;
         private readonly IMapper mapper;
+
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="localizer">inject interface IStringLocalizer</param>
+        /// <param name="service">inject interface ICatPartnerService</param>
+        /// <param name="iMapper">inject interface IMapper</param>
         public CatPartnerController(IStringLocalizer<LanguageSub> localizer, ICatPartnerService service, IMapper iMapper)
         {
             stringLocalizer = localizer;
@@ -36,12 +46,22 @@ namespace eFMS.API.Catalogue.Controllers
             mapper = iMapper;
         }
 
+        /// <summary>
+        /// get all partners
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult GetAll()
         {
             var results = catPartnerService.GetPartners();
             return Ok(results);
         }
+
+        /// <summary>
+        /// get the list of partners
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Query")]
         public IActionResult Get(CatPartnerCriteria criteria)
@@ -50,6 +70,13 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(results);
         }
 
+        /// <summary>
+        /// get and paging the list of commodities by partners
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <param name="page">page to retrieve data</param>
+        /// <param name="size">number items per page</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
         public IActionResult Get(CatPartnerCriteria criteria, int page, int size)
@@ -59,6 +86,13 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// et and paging the list of partners by conditions
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <param name="page">page to retrieve data</param>
+        /// <param name="size">number items per page</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("PagingCustomer")]
         public IActionResult GetCustomer(CatPartnerCriteria criteria, int page, int size)
@@ -68,12 +102,23 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// get partner by id
+        /// </summary>
+        /// <param name="id">id of data that need to retrieve</param>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public IActionResult Get(string id)
         {
             var data = catPartnerService.First(x => x.Id == id);
             return Ok(data);
         }
+
+        /// <summary>
+        /// add new partner
+        /// </summary>
+        /// <param name="model">object to add</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Add")]
         public IActionResult Post(CatPartnerEditModel model)
@@ -96,6 +141,12 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// update an existed item
+        /// </summary>
+        /// <param name="id">id of data that need to update</param>
+        /// <param name="model">object to update</param>
+        /// <returns></returns>
         [HttpPut("{id}")]
         public IActionResult Put(string id, CatPartnerEditModel model)
         {
@@ -117,6 +168,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// delete an existed item
+        /// </summary>
+        /// <param name="id">id of data that need to delete</param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
@@ -129,6 +185,11 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return Ok(result);
         }
+
+        /// <summary>
+        /// get department
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("GetDepartments")]
         public IActionResult GetDepartments()
@@ -155,6 +216,11 @@ namespace eFMS.API.Catalogue.Controllers
             return message;
         }
 
+        /// <summary>
+        /// import list partner
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("import")]
         [Authorize]
@@ -167,6 +233,11 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return BadRequest(new ResultHandle { Status = false, Message = result.Exception.Message });
         }
+
+        /// <summary>
+        /// download file excel from server
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("DownloadExcel")]
         public async Task<ActionResult> DownloadExcel()
         {
@@ -181,6 +252,12 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
             }
         }
+
+        /// <summary>
+        /// read data from file excel
+        /// </summary>
+        /// <param name="uploadedFile"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("uploadFile")]
         public IActionResult UploadFile(IFormFile uploadedFile)

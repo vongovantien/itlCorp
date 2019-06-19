@@ -16,6 +16,9 @@ using eFMS.API.Common.NoSql;
 
 namespace eFMS.API.Catalogue.Controllers
 {
+    /// <summary>
+    /// A base class for an MVC controller without view support.
+    /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
@@ -24,18 +27,22 @@ namespace eFMS.API.Catalogue.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatCurrencyService catCurrencyService;
-        private readonly IMapper mapper;
-        private readonly ICurrentUser currentUser;
 
-        public CatCurrencyController(IStringLocalizer<LanguageSub> localizer, ICatCurrencyService service, IMapper imapper,
-            ICurrentUser user)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="localizer">inject interface IStringLocalizer</param>
+        /// <param name="service">inject interface ICatCurrencyService</param>
+        public CatCurrencyController(IStringLocalizer<LanguageSub> localizer, ICatCurrencyService service)
         {
             stringLocalizer = localizer;
             catCurrencyService = service;
-            mapper = imapper;
-            currentUser = user;
         }
 
+        /// <summary>
+        /// get the list of all currencies
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("getAll")]
         public IActionResult Get()
@@ -44,6 +51,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// get commodity by id
+        /// </summary>
+        /// <param name="id">id of data that need to retrieve</param>
+        /// <returns></returns>
         [HttpGet]
         [Route("getById/{id}")]
         public IActionResult Get(string id)
@@ -52,6 +64,13 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// get and paging the list of currencies by conditions
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <param name="page">page to retrieve data</param>
+        /// <param name="size">number items per page</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("paging")]
         public IActionResult Get(CatCurrrencyCriteria criteria, int page, int size)
@@ -61,6 +80,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// get the list of currencies
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("getAllByQuery")]
         public IActionResult Get(CatCurrrencyCriteria criteria)
@@ -69,6 +93,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// add new currency
+        /// </summary>
+        /// <param name="model">object to add</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("add")]
         [Authorize]
@@ -80,7 +109,6 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            model.UserCreated = currentUser.UserID;
             var hs = catCurrencyService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -90,7 +118,12 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return Ok(result);
         }
-
+        
+        /// <summary>
+        /// update an existed item
+        /// </summary>
+        /// <param name="model">model to update</param>
+        /// <returns></returns>
         [HttpPut]
         [Route("update")]
         [Authorize]
@@ -102,7 +135,6 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            model.UserModified = currentUser.UserID;
             var hs = catCurrencyService.Update(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -113,11 +145,15 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// delete an existed item
+        /// </summary>
+        /// <param name="id">id of data that want to delete</param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         [Authorize]
         public IActionResult Delete(string id)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = catCurrencyService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

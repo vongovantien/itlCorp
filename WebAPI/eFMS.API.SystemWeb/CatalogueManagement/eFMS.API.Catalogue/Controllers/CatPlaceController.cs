@@ -21,6 +21,9 @@ using eFMS.API.Catalogue.Infrastructure.Middlewares;
 
 namespace eFMS.API.Catalogue.Controllers
 {
+    /// <summary>
+    /// A base class for an MVC controller without view support.
+    /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
@@ -31,6 +34,12 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatPlaceService catPlaceService;
         private readonly IMapper mapper;
 
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="localizer">inject interface IStringLocalizer</param>
+        /// <param name="service">inject interface ICatPlaceService</param>
+        /// <param name="iMapper">inject interface IMapper</param>
         public CatPlaceController(IStringLocalizer<LanguageSub> localizer, ICatPlaceService service, IMapper iMapper)
         {
             stringLocalizer = localizer;
@@ -38,6 +47,10 @@ namespace eFMS.API.Catalogue.Controllers
             mapper = iMapper;
         }
 
+        /// <summary>
+        /// get all places
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Get()
         {
@@ -45,6 +58,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(results);
         }
 
+        /// <summary>
+        /// get the list of all places
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Query")]
         public IActionResult Get(CatPlaceCriteria criteria)
@@ -53,6 +71,13 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(results);
         }
 
+        /// <summary>
+        /// get and paging the list of places by conditions
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <param name="page">page to retrieve data</param>
+        /// <param name="size">number items per page</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
         public IActionResult Get(CatPlaceCriteria criteria, int page, int size)
@@ -62,6 +87,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// get place by id
+        /// </summary>
+        /// <param name="id">id to retrieve data</param>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public IActionResult Get(Guid id)
         {
@@ -69,6 +99,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// get the list of provinces by country
+        /// </summary>
+        /// <param name="countryId">country id</param>
+        /// <returns></returns>
         [HttpGet]
         [Route("GetProvinces")]
         public IActionResult GetProvinces(short? countryId)
@@ -77,6 +112,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(results);
         }
 
+        /// <summary>
+        /// get the list of districts by province
+        /// </summary>
+        /// <param name="provinceId">province id</param>
+        /// <returns></returns>
         [HttpGet]
         [Route("GetDistricts")]
         public IActionResult GetDistricts(Guid? provinceId)
@@ -85,6 +125,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(results);
         }
 
+
+        /// <summary>
+        /// get the list of mode
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("GetModeOfTransport")]
         public IActionResult GetModeOfTransport()
@@ -92,6 +137,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(catPlaceService.GetModeOfTransport());
         }
 
+        /// <summary>
+        /// add new place
+        /// </summary>
+        /// <param name="model">object to add</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Add")]
         [Authorize]
@@ -116,6 +166,12 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// update an existed item
+        /// </summary>
+        /// <param name="id">id of data that want to update</param>
+        /// <param name="model">object to update</param>
+        /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize]
         public IActionResult Put(Guid id, CatPlaceEditModel model)
@@ -139,6 +195,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// delete an existed item
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         [Authorize]
         public IActionResult Delete(Guid id)
@@ -153,6 +214,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// download an excel file from server
+        /// </summary>
+        /// <param name="type">type of partner</param>
+        /// <returns></returns>
         [HttpGet("DownloadExcel")]
         public async Task<ActionResult> DownloadExcel(CatPlaceTypeEnum type)
         {
@@ -168,6 +234,12 @@ namespace eFMS.API.Catalogue.Controllers
             }
         }
 
+        /// <summary>
+        /// read data from excel file
+        /// </summary>
+        /// <param name="uploadedFile">file upload</param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("UpLoadFile")]
         //[Authorize]
@@ -309,6 +381,11 @@ namespace eFMS.API.Catalogue.Controllers
             return list;
         }
 
+        /// <summary>
+        /// import partner data
+        /// </summary>
+        /// <param name="data">data to import</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Import")]
         [Authorize]

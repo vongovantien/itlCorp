@@ -18,6 +18,9 @@ using OfficeOpenXml;
 
 namespace eFMS.API.Catalogue.Controllers
 {
+    /// <summary>
+    /// A base class for an MVC controller without view support.
+    /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
@@ -26,14 +29,25 @@ namespace eFMS.API.Catalogue.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatCountryService catCountryService;
-        //private readonly ICurrentUser currentUser;
+
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="localizer">inject IStringLocalizer</param>
+        /// <param name="service">inject ICatCountryService serrvice</param>
         public CatCountryController(IStringLocalizer<LanguageSub> localizer, ICatCountryService service)
         {
             stringLocalizer = localizer;
             catCountryService = service;
-            //currentUser = user;
         }
 
+        /// <summary>
+        /// get and paging the list of countries by conditions
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <param name="page">page to retrieve data</param>
+        /// <param name="size">number items per page</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("paging")]
         public IActionResult Get(CatCountryCriteria criteria, int page, int size)
@@ -43,6 +57,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// get the list of countries
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("query")]
         public IActionResult Get(CatCountryCriteria criteria)
@@ -51,7 +70,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(data);
         }
 
-        
+        /// <summary>
+        /// get country by id
+        /// </summary>
+        /// <param name="id">id of data that need to retrieve</param>
+        /// <returns></returns>
         [HttpGet]
         [Route("getById/{id}")]
         public IActionResult Get(int id)
@@ -60,6 +83,10 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
         
+        /// <summary>
+        /// get all data
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("getAll")]
         public IActionResult GetAll()
@@ -68,6 +95,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// add new country
+        /// </summary>
+        /// <param name="catCountry">object to add</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("addNew")]
         [Authorize]
@@ -79,7 +111,6 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            //catCountry.UserCreated = currentUser.UserID;
             var hs = catCountryService.Add(catCountry);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -90,6 +121,11 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// update an existed country
+        /// </summary>
+        /// <param name="catCountry">object to update</param>
+        /// <returns></returns>
         [HttpPut]
         [Route("update")]
         [Authorize]
@@ -101,7 +137,6 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            //catCountry.UserModified = currentUser.UserID;
             var hs = catCountryService.Update(catCountry);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -112,13 +147,16 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// delete an existed country
+        /// </summary>
+        /// <param name="id">id of data that need to delete</param>
+        /// <returns></returns>
         [HttpDelete]
         [Route("delete/{id}")]
         [Authorize]
         public IActionResult Delete(short id)
         {
-            //ChangeTrackerHelper.currentUser = currentUser.UserID;
-            //var hs = catCountryService.Delete(x => x.Id == id);
             var hs = catCountryService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -129,6 +167,10 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// get all countries by current language
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("GetByLanguage")]
         public IActionResult GetByLanguage()
@@ -137,6 +179,10 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(results);
         }
 
+        /// <summary>
+        /// download exel file from server
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("DownloadExcel")]
         public async Task<ActionResult> DownloadExcel()
         {
@@ -152,9 +198,13 @@ namespace eFMS.API.Catalogue.Controllers
             }
         }
 
+        /// <summary>
+        /// read a file excel
+        /// </summary>
+        /// <param name="uploadedFile"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("UpLoadFile")]
-      //  [Authorize]
         public IActionResult UpLoadFile(IFormFile uploadedFile)
         {
             var file = new FileHelper().UploadExcel(uploadedFile);
@@ -185,12 +235,17 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
         }
+
+        /// <summary>
+        /// import list countries
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Import")]
         [Authorize]
         public IActionResult Import([FromBody]List<CatCountryImportModel> data)
         {
-            //ChangeTrackerHelper.currentUser = currentUser.UserID;
             var result = catCountryService.Import(data);
             if (result != null)
             {

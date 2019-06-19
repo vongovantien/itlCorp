@@ -29,7 +29,7 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly IDistributedCache cache;
-        private ICurrentUser currentUser;
+        private readonly ICurrentUser currentUser;
         public CatPlaceService(IContextBase<CatPlace> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, IDistributedCache distributedCache, ICurrentUser user) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -42,6 +42,66 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<CsTransaction>("Id", "Pod");
             SetChildren<CsTransactionDetail>("Id", "Pol");
             SetChildren<CsTransactionDetail>("Id", "Pod");
+        }
+
+        #region CRUD
+        public override HandleState Add(CatPlaceModel model)
+        {
+            var entity = mapper.Map<CatPlace>(model);
+            entity.Id = Guid.NewGuid();
+            entity.UserCreated = entity.UserModified = currentUser.UserID;
+            entity.DatetimeCreated = entity.DatetimeModified = DateTime.Now;
+            entity.Inactive = false;
+            var result = DataContext.Add(entity, true);
+            if (result.Success)
+            {
+                cache.Remove(Templates.CatPlace.NameCaching.ListName);
+            }
+            return result;
+        }
+        public HandleState Update(CatPlaceModel model)
+        {
+            var entity = mapper.Map<CatPlace>(model);
+            entity.DatetimeModified = DateTime.Now;
+            entity.UserModified = currentUser.UserID;
+            if (entity.Inactive == true)
+            {
+                entity.InactiveOn = DateTime.Now;
+            }
+            var result = DataContext.Update(entity, x => x.Id == model.Id);
+            if (result.Success)
+            {
+                cache.Remove(Templates.CatPlace.NameCaching.ListName);
+            }
+            return result;
+        }
+        public HandleState Delete(Guid id)
+        {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
+            var hs = DataContext.Delete(x => x.Id == id);
+            if (hs.Success)
+            {
+                cache.Remove(Templates.CatPlace.NameCaching.ListName);
+            }
+            return hs;
+        }
+        #endregion
+
+        public IQueryable<CatPlaceModel> GetCatPlaces()
+        {
+            var places = RedisCacheHelper.GetObject<List<CatPlace>>(cache, Templates.CatPlace.NameCaching.ListName);
+            IQueryable<CatPlace> data = null;
+            if (places != null)
+            {
+                data = places.AsQueryable();
+            }
+            else
+            {
+                data = DataContext.Get();
+                RedisCacheHelper.SetObject(cache, Templates.CatPlace.NameCaching.ListName, data);
+            }
+            var results = data?.Select(x => mapper.Map<CatPlaceModel>(x));
+            return results;
         }
 
         public List<vw_catProvince> GetProvinces(short? countryId)
@@ -119,37 +179,7 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             return results;
         }
-        public override HandleState Add(CatPlaceModel model)
-        {
-            var entity = mapper.Map<CatPlace>(model);
-            entity.Id = Guid.NewGuid();
-            entity.UserCreated = entity.UserModified = currentUser.UserID;
-            entity.DatetimeCreated = entity.DatetimeModified = DateTime.Now;
-            entity.Inactive = false;
-            var result = DataContext.Add(entity, true);
-            if (result.Success)
-            {
-                RedisCacheHelper.SetObject(cache, Templates.CatPlace.NameCaching.ListName, DataContext.Get());
-            }
-            return result;
-        }
-        public HandleState Update(CatPlaceModel model)
-        {
-            var entity = mapper.Map<CatPlace>(model);
-            entity.DatetimeModified = DateTime.Now;
-            entity.UserModified = currentUser.UserID;
-            if (entity.Inactive == true)
-            {
-                entity.InactiveOn = DateTime.Now;
-            }
-            var result = DataContext.Update(entity, x => x.Id == model.Id);
-            if (result.Success)
-            {
-                Func<CatPlace, bool> predicate = x => x.Id == entity.Id;
-                RedisCacheHelper.ChangeItemInList(cache, Templates.CatPlace.NameCaching.ListName, entity, predicate);
-            }
-            return result;
-        }
+
         private IQueryable<CatPlaceViewModel> GetCulturalData(IQueryable<sp_GetCatPlace> list)
         {
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
@@ -658,7 +688,6 @@ namespace eFMS.API.Catalogue.DL.Services
             try
             {
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-                var newList = new List<CatPlace>();
                 foreach (var item in data)
                 {
                     bool inactive = string.IsNullOrEmpty(item.Status) ? false : (item.Status.Trim().ToLower() == "inactive" ? true : false);
@@ -681,20 +710,10 @@ namespace eFMS.API.Catalogue.DL.Services
                         ModeOfTransport = item.ModeOfTransport,
                         AreaId = item.AreaId
                     };
-                    newList.Add(catPlace);
+                    dc.CatPlace.Add(catPlace);
                 }
-                dc.CatPlace.AddRange(newList);
                 dc.SaveChanges();
-                var lstPlaces = RedisCacheHelper.GetObject<List<CatPlace>>(cache, Templates.CatPlace.NameCaching.ListName);
-                if (lstPlaces.Count == 0)
-                {
-                    lstPlaces = dc.CatPlace.ToList();
-                }
-                else
-                {
-                    lstPlaces.AddRange(newList);
-                }
-                RedisCacheHelper.SetObject(cache, Templates.CatPlace.NameCaching.ListName, lstPlaces);
+                cache.Remove(Templates.CatPlace.NameCaching.ListName);
                 return new HandleState();
             }
             catch (Exception ex)
@@ -703,16 +722,5 @@ namespace eFMS.API.Catalogue.DL.Services
             }
         }
 
-        public HandleState Delete(Guid id)
-        {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
-            var hs = DataContext.Delete(x => x.Id == id);
-            if (hs.Success)
-            {
-                Func<CatPlace, bool> predicate = x => x.Id == id;
-                RedisCacheHelper.RemoveItemInList(cache, Templates.CatPlace.NameCaching.ListName, predicate);
-            }
-            return hs;
-        }
     }
 }

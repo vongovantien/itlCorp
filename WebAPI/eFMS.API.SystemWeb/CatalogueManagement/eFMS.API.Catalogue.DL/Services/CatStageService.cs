@@ -14,17 +14,30 @@ using Microsoft.Extensions.Localization;
 using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Common.NoSql;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
     public class CatStageService : RepositoryBase<CatStage, CatStageModel>, ICatStageService
     {
         private readonly IStringLocalizer stringLocalizer;
-        public CatStageService(IContextBase<CatStage> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer) : base(repository, mapper)
+        private readonly IDistributedCache cache;
+        public CatStageService(IContextBase<CatStage> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, IDistributedCache distributedCache) : base(repository, mapper)
         {
             stringLocalizer = localizer;
+            cache = distributedCache;
         }        
         
+        public IQueryable<CatStageModel> GetAll()
+        {
+            IQueryable<CatStage> data = RedisCacheHelper.Get<CatStage>(cache, Templates.CatStage.NameCaching.ListName);
+            if(data == null)
+            {
+                data = DataContext.Get();
+                RedisCacheHelper.SetObject(cache, Templates.CatStage.NameCaching.ListName, data);
+            }
+            return data?.Select(x => mapper.Map<CatStageModel>(x));
+        } 
 
         public HandleState AddStage(CatStageModel catStage)
         {
@@ -215,6 +228,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     dc.CatStage.Add(stage);
                 }
                 dc.SaveChanges();
+
+                cache.Remove(Templates.CatStage.NameCaching.ListName);
                 return new HandleState();
             }
             catch(Exception ex)

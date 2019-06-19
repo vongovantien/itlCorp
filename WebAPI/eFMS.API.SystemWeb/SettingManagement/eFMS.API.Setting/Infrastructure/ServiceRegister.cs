@@ -16,6 +16,8 @@ using eFMS.API.Setting.Infrastructure.Filters;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using System;
 using eFMS.API.Common;
+using eFMS.API.Provider.Services.IService;
+using eFMS.API.Provider.Services.ServiceImpl;
 
 namespace eFMS.API.Setting.Infrastructure
 {
@@ -107,13 +109,17 @@ namespace eFMS.API.Setting.Infrastructure
                 });
             return services;
         }
-        //public static IServiceCollection AddCatelogueManagementApiServices(this IServiceCollection services)
-        //{
-        //    services.AddHttpClient<ICatAreaApiService, CatAreaApiService>()
-        //           .SetHandlerLifetime(TimeSpan.FromMinutes(5));  //Sample. Default lifetime is 5 minutes;
 
-        //    return services;
-        //}
+        public static IServiceCollection AddCatelogueManagementApiServices(this IServiceCollection services)
+        {
+            services.AddHttpClient<ICatPartnerApiService, CatPartnerApiService>()
+                   .SetHandlerLifetime(TimeSpan.FromMinutes(5));  //Sample. Default lifetime is 5 minutes;
+            services.AddHttpClient<ICatPlaceApiService, CatPlaceApiService>()
+                   .SetHandlerLifetime(TimeSpan.FromMinutes(5));  //Sample. Default lifetime is 5 minutes;
+            services.AddHttpClient<ICatCountryApiService, CatCountryApiService>()
+                  .SetHandlerLifetime(TimeSpan.FromMinutes(5));  //Sample. Default lifetime is 5 minutes;
+            return services;
+        }
 
         public static IServiceCollection AddConfigureSetting(this IServiceCollection service, IConfiguration configuration)
         {

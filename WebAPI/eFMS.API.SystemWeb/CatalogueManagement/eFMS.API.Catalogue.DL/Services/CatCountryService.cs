@@ -39,16 +39,18 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<CatPartner>("Id", "CountryShippingId");
             SetChildren<CsTransactionDetail>("Id", "OriginCountryId");
         }
-        public override HandleState Add(CatCountryModel model)
+
+        #region CRUD
+        public override HandleState Add(CatCountryModel entity)
         {
-            model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
-            model.UserCreated = model.UserModified = currentUser.UserID;
-            model.Inactive = false;
-            var entity = mapper.Map<CatCountry>(model);
-            var hs = DataContext.Add(entity);
+            entity.DatetimeCreated = entity.DatetimeModified = DateTime.Now;
+            entity.UserCreated = entity.UserModified = currentUser.UserID;
+            entity.Inactive = false;
+            var country = mapper.Map<CatCountry>(entity);
+            var hs = DataContext.Add(country);
             if (hs.Success)
             {
-                RedisCacheHelper.SetObject(cache, Templates.CatCountry.NameCaching.ListName, DataContext.Get());
+                cache.Remove(Templates.CatCountry.NameCaching.ListName);
             }
             return hs;
         }
@@ -64,8 +66,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
             if (hs.Success)
             {
-                Func<CatCountry, bool> predicate = x => x.Id == model.Id;
-                RedisCacheHelper.ChangeItemInList(cache, Templates.CatCountry.NameCaching.ListName, entity, predicate);
+                cache.Remove(Templates.CatCountry.NameCaching.ListName);
             }
             return hs;
         }
@@ -75,56 +76,11 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
-                //var list = RedisCacheHelper.GetObject<List<CatCountry>>(cache, Templates.CatCountry.NameCaching.ListName);
-                //var index = list.FindIndex(x => x.Id == id);
-                //if (index > -1)
-                //{
-                //    list.RemoveAt(index);
-                //    RedisCacheHelper.SetObject(cache, Templates.CatCountry.NameCaching.ListName, list);
-                //}
-                Func<CatCountry, bool> predicate = x => x.Id == id;
-                RedisCacheHelper.RemoveItemInList(cache, Templates.CatCountry.NameCaching.ListName, predicate);
+                cache.Remove(Templates.CatCountry.NameCaching.ListName);
             }
             return hs;
         }
-        public List<CatCountryImportModel> CheckValidImport(List<CatCountryImportModel> list)
-        {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var countries = dc.CatCountry.ToList();
-            list.ForEach(item =>
-            {
-                if (string.IsNullOrEmpty(item.NameEn))
-                {
-                    item.NameEn = stringLocalizer[LanguageSub.MSG_COUNTRY_NAME_EN_EMPTY];
-                    item.IsValid = false;
-                }
-                if (string.IsNullOrEmpty(item.NameVn))
-                {
-                    item.NameVn = stringLocalizer[LanguageSub.MSG_COUNTRY_NAME_LOCAL_EMPTY];
-                    item.IsValid = false;
-                }
-                if (string.IsNullOrEmpty(item.Code))
-                {
-                    item.Code = stringLocalizer[LanguageSub.MSG_COUNTRY_CODE_EMPTY];
-                    item.IsValid = false;
-                }
-                else
-                {
-                    var country = countries.FirstOrDefault(x => x.Code.ToLower()==item.Code.ToLower());
-                    if(country != null)
-                    {
-                        item.Code = string.Format(stringLocalizer[LanguageSub.MSG_COUNTRY_EXISTED], item.Code);
-                        item.IsValid = false;
-                    }
-                    if(list.Count(x => (x.Code??"").IndexOf(item.Code ??"", StringComparison.OrdinalIgnoreCase) >=0) > 1)
-                    {
-                        item.Code = string.Format(stringLocalizer[LanguageSub.MSG_COUNTRY_CODE_DUPLICATE], item.Code);
-                        item.IsValid = false;
-                    }
-                }
-            });
-            return list;
-        }
+        #endregion
 
         public List<CatCountryViewModel> GetByLanguage()
         {
@@ -156,6 +112,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return returnList;        
         }
 
+        #region Import
         public HandleState Import(List<CatCountryImportModel> data)
         {
             try
@@ -172,24 +129,14 @@ namespace eFMS.API.Catalogue.DL.Services
                         NameVn = item.NameVn,
                         DatetimeCreated = DateTime.Now,
                         UserCreated = currentUser.UserID,
-                        UserModified = currentUser.UserID,
                         Inactive = (item.Status ?? "").Contains("active"),
                         InactiveOn = item.Status != null? DateTime.Now: inactive
                     };
-                    newList.Add(country);
+                    dc.CatCountry.Add(country);
+                    cache.Remove(Templates.CatCountry.NameCaching.ListName);
                 }
-                dc.CatCountry.AddRange(newList);
                 dc.SaveChanges();
-                var lstCountries = RedisCacheHelper.GetObject<List<CatCountry>>(cache, Templates.CatCountry.NameCaching.ListName);
-                if (lstCountries == null)
-                {
-                    lstCountries = dc.CatCountry.ToList();
-                }
-                else
-                {
-                    lstCountries.AddRange(newList);
-                }
-                RedisCacheHelper.SetObject(cache, Templates.CatCountry.NameCaching.ListName, lstCountries);
+               
                 return new HandleState();
             }
             catch (Exception ex)
@@ -197,6 +144,46 @@ namespace eFMS.API.Catalogue.DL.Services
                 return new HandleState(ex.Message);
             }
         }
+        
+        public List<CatCountryImportModel> CheckValidImport(List<CatCountryImportModel> list)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var countries = dc.CatCountry.ToList();
+            list.ForEach(item =>
+            {
+                if (string.IsNullOrEmpty(item.NameEn))
+                {
+                    item.NameEn = stringLocalizer[LanguageSub.MSG_COUNTRY_NAME_EN_EMPTY];
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.NameVn))
+                {
+                    item.NameVn = stringLocalizer[LanguageSub.MSG_COUNTRY_NAME_LOCAL_EMPTY];
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.Code))
+                {
+                    item.Code = stringLocalizer[LanguageSub.MSG_COUNTRY_CODE_EMPTY];
+                    item.IsValid = false;
+                }
+                else
+                {
+                    var country = countries.FirstOrDefault(x => x.Code.ToLower() == item.Code.ToLower());
+                    if (country != null)
+                    {
+                        item.Code = string.Format(stringLocalizer[LanguageSub.MSG_COUNTRY_EXISTED], item.Code);
+                        item.IsValid = false;
+                    }
+                    if (list.Count(x => (x.Code ?? "").IndexOf(item.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0) > 1)
+                    {
+                        item.Code = string.Format(stringLocalizer[LanguageSub.MSG_COUNTRY_CODE_DUPLICATE], item.Code);
+                        item.IsValid = false;
+                    }
+                }
+            });
+            return list;
+        }
+        #endregion
 
         public IQueryable<CatCountry> Query(CatCountryCriteria criteria)
         {
@@ -221,6 +208,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             return returnList;
         }
+
         private IQueryable<CatCountry> Query(IQueryable<CatCountry>  dataFromCache, Expression<Func<CatCountry, bool>> query)
         {
             if (dataFromCache == null)

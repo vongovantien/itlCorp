@@ -16,6 +16,7 @@ namespace eFMS.API.Catalogue.DL.IService
 {
     public interface ICatPlaceService : IRepositoryBase<CatPlace, CatPlaceModel>
     {
+        IQueryable<CatPlaceModel> GetCatPlaces();
         IQueryable<sp_GetCatPlace> Query(CatPlaceCriteria criteria);
         List<CatPlaceViewModel> Paging(CatPlaceCriteria criteria, int page, int size, out int rowsCount);
         List<vw_catProvince> GetProvinces(short? countryId);

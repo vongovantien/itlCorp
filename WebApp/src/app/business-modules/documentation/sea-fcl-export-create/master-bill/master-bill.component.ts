@@ -20,6 +20,7 @@ import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum'
 export class MasterBillComponent implements OnInit, OnChanges {
     async ngOnChanges(changes: import("@angular/core").SimpleChanges) {
         //this.baseServices.spinnerShow();
+        this.cdr.detectChanges();
     }
     @Input()shipment: CsTransaction;
     @Input()isImport: boolean;
@@ -43,6 +44,7 @@ export class MasterBillComponent implements OnInit, OnChanges {
     paymentTermActive: any[] = [];
     shimentTypeActive: any[] = [];
     inEditing: boolean = false;
+    isLoaded: boolean = false;
 
     constructor(
         private baseServices: BaseService,
@@ -71,10 +73,12 @@ export class MasterBillComponent implements OnInit, OnChanges {
                 this.shimentTypeActive = [this.shipmentTypes[index]];
                 this.shipment.shipmentType = this.shipmentTypes[index].id;
             } 
+            this.isLoaded = true;
         }
         else if(this.shipment.id != "00000000-0000-0000-0000-000000000000"){
             await this.getShipmentDetail(this.shipment.id);
             if(this.isImport == false){
+                this.shipment.jobNo = null;
                 this.etdSelected = (this.shipment.etd!= null)? { startDate: moment(this.shipment.etd), endDate: moment(this.shipment.etd) }: null;
                 this.etaSelected = (this.shipment.eta!= null)? { startDate: moment(this.shipment.eta), endDate: moment(this.shipment.eta) }: null;
             }
@@ -125,7 +129,7 @@ export class MasterBillComponent implements OnInit, OnChanges {
                 if(index > -1) this.shipment.personInChargeName = this.userInCharges[index].username;
                 else this.shipment.personInChargeName = '';
             }
-                  
+            //this.isLoaded = true;
         }
         this.shipmentDetails.emit(Object.assign({},this.shipment));    
         //this.isLoaded = true;

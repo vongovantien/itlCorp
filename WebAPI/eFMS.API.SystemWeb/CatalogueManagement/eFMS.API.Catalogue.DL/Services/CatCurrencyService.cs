@@ -5,6 +5,8 @@ using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Catalogue.Service.Models;
+using eFMS.API.Common.NoSql;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
@@ -18,8 +20,10 @@ namespace eFMS.API.Catalogue.DL.Services
     public class CatCurrencyService : RepositoryBase<CatCurrency, CatCurrencyModel>, ICatCurrencyService
     {
         private readonly IDistributedCache cache;
-        public CatCurrencyService(IContextBase<CatCurrency> repository, IMapper mapper, IDistributedCache distributedCache) : base(repository, mapper)
+        private readonly ICurrentUser currentUser;
+        public CatCurrencyService(IContextBase<CatCurrency> repository, IMapper mapper, IDistributedCache distributedCache, ICurrentUser user) : base(repository, mapper)
         {
+            currentUser = user;
             cache = distributedCache;
             SetChildren<CatCharge>("Id", "CurrencyId");
             SetChildren<CatCurrencyExchange>("Id", "CurrencyFromId");
@@ -29,28 +33,68 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<CsShipmentSurcharge>("Id", "CurrencyId");
         }
 
-        public override HandleState Add(CatCurrencyModel model)
+        #region CRUD
+        public override HandleState Add(CatCurrencyModel entity)
         {
-            var entity = mapper.Map<CatCurrency>(model);
-            entity.DatetimeCreated = entity.DatetimeModified = DateTime.Now;
-            entity.Inactive = false;
-            var result = DataContext.Add(entity, true);
+            var currency = mapper.Map<CatCurrency>(entity);
+            currency.DatetimeCreated = entity.DatetimeModified = DateTime.Now;
+            currency.Inactive = false;
+            currency.UserCreated = currentUser.UserID;
+            var result = DataContext.Add(currency, true);
             if (result.Success)
             {
-                RedisCacheHelper.SetObject(cache, Templates.CatCurrency.NameCaching.ListName, DataContext.Get());
+                cache.Remove(Templates.CatCurrency.NameCaching.ListName);
             }
             return result;
         }
+
+        public HandleState Update(CatCurrencyModel model)
+        {
+            HandleState result = new HandleState();
+            try
+            {
+                var entity = mapper.Map<CatCurrency>(model);
+                entity.UserModified = currentUser.UserID;
+                entity.DatetimeModified = DateTime.Now;
+                if (entity.Inactive == true)
+                {
+                    entity.InactiveOn = DateTime.Now;
+                }
+                result = DataContext.Update(entity, x => x.Id == model.Id, false);
+                if (result.Success)
+                {
+                    if (model.IsDefault)
+                    {
+                        var listDefaults = DataContext.Get(x => x.Id != model.Id && x.IsDefault == true);
+                        foreach (var item in listDefaults)
+                        {
+                            item.IsDefault = false;
+                            item.DatetimeModified = DateTime.Now;
+                            DataContext.DC.Update(item);
+                        }
+                    }
+                }
+                ((eFMSDataContext)DataContext.DC).SaveChanges();
+                cache.Remove(Templates.CatCurrency.NameCaching.ListName);
+            }
+            catch (Exception ex)
+            {
+                result = new HandleState(ex.Message);
+            }
+            return result;
+        }
+
         public HandleState Delete(string id)
         {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
-                Func<CatCurrency, bool> predicate = x => x.Id == id;
-                RedisCacheHelper.RemoveItemInList(cache, Templates.CatCurrency.NameCaching.ListName, predicate);
+                cache.Remove(Templates.CatCurrency.NameCaching.ListName);
             }
             return hs;
         }
+        #endregion
 
         public List<CatCurrency> Paging(CatCurrrencyCriteria criteria, int pageNumber, int pageSize, out int rowsCount, out int totalPages)
         {
@@ -100,41 +144,6 @@ namespace eFMS.API.Catalogue.DL.Services
                                     || (x.CurrencyName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1);
             }
             return list;
-        }
-
-        public HandleState Update(CatCurrencyModel model)
-        {
-            HandleState result = new HandleState();
-            try
-            {
-                var entity = mapper.Map<CatCurrency>(model);
-                entity.DatetimeModified = DateTime.Now;
-                if (entity.Inactive == true)
-                {
-                    entity.InactiveOn = DateTime.Now;
-                }
-                result = DataContext.Update(entity, x => x.Id == model.Id, false);
-                if (result.Success)
-                {
-                    if (model.IsDefault)
-                    {
-                        var listDefaults = DataContext.Get(x => x.Id != model.Id && x.IsDefault == true);
-                        foreach (var item in listDefaults)
-                        {
-                            item.IsDefault = false;
-                            item.DatetimeModified = DateTime.Now;
-                            DataContext.DC.Update(item);
-                        }
-                    }
-                }
-                ((eFMSDataContext)DataContext.DC).SaveChanges();
-                RedisCacheHelper.SetObject(cache, Templates.CatCurrency.NameCaching.ListName, DataContext.Get());
-            }
-            catch (Exception ex)
-            {
-                result = new HandleState(ex.Message);
-            }
-            return result;
         }
     }
 }
