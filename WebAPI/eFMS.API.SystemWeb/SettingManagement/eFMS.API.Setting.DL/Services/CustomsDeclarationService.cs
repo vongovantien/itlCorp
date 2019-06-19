@@ -196,5 +196,26 @@ namespace eFMS.API.Setting.DL.Services
             }
             return results;
         }
+
+        public List<CustomsDeclarationModel> GetBy(string jobId)
+        {
+            List<CustomsDeclarationModel> results = null;
+            var data = DataContext.Get(x => x.Mblid == jobId);
+            foreach (var item in data)
+            {
+                var clearance = mapper.Map<CustomsDeclarationModel>(item);
+                results.Add(clearance);
+            }
+            return results;
+        }
+
+        public object GetClearanceTypeData() {
+            var types = CustomData.Types;
+            var cargoTypes = CustomData.CargoTypes;
+            var routes = CustomData.Routes;
+            var serviceTypes = CustomData.ServiceTypes;
+            var results = new { types, cargoTypes, routes, serviceTypes };
+            return results;
+        }
     }
 }
