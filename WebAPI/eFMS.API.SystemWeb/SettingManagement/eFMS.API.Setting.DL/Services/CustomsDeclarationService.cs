@@ -178,7 +178,7 @@ namespace eFMS.API.Setting.DL.Services
             {
                 query = query.And(x => x.JobNo != null);
             }
-            else
+            else if(criteria.ImPorted == false)
             {
                 query = query.And(x => x.JobNo == null);
             }
@@ -191,10 +191,13 @@ namespace eFMS.API.Setting.DL.Services
         private List<CustomsDeclarationModel> MapClearancesToClearanceModels(IQueryable<CustomsDeclaration> list)
         {
             List<CustomsDeclarationModel> results = new List<CustomsDeclarationModel>();
-            //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var countries = countryApi.Getcountries().Result != null? countryApi.Getcountries().Result.ToList(): new List<Provider.Models.CatCountryApiModel>(); //dc.CatCountry;
-            var portIndexs = catPlaceApi.GetPlaces().Result != null? catPlaceApi.GetPlaces().Result.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port)).ToList(): new List<Provider.Models.CatPlaceApiModel>(); //dc.CatPlace.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port));
-            var customers = catPartnerApi.GetPartners().Result != null?catPartnerApi.GetPartners().Result.Where(x => x.PartnerGroup == GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER)).ToList(): new List<Provider.Models.CatPartnerApiModel>(); //dc.CatPartner.Where(x => x.PartnerGroup == GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER));
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            //var countries = countryApi.Getcountries().Result != null? countryApi.Getcountries().Result.ToList(): new List<Provider.Models.CatCountryApiModel>(); //dc.CatCountry;
+            //var portIndexs = catPlaceApi.GetPlaces().Result != null? catPlaceApi.GetPlaces().Result.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port)).ToList(): new List<Provider.Models.CatPlaceApiModel>(); //dc.CatPlace.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port));
+            //var customers = catPartnerApi.GetPartners().Result != null?catPartnerApi.GetPartners().Result.Where(x => x.PartnerGroup == GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER)).ToList(): new List<Provider.Models.CatPartnerApiModel>(); //dc.CatPartner.Where(x => x.PartnerGroup == GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER));
+            var countries = dc.CatCountry;
+            var portIndexs = dc.CatPlace.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port));
+            var customers = dc.CatPartner.Where(x => x.PartnerGroup == GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER));
             var clearances = (from clearance in list
                               join importCountry in countries on clearance.ImportcountryCode equals importCountry.Code into grpImports
                               from imCountry in grpImports.DefaultIfEmpty()
