@@ -1471,8 +1471,8 @@
         <!--end::billing-job-detail-tabview-tab-->
 
         <!--begin:: custom-declaration-tabview-tab  -->
-        <div class="tab-pane fade" role="tabpanel" id="custom-declaration-tabview-tab">
-            <app-billing-custom-declaration></app-billing-custom-declaration>
+        <div class="tab-pane fade" role="tabpanel" id="custom-declaration-tabview-tab"> 
+            <app-billing-custom-declaration *ngIf="opsTransaction"></app-billing-custom-declaration>
         </div>
         <!--end::custom-declaration-tabview-tab -->
 
