@@ -13,6 +13,8 @@ using eFMS.API.Setting.Infrastructure.Middlewares;
 using eFMS.API.Setting.Resources;
 using System.Diagnostics.Contracts;
 using eFMS.API.Setting.DL.Models.Criteria;
+using eFMS.API.Setting.DL.Common;
+using Microsoft.Extensions.Caching.Distributed;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -29,16 +31,18 @@ namespace eFMS.API.Setting.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICustomsDeclarationService customsDeclarationService;
+        private readonly IDistributedCache cache;
 
         /// <summary>
         /// constructor
         /// </summary>
         /// <param name="localizer">inject interface IStringLocalizer</param>
         /// <param name="service">inject interface ICustomsDeclarationService</param>
-        public CustomsDeclarationController(IStringLocalizer<LanguageSub> localizer, ICustomsDeclarationService service)
+        public CustomsDeclarationController(IStringLocalizer<LanguageSub> localizer, ICustomsDeclarationService service, IDistributedCache distributedCache)
         {
             stringLocalizer = localizer;
             customsDeclarationService = service;
+            cache = distributedCache;
         }
 
         /// <summary>
@@ -89,19 +93,24 @@ namespace eFMS.API.Setting.Controllers
         public IActionResult AddNew(CustomsDeclarationModel model)
         {
             var existedMessage = CheckExist(model, model.Id);
-            if (existedMessage != null)
+            if (existedMessage.Length >0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
             model.DatetimeCreated = DateTime.Now;
             model.DatetimeModified = DateTime.Now;
             model.UserCreated = model.UserModified = "admin";
+            model.Source = Constants.FromEFMS;
             var hs = customsDeclarationService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);
+            }
+            else
+            {
+                cache.Remove(Templates.CustomDeclaration.NameCaching.ListName);
             }
             return Ok(result);
         }
@@ -127,6 +136,7 @@ namespace eFMS.API.Setting.Controllers
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
+                cache.Remove(Templates.CustomDeclaration.NameCaching.ListName);
                 return BadRequest(result);
             }
             return Ok(result);
@@ -159,11 +169,15 @@ namespace eFMS.API.Setting.Controllers
         public IActionResult ImportClearancesFromEcus()
         {
             var result = customsDeclarationService.ImportClearancesFromEcus();
+            if (result.Success)
+            {
+                cache.Remove(Templates.CustomDeclaration.NameCaching.ListName);
+            }
             return Ok(result);
         }
 
         /// <summary>
-        /// get clearance types
+        /// get clearance types(types, cargoTypes, routes, serviceTypes)
         /// </summary>
         /// <returns></returns>
         [HttpGet("GetClearanceTypes")]
@@ -173,10 +187,26 @@ namespace eFMS.API.Setting.Controllers
             return Ok(results);
         }
 
+        /// <summary>
+        /// add( update) job to clearances
+        /// </summary>
+        /// <param name="clearances">list of clearances</param>
+        /// <returns></returns>
+        [HttpPost]
+        public IActionResult UpdateJobToClearances(List<CustomsDeclarationModel> clearances)
+        {
+            var result = customsDeclarationService.UpdateJobToClearances(clearances);
+            if (result.Success)
+            {
+                cache.Remove(Templates.CustomDeclaration.NameCaching.ListName);
+            }
+            return Ok(result);
+        }
+
         private string CheckExist(CustomsDeclarationModel model, decimal id)
         {
             string message = string.Empty;
-            if (id > 0)
+            if (id == 0)
             {
                 if (customsDeclarationService.Any(x => x.ClearanceNo == model.ClearanceNo))
                 {

@@ -12,9 +12,11 @@ namespace eFMS.API.Setting.DL.IService
 {
     public interface ICustomsDeclarationService : IRepositoryBase<CustomsDeclaration, CustomsDeclarationModel>
     {
+        IQueryable<CustomsDeclaration> Get();
         object GetClearanceTypeData();
         HandleState ImportClearancesFromEcus();
         List<CustomsDeclarationModel> Paging(CustomsDeclarationCriteria criteria, int page, int size, out int rowsCount);
         List<CustomsDeclarationModel> GetBy(string jobId);
+        HandleState UpdateJobToClearances(List<CustomsDeclarationModel> clearances);
     }
 }

@@ -4,5 +4,69 @@
         <name>eFMS.API.Documentation</name>
     </assembly>
     <members>
+        <member name="T:eFMS.API.Documentation.Controllers.OpsTransactionController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{SystemManagementAPI.Resources.LanguageSub},eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Documentation.DL.IService.IOpsTransactionService)">
+            <summary>
+            constructor
+            </summary>
+            <param name="localizer">inject IStringLocalizer</param>
+            <param name="user">inject ICurrentUser</param>
+            <param name="service">inject IOpsTransactionService</param>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.Query(eFMS.API.Documentation.DL.Models.Criteria.OpsTransactionCriteria)">
+            <summary>
+            get the list of countries by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.Get(System.Guid)">
+            <summary>
+            get data detail by id
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.Paging(eFMS.API.Documentation.DL.Models.Criteria.OpsTransactionCriteria,System.Int32,System.Int32)">
+            <summary>
+            get and paging the list of countries by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
+            <param name="page">page to retrieve data</param>
+            <param name="size">number items per page</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.Add(eFMS.API.Documentation.DL.Models.OpsTransactionModel)">
+            <summary>
+            add new job
+            </summary>
+            <param name="model">object to add</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.Update(eFMS.API.Documentation.DL.Models.OpsTransactionModel)">
+            <summary>
+            update an existed item
+            </summary>
+            <param name="model">object to update</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.Delete(System.Guid)">
+            <summary>
+            delete an existed item
+            </summary>
+            <param name="id">id of item that want to delete</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.CheckAllowDelete(System.Guid)">
+            <summary>
+            check an item that is allowed delete
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>

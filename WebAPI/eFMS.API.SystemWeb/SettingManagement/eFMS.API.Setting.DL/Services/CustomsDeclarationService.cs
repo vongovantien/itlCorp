@@ -18,6 +18,7 @@ using eFMS.API.Common.Helpers;
 using eFMS.API.Setting.DL.Common;
 using eFMS.API.Setting.DL.Models.Ecus;
 using eFMS.API.Provider.Services.IService;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace eFMS.API.Setting.DL.Services
 {
@@ -27,16 +28,36 @@ namespace eFMS.API.Setting.DL.Services
         private readonly ICatPlaceApiService catPlaceApi;
         private readonly IEcusConnectionService ecusCconnectionService;
         private readonly ICatCountryApiService countryApi;
+        private readonly IDistributedCache cache;
+
         public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, IMapper mapper, 
             IEcusConnectionService ecusCconnection
             , ICatPartnerApiService catPartner
             , ICatPlaceApiService catPlace
-            , ICatCountryApiService country) : base(repository, mapper)
+            , ICatCountryApiService country
+            , IDistributedCache distributedCache) : base(repository, mapper)
         {
             ecusCconnectionService = ecusCconnection;
             catPartnerApi = catPartner;
             catPlaceApi = catPlace;
             countryApi = country;
+            cache = distributedCache;
+        }
+
+        public IQueryable<CustomsDeclaration> Get()
+        {
+            var clearanceCaching = RedisCacheHelper.GetObject<List<CustomsDeclaration>>(cache, Templates.CustomDeclaration.NameCaching.ListName);
+            IQueryable<CustomsDeclaration> customClearances = null;
+            if (clearanceCaching == null)
+            {
+                customClearances = DataContext.Get();
+                RedisCacheHelper.SetObject(cache, Templates.CustomDeclaration.NameCaching.ListName, customClearances);
+            }
+            else
+            {
+                customClearances = clearanceCaching.AsQueryable();
+            }
+            return customClearances;
         }
 
         public HandleState ImportClearancesFromEcus()
@@ -60,6 +81,7 @@ namespace eFMS.API.Setting.DL.Services
                     if (itemExisted == null && clearance.SOTK != null)
                     {
                         var newClearance = MapEcusClearanceToCustom(clearance, clearanceNo);
+                        newClearance.Source = Constants.FromEFMS;
                         dc.CustomsDeclaration.Add(newClearance);
                     }
                 }
@@ -216,6 +238,25 @@ namespace eFMS.API.Setting.DL.Services
             var serviceTypes = CustomData.ServiceTypes;
             var results = new { types, cargoTypes, routes, serviceTypes };
             return results;
+        }
+
+        public HandleState UpdateJobToClearances(List<CustomsDeclarationModel> clearances)
+        {
+            var result = new HandleState();
+            try
+            {
+                foreach (var item in clearances)
+                {
+                    var clearance = mapper.Map<CustomsDeclaration>(item);
+                    clearance.JobId = item.JobId;
+                    DataContext.Update(clearance, x => x.Id == item.Id);
+                }
+            }
+            catch (Exception ex)
+            {
+                result = new HandleState(ex.Message);
+            }
+            return result;
         }
     }
 }
