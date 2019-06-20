@@ -4,7 +4,6 @@ import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { async } from '@angular/core/testing';
 
 @Component({
     selector: 'app-custom-clearance',
@@ -26,37 +25,17 @@ export class CustomClearanceComponent implements OnInit {
     ngOnInit() {
         this.initPager();
         this.getCustomsDeclaration();
-        console.log('ABC');
     }
     initPager(): any {
         this.pager.totalItems = 0;
         this.pager.currentPage = 1;
     }
 
-    getCustomsDeclaration() {
-        // this.baseServices.get(this.api_menu.ToolSetting.CustomClearance.getAll).subscribe(res => {
-        //     console.log(res);
-        //     this.ListCustomDeclaration = res;
-        // }, err => {
-        //     console.log(err);
-        //     this.ListCustomDeclaration = [];
-        //     this.baseServices.handleError(err);
-        // });
-        console.log(this.pager.currentPage);
-        console.log(this.pager.pageSize);
-        
-        // const res = await this.baseServices.postAsync(this.api_menu.ToolSetting.CustomClearance.paging + "?pageNumber=" + this.pager.currentPage + "&pageSize=" + this.pager.pageSize, {}, true, true);
-        // console.log(res);
-        // this.ListCustomDeclaration = res.data;
-        // this.pager.totalItems = res.totalItems;
-        this.baseServices.post(this.api_menu.ToolSetting.CustomClearance.paging + "?pageNumber=" + this.pager.currentPage + "&pageSize=" + this.pager.pageSize, {  }).subscribe((res:any) => {
-            this.ListCustomDeclaration = res;
-            console.log(this.ListCustomDeclaration);
-        });
-
-        // const response = await this.baseServices.getAsync(this.api_menu.ToolSetting.CustomClearance.getAll,true,true);       
-        // console.log(response);
-
+    async getCustomsDeclaration() {        
+        const res = await this.baseServices.postAsync(this.api_menu.ToolSetting.CustomClearance.paging + "?pageNumber=" + this.pager.currentPage + "&pageSize=" + this.pager.pageSize, {}, true, true);
+        console.log(res);
+        this.ListCustomDeclaration = res.data;
+        this.pager.totalItems = res.totalItems;
     }
 
     setPage(pager: PagerSetting) {

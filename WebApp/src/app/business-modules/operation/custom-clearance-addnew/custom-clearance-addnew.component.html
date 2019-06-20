@@ -114,7 +114,7 @@
                             <label class="form-control-label" for="">
                                 Service Type
                             </label>
-                            <ng-select [allowClear]="true" [items]="serveiceType" [disabled]="disabled"
+                            <ng-select [allowClear]="true" [items]="serviceTypes" [disabled]="disabled"
                                 (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
                                 (typed)="typed($event)" placeholder="Select filter">
                             </ng-select>
@@ -173,7 +173,7 @@
                             <label class="form-control-label" for="">
                                 Type
                             </label>
-                            <ng-select [allowClear]="true" [items]="typeClearance" [disabled]="disabled"
+                            <ng-select [allowClear]="true" [items]="clearanceTypes" [disabled]="disabled"
                                 (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
                                 (typed)="typed($event)" placeholder="Select filter">
                             </ng-select>
@@ -184,7 +184,7 @@
                             <label class="form-control-label" for="">
                                 Route
                             </label>
-                            <ng-select [allowClear]="true" [items]="['Red', 'Green', 'Yellow']" [disabled]="disabled"
+                            <ng-select [allowClear]="true" [items]="routes" [disabled]="disabled"
                                 (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
                                 (typed)="typed($event)" placeholder="Select filter">
                             </ng-select>
@@ -197,7 +197,7 @@
                             <label class="form-control-label" for="">
                                 Cargo Type
                             </label>
-                            <ng-select [allowClear]="true" [items]="['LCL', 'FCL']" [disabled]="disabled"
+                            <ng-select [allowClear]="true" [items]="cargoTypes" [disabled]="disabled"
                                 (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
                                 (typed)="typed($event)" placeholder="Select filter">
                             </ng-select>
@@ -208,7 +208,7 @@
                             <label class="form-control-label" for="">
                                 Export Country
                             </label>
-                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
+                            <ng-select [allowClear]="true" [items]="countries" [disabled]="disabled"
                                 (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
                                 (typed)="typed($event)" placeholder="Select filter">
                             </ng-select>
@@ -219,7 +219,7 @@
                             <label class="form-control-label" for="">
                                 Import Country
                             </label>
-                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
+                            <ng-select [allowClear]="true" [items]="countries" [disabled]="disabled"
                                 (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
                                 (typed)="typed($event)" placeholder="Select filter">
                             </ng-select>

@@ -18,6 +18,9 @@ using eFMS.API.Setting.DL.Models.Criteria;
 
 namespace eFMS.API.Setting.Controllers
 {
+    /// <summary>
+    /// A base class for an MVC controller without view support.
+    /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
@@ -27,12 +30,21 @@ namespace eFMS.API.Setting.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICustomsDeclarationService customsDeclarationService;
 
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="localizer">inject interface IStringLocalizer</param>
+        /// <param name="service">inject interface ICustomsDeclarationService</param>
         public CustomsDeclarationController(IStringLocalizer<LanguageSub> localizer, ICustomsDeclarationService service)
         {
             stringLocalizer = localizer;
             customsDeclarationService = service;
         }
 
+        /// <summary>
+        /// get the list of custom declarations
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Get()
         {
@@ -40,6 +52,25 @@ namespace eFMS.API.Setting.Controllers
             return Ok(results);
         }
 
+        /// <summary>
+        /// get the list of custom declarations by job id
+        /// </summary>
+        /// <param name="jobId">jobId that want to retrieve custom declarations</param>
+        /// <returns></returns>
+        [HttpGet("GetBy/{jobId}")]
+        public IActionResult GetBy(string jobId)
+        {
+            var results = customsDeclarationService.GetBy(jobId);
+            return Ok(results);
+        }
+
+        /// <summary>
+        /// get and paging the list of custom declarations by conditions
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <param name="pageNumber">page to retrieve data</param>
+        /// <param name="pageSize">number items per page</param>
+        /// <returns></returns>
         [HttpPost("Paging")]
         public IActionResult Paging(CustomsDeclarationCriteria criteria, int pageNumber, int pageSize)
         {
@@ -47,7 +78,12 @@ namespace eFMS.API.Setting.Controllers
             var result = new { data, totalItems, pageNumber, pageSize };
             return Ok(result);
         }
-
+        
+        /// <summary>
+        /// add new custom clearance
+        /// </summary>
+        /// <param name="model">object to add</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Add")]
         public IActionResult AddNew(CustomsDeclarationModel model)
@@ -70,6 +106,11 @@ namespace eFMS.API.Setting.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// update an existed item
+        /// </summary>
+        /// <param name="model">object to update</param>
+        /// <returns></returns>
         [HttpPut]
         [Route("Update")]
         public IActionResult Update(CustomsDeclarationModel model)
@@ -91,6 +132,11 @@ namespace eFMS.API.Setting.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// delete an existed item
+        /// </summary>
+        /// <param name="id">id of existed item that want to delete</param>
+        /// <returns></returns>
         [HttpDelete]
         [Route("Delete")]
         public IActionResult Delete(int id)
@@ -105,11 +151,26 @@ namespace eFMS.API.Setting.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// import custom declaration from ecus system
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("ImportClearancesFromEcus")]
         public IActionResult ImportClearancesFromEcus()
         {
             var result = customsDeclarationService.ImportClearancesFromEcus();
             return Ok(result);
+        }
+
+        /// <summary>
+        /// get clearance types
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetClearanceTypes")]
+        public IActionResult GetClearanceTypes()
+        {
+            var results = customsDeclarationService.GetClearanceTypeData();
+            return Ok(results);
         }
 
         private string CheckExist(CustomsDeclarationModel model, decimal id)

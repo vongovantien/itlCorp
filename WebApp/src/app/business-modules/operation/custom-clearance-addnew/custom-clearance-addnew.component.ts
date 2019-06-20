@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import moment from 'moment/moment';
+import { BaseService } from 'src/services-base/base.service';
+import { API_MENU } from 'src/constants/api-menu.const';
+import * as dataHelper from 'src/helper/data.helper';
 
 @Component({
     selector: 'app-custom-clearance-addnew',
@@ -7,14 +10,42 @@ import moment from 'moment/moment';
     styleUrls: ['./custom-clearance-addnew.component.scss']
 })
 export class CustomClearanceAddnewComponent implements OnInit {
+    countries: any[] = [];
+    clearanceTypes: any[] = [];
+    serviceTypes: any[] = [];
+    cargoTypes: any[] = [];
+    routes: any[] = [];
 
-    constructor() {
+    constructor(private baseServices: BaseService,
+        private api_menu: API_MENU) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
     }
 
     ngOnInit() {
+        this.getCountries();
+        this.getClearanceData();
+    }
+
+    async getClearanceData() {
+        const responses = await this.baseServices.getAsync(this.api_menu.ToolSetting.CustomClearance.getClearanceTypes, false, false);
+        if(responses != null){
+            this.clearanceTypes = dataHelper.prepareNg2SelectData(responses.types, 'value', 'displayName');
+            this.serviceTypes = dataHelper.prepareNg2SelectData(responses.serviceTypes, 'value', 'displayName');
+            this.cargoTypes = dataHelper.prepareNg2SelectData(responses.cargoTypes, 'value', 'displayName');
+            this.routes = dataHelper.prepareNg2SelectData(responses.routes, 'value', 'displayName');
+        }
+    }
+
+    async getCountries() {
+        const responses = await this.baseServices.getAsync(this.api_menu.Catalogue.Country.getAll, false, false);
+        if(responses != null){
+            this.countries = dataHelper.prepareNg2SelectData(responses, 'code', 'nameEn');
+        }
+        else{
+            this.countries = [];
+        }
     }
 
 

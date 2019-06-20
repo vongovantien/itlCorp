@@ -20,6 +20,9 @@ using eFMS.API.Common.Globals;
 
 namespace eFMS.API.Setting.Controllers
 {
+    /// <summary>
+    /// A base class for an MVC controller without view support.
+    /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
@@ -29,12 +32,22 @@ namespace eFMS.API.Setting.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly IEcusConnectionService ecusConnectionService;
 
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="localizer">inject interface IStringLocalizer</param>
+        /// <param name="service">inject interface IEcusConnectionService</param>
         public EcusConnectionController(IStringLocalizer<eFMS.API.Setting.Resources.LanguageSub> localizer, IEcusConnectionService service)
         {
             stringLocalizer = localizer;
             ecusConnectionService = service;
         }
 
+        /// <summary>
+        /// add new ecus connection
+        /// </summary>
+        /// <param name="model">model to add</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Add")]
         public IActionResult AddNew(SetEcusConnectionModel model)
@@ -56,6 +69,11 @@ namespace eFMS.API.Setting.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// update an existed item
+        /// </summary>
+        /// <param name="model">object to update</param>
+        /// <returns></returns>
         [HttpPut]
         [Route("Update")]
         public IActionResult Update(SetEcusConnectionModel model)
@@ -77,6 +95,11 @@ namespace eFMS.API.Setting.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// delete an existed item
+        /// </summary>
+        /// <param name="id">id of item want to delete</param>
+        /// <returns></returns>
         [HttpDelete]
         [Route("Delete")]
         public IActionResult Delete(int id)
@@ -91,6 +114,13 @@ namespace eFMS.API.Setting.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// get and paging the list of custom declarations by conditions
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <param name="pageNumber">page to retrieve data</param>
+        /// <param name="pageSize">number items per page</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
         public IActionResult Paging(SetEcusConnectionCriteria criteria,int pageNumber, int pageSize)
@@ -100,21 +130,22 @@ namespace eFMS.API.Setting.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// get all ecus connections
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("GetAll")]
         public List<SetEcusConnectionModel> GetAll()
         {
             return ecusConnectionService.GetConnections();
         }
-        //[HttpGet]
-        //[Route("Test")]
-        //[Authorize]
-        //public IActionResult Test()
-        //{
-        //    var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
-        //    var results = ecusConnectionService.Test(token);
-        //    return Ok(results);
-        //}
+
+        /// <summary>
+        /// get detail of ecus connection by id
+        /// </summary>
+        /// <param name="id">id of data that want to retrieve</param>
+        /// <returns></returns>
         [HttpGet]
         [Route("GetDetails")]
         public SetEcusConnectionModel GetDetails(int id)
@@ -129,6 +160,15 @@ namespace eFMS.API.Setting.Controllers
             return message;
         }
 
+        /// <summary>
+        /// get data from ecus system by user id
+        /// </summary>
+        /// <param name="userId">user id</param>
+        /// <param name="serverName">server name</param>
+        /// <param name="dbusername">user name sql</param>
+        /// <param name="dbpassword">password sql</param>
+        /// <param name="database">database name</param>
+        /// <returns></returns>
         [HttpGet]
         [Route("GetDataEcusByUser")]
         public IActionResult GetDataEcusByUser(string userId, string serverName, string dbusername, string dbpassword, string database)

@@ -5,26 +5,37 @@ namespace eFMS.API.Documentation.Service.Models
 {
     public partial class CustomsDeclaration
     {
-        public decimal Id { get; set; }
+        public int Id { get; set; }
+        public decimal? IdfromEcus { get; set; }
+        public string JobNo { get; set; }
         public string ClearanceNo { get; set; }
-        public string CustomerId { get; set; }
+        public string FirstClearanceNo { get; set; }
+        public string PartnerTaxCode { get; set; }
         public DateTime? ClearanceDate { get; set; }
-        public Guid? Mblid { get; set; }
-        public Guid? Hblid { get; set; }
+        public string Mblid { get; set; }
+        public string Hblid { get; set; }
+        public string PortCodeCk { get; set; }
+        public string PortCodeNn { get; set; }
+        public string UnitId { get; set; }
+        public int? QtyCont { get; set; }
         public string ServiceType { get; set; }
         public string Gateway { get; set; }
         public string Type { get; set; }
         public string Route { get; set; }
         public string DocumentType { get; set; }
-        public Guid? ExportCountryId { get; set; }
-        public Guid? ImportcountryId { get; set; }
+        public string ExportCountryCode { get; set; }
+        public string ImportcountryCode { get; set; }
         public int? CommodityId { get; set; }
         public decimal? GrossWeight { get; set; }
         public decimal? ChargeWeight { get; set; }
         public decimal? Cbm { get; set; }
-        public int? ContQuantity { get; set; }
-        public string Pcs { get; set; }
+        public int? Pcs { get; set; }
         public string Source { get; set; }
         public string Note { get; set; }
+        public Guid? JobId { get; set; }
+        public string UserCreated { get; set; }
+        public string UserModified { get; set; }
+        public DateTime? DatetimeCreated { get; set; }
+        public DateTime? DatetimeModified { get; set; }
     }
 }
