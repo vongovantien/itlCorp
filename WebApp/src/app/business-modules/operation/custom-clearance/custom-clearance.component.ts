@@ -1,5 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import moment from 'moment/moment';
+import { BaseService } from 'src/services-base/base.service';
+import { API_MENU } from 'src/constants/api-menu.const';
+import { PAGINGSETTING } from 'src/constants/paging.const';
+import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 
 @Component({
     selector: 'app-custom-clearance',
@@ -7,16 +11,39 @@ import moment from 'moment/moment';
     styleUrls: ['./custom-clearance.component.scss']
 })
 export class CustomClearanceComponent implements OnInit {
+    ListCustomDeclaration: any = [];
+    pager: PagerSetting = PAGINGSETTING;
+    searchObject: any = {};
 
-    constructor() {
+    constructor(private baseServices: BaseService,
+        private api_menu: API_MENU) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
     }
 
     ngOnInit() {
+        this.initPager();
+        this.getCustomsDeclaration();
+    }
+    initPager(): any {
+        this.pager.totalItems = 0;
+        this.pager.currentPage = 1;
     }
 
+    async getCustomsDeclaration() {        
+        const res = await this.baseServices.postAsync(this.api_menu.ToolSetting.CustomClearance.paging + "?pageNumber=" + this.pager.currentPage + "&pageSize=" + this.pager.pageSize, {}, true, true);
+        console.log(res);
+        this.ListCustomDeclaration = res.data;
+        this.pager.totalItems = res.totalItems;
+    }
+
+    setPage(pager: PagerSetting) {
+        this.pager.currentPage = pager.currentPage;
+        this.pager.pageSize = pager.pageSize;
+        this.pager.totalPages = pager.totalPages;
+        this.getCustomsDeclaration();
+    }
 
     /**
      * Daterange picker

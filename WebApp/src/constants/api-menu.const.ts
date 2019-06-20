@@ -243,7 +243,9 @@ export class API_MENU {
             paging:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/Paging"
         },
         CustomClearance:{
-            getClearanceTypes:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/GetClearanceTypes"
+            getAll:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration",
+            getClearanceTypes:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/GetClearanceTypes",
+            paging:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/Paging"
         }
     }
 
