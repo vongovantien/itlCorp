@@ -1,10 +1,10 @@
 <div class="modal fade" id="ops-credit-debit-note-detail-modal" data-backdrop="static" role="dialog" aria-labelledby=""
     aria-hidden="true">
-    <div class="modal-dialog c-modal-fullscreen" role="document"  *ngIf="CDNoteEditing!=null">
+    <div class="modal-dialog c-modal-fullscreen" role="document"  >
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header" *ngIf="CDNoteEditing!=null">
                 <h5  class="modal-title">Detail<span class="m--margin-left-5">Credit Note</span>&nbsp;<span class="m--font-danger m--margin-left-5">{{CDNoteEditing.soa.code}}</span></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" >
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <div class="modal-actions c-button-actions">
@@ -18,7 +18,7 @@
                     </button>
                 </div>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" *ngIf="CDNoteEditing!=null">
                <!--begin::Form-->
                <div class="m-form m-form--state">
                 <div class="div-inside bg-secondary m--margin-bottom-15">
@@ -150,7 +150,7 @@
                                         <span class="m--font-bolder">
                                             Locked:
                                         </span>
-                                        <span class="m--font-brand">{{CDNoteEditing.isLoocked}}</span>
+                                        <span class="m--font-brand">{{CDNoteEditing.isLocked.toString()}}</span>
                                         <!-- <span class="m--font-danger">Yes</span> -->
                                     </div>
                                 </div>

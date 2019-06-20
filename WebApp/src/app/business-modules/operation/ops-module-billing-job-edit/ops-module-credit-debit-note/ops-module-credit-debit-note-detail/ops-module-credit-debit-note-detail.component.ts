@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterViewChecked, Input, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
+import { AcctSoaDetails } from 'src/app/shared/models/document/acctSoaDetails.model';
 declare var $: any;
 
 @Component({
@@ -15,7 +16,7 @@ export class OpsModuleCreditDebitNoteDetailComponent implements OnInit, AfterVie
   STORAGE_DATA: any = null;
   currentSOANo: string = null;
   currentJobID: string = null;
-  CDNoteEditing: any = null;
+  CDNoteEditing: AcctSoaDetails = null;
   ngAfterViewChecked(): void {
     this.open = true;
     this.cdr.detectChanges();
@@ -67,4 +68,7 @@ export class OpsModuleCreditDebitNoteDetailComponent implements OnInit, AfterVie
 
   }
 
+  Close(){
+    $('#ops-credit-debit-note-detail-modal').modal('hide');
+  }
 }
