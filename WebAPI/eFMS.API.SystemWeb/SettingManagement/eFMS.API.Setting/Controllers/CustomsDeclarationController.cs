@@ -73,7 +73,7 @@ namespace eFMS.API.Setting.Controllers
         /// <returns></returns>
         [HttpPost("Paging")]
         public IActionResult Paging(CustomsDeclarationCriteria criteria, int pageNumber, int pageSize)
-        {
+       {
             var data = customsDeclarationService.Paging(criteria, pageNumber, pageSize, out int totalItems);
             var result = new { data, totalItems, pageNumber, pageSize };
             return Ok(result);
