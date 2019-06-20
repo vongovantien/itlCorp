@@ -241,6 +241,10 @@ export class API_MENU {
             update:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/Update",
             delete:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/Delete",
             paging:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/Paging"
+        },
+        CustomClearance:{
+            getAll:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration",
+            paging:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/Paging"
         }
     }
 
