@@ -4,14 +4,16 @@ using System.Text;
 
 namespace eFMS.API.Setting.DL.Common
 {
-    public class Constants
+    public static class Constants
     {
         public const string Insert = "Insert";
         public const string Update = "Update";
         public const string Delete = "Delete";
         public const string Active = "Active";
+        public const string FromEFMS = "eFMS";
+        public const string FromEcus = "Ecus";
     }
-    public class ClearanceConstants
+    public static class ClearanceConstants
     {
         public const string Air_Service = "Air";
         public const string Sea_FCL_Service = "Sea FCL";
@@ -32,7 +34,7 @@ namespace eFMS.API.Setting.DL.Common
         public const string Import_Type_Value = "Import";
         public const string Export_Type_Value = "Export";
     }
-    public class CatPlaceConstant
+    public static class CatPlaceConstant
     {
         public const string Warehouse = "Warehouse";
         public const string Port = "Port";

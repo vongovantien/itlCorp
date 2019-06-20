@@ -18,6 +18,9 @@ using SystemManagementAPI.Resources;
 
 namespace eFMS.API.Documentation.Controllers
 {
+    /// <summary>
+    /// A base class for an MVC controller without view support.
+    /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
@@ -28,6 +31,12 @@ namespace eFMS.API.Documentation.Controllers
         private readonly ICurrentUser currentUser;
         private readonly IOpsTransactionService transactionService;
 
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="localizer">inject IStringLocalizer</param>
+        /// <param name="user">inject ICurrentUser</param>
+        /// <param name="service">inject IOpsTransactionService</param>
         public OpsTransactionController(IStringLocalizer<LanguageSub> localizer, ICurrentUser user, IOpsTransactionService service)
         {
             stringLocalizer = localizer;
@@ -35,18 +44,37 @@ namespace eFMS.API.Documentation.Controllers
             transactionService = service;
         }
 
+        /// <summary>
+        /// get the list of countries by conditions
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <returns></returns>
         [HttpPost("Query")]
         public IActionResult Query(OpsTransactionCriteria criteria)
         {
             var results = transactionService.Query(criteria);
             return Ok(results);
         }
+
+        /// <summary>
+        /// get data detail by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Get(Guid id)
         {
             var result = transactionService.GetDetails(id); //transactionService.First(x => x.Id == id);
             return Ok(result);
         }
+
+        /// <summary>
+        /// get and paging the list of countries by conditions
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <param name="page">page to retrieve data</param>
+        /// <param name="size">number items per page</param>
+        /// <returns></returns>
         [HttpPost("Paging")]
         public IActionResult Paging(OpsTransactionCriteria criteria, int page, int size)
         {
@@ -55,6 +83,11 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// add new job
+        /// </summary>
+        /// <param name="model">object to add</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Add")]
         public IActionResult Add(OpsTransactionModel model)
@@ -75,6 +108,11 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// update an existed item
+        /// </summary>
+        /// <param name="model">object to update</param>
+        /// <returns></returns>
         [HttpPut]
         [Route("Update")]       
         public IActionResult Update(OpsTransactionModel model)
@@ -97,6 +135,11 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// delete an existed item
+        /// </summary>
+        /// <param name="id">id of item that want to delete</param>
+        /// <returns></returns>
         [HttpDelete]
         [Route("Delete/{id}")]
         public IActionResult Delete(Guid id)
@@ -114,6 +157,12 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+
+        /// <summary>
+        /// check an item that is allowed delete
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("CheckAllowDelete/{id}")]
         public IActionResult CheckAllowDelete(Guid id)
         {

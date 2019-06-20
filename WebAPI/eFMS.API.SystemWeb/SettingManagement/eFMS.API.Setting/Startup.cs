@@ -48,6 +48,11 @@ namespace eFMS.API.Setting
         {
           
             services.AddAutoMapper();
+            services.AddDistributedRedisCache(options =>
+            {
+                options.InstanceName = "Setting";
+                options.Configuration = Configuration.GetConnectionString("Redis");
+            });
             services.AddAuthorize(Configuration);
             services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddConfigureSetting(Configuration);

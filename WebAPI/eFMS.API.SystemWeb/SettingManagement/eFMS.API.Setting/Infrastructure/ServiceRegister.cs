@@ -18,6 +18,8 @@ using System;
 using eFMS.API.Common;
 using eFMS.API.Provider.Services.IService;
 using eFMS.API.Provider.Services.ServiceImpl;
+using System.IO;
+using System.Reflection;
 
 namespace eFMS.API.Setting.Infrastructure
 {
@@ -84,7 +86,12 @@ namespace eFMS.API.Setting.Infrastructure
                 {
                     var provider = services.BuildServiceProvider()
                     .GetRequiredService<IApiVersionDescriptionProvider>();
-
+                    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                    if (xmlPath != null)
+                    {
+                        options.IncludeXmlComments(xmlPath);
+                    }
                     foreach (var description in provider.ApiVersionDescriptions)
                     {
                         options.SwaggerDoc(
