@@ -23,6 +23,7 @@ namespace eFMS.API.Documentation.Controllers
         /// constructor
         /// </summary>
         /// <param name="localizer">inject interface IStringLocalizer</param>
+        /// <param name="opsStageAssigned"></param>
         public OpsStageAssignedController(IStringLocalizer<LanguageSub> localizer, IOpsStageAssignedService opsStageAssigned)
         {
             stringLocalizer = localizer;

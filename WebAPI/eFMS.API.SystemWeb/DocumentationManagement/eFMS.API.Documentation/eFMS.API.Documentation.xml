@@ -14,6 +14,7 @@
             constructor
             </summary>
             <param name="localizer">inject interface IStringLocalizer</param>
+            <param name="opsStageAssigned"></param>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.OpsStageAssignedController.Get">
             <summary>

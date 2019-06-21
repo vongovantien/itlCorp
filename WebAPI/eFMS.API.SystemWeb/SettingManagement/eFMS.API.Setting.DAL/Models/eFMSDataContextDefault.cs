@@ -2258,8 +2258,6 @@ namespace eFMS.API.Setting.Service.Models
                     .HasColumnName("CBM")
                     .HasColumnType("decimal(18, 4)");
 
-                entity.Property(e => e.ChargeWeight).HasColumnType("decimal(18, 4)");
-
                 entity.Property(e => e.ClearanceDate).HasColumnType("smalldatetime");
 
                 entity.Property(e => e.ClearanceNo)
@@ -2311,6 +2309,8 @@ namespace eFMS.API.Setting.Service.Models
                     .HasColumnName("MBLID")
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.NetWeight).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.PartnerTaxCode)
                     .HasMaxLength(50)

@@ -1,4 +1,5 @@
 ﻿using eFMS.API.Common.Helpers;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
@@ -15,10 +16,13 @@ namespace eFMS.API.Provider.Services.ServiceImpl
         protected readonly HttpClient apiClient;
         protected readonly string baseUrl;
         protected readonly IOptions<APIUrls> settings;
-        public BaseApiService(HttpClient httpClient, IOptions<APIUrls> settings, int versionApi, string nameUrlBase)
+        private readonly IMemoryCache memoryCache;
+
+        public BaseApiService(HttpClient httpClient, IOptions<APIUrls> settings, int versionApi, string nameUrlBase, IMemoryCache cache)
         {
             this.settings = settings;
             apiClient = httpClient;
+            memoryCache = cache;
             baseUrl = $"{ObjectHelper.GetValueBy(settings.Value, nameUrlBase)}/api/v{versionApi}/{CultureInfo.CurrentCulture.Name}";
         }
 
@@ -31,6 +35,41 @@ namespace eFMS.API.Provider.Services.ServiceImpl
                     return JsonConvert.DeserializeObject<TResponse>(strResponse);
             }
             catch {
+            }
+            return default(TResponse);
+        }
+        protected async Task<TResponse> GetApi<TResponse>(string strUri, bool? isAllowCaching = false, double? dSeconds = 300)
+        {
+            try
+            {
+                if (isAllowCaching == true)
+                {
+                    bool isExists = memoryCache.TryGetValue(strUri, out TResponse response);
+                    if (isExists)
+                    {
+                        return response;
+                    }
+                    else
+                    {
+                        string strResponse = await apiClient.GetStringAsync(strUri);
+                        if (!String.IsNullOrEmpty(strResponse))
+                        {
+                            response = JsonConvert.DeserializeObject<TResponse>(strResponse);
+                            MemoryCacheEntryOptions cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(dSeconds ?? 0));
+                            memoryCache.Set(strUri, response, cacheEntryOptions);
+                            return response;
+                        }
+                    }
+                }
+                else
+                {
+                    string strResponse = await apiClient.GetStringAsync(strUri);
+                    if (!String.IsNullOrEmpty(strResponse))
+                        return JsonConvert.DeserializeObject<TResponse>(strResponse);
+                }
+            }
+            catch
+            {
             }
             return default(TResponse);
         }

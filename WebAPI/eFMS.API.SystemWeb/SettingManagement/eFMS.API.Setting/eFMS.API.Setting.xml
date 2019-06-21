@@ -22,11 +22,18 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Setting.Controllers.CustomsDeclarationController.GetBy(System.String)">
+        <member name="M:eFMS.API.Setting.Controllers.CustomsDeclarationController.GetBy(System.Guid)">
             <summary>
             get the list of custom declarations by job id
             </summary>
             <param name="jobId">jobId that want to retrieve custom declarations</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Setting.Controllers.CustomsDeclarationController.Query(eFMS.API.Setting.DL.Models.Criteria.CustomsDeclarationCriteria)">
+            <summary>
+            get the list of custom declarations by conditions
+            </summary>
+            <param name="criteria"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Setting.Controllers.CustomsDeclarationController.Paging(eFMS.API.Setting.DL.Models.Criteria.CustomsDeclarationCriteria,System.Int32,System.Int32)">
