@@ -27,7 +27,7 @@ namespace eFMS.API.Setting.Service.Models
         public string ImportcountryCode { get; set; }
         public int? CommodityId { get; set; }
         public decimal? GrossWeight { get; set; }
-        public decimal? ChargeWeight { get; set; }
+        public decimal? NetWeight { get; set; }
         public decimal? Cbm { get; set; }
         public int? Pcs { get; set; }
         public string Source { get; set; }

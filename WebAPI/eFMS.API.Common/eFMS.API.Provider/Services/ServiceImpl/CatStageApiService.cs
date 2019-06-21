@@ -3,6 +3,7 @@ using eFMS.API.Provider.Infrasture.API.Catalogue;
 using eFMS.API.Provider.Models;
 using eFMS.API.Provider.Models.Criteria;
 using eFMS.API.Provider.Services.IService;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -15,10 +16,15 @@ namespace eFMS.API.Provider.Services.ServiceImpl
 {
     public class CatStageApiService : BaseApiService, ICatStageApiService
     {
-        public CatStageApiService(HttpClient httpClient, IOptions<Settings.APIUrls> settings) : base(httpClient, settings, 1, nameof(APIUrls.CatelogueUrl))
+        public CatStageApiService(HttpClient httpClient, IOptions<Settings.APIUrls> settings, IMemoryCache memoryCache) : base(httpClient, settings, 1, nameof(APIUrls.CatelogueUrl), memoryCache)
         {
         }
 
+        public async Task<List<CatStageApiModel>> GetAll()
+        {
+            string strUri = CatPartnerAPI.GetAll(baseUrl);
+            return await GetApi<List<CatStageApiModel>>(strUri, true);
+        }
         public async Task<List<CatStageApiModel>> GetStages(CatStageCriteria criteria)
         {
             string strUri = CatStageAPI.GetAll(baseUrl);

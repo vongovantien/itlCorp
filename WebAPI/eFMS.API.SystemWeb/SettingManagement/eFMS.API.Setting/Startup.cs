@@ -55,6 +55,7 @@ namespace eFMS.API.Setting
             });
             services.AddAuthorize(Configuration);
             services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMemoryCache();
             services.AddConfigureSetting(Configuration);
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
             ServiceRegister.Register(services);

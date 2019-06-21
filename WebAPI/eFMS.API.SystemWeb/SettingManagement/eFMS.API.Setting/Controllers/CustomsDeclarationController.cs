@@ -62,10 +62,22 @@ namespace eFMS.API.Setting.Controllers
         /// <param name="jobId">jobId that want to retrieve custom declarations</param>
         /// <returns></returns>
         [HttpGet("GetBy/{jobId}")]
-        public IActionResult GetBy(string jobId)
+        public IActionResult GetBy(Guid jobId)
         {
             var results = customsDeclarationService.GetBy(jobId);
             return Ok(results);
+        }
+
+        /// <summary>
+        /// get the list of custom declarations by conditions
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("Query")]
+        public IActionResult Query(CustomsDeclarationCriteria criteria)
+        {
+            var data = customsDeclarationService.Query(criteria);
+            return Ok(data);
         }
 
         /// <summary>

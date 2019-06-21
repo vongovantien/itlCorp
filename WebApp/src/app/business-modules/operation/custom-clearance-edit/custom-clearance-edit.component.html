@@ -32,7 +32,7 @@
                             <label class="form-control-label" for="">
                                 Customer <span class="m--font-danger">(*)</span>
                             </label>
-                            <div class="dropdown e--combogrid">
+                            <!-- <div class="dropdown e--combogrid">
                                 <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
                                     data-toggle="dropdown" placeholder="Please selected">
                                 <div class="dropdown-menu e--combogrid-content">
@@ -72,7 +72,14 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
+
+                            <app-combo-grid-virtual-scroll
+                                [currentActiveItemId]="{field:'taxCode',value:customDeclaration.partnerTaxCode}"
+                                [selectedDisplayFields]="['partnerNameEn']" [dataSources]="listCustomer"
+                                [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                            </app-combo-grid-virtual-scroll>
+                            
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -279,7 +286,8 @@
                             <label class="form-control-label" for="">
                                 Gross Weight
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" [(ngModel)]="customDeclaration.grossWeight" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square"
+                                [(ngModel)]="customDeclaration.grossWeight" placeholder="">
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -287,7 +295,8 @@
                             <label class="form-control-label" for="">
                                 Net Weight
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" [(ngModel)]="customDeclaration.chargeWeight" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square"
+                                [(ngModel)]="customDeclaration.chargeWeight" placeholder="">
                         </div>
                     </div>
                 </div>
@@ -297,7 +306,8 @@
                             <label class="form-control-label" for="">
                                 CBM
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" [(ngModel)]="customDeclaration.cbm" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square"
+                                [(ngModel)]="customDeclaration.cbm" placeholder="">
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -305,7 +315,8 @@
                             <label class="form-control-label" for="">
                                 Qty Cont
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" [(ngModel)]="customDeclaration.qtyCont" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square"
+                                [(ngModel)]="customDeclaration.qtyCont" placeholder="">
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -314,7 +325,8 @@
                                 Package Qty
                             </label>
                             <div class="input-group m-input-group m-input-group--square">
-                                <input type="text" class="form-control m-input" aria-label="" [(ngModel)]="customDeclaration.psc">
+                                <input type="text" class="form-control m-input" aria-label=""
+                                    [(ngModel)]="customDeclaration.psc">
                                 <div class="input-group-prepend">
                                     <ng-select [allowClear]="false" [items]="packagesUnit" [active]="packagesUnitActive"
                                         [disabled]="disabled" (data)="refreshValue($event)"
@@ -392,7 +404,8 @@
                     </span>
                 </span>
             </button>
-            <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase">
+            <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
+                routerLink="/home/operation/custom-clearance">
                 <span>
                     <i class="la la-ban"></i>
                     <span>

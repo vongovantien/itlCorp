@@ -191,13 +191,16 @@ namespace eFMS.API.Setting.DL.Services
         private List<CustomsDeclarationModel> MapClearancesToClearanceModels(IQueryable<CustomsDeclaration> list)
         {
             List<CustomsDeclarationModel> results = new List<CustomsDeclarationModel>();
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            //var countries = countryApi.Getcountries().Result != null? countryApi.Getcountries().Result.ToList(): new List<Provider.Models.CatCountryApiModel>(); //dc.CatCountry;
-            //var portIndexs = catPlaceApi.GetPlaces().Result != null? catPlaceApi.GetPlaces().Result.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port)).ToList(): new List<Provider.Models.CatPlaceApiModel>(); //dc.CatPlace.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port));
-            //var customers = catPartnerApi.GetPartners().Result != null?catPartnerApi.GetPartners().Result.Where(x => x.PartnerGroup == GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER)).ToList(): new List<Provider.Models.CatPartnerApiModel>(); //dc.CatPartner.Where(x => x.PartnerGroup == GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER));
-            var countries = dc.CatCountry;
-            var portIndexs = dc.CatPlace.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port));
-            var customers = dc.CatPartner.Where(x => x.PartnerGroup == GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER));
+            //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var countryCache = countryApi.Getcountries().Result;
+            var portCache = catPlaceApi.GetPlaces().Result;
+            var customerCache = catPartnerApi.GetPartners().Result;
+            var countries = countryCache != null ? countryCache.ToList() : new List<Provider.Models.CatCountryApiModel>(); //dc.CatCountry;
+            var portIndexs = portCache != null ? portCache.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port)).ToList() : new List<Provider.Models.CatPlaceApiModel>(); //dc.CatPlace.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port));
+            var customers = customerCache != null ? customerCache.Where(x => x.PartnerGroup == GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER)).ToList() : new List<Provider.Models.CatPartnerApiModel>(); //dc.CatPartner.Where(x => x.PartnerGroup == GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER));
+            //var countries = dc.CatCountry;
+            //var portIndexs = dc.CatPlace.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port));
+            //var customers = dc.CatPartner.Where(x => x.PartnerGroup == GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER));
             var clearances = (from clearance in list
                               join importCountry in countries on clearance.ImportcountryCode equals importCountry.Code into grpImports
                               from imCountry in grpImports.DefaultIfEmpty()
@@ -222,10 +225,10 @@ namespace eFMS.API.Setting.DL.Services
             return results;
         }
 
-        public List<CustomsDeclarationModel> GetBy(string jobId)
+        public List<CustomsDeclarationModel> GetBy(Guid jobId)
         {
             List<CustomsDeclarationModel> results = null;
-            var data = DataContext.Get(x => x.Mblid == jobId);
+            var data = DataContext.Get(x => x.JobId == jobId);
             foreach (var item in data)
             {
                 var clearance = mapper.Map<CustomsDeclarationModel>(item);
@@ -261,12 +264,33 @@ namespace eFMS.API.Setting.DL.Services
             }
             return result;
         }
-
-        public CustomsDeclaration GetById(string id)
+ 		public CustomsDeclaration GetById(string id)
         {
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var result = dc.CustomsDeclaration.Where(x => x.Id == Int32.Parse(id)).FirstOrDefault();
             return result;
+        }
+        public List<CustomsDeclarationModel> Query(CustomsDeclarationCriteria criteria)
+        {
+            Expression<Func<CustomsDeclaration, bool>> query = x => (x.ClearanceNo.IndexOf(criteria.ClearanceNo ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                                                                       && (x.UserCreated == criteria.PersonHandle || string.IsNullOrEmpty(criteria.PersonHandle))
+                                                                                       && (x.Type == criteria.Type || string.IsNullOrEmpty(criteria.Type))
+                                                                                       && (x.ClearanceDate >= criteria.FromClearanceDate || criteria.FromClearanceDate == null)
+                                                                                       && (x.ClearanceDate <= criteria.ToClearanceDate || criteria.ToClearanceDate == null)
+                                                                                       && (x.DatetimeCreated >= criteria.FromImportDate || criteria.FromImportDate == null)
+                                                                                       && (x.DatetimeCreated <= criteria.ToImportDate || criteria.ToImportDate == null);
+            if (criteria.ImPorted == true)
+            {
+                query = query.And(x => x.JobNo != null);
+            }
+            else if (criteria.ImPorted == false)
+            {
+                query = query.And(x => x.JobNo == null);
+            }
+            var list = DataContext.Get(query);
+            if (list == null) return new List<CustomsDeclarationModel>();
+            var results = MapClearancesToClearanceModels(list);
+            return results;
         }
     }
 }

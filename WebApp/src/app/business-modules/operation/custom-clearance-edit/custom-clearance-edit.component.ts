@@ -11,6 +11,7 @@ import { API_MENU } from 'src/constants/api-menu.const';
 })
 export class CustomClearanceEditComponent implements OnInit {
     customDeclaration: any = {};
+    listCustomer: any = [];
 
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU,
@@ -24,6 +25,7 @@ export class CustomClearanceEditComponent implements OnInit {
         await this.route.params.subscribe(prams => {
             if (prams.id != undefined) {
                 console.log(prams.id);
+                this.getListCustomer();
                 this.getCustomCleanranceById(prams.id);
             }
         });
@@ -43,8 +45,15 @@ export class CustomClearanceEditComponent implements OnInit {
         this.customDeclaration.clearanceDate = this.customDeclaration.clearanceDate == null ? this.customDeclaration.clearanceDate : { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate) };
     }
 
-    updateCustomClearance(){
+    updateCustomClearance() {
         console.log(this.customDeclaration.clearanceNo)
+    }
+
+    async getListCustomer() {
+        //partnerGroup = 3 ~ Customer
+        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: 3 });
+        console.log(res);
+        this.listCustomer = res;
     }
 
     /**
