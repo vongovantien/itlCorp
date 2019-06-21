@@ -4,6 +4,8 @@ import { AccountReceivablePayableComponent } from './account-receivable-payable/
 import { AdvancePaymentComponent } from './advance-payment/advance-payment.component';
 import { SettlementPaymentComponent } from './settlement-payment/settlement-payment.component';
 import { StatementOfAccountComponent } from './statement-of-account/statement-of-account.component';
+import { StatementOfAccountAddnewComponent } from './statement-of-account-addnew/statement-of-account-addnew.component';
+import { StatementOfAccountEditComponent } from './statement-of-account-edit/statement-of-account-edit.component';
 
 const routes: Routes = [
   {
@@ -13,19 +15,51 @@ const routes: Routes = [
   },
   {
     path:'account-receivable-payable',
-    component:AccountReceivablePayableComponent
+    component:AccountReceivablePayableComponent,
+    data:{
+        name:"Account Receivable Payable",
+        level:2
+    }
   },
   {
     path:'advance-payment',
-    component:AdvancePaymentComponent
+    component:AdvancePaymentComponent,
+    data:{
+        name:"Advance Payment",
+        level:2
+    }
   },
   {
     path:'settlement-payment',
-    component:SettlementPaymentComponent
+    component:SettlementPaymentComponent,
+    data:{
+        name:"Settlement Payment",
+        level:2
+    }
   },
   {
     path:'statement-of-account',
-    component:StatementOfAccountComponent
+    component:StatementOfAccountComponent,
+    data:{
+        name:"Statement Of Account",
+        level:2
+    }
+  },
+  {
+    path:'statement-of-account-addnew',
+    component:StatementOfAccountAddnewComponent,
+    data:{
+        name:"Statement Of Account Add New",
+        level:2
+    }
+  },
+  {
+    path:'statement-of-account-edit',
+    component:StatementOfAccountEditComponent,
+    data:{
+        name:"Statement Of Account Edit",
+        level:2
+    }
   }
 ];
 
