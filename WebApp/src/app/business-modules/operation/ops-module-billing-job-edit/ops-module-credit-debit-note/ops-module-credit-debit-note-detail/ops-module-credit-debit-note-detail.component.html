@@ -2,13 +2,13 @@
     aria-hidden="true">
     <div class="modal-dialog c-modal-fullscreen" role="document"  >
         <div class="modal-content">
-            <div class="modal-header" *ngIf="CDNoteEditing!=null">
-                <h5  class="modal-title">Detail<span class="m--margin-left-5">Credit Note</span>&nbsp;<span class="m--font-danger m--margin-left-5">{{CDNoteEditing.soa.code}}</span></h5>
+            <div class="modal-header" *ngIf="CDNoteDetails!=null">
+                <h5  class="modal-title">Detail<span class="m--margin-left-5">Credit Note</span>&nbsp;<span class="m--font-danger m--margin-left-5">{{CDNoteDetails.soa.code}}</span></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" >
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <div class="modal-actions c-button-actions">
-                    <button class="btn btn-sm btn-default m-btn--square m-btn--icon">
+                    <button class="btn btn-sm btn-default m-btn--square m-btn--icon" (click)="Preview()">
                         <span>
                             <i class="la la-file-text-o"></i>
                             <span>
@@ -18,7 +18,7 @@
                     </button>
                 </div>
             </div>
-            <div class="modal-body" *ngIf="CDNoteEditing!=null">
+            <div class="modal-body" *ngIf="CDNoteDetails!=null">
                <!--begin::Form-->
                <div class="m-form m-form--state">
                 <div class="div-inside bg-secondary m--margin-bottom-15">
@@ -29,32 +29,32 @@
                                     <span class="m--font-bolder">
                                         Subject To : 
                                     </span>
-                                    <span>{{CDNoteEditing.partnerNameEn}}</span>
+                                    <span>{{CDNoteDetails.partnerNameEn}}</span>
                                 </div>
                                 <div class="m--margin-top-5">
                                     <span class="m--font-bolder">
                                         Address:
                                     </span>
-                                    <span>{{CDNoteEditing.partnerShippingAddress}}</span>
+                                    <span>{{CDNoteDetails.partnerShippingAddress}}</span>
                                 </div>
                                 <div class="m--margin-top-5">
                                     <span class="m--font-bolder">
                                         Tel:  
                                     </span>
-                                    <span>{{CDNoteEditing.partnerTel}}</span>
+                                    <span>{{CDNoteDetails.partnerTel}}</span>
                                 </div>
                                 <div class="m--margin-top-5">
                                     <span class="m--font-bolder">
                                         Taxcode: 
                                     </span>
-                                    <span>{{CDNoteEditing.partnerTaxcode}}</span>
+                                    <span>{{CDNoteDetails.partnerTaxcode}}</span>
                                 </div>
                             </div>
                             <div class="m--margin-bottom-10">
                                 <span class="m--font-bolder">
                                     House Bill of Lading
                                 </span>
-                                <span>{{CDNoteEditing.partnerTaxcode}}</span>
+                                <span>{{CDNoteDetails.partnerTaxcode}}</span>
                             </div>
                         </div>
                         <div class="col-xl-8">
@@ -64,7 +64,7 @@
                                         <span class="m--font-bolder">
                                             Job ID: 
                                         </span>
-                                        <span>{{CDNoteEditing.jobId}}</span>
+                                        <span>{{CDNoteDetails.jobId}}</span>
                                     </div>
                                 </div>
                                 <div class="col-xl-6">
@@ -72,7 +72,7 @@
                                         <span class="m--font-bolder">
                                             Master Bill of Lading: 
                                         </span>
-                                        <span>{{CDNoteEditing.mbLadingNo}}</span>
+                                        <span>{{CDNoteDetails.mbLadingNo}}</span>
                                     </div>
                                 </div>
                             </div>
@@ -82,7 +82,7 @@
                                         <span class="m--font-bolder">
                                             Port of loading:
                                         </span>
-                                        <span>{{CDNoteEditing.pol}} , {{CDNoteEditing.polCountry}}</span>
+                                        <span>{{CDNoteDetails.pol}} , {{CDNoteDetails.polCountry}}</span>
                                     </div>
                                 </div>
                                 <div class="col-xl-6">
@@ -90,7 +90,7 @@
                                         <span class="m--font-bolder">
                                             Port of destination:
                                         </span>
-                                        <span>{{CDNoteEditing.pod}} , {{CDNoteEditing.podCountry}}</span>
+                                        <span>{{CDNoteDetails.pod}} , {{CDNoteDetails.podCountry}}</span>
                                     </div>
                                 </div>
                             </div>
@@ -100,7 +100,7 @@
                                         <span class="m--font-bolder">
                                             Estimated Time of Departure: 
                                         </span>
-                                        <span>{{CDNoteEditing.etd | date : 'dd/MM/yyyy'}}</span>
+                                        <span>{{CDNoteDetails.etd | date : 'dd/MM/yyyy'}}</span>
                                     </div>
                                 </div>
                                 <div class="col-xl-6">
@@ -108,7 +108,7 @@
                                         <span class="m--font-bolder">
                                             Estimated Time of Arrival: 
                                         </span>
-                                        <span>{{CDNoteEditing.eta | date : 'dd/MM/yyyy'}}</span>
+                                        <span>{{CDNoteDetails.eta | date : 'dd/MM/yyyy'}}</span>
                                     </div>
                                 </div>
                             </div>
@@ -118,7 +118,7 @@
                                         <span class="m--font-bolder">
                                             Vessel: 
                                         </span>
-                                        <span>{{CDNoteEditing.vessel}}</span>
+                                        <span>{{CDNoteDetails.vessel}}</span>
                                     </div>
                                 </div>
                                 <div class="col-xl-6">
@@ -126,7 +126,7 @@
                                         <span class="m--font-bolder">
                                             Volume:
                                         </span>
-                                        <span>{{CDNoteEditing.volum}} CBM</span>
+                                        <span>{{CDNoteDetails.volum}} CBM</span>
                                     </div>
                                 </div>
                             </div>
@@ -136,7 +136,7 @@
                                         <span class="m--font-bolder">
                                             Container Quantity:
                                         </span>
-                                        <span>{{CDNoteEditing.hbConstainers}}</span>
+                                        <span>{{CDNoteDetails.hbConstainers}}</span>
                                     </div>
                                 </div>
                                 <div class="col-xl-6">
@@ -144,13 +144,13 @@
                                         <span class="m--font-bolder">
                                             SOA:
                                         </span>
-                                        <span>{{CDNoteEditing.soa.code}}</span>
+                                        <span>{{CDNoteDetails.soa.code}}</span>
                                     </div>
                                     <div class="m--margin-bottom-10">
                                         <span class="m--font-bolder">
                                             Locked:
                                         </span>
-                                        <span class="m--font-brand">{{CDNoteEditing.isLocked.toString()}}</span>
+                                        <span class="m--font-brand">{{CDNoteDetails.isLocked.toString()}}</span>
                                         <!-- <span class="m--font-danger">Yes</span> -->
                                     </div>
                                 </div>
@@ -220,7 +220,7 @@
                             </tr>
                         </thead>
                         <tbody class="tbody-group">
-                            <tr class="" *ngFor="let item of CDNoteEditing.listSurcharges;let i = index;">
+                            <tr class="" *ngFor="let item of CDNoteDetails.listSurcharges;let i = index;">
                                 <td>
                                     <span>{{item.hwbno}}</span>
                                 </td>
@@ -246,10 +246,10 @@
                                     <span>{{item.vatrate}}</span>
                                 </td>
                                 <td>
-                                    <span class="credit-value" *ngIf="item.type==='BUY' || item.type=='LOGISTIC' || (item.type==='OBH' && CDNoteEditing.partnerId===item.receiverId)">{{item.total*item.exchangeRate | number:'1.3-3'}}</span>         
+                                    <span class="credit-value" *ngIf="item.type==='BUY' || item.type=='LOGISTIC' || (item.type==='OBH' && CDNoteDetails.partnerId===item.receiverId)">{{item.total*item.exchangeRate | number:'1.3-3'}}</span>         
                                 </td>
                                 <td>
-                                    <span class="debit-value" *ngIf="item.type==='SELL' || (item.type==='OBH' && CDNoteEditing.partnerId===item.payerId)">{{item.total*item.exchangeRate | number:'1.3-3'}}</span>       
+                                    <span class="debit-value" *ngIf="item.type==='SELL' || (item.type==='OBH' && CDNoteDetails.partnerId===item.payerId)">{{item.total*item.exchangeRate | number:'1.3-3'}}</span>       
                                 </td>
                                 <td>
                                     <span>{{item.notes}}</span>
@@ -309,3 +309,7 @@
         </div>
     </div>
 </div>
+
+<!--end::preview-test-modal-->
+<app-report-preview [data]="dataReport" *ngIf="dataReport" [modalId]="previewModalId"></app-report-preview>
+<!--end::preview-modal-->

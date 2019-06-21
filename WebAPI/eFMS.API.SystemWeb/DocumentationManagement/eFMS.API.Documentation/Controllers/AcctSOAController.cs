@@ -99,9 +99,17 @@ namespace eFMS.API.Documentation.Controllers
         [HttpGet]
         [Route("GetDetails")]
         //[Authorize]
-        public object Get(Guid JobId,string soaNo)
+        public AcctSOADetailsModel Get(Guid JobId,string soaNo)
         {
             return acctSOAServices.GetSOADetails(JobId, soaNo);
+        }
+
+        [HttpPost]
+        [Route("PreviewOpsCdNote")]
+        public IActionResult PreviewOpsCdNote(AcctSOADetailsModel model)
+        {
+            var result = acctSOAServices.Preview(model);
+            return Ok(result);
         }
 
 

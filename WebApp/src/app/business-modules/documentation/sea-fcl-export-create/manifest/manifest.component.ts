@@ -120,7 +120,6 @@ export class ManifestComponent implements OnInit {
             var id = this.previewModalId;
             var _this = this;
             var response = await this.baseServices.postAsync(this.api_menu.Documentation.CsManifest.preview, this.manifest, false, true);
-            console.log(response);
             this.dataReport = response;
             var checkExist = setInterval(function() {
                 if ($('#frame').length) {

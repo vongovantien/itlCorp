@@ -17,6 +17,8 @@ export class CreditAndDebitNoteDetailComponent implements OnInit,AfterViewChecke
     }
     CDNoteEditing:any = null;
     currentSOANo : string = null;
+    previewModalId = "preview-modal";
+    dataReport: any;
     @Output() CdNoteEditingEmiter = new EventEmitter<any>();
     @Input() set EditingCDNoteNo(soaNo:string){
         if(soaNo!=null){
@@ -54,6 +56,10 @@ export class CreditAndDebitNoteDetailComponent implements OnInit,AfterViewChecke
 
     close(){
         this.open = false;
+    }
+
+    async Preview(){
+        this.dataReport = null;
     }
 
 

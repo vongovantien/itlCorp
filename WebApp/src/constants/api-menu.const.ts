@@ -47,7 +47,7 @@ export class API_MENU {
             return this.PROTOCOL + this.HOST.Staging + "/" + Module + "/api/v" + this.getCurrentVersion() + "/" + this.getCurrentLanguage() + "/";
         }
     }
-    private getReportPath(Module){
+    private getReportPath(Module:string){
         if (this.CURRENT_HOST == this.HOST.Local) {
             return this.PROTOCOL + this.HOST.Local + this.getPort(Module) + "/Default.aspx";
         }
@@ -218,7 +218,6 @@ export class API_MENU {
     /**
     * TOOL-SETTING MODULE API URL DEFINITION 
     */
-
     public ToolSetting = {
         ExchangeRate: {
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrencyExchange/GetExchangeRateHistory/Paging",
@@ -244,6 +243,9 @@ export class API_MENU {
         }
     }
 
+    /**
+     * DOCUMENTATION MODULE API URL DEFINITION 
+     */
     public Documentation = {
         Terminology: {
             getShipmentCommonData : this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "Terminology/getShipmentCommonData",
@@ -286,7 +288,8 @@ export class API_MENU {
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/Update",
             delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/Delete",
             getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/Get",
-            getDetails: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/GetDetails",
+            getDetails: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/GetDetails",            
+            previewCDNote: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/PreviewOpsCdNote"
         },
         CsManifest: {
             get: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsManifest/",
@@ -311,5 +314,9 @@ export class API_MENU {
             getByJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CustomsDeclaration/GetByJob"
         }   
     }
+
+    /**
+     * REPORT MODULE API URL DEFINITION
+     */
     public Report = this.getReportPath(SystemConstants.MODULE_NAME.Report);
 }
