@@ -14,30 +14,35 @@ export class BillingCustomDeclarationComponent implements OnInit {
   currentJob: OpsTransaction;
   pager: PagerSetting = PAGINGSETTING;
   customClearances: any[];
+  notImportedCustomClearances: any[];
 
   constructor(private baseServices: BaseService,
     private api_menu: API_MENU) { }
 
   async ngOnInit() {
-    this.stateChecking();
+    await this.stateChecking();
   }
 
   async getCustomClearanesOfJob(id: string) {
     this.customClearances = await this.baseServices.getAsync(this.api_menu.ToolSetting.CustomClearance.getByJob + id, false, true);
-    console.log(this.customClearances);
   }
 
   stateChecking() {
     setTimeout(() => {
       this.baseServices.dataStorage.subscribe(data => {
         if(data["CurrentOpsTransaction"] != null){
-          console.log('custom clearance');
           this.currentJob = data["CurrentOpsTransaction"];
+          
           if(this.currentJob != null){
             this.getCustomClearanesOfJob(this.currentJob.id);
+            this.getCustomClearancesNotImported();
           }
         }
       }); 
     }, 1000);
+  }
+  async getCustomClearancesNotImported() {
+    this.notImportedCustomClearances = await this.baseServices.postAsync(this.api_menu.ToolSetting.CustomClearance.query, { "imPorted": false }, false, true);
+    console.log(this.notImportedCustomClearances);
   }
 }

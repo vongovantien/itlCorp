@@ -30,7 +30,7 @@
                     </a>
                 </li>
                 <li class="nav-item m-tabs__item">
-                    <a class="nav-link m-tabs__link" id="" href="#custom-declaration-tabview-tab" data-toggle="tab"
+                    <a class="nav-link m-tabs__link" id="" href="#custom-declaration-tabview-tab" data-toggle="tab" (click)="getCustomClearances()"
                         role="tab">
                         Custom declaration
                     </a>
@@ -1472,7 +1472,7 @@
 
         <!--begin:: custom-declaration-tabview-tab  -->
         <div class="tab-pane fade" role="tabpanel" id="custom-declaration-tabview-tab"> 
-            <app-billing-custom-declaration *ngIf="opsTransaction"></app-billing-custom-declaration>
+            <app-billing-custom-declaration *ngIf="isLoadClearance"></app-billing-custom-declaration>
         </div>
         <!--end::custom-declaration-tabview-tab -->
 

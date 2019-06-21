@@ -229,6 +229,8 @@ namespace eFMS.API.Setting.DL.Services
         {
             List<CustomsDeclarationModel> results = null;
             var data = DataContext.Get(x => x.JobId == jobId);
+            if (data == null) return results;
+            results = new List<CustomsDeclarationModel>();
             foreach (var item in data)
             {
                 var clearance = mapper.Map<CustomsDeclarationModel>(item);

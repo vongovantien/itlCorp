@@ -921,4 +921,13 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     public refreshValue(value: any): void {
         this.value = value;
     }
+
+    /**
+     * get custom clearances
+     */
+    isLoadClearance = false;
+    getCustomClearances(){
+        this.baseServices.setData("CurrentOpsTransaction", this.opsTransaction);
+        this.isLoadClearance = true;
+    }
 }

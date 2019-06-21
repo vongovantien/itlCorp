@@ -84,9 +84,9 @@
                         </th>
                     </tr>
                 </thead>
-                <tbody class="tbody-group">
-                    <tr class="">
-                        <ng-container>
+                <tbody class="tbody-group" *ngIf="customClearances">
+                    <ng-container *ngFor="let clearance of customClearances; let i=index">
+                        <tr class="">
                             <td class="table-actions-col">
                                 <div class="table-actions">
                                     <label class="m-checkbox">
@@ -96,37 +96,37 @@
                                 </div>
                             </td>
                             <td>
-                                <span>text</span>
+                                <span>{{ clearance.clearanceNo }}</span>
+                            </td>
+                            <td>
+                                <span>{{ clearance.datetimeCreated | date:'dd/mm/yyyy' }}</span>
+                            </td>
+                            <td>
+                                <span>{{ clearance.clearanceDate| date:'dd/mm/yyyy' }}</span>
+                            </td>
+                            <td>
+                                <span>{{ clearance.hblid }}</span>
+                            </td>
+                            <td>
+                                <span>{{ clearance.exportCountryCode }}</span>
+                            </td>
+                            <td>
+                                <span>{{ clearance.importcountryCode }}</span>
                             </td>
                             <td>
                                 <span>text</span>
                             </td>
                             <td>
-                                <span>text</span>
+                                <span>{{ clearance.qtyCont }}</span>
                             </td>
                             <td>
-                                <span>text</span>
+                                <span>{{ clearance.firstClearanceNo }}</span>
                             </td>
                             <td>
-                                <span>text</span>
+                                <span>{{ clearance.note }}</span>
                             </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                            <td>
-                                <span>text</span>
-                            </td>
-                        </ng-container>
-                    </tr>
+                        </tr>
+                    </ng-container>
                 </tbody>
             </table>
         </div>
@@ -253,53 +253,55 @@
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="tbody-group">
-                                <tr class="">
-                                    <td class="table-actions-col">
-                                        <div class="table-actions">
-                                            <label class="m-checkbox">
-                                                <input type="checkbox" name="">
-                                                <span></span>
-                                            </label>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                    <td>
-                                        <span>text</span>
-                                    </td>
-                                </tr>
+                            <tbody class="tbody-group" *ngIf="notImportedCustomClearances">
+                                <ng-container *ngFor="let item of notImportedCustomClearances; let i=index">
+                                    <tr class="">
+                                        <td class="table-actions-col">
+                                            <div class="table-actions">
+                                                <label class="m-checkbox">
+                                                    <input type="checkbox" name="">
+                                                    <span></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span>{{ item.clearanceNo }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ item.datetimeCreated | date:'dd/mm/yyyy' }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ item.clearanceDate| date:'dd/mm/yyyy' }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ item.hblid }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ item.exportCountryCode }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ item.importcountryCode }}</span>
+                                        </td>
+                                        <td>
+                                            <span>text</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ item.qtyCont }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ item.firstClearanceNo }}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{ item.note }}</span>
+                                        </td>
+                                    </tr>
+                                </ng-container>
                             </tbody>
                         </table>
                     </div>
                     <!--end: Datatable-->  
                     <!--begin::pagination-->
-                    <div class="pagination-nav">
+                    <!-- <div class="pagination-nav">
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="tatable__pager-size" style="max-width: 190px">
@@ -326,7 +328,9 @@
                                 </nav>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
+                    <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)"
+                            (pagerObject)="setPage($event)"></app-pagination>
                     <!--end::pagination--> 
                     <!--end::m-portlet --> 
                 </div>
