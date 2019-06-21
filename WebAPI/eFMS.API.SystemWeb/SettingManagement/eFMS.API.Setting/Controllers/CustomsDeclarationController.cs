@@ -222,5 +222,17 @@ namespace eFMS.API.Setting.Controllers
             }
             return message;
         }
+
+        /// <summary>
+        /// get custom declarations by id
+        /// </summary>
+        /// <param name="id">id that want to retrieve custom declarations</param>
+        /// <returns></returns>
+        [HttpGet("GetById/{id}")]
+        public IActionResult GetById(string id)
+        {
+            var results = customsDeclarationService.GetById(id);
+            return Ok(results);
+        }
     }
 }

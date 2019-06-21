@@ -49,7 +49,7 @@
                             <label class="form-control-label" for="">
                                 Person Handle
                             </label>
-                            <ng-select [allowClear]="false" [items]="ListUser" [active]="currentUser" [disabled]="disabled"
+                            <ng-select [allowClear]="false" [items]="listUser" [active]="currentUser" [disabled]="disabled"
                                 (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
                                 (typed)="typed($event)" placeholder="Select filter">
                             </ng-select>
@@ -193,25 +193,32 @@
                     <thead>
                         <tr>
                             <th class="table-actions-col">Action</th>
-                            <th class="sorting">
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceNo'), 'sorting_desc': (!isDesc && sortKey == 'clearanceNo') }"
+                            (click)="sort('clearanceNo')">
                                 <span>Clearance No</span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'type'), 'sorting_desc': (!isDesc && sortKey == 'type') }"
+                            (click)="sort('type')">
                                 <span>Type</span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'gatewayName'), 'sorting_desc': (!isDesc && sortKey == 'gatewayName') }"
+                            (click)="sort('gatewayName')">
                                 <span>Gate Way</span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'customerName'), 'sorting_desc': (!isDesc && sortKey == 'customerName') }"
+                            (click)="sort('customerName')">
                                 <span>Partner Name</span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'importCountryName'), 'sorting_desc': (!isDesc && sortKey == 'importCountryName') }"
+                            (click)="sort('importCountryName')">
                                 <span>Import Country</span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'exportCountryName'), 'sorting_desc': (!isDesc && sortKey == 'exportCountryName') }"
+                            (click)="sort('exportCountryName')">
                                 <span>Export Country</span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'jobId'), 'sorting_desc': (!isDesc && sortKey == 'jobId') }"
+                            (click)="sort('jobId')">
                                 <span>JOBID</span>
                             </th>
                             <th>
@@ -222,8 +229,8 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody *ngIf="ListCustomDeclaration.length > 0; else norecord">
-                        <tr *ngFor="let custom of ListCustomDeclaration; let i = index">
+                    <tbody *ngIf="listCustomDeclaration.length > 0; else norecord">
+                        <tr *ngFor="let custom of listCustomDeclaration; let i = index">
                             <td class="table-actions-col">
                                 <div class="table-actions">
                                     <label class="m-checkbox">
@@ -234,7 +241,7 @@
                             </td>
                             <td>
                                 <a href="javascript:void(0)"
-                                    routerLink="/home/operation/custom-clearance-edit">{{custom.clearanceNo}}</a>
+                                     (click)="gotoEditPage(custom.id)">{{custom.clearanceNo}}</a>
                             </td>
                             <td>
                                 <span>{{custom.type}}</span>

@@ -18,5 +18,6 @@ namespace eFMS.API.Setting.DL.IService
         List<CustomsDeclarationModel> Paging(CustomsDeclarationCriteria criteria, int page, int size, out int rowsCount);
         List<CustomsDeclarationModel> GetBy(string jobId);
         HandleState UpdateJobToClearances(List<CustomsDeclarationModel> clearances);
+        CustomsDeclaration GetById(string id);
     }
 }
