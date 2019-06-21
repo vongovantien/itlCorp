@@ -19,5 +19,6 @@ namespace eFMS.API.Setting.DL.IService
         List<CustomsDeclarationModel> Query(CustomsDeclarationCriteria criteria);
         List<CustomsDeclarationModel> GetBy(Guid jobId);
         HandleState UpdateJobToClearances(List<CustomsDeclarationModel> clearances);
+        CustomsDeclaration GetById(string id);
     }
 }

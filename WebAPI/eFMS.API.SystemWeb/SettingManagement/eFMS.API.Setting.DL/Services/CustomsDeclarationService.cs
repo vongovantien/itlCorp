@@ -266,7 +266,12 @@ namespace eFMS.API.Setting.DL.Services
             }
             return result;
         }
-
+ 		public CustomsDeclaration GetById(string id)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var result = dc.CustomsDeclaration.Where(x => x.Id == Int32.Parse(id)).FirstOrDefault();
+            return result;
+        }
         public List<CustomsDeclarationModel> Query(CustomsDeclarationCriteria criteria)
         {
             Expression<Func<CustomsDeclaration, bool>> query = x => (x.ClearanceNo.IndexOf(criteria.ClearanceNo ?? "", StringComparison.OrdinalIgnoreCase) > -1)

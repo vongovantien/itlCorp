@@ -85,6 +85,13 @@
             <param name="clearances">list of clearances</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Setting.Controllers.CustomsDeclarationController.GetById(System.String)">
+            <summary>
+            get custom declarations by id
+            </summary>
+            <param name="id">id that want to retrieve custom declarations</param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Setting.Controllers.EcusConnectionController">
             <summary>
             A base class for an MVC controller without view support.

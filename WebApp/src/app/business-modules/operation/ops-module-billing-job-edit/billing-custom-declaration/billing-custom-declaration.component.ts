@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { BaseService } from 'src/services-base/base.service';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
 import { API_MENU } from 'src/constants/api-menu.const';
-import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
+import { PAGINGSETTING } from 'src/constants/paging.const';
 
 @Component({
   selector: 'app-billing-custom-declaration',
@@ -12,9 +12,9 @@ import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 })
 export class BillingCustomDeclarationComponent implements OnInit {
   currentJob: OpsTransaction;
-  pager: PagerSetting = PAGINGSETTING;
-  customClearances: any[];
   notImportedCustomClearances: any[];
+  customClearances: any[];
+  pager: PagerSetting = PAGINGSETTING;
 
   constructor(private baseServices: BaseService,
     private api_menu: API_MENU) { }
@@ -25,6 +25,10 @@ export class BillingCustomDeclarationComponent implements OnInit {
 
   async getCustomClearanesOfJob(id: string) {
     this.customClearances = await this.baseServices.getAsync(this.api_menu.ToolSetting.CustomClearance.getByJob + id, false, true);
+    this.pager.totalItems = this.customClearances.length;
+  }
+  setPage(pager){
+    console.log('pager');
   }
 
   stateChecking() {

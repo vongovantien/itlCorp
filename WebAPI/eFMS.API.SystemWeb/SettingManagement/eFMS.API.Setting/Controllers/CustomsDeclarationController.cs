@@ -89,7 +89,7 @@ namespace eFMS.API.Setting.Controllers
         /// <returns></returns>
         [HttpPost("Paging")]
         public IActionResult Paging(CustomsDeclarationCriteria criteria, int pageNumber, int pageSize)
-        {
+       {
             var data = customsDeclarationService.Paging(criteria, pageNumber, pageSize, out int totalItems);
             var result = new { data, totalItems, pageNumber, pageSize };
             return Ok(result);
@@ -233,6 +233,18 @@ namespace eFMS.API.Setting.Controllers
                 }
             }
             return message;
+        }
+
+        /// <summary>
+        /// get custom declarations by id
+        /// </summary>
+        /// <param name="id">id that want to retrieve custom declarations</param>
+        /// <returns></returns>
+        [HttpGet("GetById/{id}")]
+        public IActionResult GetById(string id)
+        {
+            var results = customsDeclarationService.GetById(id);
+            return Ok(results);
         }
     }
 }
