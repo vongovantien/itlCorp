@@ -88,7 +88,7 @@ namespace eFMS.API.Setting.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
             modelBuilder.Entity<AcctSoa>(entity =>
             {
@@ -2254,6 +2254,10 @@ namespace eFMS.API.Setting.Service.Models
             {
                 entity.Property(e => e.Id).HasColumnName("ID");
 
+                entity.Property(e => e.CargoType)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Cbm)
                     .HasColumnName("CBM")
                     .HasColumnType("decimal(18, 4)");
@@ -2266,7 +2270,9 @@ namespace eFMS.API.Setting.Service.Models
 
                 entity.Property(e => e.CommodityId).HasColumnName("CommodityID");
 
-                entity.Property(e => e.DatetimeCreated).HasColumnType("smalldatetime");
+                entity.Property(e => e.DatetimeCreated)
+                    .HasColumnType("smalldatetime")
+                    .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("smalldatetime");
 
