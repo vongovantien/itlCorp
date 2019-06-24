@@ -3,7 +3,7 @@ import moment from 'moment/moment';
 import { ActivatedRoute } from '@angular/router';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
-import _ from 'lodash';
+import find from 'lodash/find';
 
 @Component({
     selector: 'app-custom-clearance-edit',
@@ -13,6 +13,10 @@ import _ from 'lodash';
 export class CustomClearanceEditComponent implements OnInit {
     customDeclaration: any = {};
     listCustomer: any = [];
+    listPort: any = [];
+    listCountry: any = [];
+    listCommodity: any = [];
+    listUnit: any = [];
 
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU,
@@ -23,11 +27,15 @@ export class CustomClearanceEditComponent implements OnInit {
     }
 
     async ngOnInit() {
+        this.getClearanceType();
+        await this.getListCustomer();
+        await this.getListPort();
+        this.getListCountry();
+        await this.getListUnit();
+        await this.getListCommodity();
         await this.route.params.subscribe(prams => {
             if (prams.id != undefined) {
                 console.log(prams.id);
-                this.getClearanceType();
-                this.getListCustomer();
                 this.getCustomCleanranceById(prams.id);
             }
         });
@@ -36,7 +44,7 @@ export class CustomClearanceEditComponent implements OnInit {
     async getCustomCleanranceById(id) {
         // this.baseServices.get(this.api_menu.ToolSetting.CustomClearance.details + id).subscribe((res: any) => {
         //     console.log(res);
-        //     this.customDeclaration = res;
+        //     this.customDeclaration = res;           
         // }, err => {
         //     this.customDeclaration = {};
         //     this.baseServices.handleError(err);
@@ -44,30 +52,47 @@ export class CustomClearanceEditComponent implements OnInit {
         const res = await this.baseServices.getAsync(this.api_menu.ToolSetting.CustomClearance.details + id, true, true);
         console.log(res);
         this.customDeclaration = res;
-
-        console.log(this.listCustomer);
-        const _customer = _.find(this.listCustomer, { 'taxCode': this.customDeclaration.partnerTaxCode });
+        const _customer = find(this.listCustomer, { 'taxCode': this.customDeclaration.partnerTaxCode });
         this.customerCurrent = _customer != undefined ? _customer.taxCode : '';
         console.log('customerCurrent: ' + this.customerCurrent);
 
         this.customDeclaration.clearanceDate = this.customDeclaration.clearanceDate == null ? this.customDeclaration.clearanceDate : { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate) };
-        
-        const _serviceType = _.find(this.serviceTypes, { 'id': this.customDeclaration.serviceType });
+
+        const _serviceType = find(this.serviceTypes, { 'id': this.customDeclaration.serviceType });
         this.serviceTypeCurrent = _serviceType != undefined ? [_serviceType.id] : [];
         console.log('serviceTypeCurrent: ' + this.serviceTypeCurrent);
 
-        const _typeClearance = _.find(this.typeClearance, { 'id': this.customDeclaration.type });
+        const _port = find(this.listPort, { 'code': this.customDeclaration.gateway });
+        this.portCurrent = _port != undefined ? _port.code : '';
+        console.log('portCurrent: ' + this.portCurrent);
+
+        const _typeClearance = find(this.typeClearance, { 'id': this.customDeclaration.type });
         this.typeClearanceCurrent = _typeClearance != undefined ? [_typeClearance.id] : [];
         console.log('typeClearanceCurrent: ' + this.typeClearanceCurrent);
-        
-        const _routeClearance = _.find(this.routeClearance, { 'id' : this.customDeclaration.route});
+
+        const _routeClearance = find(this.routeClearance, { 'id': this.customDeclaration.route });
         this.routeClearanceCurrent = _routeClearance != undefined ? [_routeClearance.id] : [];
         console.log('routeClearanceCurrent: ' + this.routeClearanceCurrent);
 
-        const _cargoType = _.find(this.cargoTypes, { 'id' : this.customDeclaration.cargoType});
+        const _cargoType = find(this.cargoTypes, { 'id': this.customDeclaration.cargoType });
         this.cargoTypeCurrent = _cargoType != undefined ? [_cargoType.id] : [];
         console.log('cargoTypeCurrent: ' + this.cargoTypeCurrent);
 
+        const _countryExport = find(this.listCountry, { 'code': this.customDeclaration.exportCountryCode });
+        this.countryExportCurrent = _countryExport != undefined ? _countryExport.code : '';
+        console.log('countryExportCurrent: ' + this.countryExportCurrent);
+
+        const _countryImport = find(this.listCountry, { 'code': this.customDeclaration.importCountryCode });
+        this.countryImportCurrent = _countryImport != undefined ? _countryImport.code : '';
+        console.log('countryImportCurrent: ' + this.countryImportCurrent);
+
+        const _commodity = find(this.listCommodity, { 'code': this.customDeclaration.commodityCode });
+        this.commodityCurrent = _commodity != undefined ? _commodity.code : '';
+        console.log('commodityCurrent: ' + this.commodityCurrent);
+
+        const _unit = find(this.listUnit, { 'code': this.customDeclaration.unitCode });
+        this.unitCurrent = _unit != undefined ? _unit.code : '';
+        console.log('unitCurrent: ' + this.unitCurrent);
     }
 
     updateCustomClearance() {
@@ -76,14 +101,14 @@ export class CustomClearanceEditComponent implements OnInit {
 
     async getListCustomer() {
         //partnerGroup = 3 ~ Customer
-        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: 3 });
-        console.log(res);
+        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: 3 }, true, true);
+        //console.log(res);
         this.listCustomer = res;
     }
 
     getClearanceType() {
         this.baseServices.get(this.api_menu.ToolSetting.CustomClearance.getClearanceTypes).subscribe((res: any) => {
-            console.log(res);
+            //console.log(res);
             this.serviceTypes = res.serviceTypes.map(x => ({ "text": x.displayName, "id": x.value }));
             this.typeClearance = res.types.map(x => ({ "text": x.displayName, "id": x.value }));
             this.routeClearance = res.routes.map(x => ({ "text": x.displayName, "id": x.value }));
@@ -91,6 +116,32 @@ export class CustomClearanceEditComponent implements OnInit {
         });
     }
 
+    async getListPort() {
+        //placeType = 8 ~ Port
+        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, { placeType: 8 }, true, true);
+        //console.log(res);
+        this.listPort = res;
+    }
+
+    getListCountry() {
+        this.baseServices.get(this.api_menu.Catalogue.Country.getAll).subscribe((res: any) => {
+            //console.log(res);
+            this.listCountry = res;
+        });
+    }
+
+    async getListCommodity() {
+        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, {}, true, true);
+        //console.log(res);
+        this.listCommodity = res;
+    }
+
+    async getListUnit() {
+        //unitType = Package
+        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: 'Package' }, true, true);
+        //console.log(res);
+        this.listUnit = res;
+    }
     /**
       * Daterange picker
       */
@@ -125,16 +176,18 @@ export class CustomClearanceEditComponent implements OnInit {
     typeClearance: any = [];
     routeClearance: any = [];
     cargoTypes: any = [];
-    
+
     customerCurrent: string = '';
+    portCurrent: string = '';
+    countryImportCurrent: string = '';
+    countryExportCurrent: string = '';
+    commodityCurrent: string = '';
+    unitCurrent: string = '';
 
     serviceTypeCurrent: any = [];
     typeClearanceCurrent: any = [];
     routeClearanceCurrent: any = [];
     cargoTypeCurrent: any = [];
-    
-    packagesUnit: Array<string> = ['PKG', 'PCS', 'BOX', 'CNTS'];
-    packagesUnitActive = ['PKG'];
 
     private value: any = {};
     private _disabledV: string = '0';

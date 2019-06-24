@@ -217,8 +217,8 @@
                             (click)="sort('exportCountryName')">
                                 <span>Export Country</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'jobId'), 'sorting_desc': (!isDesc && sortKey == 'jobId') }"
-                            (click)="sort('jobId')">
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'jobNo'), 'sorting_desc': (!isDesc && sortKey == 'jobNo') }"
+                            (click)="sort('jobNo')">
                                 <span>JOBID</span>
                             </th>
                             <th>
@@ -259,7 +259,7 @@
                                 <span>{{custom.exportCountryName}}</span>
                             </td>
                             <td>
-                                <span>{{custom.jobId}}</span>
+                                <span>{{custom.jobNo}}</span>
                             </td>
                             <td>
                                 <span>{{custom.clearanceDate | date: 'dd/MM/yyyy'}}</span>

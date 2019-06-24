@@ -34,48 +34,6 @@
                             <label class="form-control-label" for="">
                                 Customer <span class="m--font-danger">(*)</span>
                             </label>
-                            <!-- <div class="dropdown e--combogrid">
-                                <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
-                                    data-toggle="dropdown" placeholder="Please selected">
-                                <div class="dropdown-menu e--combogrid-content">
-                                    <div class="tabel-wrapper table-fixed">
-                                        <div class="table-head-fixed">
-                                            <div class="table-filter-block">
-                                                <div class="search-field">
-                                                    <input class="form-control m-input m-input--square" type="text"
-                                                        placeholder="Search...">
-                                                    <i class="icon-search"></i>
-                                                </div>
-                                            </div>
-                                            <div class="table-header">
-                                                <table class="table table-hover">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Partner Id</th>
-                                                            <th>Name ABBR</th>
-                                                            <th>Name EN</th>
-                                                            <th>Tax Code</th>
-                                                        </tr>
-                                                    </thead>
-                                                </table>
-                                            </div>
-                                        </div>
-                                        <div class="table-body-scroll">
-                                            <table class="table table-hover">
-                                                <tbody>
-                                                    <tr class="data-row data-selected">
-                                                        <td>Partner Id</td>
-                                                        <td>Name ABBR</td>
-                                                        <td>Name EN</td>
-                                                        <td>Tax Code</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> -->
-
                             <app-combo-grid-virtual-scroll
                                 [currentActiveItemId]="{field:'taxCode',value:customerCurrent,hardValue:''}"
                                 [selectedDisplayFields]="['partnerNameEn']" [dataSources]="listCustomer"
@@ -141,45 +99,11 @@
                             <label class="form-control-label" for="">
                                 Gateway <span class="m--font-danger">(*)</span>
                             </label>
-                            <div class="dropdown e--combogrid">
-                                <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
-                                    data-toggle="dropdown" placeholder="Please selected">
-                                <div class="dropdown-menu e--combogrid-content">
-                                    <div class="tabel-wrapper table-fixed">
-                                        <div class="table-head-fixed">
-                                            <div class="table-filter-block">
-                                                <div class="search-field">
-                                                    <input class="form-control m-input m-input--square" type="text"
-                                                        placeholder="Search...">
-                                                    <i class="icon-search"></i>
-                                                </div>
-                                            </div>
-                                            <div class="table-header">
-                                                <table class="table table-hover">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Port Code</th>
-                                                            <th>Port Name (EN)</th>
-                                                            <th>Country Name (EN)</th>
-                                                        </tr>
-                                                    </thead>
-                                                </table>
-                                            </div>
-                                        </div>
-                                        <div class="table-body-scroll">
-                                            <table class="table table-hover">
-                                                <tbody>
-                                                    <tr class="data-row data-selected">
-                                                        <td>Port Code</td>
-                                                        <td>Port Name (EN)</td>
-                                                        <td>Country Name (EN)</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <app-combo-grid-virtual-scroll
+                                [currentActiveItemId]="{field:'code',value:portCurrent,hardValue:''}"
+                                [selectedDisplayFields]="['nameEn']" [dataSources]="listPort"
+                                [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name (EN)'},{'field':'countryNameEN','label':'Country Name (EN)'}]">
+                            </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -224,10 +148,11 @@
                             <label class="form-control-label" for="">
                                 Export Country
                             </label>
-                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
-                                (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
-                                (typed)="typed($event)" placeholder="Select filter">
-                            </ng-select>
+                            <app-combo-grid-virtual-scroll
+                                [currentActiveItemId]="{field:'code',value:countryExportCurrent,hardValue:''}"
+                                [selectedDisplayFields]="['nameEn']" [dataSources]="listCountry"
+                                [displayFields]="[{'field':'code','label':'Country Code'},{'field':'nameEn','label':'Country Name (EN)'}]">
+                            </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -235,10 +160,11 @@
                             <label class="form-control-label" for="">
                                 Import Country
                             </label>
-                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
-                                (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
-                                (typed)="typed($event)" placeholder="Select filter">
-                            </ng-select>
+                            <app-combo-grid-virtual-scroll
+                                [currentActiveItemId]="{field:'code',value:countryImportCurrent,hardValue:''}"
+                                [selectedDisplayFields]="['nameEn']" [dataSources]="listCountry"
+                                [displayFields]="[{'field':'code','label':'Country Code'},{'field':'nameEn','label':'Country Name (EN)'}]">
+                            </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
                 </div>
@@ -248,42 +174,11 @@
                             <label class="form-control-label" for="">
                                 Commodity
                             </label>
-                            <div class="dropdown e--combogrid">
-                                <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
-                                    data-toggle="dropdown" placeholder="Please selected">
-                                <div class="dropdown-menu e--combogrid-content">
-                                    <div class="tabel-wrapper table-fixed">
-                                        <div class="table-head-fixed">
-                                            <div class="table-filter-block">
-                                                <div class="search-field">
-                                                    <input class="form-control m-input m-input--square" type="text"
-                                                        placeholder="Search...">
-                                                    <i class="icon-search"></i>
-                                                </div>
-                                            </div>
-                                            <div class="table-header">
-                                                <table class="table table-hover">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Commodity Code</th>
-                                                            <th>Commodity Name (EN)</th>
-                                                    </thead>
-                                                </table>
-                                            </div>
-                                        </div>
-                                        <div class="table-body-scroll">
-                                            <table class="table table-hover">
-                                                <tbody>
-                                                    <tr class="data-row data-selected">
-                                                        <td>Commodity Code</td>
-                                                        <td>Commodity Name (EN)</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <app-combo-grid-virtual-scroll
+                                [currentActiveItemId]="{field:'code',value:commodityCurrent,hardValue:''}"
+                                [selectedDisplayFields]="['commodityNameEn']" [dataSources]="listCommodity"
+                                [displayFields]="[{'field':'code','label':'Commodity Code'},{'field':'commodityNameEn','label':'Commodity Name (EN)'}]">
+                            </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -301,7 +196,7 @@
                                 Net Weight
                             </label>
                             <input type="text" class="form-control m-input m-input--square"
-                                [(ngModel)]="customDeclaration.chargeWeight" placeholder="">
+                                [(ngModel)]="customDeclaration.netWeight" placeholder="">
                         </div>
                     </div>
                 </div>
@@ -331,13 +226,13 @@
                             </label>
                             <div class="input-group m-input-group m-input-group--square">
                                 <input type="text" class="form-control m-input" aria-label=""
-                                    [(ngModel)]="customDeclaration.psc">
+                                    [(ngModel)]="customDeclaration.pcs">
                                 <div class="input-group-prepend">
-                                    <ng-select [allowClear]="false" [items]="packagesUnit" [active]="packagesUnitActive"
-                                        [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="selected($event)" (removed)="removed($event)"
-                                        (typed)="typed($event)" placeholder="">
-                                    </ng-select>
+                                    <app-combo-grid-virtual-scroll
+                                        [currentActiveItemId]="{field:'code',value:unitCurrent,hardValue:''}"
+                                        [selectedDisplayFields]="['unitNameEn']" [dataSources]="listUnit"
+                                        [displayFields]="[{'field':'code','label':'Unit Code'},{'field':'unitNameEn','label':'Unit Name (EN)'}]">
+                                    </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
                         </div>
@@ -357,33 +252,35 @@
                 <div class="row">
                     <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
                         <span class="m--font-bolder">Create:</span>
-                        <span class="m--font-brand m--margin-left-5">dd/MM/yyyy h:mm:ss</span>
+                        <span
+                            class="m--font-brand m--margin-left-5">{{customDeclaration.datetimeCreated | date: 'dd/MM/yyyy h:mm:ss'}}</span>
                         <span class="m--font-bolder m--margin-left-5">by</span>
-                        <span class="m--font-brand m--margin-left-5">userCreated</span>
+                        <span class="m--font-brand m--margin-left-5">{{customDeclaration.userCreated}}</span>
                     </div>
                     <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
                         <span class="m--font-bolder">Modified:</span>
-                        <span class="m--font-brand m--margin-left-5">dd/MM/yyyy h:mm:ss</span>
+                        <span
+                            class="m--font-brand m--margin-left-5">{{customDeclaration.datetimeModified | date: 'dd/MM/yyyy h:mm:ss'}}</span>
                         <span class="m--font-bolder m--margin-left-5">by</span>
-                        <span class="m--font-brand m--margin-left-5">userModified</span>
+                        <span class="m--font-brand m--margin-left-5">{{customDeclaration.userModified}}</span>
                     </div>
                     <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
                         <span class="m--font-bolder">Source:</span>
-                        <span class="m--font-brand m--margin-left-5">eFMS</span>
+                        <span class="m--font-brand m--margin-left-5">{{customDeclaration.source}}</span>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
                         <span class="m--font-bolder">First Customer No:</span>
-                        <span class="m--font-brand m--margin-left-5"></span>
+                        <span class="m--font-brand m--margin-left-5">{{customDeclaration.firstClearanceNo}}</span>
                     </div>
                     <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
                         <span class="m--font-bolder">Reference JobID:</span>
-                        <span class="m--font-brand m--margin-left-5"></span>
+                        <span class="m--font-brand m--margin-left-5">{{customDeclaration.jobNo}}</span>
                     </div>
                     <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
                         <span class="m--font-bolder">Convert time:</span>
-                        <span class="m--font-brand m--margin-left-5"></span>
+                        <span class="m--font-brand m--margin-left-5">{{customDeclaration.datetimeCreated | date: 'dd/MM/yyyy h:mm:ss'}}</span>
                     </div>
                 </div>
 

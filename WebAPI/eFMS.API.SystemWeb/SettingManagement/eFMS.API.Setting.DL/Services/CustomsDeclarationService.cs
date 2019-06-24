@@ -292,10 +292,10 @@ namespace eFMS.API.Setting.DL.Services
             }
             return result;
         }
- 		public CustomsDeclaration GetById(string id)
+ 		public CustomsDeclaration GetById(int id)
         {
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var result = dc.CustomsDeclaration.Where(x => x.Id == Int32.Parse(id)).FirstOrDefault();
+            var result = dc.CustomsDeclaration.Where(x => x.Id == id).FirstOrDefault();
             return result;
         }
         public List<CustomsDeclarationModel> Query(CustomsDeclarationCriteria criteria)
