@@ -12,6 +12,7 @@ import { SelectModule } from 'ng2-select';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { StatementOfAccountAddnewComponent } from './statement-of-account-addnew/statement-of-account-addnew.component';
 import { StatementOfAccountEditComponent } from './statement-of-account-edit/statement-of-account-edit.component';
+import { StatementOfAccountDetailComponent } from './statement-of-account-detail/statement-of-account-detail.component';
 
 @NgModule({
   imports: [
@@ -26,7 +27,10 @@ import { StatementOfAccountEditComponent } from './statement-of-account-edit/sta
       StatementOfAccountComponent, 
       AdvancePaymentComponent, 
       SettlementPaymentComponent, 
-      AccountReceivablePayableComponent, StatementOfAccountAddnewComponent, StatementOfAccountEditComponent
+      AccountReceivablePayableComponent, 
+      StatementOfAccountAddnewComponent, 
+      StatementOfAccountEditComponent, 
+      StatementOfAccountDetailComponent
     ]
 })
 export class AccountingModule { }

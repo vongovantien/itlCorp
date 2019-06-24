@@ -6,6 +6,7 @@ import { SettlementPaymentComponent } from './settlement-payment/settlement-paym
 import { StatementOfAccountComponent } from './statement-of-account/statement-of-account.component';
 import { StatementOfAccountAddnewComponent } from './statement-of-account-addnew/statement-of-account-addnew.component';
 import { StatementOfAccountEditComponent } from './statement-of-account-edit/statement-of-account-edit.component';
+import { StatementOfAccountDetailComponent } from './statement-of-account-detail/statement-of-account-detail.component';
 
 const routes: Routes = [
   {
@@ -58,6 +59,14 @@ const routes: Routes = [
     component:StatementOfAccountEditComponent,
     data:{
         name:"Statement Of Account Edit",
+        level:2
+    }
+  },
+  {
+    path:'statement-of-account-detail',
+    component:StatementOfAccountDetailComponent,
+    data:{
+        name:"Statement Of Account Detail",
         level:2
     }
   }
