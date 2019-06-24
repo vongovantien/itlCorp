@@ -47,7 +47,7 @@ export class BillingCustomDeclarationComponent implements OnInit {
     this.setPageMaster(this.pager);
   }
 
-  stateChecking() {
+  async stateChecking() {
     setTimeout(() => {
       this.baseServices.dataStorage.subscribe(data => {
         if(data["CurrentOpsTransaction"] != null){
@@ -90,8 +90,11 @@ export class BillingCustomDeclarationComponent implements OnInit {
     }
   }
   showPopupAdd(){
-    this.pager.currentPage = 1;
-    this.setPage(this.pager);
+    if(this.notImportedData != null){
+      this.pager.currentPage = 1;
+      // this.pagingNotImported.setPage(this.pager.currentPage);
+      this.setPage(this.pager);
+    }
   }
   async getCustomClearancesNotImported() {
     this.notImportedData = await this.baseServices.postAsync(this.api_menu.ToolSetting.CustomClearance.query, { "imPorted": false }, false, true);
