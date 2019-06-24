@@ -20,6 +20,9 @@ using eFMS.API.Provider.Services.IService;
 using eFMS.API.Provider.Services.ServiceImpl;
 using System.IO;
 using System.Reflection;
+using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace eFMS.API.Setting.Infrastructure
 {
@@ -32,6 +35,9 @@ namespace eFMS.API.Setting.Infrastructure
             services.AddTransient<ICategoryLogService, CategoryLogService>();
             services.AddTransient<IEcusConnectionService, EcusConnectionService>();
             services.AddTransient<ICustomsDeclarationService, CustomsDeclarationService>();
+            services.AddTransient<ICurrentUser, CurrentUser>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
         }
 
         public static IServiceCollection AddAuthorize(this IServiceCollection services, IConfiguration configuration)

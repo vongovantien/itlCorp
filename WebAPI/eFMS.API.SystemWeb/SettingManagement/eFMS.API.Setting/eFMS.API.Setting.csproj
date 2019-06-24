@@ -56,6 +56,9 @@
     <Reference Include="eFMS.API.Setting.Service">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Setting.Service.dll</HintPath>
     </Reference>
+    <Reference Include="eFMS.IdentityServer.DL">
+      <HintPath>..\..\IdentityServer\bin\netcoreapp2.2\eFMS.IdentityServer.DL.dll</HintPath>
+    </Reference>
     <Reference Include="ITL.NetCore.Common">
       <HintPath>..\..\..\..\bin\netcoreapp2.2\ITL.NetCore.Common.dll</HintPath>
     </Reference>

@@ -32,7 +32,6 @@ namespace eFMS.API.Setting.Service.Models
         public int? Pcs { get; set; }
         public string Source { get; set; }
         public string Note { get; set; }
-        public Guid? JobId { get; set; }
         public string UserCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeCreated { get; set; }

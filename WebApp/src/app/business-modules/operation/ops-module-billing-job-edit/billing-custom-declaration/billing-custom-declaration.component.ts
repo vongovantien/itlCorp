@@ -37,8 +37,8 @@ export class BillingCustomDeclarationComponent implements OnInit {
     await this.stateChecking();
   }
 
-  async getCustomClearanesOfJob(id: string) {
-    this.importedData = await this.baseServices.getAsync(this.api_menu.ToolSetting.CustomClearance.getByJob + id, false, true);
+  async getCustomClearanesOfJob(jobNo: string) {
+    this.importedData = await this.baseServices.getAsync(this.api_menu.ToolSetting.CustomClearance.getByJob + "?jobNo=" + jobNo, false, true);
     if(this.importedData != null){
       this.importedData.forEach(element => {
         element.isChecked = false;
@@ -54,7 +54,7 @@ export class BillingCustomDeclarationComponent implements OnInit {
           this.currentJob = data["CurrentOpsTransaction"];
           
           if(this.currentJob != null){
-            this.getCustomClearanesOfJob(this.currentJob.id);
+            this.getCustomClearanesOfJob(this.currentJob.jobNo);
             this.getCustomClearancesNotImported();
           }
         }
@@ -78,7 +78,6 @@ export class BillingCustomDeclarationComponent implements OnInit {
     if(dataToUpdate.length > 0){
       dataToUpdate.forEach(x =>{
         x.jobNo = null;
-        x.jobId = null;
       });
       let responses = await this.baseServices.postAsync(this.api_menu.ToolSetting.CustomClearance.updateToAJob, dataToUpdate, false, true);
       if(responses == true){
@@ -151,7 +150,6 @@ export class BillingCustomDeclarationComponent implements OnInit {
     if(dataToUpdate.length > 0){
       dataToUpdate.forEach(x =>{
         x.jobNo = this.currentJob.jobNo;
-        x.jobId = this.currentJob.id;
       });
       let responses = await this.baseServices.postAsync(this.api_menu.ToolSetting.CustomClearance.updateToAJob, dataToUpdate, false, true);
       if(responses == true){

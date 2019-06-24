@@ -15,6 +15,9 @@ using System.Diagnostics.Contracts;
 using eFMS.API.Setting.DL.Models.Criteria;
 using eFMS.API.Setting.DL.Common;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.AspNetCore.Authorization;
+using eFMS.IdentityServer.DL.UserManager;
+using eFMS.API.Common.NoSql;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -32,17 +35,20 @@ namespace eFMS.API.Setting.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICustomsDeclarationService customsDeclarationService;
         private readonly IDistributedCache cache;
+        private readonly ICurrentUser currentUser;
 
         /// <summary>
         /// constructor
         /// </summary>
         /// <param name="localizer">inject interface IStringLocalizer</param>
         /// <param name="service">inject interface ICustomsDeclarationService</param>
-        public CustomsDeclarationController(IStringLocalizer<LanguageSub> localizer, ICustomsDeclarationService service, IDistributedCache distributedCache)
+        /// <param name="distributedCache"></param>
+        public CustomsDeclarationController(IStringLocalizer<LanguageSub> localizer, ICustomsDeclarationService service, IDistributedCache distributedCache, ICurrentUser user)
         {
             stringLocalizer = localizer;
             customsDeclarationService = service;
             cache = distributedCache;
+            currentUser = user;
         }
 
         /// <summary>
@@ -59,12 +65,12 @@ namespace eFMS.API.Setting.Controllers
         /// <summary>
         /// get the list of custom declarations by job id
         /// </summary>
-        /// <param name="jobId">jobId that want to retrieve custom declarations</param>
+        /// <param name="jobNo">jobId that want to retrieve custom declarations</param>
         /// <returns></returns>
-        [HttpGet("GetBy/{jobId}")]
-        public IActionResult GetBy(Guid jobId)
+        [HttpGet("GetBy")]
+        public IActionResult GetBy(string jobNo)
         {
-            var results = customsDeclarationService.GetBy(jobId);
+            var results = customsDeclarationService.GetBy(jobNo);
             return Ok(results);
         }
 
@@ -94,12 +100,13 @@ namespace eFMS.API.Setting.Controllers
             var result = new { data, totalItems, pageNumber, pageSize };
             return Ok(result);
         }
-        
+
         /// <summary>
         /// add new custom clearance
         /// </summary>
         /// <param name="model">object to add</param>
         /// <returns></returns>
+        [Authorize]
         [HttpPost]
         [Route("Add")]
         public IActionResult AddNew(CustomsDeclarationModel model)
@@ -111,7 +118,7 @@ namespace eFMS.API.Setting.Controllers
             }
             model.DatetimeCreated = DateTime.Now;
             model.DatetimeModified = DateTime.Now;
-            model.UserCreated = model.UserModified = "admin";
+            model.UserCreated = model.UserModified = currentUser.UserID;
             model.Source = Constants.FromEFMS;
             var hs = customsDeclarationService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
@@ -132,6 +139,7 @@ namespace eFMS.API.Setting.Controllers
         /// </summary>
         /// <param name="model">object to update</param>
         /// <returns></returns>
+        [Authorize]
         [HttpPut]
         [Route("Update")]
         public IActionResult Update(CustomsDeclarationModel model)
@@ -142,7 +150,7 @@ namespace eFMS.API.Setting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
             model.DatetimeModified = DateTime.Now;
-            model.UserModified = "admin";
+            model.UserModified = currentUser.UserID;
             var hs = customsDeclarationService.Update(model, x => x.Id == model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -159,10 +167,12 @@ namespace eFMS.API.Setting.Controllers
         /// </summary>
         /// <param name="id">id of existed item that want to delete</param>
         /// <returns></returns>
+        [Authorize]
         [HttpDelete]
         [Route("Delete")]
         public IActionResult Delete(int id)
         {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = customsDeclarationService.Delete(x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -177,7 +187,8 @@ namespace eFMS.API.Setting.Controllers
         /// import custom declaration from ecus system
         /// </summary>
         /// <returns></returns>
-        [HttpGet("ImportClearancesFromEcus")]
+        [Authorize]
+        [HttpPost("ImportClearancesFromEcus")]
         public IActionResult ImportClearancesFromEcus()
         {
             var result = customsDeclarationService.ImportClearancesFromEcus();
@@ -204,6 +215,7 @@ namespace eFMS.API.Setting.Controllers
         /// </summary>
         /// <param name="clearances">list of clearances</param>
         /// <returns></returns>
+        [Authorize]
         [HttpPost("UpdateJobToClearances")]
         public IActionResult UpdateJobToClearances(List<CustomsDeclarationModel> clearances)
         {

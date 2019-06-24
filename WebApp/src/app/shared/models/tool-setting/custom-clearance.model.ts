@@ -27,7 +27,6 @@ export class CustomClearance {
     pcs: null;
     source: null;
     note: null;
-    jobId: null;
     userCreated: null;
     userModified: null;
     datetimeCreated: Date = null;

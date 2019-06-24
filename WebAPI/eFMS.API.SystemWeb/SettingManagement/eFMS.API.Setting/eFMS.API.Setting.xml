@@ -9,12 +9,13 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Setting.Controllers.CustomsDeclarationController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Setting.Resources.LanguageSub},eFMS.API.Setting.DL.IService.ICustomsDeclarationService,Microsoft.Extensions.Caching.Distributed.IDistributedCache)">
+        <member name="M:eFMS.API.Setting.Controllers.CustomsDeclarationController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Setting.Resources.LanguageSub},eFMS.API.Setting.DL.IService.ICustomsDeclarationService,Microsoft.Extensions.Caching.Distributed.IDistributedCache,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
             <summary>
             constructor
             </summary>
             <param name="localizer">inject interface IStringLocalizer</param>
             <param name="service">inject interface ICustomsDeclarationService</param>
+            <param name="distributedCache"></param>
         </member>
         <member name="M:eFMS.API.Setting.Controllers.CustomsDeclarationController.Get">
             <summary>
@@ -22,11 +23,11 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Setting.Controllers.CustomsDeclarationController.GetBy(System.Guid)">
+        <member name="M:eFMS.API.Setting.Controllers.CustomsDeclarationController.GetBy(System.String)">
             <summary>
             get the list of custom declarations by job id
             </summary>
-            <param name="jobId">jobId that want to retrieve custom declarations</param>
+            <param name="jobNo">jobId that want to retrieve custom declarations</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Setting.Controllers.CustomsDeclarationController.Query(eFMS.API.Setting.DL.Models.Criteria.CustomsDeclarationCriteria)">

@@ -19,6 +19,7 @@ using eFMS.API.Setting.DL.Common;
 using eFMS.API.Setting.DL.Models.Ecus;
 using eFMS.API.Provider.Services.IService;
 using Microsoft.Extensions.Caching.Distributed;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.Setting.DL.Services
 {
@@ -30,6 +31,7 @@ namespace eFMS.API.Setting.DL.Services
         private readonly ICatCountryApiService countryApi;
         private readonly ICatCommodityApiService commodityApi;
         private readonly IDistributedCache cache;
+        private readonly ICurrentUser currentUser;
 
         public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, IMapper mapper, 
             IEcusConnectionService ecusCconnection
@@ -37,7 +39,8 @@ namespace eFMS.API.Setting.DL.Services
             , ICatPlaceApiService catPlace
             , ICatCountryApiService country
             , IDistributedCache distributedCache
-            , ICatCommodityApiService commodity) : base(repository, mapper)
+            , ICatCommodityApiService commodity
+            , ICurrentUser user) : base(repository, mapper)
         {
             ecusCconnectionService = ecusCconnection;
             catPartnerApi = catPartner;
@@ -45,6 +48,7 @@ namespace eFMS.API.Setting.DL.Services
             countryApi = country;
             cache = distributedCache;
             commodityApi = commodity;
+            currentUser = user;
         }
 
         public IQueryable<CustomsDeclaration> Get()
@@ -65,7 +69,7 @@ namespace eFMS.API.Setting.DL.Services
 
         public HandleState ImportClearancesFromEcus()
         {
-            string userId = "admin";
+            string userId = currentUser.UserID;
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var connections = dc.SetEcusconnection.Where(x => x.UserId == userId);
             var result = new HandleState();
@@ -250,10 +254,10 @@ namespace eFMS.API.Setting.DL.Services
             return results;
         }
 
-        public List<CustomsDeclarationModel> GetBy(Guid jobId)
+        public List<CustomsDeclarationModel> GetBy(string jobNo)
         {
             List<CustomsDeclarationModel> results = null;
-            var data = DataContext.Get(x => x.JobId == jobId);
+            var data = DataContext.Get(x => x.JobNo == jobNo);
             if (data == null) return results;
             results = new List<CustomsDeclarationModel>();
             foreach (var item in data)
@@ -281,7 +285,6 @@ namespace eFMS.API.Setting.DL.Services
                 foreach (var item in clearances)
                 {
                     var clearance = mapper.Map<CustomsDeclaration>(item);
-                    clearance.JobId = item.JobId;
                     DataContext.Update(clearance, x => x.Id == item.Id, false);
                 }
                 DataContext.DC.SaveChanges();

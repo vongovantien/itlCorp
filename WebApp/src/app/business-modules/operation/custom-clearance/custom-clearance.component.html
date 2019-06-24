@@ -265,8 +265,8 @@
                                 <span>{{custom.clearanceDate | date: 'dd/MM/yyyy'}}</span>
                             </td>
                             <td>
-                                <span *ngIf="custom.jobId; else nojobid" class="m--font-success">Imported</span>
-                                <ng-template #nojobid>
+                                <span *ngIf="custom.jobNo; else nojobno" class="m--font-success">Imported</span>
+                                <ng-template #nojobno>
                                     <span class="m--font-danger">Not Imported</span>
                                 </ng-template>
                             </td>

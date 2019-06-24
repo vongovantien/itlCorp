@@ -12,6 +12,7 @@ using eFMS.API.Setting.DL.Models.Criteria;
 using System.Data;
 using eFMS.API.Setting.DL.Models.Ecus;
 using eFMS.API.Setting.DL.Helpers;
+using System;
 //using eFMS.API.Provider.Services.IService;
 
 namespace eFMS.API.Setting.DL.Services
@@ -155,7 +156,7 @@ namespace eFMS.API.Setting.DL.Services
                     return dt.DataTableToList<DTOKHAIMD>();
                 }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 return null;
             }
