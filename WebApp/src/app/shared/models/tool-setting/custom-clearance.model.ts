@@ -19,8 +19,8 @@ export class CustomClearance {
     route: null;
     documentType: null;
     exportCountryCode: null;
-    importcountryCode: null;
-    commodityId: null;
+    importCountryCode: null;
+    commodityCode: null;
     grossWeight: null;
     netWeight: null;
     cbm: null;

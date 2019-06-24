@@ -450,8 +450,8 @@ namespace eFMS.API.Documentation.DL.Services
             {
                DBTitle = "N/A",
                DebitNo = model.Soa.Code,
-               TotalDebit = model.TotalDebit?.ToString(),
-               TotalCredit = model.TotalCredit?.ToString(),
+               TotalDebit = model.TotalDebit==null? "N/A": model.TotalDebit.ToString(),
+               TotalCredit = model.TotalCredit == null ? "N/A" : model.TotalCredit.ToString(),
                DueToTitle = "N/A",
                DueTo = "N/A",
                DueToCredit = "N/A",
@@ -459,6 +459,7 @@ namespace eFMS.API.Documentation.DL.Services
                CompanyName = "N/A",
                CompanyAddress1 = "N/A",
                ComapnyAddress2 = "N/A",
+               CompanyDescription = "N/A",
                Website = "efms.itlvn.com",
                IbanCode = "N/A",
                AccountName = "N/A",
@@ -468,12 +469,12 @@ namespace eFMS.API.Documentation.DL.Services
                AccsVND = "N/A",
                BankAddress = "N/A",
                Paymentterms = "N/A",
-               DecimalNo = null,
-               CurrDecimal = null,
+               DecimalNo = 2,
+               CurrDecimal = 2,
                IssueInv = "N/A",
                InvoiceInfo = "N/A",
                Contact = "N/A",
-               IssueDate = null,
+               IssueDate = DateTime.Now.ToString(),
                OtherRef = "N/A"
             };
             var listSOA = new List<AcctSOAReport>();

@@ -51,6 +51,17 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         /// <summary>
+        /// get all data
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetAll")]
+        public IActionResult GetAll()
+        {
+            var results = catComonityService.GetAll();
+            return Ok(results);
+        }
+
+        /// <summary>
         /// get the list of commodities
         /// </summary>
         /// <param name="criteria">search conditions</param>

@@ -28,6 +28,7 @@ namespace eFMS.API.Setting.DL.Services
         private readonly ICatPlaceApiService catPlaceApi;
         private readonly IEcusConnectionService ecusCconnectionService;
         private readonly ICatCountryApiService countryApi;
+        private readonly ICatCommodityApiService commodityApi;
         private readonly IDistributedCache cache;
 
         public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, IMapper mapper, 
@@ -35,13 +36,15 @@ namespace eFMS.API.Setting.DL.Services
             , ICatPartnerApiService catPartner
             , ICatPlaceApiService catPlace
             , ICatCountryApiService country
-            , IDistributedCache distributedCache) : base(repository, mapper)
+            , IDistributedCache distributedCache
+            , ICatCommodityApiService commodity) : base(repository, mapper)
         {
             ecusCconnectionService = ecusCconnection;
             catPartnerApi = catPartner;
             catPlaceApi = catPlace;
             countryApi = country;
             cache = distributedCache;
+            commodityApi = commodity;
         }
 
         public IQueryable<CustomsDeclaration> Get()
@@ -104,7 +107,7 @@ namespace eFMS.API.Setting.DL.Services
             {
                 type = ClearanceConstants.Import_Type_Value;
             }
-            var serviceType = GetServiceType(clearance);
+            var serviceType = GetServiceType(clearance, out string cargoType);
             var route = GetRouteType(clearance.PLUONG);
             var partnerTaxCode = clearance.MA_DV;
             if (clearance.MA_DV != null)
@@ -124,9 +127,9 @@ namespace eFMS.API.Setting.DL.Services
                 PortCodeCk = clearance.MA_CK,
                 PortCodeNn = clearance.MA_CANGNN,
                 ExportCountryCode = clearance.NUOC_XK,
-                ImportcountryCode = clearance.NUOC_NK,
+                ImportCountryCode = clearance.NUOC_NK,
                 Pcs = clearance.SO_KIEN == null ? (int?)clearance.SO_KIEN : null,
-                UnitId = clearance.DVT_KIEN,
+                UnitCode = clearance.DVT_KIEN,
                 QtyCont = clearance.SO_CONTAINER == null ? (int?)clearance.SO_CONTAINER : null,
                 GrossWeight = clearance.TR_LUONG,
                 Route = clearance.PLUONG,
@@ -154,8 +157,9 @@ namespace eFMS.API.Setting.DL.Services
             return route;
         }
 
-        private string GetServiceType(DTOKHAIMD clearance)
+        private string GetServiceType(DTOKHAIMD clearance, out string cargoType)
         {
+            cargoType = string.Empty;
             var serviceType = string.Empty;
             switch (clearance.MA_HIEU_PTVC)
             {
@@ -163,10 +167,12 @@ namespace eFMS.API.Setting.DL.Services
                     serviceType = ClearanceConstants.Air_Service;
                     break;
                 case ClearanceConstants.Sea_FCL_Service_Type:
-                    serviceType = ClearanceConstants.Sea_FCL_Service;
+                    cargoType = ClearanceConstants.CargoTypeFCL;
+                    serviceType = ClearanceConstants.Sea_Service;
                     break;
                 case ClearanceConstants.Sea_LCL_Service_Type:
-                    serviceType = ClearanceConstants.Sea_LCL_Service;
+                    cargoType = ClearanceConstants.CargoTypeLCL;
+                    serviceType = ClearanceConstants.Sea_Service;
                     break;
                 case ClearanceConstants.Trucking_Inland_Service_Type:
                     serviceType = ClearanceConstants.Trucking_Inland_Service;
@@ -221,7 +227,7 @@ namespace eFMS.API.Setting.DL.Services
             //var portIndexs = dc.CatPlace.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port));
             //var customers = dc.CatPartner.Where(x => x.PartnerGroup == GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER));
             var clearances = (from clearance in list
-                              join importCountry in countries on clearance.ImportcountryCode equals importCountry.Code into grpImports
+                              join importCountry in countries on clearance.ImportCountryCode equals importCountry.Code into grpImports
                               from imCountry in grpImports.DefaultIfEmpty()
                               join exportCountry in countries on clearance.ExportCountryCode equals exportCountry.Code into grpExports
                               from exCountry in grpExports.DefaultIfEmpty()
@@ -276,8 +282,9 @@ namespace eFMS.API.Setting.DL.Services
                 {
                     var clearance = mapper.Map<CustomsDeclaration>(item);
                     clearance.JobId = item.JobId;
-                    DataContext.Update(clearance, x => x.Id == item.Id);
+                    DataContext.Update(clearance, x => x.Id == item.Id, false);
                 }
+                DataContext.DC.SaveChanges();
             }
             catch (Exception ex)
             {

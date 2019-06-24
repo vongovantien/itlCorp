@@ -39,6 +39,23 @@ namespace eFMS.API.Catalogue.DL.Services
             currentUser = user;
         }
 
+        /// <summary>
+        /// get all
+        /// </summary>
+        /// <returns></returns>
+        public IQueryable<CatCommodityModel> GetAll()
+        {
+            IQueryable<CatCommodity> data = RedisCacheHelper.Get<CatCommodity>(cache, Templates.CatCommodity.NameCaching.ListName);
+            if (data == null)
+            {
+                data = DataContext.Get();
+                RedisCacheHelper.SetObject(cache, Templates.CatCommodity.NameCaching.ListName, data);
+            }
+            if (data == null) return null;
+            var results = data.Select(x => mapper.Map<CatCommodityModel>(x));
+            return results;
+        }
+
         public List<CatCommodityModel> Paging(CatCommodityCriteria criteria, int page, int size, out int rowsCount)
         {
             List<CatCommodityModel> results = null;

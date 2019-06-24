@@ -18,7 +18,7 @@
                     </div>
                 </div>
                 <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
-                    <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                    <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="removeImported()">
                         <span>
                             <i class="la la-trash"></i>
                             <span>
@@ -113,10 +113,10 @@
                                 <span>{{ clearance.exportCountryCode }}</span>
                             </td>
                             <td>
-                                <span>{{ clearance.importcountryCode }}</span>
+                                <span>{{ clearance.importCountryCode }}</span>
                             </td>
                             <td>
-                                <span>text</span>
+                                <span>{{ clearance.commodityCode }}</span>
                             </td>
                             <td>
                                 <span>{{ clearance.qtyCont }}</span>
@@ -175,7 +175,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Add Custom Declaration - Custommer <span class="m--font-danger">Partner name</span></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="checkAllNotImported = false;changeAllNotImported()">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="checkAllNotImported = false;changeAllNotImported(); refreshData()">
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <div class="modal-actions c-button-actions">
@@ -286,10 +286,10 @@
                                         <span>{{ item.exportCountryCode }}</span>
                                     </td>
                                     <td>
-                                        <span>{{ item.importcountryCode }}</span>
+                                        <span>{{ item.importCountryCode }}</span>
                                     </td>
                                     <td>
-                                        <span>text</span>
+                                        <span>{{ item.commodityCode }}</span>
                                     </td>
                                     <td>
                                         <span>{{ item.qtyCont }}</span>
@@ -306,7 +306,7 @@
                     </div>
                     <!--end: Datatable-->  
                     <!--begin::pagination-->
-                    <div class="pagination-nav">
+                    <!-- <div class="pagination-nav">
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="tatable__pager-size" style="max-width: 190px">
@@ -333,9 +333,9 @@
                                 </nav>
                             </div>
                         </div>
-                    </div>
-                    <!-- <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)"
-                            (pagerObject)="setPage($event)"></app-pagination> -->
+                    </div> -->
+                    <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)" #pagingNotImported
+                            (pagerObject)="setPage($event)"></app-pagination>
                     <!--end::pagination--> 
                     <!--end::m-portlet --> 
                 </div>
@@ -350,7 +350,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="checkAllNotImported = false;changeAllNotImported()">
+                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="checkAllNotImported = false;changeAllNotImported(); refreshData()">
                     <span>
                         <i class="la la-ban"></i>
                         <span>

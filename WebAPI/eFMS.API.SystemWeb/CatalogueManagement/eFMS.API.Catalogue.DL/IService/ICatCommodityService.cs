@@ -13,6 +13,7 @@ namespace eFMS.API.Catalogue.DL.IService
 {
     public interface ICatCommodityService : IRepositoryBase<CatCommodity, CatCommodityModel>
     {
+        IQueryable<CatCommodityModel> GetAll();
         IQueryable<CatCommodityModel> Query(CatCommodityCriteria criteria);
         List<CatCommodityModel> Paging(CatCommodityCriteria criteria, int page, int size, out int rowsCount);
         List<CommodityImportModel> CheckValidImport(List<CommodityImportModel> list);

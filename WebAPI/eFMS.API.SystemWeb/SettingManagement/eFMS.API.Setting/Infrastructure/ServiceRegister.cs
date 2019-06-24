@@ -125,6 +125,8 @@ namespace eFMS.API.Setting.Infrastructure
                    .SetHandlerLifetime(TimeSpan.FromMinutes(5));  //Sample. Default lifetime is 5 minutes;
             services.AddHttpClient<ICatCountryApiService, CatCountryApiService>()
                   .SetHandlerLifetime(TimeSpan.FromMinutes(5));  //Sample. Default lifetime is 5 minutes;
+            services.AddHttpClient<ICatCommodityApiService, CatCommodityApiService>()
+                  .SetHandlerLifetime(TimeSpan.FromMinutes(5));  //Sample. Default lifetime is 5 minutes;
             return services;
         }
 

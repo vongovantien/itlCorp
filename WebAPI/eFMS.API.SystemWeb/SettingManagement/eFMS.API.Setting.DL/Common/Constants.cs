@@ -16,8 +16,7 @@ namespace eFMS.API.Setting.DL.Common
     public static class ClearanceConstants
     {
         public const string Air_Service = "Air";
-        public const string Sea_FCL_Service = "Sea FCL";
-        public const string Sea_LCL_Service = "Sea LCL";
+        public const string Sea_Service = "Sea";
         public const string Trucking_Inland_Service = "Trucking Inland";
         public const string Rail_Service = "Rail";
         public const string Warehouse_Service = "Warehouse";
@@ -28,6 +27,8 @@ namespace eFMS.API.Setting.DL.Common
         public const string Rail_Service_Type = "5";
         public const string Warehouse_Service_Type6 = "6";
         public const string Warehouse_Service_Type9 = "9";
+        public const string CargoTypeFCL = "FCL";
+        public const string CargoTypeLCL = "LCL";
 
         public const string Import_Type = "N";
         public const string Export_Type = "X";

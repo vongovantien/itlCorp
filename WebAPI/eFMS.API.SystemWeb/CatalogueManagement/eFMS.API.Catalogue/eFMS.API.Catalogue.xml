@@ -243,6 +243,12 @@
             <param name="service">inject interface ICatAreaService</param>
             <param name="iMapper">inject interface IMapper</param>
         </member>
+        <member name="M:eFMS.API.Catalogue.Controllers.CatCommonityController.GetAll">
+            <summary>
+            get all data
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Catalogue.Controllers.CatCommonityController.Get(eFMS.API.Catalogue.DL.Models.Criteria.CatCommodityCriteria)">
             <summary>
             get the list of commodities

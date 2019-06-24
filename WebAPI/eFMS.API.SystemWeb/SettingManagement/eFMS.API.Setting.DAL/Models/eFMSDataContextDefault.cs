@@ -88,7 +88,7 @@ namespace eFMS.API.Setting.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
             modelBuilder.Entity<AcctSoa>(entity =>
             {
@@ -2268,7 +2268,9 @@ namespace eFMS.API.Setting.Service.Models
                     .IsRequired()
                     .HasMaxLength(50);
 
-                entity.Property(e => e.CommodityId).HasColumnName("CommodityID");
+                entity.Property(e => e.CommodityCode)
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("smalldatetime")
@@ -2301,7 +2303,7 @@ namespace eFMS.API.Setting.Service.Models
                     .HasColumnName("IDFromECus")
                     .HasColumnType("numeric(18, 0)");
 
-                entity.Property(e => e.ImportcountryCode)
+                entity.Property(e => e.ImportCountryCode)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
@@ -2346,8 +2348,7 @@ namespace eFMS.API.Setting.Service.Models
 
                 entity.Property(e => e.Type).HasMaxLength(50);
 
-                entity.Property(e => e.UnitId)
-                    .HasColumnName("UnitID")
+                entity.Property(e => e.UnitCode)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
