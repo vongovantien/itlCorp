@@ -204,7 +204,7 @@ namespace eFMS.API.Setting.Controllers
         /// </summary>
         /// <param name="clearances">list of clearances</param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPost("UpdateJobToClearances")]
         public IActionResult UpdateJobToClearances(List<CustomsDeclarationModel> clearances)
         {
             var result = customsDeclarationService.UpdateJobToClearances(clearances);

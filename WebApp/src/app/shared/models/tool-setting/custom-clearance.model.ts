@@ -1,6 +1,39 @@
 export class CustomClearance {
     constructor(){}
-    currencyFromId: String;
-    currencyToId: String;
-    rate: number;
+    id: number = 0;
+    idfromEcus: null;
+    jobNo: null;
+    clearanceNo: string = null;
+    firstClearanceNo: null;
+    partnerTaxCode: null;
+    clearanceDate: null;
+    mblid: null;
+    hblid: null;
+    portCodeCk: null;
+    portCodeNn: null;
+    unitId: null;
+    qtyCont: null;
+    serviceType: null;
+    gateway: null;
+    type: null;
+    route: null;
+    documentType: null;
+    exportCountryCode: null;
+    importcountryCode: null;
+    commodityId: null;
+    grossWeight: null;
+    netWeight: null;
+    cbm: null;
+    pcs: null;
+    source: null;
+    note: null;
+    jobId: null;
+    userCreated: null;
+    userModified: null;
+    datetimeCreated: Date = null;
+    datetimeModified: null;
+    customerName: null;
+    importCountryName: null;
+    exportCountryName: null;
+    gatewayName: null
 }

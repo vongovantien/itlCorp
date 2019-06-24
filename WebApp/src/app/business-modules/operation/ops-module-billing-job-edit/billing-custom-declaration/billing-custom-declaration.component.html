@@ -27,7 +27,7 @@
                         </span>
                     </button>
                     <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                        data-toggle="modal" data-target="#add-custom-declaration-modal">
+                        data-toggle="modal" data-target="#add-custom-declaration-modal" (click)="showPopupAdd()">
                         <span>
                             <i class="la la-plus"></i>
                             <span>
@@ -47,7 +47,8 @@
                         <th class="table-actions-col no-sorting">
                             <div class="table-actions">
                                 <label class="m-checkbox">
-                                    <input type="checkbox" name="">
+                                    <input type="checkbox" name="checkAllImported" [checked]="checkAllImported" 
+                                        (change)="checkAllImported =! checkAllImported; changeAllImported()">
                                     <span></span>
                                 </label>
                             </div>
@@ -90,7 +91,8 @@
                             <td class="table-actions-col">
                                 <div class="table-actions">
                                     <label class="m-checkbox">
-                                        <input type="checkbox" name="">
+                                        <input type="checkbox"  [attr.name]="clearance.clearanceNo" [checked]="clearance.isChecked" 
+                                        (change)="clearance.isChecked=!clearance.isChecked; removeChecked();">
                                         <span></span>
                                     </label>
                                 </div>
@@ -99,10 +101,10 @@
                                 <span>{{ clearance.clearanceNo }}</span>
                             </td>
                             <td>
-                                <span>{{ clearance.datetimeCreated | date:'dd/mm/yyyy' }}</span>
+                                <span>{{ clearance.datetimeCreated | date:'dd/MM/yyyy' }}</span>
                             </td>
                             <td>
-                                <span>{{ clearance.clearanceDate| date:'dd/mm/yyyy' }}</span>
+                                <span>{{ clearance.clearanceDate| date:'dd/MM/yyyy' }}</span>
                             </td>
                             <td>
                                 <span>{{ clearance.hblid }}</span>
@@ -132,7 +134,7 @@
         </div>
         <!--end: Datatable-->
         <!--begin::pagination-->
-        <div class="pagination-nav">
+        <!-- <div class="pagination-nav">
             <div class="row">
                 <div class="col-sm-6">
                     <div class="tatable__pager-size" style="max-width: 190px">
@@ -159,7 +161,9 @@
                     </nav>
                 </div>
             </div>
-        </div>
+        </div> -->
+        <app-pagination *ngIf="pagerMaster.totalItems>0" [config]="pagerMaster" (pageChange)="setPageMaster($event)"
+            (pagerObject)="setPageMaster($event)"></app-pagination>
         <!--end::pagination--> 
     </div>
 </div>
@@ -171,11 +175,11 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Add Custom Declaration - Custommer <span class="m--font-danger">Partner name</span></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="checkAllNotImported = false;changeAllNotImported()">
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <div class="modal-actions c-button-actions">
-                    <button type="button" class="btn btn-sm btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                    <button type="button" class="btn btn-sm btn-default m-btn--square m-btn--icon m-btn--uppercase" (click)="refreshData(); checkAllNotImported = false; changeAllNotImported()">
                         <span>
                             <i class="la la-refresh"></i>
                             <span>
@@ -195,8 +199,9 @@
                             <div class="col-lg-4 order-2 order-lg-1">
                                 <div class="form-group">
                                     <div class="m-input-icon m-input-icon--left">
-                                        <input type="text" class="form-control m-input m-input--square"
-                                            placeholder="Search...">
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="Search..." autocomplete="nope"
+                                            [(ngModel)]="searchString" name="searchString" (change)="searchString = searchString.trim()"
+                                            (keyup)="searchClearanceNotImported($event)">
                                         <span class="m-input-icon__icon m-input-icon__icon--left">
                                             <span>
                                                 <i class="la la-search"></i>
@@ -216,7 +221,8 @@
                                     <th class="table-actions-col no-sorting">
                                         <div class="table-actions">
                                             <label class="m-checkbox">
-                                                <input type="checkbox" name="">
+                                                <input type="checkbox" name="checkAllNotImported" [checked]="checkAllNotImported" 
+                                                    (change)="checkAllNotImported =! checkAllNotImported; changeAllNotImported()">
                                                 <span></span>
                                             </label>
                                         </div>
@@ -254,54 +260,53 @@
                                 </tr>
                             </thead>
                             <tbody class="tbody-group" *ngIf="notImportedCustomClearances">
-                                <ng-container *ngFor="let item of notImportedCustomClearances; let i=index">
-                                    <tr class="">
-                                        <td class="table-actions-col">
-                                            <div class="table-actions">
-                                                <label class="m-checkbox">
-                                                    <input type="checkbox" name="">
-                                                    <span></span>
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span>{{ item.clearanceNo }}</span>
-                                        </td>
-                                        <td>
-                                            <span>{{ item.datetimeCreated | date:'dd/mm/yyyy' }}</span>
-                                        </td>
-                                        <td>
-                                            <span>{{ item.clearanceDate| date:'dd/mm/yyyy' }}</span>
-                                        </td>
-                                        <td>
-                                            <span>{{ item.hblid }}</span>
-                                        </td>
-                                        <td>
-                                            <span>{{ item.exportCountryCode }}</span>
-                                        </td>
-                                        <td>
-                                            <span>{{ item.importcountryCode }}</span>
-                                        </td>
-                                        <td>
-                                            <span>text</span>
-                                        </td>
-                                        <td>
-                                            <span>{{ item.qtyCont }}</span>
-                                        </td>
-                                        <td>
-                                            <span>{{ item.firstClearanceNo }}</span>
-                                        </td>
-                                        <td>
-                                            <span>{{ item.note }}</span>
-                                        </td>
-                                    </tr>
-                                </ng-container>
+                                <tr class="" *ngFor="let item of notImportedCustomClearances; let i=index">
+                                    <td class="table-actions-col">
+                                        <div class="table-actions">
+                                            <label class="m-checkbox">
+                                                <input type="checkbox" [attr.name]="item.clearanceNo" [checked]="item.isChecked" 
+                                                    (change)="item.isChecked=!item.isChecked; removeAllChecked();">
+                                                <span></span>
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span>{{ item.clearanceNo }}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{ item.datetimeCreated | date:'dd/MM/yyyy' }}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{ item.clearanceDate| date:'dd/MM/yyyy' }}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{ item.hblid }}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{ item.exportCountryCode }}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{ item.importcountryCode }}</span>
+                                    </td>
+                                    <td>
+                                        <span>text</span>
+                                    </td>
+                                    <td>
+                                        <span>{{ item.qtyCont }}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{ item.firstClearanceNo }}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{ item.note }}</span>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
                     <!--end: Datatable-->  
                     <!--begin::pagination-->
-                    <!-- <div class="pagination-nav">
+                    <div class="pagination-nav">
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="tatable__pager-size" style="max-width: 190px">
@@ -328,16 +333,16 @@
                                 </nav>
                             </div>
                         </div>
-                    </div> -->
-                    <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)"
-                            (pagerObject)="setPage($event)"></app-pagination>
+                    </div>
+                    <!-- <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)"
+                            (pagerObject)="setPage($event)"></app-pagination> -->
                     <!--end::pagination--> 
                     <!--end::m-portlet --> 
                 </div>
                 <!--end::Form-->
             </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="updateJobToClearance()">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -345,7 +350,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="checkAllNotImported = false;changeAllNotImported()">
                     <span>
                         <i class="la la-ban"></i>
                         <span>

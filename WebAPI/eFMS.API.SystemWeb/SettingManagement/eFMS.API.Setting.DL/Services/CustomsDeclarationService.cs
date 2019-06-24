@@ -105,6 +105,7 @@ namespace eFMS.API.Setting.DL.Services
                 type = ClearanceConstants.Import_Type_Value;
             }
             var serviceType = GetServiceType(clearance);
+            var route = GetRouteType(clearance.PLUONG);
             var partnerTaxCode = clearance.MA_DV;
             if (clearance.MA_DV != null)
             {
@@ -130,9 +131,27 @@ namespace eFMS.API.Setting.DL.Services
                 GrossWeight = clearance.TR_LUONG,
                 Route = clearance.PLUONG,
                 Type = type,
-                ServiceType = serviceType
+                ServiceType = serviceType,
             };
             return newItem;
+        }
+
+        private string GetRouteType(string luong)
+        {
+            var route = string.Empty;
+            switch(luong)
+            {
+                case ClearanceConstants.Route_Type_Vang:
+                    route = ClearanceConstants.Route_Type_Yellow;
+                    break;
+                case ClearanceConstants.Route_Type_Xanh:
+                    route = ClearanceConstants.Route_Type_Green;
+                    break;
+                case ClearanceConstants.Route_Type_Do:
+                    route = ClearanceConstants.Route_Type_Red;
+                    break;
+            }
+            return route;
         }
 
         private string GetServiceType(DTOKHAIMD clearance)

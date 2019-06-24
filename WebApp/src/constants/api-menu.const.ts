@@ -248,7 +248,8 @@ export class API_MENU {
             paging:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/Paging",
             details:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/GetById/",
             getByJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/GetBy/",
-            query: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/Query"
+            query: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/Query",
+            updateToAJob: this.getReportPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/UpdateJobToClearances"
         }
     }
 

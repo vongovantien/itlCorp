@@ -33,6 +33,13 @@ namespace eFMS.API.Setting.DL.Common
         public const string Export_Type = "X";
         public const string Import_Type_Value = "Import";
         public const string Export_Type_Value = "Export";
+
+        public const string Route_Type_Do = "Do";
+        public const string Route_Type_Xanh = "Xanh";
+        public const string Route_Type_Vang = "Vang";
+        public const string Route_Type_Red = "Red";
+        public const string Route_Type_Green = "Green";
+        public const string Route_Type_Yellow = "Yellow";
     }
     public static class CatPlaceConstant
     {
