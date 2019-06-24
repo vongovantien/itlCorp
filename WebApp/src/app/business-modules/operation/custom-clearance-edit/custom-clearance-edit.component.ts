@@ -3,6 +3,7 @@ import moment from 'moment/moment';
 import { ActivatedRoute } from '@angular/router';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
+import _ from 'lodash';
 
 @Component({
     selector: 'app-custom-clearance-edit',
@@ -25,6 +26,7 @@ export class CustomClearanceEditComponent implements OnInit {
         await this.route.params.subscribe(prams => {
             if (prams.id != undefined) {
                 console.log(prams.id);
+                this.getClearanceType();
                 this.getListCustomer();
                 this.getCustomCleanranceById(prams.id);
             }
@@ -42,7 +44,30 @@ export class CustomClearanceEditComponent implements OnInit {
         const res = await this.baseServices.getAsync(this.api_menu.ToolSetting.CustomClearance.details + id, true, true);
         console.log(res);
         this.customDeclaration = res;
+
+        console.log(this.listCustomer);
+        const _customer = _.find(this.listCustomer, { 'taxCode': this.customDeclaration.partnerTaxCode });
+        this.customerCurrent = _customer != undefined ? _customer.taxCode : '';
+        console.log('customerCurrent: ' + this.customerCurrent);
+
         this.customDeclaration.clearanceDate = this.customDeclaration.clearanceDate == null ? this.customDeclaration.clearanceDate : { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate) };
+        
+        const _serviceType = _.find(this.serviceTypes, { 'id': this.customDeclaration.serviceType });
+        this.serviceTypeCurrent = _serviceType != undefined ? [_serviceType.id] : [];
+        console.log('serviceTypeCurrent: ' + this.serviceTypeCurrent);
+
+        const _typeClearance = _.find(this.typeClearance, { 'id': this.customDeclaration.type });
+        this.typeClearanceCurrent = _typeClearance != undefined ? [_typeClearance.id] : [];
+        console.log('typeClearanceCurrent: ' + this.typeClearanceCurrent);
+        
+        const _routeClearance = _.find(this.routeClearance, { 'id' : this.customDeclaration.route});
+        this.routeClearanceCurrent = _routeClearance != undefined ? [_routeClearance.id] : [];
+        console.log('routeClearanceCurrent: ' + this.routeClearanceCurrent);
+
+        const _cargoType = _.find(this.cargoTypes, { 'id' : this.customDeclaration.cargoType});
+        this.cargoTypeCurrent = _cargoType != undefined ? [_cargoType.id] : [];
+        console.log('cargoTypeCurrent: ' + this.cargoTypeCurrent);
+
     }
 
     updateCustomClearance() {
@@ -54,6 +79,16 @@ export class CustomClearanceEditComponent implements OnInit {
         const res = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: 3 });
         console.log(res);
         this.listCustomer = res;
+    }
+
+    getClearanceType() {
+        this.baseServices.get(this.api_menu.ToolSetting.CustomClearance.getClearanceTypes).subscribe((res: any) => {
+            console.log(res);
+            this.serviceTypes = res.serviceTypes.map(x => ({ "text": x.displayName, "id": x.value }));
+            this.typeClearance = res.types.map(x => ({ "text": x.displayName, "id": x.value }));
+            this.routeClearance = res.routes.map(x => ({ "text": x.displayName, "id": x.value }));
+            this.cargoTypes = res.cargoTypes.map(x => ({ "text": x.displayName, "id": x.value }));
+        });
     }
 
     /**
@@ -85,10 +120,19 @@ export class CustomClearanceEditComponent implements OnInit {
     public items: Array<string> = ['option 1', 'option 2', 'option 3', 'option 4', 'option 5', 'option 6', 'option 7'];
 
     statusClearance: Array<string> = ['All', 'Imported', 'Not imported'];
-    typeClearance: Array<string> = ['All', 'Export', 'Imported'];
 
-    serveiceType: Array<string> = ['Air', 'Sea', 'Cross border', 'Warehouse', 'Inland', 'Railway', 'Express'];
+    serviceTypes: any = [];
+    typeClearance: any = [];
+    routeClearance: any = [];
+    cargoTypes: any = [];
+    
+    customerCurrent: string = '';
 
+    serviceTypeCurrent: any = [];
+    typeClearanceCurrent: any = [];
+    routeClearanceCurrent: any = [];
+    cargoTypeCurrent: any = [];
+    
     packagesUnit: Array<string> = ['PKG', 'PCS', 'BOX', 'CNTS'];
     packagesUnitActive = ['PKG'];
 

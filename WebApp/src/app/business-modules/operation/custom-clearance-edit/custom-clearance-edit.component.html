@@ -75,11 +75,11 @@
                             </div> -->
 
                             <app-combo-grid-virtual-scroll
-                                [currentActiveItemId]="{field:'taxCode',value:customDeclaration.partnerTaxCode}"
+                                [currentActiveItemId]="{field:'taxCode',value:customerCurrent,hardValue:''}"
                                 [selectedDisplayFields]="['partnerNameEn']" [dataSources]="listCustomer"
                                 [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                             </app-combo-grid-virtual-scroll>
-                            
+
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -125,9 +125,10 @@
                             <label class="form-control-label" for="">
                                 Service Type
                             </label>
-                            <ng-select [allowClear]="true" [items]="serveiceType" [disabled]="disabled"
-                                (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
-                                (typed)="typed($event)" placeholder="Select filter">
+                            <ng-select [allowClear]="true" [items]="serviceTypes" [disabled]="disabled"
+                                [active]="serviceTypeCurrent" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select filter">
                             </ng-select>
                         </div>
                     </div>
@@ -185,8 +186,9 @@
                                 Type
                             </label>
                             <ng-select [allowClear]="true" [items]="typeClearance" [disabled]="disabled"
-                                (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
-                                (typed)="typed($event)" placeholder="Select filter">
+                                [active]="typeClearanceCurrent" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select filter">
                             </ng-select>
                         </div>
                     </div>
@@ -195,9 +197,10 @@
                             <label class="form-control-label" for="">
                                 Route
                             </label>
-                            <ng-select [allowClear]="true" [items]="['Red', 'Green', 'Yellow']" [disabled]="disabled"
-                                (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
-                                (typed)="typed($event)" placeholder="Select filter">
+                            <ng-select [allowClear]="true" [items]="routeClearance" [disabled]="disabled"
+                                [active]="routeClearanceCurrent" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select filter">
                             </ng-select>
                         </div>
                     </div>
@@ -208,9 +211,9 @@
                             <label class="form-control-label" for="">
                                 Cargo Type
                             </label>
-                            <ng-select [allowClear]="true" [items]="['LCL', 'FCL']" [disabled]="disabled"
-                                (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
-                                (typed)="typed($event)" placeholder="Select filter">
+                            <ng-select [allowClear]="true" [items]="cargoTypes" [disabled]="disabled"
+                                [active]="cargoTypeCurrent" (data)="refreshValue($event)" (selected)="selected($event)"
+                                (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
                             </ng-select>
                         </div>
                     </div>
