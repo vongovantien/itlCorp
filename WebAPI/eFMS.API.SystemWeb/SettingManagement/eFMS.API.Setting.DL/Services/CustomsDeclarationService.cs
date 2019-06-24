@@ -123,9 +123,9 @@ namespace eFMS.API.Setting.DL.Services
                 PortCodeCk = clearance.MA_CK,
                 PortCodeNn = clearance.MA_CANGNN,
                 ExportCountryCode = clearance.NUOC_XK,
-                ImportcountryCode = clearance.NUOC_NK,
+                ImportCountryCode = clearance.NUOC_NK,
                 Pcs = clearance.SO_KIEN == null ? (int?)clearance.SO_KIEN : null,
-                UnitId = clearance.DVT_KIEN,
+                UnitCode = clearance.DVT_KIEN,
                 QtyCont = clearance.SO_CONTAINER == null ? (int?)clearance.SO_CONTAINER : null,
                 GrossWeight = clearance.TR_LUONG,
                 Route = clearance.PLUONG,
@@ -202,7 +202,7 @@ namespace eFMS.API.Setting.DL.Services
             //var portIndexs = dc.CatPlace.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port));
             //var customers = dc.CatPartner.Where(x => x.PartnerGroup == GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER));
             var clearances = (from clearance in list
-                              join importCountry in countries on clearance.ImportcountryCode equals importCountry.Code into grpImports
+                              join importCountry in countries on clearance.ImportCountryCode equals importCountry.Code into grpImports
                               from imCountry in grpImports.DefaultIfEmpty()
                               join exportCountry in countries on clearance.ExportCountryCode equals exportCountry.Code into grpExports
                               from exCountry in grpExports.DefaultIfEmpty()
@@ -266,10 +266,10 @@ namespace eFMS.API.Setting.DL.Services
             }
             return result;
         }
- 		public CustomsDeclaration GetById(string id)
+ 		public CustomsDeclaration GetById(int id)
         {
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var result = dc.CustomsDeclaration.Where(x => x.Id == Int32.Parse(id)).FirstOrDefault();
+            var result = dc.CustomsDeclaration.Where(x => x.Id == id).FirstOrDefault();
             return result;
         }
         public List<CustomsDeclarationModel> Query(CustomsDeclarationCriteria criteria)

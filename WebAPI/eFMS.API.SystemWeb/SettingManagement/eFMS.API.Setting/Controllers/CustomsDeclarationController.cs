@@ -241,7 +241,7 @@ namespace eFMS.API.Setting.Controllers
         /// <param name="id">id that want to retrieve custom declarations</param>
         /// <returns></returns>
         [HttpGet("GetById/{id}")]
-        public IActionResult GetById(string id)
+        public IActionResult GetById(int id)
         {
             var results = customsDeclarationService.GetById(id);
             return Ok(results);

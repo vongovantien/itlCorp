@@ -16,7 +16,7 @@ namespace eFMS.API.Setting.Service.Models
         public string Hblid { get; set; }
         public string PortCodeCk { get; set; }
         public string PortCodeNn { get; set; }
-        public string UnitId { get; set; }
+        public string UnitCode { get; set; }
         public int? QtyCont { get; set; }
         public string ServiceType { get; set; }
         public string Gateway { get; set; }
@@ -24,8 +24,8 @@ namespace eFMS.API.Setting.Service.Models
         public string Route { get; set; }
         public string DocumentType { get; set; }
         public string ExportCountryCode { get; set; }
-        public string ImportcountryCode { get; set; }
-        public int? CommodityId { get; set; }
+        public string ImportCountryCode { get; set; }
+        public string CommodityCode { get; set; }
         public decimal? GrossWeight { get; set; }
         public decimal? NetWeight { get; set; }
         public decimal? Cbm { get; set; }
