@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterViewChecked, Input, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
+import { AcctSoaDetails } from 'src/app/shared/models/document/acctSoaDetails.model';
 declare var $: any;
 
 @Component({
@@ -15,7 +16,10 @@ export class OpsModuleCreditDebitNoteDetailComponent implements OnInit, AfterVie
   STORAGE_DATA: any = null;
   currentSOANo: string = null;
   currentJobID: string = null;
-  CDNoteEditing: any = null;
+  CDNoteDetails: AcctSoaDetails = null;
+  previewModalId = "preview-modal";
+  dataReport: any;
+
   ngAfterViewChecked(): void {
     this.open = true;
     this.cdr.detectChanges();
@@ -32,15 +36,15 @@ export class OpsModuleCreditDebitNoteDetailComponent implements OnInit, AfterVie
   }
 
   async getSOADetails(soaNo: string) {
-    this.CDNoteEditing = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.currentJobID + "&soaNo=" + soaNo);
-    console.log(this.CDNoteEditing);
+    this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.currentJobID + "&soaNo=" + soaNo);
+    console.log(this.CDNoteDetails);
   }
 
 
   editCDNote() {
     $('#ops-credit-debit-note-detail-modal').modal('hide');
     $('#ops-credit-debit-note-edit-modal').modal('show');
-    this.baseServices.setData("CDNoteEditing", this.CDNoteEditing);
+    this.baseServices.setData("CDNoteDetails", this.CDNoteDetails);
   }
 
 
@@ -67,4 +71,28 @@ export class OpsModuleCreditDebitNoteDetailComponent implements OnInit, AfterVie
 
   }
 
+  Close(){
+    $('#ops-credit-debit-note-detail-modal').modal('hide');
+  }
+
+  async Preview(){
+    this.dataReport = null;
+    if(this.CDNoteDetails.listSurcharges.length===0){
+      this.baseServices.errorToast("This credit debit node must have at least 1 surcharge !");
+    }else{
+      var response = await this.baseServices.postAsync(this.api_menu.Documentation.AcctSOA.previewCDNote,this.CDNoteDetails);
+      console.log(response);
+      this.dataReport = response;
+      var _this = this;
+      var checkExist = setInterval(function() {
+        if ($('#frame').length) {
+            console.log("Exists!");
+            $('#' + _this.previewModalId).modal('show');
+            clearInterval(checkExist);
+        }
+     }, 100);
+    }
+}
+
+  
 }

@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Documentation.Service.ViewModels;
@@ -251,7 +253,7 @@ namespace eFMS.API.Documentation.DL.Services
             return listCharges;
         }
 
-        public object GetSOADetails(Guid JobId, string SOACode)
+        public AcctSOADetailsModel GetSOADetails(Guid JobId, string SOACode)
         {
             
             var Soa = DataContext.Where(x => x.Code == SOACode).FirstOrDefault();
@@ -329,36 +331,59 @@ namespace eFMS.API.Documentation.DL.Services
 
 
 
-            var returnObj = new
-            {
-                partnerNameEn = partner?.PartnerNameEn,
-                partnerShippingAddress = partner?.AddressShippingEn,
-                partnerTel = partner?.Tel,
-                partnerTaxcode = partner?.TaxCode,
-                partnerId = partner?.Id,
-                hbLadingNo = hbOfLadingNo,
-                mbLadingNo = mbOfLadingNo,
-                jobId = Shipment1 != null? Shipment1.Id:Shipment2.Id, 
-                pol = pol?.NameEn,
-                polCountry = pol==null?null:countries.Where(x => x.Id == pol.CountryId).FirstOrDefault()?.NameEn,
+            //var returnObj = new
+            //{
+            //    partnerNameEn = partner?.PartnerNameEn,
+            //    partnerShippingAddress = partner?.AddressShippingEn,
+            //    partnerTel = partner?.Tel,
+            //    partnerTaxcode = partner?.TaxCode,
+            //    partnerId = partner?.Id,
+            //    hbLadingNo = hbOfLadingNo,
+            //    mbLadingNo = mbOfLadingNo,
+            //    jobId = Shipment1 != null? Shipment1.Id:Shipment2.Id, 
+            //    pol = pol?.NameEn,
+            //    polCountry = pol==null?null:countries.Where(x => x.Id == pol.CountryId).FirstOrDefault()?.NameEn,
 
-                pod = pod?.NameEn,
-                podCountry = pod==null?null:countries.Where(x => x.Id == pod.CountryId).FirstOrDefault()?.NameEn,
+            //    pod = pod?.NameEn,
+            //    podCountry = pod==null?null:countries.Where(x => x.Id == pod.CountryId).FirstOrDefault()?.NameEn,
 
-                vessel = Shipment1!=null?Shipment1.FlightVesselName:Shipment2.FlightVessel, 
-                hbConstainers,
-                etd= Shipment1!=null?Shipment1.Etd:Shipment2.ServiceDate,  //Shipment?.Etd,
-                eta= Shipment1!=null?Shipment1.Eta:Shipment2.FinishDate, //Shipment?.Eta,
-                //soaNo = Soa.Code,
-                isLocked = false, // need update later 
-                volum,
-                listSurcharges,
-                Soa
-                //charges
+            //    vessel = Shipment1!=null?Shipment1.FlightVesselName:Shipment2.FlightVessel, 
+            //    hbConstainers,
+            //    etd= Shipment1!=null?Shipment1.Etd:Shipment2.ServiceDate,  //Shipment?.Etd,
+            //    eta= Shipment1!=null?Shipment1.Eta:Shipment2.FinishDate, //Shipment?.Eta,
+            //    //soaNo = Soa.Code,
+            //    isLocked = false, // need update later 
+            //    volum,
+            //    listSurcharges,
+            //    Soa
+            //    //charges
 
-            };
+            //};
 
-            return returnObj;
+            AcctSOADetailsModel SoaDetails = new AcctSOADetailsModel();
+            SoaDetails.PartnerNameEn = partner?.PartnerNameEn;
+            SoaDetails.PartnerShippingAddress = partner?.AddressShippingEn;
+            SoaDetails.PartnerTel = partner?.Tel;
+            SoaDetails.PartnerTaxcode = partner?.TaxCode;
+            SoaDetails.PartnerId = partner?.Id;
+            SoaDetails.HbLadingNo = hbOfLadingNo;
+            SoaDetails.MbLadingNo = mbOfLadingNo;
+            SoaDetails.JobId = Shipment1 != null ? Shipment1.Id : Shipment2.Id;
+            SoaDetails.Pol = pol?.NameEn;
+            SoaDetails.PolCountry = pol == null ? null : countries.Where(x => x.Id == pol.CountryId).FirstOrDefault()?.NameEn;
+            SoaDetails.Pod = pod?.NameEn;
+            SoaDetails.PodCountry = pod == null ? null : countries.Where(x => x.Id == pod.CountryId).FirstOrDefault()?.NameEn;
+            SoaDetails.Vessel = Shipment1 != null ? Shipment1.FlightVesselName : Shipment2.FlightVessel;
+            SoaDetails.HbConstainers = hbConstainers;
+            SoaDetails.Etd = Shipment1 != null ? Shipment1.Etd : Shipment2.ServiceDate;
+            SoaDetails.Eta = Shipment1 != null ? Shipment1.Eta : Shipment2.FinishDate;
+            SoaDetails.IsLocked = false;
+            SoaDetails.Volum = volum;
+            SoaDetails.ListSurcharges = listSurcharges;
+            SoaDetails.Soa = Soa;
+
+
+            return SoaDetails;
 
         }
 
@@ -412,6 +437,126 @@ namespace eFMS.API.Documentation.DL.Services
                 hs = new HandleState(ex.Message);
             }
             return hs;
+        }
+
+        public Crystal Preview(AcctSOADetailsModel model)
+        {
+            if (model == null)
+            {
+                return null;
+            }
+            Crystal result = null;
+            var parameter = new AcctSOAReportParams
+            {
+               DBTitle = "N/A",
+               DebitNo = model.Soa.Code,
+               TotalDebit = model.TotalDebit?.ToString(),
+               TotalCredit = model.TotalCredit?.ToString(),
+               DueToTitle = "N/A",
+               DueTo = "N/A",
+               DueToCredit = "N/A",
+               SayWordAll = "N/A",
+               CompanyName = "N/A",
+               CompanyAddress1 = "N/A",
+               ComapnyAddress2 = "N/A",
+               Website = "efms.itlvn.com",
+               IbanCode = "N/A",
+               AccountName = "N/A",
+               BankName = "N/A",
+               SwiftAccs = "N/A",
+               AccsUSD = "N/A",
+               AccsVND = "N/A",
+               BankAddress = "N/A",
+               Paymentterms = "N/A",
+               DecimalNo = null,
+               CurrDecimal = null,
+               IssueInv = "N/A",
+               InvoiceInfo = "N/A",
+               Contact = "N/A",
+               IssueDate = null,
+               OtherRef = "N/A"
+            };
+            var listSOA = new List<AcctSOAReport>();
+            if (model.ListSurcharges.Count > 0)
+            {
+                foreach(var item in model.ListSurcharges)
+                {
+                    var acctsoa = new AcctSOAReport
+                    {
+                        SortIndex = null,
+                        Subject = null,
+                        PartnerID = model.PartnerId,
+                        PartnerName = model.PartnerNameEn,
+                        PersonalContact = "N/A",
+                        Address = model.PartnerShippingAddress,
+                        Taxcode = model.PartnerTaxcode,
+                        Workphone = model.PartnerTel,
+                        Fax =  "N/A",
+                        TransID = "N/A",
+                        LoadingDate = null,
+                        Commodity = "N/A",
+                        PortofLading = model.PolName,
+                        PortofUnlading = model.PodName,
+                        MAWB = model.MbLadingNo,
+                        Invoice = model.Soa.InvoiceNo,
+                        EstimatedVessel = "N/A",
+                        ArrivalDate = null,
+                        Noofpieces = null,
+                        Delivery = null,
+                        HWBNO = model.HbLadingNo,
+                        Description = "N/A",
+                        Quanity = null,
+                        QUnit = "N/A",
+                        UnitPrice = null,
+                        VAT = null,
+                        Debit = model.TotalDebit,
+                        Credit = model.TotalCredit,
+                        Notes = "N/A",
+                        InputData = "N/A",
+                        PONo = "N/A",
+                        TransNotes = "N/A",
+                        Shipper = "N/A",
+                        Consignee = "N/A",
+                        ContQty = model.HbConstainers,
+                        ContSealNo = "N/A",
+                        Deposit = null,
+                        DepositCurr = "N/A",
+                        DecimalSymbol = "N/A",
+                        DigitSymbol = "N/A",
+                        DecimalNo = null,
+                        CurrDecimalNo = null,
+                        VATInvoiceNo = "N/A",
+                        GW = null,
+                        NW = null,
+                        SeaCBM = null,
+                        SOTK = "N/A",
+                        NgayDK = null,
+                        Cuakhau = "N/A",
+                        DeliveryPlace = null,
+                        TransDate = null,
+                        Unit = "N/A",
+                        UnitPieaces = "N/A"                                                             
+
+                    };
+                    listSOA.Add(acctsoa);
+                }
+            }
+            else
+            {
+                return null;
+            }
+
+            result = new Crystal
+            {
+                ReportName = "LogisticsDebitNewDNTT.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddDataSource(listSOA);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameter);
+            return result;
+                
         }
     }
 }

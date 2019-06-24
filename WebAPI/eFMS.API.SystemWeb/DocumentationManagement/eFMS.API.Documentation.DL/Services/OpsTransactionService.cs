@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Documentation.Service.ViewModels;
@@ -161,6 +163,53 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var list = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetOpsTransaction>(null);
             return list;
+        }
+
+        public Crystal PreviewCDNOte(AcctSOADetailsModel model)
+        {
+            if (model == null)
+            {
+                return null;
+            }
+            Crystal result = null;
+            var parameter = new AcctSOAReportParams
+            {
+                DBTitle = "DB title",
+                DebitNo = model.Soa.Code,
+                TotalDebit = model.TotalDebit?.ToString(),
+                TotalCredit = model.TotalCredit?.ToString(),
+                DueToTitle = "",
+                DueTo = "",
+                DueToCredit = "",
+                SayWordAll = "",
+                CompanyName = "",
+                CompanyDescription="",
+                CompanyAddress1 = "",
+                ComapnyAddress2 = "",
+                Website = "efms.itlvn.com",
+                IbanCode = "",
+                AccountName = "",
+                BankName = "",
+                SwiftAccs = "",
+                AccsUSD = "",
+                AccsVND = "",
+                BankAddress = "",
+                Paymentterms = "",
+                DecimalNo = null,
+                CurrDecimal = null,
+                IssueInv = "",
+                InvoiceInfo = "",
+                Contact = "",
+
+
+            };
+
+
+
+
+
+
+            return result;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using eFMS.API.Documentation.DL.Models;
+﻿using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Documentation.Service.ViewModels;
@@ -17,7 +18,8 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState UpdateSOA(AcctSOAModel model);
         HandleState DeleteSOA(Guid idSoA);
         List<object> GroupSOAByPartner(Guid JobId,bool IsHouseBillID);
-        object GetSOADetails(Guid JobId, string SOACode);
-        
+        AcctSOADetailsModel GetSOADetails(Guid JobId, string SOACode);
+        Crystal Preview(AcctSOADetailsModel model);
+
     }
 }
