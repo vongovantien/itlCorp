@@ -8,7 +8,7 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
     {
         public string All { get; set; }
         public string JobNo { get; set; }
-        public string Hblno { get; set; }
+        public string Hwbno { get; set; }
         public string ProductService { get; set; }
         public string ServiceMode { get; set; }
         public string ShipmentMode { get; set; }

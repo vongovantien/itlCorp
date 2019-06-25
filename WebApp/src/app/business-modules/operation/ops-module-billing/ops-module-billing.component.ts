@@ -117,14 +117,15 @@ export class OpsModuleBillingComponent implements OnInit {
           }, 100);
         this.getShipments();
     }
-    async showCustomClearance(jobId){
-        let responses = await this.baseServices.getAsync(this.api_menu.Documentation.CustomClearance.getByJob + "?jobId=" + jobId, false, true);
+    async showCustomClearance(jobNo){
+        let responses = await this.baseServices.getAsync(this.api_menu.ToolSetting.CustomClearance.getByJob + "?jobNo=" + jobNo, false, true);
         if(responses){
-            this.customClearances = responses;
+            this.customClearances = this.sortService.sort(responses, 'clearanceNo', true);;
         }
         else{
             this.customClearances = [];
         }
+        console.log(this.customClearances);
     }
     async confirmDelete(item: { id: string; }){
         this.itemToDelete = item;
@@ -144,13 +145,18 @@ export class OpsModuleBillingComponent implements OnInit {
         }
     }
     isDesc = true;
-    sortKey: string = "";
+    sortKey: string = "clearanceNo";
     sort(property) {
         this.isDesc = !this.isDesc;
         this.sortKey = property;
         this.shipments = this.sortService.sort(this.shipments, property, this.isDesc);
     }
-
+    isCusDesc = true;
+    sortClearance(property) {
+        this.isCusDesc = !this.isCusDesc;
+        this.sortKey = property;
+        this.customClearances = this.sortService.sort(this.customClearances, property, this.isCusDesc);
+    }
     async getCustomers(){
         let criteriaSearchColoader = { partnerGroup: PartnerGroupEnum.CUSTOMER, all: null };
         const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, criteriaSearchColoader, false, false);

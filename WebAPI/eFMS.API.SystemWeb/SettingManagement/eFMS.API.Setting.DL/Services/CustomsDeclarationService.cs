@@ -85,7 +85,7 @@ namespace eFMS.API.Setting.DL.Services
                 {
                     var clearanceNo = clearance.SOTK.ToString();
                     var itemExisted = clearances.FirstOrDefault(x => x.ClearanceNo == clearanceNo && x.ClearanceDate == clearance.NGAY_DK);
-                    if (itemExisted == null && clearance.SOTK != null)
+                    if (itemExisted == null || clearance.SOTK != null)
                     {
                         var newClearance = MapEcusClearanceToCustom(clearance, clearanceNo);
                         newClearance.Source = Constants.FromEFMS;
@@ -211,7 +211,8 @@ namespace eFMS.API.Setting.DL.Services
             {
                 query = query.And(x => x.JobNo == null);
             }
-            var list = DataContext.Paging(query, page, size, out rowsCount);
+            Expression<Func<CustomsDeclaration, object>> orderByProperty = x => x.DatetimeModified;
+            var list = DataContext.Paging(query, page, size, orderByProperty, false, out rowsCount);
             if (rowsCount == 0) return new List<CustomsDeclarationModel>();
             var results = MapClearancesToClearanceModels(list);
             return results;

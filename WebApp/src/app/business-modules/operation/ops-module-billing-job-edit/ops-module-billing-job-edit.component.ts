@@ -168,6 +168,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         this.opsTransaction.finishDate = this.finishDate.startDate != null? dataHelper.dateTimeToUTC(this.finishDate.startDate): null;
         let s = this.finishDate.startDate != null && this.serviceDate.startDate != null && (this.finishDate.startDate < this.serviceDate.startDate);
         if (form.invalid || this.opsTransaction.shipmentMode == null 
+            || this.opsTransaction.pod == this.opsTransaction.pol
             || this.opsTransaction.serviceMode == null 
             || this.opsTransaction.productService == null
             || this.opsTransaction.customerId == null 

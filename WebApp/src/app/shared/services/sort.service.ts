@@ -44,8 +44,15 @@ export class SortService {
 
     private prepareStringToSort(str:any){
         if(typeof str === "string"){
-            str = str.toString().toLowerCase();
-            return  deburr(str);
+            var x = Number("1000")
+            if(isNaN(x))
+            {
+                return x;
+            }
+            else{
+                str = str.toString().toLowerCase();
+                return  deburr(str);
+            }
         }
         if(typeof str === "number"){
             return str

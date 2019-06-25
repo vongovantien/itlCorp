@@ -267,7 +267,7 @@
                                 <div class="row">
 
                                     <div class="col-lg-4">
-                                        <div class="form-group">
+                                        <div class="form-group" [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && (opsTransaction.pol === opsTransaction.pod) && (opsTransaction.pol!==null)}">
                                             <label class="form-control-label" for="">
                                                 Port of Loading
                                             </label>
@@ -277,10 +277,14 @@
                                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports"
                                                 [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
                                             </app-combo-grid-virtual-scroll>
+                                            <div class="form-control-feedback"
+                                                *ngIf="addOpsForm.submitted && (opsTransaction.pol === opsTransaction.pod) && (opsTransaction.pol!==null)">
+                                                Port of loading is must be different with port of discharge
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
-                                        <div class="form-group">
+                                        <div class="form-group" [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && (opsTransaction.pol === opsTransaction.pod) && (opsTransaction.pol!==null)}">
                                             <label class="form-control-label" for="">
                                                 Port of Discharge
                                             </label>
@@ -290,6 +294,10 @@
                                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports"
                                                 [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
                                             </app-combo-grid-virtual-scroll>
+                                            <div class="form-control-feedback"
+                                                *ngIf="addOpsForm.submitted && (opsTransaction.pol === opsTransaction.pod) && (opsTransaction.pol!==null)">
+                                                Port of discharge must be different with port of loading
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
