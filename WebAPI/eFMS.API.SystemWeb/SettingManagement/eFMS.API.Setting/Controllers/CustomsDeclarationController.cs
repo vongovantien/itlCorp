@@ -229,17 +229,17 @@ namespace eFMS.API.Setting.Controllers
 
         private string CheckExist(CustomsDeclarationModel model, decimal id)
         {
-            string message = string.Empty;
+            string message = null;
             if (id == 0)
             {
-                if (customsDeclarationService.Any(x => x.ClearanceNo == model.ClearanceNo))
+                if (customsDeclarationService.Any(x => x.ClearanceNo == model.ClearanceNo && x.ClearanceDate == model.ClearanceDate))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CLEARANCENO_EXISTED].Value;
                 }
             }
             else
             {
-                if (customsDeclarationService.Any(x => (x.ClearanceNo == model.ClearanceNo && x.Id != id)))
+                if (customsDeclarationService.Any(x => (x.ClearanceNo == model.ClearanceNo && x.Id != id && x.ClearanceDate == model.ClearanceDate)))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CLEARANCENO_EXISTED].Value;
                 }

@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import find from 'lodash/find';
+import { NgForm } from '@angular/forms';
 
 @Component({
     selector: 'app-custom-clearance-edit',
@@ -95,20 +96,48 @@ export class CustomClearanceEditComponent implements OnInit {
         console.log('unitCurrent: ' + this.unitCurrent);
     }
 
-    updateCustomClearance() {
-        console.log(this.customDeclaration.clearanceNo)
+    obj: any = {};
+    async updateCustomClearance(form: NgForm) {
+        console.log(this.customerCurrent);
+        console.log(this.portCurrent);
+        if (this.customerCurrent == '' || this.portCurrent == '') return;
+        console.log(form.form.status);
+        if (form.form.status != "INVALID") {
+            this.obj.id = this.customDeclaration.id;
+            this.obj.clearanceNo = this.customDeclaration.clearanceNo;
+            this.obj.PartnerTaxCode = this.customerCurrent;//
+            this.obj.clearanceDate = this.customDeclaration.clearanceDate.endDate._d;
+            this.obj.hblid = this.customDeclaration.hblid;
+            this.obj.mblid = this.customDeclaration.mblid;
+            this.obj.serviceType = this.serviceTypeCurrent[0];//
+            this.obj.gateway = this.portCurrent;//
+            this.obj.type = this.typeClearanceCurrent[0];//
+            this.obj.route = this.routeClearanceCurrent[0];//
+            this.obj.cargoType = this.cargoTypeCurrent[0];//
+            this.obj.exportCountryCode = this.countryExportCurrent;//
+            this.obj.importCountryCode = this.countryImportCurrent;//
+            this.obj.commodityCode = this.commodityCurrent;//
+            this.obj.grossWeight = this.customDeclaration.grossWeight;
+            this.obj.netWeight = this.customDeclaration.netWeight;
+            this.obj.cbm = this.customDeclaration.cbm;
+            this.obj.qtyCont = this.customDeclaration.qtyCont;
+            this.obj.pcs = this.customDeclaration.pcs;
+            this.obj.unitCode = this.unitCurrent;//
+            this.obj.note = this.customDeclaration.note;
+            console.log(this.obj);
+            const respone = await this.baseServices.putAsync(this.api_menu.ToolSetting.CustomClearance.update, this.obj, true, true);
+            console.log(respone);
+        }
     }
 
     async getListCustomer() {
         //partnerGroup = 3 ~ Customer
         const res = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: 3 }, true, true);
-        //console.log(res);
         this.listCustomer = res;
     }
 
     getClearanceType() {
         this.baseServices.get(this.api_menu.ToolSetting.CustomClearance.getClearanceTypes).subscribe((res: any) => {
-            //console.log(res);
             this.serviceTypes = res.serviceTypes.map(x => ({ "text": x.displayName, "id": x.value }));
             this.typeClearance = res.types.map(x => ({ "text": x.displayName, "id": x.value }));
             this.routeClearance = res.routes.map(x => ({ "text": x.displayName, "id": x.value }));
@@ -119,27 +148,23 @@ export class CustomClearanceEditComponent implements OnInit {
     async getListPort() {
         //placeType = 8 ~ Port
         const res = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, { placeType: 8 }, true, true);
-        //console.log(res);
         this.listPort = res;
     }
 
     getListCountry() {
         this.baseServices.get(this.api_menu.Catalogue.Country.getAll).subscribe((res: any) => {
-            //console.log(res);
             this.listCountry = res;
         });
     }
 
     async getListCommodity() {
         const res = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, {}, true, true);
-        //console.log(res);
         this.listCommodity = res;
     }
 
     async getListUnit() {
         //unitType = Package
         const res = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: 'Package' }, true, true);
-        //console.log(res);
         this.listUnit = res;
     }
     /**
@@ -168,9 +193,6 @@ export class CustomClearanceEditComponent implements OnInit {
     /**
   * ng2-select
   */
-    public items: Array<string> = ['option 1', 'option 2', 'option 3', 'option 4', 'option 5', 'option 6', 'option 7'];
-
-    statusClearance: Array<string> = ['All', 'Imported', 'Not imported'];
 
     serviceTypes: any = [];
     typeClearance: any = [];
@@ -218,4 +240,42 @@ export class CustomClearanceEditComponent implements OnInit {
         this.value = value;
     }
 
+    public selectedServiceType(value: any): void {
+        console.log('Selected value is: ', value);
+        this.serviceTypeCurrent = [value.id];
+        if (this.serviceTypeCurrent[0] == 'Air' || this.serviceTypeCurrent[0] == 'Express') {
+            this.cargoTypeCurrent = [];
+        }
+    }
+
+    public selectedTypeClearance(value: any): void {
+        console.log('Selected value is: ', value);
+        this.typeClearanceCurrent = [value.id];
+    }
+
+    public selectedRouteClearance(value: any): void {
+        console.log('Selected value is: ', value);
+        this.routeClearanceCurrent = [value.id];
+    }
+
+    public selectedCargoType(value: any): void {
+        console.log('Selected value is: ', value);
+        this.cargoTypeCurrent = [value.id];
+    }
+
+    public removedServiceType(value: any): void {
+        this.serviceTypeCurrent = [];
+    }
+
+    public removedTypeClearance(value: any): void {
+        this.typeClearanceCurrent = [];
+    }
+
+    public removedRouteClearance(value: any): void {
+        this.routeClearanceCurrent = [];
+    }
+
+    public removedCargoType(value: any): void {
+        this.cargoTypeCurrent = [];
+    }
 }
