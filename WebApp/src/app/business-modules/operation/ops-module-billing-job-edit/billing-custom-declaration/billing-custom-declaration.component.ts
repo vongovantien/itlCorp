@@ -9,6 +9,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
 import * as lodash from 'lodash';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
+import { SortService } from 'src/app/shared/services/sort.service';
 
 @Component({
   selector: 'app-billing-custom-declaration',
@@ -33,7 +34,8 @@ export class BillingCustomDeclarationComponent implements OnInit {
   constructor(private baseServices: BaseService,
     private api_menu: API_MENU,
     private pagerService: PagingService,
-    private cdr: ChangeDetectorRef) { }
+    private cdr: ChangeDetectorRef,
+    private sortService: SortService) { }
 
   async ngOnInit() {
     await this.stateChecking();
@@ -79,6 +81,18 @@ export class BillingCustomDeclarationComponent implements OnInit {
       }
     }
   }
+  isDesc = true;
+  sortKey: string = "";
+  sort(property, isImported = true) {
+      this.isDesc = !this.isDesc;
+      this.sortKey = property;
+      if(isImported){
+        this.customClearances = this.sortService.sort(this.customClearances, property, this.isDesc);
+      }
+      else{
+        this.notImportedCustomClearances = this.sortService.sort(this.notImportedCustomClearances, property, this.isDesc);
+      }
+  }
   async removeImported(){
     let dataToUpdate = this.importedData.filter(x => x.isChecked == true);
     if(dataToUpdate.length > 0){
@@ -88,6 +102,7 @@ export class BillingCustomDeclarationComponent implements OnInit {
       let responses = await this.baseServices.postAsync(this.api_menu.ToolSetting.CustomClearance.updateToAJob, dataToUpdate, false, true);
       if(responses.success == true){
         await this.getCustomClearanesOfJob(this.currentJob.jobNo);
+        this.updateShipmentVolumn();
         this.getCustomClearancesNotImported();
       }
     }
@@ -167,9 +182,23 @@ export class BillingCustomDeclarationComponent implements OnInit {
       let responses = await this.baseServices.postAsync(this.api_menu.ToolSetting.CustomClearance.updateToAJob, dataToUpdate, false, true);
       if(responses.success == true){
         await this.getCustomClearanesOfJob(this.currentJob.jobNo);
+        this.updateShipmentVolumn();
         this.getCustomClearancesNotImported();
         this.setPageMaster(this.pagerMaster);
       }
+    }
+  }
+  async updateShipmentVolumn(){
+    if(this.importedData.length > 0){
+      this.currentJob.sumGrossWeight = 0;
+      this.currentJob.sumNetWeight = 0;
+      this.currentJob.sumCbm = 0;
+      for(let i=0; i< this.importedData.length; i++){
+        this.currentJob.sumGrossWeight = this.currentJob.sumGrossWeight + this.importedData[i].grossWeight==null?0: this.importedData[i].grossWeight;
+        this.currentJob.sumNetWeight = this.currentJob.sumNetWeight + this.importedData[i].netWeight==null?0: this.importedData[i].netWeight;
+        this.currentJob.sumCbm = this.currentJob.sumCbm + this.importedData[i].sumCbm==null?0: this.importedData[i].sumCbm;
+      }
+      await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.currentJob, false, false);
     }
   }
   removeAllChecked(){

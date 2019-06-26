@@ -4,11 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.NoSql;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
@@ -88,6 +90,7 @@ namespace eFMS.API.Documentation.Controllers
         /// </summary>
         /// <param name="model">object to add</param>
         /// <returns></returns>
+        [Authorize]
         [HttpPost]
         [Route("Add")]
         public IActionResult Add(OpsTransactionModel model)
@@ -113,6 +116,7 @@ namespace eFMS.API.Documentation.Controllers
         /// </summary>
         /// <param name="model">object to update</param>
         /// <returns></returns>
+        [Authorize]
         [HttpPut]
         [Route("Update")]       
         public IActionResult Update(OpsTransactionModel model)
@@ -124,7 +128,7 @@ namespace eFMS.API.Documentation.Controllers
             }
 
             model.ModifiedDate = DateTime.Now;
-            model.UserModified = "admin"; //currentUser.UserID
+            model.UserModified = currentUser.UserID;
             var hs = transactionService.Update(model,x=>x.Id==model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -140,10 +144,12 @@ namespace eFMS.API.Documentation.Controllers
         /// </summary>
         /// <param name="id">id of item that want to delete</param>
         /// <returns></returns>
+        [Authorize]
         [HttpDelete]
         [Route("Delete/{id}")]
         public IActionResult Delete(Guid id)
         {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             if (transactionService.CheckAllowDelete(id) == false)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_NOT_ALLOW_DELETED].Value });

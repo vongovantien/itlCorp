@@ -8,6 +8,7 @@ using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Documentation.Service.ViewModels;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
@@ -25,19 +26,21 @@ namespace eFMS.API.Documentation.DL.Services
         //private ICatPlaceApiService catplaceApi;
         //private ICatPartnerApiService catPartnerApi;
         //private ISysUserApiService sysUserApi;
+        private readonly ICurrentUser currentUser;
 
-        public OpsTransactionService(IContextBase<OpsTransaction> repository, IMapper mapper) : base(repository, mapper)
+        public OpsTransactionService(IContextBase<OpsTransaction> repository, IMapper mapper, ICurrentUser user) : base(repository, mapper)
         {
             //catStageApi = stageApi;
             //catplaceApi = placeApi;
             //catPartnerApi = partnerApi;
             //sysUserApi = userApi;
+            currentUser = user;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
             model.Id = Guid.NewGuid();
             model.CreatedDate = DateTime.Now;
-            model.UserCreated = "admin"; //currentUser.UserID;
+            model.UserCreated = currentUser.UserID; //currentUser.UserID;
             model.ModifiedDate = model.CreatedDate;
             model.UserModified = model.UserCreated;
             int countNumberJob = ((eFMSDataContext)DataContext.DC).OpsTransaction.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
@@ -47,6 +50,7 @@ namespace eFMS.API.Documentation.DL.Services
         }
         public HandleState Delete(Guid id)
         {
+
             var result = DataContext.Delete(x => x.Id == id);
             if (result.Success)
             {

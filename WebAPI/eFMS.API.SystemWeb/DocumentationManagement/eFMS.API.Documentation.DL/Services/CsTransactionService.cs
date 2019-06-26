@@ -15,13 +15,17 @@ using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Common;
 using System.Data.SqlClient;
 using eFMS.API.Documentation.Service.Contexts;
+using eFMS.API.Common.NoSql;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.Documentation.DL.Services
 {
     public class CsTransactionService : RepositoryBase<CsTransaction, CsTransactionModel>, ICsTransactionService
     {
-        public CsTransactionService(IContextBase<CsTransaction> repository, IMapper mapper) : base(repository, mapper)
+        private readonly ICurrentUser currentUser;
+        public CsTransactionService(IContextBase<CsTransaction> repository, IMapper mapper, ICurrentUser user) : base(repository, mapper)
         {
+            currentUser = user;
         }
 
         public object AddCSTransaction(CsTransactionEditModel model)
@@ -104,6 +108,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         public HandleState DeleteCSTransaction(Guid jobId)
         {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = new HandleState();
             try
             {
