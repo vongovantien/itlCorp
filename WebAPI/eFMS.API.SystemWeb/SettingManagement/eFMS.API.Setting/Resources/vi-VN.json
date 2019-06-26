@@ -11,5 +11,6 @@
   "MSG_CODE_EXISTED": "Code đã tồn tại",
   "MSG_DELETE_FAIL_INCLUDED_CHILD": "Dữ liệu có quan hệ, không thể xóa",
   "EF_ANNOTATIONS_REQUIRED": "Field [{0}] là bắt buộc",
-  "EF_ANNOTATIONS_STRING_LENGTH": "Trường [{0}] phải là chuỗi và có {2}-{1} ký tự"
+  "EF_ANNOTATIONS_STRING_LENGTH": "Trường [{0}] phải là chuỗi và có {2}-{1} ký tự",
+  "MSG_CLEARANCENO_EXISTED": "Custom No [{0}] đã tồn tại ! Vui lòng kiểm tra lại?"
 }

@@ -112,7 +112,7 @@ namespace eFMS.API.Setting.Controllers
         public IActionResult AddNew(CustomsDeclarationModel model)
         {
             var existedMessage = CheckExist(model, model.Id);
-            if (existedMessage.Length >0)
+            if (existedMessage != null)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }

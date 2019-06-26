@@ -6,12 +6,12 @@ export class CustomClearance {
     clearanceNo: string = null;
     firstClearanceNo: null;
     partnerTaxCode: null;
-    clearanceDate: null;
+    clearanceDate: any;
     mblid: null;
     hblid: null;
     portCodeCk: null;
     portCodeNn: null;
-    unitId: null;
+    unitCode: null;
     qtyCont: null;
     serviceType: null;
     gateway: null;
@@ -34,5 +34,6 @@ export class CustomClearance {
     customerName: null;
     importCountryName: null;
     exportCountryName: null;
-    gatewayName: null
+    gatewayName: null;
+    cargoType: null;
 }
