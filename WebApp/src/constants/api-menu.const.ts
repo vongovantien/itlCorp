@@ -249,7 +249,8 @@ export class API_MENU {
             getByJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/GetBy",
             query: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/Query",
             updateToAJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/UpdateJobToClearances",
-            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/Update"
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/Update",
+            add: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/Add"
         }
     }
 

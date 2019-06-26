@@ -11,5 +11,5 @@
   "MSG_DELETE_FAIL_INCLUDED_CHILD": "Data include child. Delete denied",
   "EF_ANNOTATIONS_REQUIRED": "The [{0}] field is required",
   "EF_ANNOTATIONS_STRING_LENGTH": "The [{0}] field must be charater trom {2}-{1} characters",
-  "MSG_CLEARANCENO_EXISTED": "Clearance No has been existed"
+  "MSG_CLEARANCENO_EXISTED": "Custom No [{0}] existed ! Please recheck it?" //"Clearance No has been existed"
 }
