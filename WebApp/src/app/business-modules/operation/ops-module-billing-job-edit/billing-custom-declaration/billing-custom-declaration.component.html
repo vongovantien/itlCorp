@@ -8,7 +8,9 @@
                     <div class="form-group">
                         <div class="m-input-icon m-input-icon--left">
                             <input type="text" class="form-control m-input m-input--square" placeholder="Search..."
-                                autocomplete="nope" name="searchHouse">
+                                autocomplete="nope" name="searchImportedString" [(ngModel)]="searchImportedString" 
+                                (change)="searchImportedString = searchImportedString.trim()"
+                                (keyup)="searchClearanceImported($event)">
                             <span class="m-input-icon__icon m-input-icon__icon--left">
                                 <span>
                                     <i class="la la-search"></i>
@@ -174,8 +176,8 @@
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add Custom Declaration - Custommer <span class="m--font-danger">Partner name</span></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="checkAllNotImported = false;changeAllNotImported(); refreshData()">
+                <h5 class="modal-title">Add Custom Declaration</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="checkAllNotImported = false;changeAllNotImported(); closePopUp()">
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <div class="modal-actions c-button-actions">
@@ -350,7 +352,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="checkAllNotImported = false;changeAllNotImported(); refreshData()">
+                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="checkAllNotImported = false;changeAllNotImported(); closePopUp()">
                     <span>
                         <i class="la la-ban"></i>
                         <span>

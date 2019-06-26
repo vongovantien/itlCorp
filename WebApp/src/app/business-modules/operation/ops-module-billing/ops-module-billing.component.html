@@ -286,7 +286,7 @@
                                                 <td class="table-actions-col">
                                                     <div class="table-actions" style="width: 100px">
                                                         <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" [attr.data-target]="'#ops-shipment-00' + (item.id+1)"
-                                                            title="Collapse" (click)="showCustomClearance(item.id)">
+                                                            title="Collapse" (click)="showCustomClearance(item.jobNo)">
                                                             <i class="la la-angle-up"></i>
                                                         </button>
                                                         <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" [routerLink]="['/home/operation/job-edit', { id: item.id }]"
@@ -356,31 +356,40 @@
                                                             <table class="table table-secondary dataTable">
                                                                 <thead>
                                                                     <tr>
-                                                                        <th class="sorting_asc">
+                                                                        <th class="sorting" [ngClass]="{ 'sorting_asc ': (isCusDesc && sortKey == 'clearanceNo'), 'sorting_desc': (!isCusDesc && sortKey == 'clearanceNo') }"
+                                                                            (click)="sortClearance('clearanceNo')">
                                                                             <span>Custom No</span>
                                                                         </th>
-                                                                        <th class="sorting">
+                                                                        <th class="sorting" [ngClass]="{ 'sorting_asc ': (isCusDesc && sortKey == 'clearanceDate'), 'sorting_desc': (!isCusDesc && sortKey == 'clearanceDate') }"
+                                                                            (click)="sortClearance('clearanceDate')">
                                                                             <span>Transfer Date</span>
                                                                         </th>
-                                                                        <th class="sorting">
+                                                                        <th class="sorting" [ngClass]="{ 'sorting_asc ': (isCusDesc && sortKey == 'hblid'), 'sorting_desc': (!isCusDesc && sortKey == 'hblid') }"
+                                                                            (click)="sortClearance('hblid')">
                                                                             <span>HBL No</span>
                                                                         </th>
-                                                                        <th class="sorting">
+                                                                        <th class="sorting" [ngClass]="{ 'sorting_asc ': (isCusDesc && sortKey == 'exportCountryCode'), 'sorting_desc': (!isCusDesc && sortKey == 'exportCountryCode') }"
+                                                                            (click)="sortClearance('exportCountryCode')">
                                                                             <span>Export Country</span>
                                                                         </th>
-                                                                        <th class="sorting">
+                                                                        <th class="sorting" [ngClass]="{ 'sorting_asc ': (isCusDesc && sortKey == 'importCountryCode'), 'sorting_desc': (!isCusDesc && sortKey == 'importCountryCode') }"
+                                                                            (click)="sortClearance('importCountryCode')">
                                                                             <span>Import Country</span>
                                                                         </th>
-                                                                        <th class="sorting">
+                                                                        <th class="sorting" [ngClass]="{ 'sorting_asc ': (isCusDesc && sortKey == 'commodityCode'), 'sorting_desc': (!isCusDesc && sortKey == 'commodityCode') }"
+                                                                            (click)="sortClearance('commodityCode')">
                                                                             <span>Commodity Code</span>
                                                                         </th>
-                                                                        <th class="sorting">
+                                                                        <th class="sorting" [ngClass]="{ 'sorting_asc ': (isCusDesc && sortKey == 'qtyCont'), 'sorting_desc': (!isCusDesc && sortKey == 'qtyCont') }"
+                                                                            (click)="sortClearance('qtyCont')">
                                                                             <span>Q'ty</span>
                                                                         </th>
-                                                                        <th class="sorting">
+                                                                        <th class="sorting" [ngClass]="{ 'sorting_asc ': (isCusDesc && sortKey == 'source'), 'sorting_desc': (!isCusDesc && sortKey == 'source') }"
+                                                                            (click)="sortClearance('source')">
                                                                             <span>Source</span>
                                                                         </th>
-                                                                        <th class="sorting">
+                                                                        <th class="sorting" [ngClass]="{ 'sorting_asc ': (isCusDesc && sortKey == 'note'), 'sorting_desc': (!isCusDesc && sortKey == 'note') }"
+                                                                            (click)="sortClearance('note')">
                                                                             <span>Note</span>
                                                                         </th>
                                                                     </tr>
@@ -391,25 +400,25 @@
                                                                             <span>{{ clearance.clearanceNo }}</span>
                                                                         </td>
                                                                         <td>
-                                                                            <span>{{ clearance.clearanceDate | date:'dd MMM yyyy' }}</span>
+                                                                            <span>{{ clearance.clearanceDate | date:'dd/MM/yyyy' }}</span>
                                                                         </td>
                                                                         <td>
-                                                                            <span>{{ clearance.hwbno }}</span>
+                                                                            <span>{{ clearance.hblid }}</span>
                                                                         </td>
                                                                         <td>
-                                                                            <span>{{ clearance.exportCountryName }}</span>
+                                                                            <span>{{ clearance.exportCountryCode }}</span>
                                                                         </td>
                                                                         <td>
-                                                                            <span>{{ clearance.importcountryName }}</span>
+                                                                            <span>{{ clearance.importCountryCode }}</span>
                                                                         </td>
                                                                         <td>
                                                                             <span>{{ clearance.commodityCode }}</span>
                                                                         </td>
                                                                         <td>
-                                                                            <span>{{ clearance.contQuantity }}</span>
+                                                                            <span>{{ clearance.qtyCont }}</span>
                                                                         </td>
                                                                         <td>
-                                                                            <span>{{ clearance.Source }}</span>
+                                                                            <span>{{ clearance.source }}</span>
                                                                         </td>
                                                                         <td>
                                                                             <span>{{ clearance.note }}</span>

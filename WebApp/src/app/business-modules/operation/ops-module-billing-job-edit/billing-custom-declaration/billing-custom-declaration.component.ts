@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { BaseService } from 'src/services-base/base.service';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
 import { API_MENU } from 'src/constants/api-menu.const';
@@ -24,9 +24,11 @@ export class BillingCustomDeclarationComponent implements OnInit {
   notImportedData: any[];
   importedData: any[];
   searchString: string = '';
+  searchImportedString: string = '';
   checkAllNotImported = false;
   checkAllImported = false;
-  @ViewChild('pagingNotImported',{static:false}) pagingNotImported: PaginationComponent;
+  dataNotImportedSearch: any[];
+  dataImportedSearch: any[];
 
   constructor(private baseServices: BaseService,
     private api_menu: API_MENU,
@@ -44,10 +46,12 @@ export class BillingCustomDeclarationComponent implements OnInit {
         element.isChecked = false;
       });
     }
+    this.dataImportedSearch = this.importedData;
     this.setPageMaster(this.pager);
   }
 
   async stateChecking() {
+    this.baseServices.spinnerShow();
     setTimeout(() => {
       this.baseServices.dataStorage.subscribe(data => {
         if(data["CurrentOpsTransaction"] != null){
@@ -60,6 +64,8 @@ export class BillingCustomDeclarationComponent implements OnInit {
         }
       }); 
     }, 1000);
+    
+    this.baseServices.spinnerHide();
   }
   removeChecked(){
     this.checkAllImported = false;
@@ -80,18 +86,23 @@ export class BillingCustomDeclarationComponent implements OnInit {
         x.jobNo = null;
       });
       let responses = await this.baseServices.postAsync(this.api_menu.ToolSetting.CustomClearance.updateToAJob, dataToUpdate, false, true);
-      if(responses == true){
-        this.checkAllNotImported = false;
-        this.changeAllNotImported();
-        this.pager.currentPage = 1;
-        this.setPage(this.pager);
+      if(responses.success == true){
+        await this.getCustomClearanesOfJob(this.currentJob.jobNo);
+        this.getCustomClearancesNotImported();
       }
     }
   }
+  closePopUp(){
+    this.searchString = '';
+    this.pager.totalItems = 0;
+    this.pager.currentPage = 1;
+    this.getCustomClearancesNotImported();
+  }
   showPopupAdd(){
-    if(this.notImportedData != null){
-      this.pager.currentPage = 1;
-      // this.pagingNotImported.setPage(this.pager.currentPage);
+    this.pager.totalItems = 0;
+    this.pager.currentPage = 1;
+    if(this.dataNotImportedSearch != null){
+      this.cdr.detectChanges();
       this.setPage(this.pager);
     }
   }
@@ -102,6 +113,8 @@ export class BillingCustomDeclarationComponent implements OnInit {
         element.isChecked = false;
       });
     }
+    this.dataNotImportedSearch = this.notImportedData;
+    this.setPage(this.pager);
   }
   changeAllImported(){
     if(this.checkAllImported){
@@ -152,11 +165,10 @@ export class BillingCustomDeclarationComponent implements OnInit {
         x.jobNo = this.currentJob.jobNo;
       });
       let responses = await this.baseServices.postAsync(this.api_menu.ToolSetting.CustomClearance.updateToAJob, dataToUpdate, false, true);
-      if(responses == true){
-        this.checkAllNotImported = false;
-        this.changeAllNotImported();
-        this.pager.currentPage = 1;
-        this.setPage(this.pager);
+      if(responses.success == true){
+        await this.getCustomClearanesOfJob(this.currentJob.jobNo);
+        this.getCustomClearancesNotImported();
+        this.setPageMaster(this.pagerMaster);
       }
     }
   }
@@ -180,24 +192,25 @@ export class BillingCustomDeclarationComponent implements OnInit {
     this.setPage(this.pager);
   }
   setPageMaster(pager: PagerSetting){
-    this.pagerMaster = this.pagerService.getPager(this.importedData.length, pager.currentPage, this.pagerMaster.pageSize, this.pagerMaster.totalPageBtn);
+    this.pagerMaster = this.pagerService.getPager(this.dataImportedSearch.length, pager.currentPage, this.pagerMaster.pageSize, this.pagerMaster.totalPageBtn);
     this.pagerMaster.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
     this.pagerMaster.numberToShow = SystemConstants.ITEMS_PER_PAGE;
-    this.customClearances = this.importedData.slice(this.pagerMaster.startIndex, this.pagerMaster.endIndex + 1);
+    this.customClearances = this.dataImportedSearch.slice(this.pagerMaster.startIndex, this.pagerMaster.endIndex + 1);
   }
   setPage(pager: PagerSetting){
-    this.pager = this.pagerService.getPager(this.notImportedData.length, pager.currentPage, this.pager.pageSize, this.pager.totalPageBtn);
+    this.pager = this.pagerService.getPager(this.dataNotImportedSearch.length, pager.currentPage, this.pager.pageSize, this.pager.totalPageBtn);
     this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
     this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
-    this.notImportedCustomClearances = this.notImportedData.slice(this.pager.startIndex, this.pager.endIndex + 1);
+    this.notImportedCustomClearances = this.dataNotImportedSearch.slice(this.pager.startIndex, this.pager.endIndex + 1);
   }
   searchClearanceNotImported(event){
     this.pager.totalItems = 0;
+    this.cdr.detectChanges();
     let keySearch = this.searchString.trim().toLocaleLowerCase();
     if(keySearch!==null && keySearch.length<2 && keySearch.length>0){
       return 0;
     }
-    var data = this.notImportedData.filter(item => item.clearanceNo.includes(keySearch)
+    this.dataNotImportedSearch = this.notImportedData.filter(item => item.clearanceNo.includes(keySearch)
                                                 || (item.hblid == null? '': item.hblid.toLocaleLowerCase()).includes(keySearch)
                                                 || (item.exportCountryCode == null? '': item.exportCountryCode.toLocaleLowerCase()).includes(keySearch)
                                                 || (item.importCountryCode == null? '': item.importCountryCode.toLocaleLowerCase()).includes(keySearch)
@@ -205,15 +218,25 @@ export class BillingCustomDeclarationComponent implements OnInit {
                                                 || (item.firstClearanceNo == null? '': item.firstClearanceNo.toLocaleLowerCase()).includes(keySearch)
                                                 || (item.qtyCont == null? '': item.qtyCont.toString()).includes(keySearch)
                                           );
-                                          this.pager.currentPage = 1;
-                                          this.pager.totalItems = data.length;
-                                          //this.pager = this.pagerService.getPager(data.length, 1, this.pager.pageSize, this.pager.totalPageBtn);
-                                          //this.setPage(this.pager);
-                                          //this.pagingNotImported.pager = this.pager;
-                                          this.pagingNotImported.setPage(this.pager.currentPage);
-    // this.pager = this.pagerService.getPager(data.length, 1, this.pager.pageSize, this.pager.totalPageBtn);
-    // this.notImportedCustomClearances = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
-    
-    // this.cdr.detectChanges();
+    this.pager.currentPage = 1;
+    this.pager.totalItems = this.dataNotImportedSearch.length;
+    this.setPage(this.pager);
+  }
+  searchClearanceImported(event){
+    this.pagerMaster.totalItems = 0;
+    let keySearch = this.searchImportedString.trim().toLocaleLowerCase();
+    if(keySearch!==null && keySearch.length<2 && keySearch.length>0){
+      return 0;
+    }
+    this.dataImportedSearch = this.importedData.filter(item => item.clearanceNo.includes(keySearch)
+      || (item.hblid == null? '': item.hblid.toLocaleLowerCase()).includes(keySearch)
+      || (item.exportCountryCode == null? '': item.exportCountryCode.toLocaleLowerCase()).includes(keySearch)
+      || (item.importCountryCode == null? '': item.importCountryCode.toLocaleLowerCase()).includes(keySearch)
+      || (item.commodityCode == null? '': item.commodityCode.toLocaleLowerCase()).includes(keySearch)
+      || (item.firstClearanceNo == null? '': item.firstClearanceNo.toLocaleLowerCase()).includes(keySearch)
+      || (item.qtyCont == null? '': item.qtyCont.toString()).includes(keySearch));
+    this.pagerMaster.currentPage = 1;
+    this.pagerMaster.totalItems = this.dataImportedSearch.length;
+    this.setPageMaster(this.pagerMaster);
   }
 }
