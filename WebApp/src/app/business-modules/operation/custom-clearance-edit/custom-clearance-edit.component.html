@@ -59,7 +59,7 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': updateForm.submitted && singledater.invalid }">
+                                [ngClass]="{ 'm-form__group has-danger': updateForm.submitted && customDeclaration.clearanceDate.endDate == null }">
                                 <label class="form-control-label" for="">
                                     Clearance Date <span class="m--font-danger">(*)</span>
                                 </label>
@@ -75,7 +75,7 @@
                                         </span>
                                     </span>
                                     <div class="form-control-feedback"
-                                        *ngIf="updateForm.submitted && singledater.invalid">
+                                        *ngIf="updateForm.submitted && customDeclaration.clearanceDate.endDate == null">
                                         Clearance Date is required
                                     </div>
                                 </div>

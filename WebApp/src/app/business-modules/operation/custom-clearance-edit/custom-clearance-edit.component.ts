@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import moment from 'moment/moment';
 import { ActivatedRoute } from '@angular/router';
 import { BaseService } from 'src/services-base/base.service';
@@ -21,7 +21,8 @@ export class CustomClearanceEditComponent implements OnInit {
 
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU,
-        private route: ActivatedRoute) {
+        private route: ActivatedRoute,
+        private cdr: ChangeDetectorRef) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
@@ -103,7 +104,8 @@ export class CustomClearanceEditComponent implements OnInit {
         if (this.serviceTypeCurrent[0] != 'Air' && this.serviceTypeCurrent[0] != 'Express') {
             if (this.cargoTypeCurrent.length == 0) return;
         }
-        if (formUpdate.form.status != "INVALID") {
+        if (formUpdate.form.status != "INVALID" && this.customDeclaration.clearanceDate.endDate != null) {
+            this.cdr.detach();
             this.customDeclaration.partnerTaxCode = this.strCustomerCurrent;
             this.customDeclaration.clearanceDate = moment(this.customDeclaration.clearanceDate.endDate._d).format('YYYY-MM-DD');
             this.customDeclaration.serviceType = this.serviceTypeCurrent[0];
