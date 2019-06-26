@@ -56,43 +56,43 @@
                             </div>
                         </th>
                         <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceNo'), 'sorting_desc': (!isDesc && sortKey == 'clearanceNo') }"
-                            (click)="sort('clearanceNo', isImported = true)">
+                            (click)="sort('clearanceNo', true)">
                             <span>Custom No</span>
                         </th>
                         <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'datetimeCreated'), 'sorting_desc': (!isDesc && sortKey == 'datetimeCreated') }"
-                            (click)="sort('datetimeCreated', isImported = true)">
+                            (click)="sort('datetimeCreated', true)">
                             <span>Import Date</span>
                         </th>
                         <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceDate'), 'sorting_desc': (!isDesc && sortKey == 'clearanceDate') }"
-                            (click)="sort('clearanceDate', isImported = true)">
+                            (click)="sort('clearanceDate', true)">
                             <span>Clearance Date</span>
                         </th>
                         <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'hblid'), 'sorting_desc': (!isDesc && sortKey == 'hblid') }"
-                            (click)="sort('hblid', isImported = true)">
+                            (click)="sort('hblid', true)">
                             <span>HBL No</span>
                         </th>
                         <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'exportCountryCode'), 'sorting_desc': (!isDesc && sortKey == 'exportCountryCode') }"
-                            (click)="sort('exportCountryCode', isImported = true)">
+                            (click)="sort('exportCountryCode', true)">
                             <span>Export Country</span>
                         </th>
                         <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'importCountryCode'), 'sorting_desc': (!isDesc && sortKey == 'importCountryCode') }"
-                            (click)="sort('importCountryCode', isImported = true)">
+                            (click)="sort('importCountryCode', true)">
                             <span>Import Country</span>
                         </th>
                         <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'commodityCode'), 'sorting_desc': (!isDesc && sortKey == 'commodityCode') }"
-                            (click)="sort('commodityCode', isImported = true)">
+                            (click)="sort('commodityCode', true)">
                             <span>Commodity Code</span>
                         </th>
                         <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'qtyCont'), 'sorting_desc': (!isDesc && sortKey == 'qtyCont') }"
-                            (click)="sort('qtyCont', isImported = true)">
+                            (click)="sort('qtyCont', true)">
                             <span>Qty</span>
                         </th>
                         <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'firstClearanceNo'), 'sorting_desc': (!isDesc && sortKey == 'firstClearanceNo') }"
-                            (click)="sort('firstClearanceNo', isImported = true)">
+                            (click)="sort('firstClearanceNo', true)">
                             <span>Parentdoc</span>
                         </th>
                         <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'note'), 'sorting_desc': (!isDesc && sortKey == 'note') }"
-                            (click)="sort('note', isImported = true)">
+                            (click)="sort('note', true)">
                             <span>Note</span>
                         </th>
                     </tr>
@@ -240,43 +240,43 @@
                                         </div>
                                     </th>
                                     <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceNo'), 'sorting_desc': (!isDesc && sortKey == 'clearanceNo') }"
-                                        (click)="sort('clearanceNo', isImported = false)">
+                                        (click)="sort('clearanceNo', false)">
                                         <span>Custom No</span>
                                     </th>
                                     <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'datetimeCreated'), 'sorting_desc': (!isDesc && sortKey == 'datetimeCreated') }"
-                                        (click)="sort('datetimeCreated', isImported = false)">
+                                        (click)="sort('datetimeCreated', false)">
                                         <span>Import Date</span>
                                     </th>
                                     <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceDate'), 'sorting_desc': (!isDesc && sortKey == 'clearanceDate') }"
-                                        (click)="sort('clearanceDate', isImported = false)">
+                                        (click)="sort('clearanceDate', false)">
                                         <span>Clearance Date</span>
                                     </th>
                                     <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'hblid'), 'sorting_desc': (!isDesc && sortKey == 'hblid') }"
-                                        (click)="sort('hblid', isImported = false)">
+                                        (click)="sort('hblid', false)">
                                         <span>HBL No</span>
                                     </th>
                                     <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'exportCountryCode'), 'sorting_desc': (!isDesc && sortKey == 'exportCountryCode') }"
-                                        (click)="sort('exportCountryCode', isImported = false)">
+                                        (click)="sort('exportCountryCode', false)">
                                         <span>Export Country</span>
                                     </th>
                                     <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'importCountryCode'), 'sorting_desc': (!isDesc && sortKey == 'importCountryCode') }"
-                                        (click)="sort('importCountryCode', isImported = false)">
+                                        (click)="sort('importCountryCode', false)">
                                         <span>Import Country</span>
                                     </th>
                                     <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'commodityCode'), 'sorting_desc': (!isDesc && sortKey == 'commodityCode') }"
-                                        (click)="sort('commodityCode', isImported = false)">
+                                        (click)="sort('commodityCode', false)">
                                         <span>Commodity Code</span>
                                     </th>
                                     <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'qtyCont'), 'sorting_desc': (!isDesc && sortKey == 'qtyCont') }"
-                                        (click)="sort('qtyCont', isImported = false)">
+                                        (click)="sort('qtyCont', false)">
                                         <span>Qty</span>
                                     </th>
                                     <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'firstClearanceNo'), 'sorting_desc': (!isDesc && sortKey == 'firstClearanceNo') }"
-                                        (click)="sort('firstClearanceNo', isImported = false)">
+                                        (click)="sort('firstClearanceNo', false)">
                                         <span>Parentdoc</span>
                                     </th>
                                     <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'note'), 'sorting_desc': (!isDesc && sortKey == 'note') }"
-                                        (click)="sort('note', isImported = false)">
+                                        (click)="sort('note', false)">
                                         <span>Note</span>
                                     </th>
                                 </tr>

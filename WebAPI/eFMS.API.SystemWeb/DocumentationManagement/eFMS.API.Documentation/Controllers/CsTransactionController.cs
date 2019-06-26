@@ -17,6 +17,9 @@ using SystemManagementAPI.Resources;
 
 namespace eFMS.API.Documentation.Controllers
 {
+    /// <summary>
+    /// A base class for an MVC controller without view support.
+    /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
@@ -27,6 +30,14 @@ namespace eFMS.API.Documentation.Controllers
         private readonly ICsTransactionService csTransactionService;
         private readonly ICurrentUser currentUser;
         private ICsShipmentSurchargeService surchargeService;
+
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="localizer">inject IStringLocalizer</param>
+        /// <param name="service">inject ICsTransactionService</param>
+        /// <param name="user">inject ICurrentUser</param>
+        /// <param name="serviceSurcharge">inject ICsShipmentSurchargeService</param>
         public CsTransactionController(IStringLocalizer<LanguageSub> localizer, ICsTransactionService service, ICurrentUser user,
             ICsShipmentSurchargeService serviceSurcharge)
         {
@@ -36,6 +47,11 @@ namespace eFMS.API.Documentation.Controllers
             surchargeService = serviceSurcharge;
         }
 
+        /// <summary>
+        /// count job by date
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
         [HttpGet("CountJobByDate/{{date}}")]
         public IActionResult CountJob(DateTime date)
         {
@@ -43,6 +59,11 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// get total profit by job
+        /// </summary>
+        /// <param name="JobId">job id that want to get total profit</param>
+        /// <returns></returns>
         [HttpGet]
         [Route("GetTotalProfit")]
         public List<object> GetTotalProfit(Guid JobId)
@@ -50,13 +71,25 @@ namespace eFMS.API.Documentation.Controllers
             return csTransactionService.GetListTotalHB(JobId);
         }
 
+        /// <summary>
+        /// get list transactions by search condition
+        /// </summary>
+        /// <param name="criteria">search condition</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Query")]
         public IActionResult Query(CsTransactionCriteria criteria)
         {
             return Ok(csTransactionService.Query(criteria));
         }
-        
+
+        /// <summary>
+        /// get and paging list transaction by search condition
+        /// </summary>
+        /// <param name="criteria">search condition</param>
+        /// <param name="page">page to retrieve data</param>
+        /// <param name="size">number items per page</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
         public IActionResult Paging(CsTransactionCriteria criteria, int page, int size)
@@ -66,6 +99,11 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// get transaction by id
+        /// </summary>
+        /// <param name="id">id that want to retrieve transaction</param>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public IActionResult Get(Guid id)
         {
@@ -73,6 +111,11 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// add new transaction
+        /// </summary>
+        /// <param name="model">model to update</param>
+        /// <returns></returns>
         [HttpPost]
         [Authorize]
         public IActionResult Post(CsTransactionEditModel model)
@@ -88,6 +131,11 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// import transaction
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         [Authorize]
         [Route("Import")]
@@ -104,6 +152,11 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// update an existed item
+        /// </summary>
+        /// <param name="model">model to update</param>
+        /// <returns></returns>
         [HttpPut]
         [Authorize]
         public IActionResult Put(CsTransactionEditModel model)
@@ -124,6 +177,12 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+
+        /// <summary>
+        /// delete an existed item
+        /// </summary>
+        /// <param name="id">id of existed data that want to delete</param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         [Authorize]
         public IActionResult Delete(Guid id)
@@ -142,6 +201,11 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// check allow delete an existed item
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("CheckAllowDelete/{id}")]
         public IActionResult CheckAllowDelete(Guid id)
         {
