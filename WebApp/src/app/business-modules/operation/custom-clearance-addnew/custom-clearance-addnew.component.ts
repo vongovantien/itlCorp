@@ -6,6 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
 import {Location} from '@angular/common';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
 
 @Component({
     selector: 'app-custom-clearance-addnew',
@@ -63,7 +64,6 @@ export class CustomClearanceAddnewComponent implements OnInit {
 
             const respone = await this.baseServices.postAsync(this.api_menu.ToolSetting.CustomClearance.add, this.customDeclaration, true, true);
             //console.log(respone);
-            
             this._location.back();
 
             //Reset lại clearanceDate

@@ -73,29 +73,39 @@ namespace eFMS.API.Setting.DL.Services
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var connections = dc.SetEcusconnection.Where(x => x.UserId == userId);
             var result = new HandleState();
+            var lists = new List<CustomsDeclaration>();
             foreach (var item in connections)
             {
                 var clearanceEcus = ecusCconnectionService.GetDataEcusByUser(item.UserId, item.ServerName, item.Dbusername, item.Dbpassword, item.Dbname);
                 if(clearanceEcus == null)
                 {
-                    return new HandleState("Not connect data");
+                    continue;
                 }
-                var clearances = dc.CustomsDeclaration.ToList();
-                foreach (var clearance in clearanceEcus)
+                else
                 {
-                    var clearanceNo = clearance.SOTK.ToString();
-                    var itemExisted = clearances.FirstOrDefault(x => x.ClearanceNo == clearanceNo && x.ClearanceDate == clearance.NGAY_DK);
-                    if (itemExisted == null || clearance.SOTK != null)
+                    var clearances = dc.CustomsDeclaration.ToList();
+                    foreach (var clearance in clearanceEcus)
                     {
-                        var newClearance = MapEcusClearanceToCustom(clearance, clearanceNo);
-                        newClearance.Source = Constants.FromEFMS;
-                        dc.CustomsDeclaration.Add(newClearance);
+                        var clearanceNo = clearance.SOTK?.ToString().Trim();
+                        var itemExisted = clearances.FirstOrDefault(x => x.ClearanceNo == clearanceNo && x.ClearanceDate == clearance.NGAY_DK);
+                        var countDuplicated = lists.Count(x => x.ClearanceNo == clearanceNo && x.ClearanceDate == clearance.NGAY_DK);
+                        if (itemExisted == null && clearanceNo != null && countDuplicated < 2)
+                        {
+                            var newClearance = MapEcusClearanceToCustom(clearance, clearanceNo);
+                            newClearance.Source = Constants.FromEcus;
+                            lists.Add(newClearance);
+                            //dc.CustomsDeclaration.Add(newClearance);
+                        }
                     }
                 }
             }
             try
             {
-                dc.SaveChanges();
+                if(lists.Count > 0)
+                {
+                    dc.CustomsDeclaration.AddRange(lists);
+                    dc.SaveChanges();
+                }
                 return result;
             }
             catch (Exception ex)
@@ -128,7 +138,7 @@ namespace eFMS.API.Setting.DL.Services
                 PartnerTaxCode = clearance.MA_DV,
                 Mblid = clearance.VAN_DON,
                 Hblid = clearance.VAN_DON,
-                PortCodeCk = clearance.MA_CK,
+                Gateway = clearance.MA_CK,
                 PortCodeNn = clearance.MA_CANGNN,
                 ExportCountryCode = clearance.NUOC_XK,
                 ImportCountryCode = clearance.NUOC_NK,
@@ -139,6 +149,9 @@ namespace eFMS.API.Setting.DL.Services
                 Route = clearance.PLUONG,
                 Type = type,
                 ServiceType = serviceType,
+                UserCreated = currentUser.UserID,
+                DatetimeCreated = DateTime.Now,
+                DatetimeModified = DateTime.Now
             };
             return newItem;
         }

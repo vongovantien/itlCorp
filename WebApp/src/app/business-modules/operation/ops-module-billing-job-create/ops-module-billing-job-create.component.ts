@@ -104,7 +104,6 @@ export class OpsModuleBillingJobCreateComponent implements OnInit {
             }
         }, 300);
     }
-
     isDisplay: boolean = true;
     resetDisplay() {
         this.isDisplay = false;

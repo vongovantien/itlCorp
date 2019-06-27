@@ -191,10 +191,16 @@ namespace eFMS.API.Setting.Controllers
         [HttpPost("ImportClearancesFromEcus")]
         public IActionResult ImportClearancesFromEcus()
         {
-            var result = customsDeclarationService.ImportClearancesFromEcus();
-            if (result.Success)
+            var hs = customsDeclarationService.ImportClearancesFromEcus();
+            if (hs.Success)
             {
                 cache.Remove(Templates.CustomDeclaration.NameCaching.ListName);
+            }
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
             }
             return Ok(result);
         }
