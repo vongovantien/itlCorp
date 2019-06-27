@@ -236,13 +236,16 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
-                                        <div class="form-group">
+                                        <div class="form-group" [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && mblno.invalid}">
                                             <label class="form-control-label" for="">
-                                                MBL No
+                                                MBL No <span class="m--font-danger">(*)</span>
                                             </label>
                                             <input type="text" required class="form-control m-input m-input--square"
                                                 placeholder="Enter text" name="mblno" [(ngModel)]="opsTransaction.mblno"
                                                 #mblno="ngModel">
+                                            <div class="form-control-feedback" *ngIf="addOpsForm.submitted && mblno.invalid">
+                                                MBL No is required!
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-lg-4">

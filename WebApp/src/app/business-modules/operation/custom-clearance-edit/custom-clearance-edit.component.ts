@@ -5,6 +5,7 @@ import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import find from 'lodash/find';
 import { NgForm } from '@angular/forms';
+import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
 
 @Component({
     selector: 'app-custom-clearance-edit',
@@ -12,7 +13,7 @@ import { NgForm } from '@angular/forms';
     styleUrls: ['./custom-clearance-edit.component.scss']
 })
 export class CustomClearanceEditComponent implements OnInit {
-    customDeclaration: any = {};
+    customDeclaration: CustomClearance = new CustomClearance();
     listCustomer: any = [];
     listPort: any = [];
     listCountry: any = [];

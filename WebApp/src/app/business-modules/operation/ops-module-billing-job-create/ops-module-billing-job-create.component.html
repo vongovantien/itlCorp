@@ -38,7 +38,7 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsMbl.invalid}">
                                 <label class="form-control-label" for="">
-                                    MBL No
+                                    MBL No <span class="m--font-danger">(*)</span>
                                 </label>
                                 <input [(ngModel)]="OpsTransactionToAdd.mblno" type="text" required
                                     class="form-control m-input m-input--square" placeholder="Enter text" name="opsMbl"
