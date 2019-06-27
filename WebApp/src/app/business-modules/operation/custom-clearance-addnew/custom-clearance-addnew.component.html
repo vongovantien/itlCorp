@@ -239,9 +239,8 @@
                                 <label class="form-control-label" for="">
                                     Gross Weight
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square"
+                                <input type="number" class="form-control m-input m-input--square"
                                     [(ngModel)]="customDeclaration.grossWeight" name="gross_weight"
-                                    (change)="customDeclaration.grossWeight=customDeclaration.grossWeight.trim()"
                                     onkeypress="return event.charCode == 46 || (event.charCode > 47 && event.charCode < 58)"
                                     #gross_weight="ngModel" placeholder="">
                             </div>
@@ -251,9 +250,8 @@
                                 <label class="form-control-label" for="">
                                     Net Weight
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square"
+                                <input type="number" class="form-control m-input m-input--square"
                                     [(ngModel)]="customDeclaration.netWeight" name="net_weight"
-                                    (change)="customDeclaration.netWeight=customDeclaration.netWeight.trim()"
                                     onkeypress="return event.charCode == 46 || (event.charCode > 47 && event.charCode < 58)"
                                     #net_weight="ngModel" placeholder="">
                             </div>
@@ -265,9 +263,8 @@
                                 <label class="form-control-label" for="">
                                     CBM
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square"
+                                <input type="number" class="form-control m-input m-input--square"
                                     [(ngModel)]="customDeclaration.cbm" name="cbm"
-                                    (change)="customDeclaration.cbm=customDeclaration.cbm.trim()"
                                     onkeypress="return event.charCode == 46 || (event.charCode > 47 && event.charCode < 58)"
                                     #cbm="ngModel" placeholder="">
                             </div>
@@ -277,9 +274,8 @@
                                 <label class="form-control-label" for="">
                                     Qty Cont
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square"
+                                <input type="number" class="form-control m-input m-input--square"
                                     [(ngModel)]="customDeclaration.qtyCont" name="qty_cont"
-                                    (change)="customDeclaration.qtyCont=customDeclaration.qtyCont.trim()"
                                     onkeypress="return (event.charCode > 47 && event.charCode < 58)" #qty_cont="ngModel"
                                     placeholder="">
                             </div>
@@ -290,9 +286,8 @@
                                     Package Qty
                                 </label>
                                 <div class="input-group m-input-group m-input-group--square">
-                                    <input type="text" class="form-control m-input" aria-label=""
+                                    <input type="number" class="form-control m-input" aria-label=""
                                         [(ngModel)]="customDeclaration.pcs" name="pcs"
-                                        (change)="customDeclaration.pcs=customDeclaration.pcs.trim()"
                                         onkeypress="return (event.charCode > 47 && event.charCode < 58)" #pcs="ngModel">
                                     <div class="input-group-prepend">
                                         <app-combo-grid-virtual-scroll

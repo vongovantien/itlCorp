@@ -117,6 +117,9 @@ export class CustomClearanceComponent implements OnInit {
     gotoEditPage(id) {
         this.router.navigate(["/home/operation/custom-clearance-edit", { id: id }]);
     }
+    getDataFromEcus(){
+        this.baseServices.postAsync(this.api_menu.ToolSetting.CustomClearance.importClearancesFromEcus, null, true, true);
+    }
 
     onChangeAction(id, isChecked: boolean) {
         console.log(isChecked);
