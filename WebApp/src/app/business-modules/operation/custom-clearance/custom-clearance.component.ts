@@ -6,6 +6,7 @@ import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { Router } from '@angular/router';
+declare var $: any;
 
 @Component({
     selector: 'app-custom-clearance',
@@ -18,6 +19,7 @@ export class CustomClearanceComponent implements OnInit {
     searchObject: any = {};
     listUser: Array<string> = [];
     clearanceNo: string = '';
+    idCustomCheckedArray: any = [];
 
     constructor(
         private baseServices: BaseService,
@@ -51,7 +53,7 @@ export class CustomClearanceComponent implements OnInit {
 
     getListUser() {
         this.baseServices.get(this.api_menu.System.User_Management.getAll).subscribe((res: any) => {
-            console.log(res);
+            //console.log(res);
             this.listUser = res.map(x => ({ "text": x.username, "id": x.id }));
         }, err => {
             this.listUser = [];
@@ -65,16 +67,18 @@ export class CustomClearanceComponent implements OnInit {
         this.pager.pageSize = pager.pageSize;
         this.pager.totalPages = pager.totalPages;
         this.getListCustomsDeclaration();
+
+        this.idCustomCheckedArray = [];
     }
 
-    async searchUnit() {
+    async searchCustomClearance() {
         this.initPager();
         this.searchObject = {};
 
         this.searchObject.ClearanceNo = this.clearanceNo;
         this.searchObject.FromClearanceDate = this.selectedRange.startDate._d;
         this.searchObject.ToClearanceDate = this.selectedRange.endDate._d;
-        if(this.defaultImportStatus[0] === 'All'){
+        if (this.defaultImportStatus[0] === 'All') {
             this.searchObject.ImPorted = null;
         } else {
             this.searchObject.ImPorted = this.defaultImportStatus[0] === 'Imported' ? true : false;
@@ -102,7 +106,6 @@ export class CustomClearanceComponent implements OnInit {
         this.getListCustomsDeclaration();
     }
 
-
     isDesc = true;
     sortKey: string = "";
     sort(property) {
@@ -110,9 +113,45 @@ export class CustomClearanceComponent implements OnInit {
         this.sortKey = property;
         this.listCustomDeclaration = this.sortService.sort(this.listCustomDeclaration, property, this.isDesc);
     }
-    
-    gotoEditPage(id){
+
+    gotoEditPage(id) {
         this.router.navigate(["/home/operation/custom-clearance-edit", { id: id }]);
+    }
+
+    onChangeAction(id, isChecked: boolean) {
+        console.log(isChecked);
+        console.log(id);
+        if (isChecked) {
+            this.idCustomCheckedArray.push(id);
+        } else {
+            let index = this.idCustomCheckedArray.indexOf(id);
+            this.idCustomCheckedArray.splice(index, 1);
+        }
+        console.log(this.idCustomCheckedArray);
+    }
+
+    deleteCustomClearance() {
+        //$('#confirm-delete-modal').modal('hide');
+        if (this.idCustomCheckedArray.length > 0) {
+            //$('#confirm-delete-modal').modal('show');
+            //console.log($('#btnDeleteCustomClearance'));
+            //$('#btnDeleteCustomClearance').data("target").show();
+            //this.initPager();
+            //this.getListCustomsDeclaration();
+        } else {
+            
+            //$('#btnDeleteCustomClearance').data("target").hide();
+        }
+    }
+
+    async delete(){
+        console.log(this.idCustomCheckedArray);
+        this.initPager();
+        this.getListCustomsDeclaration();        
+    }
+
+    async cancelDelete(){
+        console.log('cancel delete');
     }
 
     /**

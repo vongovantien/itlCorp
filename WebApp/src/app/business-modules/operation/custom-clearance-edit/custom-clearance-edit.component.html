@@ -67,7 +67,7 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
                                         [(ngModel)]="customDeclaration.clearanceDate" [singleDatePicker]="true"
-                                        #singledater="ngModel" name="singledater" placeholder="Select date" readonly
+                                        #singledater="ngModel" name="singledater" placeholder="Select date" 
                                         required />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
@@ -244,9 +244,8 @@
                                 <label class="form-control-label" for="">
                                     Gross Weight
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square"
+                                <input type="number" class="form-control m-input m-input--square"
                                     [(ngModel)]="customDeclaration.grossWeight" name="gross_weight"
-                                    (change)="customDeclaration.grossWeight=customDeclaration.grossWeight.trim()"
                                     onkeypress="return event.charCode == 46 || (event.charCode > 47 && event.charCode < 58)"
                                     #gross_weight="ngModel" placeholder="">
                             </div>
@@ -256,9 +255,8 @@
                                 <label class="form-control-label" for="">
                                     Net Weight
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square"
+                                <input type="number" class="form-control m-input m-input--square"
                                     [(ngModel)]="customDeclaration.netWeight" name="net_weight"
-                                    (change)="customDeclaration.netWeight=customDeclaration.netWeight.trim()"
                                     onkeypress="return event.charCode == 46 || (event.charCode > 47 && event.charCode < 58)"
                                     #net_weight="ngModel" placeholder="">
                             </div>
@@ -270,9 +268,8 @@
                                 <label class="form-control-label" for="">
                                     CBM
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square"
+                                <input type="number" class="form-control m-input m-input--square"
                                     [(ngModel)]="customDeclaration.cbm" name="cbm"
-                                    (change)="customDeclaration.cbm=customDeclaration.cbm.trim()"
                                     onkeypress="return event.charCode == 46 || (event.charCode > 47 && event.charCode < 58)"
                                     #cbm="ngModel" placeholder="">
                             </div>
@@ -282,9 +279,8 @@
                                 <label class="form-control-label" for="">
                                     Qty Cont
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square"
+                                <input type="number" class="form-control m-input m-input--square"
                                     [(ngModel)]="customDeclaration.qtyCont" name="qty_cont"
-                                    (change)="customDeclaration.qtyCont=customDeclaration.qtyCont.trim()"
                                     onkeypress="return (event.charCode > 47 && event.charCode < 58)" #qty_cont="ngModel"
                                     placeholder="">
                             </div>

@@ -98,14 +98,11 @@ export class CustomClearanceEditComponent implements OnInit {
     }
 
     async updateCustomClearance(formUpdate: NgForm) {
-        //console.log(this.strCustomerCurrent);
-        //console.log(this.strPortCurrent);
         if (this.strCustomerCurrent == '' || this.strPortCurrent == '') return;
         if (this.serviceTypeCurrent[0] != 'Air' && this.serviceTypeCurrent[0] != 'Express') {
             if (this.cargoTypeCurrent.length == 0) return;
         }
         if (formUpdate.form.status != "INVALID" && this.customDeclaration.clearanceDate.endDate != null) {
-            this.cdr.detach();
             this.customDeclaration.partnerTaxCode = this.strCustomerCurrent;
             this.customDeclaration.clearanceDate = moment(this.customDeclaration.clearanceDate.endDate._d).format('YYYY-MM-DD');
             this.customDeclaration.serviceType = this.serviceTypeCurrent[0];
