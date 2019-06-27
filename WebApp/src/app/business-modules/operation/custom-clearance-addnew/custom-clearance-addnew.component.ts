@@ -5,14 +5,14 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { ActivatedRoute } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
-import {Location} from '@angular/common';
+import { Location } from '@angular/common';
 
 @Component({
     selector: 'app-custom-clearance-addnew',
     templateUrl: './custom-clearance-addnew.component.html',
     styleUrls: ['./custom-clearance-addnew.component.scss']
 })
-export class CustomClearanceAddnewComponent implements OnInit {   
+export class CustomClearanceAddnewComponent implements OnInit {
     customDeclaration: CustomClearance = new CustomClearance();
     listCustomer: any = [];
     listPort: any = [];
@@ -22,7 +22,7 @@ export class CustomClearanceAddnewComponent implements OnInit {
 
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU,
-        private route: ActivatedRoute, 
+        private route: ActivatedRoute,
         private _location: Location,
         private cdr: ChangeDetectorRef) {
         this.keepCalendarOpeningWithRange = true;
@@ -31,8 +31,6 @@ export class CustomClearanceAddnewComponent implements OnInit {
     }
 
     async ngOnInit() {
-        //this.customDeclaration.clearanceDate = {startDate: moment(), endDate: moment()};
-        
         this.getClearanceType();
         await this.getListCustomer();
         await this.getListPort();
@@ -41,7 +39,7 @@ export class CustomClearanceAddnewComponent implements OnInit {
         await this.getListCommodity();
     }
 
-    async addCustomClearance(formAdd: NgForm){
+    async addCustomClearance(formAdd: NgForm) {
         if (this.strCustomerCurrent == '' || this.strPortCurrent == '') return;
         if (this.serviceTypeCurrent[0] != 'Air' && this.serviceTypeCurrent[0] != 'Express') {
             if (this.cargoTypeCurrent.length == 0) return;
@@ -62,15 +60,16 @@ export class CustomClearanceAddnewComponent implements OnInit {
             console.log(this.customDeclaration);
 
             const respone = await this.baseServices.postAsync(this.api_menu.ToolSetting.CustomClearance.add, this.customDeclaration, true, true);
-            //console.log(respone);
-            
-            this._location.back();
-
-            //Reset lại clearanceDate
-            //this.customDeclaration.clearanceDate = { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate)};
+            console.log(respone);
+            if (respone) {
+                this._location.back();
+            } else {
+                //Reset lại clearanceDate
+                this.customDeclaration.clearanceDate = { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate)};
+            }
         }
     }
-    
+
     async getListCustomer() {
         //partnerGroup = 3 ~ Customer
         const res = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: 3 }, true, true);
@@ -139,7 +138,7 @@ export class CustomClearanceAddnewComponent implements OnInit {
     typeClearance: any = [];
     routeClearance: any = [];
     cargoTypes: any = [];
-    
+
     strCustomerCurrent: any = '';
     strPortCurrent: any = '';
     strCountryImportCurrent: any = '';

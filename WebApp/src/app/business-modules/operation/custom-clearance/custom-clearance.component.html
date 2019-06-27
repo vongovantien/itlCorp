@@ -165,7 +165,7 @@
                 <div class="row">
                     <div class="col-lg-12 c-button-actions">
                         <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                            id="btnDeleteCustomClearance" data-toggle="modal" data-target="#confirm-delete-modal" (click)="deleteCustomClearance()">
+                            id="btnDeleteCustomClearance" data-toggle="modal" data-target="#confirm-delete-modal" (click)="confirmDelete()">
                             <span>
                                 <i class="la la-trash"></i>
                                 <span>
@@ -251,7 +251,7 @@
                                             disabled="disabled">
                                         <ng-template #allowChecked>
                                             <input type="checkbox"
-                                                (change)="onChangeAction(custom.id, $event.target.checked)">
+                                                (change)="onChangeAction(custom, $event.target.checked)">
                                         </ng-template>
                                         <span></span>
                                     </label>

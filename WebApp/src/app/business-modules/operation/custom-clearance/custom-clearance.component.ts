@@ -6,6 +6,7 @@ import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 declare var $: any;
 
 @Component({
@@ -19,13 +20,14 @@ export class CustomClearanceComponent implements OnInit {
     searchObject: any = {};
     listUser: Array<string> = [];
     clearanceNo: string = '';
-    idCustomCheckedArray: any = [];
+    customCheckedArray: any = [];
 
     constructor(
         private baseServices: BaseService,
         private api_menu: API_MENU,
         private sortService: SortService,
-        private router: Router) {
+        private router: Router,
+        private toastr: ToastrService) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         //this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
@@ -42,6 +44,8 @@ export class CustomClearanceComponent implements OnInit {
     initPager(): any {
         this.pager.totalItems = 0;
         this.pager.currentPage = 1;
+
+        this.customCheckedArray = [];
     }
 
     async getListCustomsDeclaration() {
@@ -49,11 +53,12 @@ export class CustomClearanceComponent implements OnInit {
         console.log(res);
         this.listCustomDeclaration = res.data;
         this.pager.totalItems = res.totalItems;
+
+        this.customCheckedArray = [];
     }
 
     getListUser() {
         this.baseServices.get(this.api_menu.System.User_Management.getAll).subscribe((res: any) => {
-            //console.log(res);
             this.listUser = res.map(x => ({ "text": x.username, "id": x.id }));
         }, err => {
             this.listUser = [];
@@ -67,8 +72,6 @@ export class CustomClearanceComponent implements OnInit {
         this.pager.pageSize = pager.pageSize;
         this.pager.totalPages = pager.totalPages;
         this.getListCustomsDeclaration();
-
-        this.idCustomCheckedArray = [];
     }
 
     async searchCustomClearance() {
@@ -117,44 +120,38 @@ export class CustomClearanceComponent implements OnInit {
     gotoEditPage(id) {
         this.router.navigate(["/home/operation/custom-clearance-edit", { id: id }]);
     }
-    getDataFromEcus(){
+    getDataFromEcus() {
         this.baseServices.postAsync(this.api_menu.ToolSetting.CustomClearance.importClearancesFromEcus, null, true, true);
     }
 
-    onChangeAction(id, isChecked: boolean) {
-        console.log(isChecked);
-        console.log(id);
+    onChangeAction(custom, isChecked: boolean) {
         if (isChecked) {
-            this.idCustomCheckedArray.push(id);
+            this.customCheckedArray.push(custom);
         } else {
-            let index = this.idCustomCheckedArray.indexOf(id);
-            this.idCustomCheckedArray.splice(index, 1);
+            let index = this.customCheckedArray.indexOf(custom);
+            this.customCheckedArray.splice(index, 1);
         }
-        console.log(this.idCustomCheckedArray);
+        console.log(this.customCheckedArray);
     }
 
-    deleteCustomClearance() {
-        //$('#confirm-delete-modal').modal('hide');
-        if (this.idCustomCheckedArray.length > 0) {
-            //$('#confirm-delete-modal').modal('show');
-            //console.log($('#btnDeleteCustomClearance'));
-            //$('#btnDeleteCustomClearance').data("target").show();
-            //this.initPager();
-            //this.getListCustomsDeclaration();
+    confirmDelete() {
+        if (this.customCheckedArray.length > 0) {
+            $('#btnDeleteCustomClearance').attr('data-target', '#confirm-delete-modal');
         } else {
-            
-            //$('#btnDeleteCustomClearance').data("target").hide();
+            $('#btnDeleteCustomClearance').removeAttr('data-target');
+            this.toastr.warning('Not selected custom clearance', '', { positionClass: 'toast-bottom-right', closeButton: true, timeOut: 5000 });
         }
     }
 
-    async delete(){
-        console.log(this.idCustomCheckedArray);
-        this.initPager();
-        this.getListCustomsDeclaration();        
+    async delete() {
+        const response = await this.baseServices.putAsync(this.api_menu.ToolSetting.CustomClearance.deleteMultiple, this.customCheckedArray, true, true);
+        console.log(response);
+        await this.initPager();
+        await this.getListCustomsDeclaration();
     }
 
-    async cancelDelete(){
-        console.log('cancel delete');
+    async cancelDelete() {
+
     }
 
     /**

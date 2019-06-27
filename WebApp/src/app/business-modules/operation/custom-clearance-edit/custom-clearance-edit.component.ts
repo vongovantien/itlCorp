@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import moment from 'moment/moment';
 import { ActivatedRoute } from '@angular/router';
 import { BaseService } from 'src/services-base/base.service';
@@ -19,11 +19,11 @@ export class CustomClearanceEditComponent implements OnInit {
     listCountry: any = [];
     listCommodity: any = [];
     listUnit: any = [];
+    _clearanceDate: any;
 
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU,
-        private route: ActivatedRoute,
-        private cdr: ChangeDetectorRef) {
+        private route: ActivatedRoute) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
@@ -38,7 +38,6 @@ export class CustomClearanceEditComponent implements OnInit {
         await this.getListCommodity();
         await this.route.params.subscribe(prams => {
             if (prams.id != undefined) {
-                //console.log(prams.id);
                 this.getCustomCleanranceById(prams.id);
             }
         });
@@ -57,45 +56,46 @@ export class CustomClearanceEditComponent implements OnInit {
         this.customDeclaration = res;
         const _customer = find(this.listCustomer, { 'taxCode': this.customDeclaration.partnerTaxCode });
         this.strCustomerCurrent = _customer != undefined ? _customer.taxCode : '';
-        console.log('strCustomerCurrent: ' + this.strCustomerCurrent);
+        //console.log('strCustomerCurrent: ' + this.strCustomerCurrent);
 
-        this.customDeclaration.clearanceDate = this.customDeclaration.clearanceDate == null ? this.customDeclaration.clearanceDate : { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate) };
+        //this.customDeclaration.clearanceDate = this.customDeclaration.clearanceDate == null ? this.customDeclaration.clearanceDate : { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate) };
+        this._clearanceDate = this.customDeclaration.clearanceDate == null ? this.customDeclaration.clearanceDate : { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate) };
 
         const _serviceType = find(this.serviceTypes, { 'id': this.customDeclaration.serviceType });
         this.serviceTypeCurrent = _serviceType != undefined ? [_serviceType.id] : [];
-        console.log('serviceTypeCurrent: ' + this.serviceTypeCurrent);
+        //console.log('serviceTypeCurrent: ' + this.serviceTypeCurrent);
 
         const _port = find(this.listPort, { 'code': this.customDeclaration.gateway });
         this.strPortCurrent = _port != undefined ? _port.code : '';
-        console.log('portCurrent: ' + this.strPortCurrent);
+        //console.log('portCurrent: ' + this.strPortCurrent);
 
         const _typeClearance = find(this.typeClearance, { 'id': this.customDeclaration.type });
         this.typeClearanceCurrent = _typeClearance != undefined ? [_typeClearance.id] : [];
-        console.log('typeClearanceCurrent: ' + this.typeClearanceCurrent);
+        //console.log('typeClearanceCurrent: ' + this.typeClearanceCurrent);
 
         const _routeClearance = find(this.routeClearance, { 'id': this.customDeclaration.route });
         this.routeClearanceCurrent = _routeClearance != undefined ? [_routeClearance.id] : [];
-        console.log('routeClearanceCurrent: ' + this.routeClearanceCurrent);
+        //console.log('routeClearanceCurrent: ' + this.routeClearanceCurrent);
 
         const _cargoType = find(this.cargoTypes, { 'id': this.customDeclaration.cargoType });
         this.cargoTypeCurrent = _cargoType != undefined ? [_cargoType.id] : [];
-        console.log('cargoTypeCurrent: ' + this.cargoTypeCurrent);
+        //console.log('cargoTypeCurrent: ' + this.cargoTypeCurrent);
 
         const _countryExport = find(this.listCountry, { 'code': this.customDeclaration.exportCountryCode });
         this.strCountryExportCurrent = _countryExport != undefined ? _countryExport.code : '';
-        console.log('strCountryExportCurrent: ' + this.strCountryExportCurrent);
+        //console.log('strCountryExportCurrent: ' + this.strCountryExportCurrent);
 
         const _countryImport = find(this.listCountry, { 'code': this.customDeclaration.importCountryCode });
         this.strCountryImportCurrent = _countryImport != undefined ? _countryImport.code : '';
-        console.log('strCountryImportCurrent: ' + this.strCountryImportCurrent);
+        //console.log('strCountryImportCurrent: ' + this.strCountryImportCurrent);
 
         const _commodity = find(this.listCommodity, { 'code': this.customDeclaration.commodityCode });
         this.strCommodityCurrent = _commodity != undefined ? _commodity.code : '';
-        console.log('strCommodityCurrent: ' + this.strCommodityCurrent);
+        //console.log('strCommodityCurrent: ' + this.strCommodityCurrent);
 
         const _unit = find(this.listUnit, { 'code': this.customDeclaration.unitCode });
         this.strUnitCurrent = _unit != undefined ? _unit.code : '';
-        console.log('strUnitCurrent: ' + this.strUnitCurrent);
+        //console.log('strUnitCurrent: ' + this.strUnitCurrent);
     }
 
     async updateCustomClearance(formUpdate: NgForm) {
@@ -103,9 +103,10 @@ export class CustomClearanceEditComponent implements OnInit {
         if (this.serviceTypeCurrent[0] != 'Air' && this.serviceTypeCurrent[0] != 'Express') {
             if (this.cargoTypeCurrent.length == 0) return;
         }
-        if (formUpdate.form.status != "INVALID" && this.customDeclaration.clearanceDate.endDate != null) {
+        if (formUpdate.form.status != "INVALID" && this._clearanceDate.endDate != null) {
             this.customDeclaration.partnerTaxCode = this.strCustomerCurrent;
-            this.customDeclaration.clearanceDate = moment(this.customDeclaration.clearanceDate.endDate._d).format('YYYY-MM-DD');
+            //this.customDeclaration.clearanceDate = moment(this.customDeclaration.clearanceDate.endDate._d).format('YYYY-MM-DD');
+            this.customDeclaration.clearanceDate = moment(this._clearanceDate.endDate._d).format('YYYY-MM-DD');
             this.customDeclaration.serviceType = this.serviceTypeCurrent[0];
             this.customDeclaration.gateway = this.strPortCurrent;
             this.customDeclaration.type = this.typeClearanceCurrent[0];
@@ -122,8 +123,9 @@ export class CustomClearanceEditComponent implements OnInit {
             if (respone.status) {
                 this.getCustomCleanranceById(this.customDeclaration.id);
             } else {
-                //reset lại clearanceDate
-                this.customDeclaration.clearanceDate = this.customDeclaration.clearanceDate == null ? this.customDeclaration.clearanceDate : { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate) };
+                //reset lại _clearanceDate
+                //this.customDeclaration.clearanceDate = this.customDeclaration.clearanceDate == null ? this.customDeclaration.clearanceDate : { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate) };
+                this._clearanceDate = this.customDeclaration.clearanceDate == null ? this.customDeclaration.clearanceDate : { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate) };
             }
         }
     }
@@ -240,7 +242,6 @@ export class CustomClearanceEditComponent implements OnInit {
     }
 
     public selectedServiceType(value: any): void {
-        //console.log('ServiceType: ', value);
         this.serviceTypeCurrent = [value.id];
         if (this.serviceTypeCurrent[0] == 'Air' || this.serviceTypeCurrent[0] == 'Express') {
             this.cargoTypeCurrent = [];
@@ -248,17 +249,14 @@ export class CustomClearanceEditComponent implements OnInit {
     }
 
     public selectedTypeClearance(value: any): void {
-        //console.log('TypeClearance: ', value);
         this.typeClearanceCurrent = [value.id];
     }
 
     public selectedRouteClearance(value: any): void {
-        //console.log('RouteClearance: ', value);
         this.routeClearanceCurrent = [value.id];
     }
 
     public selectedCargoType(value: any): void {
-        //console.log('CargoType: ', value);
         this.cargoTypeCurrent = [value.id];
     }
 
