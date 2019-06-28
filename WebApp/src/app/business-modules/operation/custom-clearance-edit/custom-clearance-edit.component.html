@@ -33,7 +33,7 @@
                                     (change)="customDeclaration.clearanceNo=customDeclaration.clearanceNo.trim()"
                                     class="form-control m-input m-input--square" #clearance_no="ngModel"
                                     onkeypress="return event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)"
-                                    name="clearance_no" required placeholder="">
+                                    name="clearance_no" required placeholder="" autoFocus>
                                 <div class="form-control-feedback" *ngIf="updateForm.submitted && clearance_no.invalid">
                                     Clearance No is required
                                 </div>

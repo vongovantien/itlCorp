@@ -70,7 +70,12 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     NgProgressModule,
     PerfectScrollbarModule,
     SelectModule, // Scrollbar
-    OAuthModule.forRoot(),
+    OAuthModule.forRoot({
+      resourceServer: {
+          allowedUrls: ['**'],
+          sendAccessToken: true
+      }
+  }),
     NgxDaterangepickerMd,
     HighchartsChartModule,
     DragDropModule

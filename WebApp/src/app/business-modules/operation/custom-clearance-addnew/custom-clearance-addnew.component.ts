@@ -5,7 +5,8 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { ActivatedRoute } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
-import { Location } from '@angular/common';
+import {Location} from '@angular/common';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
 
 @Component({
     selector: 'app-custom-clearance-addnew',
@@ -22,7 +23,7 @@ export class CustomClearanceAddnewComponent implements OnInit {
 
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU,
-        private route: ActivatedRoute,
+        private route: ActivatedRoute, 
         private _location: Location,
         private cdr: ChangeDetectorRef) {
         this.keepCalendarOpeningWithRange = true;
@@ -38,7 +39,6 @@ export class CustomClearanceAddnewComponent implements OnInit {
         await this.getListUnit();
         await this.getListCommodity();
     }
-
     async addCustomClearance(formAdd: NgForm) {
         if (this.strCustomerCurrent == '' || this.strPortCurrent == '') return;
         if (this.serviceTypeCurrent[0] != 'Air' && this.serviceTypeCurrent[0] != 'Express') {
@@ -63,9 +63,9 @@ export class CustomClearanceAddnewComponent implements OnInit {
             console.log(respone);
             if (respone) {
                 this._location.back();
-            } else {
-                //Reset lại clearanceDate
-                this.customDeclaration.clearanceDate = { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate)};
+			} else {
+				//Reset lại clearanceDate
+				this.customDeclaration.clearanceDate = { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate)};
             }
         }
     }
