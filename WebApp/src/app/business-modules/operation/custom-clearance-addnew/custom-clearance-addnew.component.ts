@@ -62,7 +62,7 @@ export class CustomClearanceAddnewComponent implements OnInit {
             const respone = await this.baseServices.postAsync(this.api_menu.ToolSetting.CustomClearance.add, this.customDeclaration, true, true);
             console.log(respone);
             if (respone) {
-                this._location.back();
+            this._location.back();
 			} else {
 				//Reset lại clearanceDate
 				this.customDeclaration.clearanceDate = { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate)};
