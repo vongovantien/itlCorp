@@ -172,5 +172,12 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.ConvertClearanceToJob(eFMS.API.Documentation.DL.Models.OpsTransactionClearanceModel)">
+            <summary>
+            convert a custom clearance to a job
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>

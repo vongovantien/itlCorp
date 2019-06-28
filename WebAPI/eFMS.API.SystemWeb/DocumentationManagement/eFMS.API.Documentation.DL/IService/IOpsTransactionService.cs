@@ -2,6 +2,7 @@
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
@@ -17,5 +18,6 @@ namespace eFMS.API.Documentation.DL.IService
         OpsTransactionModel GetDetails(Guid id);
         bool CheckAllowDelete(Guid jobId);
         Crystal PreviewCDNOte(AcctSOADetailsModel model);
+        HandleState ConvertClearanceToJob(OpsTransactionClearanceModel model);
     }
 }

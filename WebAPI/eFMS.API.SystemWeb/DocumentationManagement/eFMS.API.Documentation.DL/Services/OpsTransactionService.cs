@@ -215,5 +215,72 @@ namespace eFMS.API.Documentation.DL.Services
 
             return result;
         }
+
+        public HandleState ConvertClearanceToJob(OpsTransactionClearanceModel model)
+        {
+            var result = new HandleState();
+            try
+            {
+                if(CheckExist(model.CustomsDeclaration, model.CustomsDeclaration.Id))
+                {
+                    result = new HandleState("Existed Code");
+                    return result;
+                }
+                if(model.CustomsDeclaration.JobNo == null)
+                {
+                    model.OpsTransaction.Id = Guid.NewGuid();
+                    model.OpsTransaction.CreatedDate = DateTime.Now;
+                    model.OpsTransaction.UserCreated = currentUser.UserID; //currentUser.UserID;
+                    model.OpsTransaction.ModifiedDate = DateTime.Now;
+                    model.OpsTransaction.UserModified = currentUser.UserID;
+                    int countNumberJob = ((eFMSDataContext)DataContext.DC).OpsTransaction.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
+                    model.OpsTransaction.JobNo = GenerateID.GenerateOPSJobID("LOG", countNumberJob);
+                    var transaction = mapper.Map<OpsTransaction>(model.OpsTransaction);
+                    DataContext.Add(transaction, false);
+                }
+
+                var clearance = mapper.Map<CustomsDeclaration>(model.CustomsDeclaration);
+                if (clearance.Id > 0)
+                {
+                    clearance.DatetimeModified = DateTime.Now;
+                    clearance.UserModified = currentUser.UserID;
+                    clearance.JobNo = model.OpsTransaction.JobNo;
+                    ((eFMSDataContext)DataContext.DC).CustomsDeclaration.Update(clearance);
+                }
+                else
+                {
+                    clearance.DatetimeCreated = DateTime.Now;
+                    clearance.DatetimeModified = DateTime.Now;
+                    clearance.UserCreated = model.CustomsDeclaration.UserModified = currentUser.UserID;
+                    clearance.Source = "eFMS";
+                    clearance.JobNo = model.OpsTransaction.JobNo;
+                    ((eFMSDataContext)DataContext.DC).CustomsDeclaration.Add(clearance);
+                }
+                DataContext.DC.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                result = new HandleState(ex.Message);
+            }
+            return result;
+        }
+        private bool CheckExist(CustomsDeclarationModel model, decimal id)
+        {
+            if (id == 0)
+            {
+                if (((eFMSDataContext)DataContext.DC).CustomsDeclaration.Any(x => x.ClearanceNo == model.ClearanceNo && x.ClearanceDate == model.ClearanceDate))
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                if (((eFMSDataContext)DataContext.DC).CustomsDeclaration.Any(x => (x.ClearanceNo == model.ClearanceNo && x.Id != id && x.ClearanceDate == model.ClearanceDate)))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

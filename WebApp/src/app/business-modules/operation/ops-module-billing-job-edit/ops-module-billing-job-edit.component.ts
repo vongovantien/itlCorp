@@ -180,6 +180,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         }
         else{
             var response = await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.opsTransaction, true, true);
+            await this.getShipmentDetails(this.opsTransaction.id);
         }
     }
     //-------------     Container   -------------------//

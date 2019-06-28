@@ -33,7 +33,7 @@
                                     (change)="customDeclaration.clearanceNo=customDeclaration.clearanceNo.trim()"
                                     class="form-control m-input m-input--square" #clearance_no="ngModel"
                                     onkeypress="return event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)"
-                                    name="clearance_no" required placeholder="" autoFocus>
+                                    name="clearance_no" required placeholder="Enter text" autoFocus>
                                 <div class="form-control-feedback" *ngIf="updateForm.submitted && clearance_no.invalid">
                                     Clearance No is required
                                 </div>
@@ -93,7 +93,7 @@
                                     [(ngModel)]="customDeclaration.hblid" name="hblid" #hblib="ngModel"
                                     (change)="customDeclaration.hblid=customDeclaration.hblid.trim()"
                                     onkeypress="return event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)"
-                                    placeholder="">
+                                    placeholder="Enter text">
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -105,7 +105,7 @@
                                     [(ngModel)]="customDeclaration.mblid" name="mblid" #mblib="ngModel"
                                     (change)="customDeclaration.mblid=customDeclaration.mblid.trim()"
                                     onkeypress="return event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)"
-                                    placeholder="">
+                                    placeholder="Enter text">
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -258,7 +258,7 @@
                                 <input type="number" class="form-control m-input m-input--square"
                                     [(ngModel)]="customDeclaration.netWeight" name="net_weight"
                                     onkeypress="return event.charCode == 46 || (event.charCode > 47 && event.charCode < 58)"
-                                    #net_weight="ngModel" placeholder="">
+                                    #net_weight="ngModel" placeholder="Enter number">
                             </div>
                         </div>
                     </div>
@@ -271,7 +271,7 @@
                                 <input type="number" class="form-control m-input m-input--square"
                                     [(ngModel)]="customDeclaration.cbm" name="cbm"
                                     onkeypress="return event.charCode == 46 || (event.charCode > 47 && event.charCode < 58)"
-                                    #cbm="ngModel" placeholder="">
+                                    #cbm="ngModel" placeholder="Enter number">
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -282,7 +282,7 @@
                                 <input type="number" class="form-control m-input m-input--square"
                                     [(ngModel)]="customDeclaration.qtyCont" name="qty_cont"
                                     onkeypress="return (event.charCode > 47 && event.charCode < 58)" #qty_cont="ngModel"
-                                    placeholder="">
+                                    placeholder="Enter number">
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -292,7 +292,7 @@
                                 </label>
                                 <div class="input-group m-input-group m-input-group--square">
                                     <input type="number" class="form-control m-input" aria-label=""
-                                        [(ngModel)]="customDeclaration.pcs" name="pcs"
+                                        [(ngModel)]="customDeclaration.pcs" name="pcs" placeholder="Enter number"
                                         onkeypress="return (event.charCode > 47 && event.charCode < 58)" #pcs="ngModel">
                                     <div class="input-group-prepend">
                                         <app-combo-grid-virtual-scroll
@@ -315,7 +315,7 @@
                                 <input type="text" class="form-control m-input m-input--square"
                                     [(ngModel)]="customDeclaration.note" name="note"
                                     (change)="customDeclaration.note=customDeclaration.note.trim()" #note="ngModel"
-                                    placeholder="">
+                                    placeholder="Enter text">
                             </div>
                         </div>
                     </div>
@@ -385,7 +385,7 @@
                     </button>
                 </ng-template>
                 <button *ngIf="customDeclaration.jobNo; else allowSaveAndConvert" type="" disabled="true"
-                    class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                    class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" >
                     <span>
                         <i class="la la la-save"></i>
                         <span>
@@ -394,7 +394,7 @@
                     </span>
                 </button>
                 <ng-template #allowSaveAndConvert>
-                    <button type="" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                    <button type="" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)="convertClearanceToShipment(updateForm)">
                         <span>
                             <i class="la la la-save"></i>
                             <span>
@@ -403,7 +403,6 @@
                         </span>
                     </button>
                 </ng-template>
-
                 <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
                     routerLink="/home/operation/custom-clearance">
                     <span>

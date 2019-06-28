@@ -319,18 +319,17 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-lg-4">
-                                        <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && flightVessel.invalid}">
+                                        <div class="form-group">
                                             <label class="form-control-label" for="">
-                                                Vessel/Flight <span class="m--font-danger">(*)</span>
+                                                Vessel/Flight
                                             </label>
                                             <input type="text" required class="form-control m-input m-input--square"
                                                 placeholder="Enter text" name="flightVessel"
                                                 [(ngModel)]="opsTransaction.flightVessel" #flightVessel="ngModel">
-                                            <div class="form-control-feedback"
+                                            <!-- <div class="form-control-feedback"
                                                 *ngIf="addOpsForm.submitted && flightVessel.invalid">
                                                 Vessel/Flight No is required!
-                                            </div>
+                                            </div> -->
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
@@ -453,8 +452,8 @@
                                             <label class="form-control-label" for="">
                                                 GW
                                             </label>
-                                            <input type="text" class="form-control m-input m-input--square"
-                                                placeholder="Enter text" name="sumGrossWeight"
+                                            <input type="number" class="form-control m-input m-input--square"
+                                                placeholder="Enter number" name="sumGrossWeight"
                                                 [(ngModel)]="opsTransaction.sumGrossWeight" #sumGrossWeight="ngModel">
                                         </div>
                                     </div>
@@ -463,8 +462,8 @@
                                             <label class="form-control-label" for="">
                                                 NW
                                             </label>
-                                            <input type="text" class="form-control m-input m-input--square"
-                                                placeholder="Enter text" name="sumNetWeight"
+                                            <input type="number" class="form-control m-input m-input--square"
+                                                placeholder="Enter number" name="sumNetWeight"
                                                 [(ngModel)]="opsTransaction.sumNetWeight" #sumNetWeight="ngModel">
                                         </div>
                                     </div>
@@ -473,8 +472,8 @@
                                             <label class="form-control-label" for="">
                                                 CBM
                                             </label>
-                                            <input type="text" class="form-control m-input m-input--square"
-                                                placeholder="Enter text" name="sumCbm"
+                                            <input type="number" class="form-control m-input m-input--square"
+                                                placeholder="Enter number" name="sumCbm"
                                                 [(ngModel)]="opsTransaction.sumCbm" #sumCbm="ngModel">
                                         </div>
                                     </div>
@@ -486,7 +485,7 @@
                                                 Packages Qty
                                             </label>
                                             <div class="input-group m-input-group m-input-group--square">
-                                                <input type="text" class="form-control m-input" aria-label="" name="sumPackages"
+                                                <input type="number" class="form-control m-input" aria-label="" name="sumPackages" placeholder="Enter number"
                                                     [(ngModel)]="opsTransaction.sumPackages" #sumPackages="ngModel">
                                                 <div class="input-group-prepend">
                                                     <ng-select [allowClear]="false" [items]="packageTypes"
@@ -504,9 +503,8 @@
                                             <label class="form-control-label" for="">
                                                 Container Qty
                                             </label>
-                                            <input type="text" class="form-control m-input m-input--square" name="sumContainers"
-                                                [(ngModel)]="opsTransaction.sumContainers" #sumContainers="ngModel"
-                                                placeholder="">
+                                            <input type="number" class="form-control m-input m-input--square" name="sumContainers" placeholder="Enter number"
+                                                [(ngModel)]="opsTransaction.sumContainers" #sumContainers="ngModel">
                                         </div>
                                     </div>
                                     <div class="col-xl-4">
