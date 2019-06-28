@@ -23,6 +23,8 @@ using System.Reflection;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.Localization;
+using LocalizationCultureCore.StringLocalizer;
 
 namespace eFMS.API.Setting.Infrastructure
 {
@@ -31,6 +33,8 @@ namespace eFMS.API.Setting.Infrastructure
 
         public static void Register(IServiceCollection services)
         {
+            services.AddTransient<IStringLocalizer, JsonStringLocalizer>();
+            services.AddTransient<IStringLocalizerFactory, JsonStringLocalizerFactory>();
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
             services.AddTransient<ICategoryLogService, CategoryLogService>();
             services.AddTransient<IEcusConnectionService, EcusConnectionService>();
@@ -85,7 +89,7 @@ namespace eFMS.API.Setting.Infrastructure
             services.AddSingleton(localizationOptions);
             return services;
         }
-        public static IServiceCollection AddSwagger(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddSwagger(this IServiceCollection services)
         {
             services.AddSwaggerGen(
                 options =>
