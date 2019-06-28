@@ -7,6 +7,8 @@ import { NgForm } from '@angular/forms';
 import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
 import {Location} from '@angular/common';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
+import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
+import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 
 @Component({
     selector: 'app-custom-clearance-addnew',
@@ -72,7 +74,7 @@ export class CustomClearanceAddnewComponent implements OnInit {
 
     async getListCustomer() {
         //partnerGroup = 3 ~ Customer
-        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: 3 }, true, true);
+        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.CUSTOMER }, true, true);
         this.listCustomer = res;
     }
 
@@ -87,7 +89,7 @@ export class CustomClearanceAddnewComponent implements OnInit {
 
     async getListPort() {
         //placeType = 8 ~ Port
-        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, { placeType: 8 }, true, true);
+        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, { placeType: PlaceTypeEnum.Port }, true, true);
         this.listPort = res;
     }
 

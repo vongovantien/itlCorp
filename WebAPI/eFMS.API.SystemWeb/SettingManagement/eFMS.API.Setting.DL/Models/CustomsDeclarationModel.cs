@@ -11,5 +11,6 @@ namespace eFMS.API.Setting.DL.Models
         public string ImportCountryName { get; set; }
         public string ExportCountryName { get; set; }
         public string GatewayName { get; set; }
+        public bool IsValid { get; set; }
     }
 }

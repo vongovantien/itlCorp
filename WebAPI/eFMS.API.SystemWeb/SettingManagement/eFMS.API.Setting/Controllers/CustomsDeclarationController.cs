@@ -10,14 +10,16 @@ using eFMS.API.Setting.Infrastructure.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using eFMS.API.Setting.Infrastructure.Middlewares;
-using eFMS.API.Setting.Resources;
-using System.Diagnostics.Contracts;
 using eFMS.API.Setting.DL.Models.Criteria;
 using eFMS.API.Setting.DL.Common;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.AspNetCore.Authorization;
 using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Common.NoSql;
+using eFMS.API.Common.Helpers;
+using Microsoft.AspNetCore.Http;
+using OfficeOpenXml;
+
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -43,7 +45,7 @@ namespace eFMS.API.Setting.Controllers
         /// <param name="localizer">inject interface IStringLocalizer</param>
         /// <param name="service">inject interface ICustomsDeclarationService</param>
         /// <param name="distributedCache"></param>
-        public CustomsDeclarationController(IStringLocalizer<LanguageSub> localizer, ICustomsDeclarationService service, IDistributedCache distributedCache, ICurrentUser user)
+        public CustomsDeclarationController(IStringLocalizer<DL.Common.LanguageSub> localizer, ICustomsDeclarationService service, IDistributedCache distributedCache, ICurrentUser user)
         {
             stringLocalizer = localizer;
             customsDeclarationService = service;
@@ -283,6 +285,83 @@ namespace eFMS.API.Setting.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        /// <summary>
+        /// download file excel from server
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("DownloadExcel")]
+        public async Task<ActionResult> DownloadExcel()
+        {
+            string templateName = Templates.CustomDeclaration.ExelImportFileName + Templates.ExelImportEx;
+            var result = await new FileHelper().ExportExcel(templateName);
+            if (result != null)
+            {
+                return result;
+            }
+            else
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+            }
+        }
+
+        /// <summary>
+        /// read data from file excel
+        /// </summary>
+        /// <param name="uploadedFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("uploadFile")]
+        public IActionResult UploadFile(IFormFile uploadedFile)
+        {
+            var file = new FileHelper().UploadExcel(uploadedFile);
+            if (file != null)
+            {
+                ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
+                int? rowCount = worksheet.Dimension?.Rows;
+                int? colCount = worksheet.Dimension?.Columns;
+                if (rowCount < 2 || rowCount == null) return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.NOT_FOUND_DATA_EXCEL].Value });
+                List<CustomsDeclarationModel> list = new List<CustomsDeclarationModel>();
+                DateTime? dateNull = null;
+                decimal? decimalNull = null;
+                int? intNull = null;
+
+                for (int row = 2; row < rowCount + 1; row++)
+                {                   
+                    var stage = new CustomsDeclarationModel
+                    {
+                        IsValid = true,
+                        ClearanceNo = worksheet.Cells[row, 1]?.Value.ToString(),
+                        Type = worksheet.Cells[row, 2].Value?.ToString(),
+                        FirstClearanceNo = worksheet.Cells[row, 3].Value?.ToString(),
+                        ClearanceDate = worksheet.Cells[row, 4].Value == null ? dateNull : Convert.ToDateTime(worksheet.Cells[row, 4].Value.ToString()),
+                        PartnerTaxCode = worksheet.Cells[row, 5].Value?.ToString(),
+                        CustomerName = worksheet.Cells[row, 6].Value?.ToString(),
+                        Mblid = worksheet.Cells[row, 7].Value?.ToString(),
+                        Hblid = worksheet.Cells[row, 8].Value?.ToString(),
+                        Gateway = worksheet.Cells[row, 9].Value?.ToString(),
+                        GrossWeight = worksheet.Cells[row, 10].Value == null ? decimalNull : Convert.ToDecimal(worksheet.Cells[row, 10].Value.ToString()),
+                        NetWeight = worksheet.Cells[row, 11].Value == null ? decimalNull : Convert.ToDecimal(worksheet.Cells[row, 11].Value.ToString()),
+                        Cbm = worksheet.Cells[row, 12].Value == null ? decimalNull : Convert.ToDecimal(worksheet.Cells[row, 12].Value.ToString()),
+                        QtyCont = worksheet.Cells[row, 13].Value == null ? intNull : Convert.ToInt32(worksheet.Cells[row, 13].Value.ToString()),
+                        Pcs = worksheet.Cells[row, 14].Value == null ? intNull : Convert.ToInt32(worksheet.Cells[row, 14].Value.ToString()),
+                        CommodityCode = worksheet.Cells[row, 15].Value?.ToString(),
+                        //CountryShipping = worksheet.Cells[row, 16].Value == null ? string.Empty : worksheet.Cells[row, 16].Value.ToString(),
+                        CargoType = worksheet.Cells[row, 17].Value?.ToString(),
+                        ServiceType = worksheet.Cells[row, 18].Value?.ToString(),
+                        Route = worksheet.Cells[row, 19].Value?.ToString(),
+                        ImportCountryCode = worksheet.Cells[row, 20].Value?.ToString(),
+                        ExportCountryCode = worksheet.Cells[row, 21].Value?.ToString()
+                    };
+                    list.Add(stage);
+                }
+                var data = customsDeclarationService.CheckValidImport(list);
+                var totalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totalValidRows };
+                return Ok(results);
+            }
+            return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
         }
     }
 }

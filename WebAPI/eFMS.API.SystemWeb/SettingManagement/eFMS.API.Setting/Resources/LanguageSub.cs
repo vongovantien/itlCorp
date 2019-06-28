@@ -30,5 +30,7 @@ namespace eFMS.API.Setting.Resources
         public static readonly string MSG_DELETE_FAIL_INCLUDED_CHILD = "MSG_DELETE_FAIL_INCLUDED_CHILD";
         public static readonly string EF_ANNOTATIONS_REQUIRED = "EF_ANNOTATIONS_REQUIRED";
         public static readonly string MSG_CLEARANCENO_EXISTED = "MSG_CLEARANCENO_EXISTED";
+        public static readonly string FILE_NOT_FOUND = "FILE_NOT_FOUND";
+        public static readonly string NOT_FOUND_DATA_EXCEL = "NOT_FOUND_DATA_EXCEL";
     }
 }

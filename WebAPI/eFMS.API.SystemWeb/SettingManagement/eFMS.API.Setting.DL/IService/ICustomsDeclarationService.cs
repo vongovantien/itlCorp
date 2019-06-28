@@ -21,5 +21,6 @@ namespace eFMS.API.Setting.DL.IService
         HandleState UpdateJobToClearances(List<CustomsDeclarationModel> clearances);
         CustomsDeclaration GetById(int id);
         HandleState DeleteMultiple(List<CustomsDeclarationModel> customs);
+        List<CustomsDeclarationModel> CheckValidImport(List<CustomsDeclarationModel> list);
     }
 }
