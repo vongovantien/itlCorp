@@ -59,14 +59,14 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': updateForm.submitted && customDeclaration.clearanceDate.endDate == null }">
+                                [ngClass]="{ 'm-form__group has-danger': updateForm.submitted && _clearanceDate.endDate == null }">
                                 <label class="form-control-label" for="">
                                     Clearance Date <span class="m--font-danger">(*)</span>
                                 </label>
                                 <div class="m-input-icon m-input-icon--right down">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                        [(ngModel)]="customDeclaration.clearanceDate" [singleDatePicker]="true"
+                                        [(ngModel)]="_clearanceDate" [singleDatePicker]="true"
                                         #singledater="ngModel" name="singledater" placeholder="Select date" readonly
                                         required />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
@@ -75,7 +75,7 @@
                                         </span>
                                     </span>
                                     <div class="form-control-feedback"
-                                        *ngIf="updateForm.submitted && customDeclaration.clearanceDate.endDate == null">
+                                        *ngIf="updateForm.submitted && _clearanceDate.endDate == null">
                                         Clearance Date is required
                                     </div>
                                 </div>

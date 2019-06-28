@@ -49,9 +49,9 @@
                             <label class="form-control-label" for="">
                                 Person Handle
                             </label>
-                            <ng-select [allowClear]="false" [items]="listUser" [active]="currentUser" [disabled]="disabled"
-                                (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
-                                (typed)="typed($event)" placeholder="Select filter">
+                            <ng-select [allowClear]="false" [items]="listUser" [active]="currentUser"
+                                [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)"
+                                (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
                             </ng-select>
                         </div>
                     </div>
@@ -60,7 +60,8 @@
                             <label class="form-control-label" for="">
                                 Clearance No
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" [(ngModel)]="clearanceNo" placeholder="">
+                            <input type="text" class="form-control m-input m-input--square" [(ngModel)]="clearanceNo"
+                                placeholder="">
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -90,9 +91,10 @@
                             </label>
                             <div class="m-input-icon m-input-icon--right down daterange-ltr">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                    [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [(ngModel)]="selectedRangeImportDate"  [ranges]="ranges"
-                                    [maxDate]="maxDate" [alwaysShowCalendars]="true" name="daterange"
-                                    placeholder="From date - to date" readonly />
+                                    [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                    [(ngModel)]="selectedRangeImportDate" [ranges]="ranges" [maxDate]="maxDate"
+                                    [alwaysShowCalendars]="true" name="daterange" placeholder="From date - to date"
+                                    readonly />
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
                                         <i class="la la-calendar"></i>
@@ -106,8 +108,9 @@
                             <label class="form-control-label" for="">
                                 Import Status
                             </label>
-                            <ng-select [allowClear]="true" [items]="statusClearance" [active]="defaultImportStatus" [disabled]="disabled"
-                                (data)="refreshValue($event)" (selected)="selectedImportStatus($event)" (removed)="removed($event)"
+                            <ng-select [allowClear]="true" [items]="statusClearance" [active]="defaultImportStatus"
+                                [disabled]="disabled" (data)="refreshValue($event)"
+                                (selected)="selectedImportStatus($event)" (removed)="removed($event)"
                                 (typed)="typed($event)" placeholder="Select filter">
                             </ng-select>
                         </div>
@@ -117,8 +120,9 @@
                             <label class="form-control-label" for="">
                                 Type
                             </label>
-                            <ng-select [allowClear]="true" [items]="typeClearance" [active]="defaultTypeClearance" [disabled]="disabled"
-                                (data)="refreshValue($event)" (selected)="selectedTypeClearance($event)" (removed)="removed($event)"
+                            <ng-select [allowClear]="true" [items]="typeClearance" [active]="defaultTypeClearance"
+                                [disabled]="disabled" (data)="refreshValue($event)"
+                                (selected)="selectedTypeClearance($event)" (removed)="removed($event)"
                                 (typed)="typed($event)" placeholder="Select filter">
                             </ng-select>
                         </div>
@@ -128,7 +132,8 @@
                     <div class="row">
                         <div class="col-lg-6"></div>
                         <div class="col-lg-6 m--align-right">
-                            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="searchUnit()">
+                            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                                (click)="searchCustomClearance()">
                                 <span>
                                     <i class="la la-search"></i>
                                     <span>
@@ -136,7 +141,8 @@
                                     </span>
                                 </span>
                             </button>
-                            <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" (click)="resetSearch()">
+                            <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                                (click)="resetSearch()">
                                 <span>
                                     <i class="la la-refresh"></i>
                                     <span>
@@ -159,7 +165,7 @@
                 <div class="row">
                     <div class="col-lg-12 c-button-actions">
                         <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                            data-toggle="" data-target="">
+                            id="btnDeleteCustomClearance" data-toggle="modal" data-target="#confirm-delete-modal" (click)="confirmDelete()">
                             <span>
                                 <i class="la la-trash"></i>
                                 <span>
@@ -193,32 +199,39 @@
                     <thead>
                         <tr>
                             <th class="table-actions-col">Action</th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceNo'), 'sorting_desc': (!isDesc && sortKey == 'clearanceNo') }"
-                            (click)="sort('clearanceNo')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceNo'), 'sorting_desc': (!isDesc && sortKey == 'clearanceNo') }"
+                                (click)="sort('clearanceNo')">
                                 <span>Clearance No</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'type'), 'sorting_desc': (!isDesc && sortKey == 'type') }"
-                            (click)="sort('type')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'type'), 'sorting_desc': (!isDesc && sortKey == 'type') }"
+                                (click)="sort('type')">
                                 <span>Type</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'gatewayName'), 'sorting_desc': (!isDesc && sortKey == 'gatewayName') }"
-                            (click)="sort('gatewayName')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'gatewayName'), 'sorting_desc': (!isDesc && sortKey == 'gatewayName') }"
+                                (click)="sort('gatewayName')">
                                 <span>Gate Way</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'customerName'), 'sorting_desc': (!isDesc && sortKey == 'customerName') }"
-                            (click)="sort('customerName')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'customerName'), 'sorting_desc': (!isDesc && sortKey == 'customerName') }"
+                                (click)="sort('customerName')">
                                 <span>Partner Name</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'importCountryName'), 'sorting_desc': (!isDesc && sortKey == 'importCountryName') }"
-                            (click)="sort('importCountryName')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'importCountryName'), 'sorting_desc': (!isDesc && sortKey == 'importCountryName') }"
+                                (click)="sort('importCountryName')">
                                 <span>Import Country</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'exportCountryName'), 'sorting_desc': (!isDesc && sortKey == 'exportCountryName') }"
-                            (click)="sort('exportCountryName')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'exportCountryName'), 'sorting_desc': (!isDesc && sortKey == 'exportCountryName') }"
+                                (click)="sort('exportCountryName')">
                                 <span>Export Country</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'jobNo'), 'sorting_desc': (!isDesc && sortKey == 'jobNo') }"
-                            (click)="sort('jobNo')">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'jobNo'), 'sorting_desc': (!isDesc && sortKey == 'jobNo') }"
+                                (click)="sort('jobNo')">
                                 <span>JOBID</span>
                             </th>
                             <th>
@@ -234,14 +247,19 @@
                             <td class="table-actions-col">
                                 <div class="table-actions">
                                     <label class="m-checkbox">
-                                        <input type="checkbox" disabled="disabled">
+                                        <input *ngIf="custom.jobNo; else allowChecked" type="checkbox"
+                                            disabled="disabled">
+                                        <ng-template #allowChecked>
+                                            <input type="checkbox"
+                                                (change)="onChangeAction(custom, $event.target.checked)">
+                                        </ng-template>
                                         <span></span>
                                     </label>
                                 </div>
                             </td>
                             <td>
                                 <a href="javascript:void(0)"
-                                     (click)="gotoEditPage(custom.id)">{{custom.clearanceNo}}</a>
+                                    (click)="gotoEditPage(custom.id)">{{custom.clearanceNo}}</a>
                             </td>
                             <td>
                                 <span>{{custom.type}}</span>
@@ -287,40 +305,52 @@
                 </table>
             </div>
             <!--end: Datatable of trucking-table -->
-            <!--begin::pagination-->
-            <!-- <div class="pagination-nav">
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="tatable__pager-size" style="max-width: 190px">
-                            <div class="select-box">
-                                <select class="form-control m-input m-input--square" id="" aria-label="">
-                                    <option value="1">15 line/screen</option>
-                                    <option value="2">30 line/screen</option>
-                                    <option value="3">50 line/screen</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <nav aria-label="">
-                            <ul class="pagination justify-content-end">
-                                <li class="page-item"><a class="page-link" href="javascript:void(0)">First</a></li>
-                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Back</a></li>
-                                <li class="page-item active"><a class="page-link" href="javascript:void(0)">1</a></li>
-                                <li class="page-item"><a class="page-link" href="javascript:void(0)">2</a></li>
-                                <li class="page-item"><a class="page-link" href="javascript:void(0)">3</a></li>
-                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Next</a></li>
-                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Last</a></li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </div> -->
+
             <app-pagination currentPage *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)"
-                    (pagerObject)="setPage($event)"></app-pagination>
-            <!--end::pagination-->
+                (pagerObject)="setPage($event)"></app-pagination>
         </div>
     </div>
     <!--end::  m-portlet-->
 </div>
 <!--end:: m-content-->
+
+<!--begin::confirm-delete-modal-->
+<div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Warning!!</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>Do you Want To delete Custom No selected??</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    data-dismiss="modal" (click)="delete()">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            OK
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal"
+                    (click)="cancelDelete()">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            No
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::confirm-delete-modal-->

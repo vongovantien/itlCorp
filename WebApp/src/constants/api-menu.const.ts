@@ -251,7 +251,8 @@ export class API_MENU {
             updateToAJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/UpdateJobToClearances",
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/Update",
             add: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/Add",
-            importClearancesFromEcus: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/ImportClearancesFromEcus"
+            importClearancesFromEcus: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/ImportClearancesFromEcus",
+            deleteMultiple: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/DeleteMultiple"
         }
     }
 

@@ -6,6 +6,8 @@ import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+declare var $: any;
 
 @Component({
     selector: 'app-custom-clearance',
@@ -18,12 +20,14 @@ export class CustomClearanceComponent implements OnInit {
     searchObject: any = {};
     listUser: Array<string> = [];
     clearanceNo: string = '';
+    customCheckedArray: any = [];
 
     constructor(
         private baseServices: BaseService,
         private api_menu: API_MENU,
         private sortService: SortService,
-        private router: Router) {
+        private router: Router,
+        private toastr: ToastrService) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         //this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
@@ -40,6 +44,8 @@ export class CustomClearanceComponent implements OnInit {
     initPager(): any {
         this.pager.totalItems = 0;
         this.pager.currentPage = 1;
+
+        this.customCheckedArray = [];
     }
 
     async getListCustomsDeclaration() {
@@ -47,11 +53,12 @@ export class CustomClearanceComponent implements OnInit {
         console.log(res);
         this.listCustomDeclaration = res.data;
         this.pager.totalItems = res.totalItems;
+
+        this.customCheckedArray = [];
     }
 
     getListUser() {
         this.baseServices.get(this.api_menu.System.User_Management.getAll).subscribe((res: any) => {
-            console.log(res);
             this.listUser = res.map(x => ({ "text": x.username, "id": x.id }));
         }, err => {
             this.listUser = [];
@@ -67,14 +74,14 @@ export class CustomClearanceComponent implements OnInit {
         this.getListCustomsDeclaration();
     }
 
-    async searchUnit() {
+    async searchCustomClearance() {
         this.initPager();
         this.searchObject = {};
 
         this.searchObject.ClearanceNo = this.clearanceNo;
         this.searchObject.FromClearanceDate = this.selectedRange.startDate._d;
         this.searchObject.ToClearanceDate = this.selectedRange.endDate._d;
-        if(this.defaultImportStatus[0] === 'All'){
+        if (this.defaultImportStatus[0] === 'All') {
             this.searchObject.ImPorted = null;
         } else {
             this.searchObject.ImPorted = this.defaultImportStatus[0] === 'Imported' ? true : false;
@@ -102,7 +109,6 @@ export class CustomClearanceComponent implements OnInit {
         this.getListCustomsDeclaration();
     }
 
-
     isDesc = true;
     sortKey: string = "";
     sort(property) {
@@ -110,8 +116,8 @@ export class CustomClearanceComponent implements OnInit {
         this.sortKey = property;
         this.listCustomDeclaration = this.sortService.sort(this.listCustomDeclaration, property, this.isDesc);
     }
-    
-    gotoEditPage(id){
+
+    gotoEditPage(id) {
         this.router.navigate(["/home/operation/custom-clearance-edit", { id: id }]);
     }
     async getDataFromEcus(){
@@ -119,6 +125,36 @@ export class CustomClearanceComponent implements OnInit {
         this.pager.totalItems = 0;
         this.pager.currentPage = 1;
         this.getListCustomsDeclaration();
+    }
+
+    onChangeAction(custom, isChecked: boolean) {
+        if (isChecked) {
+            this.customCheckedArray.push(custom);
+        } else {
+            let index = this.customCheckedArray.indexOf(custom);
+            this.customCheckedArray.splice(index, 1);
+        }
+        console.log(this.customCheckedArray);
+    }
+
+    confirmDelete() {
+        if (this.customCheckedArray.length > 0) {
+            $('#btnDeleteCustomClearance').attr('data-target', '#confirm-delete-modal');
+        } else {
+            $('#btnDeleteCustomClearance').removeAttr('data-target');
+            this.toastr.warning('Not selected custom clearance', '', { positionClass: 'toast-bottom-right', closeButton: true, timeOut: 5000 });
+        }
+    }
+
+    async delete() {
+        const response = await this.baseServices.putAsync(this.api_menu.ToolSetting.CustomClearance.deleteMultiple, this.customCheckedArray, true, true);
+        console.log(response);
+        await this.initPager();
+        await this.getListCustomsDeclaration();
+    }
+
+    async cancelDelete() {
+
     }
 
     /**

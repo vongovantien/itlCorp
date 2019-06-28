@@ -95,7 +95,7 @@ namespace eFMS.API.Setting.Controllers
         /// <returns></returns>
         [HttpPost("Paging")]
         public IActionResult Paging(CustomsDeclarationCriteria criteria, int pageNumber, int pageSize)
-       {
+        {
             var data = customsDeclarationService.Paging(criteria, pageNumber, pageSize, out int totalItems);
             var result = new { data, totalItems, pageNumber, pageSize };
             return Ok(result);
@@ -263,6 +263,26 @@ namespace eFMS.API.Setting.Controllers
         {
             var results = customsDeclarationService.GetById(id);
             return Ok(results);
+        }
+
+        /// <summary>
+        /// Delete multiple custom clearance
+        /// </summary>
+        /// <param name="customs">list of clearances selected</param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPut]
+        [Route("DeleteMultiple")]
+        public IActionResult DeleteMultiple(List<CustomsDeclarationModel> customs)
+        {
+            var hs = customsDeclarationService.DeleteMultiple(customs);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
     }
 }

@@ -33,7 +33,7 @@ namespace eFMS.API.Setting.DL.Services
         private readonly IDistributedCache cache;
         private readonly ICurrentUser currentUser;
 
-        public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, IMapper mapper, 
+        public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, IMapper mapper,
             IEcusConnectionService ecusCconnection
             , ICatPartnerApiService catPartner
             , ICatPlaceApiService catPlace
@@ -77,7 +77,7 @@ namespace eFMS.API.Setting.DL.Services
             foreach (var item in connections)
             {
                 var clearanceEcus = ecusCconnectionService.GetDataEcusByUser(item.UserId, item.ServerName, item.Dbusername, item.Dbpassword, item.Dbname);
-                if(clearanceEcus == null)
+                if (clearanceEcus == null)
                 {
                     continue;
                 }
@@ -159,7 +159,7 @@ namespace eFMS.API.Setting.DL.Services
         private string GetRouteType(string luong)
         {
             var route = string.Empty;
-            switch(luong)
+            switch (luong)
             {
                 case ClearanceConstants.Route_Type_Vang:
                     route = ClearanceConstants.Route_Type_Yellow;
@@ -220,7 +220,7 @@ namespace eFMS.API.Setting.DL.Services
             {
                 query = query.And(x => x.JobNo != null);
             }
-            else if(criteria.ImPorted == false)
+            else if (criteria.ImPorted == false)
             {
                 query = query.And(x => x.JobNo == null);
             }
@@ -255,7 +255,7 @@ namespace eFMS.API.Setting.DL.Services
                               from customer in grpCustomers.DefaultIfEmpty()
                               select new { clearance, ImportCountryName = imCountry.NameEn, ExportCountryName = exCountry.NameEn, GatewayName = port.NameEn, CustomerName = customer.PartnerNameEn }
                        );
-            if(clearances == null) return results;
+            if (clearances == null) return results;
             foreach (var item in clearances)
             {
                 var clearance = mapper.Map<CustomsDeclarationModel>(item.clearance);
@@ -282,7 +282,8 @@ namespace eFMS.API.Setting.DL.Services
             return results;
         }
 
-        public object GetClearanceTypeData() {
+        public object GetClearanceTypeData()
+        {
             var types = CustomData.Types;
             var cargoTypes = CustomData.CargoTypes;
             var routes = CustomData.Routes;
@@ -309,7 +310,7 @@ namespace eFMS.API.Setting.DL.Services
             }
             return result;
         }
- 		public CustomsDeclaration GetById(int id)
+        public CustomsDeclaration GetById(int id)
         {
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var result = dc.CustomsDeclaration.Where(x => x.Id == id).FirstOrDefault();
@@ -336,6 +337,22 @@ namespace eFMS.API.Setting.DL.Services
             if (list == null) return new List<CustomsDeclarationModel>();
             var results = MapClearancesToClearanceModels(list);
             return results;
+        }
+
+        public HandleState DeleteMultiple(List<CustomsDeclarationModel> customs)
+        {
+            var result = new HandleState();
+            try
+            {
+                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                dc.CustomsDeclaration.RemoveRange(customs);
+                dc.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                result = new HandleState(ex.Message);
+            }
+            return result;
         }
     }
 }
