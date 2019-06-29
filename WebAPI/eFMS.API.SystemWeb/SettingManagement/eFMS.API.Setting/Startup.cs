@@ -75,7 +75,7 @@ namespace eFMS.API.Setting
             services.AddCatelogueManagementApiServices();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddCulture(Configuration);
-            services.AddSwagger(Configuration);
+            services.AddSwagger();
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
             IHostingEnvironment env, IApiVersionDescriptionProvider provider)

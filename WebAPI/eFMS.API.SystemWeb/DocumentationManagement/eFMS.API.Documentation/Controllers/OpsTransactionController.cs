@@ -175,6 +175,24 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(transactionService.CheckAllowDelete(id));
         }
 
+        /// <summary>
+        /// convert a custom clearance to a job
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("ConvertClearanceToJob")]
+        public IActionResult ConvertClearanceToJob(OpsTransactionClearanceModel model)
+        {
+            var hs = transactionService.ConvertClearanceToJob(model);
+            var message = HandleError.GetMessage(hs, Crud.Insert);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
         private string CheckExist(OpsTransactionModel model)
         {
             var existedHBL = transactionService.Any(x => x.Id != model.Id && x.Hwbno == model.Hwbno);

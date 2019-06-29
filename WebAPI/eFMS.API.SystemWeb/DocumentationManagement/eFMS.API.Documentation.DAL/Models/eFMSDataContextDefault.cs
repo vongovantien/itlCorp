@@ -2238,11 +2238,13 @@ namespace eFMS.API.Documentation.Service.Models
             {
                 entity.Property(e => e.Id).HasColumnName("ID");
 
+                entity.Property(e => e.CargoType)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Cbm)
                     .HasColumnName("CBM")
                     .HasColumnType("decimal(18, 4)");
-
-                entity.Property(e => e.ChargeWeight).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.ClearanceDate).HasColumnType("smalldatetime");
 
@@ -2250,7 +2252,9 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsRequired()
                     .HasMaxLength(50);
 
-                entity.Property(e => e.CommodityId).HasColumnName("CommodityID");
+                entity.Property(e => e.CommodityCode)
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.DatetimeCreated).HasColumnType("smalldatetime");
 
@@ -2281,11 +2285,9 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("IDFromECus")
                     .HasColumnType("numeric(18, 0)");
 
-                entity.Property(e => e.ImportcountryCode)
+                entity.Property(e => e.ImportCountryCode)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.Property(e => e.JobId).HasColumnName("JobID");
 
                 entity.Property(e => e.JobNo)
                     .HasMaxLength(50)
@@ -2295,6 +2297,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("MBLID")
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.NetWeight).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.PartnerTaxCode)
                     .HasMaxLength(50)
@@ -2324,8 +2328,7 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Type).HasMaxLength(50);
 
-                entity.Property(e => e.UnitId)
-                    .HasColumnName("UnitID")
+                entity.Property(e => e.UnitCode)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
