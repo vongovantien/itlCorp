@@ -179,5 +179,12 @@
             <param name="model"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.ConvertExistedClearancesToJobs(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.OpsTransactionClearanceModel})">
+            <summary>
+            convert multi clearances to multi jobs
+            </summary>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>

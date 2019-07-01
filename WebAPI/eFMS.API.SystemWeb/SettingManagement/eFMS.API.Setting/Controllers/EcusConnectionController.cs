@@ -17,6 +17,7 @@ using eFMS.API.Setting.DL.Models.Criteria;
 using eFMS.API.Setting.DL.Models.Ecus;
 using Microsoft.AspNetCore.Authorization;
 using eFMS.API.Common.Globals;
+using eFMS.API.Setting.Resources;
 
 namespace eFMS.API.Setting.Controllers
 {

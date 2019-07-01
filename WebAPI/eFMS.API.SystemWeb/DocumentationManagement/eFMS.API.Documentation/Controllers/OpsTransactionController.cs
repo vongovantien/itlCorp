@@ -10,6 +10,7 @@ using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -184,6 +185,24 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult ConvertClearanceToJob(OpsTransactionClearanceModel model)
         {
             var hs = transactionService.ConvertClearanceToJob(model);
+            var message = HandleError.GetMessage(hs, Crud.Insert);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// convert multi clearances to multi jobs
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        [HttpPost("ConvertExistedClearancesToJobs")]
+        public IActionResult ConvertExistedClearancesToJobs([FromBody]List<OpsTransactionClearanceModel> list)
+        {
+            HandleState hs = transactionService.ConvertExistedClearancesToJobs(list);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

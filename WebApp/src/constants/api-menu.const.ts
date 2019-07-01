@@ -322,11 +322,9 @@ export class API_MENU {
             delete:this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/Delete/",
             getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction",
             checkAllowDelete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/CheckAllowDelete/",
-            convertClearanceToJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/ConvertClearanceToJob"
-        },
-        CustomClearance: {
-            getByJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CustomsDeclaration/GetByJob"
-        }   
+            convertClearanceToJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/ConvertClearanceToJob",
+            convertExistedClearancesToJobs: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/ConvertExistedClearancesToJobs"
+        }
     }
 
     /**

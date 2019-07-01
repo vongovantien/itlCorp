@@ -19,5 +19,6 @@ namespace eFMS.API.Documentation.DL.IService
         bool CheckAllowDelete(Guid jobId);
         Crystal PreviewCDNOte(AcctSOADetailsModel model);
         HandleState ConvertClearanceToJob(OpsTransactionClearanceModel model);
+        HandleState ConvertExistedClearancesToJobs(List<OpsTransactionClearanceModel> list);
     }
 }
