@@ -38,6 +38,8 @@ export class BillingCustomDeclarationComponent implements OnInit {
     private sortService: SortService) { }
 
   async ngOnInit() {
+    this.pager.currentPage = 1;
+    this.pager.totalItems = 0;
     await this.stateChecking();
   }
 
