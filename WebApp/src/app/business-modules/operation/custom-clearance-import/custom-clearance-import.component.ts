@@ -48,6 +48,7 @@ export class CustomClearanceImportComponent implements OnInit {
         this.pagingData(this.data);
         this.progressBar.complete();
         console.log(this.data);
+        localStorage.setItem("listData", JSON.stringify(this.data));
       }, err => {
         this.progressBar.complete();
         this.baseService.handleError(err);
@@ -59,6 +60,14 @@ export class CustomClearanceImportComponent implements OnInit {
     this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
     this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
     this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
+  }
+
+  setPage(pager: PagerSetting) {
+    this.pager.currentPage = pager.currentPage;
+    this.pager.pageSize = pager.pageSize;
+    this.pager.totalPages = pager.totalPages;
+    console.log(JSON.parse(localStorage.getItem("listData")));
+    this.pagingData(JSON.parse(localStorage.getItem("listData")));
   }
 
   async downloadSample() {
