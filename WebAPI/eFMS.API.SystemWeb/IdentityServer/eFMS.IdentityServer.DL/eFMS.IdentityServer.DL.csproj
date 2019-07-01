@@ -34,6 +34,9 @@
     <Reference Include="eFMS.API.Common">
       <HintPath>..\..\..\..\bin\netcoreapp2.1\eFMS.API.Common.dll</HintPath>
     </Reference>
+    <Reference Include="eFMS.IdentityServer.Service">
+      <HintPath>..\bin\netcoreapp2.2\eFMS.IdentityServer.Service.dll</HintPath>
+    </Reference>
     <Reference Include="ITL.NetCore.Common">
       <HintPath>..\..\..\..\bin\netcoreapp2.1\ITL.NetCore.Common.dll</HintPath>
     </Reference>
@@ -55,9 +58,5 @@
     <Folder Include="Helpers\" />
     <Folder Include="Models\Criteria\" />
     <Folder Include="Models\Views\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\eFMS.IdentityServer.DAL\eFMS.IdentityServer.Service.csproj" />
   </ItemGroup>
 </Project>
