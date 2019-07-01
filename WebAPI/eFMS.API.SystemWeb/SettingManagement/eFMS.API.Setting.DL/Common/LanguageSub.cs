@@ -28,11 +28,15 @@ namespace eFMS.API.Setting.DL.Common
         public static readonly string FILE_NOT_FOUND = "FILE_NOT_FOUND";
         public static readonly string NOT_FOUND_DATA_EXCEL = "NOT_FOUND_DATA_EXCEL";
 
+        public static readonly string MSG_INVALID_DATE = "MSG_INVALID_DATE";
+        public static readonly string MSG_INVALID_NUMBER = "MSG_INVALID_NUMBER";
+        public static readonly string MSG_DATA_NOT_FOUND_WRONG = "MSG_DATA_NOT_FOUND_WRONG";
+
         #region customclearance
         public static readonly string MSG_CUSTOM_CLEARANCE_NO_EMPTY = "MSG_CUSTOM_CLEARANCE_NO_EMPTY";
         public static readonly string MSG_CUSTOM_CLEARANCE_DATE_EMPTY = "MSG_CUSTOM_CLEARANCE_DATE_EMPTY";
         public static readonly string MSG_CUSTOM_CLEARANCE_CUSTOMER_ID_EMPTY = "MSG_CUSTOM_CLEARANCE_CUSTOMER_ID_EMPTY";
-        public static readonly string MSG_CUSTOM_CLEARANCE_MBL_EMPTY = "MSG_COUNTRY_EXISTED";
+        public static readonly string MSG_CUSTOM_CLEARANCE_MBL_EMPTY = "MSG_CUSTOM_CLEARANCE_MBL_EMPTY";
         public static readonly string MSG_CUSTOM_CLEARANCE_GATEWAY_EMPTY = "MSG_CUSTOM_CLEARANCE_GATEWAY_EMPTY";
         public static readonly string MSG_CUSTOM_CLEARANCE_CARGO_TYPE_EMPTY = "MSG_CUSTOM_CLEARANCE_CARGO_TYPE_EMPTY";
         public static readonly string MSG_CUSTOM_CLEARANCE_SERVICE_TYPE_EMPTY = "MSG_CUSTOM_CLEARANCE_SERVICE_TYPE_EMPTY";

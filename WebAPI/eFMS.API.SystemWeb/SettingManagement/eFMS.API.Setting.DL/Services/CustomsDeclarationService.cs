@@ -359,50 +359,253 @@ namespace eFMS.API.Setting.DL.Services
             return result;
         }
 
-        public List<CustomsDeclarationModel> CheckValidImport(List<CustomsDeclarationModel> list)
+        public List<CustomClearanceImportModel> CheckValidImport(List<CustomClearanceImportModel> list)
         {
+            DateTime dateTimeDefault;
+            decimal decimalDefault;
+            int intDefault;
+            bool isDecimal = false;
+            bool isInt = false;
+            bool isDate = false;
+
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             list.ForEach(item =>
             {
+                item.ClearanceNoValid = true;
                 if (string.IsNullOrEmpty(item.ClearanceNo))
                 {
                     item.ClearanceNo = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_NO_EMPTY];
                     item.IsValid = false;
+                    item.ClearanceNoValid = false;
                 }
-                if (item.ClearanceDate == null)
+
+                string _type = item.Type;
+                item.TypeValid = true;
+                if (!string.IsNullOrEmpty(_type))
                 {
-                    //item.ClearanceDate = null;
-                    item.IsValid = false;
+                    var a = CustomData.Types;
+                    var isFound = CustomData.Types.Any(x => x.Value == _type);
+                    if (!isFound)
+                    {
+                        item.Type = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
+                        item.IsValid = false;
+                        item.TypeValid = false;
+                    }
+                    else
+                    {
+                        item.Type = CustomData.Types.Where(x => x.Value == item.Type).First().Value;
+                        item.TypeValid = true;
+                    }
                 }
+
+                if (string.IsNullOrEmpty(item.ClearanceDateStr))
+                {
+                    item.ClearanceDateStr = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_DATE_EMPTY];
+                    item.IsValid = false;
+                    item.ClearanceDateValid = false;
+                }
+                else
+                {
+                    isDate = DateTime.TryParse(item.ClearanceDateStr, out dateTimeDefault);
+                    if (!isDate)
+                    {
+                        item.ClearanceDateStr = stringLocalizer[LanguageSub.MSG_INVALID_DATE];
+                        item.IsValid = false;
+                        item.ClearanceDateValid = false;
+                    }
+                    else
+                    {
+                        item.ClearanceDate = dateTimeDefault;
+                        item.ClearanceDateStr = dateTimeDefault.ToString("dd/MM/yyyy");
+                        item.ClearanceDateValid = true;
+                    }
+                }
+               
                 if (string.IsNullOrEmpty(item.PartnerTaxCode))
                 {
-                    item.PartnerTaxCode = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_CUSTOMER_ID_EMPTY];
+                    item.CustomerName = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_CUSTOMER_ID_EMPTY];
                     item.IsValid = false;
+                    item.PartnerTaxCodeValid = false;
                 }
+                else
+                {
+                    var isFound = catPartnerApi.GetPartners().Result.Any(x=>x.TaxCode == item.PartnerTaxCode);
+                    if (!isFound)
+                    {
+                        item.CustomerName = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
+                        item.IsValid = false;
+                        item.PartnerTaxCodeValid = false;
+                    }
+                    else
+                    {
+                        item.CustomerName = catPartnerApi.GetPartners().Result.Where(x => x.TaxCode == item.PartnerTaxCode).First().PartnerNameEn;
+                        item.PartnerTaxCodeValid = true;
+                    }
+                }
+
+                item.MblidValid = true;
                 if (string.IsNullOrEmpty(item.Mblid))
                 {
                     item.Mblid = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_MBL_EMPTY];
                     item.IsValid = false;
+                    item.MblidValid = false;
                 }
-                if (string.IsNullOrEmpty(item.Gateway))
+
+                string _gateway = item.Gateway;
+                item.GatewayValid = true;
+                if (string.IsNullOrEmpty(_gateway))
                 {
                     item.Gateway = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_GATEWAY_EMPTY];
                     item.IsValid = false;
+                    item.GatewayValid = false;
                 }
+                else
+                {
+                    var gatewayList = catPlaceApi.GetPlaces().Result.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port));
+                    var isFound = gatewayList.Any(x => x.Code == _gateway);
+                    if (!isFound)
+                    {
+                        item.Gateway = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
+                        item.IsValid = false;
+                        item.GatewayValid = false;
+                    }
+                    else
+                    {
+                        item.Type = gatewayList.Where(x => x.Code == _gateway).First().Code;
+                        item.GatewayValid = true;
+                    }
+                }
+
+                string _grossWeight = item.GrossWeightStr;
+                item.GrossWeightValid = true;
+                if (!string.IsNullOrEmpty(_grossWeight))
+                {
+                    isDecimal = decimal.TryParse(_grossWeight, out decimalDefault);
+                    if (!isDecimal || _grossWeight.IndexOf(",") > -1)
+                    {
+                        item.GrossWeightStr = stringLocalizer[LanguageSub.MSG_INVALID_NUMBER];
+                        item.IsValid = false;
+                        item.GrossWeightValid = false;
+                    }
+                    else
+                    {
+                        item.GrossWeight = Convert.ToDecimal(_grossWeight);
+                        item.GrossWeightStr = Convert.ToDecimal(_grossWeight).ToString();
+                    }
+                }
+
+                string _netWeight = item.NetWeightStr;
+                item.NetWeightValid = true;
+                if (!string.IsNullOrEmpty(_netWeight))
+                {                    
+                    isDecimal = decimal.TryParse(_netWeight, out decimalDefault);
+                    if (!isDecimal || _netWeight.IndexOf(",") > -1)
+                    {
+                        item.NetWeightStr = stringLocalizer[LanguageSub.MSG_INVALID_NUMBER];
+                        item.IsValid = false;
+                        item.NetWeightValid = false;
+                    }
+                    else
+                    {
+                        item.NetWeight = Convert.ToDecimal(_netWeight);
+                        item.NetWeightStr = Convert.ToDecimal(_netWeight).ToString();
+                    }
+                }
+
+                string _cbm = item.CbmStr;
+                item.CbmValid = true;
+                if (!string.IsNullOrEmpty(_cbm))
+                {                    
+                    isDecimal = decimal.TryParse(_cbm, out decimalDefault);
+                    if (!isDecimal || _cbm.IndexOf(",") > -1)
+                    {
+                        item.CbmStr = stringLocalizer[LanguageSub.MSG_INVALID_NUMBER];
+                        item.IsValid = false;
+                        item.CbmValid = false;
+                    }
+                    else
+                    {
+                        item.Cbm = Convert.ToDecimal(_cbm);
+                        item.CbmStr = Convert.ToDecimal(_cbm).ToString();
+                    }
+                }
+
+                string _qtyCont = item.QtyContStr;
+                item.QtyContValid = true;
+                if (!string.IsNullOrEmpty(_qtyCont))
+                {                   
+                    isInt = int.TryParse(_qtyCont, out intDefault);
+                    if (!isInt)
+                    {
+                        item.QtyContStr = stringLocalizer[LanguageSub.MSG_INVALID_NUMBER];
+                        item.IsValid = false;
+                        item.QtyContValid = false;
+                    }
+                    else
+                    {
+                        item.QtyCont = Convert.ToInt32(_qtyCont);
+                        item.QtyContStr = Convert.ToInt32(_qtyCont).ToString();
+                    }
+                }
+
+                string _pcs = item.PcsStr;
+                item.PcsValid = true;
+                if (!string.IsNullOrEmpty(_pcs))
+                {                   
+                    isInt = int.TryParse(_pcs, out intDefault);
+                    if (!isInt)
+                    {
+                        item.PcsStr = stringLocalizer[LanguageSub.MSG_INVALID_NUMBER];
+                        item.IsValid = false;
+                        item.PcsValid = false;
+                    }
+                    else
+                    {
+                        item.Pcs = Convert.ToInt32(_pcs);
+                        item.PcsStr = Convert.ToInt32(_pcs).ToString();
+                    }
+                }
+
+                string _commodity = item.CommodityCode;
+                item.CommodityValid = true;
+                if (!string.IsNullOrEmpty(_commodity))
+                {
+                    var isFound = dc.CatCommodity.Any(x => x.Code == item.CommodityCode);//dc.CatPartner.Any(x => x.TaxCode == item.PartnerTaxCode);
+                    if (!isFound)
+                    {
+                        item.CommodityName = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
+                        item.IsValid = false;
+                        item.CommodityValid = false;
+                    }
+                    else
+                    {
+                        item.CommodityName = dc.CatCommodity.Where(x => x.Code == item.CommodityCode).First().CommodityNameEn;
+                        item.CommodityValid = true;
+                    }
+                }
+
+                item.CargoTypeValid = true;
                 if (string.IsNullOrEmpty(item.CargoType))
                 {
                     item.CargoType = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_CARGO_TYPE_EMPTY];
                     item.IsValid = false;
+                    item.CargoTypeValid = false;
                 }
+
+                item.ServiceTypeValid = true;
                 if (string.IsNullOrEmpty(item.ServiceType))
                 {
                     item.ServiceType = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_SERVICE_TYPE_EMPTY];
                     item.IsValid = false;
+                    item.ServiceTypeValid = false;
                 }
+
+                item.RouteValid = true;
                 if (string.IsNullOrEmpty(item.Route))
                 {
                     item.Route = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_ROUTE_EMPTY];
                     item.IsValid = false;
+                    item.RouteValid = false;
                 }
             });
             return list;

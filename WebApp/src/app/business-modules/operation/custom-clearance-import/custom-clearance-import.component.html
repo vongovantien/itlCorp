@@ -18,7 +18,8 @@
             <div class="m-form m-form--state">
                 <div class="row">
                     <div class="col-lg-4">
-                        <input type="file" id="inputFile" class="form-control m-input m-input--square" placeholder="" (change)="chooseFile($event)" onclick="this.value=null;" accept=".xlsx">
+                        <input type="file" id="inputFile" class="form-control m-input m-input--square" placeholder=""
+                            (change)="chooseFile($event)" onclick="this.value=null;" accept=".xlsx">
                         <span class="m-form__help">
                             <a class="btn-link" href="javascript:void(0)" (click)="downloadSample()">Download sample</a>
                         </span>
@@ -54,7 +55,7 @@
                             </span> -->
                         </span>
                     </button>
-                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" >
+                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                         <span>
                             <i class="la la-save"></i>
                             <span>
@@ -62,7 +63,8 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" routerLink="/home/operation/custom-clearance">
+                    <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
+                        routerLink="/home/operation/custom-clearance">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -87,19 +89,25 @@
                         <tr>
                             <th>No</th>
                             <th>
-                                <span>Clearance No</span>
+                                <span>Clearance No (*)</span>
                             </th>
                             <th>
                                 <span>Type</span>
                             </th>
                             <th>
-                                <span>Clearance Date</span>
+                                <span>Clearance Date (*)</span>
                             </th>
                             <th>
-                                <span>Customer</span>
+                                <span>Customer (*)</span>
                             </th>
                             <th>
-                                <span>Gate Way</span>
+                                <span>MBL (*)</span>
+                            </th>
+                            <th>
+                                <span>HBL</span>
+                            </th>
+                            <th>
+                                <span>Gate Way(*)</span>
                             </th>
                             <th>
                                 <span>Gross Weight</span>
@@ -120,13 +128,13 @@
                                 <span>Commodity</span>
                             </th>
                             <th>
-                                <span>Document Type</span>
+                                <span>Cargo Type (*)</span>
                             </th>
                             <th>
-                                <span>Service Type</span>
+                                <span>Service Type (*)</span>
                             </th>
                             <th>
-                                <span>Route</span>
+                                <span>Route (*)</span>
                             </th>
                             <th>
                                 <span>Import Country</span>
@@ -139,49 +147,63 @@
                     <tbody *ngFor="let item of pagedItems; let i = index">
                         <tr>
                             <td>
-                                <span>{{ (i + this.pager.startIndex + 1) }}</span>
+                                <span>{{(i + this.pager.startIndex + 1)}}</span>
                             </td>
                             <td>
-                                <span>{{item.clearanceNo}}</span>
+                                <span
+                                    [ngClass]="{'m--font-danger' : !item.clearanceNoValid}">{{ item.clearanceNo }}</span>
                             </td>
                             <td>
-                                <span>{{item.type}}</span>
+                                <span [ngClass]="{'m--font-danger' : !item.typeValid}">{{item.type}}</span>
                             </td>
                             <td>
-                                <span>{{item.clearanceDateStr}}</span>
+                                <span
+                                    [ngClass]="{'m--font-danger' : !item.clearanceDateValid}">{{ item.clearanceDateStr }}</span>
                             </td>
                             <td>
-                                <span>{{item.customerName}}</span>
+                                <span
+                                    [ngClass]="{'m--font-danger' : !item.partnerTaxCodeValid}">{{ item.customerName }}</span>
                             </td>
                             <td>
-                                <span>{{item.gateway}}</span>
+                                <span
+                                    [ngClass]="{'m--font-danger' : !item.mblidValid}">{{ item.mblid }}</span>
                             </td>
                             <td>
-                                <span>{{item.grossWeightStr}}</span>
+                                <span>{{ item.hblid }}</span>
                             </td>
                             <td>
-                                <span>{{item.netWeightStr}}</span>
+                                <span [ngClass]="{'m--font-danger' : !item.gatewayValid}">{{ item.gateway }}</span>
                             </td>
                             <td>
-                                <span>{{item.cbmStr}}</span>
+                                <span
+                                    [ngClass]="{'m--font-danger' : !item.grossWeightValid}">{{ item.grossWeightStr }}</span>
                             </td>
                             <td>
-                                <span>{{item.qtyContStr}}</span>
+                                <span
+                                    [ngClass]="{'m--font-danger' : !item.netWeightValid}">{{ item.netWeightStr }}</span>
                             </td>
                             <td>
-                                <span>{{item.pcsStr}}</span>
+                                <span [ngClass]="{'m--font-danger' : !item.cbmValid}">{{ item.cbmStr }}</span>
                             </td>
                             <td>
-                                <span>Commodity???</span>
+                                <span [ngClass]="{'m--font-danger' : !item.qtyContValid}">{{ item.qtyContStr }}</span>
                             </td>
                             <td>
-                                <span>{{item.cargoType}}</span>
+                                <span [ngClass]="{'m--font-danger' : !item.pcsValid}">{{ item.pcsStr }}</span>
                             </td>
                             <td>
-                                <span>{{item.serviceType}}</span>
+                                <span
+                                    [ngClass]="{'m--font-danger' : !item.commodityValid}">{{ item.commodityName }}</span>
                             </td>
                             <td>
-                                <span>{{item.route}}</span>
+                                <span [ngClass]="{'m--font-danger' : !item.cargoTypeValid}">{{ item.cargoType }}</span>
+                            </td>
+                            <td>
+                                <span
+                                    [ngClass]="{'m--font-danger' : !item.serviceTypeValid}">{{ item.serviceType }}</span>
+                            </td>
+                            <td>
+                                <span [ngClass]="{'m--font-danger' : !item.routeValid}">{{ item.route }}</span>
                             </td>
                             <td>
                                 <span>{{item.importCountryCode}}</span>
@@ -194,7 +216,8 @@
                 </table>
             </div>
             <!--end: Datatable of trucking-table -->
-            <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)" (pagerObject)="setPage($event)"></app-pagination>
+            <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)"
+                (pagerObject)="setPage($event)"></app-pagination>
         </div>
     </div>
     <!--end:: m-portlet-->

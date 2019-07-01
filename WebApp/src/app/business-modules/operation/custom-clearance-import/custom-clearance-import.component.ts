@@ -49,6 +49,8 @@ export class CustomClearanceImportComponent implements OnInit {
         this.progressBar.complete();
         console.log(this.data);
         localStorage.setItem("listData", JSON.stringify(this.data));
+        console.log(this.data[0].clearanceDateStr.split('|'))
+        console.log(this.data[0].clearanceNo.split('|').length)
       }, err => {
         this.progressBar.complete();
         this.baseService.handleError(err);
