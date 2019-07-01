@@ -368,6 +368,20 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             }
         }
     }
+
+    /**
+     * cancel edit stage of container row
+     * @param index 
+     */
+    cancelNewContainer(index: number) {
+        if (this.lstMasterContainers[index].isNew == true) {
+            this.lstMasterContainers.splice(index, 1);
+        }
+        else {
+            this.lstMasterContainers[index].allowEdit = false;
+        }
+    }
+
     /**
      * get container information of a job
      * @param listContainers list of container

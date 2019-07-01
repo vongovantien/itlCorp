@@ -323,7 +323,7 @@
                         <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
                             <span class="m--font-bolder">Create:</span>
                             <span
-                                class="m--font-brand m--margin-left-5">{{customDeclaration.datetimeCreated | date: 'dd/MM/yyyy h:mm:ss'}}</span>
+                                class="m--font-brand m--margin-left-5">{{customDeclaration.datetimeCreated | date: 'dd/MM/yyyy HH:mm:ss'}}</span>
                             <span class="m--font-bolder m--margin-left-5">by</span>
                             <span class="m--font-brand m--margin-left-5">{{customDeclaration.userCreated}}</span>
                         </div>
@@ -331,7 +331,7 @@
                             *ngIf="customDeclaration.userModified; else nousermodified">
                             <span class="m--font-bolder">Modified:</span>
                             <span
-                                class="m--font-brand m--margin-left-5">{{customDeclaration.datetimeModified | date: 'dd/MM/yyyy h:mm:ss'}}</span>
+                                class="m--font-brand m--margin-left-5">{{customDeclaration.datetimeModified | date: 'dd/MM/yyyy HH:mm:ss'}}</span>
                             <span class="m--font-bolder m--margin-left-5">by</span>
                             <span class="m--font-brand m--margin-left-5">{{customDeclaration.userModified}}</span>
                         </div>
@@ -355,7 +355,7 @@
                         <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
                             <span class="m--font-bolder">Convert time:</span>
                             <span
-                                class="m--font-brand m--margin-left-5">{{customDeclaration.datetimeCreated | date: 'dd/MM/yyyy h:mm:ss'}}</span>
+                                class="m--font-brand m--margin-left-5">{{customDeclaration.datetimeCreated | date: 'dd/MM/yyyy HH:mm:ss'}}</span>
                         </div>
                     </div>
                 </div>
