@@ -10,14 +10,17 @@ using eFMS.API.Setting.Infrastructure.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using eFMS.API.Setting.Infrastructure.Middlewares;
-using eFMS.API.Setting.Resources;
-using System.Diagnostics.Contracts;
 using eFMS.API.Setting.DL.Models.Criteria;
 using eFMS.API.Setting.DL.Common;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.AspNetCore.Authorization;
 using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Common.NoSql;
+using eFMS.API.Common.Helpers;
+using Microsoft.AspNetCore.Http;
+using OfficeOpenXml;
+using System.Globalization;
+
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -43,7 +46,7 @@ namespace eFMS.API.Setting.Controllers
         /// <param name="localizer">inject interface IStringLocalizer</param>
         /// <param name="service">inject interface ICustomsDeclarationService</param>
         /// <param name="distributedCache"></param>
-        public CustomsDeclarationController(IStringLocalizer<LanguageSub> localizer, ICustomsDeclarationService service, IDistributedCache distributedCache, ICurrentUser user)
+        public CustomsDeclarationController(IStringLocalizer<DL.Common.LanguageSub> localizer, ICustomsDeclarationService service, IDistributedCache distributedCache, ICurrentUser user)
         {
             stringLocalizer = localizer;
             customsDeclarationService = service;
@@ -283,6 +286,211 @@ namespace eFMS.API.Setting.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        /// <summary>
+        /// download file excel from server
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("DownloadExcel")]
+        public async Task<ActionResult> DownloadExcel()
+        {
+            string templateName = Templates.CustomDeclaration.ExelImportFileName + Templates.ExelImportEx;
+            var result = await new FileHelper().ExportExcel(templateName);
+            if (result != null)
+            {
+                return result;
+            }
+            else
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+            }
+        }
+
+        /// <summary>
+        /// read data from file excel
+        /// </summary>
+        /// <param name="uploadedFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("uploadFile")]
+        public IActionResult UploadFile(IFormFile uploadedFile)
+        {
+            var file = new FileHelper().UploadExcel(uploadedFile);
+            if (file != null)
+            {
+                ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
+                int? rowCount = worksheet.Dimension?.Rows;
+                int? colCount = worksheet.Dimension?.Columns;
+                if (rowCount < 2 || rowCount == null) return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.NOT_FOUND_DATA_EXCEL].Value });
+                List<CustomsDeclarationModel> list = new List<CustomsDeclarationModel>();
+
+                DateTime dateTimeDefault;
+                decimal decimalDefault;
+                int intDefault;
+                bool isDecimal = false;
+                bool isInt = false;
+
+                for (int row = 2; row < rowCount + 1; row++)
+                {
+                    var stage = new CustomsDeclarationModel();
+                    //{
+                    stage.IsValid = true;
+                    stage.ClearanceNo = worksheet.Cells[row, 1]?.Value.ToString();
+                    stage.Type = worksheet.Cells[row, 2].Value?.ToString();
+                    stage.FirstClearanceNo = worksheet.Cells[row, 3].Value?.ToString();
+
+                    if (worksheet.Cells[row, 4].Value == null)
+                    {
+                        stage.ClearanceDateStr = "Clearance date is emplty";
+                        stage.IsValid = false;
+                    }
+                    else
+                    {
+                        DateTime.TryParse(worksheet.Cells[row, 4].Value.ToString(), out dateTimeDefault);
+                        if (dateTimeDefault == DateTime.MinValue)
+                        {
+                            stage.ClearanceDateStr = "Invalid date format";
+                            stage.IsValid = false;
+                        }
+                        else
+                        {
+                            stage.ClearanceDate = dateTimeDefault;
+                            stage.ClearanceDateStr = dateTimeDefault.ToString("dd/MM/yyyy");
+                        }
+                    }
+
+                    stage.PartnerTaxCode = worksheet.Cells[row, 5].Value?.ToString();
+                    stage.CustomerName = worksheet.Cells[row, 6].Value?.ToString();
+                    stage.Mblid = worksheet.Cells[row, 7].Value?.ToString();
+                    stage.Hblid = worksheet.Cells[row, 8].Value?.ToString();
+                    stage.Gateway = worksheet.Cells[row, 9].Value?.ToString();
+
+                    //stage.GrossWeight = worksheet.Cells[row, 10].Value == null ? decimalNull : Convert.ToDecimal(worksheet.Cells[row, 10].Value.ToString());
+                    //stage.NetWeight = worksheet.Cells[row, 11].Value == null ? decimalNull : Convert.ToDecimal(worksheet.Cells[row, 11].Value.ToString());
+                    //stage.Cbm = worksheet.Cells[row, 12].Value == null ? decimalNull : Convert.ToDecimal(worksheet.Cells[row, 12].Value.ToString());
+                    //stage.QtyCont = worksheet.Cells[row, 13].Value == null ? intNull : Convert.ToInt32(worksheet.Cells[row, 13].Value.ToString());
+                    //stage.Pcs = worksheet.Cells[row, 14].Value == null ? intNull : Convert.ToInt32(worksheet.Cells[row, 14].Value.ToString());
+
+                    if (worksheet.Cells[row, 10].Value == null)
+                    {
+                        stage.GrossWeightStr = "Gross Weight is empty";
+                        stage.IsValid = false;
+                    }
+                    else
+                    {
+                        string _grossWeight = worksheet.Cells[row, 10].Value.ToString();
+                        isDecimal = decimal.TryParse(_grossWeight, out decimalDefault);
+                        if (!isDecimal || _grossWeight.IndexOf(",") > -1)
+                        {
+                            stage.GrossWeightStr = "Invalid number format";
+                            stage.IsValid = false;
+                        }
+                        else
+                        {                            
+                            stage.GrossWeight = Convert.ToDecimal(_grossWeight);
+                            stage.GrossWeightStr = Convert.ToDecimal(_grossWeight).ToString();
+                        }
+                    }
+
+                    if (worksheet.Cells[row, 11].Value == null)
+                    {
+                        stage.NetWeightStr = "Net Weight is empty";
+                        stage.IsValid = false;
+                    }
+                    else
+                    {
+                        string _netWeight = worksheet.Cells[row, 11].Value.ToString();
+                        isDecimal = decimal.TryParse(_netWeight, out decimalDefault);
+                        if (!isDecimal || _netWeight.IndexOf(",") > -1)
+                        {
+                            stage.NetWeightStr = "Invalid number format";
+                            stage.IsValid = false;
+                        }
+                        else
+                        {
+                            stage.NetWeight = Convert.ToDecimal(_netWeight);
+                            stage.NetWeightStr = Convert.ToDecimal(_netWeight).ToString();
+                        }
+                    }
+
+                    if (worksheet.Cells[row, 12].Value == null)
+                    {
+                        stage.CbmStr = "Cbm is empty";
+                        stage.IsValid = false;
+                    }
+                    else
+                    {
+                        string _cbm = worksheet.Cells[row, 12].Value.ToString();
+                        isDecimal = decimal.TryParse(_cbm, out decimalDefault);
+                        if (!isDecimal || _cbm.IndexOf(",") > -1)
+                        {
+                            stage.CbmStr = "Invalid number format";
+                            stage.IsValid = false;
+                        }
+                        else
+                        {
+                            stage.Cbm = Convert.ToDecimal(_cbm);
+                            stage.CbmStr = Convert.ToDecimal(_cbm).ToString();
+                        }
+                    }
+
+                    if (worksheet.Cells[row, 13].Value == null)
+                    {
+                        stage.QtyContStr = "Qty Cont is empty";
+                        stage.IsValid = false;
+                    }
+                    else
+                    {
+                        isInt = int.TryParse(worksheet.Cells[row, 13].Value.ToString(), out intDefault);
+                        if (!isInt)
+                        {
+                            stage.QtyContStr = "Invalid number format";
+                            stage.IsValid = false;
+                        }
+                        else
+                        {
+                            stage.QtyCont = Convert.ToInt32(worksheet.Cells[row, 13].Value.ToString());
+                            stage.QtyContStr = Convert.ToInt32(worksheet.Cells[row, 13].Value.ToString()).ToString();
+                        }
+                    }
+
+                    if (worksheet.Cells[row, 14].Value == null)
+                    {
+                        stage.PcsStr = "Pcs is empty";
+                        stage.IsValid = false;
+                    }
+                    else
+                    {
+                        isInt = int.TryParse(worksheet.Cells[row, 14].Value.ToString(), out intDefault);
+                        if (!isInt)
+                        {
+                            stage.PcsStr = "Invalid number format";
+                            stage.IsValid = false;
+                        }
+                        else
+                        {
+                            stage.Pcs = Convert.ToInt32(worksheet.Cells[row, 14].Value.ToString());
+                            stage.PcsStr = Convert.ToInt32(worksheet.Cells[row, 14].Value.ToString()).ToString();
+                        }
+                    }
+
+                    stage.CommodityCode = worksheet.Cells[row, 15].Value?.ToString();
+                    //CountryShipping = worksheet.Cells[row, 16].Value == null ? string.Empty : worksheet.Cells[row, 16].Value.ToString(),
+                    stage.CargoType = worksheet.Cells[row, 17].Value?.ToString();
+                    stage.ServiceType = worksheet.Cells[row, 18].Value?.ToString();
+                    stage.Route = worksheet.Cells[row, 19].Value?.ToString();
+                    stage.ImportCountryCode = worksheet.Cells[row, 20].Value?.ToString();
+                    stage.ExportCountryCode = worksheet.Cells[row, 21].Value?.ToString();
+                    //};
+                    list.Add(stage);
+                }
+                var data = customsDeclarationService.CheckValidImport(list);
+                var totalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totalValidRows };
+                return Ok(results);
+            }
+            return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
         }
     }
 }

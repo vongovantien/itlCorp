@@ -5,8 +5,10 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { ActivatedRoute } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
-import { Location } from '@angular/common';
+import {Location} from '@angular/common';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
+import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
+import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 
 @Component({
     selector: 'app-custom-clearance-addnew',
@@ -23,7 +25,7 @@ export class CustomClearanceAddnewComponent implements OnInit {
 
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU,
-        private route: ActivatedRoute,
+        private route: ActivatedRoute, 
         private _location: Location,
         private cdr: ChangeDetectorRef) {
         this.keepCalendarOpeningWithRange = true;
@@ -39,7 +41,6 @@ export class CustomClearanceAddnewComponent implements OnInit {
         await this.getListUnit();
         await this.getListCommodity();
     }
-
     async addCustomClearance(formAdd: NgForm) {
         if (this.strCustomerCurrent == '' || this.strPortCurrent == '') return;
         if (this.serviceTypeCurrent[0] != 'Air' && this.serviceTypeCurrent[0] != 'Express') {
@@ -64,11 +65,11 @@ export class CustomClearanceAddnewComponent implements OnInit {
             console.log(respone);
             if (respone) {
             this._location.back();
-            } else {
-            //Reset lại clearanceDate
-                this.customDeclaration.clearanceDate = { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate)};
+			} else {
+				//Reset lại clearanceDate
+				this.customDeclaration.clearanceDate = { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate)};
+            }
         }
-    }
     }
     async convertClearanceToShipment(formAdd: NgForm){
         if (this.strCustomerCurrent == '' || this.strPortCurrent == '') return;
@@ -157,7 +158,7 @@ export class CustomClearanceAddnewComponent implements OnInit {
 
     async getListCustomer() {
         //partnerGroup = 3 ~ Customer
-        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: 3 }, true, true);
+        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.CUSTOMER }, true, true);
         this.listCustomer = res;
     }
 
@@ -172,7 +173,7 @@ export class CustomClearanceAddnewComponent implements OnInit {
 
     async getListPort() {
         //placeType = 8 ~ Port
-        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, { placeType: 8 }, true, true);
+        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, { placeType: PlaceTypeEnum.Port }, true, true);
         this.listPort = res;
     }
 

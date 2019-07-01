@@ -1,15 +1,10 @@
-﻿
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Localization;
-using Microsoft.Extensions.Localization;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
 
-namespace eFMS.API.Setting.Resources
+namespace eFMS.API.Setting.DL.Common
 {
-    public class LanguageSub
+    public partial class LanguageSub
     {
         //Global
         public static readonly string MSG_DATA_NOT_FOUND = "MSG_DATA_NOT_FOUND";
@@ -32,5 +27,16 @@ namespace eFMS.API.Setting.Resources
         public static readonly string MSG_CLEARANCENO_EXISTED = "MSG_CLEARANCENO_EXISTED";
         public static readonly string FILE_NOT_FOUND = "FILE_NOT_FOUND";
         public static readonly string NOT_FOUND_DATA_EXCEL = "NOT_FOUND_DATA_EXCEL";
+
+        #region customclearance
+        public static readonly string MSG_CUSTOM_CLEARANCE_NO_EMPTY = "MSG_CUSTOM_CLEARANCE_NO_EMPTY";
+        public static readonly string MSG_CUSTOM_CLEARANCE_DATE_EMPTY = "MSG_CUSTOM_CLEARANCE_DATE_EMPTY";
+        public static readonly string MSG_CUSTOM_CLEARANCE_CUSTOMER_ID_EMPTY = "MSG_CUSTOM_CLEARANCE_CUSTOMER_ID_EMPTY";
+        public static readonly string MSG_CUSTOM_CLEARANCE_MBL_EMPTY = "MSG_COUNTRY_EXISTED";
+        public static readonly string MSG_CUSTOM_CLEARANCE_GATEWAY_EMPTY = "MSG_CUSTOM_CLEARANCE_GATEWAY_EMPTY";
+        public static readonly string MSG_CUSTOM_CLEARANCE_CARGO_TYPE_EMPTY = "MSG_CUSTOM_CLEARANCE_CARGO_TYPE_EMPTY";
+        public static readonly string MSG_CUSTOM_CLEARANCE_SERVICE_TYPE_EMPTY = "MSG_CUSTOM_CLEARANCE_SERVICE_TYPE_EMPTY";
+        public static readonly string MSG_CUSTOM_CLEARANCE_ROUTE_EMPTY = "MSG_CUSTOM_CLEARANCE_ROUTE_EMPTY";
+        #endregion
     }
 }

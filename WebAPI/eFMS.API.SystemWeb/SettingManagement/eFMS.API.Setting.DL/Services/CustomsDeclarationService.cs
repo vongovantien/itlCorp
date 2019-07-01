@@ -20,6 +20,7 @@ using eFMS.API.Setting.DL.Models.Ecus;
 using eFMS.API.Provider.Services.IService;
 using Microsoft.Extensions.Caching.Distributed;
 using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.Extensions.Localization;
 
 namespace eFMS.API.Setting.DL.Services
 {
@@ -32,6 +33,7 @@ namespace eFMS.API.Setting.DL.Services
         private readonly ICatCommodityApiService commodityApi;
         private readonly IDistributedCache cache;
         private readonly ICurrentUser currentUser;
+        private readonly IStringLocalizer stringLocalizer;
 
         public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, IMapper mapper,
             IEcusConnectionService ecusCconnection
@@ -40,7 +42,8 @@ namespace eFMS.API.Setting.DL.Services
             , ICatCountryApiService country
             , IDistributedCache distributedCache
             , ICatCommodityApiService commodity
-            , ICurrentUser user) : base(repository, mapper)
+            , ICurrentUser user
+            ,IStringLocalizer<LanguageSub> localizer) : base(repository, mapper)
         {
             ecusCconnectionService = ecusCconnection;
             catPartnerApi = catPartner;
@@ -49,6 +52,7 @@ namespace eFMS.API.Setting.DL.Services
             cache = distributedCache;
             commodityApi = commodity;
             currentUser = user;
+            stringLocalizer = localizer;
         }
 
         public IQueryable<CustomsDeclaration> Get()
@@ -353,6 +357,55 @@ namespace eFMS.API.Setting.DL.Services
                 result = new HandleState(ex.Message);
             }
             return result;
+        }
+
+        public List<CustomsDeclarationModel> CheckValidImport(List<CustomsDeclarationModel> list)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            list.ForEach(item =>
+            {
+                if (string.IsNullOrEmpty(item.ClearanceNo))
+                {
+                    item.ClearanceNo = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_NO_EMPTY];
+                    item.IsValid = false;
+                }
+                if (item.ClearanceDate == null)
+                {
+                    //item.ClearanceDate = null;
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.PartnerTaxCode))
+                {
+                    item.PartnerTaxCode = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_CUSTOMER_ID_EMPTY];
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.Mblid))
+                {
+                    item.Mblid = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_MBL_EMPTY];
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.Gateway))
+                {
+                    item.Gateway = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_GATEWAY_EMPTY];
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.CargoType))
+                {
+                    item.CargoType = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_CARGO_TYPE_EMPTY];
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.ServiceType))
+                {
+                    item.ServiceType = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_SERVICE_TYPE_EMPTY];
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.Route))
+                {
+                    item.Route = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_ROUTE_EMPTY];
+                    item.IsValid = false;
+                }
+            });
+            return list;
         }
     }
 }
