@@ -21,43 +21,45 @@ import { OpsModuleCreditDebitNoteAddnewComponent } from "./job-edit/credit-debit
 import { OpsModuleCreditDebitNoteRemainingChargeComponent } from "./job-edit/credit-debit-note/ops-module-credit-debit-note-remaining-charge/ops-module-credit-debit-note-remaining-charge.component";
 import { OpsModuleCreditDebitNoteDetailComponent } from "./job-edit/credit-debit-note/ops-module-credit-debit-note-detail/ops-module-credit-debit-note-detail.component";
 import { OpsModuleCreditDebitNoteEditComponent } from "./job-edit/credit-debit-note/ops-module-credit-debit-note-edit/ops-module-credit-debit-note-edit.component";
-import { OpsModuleStageManagementDetailComponent } from "./job-edit/stage-management/detail/detail-stage-popup.component";
 import { BillingCustomDeclarationComponent } from "./job-edit/custom-declaration/billing-custom-declaration.component";
 import { OpsModuleCreditDebitNoteComponent } from "./job-edit/credit-debit-note/ops-module-credit-debit-note.component";
 import { OpsModuleStageManagementAddStagePopupComponent } from "./job-edit/stage-management/add/add-stag.popup.component";
 import { OpsModuleStageManagementComponent } from "./job-edit/stage-management/stage-management.component";
+import { OpsModuleStageManagementDetailComponent } from "./job-edit/stage-management/detail/detail-stage-popup.component";
+import { ModalModule } from "ngx-bootstrap";
 
 @NgModule({
-  imports: [
-    CommonModule,
-    OperationRoutingModule,
-    SelectModule,
-    FormsModule,
-    SharedModule,
-    NgxDaterangepickerMd,
-    DragDropModule
-  ],
-  declarations: [
-    JobMangementComponent,
-    AssigmentComponent,
-    TruckingAssignmentComponent,
-    OpsModuleBillingJobCreateComponent,
-    OpsModuleBillingComponent,
-    OpsModuleBillingJobEditComponent,
-    BillingCustomDeclarationComponent,
-    OpsModuleCreditDebitNoteComponent,
-    OpsModuleStageManagementComponent,
-    OpsModuleCreditDebitNoteAddnewComponent,
-    OpsModuleCreditDebitNoteRemainingChargeComponent,
-    OpsModuleCreditDebitNoteDetailComponent,
-    OpsModuleCreditDebitNoteEditComponent,
-    OpsModuleStageManagementDetailComponent,
-    CustomClearanceComponent,
-    CustomClearanceAddnewComponent,
-    CustomClearanceEditComponent,
-    CustomClearanceImportComponent,
+    imports: [
+        CommonModule,
+        OperationRoutingModule,
+        SelectModule,
+        FormsModule,
+        SharedModule,
+        NgxDaterangepickerMd,
+        DragDropModule,
+        ModalModule.forRoot()
+    ],
+    declarations: [
+        JobMangementComponent,
+        AssigmentComponent,
+        TruckingAssignmentComponent,
+        OpsModuleBillingJobCreateComponent,
+        OpsModuleBillingComponent,
+        OpsModuleBillingJobEditComponent,
+        BillingCustomDeclarationComponent,
+        OpsModuleCreditDebitNoteComponent,
+        OpsModuleStageManagementComponent,
+        OpsModuleCreditDebitNoteAddnewComponent,
+        OpsModuleCreditDebitNoteRemainingChargeComponent,
+        OpsModuleCreditDebitNoteDetailComponent,
+        OpsModuleCreditDebitNoteEditComponent,
+        OpsModuleStageManagementDetailComponent,
+        CustomClearanceComponent,
+        CustomClearanceAddnewComponent,
+        CustomClearanceEditComponent,
+        CustomClearanceImportComponent,
 
-    OpsModuleStageManagementAddStagePopupComponent
-  ]
+        OpsModuleStageManagementAddStagePopupComponent
+    ]
 })
 export class OperationModule {}

@@ -1,12 +1,22 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild } from "@angular/core";
+import { OpsModuleStageManagementAddStagePopupComponent } from "./add/add-stag.popup.component";
+import { AppPage } from "src/app/app.base";
 
 @Component({
-  selector: "app-ops-module-stage-management",
-  templateUrl: "./stage-management.component.html",
-  styleUrls: ["./stage-management.component.scss"]
+    selector: "app-ops-module-stage-management",
+    templateUrl: "./stage-management.component.html",
+    styleUrls: ["./stage-management.component.scss"]
 })
-export class OpsModuleStageManagementComponent implements OnInit {
-  constructor() {}
+export class OpsModuleStageManagementComponent extends AppPage {
+    @ViewChild(OpsModuleStageManagementAddStagePopupComponent, {
+        static: false
+    })
+    popupCreate: OpsModuleStageManagementAddStagePopupComponent;
+    constructor() {
+        super();
+    }
 
-  ngOnInit() {}
+    openPopUpCreateStage() {
+        this.popupCreate.show();
+    }
 }

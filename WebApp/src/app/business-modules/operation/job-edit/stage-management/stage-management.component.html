@@ -21,8 +21,7 @@
                 <div class="col-lg-4 order-2 order-lg-1">
                     <div class="form-group">
                         <div class="m-input-icon m-input-icon--left">
-                            <input type="text" class="form-control m-input m-input--square"
-                                placeholder="Search...">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Search...">
                             <span class="m-input-icon__icon m-input-icon__icon--left">
                                 <span>
                                     <i class="la la-search"></i>
@@ -32,8 +31,7 @@
                     </div>
                 </div>
                 <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
-                    <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                        data-toggle="modal" data-target="#ops-add-stage-modal">
+                    <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)="openPopUpCreateStage()">
                         <span>
                             <i class="la la-plus"></i>
                             <span>
@@ -88,8 +86,7 @@
                 <tbody class="tbody-group">
                     <tr>
                         <td class="table-actions-col no-sorting">
-                            <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit"
-                                data-toggle="modal" data-target="#ops-detail-stage-modal">
+                            <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit" data-toggle="modal" data-target="#ops-detail-stage-modal">
                                 <i class="la la-edit"></i>
                             </button>
                         </td>
@@ -127,14 +124,14 @@
                 </tbody>
             </table>
         </div>
-        <!--end: Datatable-->   
+        <!--end: Datatable-->
     </div>
 </div>
 
 <!--begin:: ops-add-stage-modal-->
-<app-ops-module-stage-management-addnew></app-ops-module-stage-management-addnew>
+<add-stage-popup></add-stage-popup>
 <!--end:: ops-add-stage-modal-->
 
 <!--begin:: ops-detail-stage-modal-->
-<app-ops-module-stage-management-detail></app-ops-module-stage-management-detail>
+<detail-stage-popup></detail-stage-popup>
 <!--end:: ops-detail-stage-modal-->

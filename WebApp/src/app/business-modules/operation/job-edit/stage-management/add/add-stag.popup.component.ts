@@ -1,36 +1,37 @@
 import { Component, OnInit } from "@angular/core";
 import { CdkDragDrop, moveItemInArray } from "@angular/cdk/drag-drop";
+import { PopupBase } from "src/app/modal.base";
 
 @Component({
-  selector: "add-stag-popup",
-  templateUrl: "./add-stage.popup.component.html",
-  styleUrls: ["./add-stage.popup.cmponent.scss"]
+    selector: "add-stage-popup",
+    templateUrl: "./add-stage.popup.component.html",
+    styleUrls: ["./add-stage.popup.component.scss"]
 })
-export class OpsModuleStageManagementAddStagePopupComponent implements OnInit {
-  numbers: any[] = [
-    {
-      name: "thor",
-      id: 1
-    },
-    {
-      name: "lee",
-      id: 2
-    },
-    {
-      name: "tam",
-      id: 3
-    },
-    {
-      name: "hau mon",
-      id: 4
+export class OpsModuleStageManagementAddStagePopupComponent extends PopupBase {
+    numbers: any[] = [
+        {
+            name: "thor",
+            id: 1
+        },
+        {
+            name: "lee",
+            id: 2
+        },
+        {
+            name: "tam",
+            id: 3
+        },
+        {
+            name: "hau mon",
+            id: 4
+        }
+    ];
+
+    constructor() {
+        super();
     }
-  ];
 
-  constructor() {}
-
-  ngOnInit() {}
-
-  dropped(event: CdkDragDrop<any[]>) {
-    moveItemInArray(this.numbers, event.previousIndex, event.currentIndex);
-  }
+    dropped(event: CdkDragDrop<any[]>) {
+        moveItemInArray(this.numbers, event.previousIndex, event.currentIndex);
+    }
 }
