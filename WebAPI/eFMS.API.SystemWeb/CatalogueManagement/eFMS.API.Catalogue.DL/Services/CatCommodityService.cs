@@ -15,6 +15,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
+using eFMS.API.Common.Helpers;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
