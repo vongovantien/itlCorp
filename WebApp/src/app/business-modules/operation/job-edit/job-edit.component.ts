@@ -20,8 +20,8 @@ declare var $: any;
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
-    templateUrl: './ops-module-billing-job-edit.component.html',
-    styleUrls: ['./ops-module-billing-job-edit.component.scss']
+    templateUrl: './job-edit.component.html',
+    styleUrls: ['./job-edit.component.scss']
 })
 export class OpsModuleBillingJobEditComponent implements OnInit {
     opsTransaction: OpsTransaction = new OpsTransaction();

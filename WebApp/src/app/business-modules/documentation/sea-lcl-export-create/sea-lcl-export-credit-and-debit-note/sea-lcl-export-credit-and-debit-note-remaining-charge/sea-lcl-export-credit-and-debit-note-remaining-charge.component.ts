@@ -1,15 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from "@angular/core";
 
 @Component({
-  selector: 'app-sea-lcl-export-credit-and-debit-note-remaining-charge',
-  templateUrl: './sea-lcl-export-credit-and-debit-note-remaining-charge.component.html',
-  styleUrls: ['./sea-lcl-export-credit-and-debit-note-remaining-charge.component.scss']
+  selector: "app-sea-lcl-export-credit-and-debit-note-remaining-charge",
+  templateUrl:
+    "./sea-lcl-export-credit-and-debit-note-remaining-charge.component.html"
 })
-export class SeaLclExportCreditAndDebitNoteRemainingChargeComponent implements OnInit {
+export class SeaLclExportCreditAndDebitNoteRemainingChargeComponent
+  implements OnInit {
+  constructor() {}
 
-  constructor() { }
-
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 }
