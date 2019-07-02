@@ -91,7 +91,7 @@ export class OpsModuleBillingJobCreateComponent implements OnInit {
             if(form.submitted){
                 var error = $('#add-new-ops-job-form').find('div.has-danger');
                 if (error.length === 0) {
-                    this.OpsTransactionToAdd.serviceDate = this.OpsTransactionToAdd.serviceDate.startDate;
+                    this.OpsTransactionToAdd.serviceDate = this.OpsTransactionToAdd.serviceDate.startDate != null?dataHelper.dateTimeToUTC(this.OpsTransactionToAdd.serviceDate.startDate): null;
                     var res = await this.baseServices.postAsync(this.api_menu.Documentation.Operation.addNew, this.OpsTransactionToAdd);
                     if (res.status) {
                         console.log(res);

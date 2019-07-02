@@ -270,7 +270,7 @@
                                 <div class="row">
 
                                     <div class="col-lg-4">
-                                        <div class="form-group" [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && (opsTransaction.pol === opsTransaction.pod) && (opsTransaction.pol!==null)}">
+                                        <div class="form-group" [ngClass]="{'m-form__group has-danger': addOpsForm.submitted && (opsTransaction.pol === opsTransaction.pod) && (opsTransaction.pol!==null)}">
                                             <label class="form-control-label" for="">
                                                 Port of Loading
                                             </label>
@@ -287,7 +287,7 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
-                                        <div class="form-group" [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && (opsTransaction.pol === opsTransaction.pod) && (opsTransaction.pol!==null)}">
+                                        <div class="form-group" [ngClass]="{'m-form__group has-danger': addOpsForm.submitted && (opsTransaction.pol === opsTransaction.pod) && (opsTransaction.pol!==null)}">
                                             <label class="form-control-label" for="">
                                                 Port of Discharge
                                             </label>
@@ -323,7 +323,7 @@
                                             <label class="form-control-label" for="">
                                                 Vessel/Flight
                                             </label>
-                                            <input type="text" required class="form-control m-input m-input--square"
+                                            <input type="text" class="form-control m-input m-input--square"
                                                 placeholder="Enter text" name="flightVessel"
                                                 [(ngModel)]="opsTransaction.flightVessel" #flightVessel="ngModel">
                                             <!-- <div class="form-control-feedback"
@@ -429,13 +429,13 @@
                                 <div class="row">
                                     <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
                                         <span class="m--font-bolder">Create:</span>
-                                        <span class="m--font-brand m--margin-left-5">{{ opsTransaction.createdDate | date : "dd/MM/yyyy hh:mm:ss" }}</span>
+                                        <span class="m--font-brand m--margin-left-5">{{ opsTransaction.createdDate | date : "dd/MM/yyyy HH:mm:ss" }}</span>
                                         <span class="m--font-bolder m--margin-left-5">by</span>
                                         <span class="m--font-brand m--margin-left-5">{{ opsTransaction.userCreated }}</span>
                                     </div>
                                     <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
                                         <span class="m--font-bolder">Modified:</span>
-                                        <span class="m--font-brand m--margin-left-5">{{ opsTransaction.modifiedDate | date : "dd/MM/yyyy hh:mm:ss" }}</span>
+                                        <span class="m--font-brand m--margin-left-5">{{ opsTransaction.modifiedDate | date : "dd/MM/yyyy HH:mm:ss" }}</span>
                                         <span class="m--font-bolder m--margin-left-5">by</span>
                                         <span class="m--font-brand m--margin-left-5">{{ opsTransaction.userModified }}</span>
                                     </div>
@@ -1682,7 +1682,7 @@
                                                     [ngClass]="{ 'has-danger': containerMasterForm.submitted && conQuantity.invalid && container.verifying}">
                                                     <input type="number" class="form-control m-input m-input--square"
                                                         min="1" max="2147483647" value="1" oninput="validity.valid||(value='');"
-                                                        placeholder="Please enter" [(ngModel)]="container.quantity"
+                                                        placeholder="Enter number" [(ngModel)]="container.quantity"
                                                         name="conQuantity" #conQuantity="ngModel" required>
                                                     <div class="form-control-feedback"
                                                         *ngIf="containerMasterForm.submitted && conQuantity.invalid && container.verifying">
@@ -1693,7 +1693,7 @@
                                             <td class="">
                                                 <div class="control-editable">
                                                     <input type="text" class="form-control m-input m-input--square"
-                                                        placeholder="Please enter" autocomplete="nope"
+                                                        placeholder="Enter text" autocomplete="nope"
                                                         [(ngModel)]="container.containerNo" (change)="container.containerNo = container.containerNo.trim()" name="containerNo"
                                                         #containerNo="ngModel">
                                                 </div>
@@ -1701,14 +1701,14 @@
                                             <td class="">
                                                 <div class="control-editable">
                                                     <input type="text" class="form-control m-input m-input--square"
-                                                        placeholder="Please enter" autocomplete="nope"
+                                                        placeholder="Enter text" autocomplete="nope"
                                                         [(ngModel)]="container.sealNo" name="sealNo" (change)="container.sealNo = container.sealNo.trim()" #sealNo="ngModel">
                                                 </div>
                                             </td>
                                             <td class="">
                                                 <div class="control-editable">
                                                     <input type="text" class="form-control m-input m-input--square"
-                                                        placeholder="Please enter" autocomplete="nope"
+                                                        placeholder="Enter text" autocomplete="nope"
                                                         [(ngModel)]="container.markNo" name="markNo" (change)="container.markNo = container.markNo.trim()" #markNo="ngModel">
                                                 </div>
                                             </td>
@@ -1740,7 +1740,7 @@
                                                     <input type="number" class="form-control m-input m-input--square"
                                                         min="1" max="32767" [(ngModel)]="container.packageQuantity"
                                                         name="packageQuantity" #packageQuantity="ngModel"
-                                                        oninput="validity.valid||(value='');" placeholder="Please enter"
+                                                        oninput="validity.valid||(value='');" placeholder="Enter number"
                                                         autocomplete="nope">
                                                 </div>
                                             </td>
@@ -1750,13 +1750,13 @@
                                                         autocomplete="nope" [(ngModel)]="container.description"
                                                         name="descriptionOfGood" #descriptionOfGood="ngModel"
                                                         (change)="container.description = container.description.trim()"
-                                                        placeholder="Please enter">
+                                                        placeholder="Enter text">
                                                 </div>
                                             </td>
                                             <td class="">
                                                 <div class="control-editable">
                                                     <input type="number" class="form-control m-input m-input--square"
-                                                        placeholder="Please enter" autocomplete="nope"
+                                                        placeholder="Enter number" autocomplete="nope"
                                                         [(ngModel)]="container.nw" name="containerNW" min="0.01"
                                                         appTwoDigitDecimaNumber #containerNW="ngModel">
                                                 </div>
@@ -1764,7 +1764,7 @@
                                             <td class="">
                                                 <div class="control-editable">
                                                     <input type="number" class="form-control m-input m-input--square"
-                                                        placeholder="Please enter" autocomplete="nope"
+                                                        placeholder="Enter number" autocomplete="nope"
                                                         [(ngModel)]="container.gw" name="containerGW" min="0.01"
                                                         appTwoDigitDecimaNumber #containerGW="ngModel">
                                                 </div>
@@ -1772,7 +1772,7 @@
                                             <td class="">
                                                 <div class="control-editable">
                                                     <input type="number" class="form-control m-input m-input--square"
-                                                        placeholder="Please enter" autocomplete="nope"
+                                                        placeholder="Enter number" autocomplete="nope"
                                                         [(ngModel)]="container.chargeAbleWeight"
                                                         name="containerchargeAbleWeight" min="0.01"
                                                         appTwoDigitDecimaNumber #containerchargeAbleWeight="ngModel">
@@ -1792,7 +1792,7 @@
                                             <td class="">
                                                 <div class="control-editable">
                                                     <input type="number" class="form-control m-input m-input--square"
-                                                        placeholder="Please enter" autocomplete="nope"
+                                                        placeholder="Enter number" autocomplete="nope"
                                                         [(ngModel)]="container.cbm" name="containerCBM" min="0.01"
                                                         appTwoDigitDecimaNumber #containerCBM="ngModel">
                                                 </div>

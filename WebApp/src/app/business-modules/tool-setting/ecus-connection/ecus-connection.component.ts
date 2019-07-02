@@ -7,7 +7,8 @@ import { NgForm } from '@angular/forms';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
-declare var $: any;
+import { SortService } from 'src/app/shared/services/sort.service';
+declare var $: any; 
 @Component({
     selector: 'app-ecus-connection',
     templateUrl: './ecus-connection.component.html',
@@ -23,17 +24,18 @@ export class EcusConnectionComponent implements OnInit {
     Users: any[] = [];
     SearchFields = [
         // {fieldName:"",displayName:"All"},
-        { fieldName: "name", displayName: "Name" },
-        { fieldName: "username", displayName: "User Name" },
-        { fieldName: "serverName", displayName: "Server Name" },
-        { fieldName: "dbname", displayName: "Database Name" }
+        { fieldName: 'name', displayName: 'Name' },
+        { fieldName: 'username', displayName: 'User Name' },
+        { fieldName: 'serverName', displayName: 'Server Name' },
+        { fieldName: 'dbname', displayName: 'Database Name' }
     ]
     configSearch: any = {
         settingFields: this.SearchFields,
         typeSearch: TypeSearch.outtab
     };
 
-    constructor(private baseService: BaseService, private api_menu: API_MENU) { }
+    constructor(private baseService: BaseService, private api_menu: API_MENU,
+        private sortService: SortService) { }
 
     ngOnInit() {
         this.initNewPager();
@@ -48,7 +50,7 @@ export class EcusConnectionComponent implements OnInit {
 
     getListUsers() {
         this.baseService.get(this.api_menu.System.User_Management.getAll).subscribe((data: any) => {
-            this.Users = prepareNg2SelectData(data, "id", "username");
+            this.Users = prepareNg2SelectData(data, 'id', 'username');
         });
     }
 
@@ -68,10 +70,11 @@ export class EcusConnectionComponent implements OnInit {
     getEcusConnections(pager: PagerSetting) {
 
         this.baseService.spinnerShow();
-        this.baseService.post(this.api_menu.ToolSetting.EcusConnection.paging + "?pageNumber=" + pager.currentPage + "&pageSize=" + pager.pageSize, this.criteria).subscribe((res: any) => {
+        this.baseService.post(this.api_menu.ToolSetting.EcusConnection.paging 
+            + '?pageNumber=' + pager.currentPage + '&pageSize=' + pager.pageSize, this.criteria).subscribe((res: any) => {
             if (res != null) {
-                this.EcusConnections = res.data;
                 this.pager.totalItems = res.totalItems;
+                this.EcusConnections = this.sortService.sort(res.data, 'name', this.isDesc);
                 console.log(this.EcusConnections);
             }
             else {
@@ -83,13 +86,14 @@ export class EcusConnectionComponent implements OnInit {
     }
 
     async getEcusConnectionDetails(id: number) {
-        this.EcusConnectionEdit = await this.baseService.getAsync(this.api_menu.ToolSetting.EcusConnection.details + "?id=" + id, true, false);
+        this.EcusConnectionEdit = await this.baseService.getAsync(this.api_menu.ToolSetting.EcusConnection.details
+                                                                    + '?id=' + id, true, false);
     }
 
     setPage(pager: PagerSetting) {
         this.pager.currentPage = pager.currentPage;
         this.pager.totalPages = pager.totalPages;
-        this.pager.pageSize = pager.pageSize
+        this.pager.pageSize = pager.pageSize;
         this.getEcusConnections(this.pager);
     }
 
@@ -97,9 +101,9 @@ export class EcusConnectionComponent implements OnInit {
 
         setTimeout(async () => {
             if (form.submitted) {
-                var error = $('#add-connection-modal').find('div.has-danger');
+                const error = $('#add-connection-modal').find('div.has-danger');
                 if (error.length === 0) {
-                    var res = await this.baseService.postAsync(this.api_menu.ToolSetting.EcusConnection.addNew, this.EcusConnectionAdd);
+                    const res = await this.baseService.postAsync(this.api_menu.ToolSetting.EcusConnection.addNew, this.EcusConnectionAdd);
                     if (res.status) {
                         this.resetDisplay();
                         form.onReset();
@@ -135,7 +139,7 @@ export class EcusConnectionComponent implements OnInit {
     async deleteConfirm(confirm: boolean = false) {
         const id = this.EcusConnections[this.indexConnectToDelete].id;
         if (confirm === true) {
-            await this.baseService.deleteAsync(this.api_menu.ToolSetting.EcusConnection.delete + "?id=" + id);
+            await this.baseService.deleteAsync(this.api_menu.ToolSetting.EcusConnection.delete + '?id=' + id);
             this.indexConnectToDelete = -1;
             this.initNewPager();
             this.getEcusConnections(this.pager);
@@ -151,6 +155,15 @@ export class EcusConnectionComponent implements OnInit {
         }, 300);
     }
 
+    isDesc = true;
+    sortKey: string = "name";
+    sort(property) {
+      this.isDesc = !this.isDesc;
+      this.sortKey = property;
+      this.EcusConnections = this.sortService.sort(this.EcusConnections, property, this.isDesc);
+    }
+  
+  
     /**
    * ng2-select
    */

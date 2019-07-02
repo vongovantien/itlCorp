@@ -282,5 +282,40 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return false;
         }
+
+        public HandleState ConvertExistedClearancesToJobs(List<OpsTransactionClearanceModel> list)
+        {
+            var result = new HandleState();
+            try
+            {
+                foreach (var item in list)
+                {
+                    if (item.CustomsDeclaration.JobNo == null)
+                    {
+                        item.OpsTransaction.Id = Guid.NewGuid();
+                        item.OpsTransaction.CreatedDate = DateTime.Now;
+                        item.OpsTransaction.UserCreated = currentUser.UserID; //currentUser.UserID;
+                        item.OpsTransaction.ModifiedDate = DateTime.Now;
+                        item.OpsTransaction.UserModified = currentUser.UserID;
+                        int countNumberJob = ((eFMSDataContext)DataContext.DC).OpsTransaction.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
+                        item.OpsTransaction.JobNo = GenerateID.GenerateOPSJobID("LOG", countNumberJob);
+                        var transaction = mapper.Map<OpsTransaction>(item.OpsTransaction);
+                        DataContext.Add(transaction, false);
+
+                        item.CustomsDeclaration.JobNo = item.OpsTransaction.JobNo;
+                        item.CustomsDeclaration.UserModified = "admin";
+                        item.CustomsDeclaration.DatetimeModified = DateTime.Now;
+                        var clearance = mapper.Map<CustomsDeclaration>(item.CustomsDeclaration);
+                        ((eFMSDataContext)DataContext.DC).CustomsDeclaration.Update(clearance);
+                    }
+                }
+                ((eFMSDataContext)DataContext.DC).SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                result = new HandleState(ex.Message);
+            }
+            return result;
+        }
     }
 }

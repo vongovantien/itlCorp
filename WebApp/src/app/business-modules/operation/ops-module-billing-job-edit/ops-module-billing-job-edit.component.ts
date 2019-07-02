@@ -168,7 +168,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         this.opsTransaction.finishDate = this.finishDate.startDate != null? dataHelper.dateTimeToUTC(this.finishDate.startDate): null;
         let s = this.finishDate.startDate != null && this.serviceDate.startDate != null && (this.finishDate.startDate < this.serviceDate.startDate);
         if (form.invalid || this.opsTransaction.shipmentMode == null 
-            || this.opsTransaction.pod == this.opsTransaction.pol
+            || (this.opsTransaction.pod == this.opsTransaction.pol && this.opsTransaction.pod != null && this.opsTransaction.pol  != null)
             || this.opsTransaction.serviceMode == null 
             || this.opsTransaction.productService == null
             || this.opsTransaction.customerId == null 
@@ -368,6 +368,20 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             }
         }
     }
+
+    /**
+     * cancel edit stage of container row
+     * @param index 
+     */
+    cancelNewContainer(index: number) {
+        if (this.lstMasterContainers[index].isNew == true) {
+            this.lstMasterContainers.splice(index, 1);
+        }
+        else {
+            this.lstMasterContainers[index].allowEdit = false;
+        }
+    }
+
     /**
      * get container information of a job
      * @param listContainers list of container

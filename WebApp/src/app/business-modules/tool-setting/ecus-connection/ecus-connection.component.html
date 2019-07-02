@@ -89,25 +89,32 @@
                     <thead>
                         <tr>
                             <th class="table-actions-col no-sorting"></th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'name'), 'sorting_desc': (!isDesc && sortKey == 'name'), 'sorting': sortKey != 'name' }"
+                                (click)="sort('name')">
                                 <span>Name</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'username'), 'sorting_desc': (!isDesc && sortKey == 'username'), 'sorting': sortKey != 'username' }"
+                                (click)="sort('username')">
                                 <span>User name</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'fullname'), 'sorting_desc': (!isDesc && sortKey == 'fullname'), 'sorting': sortKey != 'fullname' }"
+                                (click)="sort('fullname')">
                                 <span>Full name</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'serverName'), 'sorting_desc': (!isDesc && sortKey == 'serverName'), 'sorting': sortKey != 'serverName' }"
+                                (click)="sort('serverName')">
                                 <span>Server name</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'dbname'), 'sorting_desc': (!isDesc && sortKey == 'dbname'), 'sorting': sortKey != 'dbname' }"
+                                (click)="sort('dbname')">
                                 <span>DB name</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'inactive'), 'sorting_desc': (!isDesc && sortKey == 'inactive'), 'sorting': sortKey != 'inactive' }"
+                                (click)="sort('inactive')">
                                 <span>Status</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'datetimeCreated'), 'sorting_desc': (!isDesc && sortKey == 'datetimeCreated'), 'sorting': sortKey != 'datetimeCreated' }"
+                                (click)="sort('datetimeCreated')">
                                 <span>Modified Date</span>
                             </th>
                         </tr>

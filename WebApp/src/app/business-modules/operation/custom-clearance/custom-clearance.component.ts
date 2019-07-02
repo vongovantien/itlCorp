@@ -7,6 +7,9 @@ import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
+import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
+import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 declare var $: any;
 
 @Component({
@@ -21,6 +24,9 @@ export class CustomClearanceComponent implements OnInit {
     listUser: Array<string> = [];
     clearanceNo: string = '';
     customCheckedArray: any = [];
+    listCustomer: any = [];
+    listPort: any = [];
+    listUnit: any = [];
 
     constructor(
         private baseServices: BaseService,
@@ -39,6 +45,9 @@ export class CustomClearanceComponent implements OnInit {
         this.getListUser();
         this.currentUser = [localStorage.getItem('currently_userName')];
         this.getListCustomsDeclaration();
+        this.getListCustomer();
+        this.getListPort();
+        this.getListUnit();
     }
 
     initPager(): any {
@@ -136,7 +145,14 @@ export class CustomClearanceComponent implements OnInit {
         }
         console.log(this.customCheckedArray);
     }
-
+    confirmConvert() {
+        if(this.customCheckedArray.length > 0){
+            $('#confirm-convert-modal').modal('show');
+        }
+        else{
+            this.toastr.warning('Not selected custom clearance');
+        }
+    }
     confirmDelete() {
         if (this.customCheckedArray.length > 0) {
             $('#btnDeleteCustomClearance').attr('data-target', '#confirm-delete-modal');
@@ -157,6 +173,85 @@ export class CustomClearanceComponent implements OnInit {
 
     }
 
+    async convertToJobs(){
+        let clearancesToConvert = this.mapClearancesToJobs();
+        let response = await this.baseServices.postAsync(this.api_menu.Documentation.Operation.convertExistedClearancesToJobs, clearancesToConvert, true, true);
+        if(response.status){
+            await this.initPager();
+            await this.getListCustomsDeclaration();
+        }
+    }
+    async getListCustomer() {
+        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.CUSTOMER }, true, true);
+        this.listCustomer = res;
+    }
+    async getListPort() {
+        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, { placeType: PlaceTypeEnum.Port }, true, true);
+        this.listPort = res;
+    }
+    async getListUnit() {
+        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: 'Package' }, true, true);
+        this.listUnit = res;
+    }
+    mapClearancesToJobs() {
+        let clearancesToConvert = [];
+        for(let i =0; i< this.customCheckedArray.length; i++){
+            let clearance = this.customCheckedArray[i];
+            let shipment = new OpsTransaction();
+            let index = this.listCustomer.findIndex(x => x.taxCode == clearance.partnerTaxCode);
+            if(index > -1){
+                let customer = this.listCustomer[index];
+                shipment.customerId = customer.id;
+                shipment.salemanId = customer.salemanId;
+                index = this.listPort.findIndex(x => x.code == clearance.gateway);
+                if(index > -1){
+                    if(clearance.type == "Export"){
+                        shipment.pol = this.listPort[index].id;
+                    }
+                    if(clearance.type == "Import"){
+                        shipment.pod = this.listPort[index].id;
+                    }
+                }
+                if(clearance.serviceType == "Sea")
+                {
+                    if(clearance.cargoType == "FCL"){
+                        shipment.productService = "Sea FCL";
+                    }
+                    if(clearance.cargoType == "LCL"){
+                        shipment.productService = "Sea LCL";
+                    }
+                }
+                else{
+                    shipment.productService = clearance.serviceType;
+                }
+                shipment.shipmentMode = "External";
+                shipment.mblno = clearance.mblid;
+                shipment.hwbno = clearance.hblid;
+                shipment.serviceDate = clearance.clearanceDate;
+                shipment.sumGrossWeight = clearance.grossWeight;
+                shipment.sumNetWeight = clearance.netWeight;
+                shipment.sumCbm = clearance.cbm;
+                let claim = localStorage.getItem('id_token_claims_obj');
+                let currenctUser = JSON.parse(claim)["id"];
+                shipment.billingOpsId = currenctUser;
+                index = this.listUnit.findIndex(x => x.code == clearance.unitCode);
+                if(index > -1){
+                    shipment.packageTypeID = this.listUnit[index].id;
+                }
+            }
+            else{
+                this.baseServices.errorToast("Không đủ điều kiện để tạo job mới");
+                shipment = null;
+            }
+            if(clearance.clearanceDate == null)
+            {
+                this.baseServices.errorToast("Không đủ điều kiện để tạo job mới");
+                shipment = null;
+            }
+            clearancesToConvert.push({ opsTransaction: shipment, customsDeclaration: clearance});
+        }
+        return clearancesToConvert;
+    }
     /**
      * Daterange picker
      */
