@@ -35,18 +35,12 @@
                                     </div>
                                     <div class="list-group-item filter-group-item">
                                         <div class="row">
-                                            <div class="col-sm-1">&nbsp;</div>
-                                            <div class="col-sm-3">
+                                            <div class="col-sm-6">
                                                 <span>
                                                     <input type="text" class="form-control form-control-sm m-input m-input--square" placeholder="Filter">
                                                 </span>
                                             </div>
-                                            <div class="col-sm-4">
-                                                <span>
-                                                    <input type="text" class="form-control form-control-sm m-input m-input--square" placeholder="Filter">
-                                                </span>
-                                            </div>
-                                            <div class="col-sm-4">
+                                            <div class="col-sm-6">
                                                 <span>
                                                     <input type="text" class="form-control form-control-sm m-input m-input--square" placeholder="Filter">
                                                 </span>
@@ -56,19 +50,19 @@
                                 </div>
 
                                 <div class="list-group fit-height-div">
-                                    <div *ngFor="let number of numbers" class="list-group-item">
+                                    <div *ngFor="let stage of stages; let i = index" class="list-group-item">
                                         <div class="row">
                                             <div class="col-sm-1">
                                                 <label class="m-checkbox">
-                                                    <input type="checkbox">
+                                                    <input type="checkbox" (change)="onChangeCheckBoxStage($event, stage, i)" value="{{stage}}">
                                                     <span></span>
                                                 </label>
                                             </div>
                                             <div class="col-sm-5">
-                                                <span>stage code</span>
+                                                <span>{{stage.code}}</span>
                                             </div>
                                             <div class="col-sm-6">
-                                                <span>stage name</span>
+                                                <span>{{stage.name}}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -77,20 +71,16 @@
                             </div>
 
                             <div class="col-sm-2 m--margin-top-100">
-                                <button type="button" class="btn btn-success btn-block m-btn--square m-btn--icon m-btn--uppercase">
+                                <button type="button" class="btn btn-success btn-block m-btn--square m-btn--icon m-btn--uppercase" (click)="onAddStage()">
                                     <span>
                                         <i class="la la-arrow-right"></i>
-                                        <span>
-                                            add
-                                        </span>
+                                        <span>add</span>
                                     </span>
                                 </button>
-                                <button type="reset" class="btn btn-danger btn-block m-btn--square m-btn--icon m-btn--uppercase">
+                                <button type="reset" class="btn btn-danger btn-block m-btn--square m-btn--icon m-btn--uppercase" (click)="onRemoveStage()">
                                     <span>
                                         <i class="la la-arrow-left"></i>
-                                        <span>
-                                            remove
-                                        </span>
+                                        <span >remove</span>
                                     </span>
                                 </button>
                             </div>
@@ -120,18 +110,12 @@
                                     </div>
                                     <div class="list-group-item filter-group-item">
                                         <div class="row">
-                                            <div class="col-sm-1">&nbsp;</div>
-                                            <div class="col-sm-3">
+                                            <div class="col-sm-6">
                                                 <span>
                                                     <input type="text" class="form-control form-control-sm m-input m-input--square" placeholder="Filter">
                                                 </span>
                                             </div>
-                                            <div class="col-sm-4">
-                                                <span>
-                                                    <input type="text" class="form-control form-control-sm m-input m-input--square" placeholder="Filter">
-                                                </span>
-                                            </div>
-                                            <div class="col-sm-4">
+                                            <div class="col-sm-6">
                                                 <span>
                                                     <input type="text" class="form-control form-control-sm m-input m-input--square" placeholder="Filter">
                                                 </span>
@@ -139,37 +123,32 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div cdkDropList (cdkDropListDropped)="dropped($event)" class="list-group list-group fit-height-div">
-                                    <div cdkDrag *ngFor="let number of numbers" class="list-group-item">
+                                <div class="list-group fit-height-div">
+                                    <div *ngFor="let stage of selectedStages; let i = index" class="list-group-item">
                                         <div class="row">
                                             <div class="col-sm-1">
                                                 <label class="m-checkbox">
-                                                    <input type="checkbox">
+                                                    <input type="checkbox"(change)="onChangeCheckBoxStageSelected($event, stage, i)" value="{{stage}}">
                                                     <span></span>
                                                 </label>
                                             </div>
-                                            <div class="col-sm-3">
-                                                <span>{{ number.id }}</span>
+                                            <div class="col-sm-5">
+                                                <span>{{stage.code}}</span>
                                             </div>
-                                            <div class="col-sm-4">
-                                                <span>stage code</span>
-                                            </div>
-                                            <div class="col-sm-4">
-                                                <span>{{ number.name }}</span>
+                                            <div class="col-sm-6">
+                                                <span>{{stage.name}}</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <!--end: -->
                             </div>
                         </div>
+                        <!--end:: add-stage-block-->
                     </div>
-                    <!--end:: add-stage-block-->
+                    <!--end::Form-->
                 </div>
-                <!--end::Form-->
-            </div>
-            <div class="modal-footer m--align-center">
-                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                <div class="modal-footer m--align-center">
+                    <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -177,7 +156,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" (click)="hide()">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
@@ -185,7 +164,7 @@
                         </span>
                     </span>
                 </button>
+                </div>
             </div>
         </div>
     </div>
-</div>

@@ -106,41 +106,42 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         // this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
     }
     async ngOnInit() {
-        this.getUnits();
-        this.getPartners();
-        this.getCurrencies();
-        this.getListBuyingRateCharges();
-        this.getListSellingRateCharges();
-        this.getListOBHCharges();
-        this.getCustomers();
-        this.getPorts();
-        this.getSuppliers();
-        this.getAgents();
-        this.getBillingOps();
-        this.getWarehouses();
-        this.getContainerData();
-        await this.getShipmentCommonData();
-        await this.route.params.subscribe(async prams => {
-            if (prams.id != undefined) {
-                await this.getShipmentDetails(prams.id);
+        this.route.params.subscribe( async(params: any) => {
+            this.getUnits();
+            this.getPartners();
+            this.getCurrencies();
+            this.getListBuyingRateCharges();
+            this.getListSellingRateCharges();
+            this.getListOBHCharges();
+            this.getCustomers();
+            this.getPorts();
+            this.getSuppliers();
+            this.getAgents();
+            this.getBillingOps();
+            this.getWarehouses();
+            this.getContainerData();
+            await this.getShipmentCommonData();
+            if (!!params && !!params.id ) {
+                await this.getShipmentDetails(params.id);
                 if(this.opsTransaction != null){
-                    this.serviceDate = (this.opsTransaction.serviceDate!= null)? { startDate: moment(this.opsTransaction.serviceDate), endDate: moment(this.opsTransaction.serviceDate) }: null;
+                    this.serviceDate = (this.opsTransaction.serviceDate !== null)? { startDate: moment(this.opsTransaction.serviceDate), endDate: moment(this.opsTransaction.serviceDate) }: null;
                     this.finishDate = this.opsTransaction.finishDate != null? { startDate: moment(this.opsTransaction.finishDate), endDate: moment(this.opsTransaction.finishDate) }: null;
-                    let index = this.productServices.findIndex(x => x.id == this.opsTransaction.productService);
-                    if (index > -1) this.productServiceActive = [this.productServices[index]];
-                    index = this.serviceModes.findIndex(x => x.id == this.opsTransaction.serviceMode);
-                    if (index > -1) this.serviceModeActive = [this.serviceModes[index]];
-                    index = this.shipmentModes.findIndex(x => x.id == this.opsTransaction.shipmentMode);
-                    if (index > -1) this.shipmentModeActive = [this.shipmentModes[index]];
+                    let index = this.productServices.findIndex(x => x.id === this.opsTransaction.productService);
+                    if (index > -1) { this.productServiceActive = [this.productServices[index]]; }
+                    index = this.serviceModes.findIndex(x => x.id === this.opsTransaction.serviceMode);
+                    if (index > -1) { this.serviceModeActive = [this.serviceModes[index]] };
+                    index = this.shipmentModes.findIndex(x => x.id === this.opsTransaction.shipmentMode);
+                    if (index > -1) {this.shipmentModeActive = [this.shipmentModes[index]]};
                     this.getAllSurCharges();
                     this.getShipmentContainer();
                 }
-                else{
+                else {
                     this.serviceDate = null;
                     this.finishDate = null;
                 }
             }
-        });
+        })
+        
     }
     async getShipmentContainer() {
         let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, { mblid: this.opsTransaction.id }, false, false);

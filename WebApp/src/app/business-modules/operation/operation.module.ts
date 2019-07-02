@@ -23,10 +23,10 @@ import { OpsModuleCreditDebitNoteDetailComponent } from "./job-edit/credit-debit
 import { OpsModuleCreditDebitNoteEditComponent } from "./job-edit/credit-debit-note/ops-module-credit-debit-note-edit/ops-module-credit-debit-note-edit.component";
 import { BillingCustomDeclarationComponent } from "./job-edit/custom-declaration/billing-custom-declaration.component";
 import { OpsModuleCreditDebitNoteComponent } from "./job-edit/credit-debit-note/ops-module-credit-debit-note.component";
-import { OpsModuleStageManagementAddStagePopupComponent } from "./job-edit/stage-management/add/add-stag.popup.component";
 import { OpsModuleStageManagementComponent } from "./job-edit/stage-management/stage-management.component";
 import { OpsModuleStageManagementDetailComponent } from "./job-edit/stage-management/detail/detail-stage-popup.component";
 import { ModalModule } from "ngx-bootstrap";
+import { OpsModuleStageManagementAddStagePopupComponent } from "./job-edit/stage-management/add/add-stage.popup.component";
 
 @NgModule({
     imports: [

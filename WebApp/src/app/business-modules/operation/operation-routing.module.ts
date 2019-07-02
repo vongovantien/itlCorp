@@ -37,7 +37,7 @@ const routes: Routes = [
     }
   },
   {
-    path: "job-edit",
+    path: "job-edit/:id",
     component: OpsModuleBillingJobEditComponent,
     data: {
       name: "Job Edit",

@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
-import { OpsModuleStageManagementAddStagePopupComponent } from "./add/add-stag.popup.component";
 import { AppPage } from "src/app/app.base";
+import { OpsModuleStageManagementAddStagePopupComponent } from "./add/add-stage.popup.component";
 
 @Component({
     selector: "app-ops-module-stage-management",
