@@ -100,3 +100,7 @@ bin
 /WebAPI/eFMS.API.Common/eFMS.API.Common/obj
 /WebAPI/eFMS.API.Common/eFMS.API.Provider/obj
 /WebAPI/eFMS.API.Common/packages
+/WebAPI/eFMS.API.SystemWeb/OperationManagement/.vs
+/WebAPI/eFMS.API.SystemWeb/OperationManagement/eFMS.API.Operation.DL/obj
+/WebAPI/eFMS.API.SystemWeb/OperationManagement/eFMS.API.Operation.DAL/obj
+/WebAPI/eFMS.API.SystemWeb/OperationManagement/eFMS.API.Operation/obj

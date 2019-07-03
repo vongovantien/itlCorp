@@ -29,10 +29,10 @@
 
   <ItemGroup>
     <Reference Include="ITL.NetCore.Common">
-      <HintPath>..\..\..\..\bin\netcoreapp2.1\ITL.NetCore.Common.dll</HintPath>
+      <HintPath>..\bin\netcoreapp2.2\ITL.NetCore.Common.dll</HintPath>
     </Reference>
     <Reference Include="ITL.NetCore.Connection">
-      <HintPath>..\..\..\..\bin\netcoreapp2.1\ITL.NetCore.Connection.dll</HintPath>
+      <HintPath>..\bin\netcoreapp2.2\ITL.NetCore.Connection.dll</HintPath>
     </Reference>
   </ItemGroup>
 
