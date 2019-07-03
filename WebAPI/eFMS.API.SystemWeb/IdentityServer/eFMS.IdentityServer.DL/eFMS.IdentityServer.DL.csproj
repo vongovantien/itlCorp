@@ -32,13 +32,16 @@
 
   <ItemGroup>
     <Reference Include="eFMS.API.Common">
-      <HintPath>..\..\..\..\bin\netcoreapp2.1\eFMS.API.Common.dll</HintPath>
+      <HintPath>..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="eFMS.IdentityServer.Service">
+      <HintPath>..\bin\netcoreapp2.2\eFMS.IdentityServer.Service.dll</HintPath>
     </Reference>
     <Reference Include="ITL.NetCore.Common">
-      <HintPath>..\..\..\..\bin\netcoreapp2.1\ITL.NetCore.Common.dll</HintPath>
+      <HintPath>..\bin\netcoreapp2.2\ITL.NetCore.Common.dll</HintPath>
     </Reference>
     <Reference Include="ITL.NetCore.Connection">
-      <HintPath>..\..\..\..\bin\netcoreapp2.1\ITL.NetCore.Connection.dll</HintPath>
+      <HintPath>..\bin\netcoreapp2.2\ITL.NetCore.Connection.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNetCore.Http.Abstractions">
       <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.http.abstractions\2.1.1\lib\netstandard2.0\Microsoft.AspNetCore.Http.Abstractions.dll</HintPath>
@@ -55,9 +58,5 @@
     <Folder Include="Helpers\" />
     <Folder Include="Models\Criteria\" />
     <Folder Include="Models\Views\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\eFMS.IdentityServer.DAL\eFMS.IdentityServer.Service.csproj" />
   </ItemGroup>
 </Project>
