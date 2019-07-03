@@ -30,12 +30,13 @@ namespace eFMS.API.Setting.DL.Common
 
         public static readonly string MSG_INVALID_DATE = "MSG_INVALID_DATE";
         public static readonly string MSG_INVALID_NUMBER = "MSG_INVALID_NUMBER";
-        public static readonly string MSG_DATA_NOT_FOUND_WRONG = "MSG_DATA_NOT_FOUND_WRONG";
+        public static readonly string MSG_DUPLICATE_DATA = "MSG_DUPLICATE_DATA";
+        public static readonly string MSG_INVALID_MAX_LENGTH = "MSG_INVALID_MAX_LENGTH";
 
         #region customclearance
         public static readonly string MSG_CUSTOM_CLEARANCE_NO_EMPTY = "MSG_CUSTOM_CLEARANCE_NO_EMPTY";
         public static readonly string MSG_CUSTOM_CLEARANCE_DATE_EMPTY = "MSG_CUSTOM_CLEARANCE_DATE_EMPTY";
-        public static readonly string MSG_CUSTOM_CLEARANCE_CUSTOMER_ID_EMPTY = "MSG_CUSTOM_CLEARANCE_CUSTOMER_ID_EMPTY";
+        public static readonly string MSG_CUSTOM_CLEARANCE_CUSTOMER_CODE_EMPTY = "MSG_CUSTOM_CLEARANCE_CUSTOMER_CODE_EMPTY";
         public static readonly string MSG_CUSTOM_CLEARANCE_MBL_EMPTY = "MSG_CUSTOM_CLEARANCE_MBL_EMPTY";
         public static readonly string MSG_CUSTOM_CLEARANCE_GATEWAY_EMPTY = "MSG_CUSTOM_CLEARANCE_GATEWAY_EMPTY";
         public static readonly string MSG_CUSTOM_CLEARANCE_CARGO_TYPE_EMPTY = "MSG_CUSTOM_CLEARANCE_CARGO_TYPE_EMPTY";

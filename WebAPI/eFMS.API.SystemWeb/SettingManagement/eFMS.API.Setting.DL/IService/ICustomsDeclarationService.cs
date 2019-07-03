@@ -22,5 +22,7 @@ namespace eFMS.API.Setting.DL.IService
         CustomsDeclaration GetById(int id);
         HandleState DeleteMultiple(List<CustomsDeclarationModel> customs);
         List<CustomClearanceImportModel> CheckValidImport(List<CustomClearanceImportModel> list);
+        HandleState Import(List<CustomsDeclarationModel> data);
+
     }
 }

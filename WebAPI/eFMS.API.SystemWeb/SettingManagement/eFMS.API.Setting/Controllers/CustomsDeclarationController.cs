@@ -269,7 +269,7 @@ namespace eFMS.API.Setting.Controllers
         }
 
         /// <summary>
-        /// Delete multiple custom clearance
+        /// delete multiple custom clearance
         /// </summary>
         /// <param name="customs">list of clearances selected</param>
         /// <returns></returns>
@@ -327,40 +327,40 @@ namespace eFMS.API.Setting.Controllers
                 
                 for (int row = 2; row < rowCount + 1; row++)
                 {
-                    var stage = new CustomClearanceImportModel();
-                    //{
-                    stage.IsValid = true;
-                    stage.ClearanceNo = worksheet.Cells[row, 1].Value?.ToString();
-                    stage.Type = worksheet.Cells[row, 2].Value?.ToString();
-                    stage.FirstClearanceNo = worksheet.Cells[row, 3].Value?.ToString();
+                    var stage = new CustomClearanceImportModel
+                    {
+                        IsValid = true,
+                        ClearanceNo = worksheet.Cells[row, 1].Value?.ToString(),
+                        Type = worksheet.Cells[row, 2].Value?.ToString(),
+                        FirstClearanceNo = worksheet.Cells[row, 3].Value?.ToString(),
 
-                    stage.ClearanceDateStr = worksheet.Cells[row, 4].Value?.ToString();                    
+                        ClearanceDateStr = worksheet.Cells[row, 4].Value?.ToString(),
 
-                    stage.PartnerTaxCode = worksheet.Cells[row, 5].Value?.ToString();
-                    stage.CustomerName = worksheet.Cells[row, 6].Value?.ToString();
-                    stage.Mblid = worksheet.Cells[row, 7].Value?.ToString();
-                    stage.Hblid = worksheet.Cells[row, 8].Value?.ToString();
-                    stage.Gateway = worksheet.Cells[row, 9].Value?.ToString();
-                    
+                        PartnerTaxCode = worksheet.Cells[row, 5].Value?.ToString(),
+                        CustomerName = worksheet.Cells[row, 6].Value?.ToString(),
+                        Mblid = worksheet.Cells[row, 7].Value?.ToString(),
+                        Hblid = worksheet.Cells[row, 8].Value?.ToString(),
+                        Gateway = worksheet.Cells[row, 9].Value?.ToString(),
 
-                    stage.GrossWeightStr = worksheet.Cells[row, 10].Value?.ToString();
+                        GrossWeightStr = worksheet.Cells[row, 10].Value?.ToString(),
+                        NetWeightStr = worksheet.Cells[row, 11].Value?.ToString(),
+                        CbmStr = worksheet.Cells[row, 12].Value?.ToString(),
+                        QtyContStr = worksheet.Cells[row, 13].Value?.ToString(),
+                        PcsStr = worksheet.Cells[row, 14].Value?.ToString(),
 
-                    stage.NetWeightStr = worksheet.Cells[row, 11].Value?.ToString();                    
+                        CommodityCode = worksheet.Cells[row, 15].Value?.ToString(),
+                        CargoType = worksheet.Cells[row, 17].Value?.ToString(),
+                        ServiceType = worksheet.Cells[row, 18].Value?.ToString(),
+                        Route = worksheet.Cells[row, 19].Value?.ToString(),
+                        ImportCountryCode = worksheet.Cells[row, 20].Value?.ToString(),
+                        ExportCountryCode = worksheet.Cells[row, 21].Value?.ToString(),
 
-                    stage.CbmStr = worksheet.Cells[row, 12].Value?.ToString();
-
-                    stage.QtyContStr = worksheet.Cells[row, 13].Value?.ToString();
-
-                    stage.PcsStr = worksheet.Cells[row, 14].Value?.ToString();
-                    
-
-                    stage.CommodityCode = worksheet.Cells[row, 15].Value?.ToString();
-                    stage.CargoType = worksheet.Cells[row, 17].Value?.ToString();
-                    stage.ServiceType = worksheet.Cells[row, 18].Value?.ToString();
-                    stage.Route = worksheet.Cells[row, 19].Value?.ToString();
-                    stage.ImportCountryCode = worksheet.Cells[row, 20].Value?.ToString();
-                    stage.ExportCountryCode = worksheet.Cells[row, 21].Value?.ToString();
-                    //};
+                        Source = Constants.FromEFMS,
+                        DatetimeModified = DateTime.Now,
+                        UserModified = currentUser.UserID,
+                        DatetimeCreated = DateTime.Now,
+                        UserCreated = currentUser.UserID
+                    };
                     list.Add(stage);
                 }
                 var data = customsDeclarationService.CheckValidImport(list);
@@ -370,5 +370,27 @@ namespace eFMS.API.Setting.Controllers
             }
             return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
         }
+
+        /// <summary>
+        /// import list custom clearance
+        /// </summary>
+        /// <param name="data">list custom clearance</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("Import")]
+        [Authorize]
+        public IActionResult Import([FromBody]List<CustomsDeclarationModel> data)
+        {
+            var result = customsDeclarationService.Import(data);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+            }
+        }
+
     }
 }

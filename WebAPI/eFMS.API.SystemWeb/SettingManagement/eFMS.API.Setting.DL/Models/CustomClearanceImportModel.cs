@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace eFMS.API.Setting.DL.Models
+﻿namespace eFMS.API.Setting.DL.Models
 {
     public class CustomClearanceImportModel : CustomsDeclarationModel
     {
@@ -24,6 +20,7 @@ namespace eFMS.API.Setting.DL.Models
         public bool TypeValid { get; set; }
         public bool PartnerTaxCodeValid { get; set; }
         public bool MblidValid { get; set; }
+        public bool HblidValid { get; set; }
         public bool GatewayValid { get; set; }
 
         public bool CargoTypeValid { get; set; }
@@ -32,5 +29,7 @@ namespace eFMS.API.Setting.DL.Models
         public bool CommodityValid { get; set; }
         public string CommodityName { get; set; }
 
+        public bool ImportCountryCodeValid { get; set; }
+        public bool ExportCountryCodeValid { get; set; }
     }
 }
