@@ -4,7 +4,6 @@ using Microsoft.Extensions.Localization;
 using LocalizationCultureCore.StringLocalizer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.Extensions.Configuration;
 using System.Globalization;
 using Microsoft.AspNetCore.Builder;
@@ -21,6 +20,10 @@ using System.IO;
 using System.Reflection;
 using System;
 using eFMS.API.Operation.Service.Contexts;
+using eFMS.API.Operation.DL.IService;
+using eFMS.API.Operation.DL.Services;
+using eFMS.API.Provider.Services.ServiceImpl;
+using eFMS.API.Provider.Services.IService;
 
 namespace eFMS.API.Operation.Infrastructure
 {
@@ -35,7 +38,7 @@ namespace eFMS.API.Operation.Infrastructure
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
-            services.AddTransient<ICurrentUser, CurrentUser>();
+            services.AddTransient<IOpsStageAssignedService, OpsStageAssignedService>();
         }
 
         public static IServiceCollection AddCulture(this IServiceCollection services, IConfiguration configuration)
@@ -152,6 +155,13 @@ namespace eFMS.API.Operation.Infrastructure
                             .AllowCredentials();
                     });
             });
+            return services;
+        }
+
+        public static IServiceCollection AddCatelogueManagementApiServices(this IServiceCollection services)
+        {
+            services.AddHttpClient<ICatStageApiService, CatStageApiService>()
+                   .SetHandlerLifetime(TimeSpan.FromMinutes(5)); 
             return services;
         }
     }

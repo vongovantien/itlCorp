@@ -1,11 +1,7 @@
-﻿using eFMS.API.Operation.DL.Common;
+﻿using eFMS.API.Operation.Resources;
 using Microsoft.Extensions.Localization;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Globalization;
-using System.Linq;
 
 namespace eFMS.API.Operation.Infrastructure.AttributeEx
 {

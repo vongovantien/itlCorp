@@ -1,5 +1,5 @@
-﻿using eFMS.API.Operation.DL.Common;
-using eFMS.API.Common.Globals;
+﻿using eFMS.API.Common.Globals;
+using eFMS.API.Operation.Resources;
 using ITL.NetCore.Common;
 using System;
 

@@ -60,10 +60,11 @@ namespace eFMS.API.Operation
                 config.ApiVersionReader = new HeaderApiVersionReader("api-version");
             });
 
-            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            //services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddCulture(Configuration);
             services.AddSwagger();
             services.AddConfigureSetting(Configuration);
+            services.AddCatelogueManagementApiServices();
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
             IHostingEnvironment env, IApiVersionDescriptionProvider provider)

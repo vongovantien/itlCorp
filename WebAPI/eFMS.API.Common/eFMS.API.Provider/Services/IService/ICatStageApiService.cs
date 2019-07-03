@@ -10,5 +10,6 @@ namespace eFMS.API.Provider.Services.IService
     public interface ICatStageApiService
     {
         Task<List<CatStageApiModel>> GetStages(CatStageCriteria criteria);
+        Task<List<CatStageApiModel>> GetAll();
     }
 }

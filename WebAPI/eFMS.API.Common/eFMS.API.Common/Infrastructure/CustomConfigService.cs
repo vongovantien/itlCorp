@@ -38,6 +38,7 @@ namespace eFMS.API.Common.Infrastructure
             services.AddSingleton(localizationOptions);
             return services;
         }
+
         public static IServiceCollection AddCustomConfigureSetting(this IServiceCollection service, IConfiguration configuration)
         {
             service.Configure<Settings>(options =>
