@@ -10,5 +10,6 @@ namespace eFMS.API.Operation.DL.Models
     {
         public string StageCode { get; set; }
         public string StageNameEN { get; set; }
+        public string DepartmentName { get; set; }
     }
 }

@@ -68,7 +68,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Common\" />
     <Folder Include="Infrastructure\ErrorHandler\" />
     <Folder Include="Models\Criteria\" />
     <Folder Include="ViewModels\" />

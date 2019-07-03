@@ -59,7 +59,7 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult GetAll()
         {
             var results = catStageService.GetAll();
-            return Ok();
+            return Ok(results);
         }
 
         /// <summary>

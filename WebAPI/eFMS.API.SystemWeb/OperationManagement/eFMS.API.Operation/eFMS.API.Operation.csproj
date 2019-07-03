@@ -2,6 +2,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <OutputPath>..\bin</OutputPath>
+    <DocumentationFile>eFMS.API.Operation.xml</DocumentationFile>
   </PropertyGroup>
 <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
@@ -63,6 +64,9 @@
     </Reference>
     <Reference Include="eFMS.API.Provider">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Provider.dll</HintPath>
+    </Reference>
+    <Reference Include="eFMS.IdentityServer.DL">
+      <HintPath>..\bin\netcoreapp2.2\eFMS.IdentityServer.DL.dll</HintPath>
     </Reference>
     <Reference Include="ITL.NetCore.Common">
       <HintPath>..\bin\netcoreapp2.2\ITL.NetCore.Common.dll</HintPath>
