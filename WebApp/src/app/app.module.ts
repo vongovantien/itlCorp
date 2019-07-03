@@ -13,7 +13,7 @@ import { LoginComponent } from "./login/login.component";
 import { MasterPageComponent } from "./master-page/master-page.component";
 import { NotfoundPageComponent } from "./notfound-page/notfound-page.component";
 import { BaseService } from "src/services-base/base.service";
-import { HttpClientModule } from "@angular/common/http";
+import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 import { ToastrModule } from "ngx-toastr";
 import { PagingService } from "./shared/common/pagination/paging-service";
 import { CommonModule } from "@angular/common";
@@ -40,6 +40,7 @@ import { ScrollingModule } from "@angular/cdk/scrolling";
 
 import { DragDropModule } from "@angular/cdk/drag-drop";
 import { ModalModule } from "ngx-bootstrap";
+import { AuthInterceptor } from "./auth.interceptor";
 // import { ChartModule } from 'angular-highcharts';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     // wheelPropagation: true
@@ -94,7 +95,12 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         {
             provide: PERFECT_SCROLLBAR_CONFIG, // Scrollbar
             useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG // Scrollbar
-        }
+        },
+        {
+			provide: HTTP_INTERCEPTORS,
+			useClass: AuthInterceptor,
+			multi: true,
+		}
     ],
     bootstrap: [AppComponent],
     exports: [ScrollingModule]
