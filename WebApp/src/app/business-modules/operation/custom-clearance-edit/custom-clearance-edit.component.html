@@ -30,7 +30,7 @@
                                     Clearance No <span class="m--font-danger">(*)</span>
                                 </label>
                                 <input type="text" [(ngModel)]="customDeclaration.clearanceNo"
-                                    (change)="customDeclaration.clearanceNo=customDeclaration.clearanceNo.trim()"
+                                    (change)="customDeclaration.clearanceNo=customDeclaration.clearanceNo.trim()" maxlength="50"
                                     class="form-control m-input m-input--square" #clearance_no="ngModel"
                                     onkeypress="return event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)"
                                     name="clearance_no" required placeholder="Enter text" autoFocus>
@@ -91,7 +91,7 @@
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square"
                                     [(ngModel)]="customDeclaration.hblid" name="hblid" #hblib="ngModel"
-                                    (change)="customDeclaration.hblid=customDeclaration.hblid.trim()"
+                                    (change)="customDeclaration.hblid=customDeclaration.hblid.trim()" maxlength="50"
                                     onkeypress="return event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)"
                                     placeholder="Enter text">
                             </div>
@@ -103,7 +103,7 @@
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square"
                                     [(ngModel)]="customDeclaration.mblid" name="mblid" #mblib="ngModel"
-                                    (change)="customDeclaration.mblid=customDeclaration.mblid.trim()"
+                                    (change)="customDeclaration.mblid=customDeclaration.mblid.trim()" maxlength="50"
                                     onkeypress="return event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)"
                                     placeholder="Enter text">
                             </div>
