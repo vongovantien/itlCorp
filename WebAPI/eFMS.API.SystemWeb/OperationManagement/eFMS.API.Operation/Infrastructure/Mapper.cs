@@ -13,6 +13,7 @@ namespace eFMS.API.Operation.Infrastructure
             //CreateMap<SysUserGroupModel, SysUserGroup>();
             CreateMap<OpsStageAssigned, OpsStageAssignedModel>();
             CreateMap<OpsStageAssignedEditModel, OpsStageAssigned>();
+            CreateMap<OpsStageAssignedEditModel, OpsStageAssignedModel>();
         }
     }
 }

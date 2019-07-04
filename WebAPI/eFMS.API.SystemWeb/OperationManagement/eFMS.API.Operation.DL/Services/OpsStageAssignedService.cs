@@ -35,7 +35,7 @@ namespace eFMS.API.Operation.DL.Services
 
         public HandleState AddMultipleStage(List<OpsStageAssignedEditModel> models, Guid jobId)
         {
-            //ChangeTrackerHelper.currentUser = currentUser.UserID;
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var result = new HandleState();
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var stagesByJob = DataContext.Get(x => x.JobId == jobId);
@@ -45,12 +45,12 @@ namespace eFMS.API.Operation.DL.Services
                 if(item.Id == Guid.Empty)
                 {
                     var assignedItem = mapper.Map<OpsStageAssigned>(item);
-                    item.Id = Guid.NewGuid();
-                    item.JobId = jobId;
-                    item.Deadline = item.Deadline ?? null;
-                    item.CreatedDate = item.ModifiedDate = DateTime.Now;
-                    item.UserCreated = "admin";//currentUser.UserID;
-                    dc.Add(item);
+                    assignedItem.Id = Guid.NewGuid();
+                    assignedItem.JobId = jobId;
+                    assignedItem.Deadline = item.Deadline ?? null;
+                    assignedItem.CreatedDate = assignedItem.ModifiedDate = DateTime.Now;
+                    assignedItem.UserCreated = currentUser.UserID;
+                    dc.Add(assignedItem);
                 }
             }
             if(listToDelete.Count() > 0)
@@ -74,11 +74,14 @@ namespace eFMS.API.Operation.DL.Services
             var data = DataContext.First(x => x.Id == id);
             if (data == null) return null;
             var stages = catStageApi.GetAll().Result;
+            var departments = catDepartmentApi.GetAll().Result;
             var result = mapper.Map<OpsStageAssignedModel>(data);
             if(stages != null)
             {
+                var stage = stages?.FirstOrDefault(x => x.Id == result.StageId);
                 result.StageCode = stages.FirstOrDefault(x => x.Id == result.StageId).Code;
                 result.StageNameEN = stages.FirstOrDefault(x => x.Id == result.StageId).StageNameEn;
+                result.DepartmentName = departments?.FirstOrDefault(x => x.Id == stage.DepartmentId)?.DeptName;
             }
             return result;
         }
@@ -112,7 +115,7 @@ namespace eFMS.API.Operation.DL.Services
                 var assignedItem = mapper.Map<OpsStageAssignedModel>(item);
                 assignedItem.StageCode = stage?.Code;
                 assignedItem.StageNameEN = stage?.StageNameEn;
-                assignedItem.DepartmentName = departments?.FirstOrDefault(x => x.Id == stage.DepartmentId)?.DeptName;
+                assignedItem.DepartmentName = stage == null? null: departments?.FirstOrDefault(x => x.Id == stage.DepartmentId)?.DeptName;
                 results.Add(assignedItem);
             }
             return results;

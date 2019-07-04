@@ -53,7 +53,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Operation.Controllers.OpsStageAssignedController.Update(eFMS.API.Operation.DL.Models.OpsStageAssignedModel)">
+        <member name="M:eFMS.API.Operation.Controllers.OpsStageAssignedController.Update(eFMS.API.Operation.DL.Models.OpsStageAssignedEditModel)">
             <summary>
             update an existed item
             </summary>

@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\OpsStageAssignedController.cs" />
     <Compile Remove="Controllers\SysEmployeesController.cs" />
     <Compile Remove="Infrastructure\Middlewares\JsonLocalizationServiceCollectionEx.cs" />
   </ItemGroup>

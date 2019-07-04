@@ -95,6 +95,7 @@ namespace eFMS.API.Operation.Controllers
         /// <param name="models">list of stages</param>
         /// <param name="jobId">id of job want to add list stages</param>
         /// <returns></returns>
+        [Authorize]
         [HttpPut("AddMultipleStage")]
         public IActionResult AddMultipleStage(List<OpsStageAssignedEditModel> models, Guid jobId)
         {
@@ -126,9 +127,12 @@ namespace eFMS.API.Operation.Controllers
         /// <returns></returns>
         [HttpPut("Update")]
         [Authorize]
-        public IActionResult Update(OpsStageAssignedModel model)
+        public IActionResult Update(OpsStageAssignedEditModel model)
         {
-            var hs = opsStageAssignedService.Update(model, x => x.Id == model.Id);
+            var assigned = mapper.Map<OpsStageAssignedModel>(model);
+            assigned.UserModified = currentUser.UserID;
+            assigned.ModifiedDate = DateTime.Now;
+            var hs = opsStageAssignedService.Update(assigned, x => x.Id == model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
