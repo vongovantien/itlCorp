@@ -1,6 +1,6 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { FormsModule } from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { OperationRoutingModule } from "./operation-routing.module";
 import { JobMangementComponent } from "./job-mangement/job-mangement.component";
 import { AssigmentComponent } from "./assigment/assigment.component";
@@ -25,19 +25,27 @@ import { BillingCustomDeclarationComponent } from "./job-edit/custom-declaration
 import { OpsModuleCreditDebitNoteComponent } from "./job-edit/credit-debit-note/ops-module-credit-debit-note.component";
 import { OpsModuleStageManagementComponent } from "./job-edit/stage-management/stage-management.component";
 import { OpsModuleStageManagementDetailComponent } from "./job-edit/stage-management/detail/detail-stage-popup.component";
-import { ModalModule } from "ngx-bootstrap";
+import { ModalModule, TabsModule } from "ngx-bootstrap";
 import { OpsModuleStageManagementAddStagePopupComponent } from "./job-edit/stage-management/add/add-stage.popup.component";
 
+
+const Lib = [
+    NgxDaterangepickerMd,
+    DragDropModule,
+    SelectModule,
+    TabsModule.forRoot(),
+    ModalModule.forRoot(),
+
+]
 @NgModule({
     imports: [
         CommonModule,
         OperationRoutingModule,
-        SelectModule,
         FormsModule,
+        ReactiveFormsModule,
         SharedModule,
-        NgxDaterangepickerMd,
-        DragDropModule,
-        ModalModule.forRoot()
+        ...Lib
+
     ],
     declarations: [
         JobMangementComponent,

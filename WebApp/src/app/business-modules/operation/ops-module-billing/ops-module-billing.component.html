@@ -248,7 +248,7 @@
                                                         <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" [attr.data-target]="'#ops-shipment-00' + (item.id+1)" title="Collapse" (click)="showCustomClearance(item.jobNo)">
                                                             <i class="la la-angle-up"></i>
                                                         </button>
-                                                        <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" [routerLink]="['/home/operation/job-edit', { id: item.id }]" title="Edit">
+                                                        <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" [routerLink]="['/home/operation/job-edit/' + item.id]" title="Edit">
                                                             <i class="la la-edit"></i>
                                                         </button>
                                                         <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Remove" (click)="confirmDelete(item)">
