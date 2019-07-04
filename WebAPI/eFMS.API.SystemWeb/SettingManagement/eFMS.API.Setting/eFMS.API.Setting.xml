@@ -95,7 +95,7 @@
         </member>
         <member name="M:eFMS.API.Setting.Controllers.CustomsDeclarationController.DeleteMultiple(System.Collections.Generic.List{eFMS.API.Setting.DL.Models.CustomsDeclarationModel})">
             <summary>
-            Delete multiple custom clearance
+            delete multiple custom clearance
             </summary>
             <param name="customs">list of clearances selected</param>
             <returns></returns>
@@ -111,6 +111,13 @@
             read data from file excel
             </summary>
             <param name="uploadedFile"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Setting.Controllers.CustomsDeclarationController.Import(System.Collections.Generic.List{eFMS.API.Setting.DL.Models.CustomsDeclarationModel})">
+            <summary>
+            import list custom clearance
+            </summary>
+            <param name="data">list custom clearance</param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Setting.Controllers.EcusConnectionController">

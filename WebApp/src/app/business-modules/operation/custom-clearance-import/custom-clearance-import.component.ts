@@ -8,6 +8,9 @@ import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { NgProgressComponent } from '@ngx-progressbar/core';
 import { SystemConstants } from 'src/constants/system.const';
+import { language } from 'src/languages/language.en';
+import { ToastrService } from 'ngx-toastr';
+declare var $: any;
 
 @Component({
   selector: 'app-custom-clearance-import',
@@ -29,7 +32,8 @@ export class CustomClearanceImportComponent implements OnInit {
     private pagingService: PagingService,
     private baseService: BaseService,
     private api_menu: API_MENU,
-    private sortService: SortService) { }
+    private sortService: SortService,
+    private toastr: ToastrService) { }
 
   ngOnInit() {
     this.pager.totalItems = 0;
@@ -38,6 +42,9 @@ export class CustomClearanceImportComponent implements OnInit {
   chooseFile(file: Event) {
     if (file.target['files'] == null) return;
     this.progressBar.start();
+    /**/
+    this.resetBeforeSelecedFile();
+    /**/
     this.baseService.uploadfile(this.api_menu.ToolSetting.CustomClearance.uploadExel, file.target['files'], "uploadedFile")
       .subscribe((response: any) => {
         console.log(response);
@@ -48,7 +55,6 @@ export class CustomClearanceImportComponent implements OnInit {
         this.pagingData(this.data);
         this.progressBar.complete();
         console.log(this.data);
-        localStorage.setItem("listData", JSON.stringify(this.data));
       }, err => {
         this.progressBar.complete();
         this.baseService.handleError(err);
@@ -62,15 +68,88 @@ export class CustomClearanceImportComponent implements OnInit {
     this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
   }
 
-  setPage(pager: PagerSetting) {
+  async setPage(pager: PagerSetting) {
     this.pager.currentPage = pager.currentPage;
     this.pager.pageSize = pager.pageSize;
     this.pager.totalPages = pager.totalPages;
-    console.log(JSON.parse(localStorage.getItem("listData")));
-    this.pagingData(JSON.parse(localStorage.getItem("listData")));
+
+    if (this.isShowInvalid) {
+      this.pagingData(this.data);
+    } else {
+      this.pagingData(this.inValidItems);
+    }
   }
 
   async downloadSample() {
     await this.baseService.downloadfile(this.api_menu.ToolSetting.CustomClearance.downloadExcel, 'CustomClearanceImportTemplate.xlsx');
   }
+
+  isDesc = true;
+  sortKey: string;
+  sort(property) {
+    this.isDesc = !this.isDesc;
+    this.sortKey = property;
+    this.pagedItems = this.sortService.sort(this.pagedItems, property, this.isDesc);
+  }
+
+  hideInvalid() {
+    if (this.data == null || this.data == undefined) return;
+    this.isShowInvalid = !this.isShowInvalid;
+    this.sortKey = '';
+    if (this.isShowInvalid) {
+      this.pager.totalItems = this.data.length;
+      this.pagingData(this.data);
+    } else {
+      this.inValidItems = this.data.filter(x => !x.isValid);
+      this.pager.totalItems = this.inValidItems.length;
+      this.setPage(this.pager);
+    }
+
+    this.pager.currentPage = 1;
+    if (this.inValidItems.length > 0) {
+      this.child.setPage(this.pager.currentPage);
+    }
+  }
+
+  reset() {
+    this.data = null;
+    this.pagedItems = null;
+    $("#inputFile").val('');
+    this.pager.totalItems = 0;
+    this.totalRows = this.totalValidRows = 0;
+  }
+
+  resetBeforeSelecedFile() {
+    this.pager.currentPage = 1;
+    this.pager.totalItems = 0;
+    this.totalRows = this.totalValidRows = 0;
+    this.pagedItems = [];
+    this.isShowInvalid = true;
+  }
+
+  async import() {
+    if (this.data == null || this.data == undefined) {
+      this.toastr.warning('Not selected import file', '', { positionClass: 'toast-bottom-right', closeButton: true, timeOut: 5000 });
+      return;
+    }
+    if (this.totalRows - this.totalValidRows > 0) {
+      $('#upload-alert-modal').modal('show');
+    }
+    else {
+      this.progressBar.start();
+      console.log(this.data);
+      var response = await this.baseService.postAsync(this.api_menu.ToolSetting.CustomClearance.import, this.data, true, false);
+      if (response.success) {
+        this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
+        this.reset();
+        this.progressBar.complete();
+      }
+      else {
+        this.progressBar.complete();
+        this.baseService.handleError(response);
+      }
+      console.log(response);
+    }
+  }
+
 }

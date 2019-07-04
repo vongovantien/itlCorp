@@ -254,7 +254,8 @@ export class API_MENU {
             importClearancesFromEcus: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/ImportClearancesFromEcus",
             deleteMultiple: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/DeleteMultiple",
             downloadExcel: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/DownloadExcel",
-            uploadExel: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/upLoadFile"
+            uploadExel: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/upLoadFile",
+            import: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/Import"
         }
     }
 
