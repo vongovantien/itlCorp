@@ -32,7 +32,7 @@ export class StageManagementComponent implements OnInit {
     index_stage_edit = null;
     index_current_department = null;
 
-    @ViewChild(PaginationComponent,{static:false}) child;
+    @ViewChild(PaginationComponent, { static: false }) child;
 
     constructor(
         private excelService: ExcelService,
@@ -61,12 +61,12 @@ export class StageManagementComponent implements OnInit {
     getDepartments() {
         this.baseServices.get(this.api_menu.System.Department.getAll).subscribe(data => {
             this.ListDepartment = data;
-            this.ListDepartment =  dataHelper.prepareNg2SelectData(this.ListDepartment,'id','code');  //this.ListDepartment.map(x => ({ "text": x.code, "id": x.id }));
+            this.ListDepartment = dataHelper.prepareNg2SelectData(this.ListDepartment, 'id', 'code');  //this.ListDepartment.map(x => ({ "text": x.code, "id": x.id }));
         });
     }
 
     index_stage_remove = null;
-    async remove_stage(index:number, action:string) {
+    async remove_stage(index: number, action: string) {
         if (action == "confirm") {
             this.index_stage_remove = index;
         }
@@ -75,37 +75,39 @@ export class StageManagementComponent implements OnInit {
             var id_stage = this.ListStages[this.index_stage_remove].id;
             await this.baseServices.deleteAsync(this.api_menu.Catalogue.Stage_Management.delete + id_stage, true, true)
             // await this.setPage(this.pager);
-            await this.getStages(this.pager);
+            this.pager.currentPage = 1;
+            this.pager.totalItems = 0;
+            this.ListStages = await this.getStages(this.pager);
 
-            this.child.setPage(this.pager.currentPage);
-            if (this.pager.currentPage > this.pager.totalPages) {
-                this.pager.currentPage = this.pager.totalPages;
-                this.child.setPage(this.pager.currentPage);
-            }
+            // this.child.setPage(this.pager.currentPage);
+            // if (this.pager.currentPage > this.pager.totalPages) {
+            //     this.pager.currentPage = this.pager.totalPages;
+            //     this.child.setPage(this.pager.currentPage);
+            // }
 
 
         }
     }
 
 
-    async edit_stage(index: number, action: string, form: NgForm) {       
+    async edit_stage(index: number, action: string, form: NgForm) {
 
         if (action == "confirm") {
 
             this.index_stage_edit = index;
             var currentStage = this.ListStages[this.index_stage_edit];
-            this.index_current_department = lodash.findIndex(this.ListDepartment,function(d){
-                return d['id']==currentStage.departmentId; 
+            this.index_current_department = lodash.findIndex(this.ListDepartment, function (d) {
+                return d['id'] == currentStage.departmentId;
             });
 
         } else {
             if (form.form.status != "INVALID") {
                 this.StageToUpdate = this.ListStages[this.index_stage_edit];
                 var res = await this.baseServices.putAsync(this.api_menu.Catalogue.Stage_Management.update, this.StageToUpdate, true, true);
-                if(res){
+                if (res) {
                     this.StageToUpdate = new StageModel();
                     $('#edit-stage-management-modal').modal('hide');
-                    
+
                     //this.pager.currentPage = 1;
                     //this.child.setPage(this.pager.currentPage);
                     this.pager.totalItems = 0;
@@ -115,7 +117,7 @@ export class StageManagementComponent implements OnInit {
                 }
             }
         }
-   
+
     }
 
 
@@ -277,7 +279,7 @@ export class StageManagementComponent implements OnInit {
 
     isDesc = true;
     sortKey: string = "id";
-    sort(property:any) {
+    sort(property: any) {
         this.sortKey = property;
         this.isDesc = !this.isDesc;
         if (property === 'deptName') {
@@ -299,7 +301,7 @@ export class StageManagementComponent implements OnInit {
     }
 
     async import() {
-        
+
     }
 
     async export() {
@@ -352,7 +354,7 @@ export class StageManagementComponent implements OnInit {
             { name: "Inactive", width: 30 }
         ]
         exportModel.data = stages;
-        exportModel.fileName = "Stage - "+new Date().toISOString();
+        exportModel.fileName = "Stage - " + new Date().toISOString();
 
         this.excelService.generateExcel(exportModel);
     }
