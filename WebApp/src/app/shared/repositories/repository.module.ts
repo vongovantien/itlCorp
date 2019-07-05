@@ -1,9 +1,10 @@
 import { NgModule } from '@angular/core';
-import { JobRepo } from './JobRepo.repo';
+import { JobRepo, SystemRepo } from './index';
 
 @NgModule({
     providers: [
-        JobRepo
+        JobRepo,
+        SystemRepo
     ],
 })
 export class RepositoryModule {
