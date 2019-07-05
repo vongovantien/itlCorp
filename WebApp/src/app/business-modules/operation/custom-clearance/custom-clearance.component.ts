@@ -10,6 +10,10 @@ import { ToastrService } from 'ngx-toastr';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
+//import { SystemConstants } from 'src/constants/system.const';
+import * as lodash from 'lodash';
+import { ExcelService } from 'src/app/shared/services/excel.service';
+import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 declare var $: any;
 
 @Component({
@@ -29,6 +33,7 @@ export class CustomClearanceComponent implements OnInit {
     listUnit: any = [];
 
     constructor(
+        private excelService: ExcelService,
         private baseServices: BaseService,
         private api_menu: API_MENU,
         private sortService: SortService,
@@ -129,7 +134,7 @@ export class CustomClearanceComponent implements OnInit {
     gotoEditPage(id) {
         this.router.navigate(["/home/operation/custom-clearance-edit", { id: id }]);
     }
-    async getDataFromEcus(){
+    async getDataFromEcus() {
         await this.baseServices.postAsync(this.api_menu.ToolSetting.CustomClearance.importClearancesFromEcus, null, true, true);
         this.pager.totalItems = 0;
         this.pager.currentPage = 1;
@@ -146,10 +151,10 @@ export class CustomClearanceComponent implements OnInit {
         console.log(this.customCheckedArray);
     }
     confirmConvert() {
-        if(this.customCheckedArray.length > 0){
+        if (this.customCheckedArray.length > 0) {
             $('#confirm-convert-modal').modal('show');
         }
-        else{
+        else {
             this.toastr.warning('Not selected custom clearance');
         }
     }
@@ -173,10 +178,10 @@ export class CustomClearanceComponent implements OnInit {
 
     }
 
-    async convertToJobs(){
+    async convertToJobs() {
         let clearancesToConvert = this.mapClearancesToJobs();
         let response = await this.baseServices.postAsync(this.api_menu.Documentation.Operation.convertExistedClearancesToJobs, clearancesToConvert, true, true);
-        if(response.status){
+        if (response.status) {
             await this.initPager();
             await this.getListCustomsDeclaration();
         }
@@ -195,33 +200,32 @@ export class CustomClearanceComponent implements OnInit {
     }
     mapClearancesToJobs() {
         let clearancesToConvert = [];
-        for(let i =0; i< this.customCheckedArray.length; i++){
+        for (let i = 0; i < this.customCheckedArray.length; i++) {
             let clearance = this.customCheckedArray[i];
             let shipment = new OpsTransaction();
             let index = this.listCustomer.findIndex(x => x.taxCode == clearance.partnerTaxCode);
-            if(index > -1){
+            if (index > -1) {
                 let customer = this.listCustomer[index];
                 shipment.customerId = customer.id;
                 shipment.salemanId = customer.salemanId;
                 index = this.listPort.findIndex(x => x.code == clearance.gateway);
-                if(index > -1){
-                    if(clearance.type == "Export"){
+                if (index > -1) {
+                    if (clearance.type == "Export") {
                         shipment.pol = this.listPort[index].id;
                     }
-                    if(clearance.type == "Import"){
+                    if (clearance.type == "Import") {
                         shipment.pod = this.listPort[index].id;
                     }
                 }
-                if(clearance.serviceType == "Sea")
-                {
-                    if(clearance.cargoType == "FCL"){
+                if (clearance.serviceType == "Sea") {
+                    if (clearance.cargoType == "FCL") {
                         shipment.productService = "Sea FCL";
                     }
-                    if(clearance.cargoType == "LCL"){
+                    if (clearance.cargoType == "LCL") {
                         shipment.productService = "Sea LCL";
                     }
                 }
-                else{
+                else {
                     shipment.productService = clearance.serviceType;
                 }
                 shipment.shipmentMode = "External";
@@ -235,23 +239,83 @@ export class CustomClearanceComponent implements OnInit {
                 let currenctUser = JSON.parse(claim)["id"];
                 shipment.billingOpsId = currenctUser;
                 index = this.listUnit.findIndex(x => x.code == clearance.unitCode);
-                if(index > -1){
+                if (index > -1) {
                     shipment.packageTypeID = this.listUnit[index].id;
                 }
             }
-            else{
+            else {
                 this.baseServices.errorToast("Không đủ điều kiện để tạo job mới");
                 shipment = null;
             }
-            if(clearance.clearanceDate == null)
-            {
+            if (clearance.clearanceDate == null) {
                 this.baseServices.errorToast("Không đủ điều kiện để tạo job mới");
                 shipment = null;
             }
-            clearancesToConvert.push({ opsTransaction: shipment, customsDeclaration: clearance});
+            clearancesToConvert.push({ opsTransaction: shipment, customsDeclaration: clearance });
         }
         return clearancesToConvert;
     }
+
+    async export() {
+        /**Prepare data */
+        var customClearances = await this.baseServices.postAsync(this.api_menu.ToolSetting.CustomClearance.query, this.searchObject);
+        console.log(customClearances);
+        //if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
+        customClearances = lodash.map(customClearances, function (item, index) {
+            return [
+                index + 1,
+                item.clearanceNo,
+                item.type,
+                item.gateway,
+                item.customerName,
+                item.importCountryName,
+                item.exportCountryName,
+                item.jobNo,
+                moment(item.clearanceDate).format('DD/MM/YYYY'),
+                (item.jobNo != null && item.jobNo != '') ? 'Imported' : 'Not Imported'
+            ]
+        });
+        //}
+        // if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
+        //     customClearances = lodash.map(customClearances, function (item, index) {
+        //         return [
+        //             index + 1,
+        //             item.clearanceNo,
+        //             item.type,
+        //             item.gateway,
+        //             item.customerName,
+        //             item.importCountryName,
+        //             item.exportCountryName,
+        //             item.jobNo,
+        //             moment(item.clearanceDate).format('DD/MM/YYYY'),
+        //             (item.jobNo != null && item.jobNo != '') ? 'Imported' : 'Not Imported'
+        //         ]
+        //     });
+        // }
+
+        /**Set up stylesheet */
+        const exportModel: ExportExcel = new ExportExcel();
+        exportModel.fileName = "Custom Clearance Report";
+        const currrently_user = localStorage.getItem('currently_userName');
+        exportModel.title = "Custom Clearance Report ";
+        exportModel.author = currrently_user;
+        exportModel.header = [
+            { name: "No.", width: 10 },
+            { name: "Clearance No", width: 25 },
+            { name: "Type", width: 10 },
+            { name: "Gateway", width: 25 },
+            { name: "Partner Name", width: 25 },
+            { name: "Import Country", width: 25 },
+            { name: "Export Country", width: 25 },
+            { name: "JOBID", width: 25 },
+            { name: "Clearance Date", width: 20 },
+            { name: "Status", width: 25 }
+        ];
+
+        exportModel.data = customClearances;
+        this.excelService.generateExcel(exportModel);
+    }
+
     /**
      * Daterange picker
      */
