@@ -22,12 +22,15 @@
                         </div>
                     </div>
                 </div>
-                <div class="m-portlet__body" *ngIf="exchangeRateNewest">
-                    <form name="formUpdateRate" #formUpdateRate="ngForm" novalidate (ngSubmit)="formUpdateRate.form.valid">
+                <div class="m-portlet__body">
+                    <form name="formUpdateRate" #formUpdateRate="ngForm" novalidate
+                        (ngSubmit)="formUpdateRate.form.valid">
                         <div class="h6 m--margin-bottom-10">
                             <span>Update date:</span>&nbsp;
                             <!-- <span class="m--font-primary">November 11. 2018 - 23:59:59 UTC + 7G</span> -->
-                            <span class="m--font-primary">{{ exchangeRateNewest.datetimeModified | date: 'MMMM dd. yyyy' }} - {{ exchangeRateNewest.datetimeModified | date: 'h:mm'}}</span>
+                            <span class="m--font-primary"
+                                *ngIf="exchangeRateNewest">{{ exchangeRateNewest.datetimeModified | date: 'MMMM dd. yyyy' }}
+                                - {{ exchangeRateNewest.datetimeModified | date: 'h:mm'}}</span>
                         </div>
                         <!--begin: table -->
                         <div class="table-wrapper" id="">
@@ -56,8 +59,9 @@
                                             <span>{{ item.rate | number : '1.3-3' }}</span>
                                         </td>
                                         <td style="width: 40%">
-                                            <input type="number" min="0" class="form-control m-input m-input--square" placeholder="" appThreeDigitDecimaNumber
-                                            [(ngModel)]="item.newRate" [name]="'exchangeRate'+i" (ngModelChange)="valueChange($event)" >
+                                            <input type="number" min="0" class="form-control m-input m-input--square"
+                                                placeholder="" appThreeDigitDecimaNumber [(ngModel)]="item.newRate"
+                                                [name]="'exchangeRate'+i" (ngModelChange)="valueChange($event)">
                                         </td>
                                     </tr>
                                 </tbody>
@@ -67,13 +71,17 @@
                         <div class="form-actions">
                             <div class="row">
                                 <div class="col-lg-4">
-                                    <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" 
-                                        attr.data-target="#{{nameSettingExchangeRateModal}}" (click)="showSetting()">
+                                    <button type="button"
+                                        class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                        data-toggle="modal" data-target="#setting-exchange-rate-modal"
+                                        (click)="showSetting()">
                                         Setting
                                     </button>
                                 </div>
                                 <div class="col-lg-8 m--align-right">
-                                    <button [disabled]="!isAllowUpdateRate" type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal" attr.data-target="#{{nameUpdateRateModal}}">
+                                    <button [disabled]="!isAllowUpdateRate" type="button"
+                                        class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                                        data-toggle="modal" data-target="#update-exchange-rate-modal">
                                         <span>
                                             <i class="la la-save"></i>
                                             <span>
@@ -81,7 +89,9 @@
                                             </span>
                                         </span>
                                     </button>
-                                    <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" (click)="resetForm(formUpdateRate)">
+                                    <button type="button"
+                                        class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                                        (click)="resetForm(formUpdateRate)">
                                         <span>
                                             <i class="la la-refresh"></i>
                                             <span>
@@ -111,19 +121,20 @@
                 <div class="m-portlet__body">
                     <!--begin::Form-->
                     <div class="m-form">
-                        <form name="formConvertRate" #formConvertRate="ngForm" novalidate (ngSubmit)="formConvertRate.form.valid">
+                        <form name="formConvertRate" #formConvertRate="ngForm" novalidate
+                            (ngSubmit)="formConvertRate.form.valid">
                             <div class="m-form m-form--state">
 
-                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formConvertRate.submitted && convertDate.invalid }">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': formConvertRate.submitted && convertDate.invalid }">
                                     <label class="form-control-label" for="">
                                         Select range date
                                     </label>
                                     <div class="m-input-icon m-input-icon--right daterange-rtl">
-                                        <input type="text" #convertDate="ngModel" class="form-control m-input" 
-                                            ngxDaterangepickerMd [(ngModel)]="convert.selectedRangeDate" 
-                                            [singleDatePicker]="true" name="convertDate"  
-                                            [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                            required readonly 
+                                        <input type="text" #convertDate="ngModel" class="form-control m-input"
+                                            ngxDaterangepickerMd [(ngModel)]="convert.selectedRangeDate"
+                                            [singleDatePicker]="true" name="convertDate" [autoApply]="true"
+                                            [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}" required readonly
                                             [maxDate]="maxDate"
                                             [ngClass]="{ 'm-input--square': formConvertRate.submitted && convertDate.invalid }" />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
@@ -131,48 +142,58 @@
                                                 <i class="la la-calendar"></i>
                                             </span>
                                         </span>
-                                        <div class="form-control-feedback" *ngIf="formConvertRate.submitted && convertDate.invalid" >
-                                                Please select currency
-                                            </div>
+                                        <div class="form-control-feedback"
+                                            *ngIf="formConvertRate.submitted && convertDate.invalid">
+                                            Please select currency
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formConvertRate.submitted && this.convert.fromCurrency == null }">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': formConvertRate.submitted && this.convert.fromCurrency == null }">
                                     <label class="form-control-label" for="">
                                         Convert from
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="fromCurrencies" [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="selected($event, selectTypeName.fromCurrency)" (removed)="removed($event, selectTypeName.fromCurrency)" (typed)="typed($event)"
+                                    <ng-select [allowClear]="true" [items]="fromCurrencies" [disabled]="disabled"
+                                        (data)="refreshValue($event)" (selected)="convert.fromCurrency = $event.id"
+                                        (removed)="convert.fromCurrency = null; rate = null" (typed)="typed($event)"
                                         placeholder="Select currency">
                                     </ng-select>
-                                    <div class="form-control-feedback" *ngIf="formConvertRate.submitted && this.convert.fromCurrency == null" >
-                                            Please selected currency
-                                        </div>
+                                    <div class="form-control-feedback"
+                                        *ngIf="formConvertRate.submitted && this.convert.fromCurrency == null">
+                                        Please selected currency
+                                    </div>
                                 </div>
-                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formConvertRate.submitted && this.convert.toCurrency == null }">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': formConvertRate.submitted && this.convert.toCurrency == null }">
                                     <label class="form-control-label" for="">
                                         Convert to
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="toCurrencies" [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="selected($event, selectTypeName.toCurrency)" (removed)="removed($event, selectTypeName.toCurrency)" (typed)="typed($event)"
+                                    <ng-select [allowClear]="true" [items]="toCurrencies" [disabled]="disabled"
+                                        (data)="refreshValue($event)" (selected)="convert.toCurrency = $event.id"
+                                        (removed)="convert.toCurrency = null; rate = null" (typed)="typed($event)"
                                         placeholder="Select currency">
                                     </ng-select>
-                                    <div class="form-control-feedback" *ngIf="formConvertRate.submitted && this.convert.toCurrency == null" >
-                                            Please selected currency
-                                        </div>
+                                    <div class="form-control-feedback"
+                                        *ngIf="formConvertRate.submitted && this.convert.toCurrency == null">
+                                        Please selected currency
+                                    </div>
                                 </div>
                                 <div class="form-group form-actions m--align-right">
-                                    <button type="submit" class="btn btn-brand m-btn--square m-btn--uppercase" (click)="convertRate(formConvertRate)">
+                                    <button type="submit" class="btn btn-brand m-btn--square m-btn--uppercase"
+                                        (click)="convertRate(formConvertRate)">
                                         Convert
                                     </button>
                                 </div>
                             </div>
-                        
+
                             <hr>
                             <div class="form-group" *ngIf="rate">
                                 <label class="form-control-label" for="">
-                                    Date: <span class="m--font-primary">{{ convert.selectedRangeDate.startDate | date: 'MMMM dd. yyyy'}}</span>
+                                    Date: <span
+                                        class="m--font-primary">{{ convert.selectedRangeDate.startDate | date: 'MMMM dd. yyyy'}}</span>
                                 </label>
-                                <div class="border m--padding-10 bg-secondary" *ngIf="convert.fromCurrency && convert.toCurrency">
+                                <div class="border m--padding-10 bg-secondary"
+                                    *ngIf="convert.fromCurrency && convert.toCurrency">
                                     <ng-container>
                                         <span>({{ convert.fromCurrency }})</span>&nbsp;
                                         <span>=</span>&nbsp;
@@ -212,12 +233,10 @@
                     <div class="col-lg-6">
                         <div class="input-group">
                             <div class="custom-file m-input-icon m-input-icon--right up">
-                                <input type="text" class="form-control m-input m-input--square"
-                                ngxDaterangepickerMd [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                [(ngModel)]="selectedrange"
-                                [ranges]="ranges"
-                                [alwaysShowCalendars]="true"
-                                name="daterange" placeholder="From date - to date" readonly/>
+                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                    [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}" [(ngModel)]="selectedrange"
+                                    [ranges]="ranges" [alwaysShowCalendars]="true" name="daterange"
+                                    placeholder="From date - to date" readonly />
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
                                         <i class="la la-calendar"></i>
@@ -225,11 +244,13 @@
                                 </span>
                             </div>
                             <div class="input-group-append">
-                                <button type="button" class="btn btn-brand m-btn--square m-btn--icon" title="Search" (click)="searchHistory()">
+                                <button type="button" class="btn btn-brand m-btn--square m-btn--icon" title="Search"
+                                    (click)="searchHistory()">
                                     <i class="la la-search"></i>
                                 </button>
-                                <button class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" type="button" (click)="resetSearch()">
-                                    <span ><i class="la la-refresh"></i><span> Reset </span></span>
+                                <button class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" type="button"
+                                    (click)="resetSearch()">
+                                    <span><i class="la la-refresh"></i><span> Reset </span></span>
                                 </button>
                             </div>
                         </div>
@@ -238,11 +259,14 @@
             </div>
             <!--end: Search Form -->
             <!--begin: Datatable -->
-            <app-table-detail [records]="exchangeRates" [settings]="ExchangeRateSettings" (sortChange)="onSortChange($event)" 
-                [nameDetailModal]="nameDetailModal" (detail)="showDetail($event)"></app-table-detail>
+            <app-table-detail [records]="exchangeRates" [settings]="ExchangeRateSettings"
+                (sortChange)="onSortChange($event)" [nameDetailModal]="'detail-history-modal'"
+                (detail)="showDetail($event)">
+            </app-table-detail>
             <!--end: Datatable -->
             <!--begin::pagination-->
-            <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)"></app-pagination>
+            <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)">
+            </app-pagination>
             <!--end::pagination-->
         </div>
     </div>
@@ -251,7 +275,8 @@
 <!--end::m-content-->
 
 <!--begin::update-exchange-rate-modal-->
-<div class="modal fade" id="update-exchange-rate-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<div class="modal fade" id="update-exchange-rate-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -262,11 +287,13 @@
             </div>
             <div class="modal-body">
                 <div class="confirm-text-block">
-                    <span>Are you sure you want to update exchange rate? All currency without new value will use the lasted rate</span>
+                    <span>Are you sure you want to update exchange rate? All currency without new value will use the
+                        lasted rate</span>
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="updateRate()">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)="updateRate()">
                     <span>
                         <i class="la la-check"></i>
                         <span>
@@ -290,22 +317,24 @@
 <!--end::update-exchange-rate-modal-->
 
 <!--begin::setting-exchange-rate-modal-->
-<div class="modal fade" id="{{nameSettingExchangeRateModal}}" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<div class="modal fade" id="setting-exchange-rate-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form  name="formSettingRate" #formSettingRate="ngForm" novalidate (ngSubmit)="formSettingRate.form.valid" >
-                
+            <form name="formSettingRate" #formSettingRate="ngForm" novalidate (ngSubmit)="formSettingRate.form.valid">
+
                 <div class="modal-header">
-                        <h5 class="modal-title">Setting</h5>
-                        <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="cancelAddRate()">
+                    <h5 class="modal-title">Setting</h5>
+                    <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="cancelAddRate()">
                             <span aria-hidden="true">&times;</span>
                         </button> -->
-                        <app-close-modal-button (click)="cancelAddRate()"></app-close-modal-button>
+                    <app-close-modal-button (click)="cancelAddRate()"></app-close-modal-button>
                 </div>
                 <div class="modal-body">
                     <div class="m-form m-form--state m--margin-bottom-10">
                         <div class="m--align-right">
-                            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)="addNewRate()">
+                            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                (click)="addNewRate()">
                                 <span>
                                     <i class="icon-plus7"></i>
                                     <span>
@@ -327,16 +356,17 @@
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody *ngIf="exchangeRateNewest">
-                                <ng-container *ngFor="let item of exchangeRateNewest.exchangeRates; let j = index">
-                                    <tr>
+                            <tbody>
+                                <ng-container *ngIf="exchangeRateNewest">
+                                    <tr *ngFor="let item of exchangeRateNewest.exchangeRates; let j = index">
                                         <td class="table-actions-col">
                                             <div class="table-actions" style="width: 70px">
                                                 <!-- <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                     title="" data-toggle="modal" data-target="#confirm-delete-modal" (click)="confirmDeleteRate(item)">
                                                     <i class="la la-trash"></i>
                                                 </button> -->
-                                                <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                <button type="button"
+                                                    class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                     title="" (click)="confirmDeleteRate(item)">
                                                     <i class="la la-trash"></i>
                                                 </button>
@@ -350,16 +380,20 @@
                                 <tr *ngFor="let item of exchangeRateToAdd.CatCurrencyExchangeRates; let j = index">
                                     <td class="table-actions-col">
                                         <div class="table-actions" style="width: 70px">
-                                            <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            <button type="button"
+                                                class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                 title="" data-toggle="modal" (click)="removeNewRate(j)">
                                                 <i class="la la-trash"></i>
                                             </button>
                                         </div>
                                     </td>
                                     <td>
-                                        <span [ngClass]="{ 'm-form__group has-danger': isSubmitted && item.currencyFromID == null }">
-                                            <ng-select #currencyRateSelect [allowClear]="true" [items]="catCurrencies" [disabled]="disabled" (data)="refreshValue($event)"
-                                                (selected)="selected($event, selectTypeName.rateSetting)" (removed)="removed($event, selectTypeName.rateSetting)" (typed)="typed($event)"
+                                        <span
+                                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && item.currencyFromID == null }">
+                                            <ng-select #currencyRateSelect [allowClear]="true" [items]="catCurrencies"
+                                                [disabled]="disabled" (data)="refreshValue($event)"
+                                                (selected)="selectedCurrencyToAddRate($event)"
+                                                (removed)="removedCurrency($event)" (typed)="typed($event)"
                                                 placeholder="Select currency">
                                             </ng-select>
                                         </span>
@@ -379,7 +413,8 @@
                             </span>
                         </span>
                     </button> -->
-                    <app-default-button [buttonSetting]="saveButtonSetting" (click)="saveNewRate()"></app-default-button>
+                    <app-default-button [buttonSetting]="saveButtonSetting" (click)="saveNewRate()">
+                    </app-default-button>
                     <!-- <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="cancelAddRate()">
                         <span>
                             <i class="la la-ban"></i>
@@ -388,7 +423,8 @@
                             </span>
                         </span>
                     </button> -->
-                    <app-default-button [buttonSetting]="cancelButtonSetting" (click)="cancelAddRate()"></app-default-button>
+                    <app-default-button [buttonSetting]="cancelButtonSetting" (click)="cancelAddRate()">
+                    </app-default-button>
                 </div>
             </form>
         </div>
@@ -398,15 +434,18 @@
 
 <!--begin::confirm-delete-modal-->
 
-<app-delete-confirm-modal (delete)="onDelete($event)" [title]="titleConfirmDelete"></app-delete-confirm-modal>
+<app-delete-confirm-modal (delete)="onDelete($event)" [title]="'You want to delete this currency?'">
+</app-delete-confirm-modal>
 <!--end::confirm-delete-modal-->
 
 <!--begin::detail-history-modal-->
-<div class="modal fade" id="detail-history-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<div class="modal fade" id="detail-history-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content" *ngIf="exchangeRatesOfDay">
             <div class="modal-header">
-                <h5 class="modal-title">Exchange Rate Date: {{ exchangeRatesOfDay.datetimeCreated | date: 'MMMM dd. yyyy' }}</h5>
+                <h5 class="modal-title">Exchange Rate Date:
+                    {{ exchangeRatesOfDay.datetimeCreated | date: 'MMMM dd. yyyy' }}</h5>
                 <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button> -->
@@ -455,7 +494,8 @@
                 <!--end: table -->
             </div>
             <div class="modal-footer m--align-right c-button-actions">
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" aria-label="Close">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    data-dismiss="modal" aria-label="Close">
                     close
                 </button>
             </div>

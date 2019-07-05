@@ -156,8 +156,6 @@ namespace eFMS.API.Operation.Service.Models
 
                 entity.Property(e => e.Description).HasMaxLength(200);
 
-                entity.Property(e => e.IsCurrentStage).HasDefaultValueSql("((0))");
-
                 entity.Property(e => e.JobId).HasColumnName("JobID");
 
                 entity.Property(e => e.MainPersonInCharge)
@@ -165,6 +163,8 @@ namespace eFMS.API.Operation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Name).HasMaxLength(200);
 
                 entity.Property(e => e.ProcessTime).HasColumnType("decimal(18, 3)");
 

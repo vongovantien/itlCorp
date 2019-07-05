@@ -1,4 +1,5 @@
-﻿using eFMS.API.Operation.DL.Models;
+﻿using eFMS.API.Operation.DL.Common;
+using eFMS.API.Operation.DL.Models;
 using eFMS.API.Operation.Service.Models;
 using eFMS.API.Provider.Models;
 using ITL.NetCore.Common;
@@ -12,8 +13,9 @@ namespace eFMS.API.Operation.DL.IService
 {
     public interface IOpsStageAssignedService : IRepositoryBase<OpsStageAssigned, OpsStageAssignedModel>
     {
+        OpsStageAssignedModel GetBy(Guid id);
         List<OpsStageAssignedModel> GetByJob(Guid jobId);
         List<CatStageApiModel> GetNotAssigned(Guid jobId);
-        HandleState AddMultipleStage(List<OpsStageAssignedEditModel> models);
+        HandleState AddMultipleStage(List<OpsStageAssignedEditModel> models, Guid jobId);
     }
 }

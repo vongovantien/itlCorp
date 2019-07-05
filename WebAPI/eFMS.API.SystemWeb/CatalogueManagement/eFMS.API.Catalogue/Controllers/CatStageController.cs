@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Localization;
 using OfficeOpenXml;
+using static eFMS.API.Catalogue.DL.Common.Templates;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -59,7 +60,7 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult GetAll()
         {
             var results = catStageService.GetAll();
-            return Ok();
+            return Ok(results);
         }
 
         /// <summary>

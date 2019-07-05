@@ -24,6 +24,7 @@ using eFMS.API.Operation.DL.IService;
 using eFMS.API.Operation.DL.Services;
 using eFMS.API.Provider.Services.ServiceImpl;
 using eFMS.API.Provider.Services.IService;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.Operation.Infrastructure
 {
@@ -38,6 +39,7 @@ namespace eFMS.API.Operation.Infrastructure
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
+            services.AddTransient<ICurrentUser, CurrentUser>();
             services.AddTransient<IOpsStageAssignedService, OpsStageAssignedService>();
         }
 
@@ -162,6 +164,13 @@ namespace eFMS.API.Operation.Infrastructure
         {
             services.AddHttpClient<ICatStageApiService, CatStageApiService>()
                    .SetHandlerLifetime(TimeSpan.FromMinutes(5)); 
+            return services;
+        }
+
+        public static IServiceCollection AddSystemManagementApiServices(this IServiceCollection services)
+        {
+            services.AddHttpClient<ICatDepartmentApiService, CatDepartmentApiService>()
+                   .SetHandlerLifetime(TimeSpan.FromMinutes(5));
             return services;
         }
     }

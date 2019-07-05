@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using static eFMS.API.Provider.Infrasture.Settings;
 
 namespace eFMS.API.Operation
 {
@@ -59,12 +60,13 @@ namespace eFMS.API.Operation
                 config.DefaultApiVersion = new ApiVersion(1, 0);
                 config.ApiVersionReader = new HeaderApiVersionReader("api-version");
             });
-
+            services.Configure<APIUrls>(options => Configuration.GetSection(nameof(APIUrls)).Bind(options));
             //services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddCulture(Configuration);
             services.AddSwagger();
             services.AddConfigureSetting(Configuration);
             services.AddCatelogueManagementApiServices();
+            services.AddSystemManagementApiServices();
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
             IHostingEnvironment env, IApiVersionDescriptionProvider provider)

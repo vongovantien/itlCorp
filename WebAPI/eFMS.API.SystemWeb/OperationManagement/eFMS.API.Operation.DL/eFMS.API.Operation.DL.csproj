@@ -25,8 +25,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Common\LanguageSub.cs" />
     <Compile Remove="Infrastructure\ErrorHandler\ErrorMessages.cs" />
     <Compile Remove="Infrastructure\ErrorHandler\IErrorHandler.cs" />
+    <Compile Remove="IService\ICustomsDeclarationService.cs" />
+    <Compile Remove="Services\CustomsDeclarationService.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -68,9 +71,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Common\" />
     <Folder Include="Infrastructure\ErrorHandler\" />
-    <Folder Include="Models\Criteria\" />
     <Folder Include="ViewModels\" />
   </ItemGroup>
 </Project>

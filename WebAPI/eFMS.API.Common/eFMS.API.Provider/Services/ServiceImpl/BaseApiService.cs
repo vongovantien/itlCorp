@@ -68,8 +68,9 @@ namespace eFMS.API.Provider.Services.ServiceImpl
                         return JsonConvert.DeserializeObject<TResponse>(strResponse);
                 }
             }
-            catch
+            catch(Exception ex)
             {
+                throw ex;
             }
             return default(TResponse);
         }

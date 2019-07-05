@@ -23,7 +23,7 @@ namespace eFMS.API.Provider.Services.ServiceImpl
         public async Task<List<CatStageApiModel>> GetAll()
         {
             string strUri = CatStageAPI.GetAll(baseUrl);
-            return await GetApi<List<CatStageApiModel>>(strUri, true);
+            return await GetApi<List<CatStageApiModel>>(strUri);
         }
         public async Task<List<CatStageApiModel>> GetStages(CatStageCriteria criteria)
         {
