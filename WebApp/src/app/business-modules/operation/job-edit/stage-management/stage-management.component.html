@@ -55,19 +55,19 @@
                             <span>No</span>
                         </th>
                         <th class="sorting">
-                            <span>Status</span>
-                        </th>
-                        <th class="sorting">
-                            <span>Name Abbr</span>
+                            <span>Code</span>
                         </th>
                         <th class="sorting">
                             <span>Name</span>
                         </th>
                         <th class="sorting">
-                            <span>Description</span>
+                            <span>Deadline</span>
                         </th>
                         <th class="sorting">
-                            <span>Role</span>
+                            <span>Done Date</span>
+                        </th>
+                        <th class="sorting">
+                            <span>Description</span>
                         </th>
                         <th class="sorting">
                             <span>OPS Incharge</span>
@@ -76,49 +76,50 @@
                             <span>Process Time</span>
                         </th>
                         <th class="sorting">
-                            <span>Design</span>
+                            <span>Role</span>
                         </th>
                         <th class="sorting">
-                            <span>Done Date</span>
+                            <span>Status</span>
                         </th>
                     </tr>
                 </thead>
                 <tbody class="tbody-group">
-                    <tr>
+                    <tr *ngFor="let stage of stages; let i = index">
                         <td class="table-actions-col no-sorting">
-                            <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit" data-toggle="modal" data-target="#ops-detail-stage-modal">
+                            <button (click)="getDetail(stage.id)" type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit">
                                 <i class="la la-edit"></i>
                             </button>
                         </td>
                         <td class="sorting">
-                            <span>No</span>
+                            <span>{{i + 1}}</span>
+                        </td>
+
+                        <td class="sorting">
+                            <span>{{stage.stageCode}}</span>
                         </td>
                         <td class="sorting">
-                            <span>Status</span>
+                            <span>{{stage.stageNameEN}}</span>
                         </td>
                         <td class="sorting">
-                            <span>Name Abbr</span>
+                            <span>{{stage.deadline | date: 'HH:mm dd/MM/yyyy'}}</span>
                         </td>
                         <td class="sorting">
-                            <span>Name</span>
+                            <span>{{stage.doneDate | date: 'dd/mm/yyyy'}}</span>
                         </td>
                         <td class="sorting">
-                            <span>Description</span>
+                            <span>{{stage.description}}</span>
                         </td>
                         <td class="sorting">
-                            <span>Role</span>
+                            <span>{{stage.mainPersonInCharge}}</span>
                         </td>
                         <td class="sorting">
-                            <span>Person Incharge</span>
+                            <span>{{stage.processTime}}</span>
                         </td>
                         <td class="sorting">
-                            <span>Process Time</span>
+                            <span>{{stage.departmentName}}</span>
                         </td>
                         <td class="sorting">
-                            <span>Design</span>
-                        </td>
-                        <td class="sorting">
-                            <span>Done Date</span>
+                            <span>{{stage.status}}</span>
                         </td>
                     </tr>
                 </tbody>
@@ -129,9 +130,9 @@
 </div>
 
 <!--begin:: ops-add-stage-modal-->
-<add-stage-popup></add-stage-popup>
+<add-stage-popup [stages]="stageAvailable" [id]="jobId" (onSuccess)="onAddSuccess()"></add-stage-popup>
 <!--end:: ops-add-stage-modal-->
 
 <!--begin:: ops-detail-stage-modal-->
-<detail-stage-popup></detail-stage-popup>
+<detail-stage-popup [data]="selectedStage"></detail-stage-popup>
 <!--end:: ops-detail-stage-modal-->

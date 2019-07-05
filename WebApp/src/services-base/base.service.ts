@@ -94,8 +94,8 @@ export class  BaseService implements ErrorHandler {
    */
   public post(url: string, data?: any) {
 
-    var token = 'Bearer ' + localStorage.getItem("access_token");
-    this.headers = this.headers.set("Authorization", token);
+    // var token = 'Bearer ' + localStorage.getItem("access_token");
+    // this.headers = this.headers.set("Authorization", token);
     return this._http.post(url, data, { headers: this.headers });
   }
 
@@ -132,8 +132,8 @@ export class  BaseService implements ErrorHandler {
    * @param data 
    */
   public put(url: string, data?: any) {
-    var token = 'Bearer ' + localStorage.getItem("access_token");
-    this.headers = this.headers.set("Authorization", token);
+    // var token = 'Bearer ' + localStorage.getItem("access_token");
+    // this.headers = this.headers.set("Authorization", token);
     return this._http.put(url, data, { headers: this.headers });
   }
 
@@ -169,8 +169,8 @@ export class  BaseService implements ErrorHandler {
    * @param url 
    */
   public delete(url: string) {
-    var token = 'Bearer ' + localStorage.getItem("access_token");
-    this.headers = this.headers.set("Authorization", token);
+    // var token = 'Bearer ' + localStorage.getItem("access_token");
+    // this.headers = this.headers.set("Authorization", token);
     return this._http.delete(url, { headers: this.headers });
   }
 
@@ -211,8 +211,8 @@ export class  BaseService implements ErrorHandler {
     }
   }
   public async downloadfile(url: string, saveAsFileName: string): Promise<any> {
-    var token = 'Bearer ' + localStorage.getItem("access_token");
-    this.headers = this.headers.set("Authorization", token);
+    // var token = 'Bearer ' + localStorage.getItem("access_token");
+    // this.headers = this.headers.set("Authorization", token);
     this.spinnerShow();
     try {
       this.spinnerHide();

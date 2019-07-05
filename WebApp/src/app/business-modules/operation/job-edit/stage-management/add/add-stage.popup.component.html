@@ -35,12 +35,13 @@
                                     </div>
                                     <div class="list-group-item filter-group-item">
                                         <div class="row">
-                                            <div class="col-sm-6">
+                                            <div class="col-sm-1"></div>
+                                            <div class="col-sm-4">
                                                 <span>
                                                     <input type="text" class="form-control form-control-sm m-input m-input--square" placeholder="Filter">
                                                 </span>
                                             </div>
-                                            <div class="col-sm-6">
+                                            <div class="col-sm-4">
                                                 <span>
                                                     <input type="text" class="form-control form-control-sm m-input m-input--square" placeholder="Filter">
                                                 </span>
@@ -58,11 +59,11 @@
                                                     <span></span>
                                                 </label>
                                             </div>
-                                            <div class="col-sm-5">
+                                            <div class="col-sm-4">
                                                 <span>{{stage.code}}</span>
                                             </div>
-                                            <div class="col-sm-6">
-                                                <span>{{stage.name}}</span>
+                                            <div class="col-sm-4">
+                                                <span>{{stage.stageNameEn}}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -110,12 +111,20 @@
                                     </div>
                                     <div class="list-group-item filter-group-item">
                                         <div class="row">
-                                            <div class="col-sm-6">
+                                            <div class="col-sm-1">
+
+                                            </div>
+                                            <div class="col-sm-3">
                                                 <span>
                                                     <input type="text" class="form-control form-control-sm m-input m-input--square" placeholder="Filter">
                                                 </span>
                                             </div>
-                                            <div class="col-sm-6">
+                                            <div class="col-sm-4">
+                                                <span>
+                                                    <input type="text" class="form-control form-control-sm m-input m-input--square" placeholder="Filter">
+                                                </span>
+                                            </div>
+                                            <div class="col-sm-4">
                                                 <span>
                                                     <input type="text" class="form-control form-control-sm m-input m-input--square" placeholder="Filter">
                                                 </span>
@@ -123,8 +132,8 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="list-group fit-height-div">
-                                    <div *ngFor="let stage of selectedStages; let i = index" class="list-group-item">
+                                <div class="list-group fit-height-div" cdkDropList (cdkDropListDropped)="drop($event)">
+                                    <div *ngFor="let stage of selectedStages; let i = index" class="list-group-item" cdkDrag>
                                         <div class="row">
                                             <div class="col-sm-1">
                                                 <label class="m-checkbox">
@@ -132,11 +141,14 @@
                                                     <span></span>
                                                 </label>
                                             </div>
-                                            <div class="col-sm-5">
+                                            <div class="col-sm-3">
+                                                {{i+1}}
+                                            </div>
+                                            <div class="col-sm-4">
                                                 <span>{{stage.code}}</span>
                                             </div>
-                                            <div class="col-sm-6">
-                                                <span>{{stage.name}}</span>
+                                            <div class="col-sm-4">
+                                                <span>{{stage.stageNameEn}}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -148,7 +160,7 @@
                     <!--end::Form-->
                 </div>
                 <div class="modal-footer m--align-center">
-                    <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSaveStage()" [disabled]="!selectedStages.length">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -156,7 +168,7 @@
                         </span>
                     </span>
                 </button>
-                    <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" (click)="hide()">
+                    <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" (click)="onCancel()">
                     <span>
                         <i class="la la-ban"></i>
                         <span>

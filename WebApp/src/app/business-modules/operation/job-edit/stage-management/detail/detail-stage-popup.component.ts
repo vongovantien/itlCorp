@@ -1,84 +1,163 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, Input } from "@angular/core";
 import moment from "moment/moment";
+import { PopupBase } from "src/app/modal.base";
+import { FormBuilder, FormGroup, AbstractControl, Validators } from "@angular/forms";
+import { Stage } from "src/app/shared/models/operation/stage";
+import { JobRepo } from "src/app/shared/repositories";
+import { takeUntil, catchError, finalize } from "rxjs/operators";
+import { ToastrService } from "ngx-toastr";
 
 @Component({
-  selector: "detail-stage-popup",
-  templateUrl: "./detail-stage-popup.component.html"
+    selector: "detail-stage-popup",
+    templateUrl: "./detail-stage-popup.component.html"
 })
-export class OpsModuleStageManagementDetailComponent implements OnInit {
-  constructor() {
-    this.keepCalendarOpeningWithRange = true;
-    this.selectedDate = Date.now();
-    this.selectedRange = {
-      startDate: moment().startOf("month"),
-      endDate: moment().endOf("month")
-    };
-  }
+export class OpsModuleStageManagementDetailComponent extends PopupBase implements OnInit {
 
-  ngOnInit() {}
+    @Input() data: Stage = null;
 
-  /**
-   * Daterange picker
-   */
-  selectedRange: any;
-  selectedDate: any;
-  keepCalendarOpeningWithRange: true;
-  maxDate: moment.Moment = moment();
-  ranges: any = {
-    Today: [moment(), moment()],
-    Yesterday: [moment().subtract(1, "days"), moment().subtract(1, "days")],
-    "Last 7 Days": [moment().subtract(6, "days"), moment()],
-    "Last 30 Days": [moment().subtract(29, "days"), moment()],
-    "This Month": [moment().startOf("month"), moment().endOf("month")],
-    "Last Month": [
-      moment()
-        .subtract(1, "month")
-        .startOf("month"),
-      moment()
-        .subtract(1, "month")
-        .endOf("month")
-    ]
-  };
+    form: FormGroup;
+    stageName: AbstractControl;
+    processTime: AbstractControl;
+    description: AbstractControl;
+    comment: AbstractControl;
+    departmentName: AbstractControl;
 
-  /**
-   * ng2-select
-   */
-  statusStage: Array<string> = [
-    "In schedule",
-    "Processing",
-    "Done",
-    "Overdue",
-    "Pending",
-    "Deleted"
-  ];
-  statusStageActive = ["In schedule"];
+    deadLineDate: any;
 
-  private value: any = {};
-  private _disabledV: string = "0";
-  public disabled: boolean = false;
+    statusStage: Array<string> = ["In schedule", "Processing", "Done", "Overdue", "Pending", "Deleted"];
 
-  private get disabledV(): string {
-    return this._disabledV;
-  }
+    //config for combo gird
+    configComboGrid: any = {
+        user: {
+            placeholder: 'Please select',
+            displayFields: [
+                { field: 'username', label: 'UserName' },
+                { field: 'employeeNameEn', label: 'FullName' },
+                { field: 'id', label: 'Role' }],
+            source: [
+                { id: 'Admin', username: 'Admin', employeeNameEn: 'Kenny.Thương' },
+                { id: 'Admin 2', username: 'Admin 2', employeeNameEn: 'Kenny' },
+                { id: 'Admin 3', username: 'Admin 3', employeeNameEn: 'Thương' },
 
-  private set disabledV(value: string) {
-    this._disabledV = value;
-    this.disabled = this._disabledV === "1";
-  }
+            ],
+            selectedDisplayFields: ['username'],
+        }
+    }
+    statusStageActive = ["In schedule"];
 
-  public selected(value: any): void {
-    console.log("Selected value is: ", value);
-  }
+    value: any = {};
 
-  public removed(value: any): void {
-    console.log("Removed value is: ", value);
-  }
+    constructor(
+        private _fb: FormBuilder,
+        private _jobRepo: JobRepo,
+        private _toaster: ToastrService
+    ) {
+        super();
+        this.initForm();
+    }
 
-  public typed(value: any): void {
-    console.log("New search input: ", value);
-  }
+    ngOnChanges() {
+        if (!!this.data) {
+            this.initFormUpdate();
+            console.log(this.data);
+        }
+    }
 
-  public refreshValue(value: any): void {
-    this.value = value;
-  }
+    ngOnInit() {
+    }
+
+    initForm() {
+        this.form = this._fb.group({
+            'stageName': [{ value: '', disabled: true }, Validators.compose([
+                Validators.required,
+            ])],
+            'processTime': [, Validators.compose([
+                Validators.min(1)
+            ])],
+            'departmentName': [{ value: '', disabled: true }, Validators.compose([
+                Validators.required,
+            ])],
+            'description': ['',],
+            'comment': ['',],
+        });
+        this.stageName = this.form.controls['stageName'];
+        this.processTime = this.form.controls['processTime'];
+        this.description = this.form.controls['description'];
+        this.comment = this.form.controls['comment'];
+        this.departmentName = this.form.controls['departmentName'];
+    }
+
+    initFormUpdate() {
+        this.form.setValue({
+            stageName: this.data.stageNameEN,
+            comment: this.data.comment || '',
+            departmentName: this.data.departmentName,
+            description: this.data.description || '',
+            processTime: this.data.processTime,
+        });
+        this.deadLineDate = this.data.deadline;
+    }
+
+    selected(value: any): void {
+        console.log("Selected value is: ", value);
+    }
+
+    removed(value: any): void {
+        console.log("Removed value is: ", value);
+    }
+
+    typed(value: any): void {
+        console.log("New search input: ", value);
+    }
+
+    refreshValue(value: any): void {
+        this.value = value;
+    }
+
+    onSelectMainPersonIncharge($event: any) {
+        console.log($event);
+    }
+
+    onSelectRealPersonIncharge($event) {
+        console.log($event);
+    }
+
+    onSubmit(form: FormGroup) {
+        const body = {
+            id: this.data.id,
+            jobId: this.data.jobId,
+            stageId: this.data.stageId,
+            name: this.data.name,
+            orderNumberProcessed: this.data.orderNumberProcessed,
+            mainPersonInCharge: this.data.mainPersonInCharge || "kenny",
+            realPersonInCharge: this.data.realPersonInCharge || "kenny",
+            processTime: form.value.processTime,
+            comment: form.value.comment,
+            description: form.value.description,
+            deadline: moment(this.deadLineDate).format("YYYY-MM-DDTHH:mm:ssZ"),
+            status: 'Pending'
+        }
+        console.log(body);
+        this._jobRepo.updateStageToJob(body).pipe(
+            takeUntil(this.ngUnsubscribe),
+            catchError(this.catchError),
+            finalize(() => { }),
+        ).subscribe(
+            (res: any) => {
+                if (!res.status) {
+                    this._toaster.success(res.message, '', { positionClass: 'toast-bottom-right' });
+                } else {
+                    console.log(res);
+                    // remove stages selected
+                    this.hide();
+                }
+            },
+            // error
+            (errs: any) => {
+                // this.handleErrors(errs)
+            },
+            // complete
+            () => { }
+        )
+    }
 }

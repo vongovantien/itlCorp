@@ -30,11 +30,15 @@ import { RouterModule } from "@angular/router";
 import { CfBeforeLeaveModalComponent } from "./common/cf-before-leave-modal/cf-before-leave-modal.component";
 import { AutofocusDirective } from "../shared/directives/auto-focus.directive";
 import { ModalModule } from "ngx-bootstrap";
+import { RepositoryModule } from "./repositories/repository.module";
+import { ServiceModule } from "./services/service.module";
 
 const Libary = [ModalModule.forRoot()];
 @NgModule({
   imports: [
     CommonModule,
+    RepositoryModule,
+    ServiceModule,
     FormsModule,
     SelectModule,
     ScrollingModule,
@@ -88,6 +92,6 @@ const Libary = [ModalModule.forRoot()];
     CfBeforeLeaveModalComponent,
     AutofocusDirective
   ],
-  providers: [SortService, ExcelService, API_MENU]
+  providers: [API_MENU]
 })
 export class SharedModule {}
