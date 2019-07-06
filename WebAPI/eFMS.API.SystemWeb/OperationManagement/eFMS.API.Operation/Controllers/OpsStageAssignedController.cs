@@ -42,7 +42,7 @@ namespace eFMS.API.Operation.Controllers
         /// <param name="service"></param>
         /// <param name="iMapper"></param>
         /// <param name="user"></param>
-        public OpsStageAssignedController(IStringLocalizer<LanguageSub> localizer, 
+        public OpsStageAssignedController(IStringLocalizer<Resources.LanguageSub> localizer, 
             IOpsStageAssignedService service, 
             IMapper iMapper,
             ICurrentUser user)

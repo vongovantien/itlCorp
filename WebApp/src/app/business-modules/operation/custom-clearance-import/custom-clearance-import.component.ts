@@ -45,7 +45,7 @@ export class CustomClearanceImportComponent implements OnInit {
     /**/
     this.resetBeforeSelecedFile();
     /**/
-    this.baseService.uploadfile(this.api_menu.ToolSetting.CustomClearance.uploadExel, file.target['files'], "uploadedFile")
+    this.baseService.uploadfile(this.api_menu.Operation.CustomClearance.uploadExel, file.target['files'], "uploadedFile")
       .subscribe((response: any) => {
         console.log(response);
         this.data = response.data;
@@ -81,7 +81,7 @@ export class CustomClearanceImportComponent implements OnInit {
   }
 
   async downloadSample() {
-    await this.baseService.downloadfile(this.api_menu.ToolSetting.CustomClearance.downloadExcel, 'CustomClearanceImportTemplate.xlsx');
+    await this.baseService.downloadfile(this.api_menu.Operation.CustomClearance.downloadExcel, 'CustomClearanceImportTemplate.xlsx');
   }
 
   isDesc = true;
@@ -138,7 +138,7 @@ export class CustomClearanceImportComponent implements OnInit {
     else {
       this.progressBar.start();
       console.log(this.data);
-      var response = await this.baseService.postAsync(this.api_menu.ToolSetting.CustomClearance.import, this.data, true, false);
+      var response = await this.baseService.postAsync(this.api_menu.Operation.CustomClearance.import, this.data, true, false);
       if (response.success) {
         this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
         this.reset();

@@ -70,7 +70,7 @@ export class EcusConnectionComponent implements OnInit {
     getEcusConnections(pager: PagerSetting) {
 
         this.baseService.spinnerShow();
-        this.baseService.post(this.api_menu.ToolSetting.EcusConnection.paging 
+        this.baseService.post(this.api_menu.Operation.EcusConnection.paging 
             + '?pageNumber=' + pager.currentPage + '&pageSize=' + pager.pageSize, this.criteria).subscribe((res: any) => {
             if (res != null) {
                 this.pager.totalItems = res.totalItems;
@@ -86,7 +86,7 @@ export class EcusConnectionComponent implements OnInit {
     }
 
     async getEcusConnectionDetails(id: number) {
-        this.EcusConnectionEdit = await this.baseService.getAsync(this.api_menu.ToolSetting.EcusConnection.details
+        this.EcusConnectionEdit = await this.baseService.getAsync(this.api_menu.Operation.EcusConnection.details
                                                                     + '?id=' + id, true, false);
     }
 
@@ -103,7 +103,7 @@ export class EcusConnectionComponent implements OnInit {
             if (form.submitted) {
                 const error = $('#add-connection-modal').find('div.has-danger');
                 if (error.length === 0) {
-                    const res = await this.baseService.postAsync(this.api_menu.ToolSetting.EcusConnection.addNew, this.EcusConnectionAdd);
+                    const res = await this.baseService.postAsync(this.api_menu.Operation.EcusConnection.addNew, this.EcusConnectionAdd);
                     if (res.status) {
                         this.resetDisplay();
                         form.onReset();
@@ -122,7 +122,7 @@ export class EcusConnectionComponent implements OnInit {
             if (form.submitted) {
                 var error = $('#edit-connection-modal').find('div.has-danger');
                 if (error.length === 0) {
-                    var res = await this.baseService.putAsync(this.api_menu.ToolSetting.EcusConnection.update, this.EcusConnectionEdit);
+                    var res = await this.baseService.putAsync(this.api_menu.Operation.EcusConnection.update, this.EcusConnectionEdit);
                     if (res.status) {
                         this.resetDisplay();
                         form.onReset();
@@ -139,7 +139,7 @@ export class EcusConnectionComponent implements OnInit {
     async deleteConfirm(confirm: boolean = false) {
         const id = this.EcusConnections[this.indexConnectToDelete].id;
         if (confirm === true) {
-            await this.baseService.deleteAsync(this.api_menu.ToolSetting.EcusConnection.delete + '?id=' + id);
+            await this.baseService.deleteAsync(this.api_menu.Operation.EcusConnection.delete + '?id=' + id);
             this.indexConnectToDelete = -1;
             this.initNewPager();
             this.getEcusConnections(this.pager);

@@ -1,4 +1,4 @@
-﻿namespace eFMS.API.Setting.DL.Models
+﻿namespace eFMS.API.Operation.DL.Models
 {
     public class CustomClearanceImportModel : CustomsDeclarationModel
     {

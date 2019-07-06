@@ -1,25 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using eFMS.API.Setting.DL.IService;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using eFMS.API.Setting.DL.Common;
-using Microsoft.Extensions.Localization;
-using eFMS.API.Setting.Infrastructure.Middlewares;
-using ITL.NetCore.Common.Items;
-using ITL.NetCore.Common;
-using eFMS.API.Setting.DL.Models;
-using eFMS.API.Setting.Infrastructure.Common;
 using eFMS.API.Common;
-using eFMS.API.Setting.DL.Models.Criteria;
-using eFMS.API.Setting.DL.Models.Ecus;
-using Microsoft.AspNetCore.Authorization;
 using eFMS.API.Common.Globals;
-using eFMS.API.Setting.Resources;
+using eFMS.API.Operation.DL.IService;
+using eFMS.API.Operation.DL.Models;
+using eFMS.API.Operation.DL.Models.Criteria;
+using eFMS.API.Operation.Infrastructure.Common;
+using eFMS.API.Operation.Infrastructure.Middlewares;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
-namespace eFMS.API.Setting.Controllers
+namespace eFMS.API.Operation.Controllers
 {
     /// <summary>
     /// A base class for an MVC controller without view support.
@@ -38,7 +29,7 @@ namespace eFMS.API.Setting.Controllers
         /// </summary>
         /// <param name="localizer">inject interface IStringLocalizer</param>
         /// <param name="service">inject interface IEcusConnectionService</param>
-        public EcusConnectionController(IStringLocalizer<eFMS.API.Setting.Resources.LanguageSub> localizer, IEcusConnectionService service)
+        public EcusConnectionController(IStringLocalizer<Resources.LanguageSub> localizer, IEcusConnectionService service)
         {
             stringLocalizer = localizer;
             ecusConnectionService = service;
@@ -124,7 +115,7 @@ namespace eFMS.API.Setting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
-        public IActionResult Paging(SetEcusConnectionCriteria criteria,int pageNumber, int pageSize)
+        public IActionResult Paging(SetEcusConnectionCriteria criteria, int pageNumber, int pageSize)
         {
             var data = ecusConnectionService.Paging(criteria, pageNumber, pageSize, out int totalItems);
             var result = new { data, totalItems, pageNumber, pageSize };
@@ -156,8 +147,8 @@ namespace eFMS.API.Setting.Controllers
         private string CheckExist(SetEcusConnectionModel model)
         {
             string message = string.Empty;
-            var existed = ecusConnectionService.Any(x => x.Id!=model.Id && x.UserId == model.UserId && x.ServerName == model.ServerName && x.Dbname == model.Dbname);
-            message = existed ? "This connection of "+model.Username+" has already existed, Please check again!" : null;
+            var existed = ecusConnectionService.Any(x => x.Id != model.Id && x.UserId == model.UserId && x.ServerName == model.ServerName && x.Dbname == model.Dbname);
+            message = existed ? "This connection of " + model.Username + " has already existed, Please check again!" : null;
             return message;
         }
 

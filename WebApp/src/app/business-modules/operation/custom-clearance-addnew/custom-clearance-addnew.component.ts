@@ -61,7 +61,7 @@ export class CustomClearanceAddnewComponent implements OnInit {
             this.customDeclaration.unitCode = this.strUnitCurrent;
             console.log(this.customDeclaration);
 
-            const respone = await this.baseServices.postAsync(this.api_menu.ToolSetting.CustomClearance.add, this.customDeclaration, true, true);
+            const respone = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.add, this.customDeclaration, true, true);
             console.log(respone);
             if (respone) {
             this._location.back();
@@ -163,7 +163,7 @@ export class CustomClearanceAddnewComponent implements OnInit {
     }
 
     getClearanceType() {
-        this.baseServices.get(this.api_menu.ToolSetting.CustomClearance.getClearanceTypes).subscribe((res: any) => {
+        this.baseServices.get(this.api_menu.Operation.CustomClearance.getClearanceTypes).subscribe((res: any) => {
             this.serviceTypes = res.serviceTypes.map(x => ({ "text": x.displayName, "id": x.value }));
             this.typeClearance = res.types.map(x => ({ "text": x.displayName, "id": x.value }));
             this.routeClearance = res.routes.map(x => ({ "text": x.displayName, "id": x.value }));

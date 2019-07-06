@@ -4,27 +4,23 @@ using System.Linq;
 using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
-using eFMS.API.Setting.DL.IService;
-using eFMS.API.Setting.DL.Models;
-using eFMS.API.Setting.Infrastructure.Common;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
-using eFMS.API.Setting.Infrastructure.Middlewares;
-using eFMS.API.Setting.DL.Models.Criteria;
-using eFMS.API.Setting.DL.Common;
-using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.AspNetCore.Authorization;
-using eFMS.IdentityServer.DL.UserManager;
-using eFMS.API.Common.NoSql;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Common.NoSql;
+using eFMS.API.Operation.DL.Common;
+using eFMS.API.Operation.DL.IService;
+using eFMS.API.Operation.DL.Models;
+using eFMS.API.Operation.DL.Models.Criteria;
+using eFMS.API.Operation.Infrastructure.Common;
+using eFMS.API.Operation.Infrastructure.Middlewares;
+using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Localization;
 using OfficeOpenXml;
-using System.Globalization;
 
-
-// For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
-namespace eFMS.API.Setting.Controllers
+namespace eFMS.API.Operation.Controllers
 {
     /// <summary>
     /// A base class for an MVC controller without view support.
@@ -33,7 +29,7 @@ namespace eFMS.API.Setting.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    public class CustomsDeclarationController : Controller
+    public class CustomsDeclarationController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICustomsDeclarationService customsDeclarationService;
@@ -324,7 +320,7 @@ namespace eFMS.API.Setting.Controllers
                 int? colCount = worksheet.Dimension?.Columns;
                 if (rowCount < 2 || rowCount == null) return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.NOT_FOUND_DATA_EXCEL].Value });
                 List<CustomClearanceImportModel> list = new List<CustomClearanceImportModel>();
-                
+
                 for (int row = 2; row < rowCount + 1; row++)
                 {
                     var stage = new CustomClearanceImportModel

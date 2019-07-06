@@ -110,6 +110,22 @@
   "MSG_STAGE_CODE_DUPLICATE": "Code {0} has been duplicated!|wrong",
   "MSG_STAGE_STATUS_EMPTY": "Status is not allow empty!|wrong",
 
-  "EF_DISPLAYNAME_CODE": "Mã code"
+  "EF_DISPLAYNAME_CODE": "Mã code",
   //------------end  : Commodity
+
+  //------------start: Custom Clearance
+  "MSG_CLEARANCENO_EXISTED": "Custom No [{0}] đã tồn tại ! Vui lòng kiểm tra lại?",
+  "MSG_INVALID_DATE": "Định dạng ngày không đúng",
+  "MSG_INVALID_NUMBER": "Định dạng số không đúng",
+  "MSG_CUSTOM_CLEARANCE_NO_EMPTY": "Clearance No không được để trống",
+  "MSG_CUSTOM_CLEARANCE_DATE_EMPTY": "Clearance Date không được để trống",
+  "MSG_CUSTOM_CLEARANCE_CUSTOMER_CODE_EMPTY": "Customer Code không được để trống",
+  "MSG_CUSTOM_CLEARANCE_MBL_EMPTY": "MBL không được để trống",
+  "MSG_CUSTOM_CLEARANCE_GATEWAY_EMPTY": "Gateway không được để trống",
+  "MSG_CUSTOM_CLEARANCE_CARGO_TYPE_EMPTY": "Cargo Type không được để trống",
+  "MSG_CUSTOM_CLEARANCE_SERVICE_TYPE_EMPTY": "Service Type không được để trống",
+  "MSG_CUSTOM_CLEARANCE_ROUTE_EMPTY": "Route không được để trống",
+  "MSG_DUPLICATE_DATA": "{0} duplacate data",
+  "MSG_INVALID_MAX_LENGTH": "Chỉ được nhập tối đa {0} ký tự"
+  //------------end: Custom Clearance
 }
