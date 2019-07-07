@@ -244,8 +244,8 @@ namespace eFMS.API.Documentation.DL.Services
                 charge.ExchangeRateUSDToVND = exchangeUSDToVND == null ? 1 : exchangeUSDToVND.Rate;
                 charge.PartnerName = item.p?.PartnerNameEn;
                 charge.NameEn = item?.ChargeNameEn;
-                charge.ReceiverName = item.r?.PartnerNameEn;
-                charge.PayerName = item.pay?.PartnerNameEn;
+                charge.ReceiverName = item.r?.ShortName;
+                charge.PayerName = item.pay?.ShortName;
                 charge.Unit = item.UnitNameEn;
                 charge.Currency = item.CurrencyName;
                 charge.ChargeCode = item.Code;
