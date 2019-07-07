@@ -47,7 +47,7 @@ export class OpsModuleBillingComponent implements OnInit {
     isFilterTime = false;
     customClearances: any[] = [];
     itemToDelete: any = null;
-    
+
     constructor(private baseServices: BaseService,
         private sortService: SortService,
         private api_menu: API_MENU) {
@@ -64,9 +64,9 @@ export class OpsModuleBillingComponent implements OnInit {
         this.getCustomers();
         this.getShipments();
     }
-    async getUserInCharges(){
-        let responses = await this.baseServices.postAsync(this.api_menu.System.User_Management.paging +"?page=1&size=20", { all: null }, false, false);
-        if(responses != null){
+    async getUserInCharges() {
+        let responses = await this.baseServices.postAsync(this.api_menu.System.User_Management.paging + "?page=1&size=20", { all: null }, false, false);
+        if (responses != null) {
             this.userInCharges = responses.data;
             console.log(this.userInCharges);
         }
@@ -77,31 +77,31 @@ export class OpsModuleBillingComponent implements OnInit {
         this.pager.totalPages = pager.totalPages;
         await this.getShipments();
     }
-    searchShipment(){
+    searchShipment() {
         this.pager.totalItems = 0;
-        this.criteria.jobNo =null;
+        this.criteria.jobNo = null;
         this.criteria.hwbno = null;
         this.criteria.all = null;
-        if(this.isFilterTime){
+        if (this.isFilterTime) {
             this.criteria.serviceDateFrom = this.selectedRange.startDate;
             this.criteria.serviceDateTo = this.selectedRange.endDate;
         }
-        else{
+        else {
             this.criteria.serviceDateFrom = null;
             this.criteria.serviceDateTo = null;
         }
-        if(this.selectedFilter === 'Job ID'){
+        if (this.selectedFilter === 'Job ID') {
             this.criteria.jobNo = this.searchString;
         }
-        else if(this.selectedFilter === 'HBL'){
+        else if (this.selectedFilter === 'HBL') {
             this.criteria.hwbno = this.searchString;
         }
-        else{
+        else {
             this.criteria.all = this.searchString;
         }
         this.getShipments();
     }
-    resetSearch(){
+    resetSearch() {
         this.selectedFilter = 'Job ID';
         this.searchFilterActive = ['Job ID'];
         this.criteria = {
@@ -114,32 +114,32 @@ export class OpsModuleBillingComponent implements OnInit {
         this.isReset = false;
         setTimeout(() => {
             this.isReset = true;
-          }, 100);
+        }, 100);
         this.getShipments();
     }
-    async showCustomClearance(jobNo){
-        let responses = await this.baseServices.getAsync(this.api_menu.ToolSetting.CustomClearance.getByJob + "?jobNo=" + jobNo, false, true);
-        if(responses){
+    async showCustomClearance(jobNo) {
+        let responses = await this.baseServices.getAsync(this.api_menu.Operation.CustomClearance.getByJob + "?jobNo=" + jobNo, false, true);
+        if (responses) {
             this.customClearances = this.sortService.sort(responses, 'clearanceNo', true);;
         }
-        else{
+        else {
             this.customClearances = [];
         }
         console.log(this.customClearances);
     }
-    async confirmDelete(item: { id: string; }){
+    async confirmDelete(item: { id: string; }) {
         this.itemToDelete = item;
         let respone = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.checkAllowDelete + item.id, false, true);
-        if(respone == true){
+        if (respone == true) {
             $('#confirm-delete-job-modal').modal('show');
         }
-        else{
+        else {
             $('#confirm-can-not-delete-job-modal').modal('show');
         }
     }
-    async deleteJob(){
+    async deleteJob() {
         let respone = await this.baseServices.deleteAsync(this.api_menu.Documentation.Operation.delete + this.itemToDelete.id, true, true);
-        if(respone.status){
+        if (respone.status) {
             $('#confirm-delete-job-modal').modal('hide');
             this.getShipments();
         }
@@ -157,20 +157,20 @@ export class OpsModuleBillingComponent implements OnInit {
         this.sortKey = property;
         this.customClearances = this.sortService.sort(this.customClearances, property, this.isCusDesc);
     }
-    async getCustomers(){
+    async getCustomers() {
         let criteriaSearchColoader = { partnerGroup: PartnerGroupEnum.CUSTOMER, all: null };
         const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, criteriaSearchColoader, false, false);
-        if(partners != null){
+        if (partners != null) {
             this.customers = partners;
             console.log(this.customers);
         }
     }
-    async getShipments(){
-        let responses = await this.baseServices.postAsync(this.api_menu.Documentation.Operation.paging+"?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.criteria,true, true);
-        if(responses.data != null){
+    async getShipments() {
+        let responses = await this.baseServices.postAsync(this.api_menu.Documentation.Operation.paging + "?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.criteria, true, true);
+        if (responses.data != null) {
             this.shipments = responses.data.opsTransactions;
         }
-        else{
+        else {
             this.shipments = [];
         }
         console.log(this.shipments);
