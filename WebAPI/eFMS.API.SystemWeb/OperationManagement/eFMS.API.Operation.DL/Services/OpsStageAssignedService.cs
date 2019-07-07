@@ -42,7 +42,7 @@ namespace eFMS.API.Operation.DL.Services
             var listToDelete = stagesByJob.Where(x => !models.Any(model => model.Id == x.Id));
             foreach(var item in models)
             {
-                if(item.Id == Guid.Empty)
+                if (item.Id == Guid.Empty)
                 {
                     var assignedItem = mapper.Map<OpsStageAssigned>(item);
                     assignedItem.Id = Guid.NewGuid();
@@ -51,6 +51,14 @@ namespace eFMS.API.Operation.DL.Services
                     assignedItem.CreatedDate = assignedItem.ModifiedDate = DateTime.Now;
                     assignedItem.UserCreated = currentUser.UserID;
                     dc.Add(assignedItem);
+                }
+                else
+                {
+                    var assignedToUpdate = dc.OpsStageAssigned.Find(item.Id);
+                    assignedToUpdate.UserModified = currentUser.UserID;
+                    assignedToUpdate.ModifiedDate = DateTime.Now;
+                    assignedToUpdate.OrderNumberProcessed = item.OrderNumberProcessed;
+                    dc.Update(assignedToUpdate);
                 }
             }
             if(listToDelete.Count() > 0)
