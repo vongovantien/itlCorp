@@ -1,19 +1,23 @@
-import { Component, OnInit, Input } from "@angular/core";
-import moment from "moment/moment";
-import { PopupBase } from "src/app/modal.base";
+import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { FormBuilder, FormGroup, AbstractControl, Validators } from "@angular/forms";
-import { Stage } from "src/app/shared/models/operation/stage";
-import { JobRepo } from "src/app/shared/repositories";
+
+import { PopupBase } from "src/app/modal.base";
+import { JobRepo, SystemRepo } from "src/app/shared/repositories";
+import { User, Stage } from "src/app/shared/models";
+
 import { takeUntil, catchError, finalize } from "rxjs/operators";
 import { ToastrService } from "ngx-toastr";
+import moment from "moment";
 
 @Component({
     selector: "detail-stage-popup",
-    templateUrl: "./detail-stage-popup.component.html"
+    templateUrl: "./detail-stage-popup.component.html",
+    styleUrls: ['./detail-stage-popup.component.scss']
 })
 export class OpsModuleStageManagementDetailComponent extends PopupBase implements OnInit {
 
     @Input() data: Stage = null;
+    @Output() onSuccess: EventEmitter<any> = new EventEmitter<any>();
 
     form: FormGroup;
     stageName: AbstractControl;
@@ -22,35 +26,59 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
     comment: AbstractControl;
     departmentName: AbstractControl;
 
-    deadLineDate: any;
+    deadLineDate: AbstractControl;
 
-    statusStage: Array<string> = ["In schedule", "Processing", "Done", "Overdue", "Pending", "Deleted"];
+    statusStage: Array<any> = [
+        {
+            id: "InSchedule",
+            text: "In Schedule"
+        },
+        {
+            id: "Processing",
+            text: "Processing"
+        },
+        {
+            id: "Done",
+            text: "Done"
+        },
+        {
+            id: "Overdued",
+            text: "Overdued"
+        },
+        {
+            id: "Pending",
+            text: "Pending"
+        },
+        {
+            id: "Deleted",
+            text: "Deleted"
+        }
+    ]
+    statusStageActive: string[] = [this.statusStage[0].id];
+
+    systemUsers: User[] = [];
+    
+    mainPersonInCharge: string = '';
+    realPerSonInCharge: string = '';
 
     //config for combo gird
     configComboGrid: any = {
-        user: {
-            placeholder: 'Please select',
-            displayFields: [
-                { field: 'username', label: 'UserName' },
-                { field: 'employeeNameEn', label: 'FullName' },
-                { field: 'id', label: 'Role' }],
-            source: [
-                { id: 'Admin', username: 'Admin', employeeNameEn: 'Kenny.Thương' },
-                { id: 'Admin 2', username: 'Admin 2', employeeNameEn: 'Kenny' },
-                { id: 'Admin 3', username: 'Admin 3', employeeNameEn: 'Thương' },
-
-            ],
-            selectedDisplayFields: ['username'],
-        }
+        placeholder: 'Please select',
+        displayFields: [
+            { field: 'username', label: 'UserName' },
+            { field: 'employeeNameEn', label: 'FullName' },
+        ],
+        source: this.systemUsers,
+        selectedDisplayFields: ['username'],
     }
-    statusStageActive = ["In schedule"];
 
-    value: any = {};
+    isSummited: boolean = false;
 
     constructor(
         private _fb: FormBuilder,
         private _jobRepo: JobRepo,
-        private _toaster: ToastrService
+        private _toaster: ToastrService,
+        private _systemRepo: SystemRepo
     ) {
         super();
         this.initForm();
@@ -59,11 +87,11 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
     ngOnChanges() {
         if (!!this.data) {
             this.initFormUpdate();
-            console.log(this.data);
         }
     }
 
     ngOnInit() {
+        this.getListSystemUser();
     }
 
     initForm() {
@@ -77,14 +105,19 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             'departmentName': [{ value: '', disabled: true }, Validators.compose([
                 Validators.required,
             ])],
-            'description': ['',],
-            'comment': ['',],
+            'description': [''],
+            'comment': [''],
+            'deadLineDate': [{
+                startDate: null,
+                endDate: null
+            }],
         });
         this.stageName = this.form.controls['stageName'];
         this.processTime = this.form.controls['processTime'];
         this.description = this.form.controls['description'];
         this.comment = this.form.controls['comment'];
         this.departmentName = this.form.controls['departmentName'];
+        this.deadLineDate = this.form.controls['deadLineDate'];
     }
 
     initFormUpdate() {
@@ -94,67 +127,87 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             departmentName: this.data.departmentName,
             description: this.data.description || '',
             processTime: this.data.processTime,
+            deadLineDate: { startDate: moment(this.data.deadline || new Date()), endDate: moment(this.data.deadline || new Date()) }
         });
-        this.deadLineDate = this.data.deadline;
+
+        this.mainPersonInCharge = this.data.mainPersonInCharge;
+        this.statusStageActive = this.statusStage.filter((item: any) => item.id === (this.data.status) || ''.trim());
     }
 
-    selected(value: any): void {
-        console.log("Selected value is: ", value);
+    selected($event: any): void {
+        this.statusStageActive[0] = $event.id;
     }
 
-    removed(value: any): void {
-        console.log("Removed value is: ", value);
-    }
-
-    typed(value: any): void {
-        console.log("New search input: ", value);
-    }
-
-    refreshValue(value: any): void {
-        this.value = value;
-    }
-
-    onSelectMainPersonIncharge($event: any) {
-        console.log($event);
+    onSelectMainPersonIncharge($event: User) {
+        this.mainPersonInCharge = $event.username;
     }
 
     onSelectRealPersonIncharge($event) {
-        console.log($event);
+        this.realPerSonInCharge = $event.username;
+    }
+
+    refreshValue($event: any) {
     }
 
     onSubmit(form: FormGroup) {
-        const body = {
-            id: this.data.id,
-            jobId: this.data.jobId,
-            stageId: this.data.stageId,
-            name: this.data.name,
-            orderNumberProcessed: this.data.orderNumberProcessed,
-            mainPersonInCharge: this.data.mainPersonInCharge || "kenny",
-            realPersonInCharge: this.data.realPersonInCharge || "kenny",
-            processTime: form.value.processTime,
-            comment: form.value.comment,
-            description: form.value.description,
-            deadline: moment(this.deadLineDate).format("YYYY-MM-DDTHH:mm:ssZ"),
-            status: 'Pending'
+        this.isSummited = true;
+        if (!this.mainPersonInCharge) {
+            return;
+        } else {
+            const body = {
+                id: this.data.id,
+                jobId: this.data.jobId,
+                stageId: this.data.stageId,
+                name: this.data.name,
+                orderNumberProcessed: this.data.orderNumberProcessed,
+                mainPersonInCharge: this.mainPersonInCharge || "admin",
+                realPersonInCharge: this.realPerSonInCharge || "admin",
+                processTime: form.value.processTime,
+                comment: form.value.comment,
+                description: form.value.description,
+                deadline: moment(form.value.deadLineDate.startDate).format('YYYY-MM-DDTHH:mm'),
+                status: this.statusStageActive[0] || this.statusStage[0].id
+            };
+
+            this._jobRepo.updateStageToJob(body).pipe(
+                takeUntil(this.ngUnsubscribe),
+                catchError(this.catchError),
+                finalize(() => { }),
+            ).subscribe(
+                (res: any) => {
+                    if (!res.status) {
+                        this._toaster.error(res.message, '', { positionClass: 'toast-bottom-right' });
+                    } else {
+                        this.onSuccess.emit();
+                        this._toaster.success(res.message, '', { positionClass: 'toast-bottom-right' });
+                        this.hide();
+                    }
+                },
+                // error
+                (errs: any) => {
+                },
+                // complete
+                () => { }
+            )
         }
-        console.log(body);
-        this._jobRepo.updateStageToJob(body).pipe(
+
+    }
+
+    getListSystemUser() {
+        this._systemRepo.getListSystemUser().pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),
             finalize(() => { }),
         ).subscribe(
-            (res: any) => {
-                if (!res.status) {
-                    this._toaster.success(res.message, '', { positionClass: 'toast-bottom-right' });
+            (res: any[]) => {
+                if (!res) {
                 } else {
-                    console.log(res);
-                    // remove stages selected
-                    this.hide();
+                    this.systemUsers = res.map((item: any) => new User(item));
+                    this.configComboGrid.source = this.systemUsers;
                 }
             },
             // error
             (errs: any) => {
-                // this.handleErrors(errs)
             },
             // complete
             () => { }

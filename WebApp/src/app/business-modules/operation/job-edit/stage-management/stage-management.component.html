@@ -130,9 +130,9 @@
 </div>
 
 <!--begin:: ops-add-stage-modal-->
-<add-stage-popup [stages]="stageAvailable" [id]="jobId" (onSuccess)="onAddSuccess()"></add-stage-popup>
+<add-stage-popup [stages]="stageAvailable" [stageSelected]="stages" [id]="jobId" (onSuccess)="onAddSuccess()"></add-stage-popup>
 <!--end:: ops-add-stage-modal-->
 
 <!--begin:: ops-detail-stage-modal-->
-<detail-stage-popup [data]="selectedStage"></detail-stage-popup>
+<detail-stage-popup [data]="selectedStage" (onSuccess)="onAddSuccess()"></detail-stage-popup>
 <!--end:: ops-detail-stage-modal-->

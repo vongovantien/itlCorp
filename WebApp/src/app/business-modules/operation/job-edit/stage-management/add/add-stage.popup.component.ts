@@ -18,6 +18,7 @@ import * as _ from "lodash";
 export class OpsModuleStageManagementAddStagePopupComponent extends PopupBase implements OnInit, OnChanges {
 
   @Input() stages: any[] = [];
+  @Input() stageSelected: any[] = [];
   @Input() id: string = '';
   @Output() onSuccess: EventEmitter<any> = new EventEmitter<any>();
 
@@ -38,7 +39,9 @@ export class OpsModuleStageManagementAddStagePopupComponent extends PopupBase im
   }
 
   ngOnChanges() {
-    if(!!this.stages.length) {
+    if(!!this.stageSelected.length) {
+      this.selectedStages = this.stageSelected;
+      console.log(this.stageSelected);
     }
   }
 
@@ -53,10 +56,10 @@ export class OpsModuleStageManagementAddStagePopupComponent extends PopupBase im
 
   onAddStage() {
     this.selectedStages.push(...this.tempStages1);
-
     this.stages = this.stages.filter(
       (stage: any) => !_.includes(this.selectedStages, stage)
     );
+    console.log(this.selectedStages);
 
     this.tempStages1 = [];
   }
@@ -72,18 +75,18 @@ export class OpsModuleStageManagementAddStagePopupComponent extends PopupBase im
   }
 
   onSaveStage() {
-    this.selectedStages = this.selectedStages.map( (stage: StageModel,index: number) => {
+    const stageSelected = this.selectedStages.map( (stage: any,index: number) => {
       return ({
         id: '00000000-0000-0000-0000-000000000000', //TODO
         orderNumberProcessed: index,
-        code: stage.code,
-        stageId: stage.id,
+        code: stage.code || stage.stageCode,
+        stageId: stage.stageId || stage.id,
         jobId: this.id
       })
     });
 
     this._spinner.show();
-    this._jobRepo.addStageToJob(this.id, this.selectedStages).pipe(
+    this._jobRepo.addStageToJob(this.id, stageSelected).pipe(
       takeUntil(this.ngUnsubscribe),
       catchError(this.catchError),
       finalize(() => { this._spinner.hide() }),
@@ -110,6 +113,7 @@ export class OpsModuleStageManagementAddStagePopupComponent extends PopupBase im
 
   onCancel() {
     this.hide();
+    this.onSuccess.emit();
     this.stages.push(...this.selectedStages);
 
     this.selectedStages = this.selectedStages.filter(
