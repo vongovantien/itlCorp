@@ -25,7 +25,7 @@ export class API_MENU {
      * Use HOST.Test to run on test environment
      * Use HOST.Staging to run on staging environment 
      */
-    private CURRENT_HOST: String = this.HOST.Local;  //environment.HOST.WEB_URL;  
+    private CURRENT_HOST: String =  environment.HOST.WEB_URL;  //this.HOST.Local;
 
     private getCurrentLanguage() {
         return localStorage.getItem(SystemConstants.CURRENT_LANGUAGE);

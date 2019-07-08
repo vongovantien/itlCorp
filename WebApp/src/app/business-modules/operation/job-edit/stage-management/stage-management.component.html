@@ -4,15 +4,15 @@
         <div class="row">
             <div class="col-md-4 m--margin-bottom-10">
                 <span class="m--font-bolder">Estimated Begin Date:</span>
-                <span class="m--font-brand m--margin-left-5">dd/MM/yyyy h:mm:ss</span>
+                <span class="m--font-brand m--margin-left-5">{{data.serviceDate | date:'dd/MM/yyyy'}}</span>
             </div>
             <div class="col-md-4 m--margin-bottom-10">
                 <span class="m--font-bolder">Estimated Finish Date:</span>
-                <span class="m--font-brand m--margin-left-5">dd/MM/yyyy h:mm:ss</span>
+                <span class="m--font-brand m--margin-left-5">{{!!data.finishDate ? (data.finishDate | date: 'dd/MM/yyyy') : '-'}}</span>
             </div>
             <div class="col-md-4 m--margin-bottom-10">
                 <span class="m--font-bolder">Job Status:</span>
-                <span class="m--font-brand m--margin-left-5">Overdued</span>
+                <span class="m--font-brand m--margin-left-5">{{!!data.currentStatus ? data.currentStatus : '-'}}</span>
             </div>
         </div>
         <!--begin: Search Form -->
@@ -21,7 +21,7 @@
                 <div class="col-lg-4 order-2 order-lg-1">
                     <div class="form-group">
                         <div class="m-input-icon m-input-icon--left">
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Search...">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Search..." [(ngModel)]="keyword" name="keyword" (ngModelChange)="onSearching($event)">
                             <span class="m-input-icon__icon m-input-icon__icon--left">
                                 <span>
                                     <i class="la la-search"></i>

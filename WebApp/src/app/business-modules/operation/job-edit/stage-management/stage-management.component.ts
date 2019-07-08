@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, OnInit, ViewChild, Input } from "@angular/core";
 import { AppPage } from "src/app/app.base";
 import { OpsModuleStageManagementAddStagePopupComponent } from "./add/add-stage.popup.component";
 import { NgxSpinnerService } from "ngx-spinner";
@@ -17,15 +17,18 @@ import { Stage } from "src/app/shared/models/operation/stage";
 })
 export class OpsModuleStageManagementComponent extends AppPage {
 
+    @Input() data: any = null;
     @ViewChild(OpsModuleStageManagementAddStagePopupComponent, { static: false }) popupCreate: OpsModuleStageManagementAddStagePopupComponent;
     @ViewChild(OpsModuleStageManagementDetailComponent, { static: false }) popupDetail: OpsModuleStageManagementDetailComponent;
 
     stages: Stage[] = [];
     stageAvailable: any[] = [];
     selectedStage: Stage = null;
+    currentStages: Stage[] = [];
 
     jobId: string = '';
 
+    timeOutSearch: any;
     constructor(
         private _spinner: NgxSpinnerService,
         private _jobRepo: JobRepo,
@@ -42,6 +45,10 @@ export class OpsModuleStageManagementComponent extends AppPage {
                 this.getListStageAvailable(this.jobId);
             }
         });
+    }
+
+    ngOnChanges() {
+
     }
 
     openPopUpCreateStage() {
@@ -64,6 +71,7 @@ export class OpsModuleStageManagementComponent extends AppPage {
                 if (res instanceof Error) {
                 } else {
                     this.stages = res.map((item: any) => new Stage(item));
+                    this.currentStages = this.stages;
                 }
             },
             // error
@@ -121,6 +129,25 @@ export class OpsModuleStageManagementComponent extends AppPage {
             // complete
             () => { }
         )
+    }
+
+    onSearching(keyword: string) {
+        clearTimeout(this.timeOutSearch);
+        this.timeOutSearch = setTimeout(() => {
+            if (keyword.length >= 3) {
+                this.stages = this.stages.filter((item: Stage) => {
+                    if (!!item) {
+                        return item.stageCode.toLowerCase().search(keyword.toLowerCase().trim()) !== -1
+                            || (item.stageNameEN || '').toLowerCase().search(keyword.toLowerCase().trim()) !== -1
+                            || (item.description || '').toLowerCase().search(keyword.toLowerCase().trim()) !== -1;
+                    }
+                });
+            } else {
+                this.stages = this.currentStages;
+            }
+        }, 500);
+
+
     }
 
     // when add success stage into job
