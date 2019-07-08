@@ -57,14 +57,14 @@ export class CustomClearanceEditComponent implements OnInit {
     }
 
     async getCustomCleanranceById(id) {
-        // this.baseServices.get(this.api_menu.ToolSetting.CustomClearance.details + id).subscribe((res: any) => {
+        // this.baseServices.get(this.api_menu.Operation.CustomClearance.details + id).subscribe((res: any) => {
         //     console.log(res);
         //     this.customDeclaration = res;           
         // }, err => {
         //     this.customDeclaration = {};
         //     this.baseServices.handleError(err);
         // });
-        const res = await this.baseServices.getAsync(this.api_menu.ToolSetting.CustomClearance.details + id, true, true);
+        const res = await this.baseServices.getAsync(this.api_menu.Operation.CustomClearance.details + id, true, true);
         console.log(res);
         this.customDeclaration = res;
         const _customer = find(this.listCustomer, { 'taxCode': this.customDeclaration.partnerTaxCode });
@@ -131,7 +131,7 @@ export class CustomClearanceEditComponent implements OnInit {
             this.customDeclaration.unitCode = this.strUnitCurrent;
             console.log(this.customDeclaration);
 
-            const respone = await this.baseServices.putAsync(this.api_menu.ToolSetting.CustomClearance.update, this.customDeclaration, true, true);
+            const respone = await this.baseServices.putAsync(this.api_menu.Operation.CustomClearance.update, this.customDeclaration, true, true);
             console.log(respone);
             if (respone.status) {
                 this.getCustomCleanranceById(this.customDeclaration.id);
@@ -236,7 +236,7 @@ export class CustomClearanceEditComponent implements OnInit {
     }
 
     getClearanceType() {
-        this.baseServices.get(this.api_menu.ToolSetting.CustomClearance.getClearanceTypes).subscribe((res: any) => {
+        this.baseServices.get(this.api_menu.Operation.CustomClearance.getClearanceTypes).subscribe((res: any) => {
             this.serviceTypes = res.serviceTypes.map(x => ({ "text": x.displayName, "id": x.value }));
             this.typeClearance = res.types.map(x => ({ "text": x.displayName, "id": x.value }));
             this.routeClearance = res.routes.map(x => ({ "text": x.displayName, "id": x.value }));

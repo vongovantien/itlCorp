@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using eFMS.API.Setting.Service.Models;
+﻿using eFMS.API.Operation.Service.Models;
 
-namespace eFMS.API.Setting.DL.Models
+namespace eFMS.API.Operation.DL.Models
 {
     public class SetEcusConnectionModel : SetEcusconnection
     {
@@ -11,6 +8,5 @@ namespace eFMS.API.Setting.DL.Models
         public string Fullname { get; set; }
         public string UserCreatedName { get; set; }
         public string UserModifiedName { get; set; }
-
     }
 }

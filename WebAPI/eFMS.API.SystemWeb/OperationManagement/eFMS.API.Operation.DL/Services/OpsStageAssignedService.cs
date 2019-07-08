@@ -42,7 +42,7 @@ namespace eFMS.API.Operation.DL.Services
             var listToDelete = stagesByJob.Where(x => !models.Any(model => model.Id == x.Id));
             foreach(var item in models)
             {
-                if(item.Id == Guid.Empty)
+                if (item.Id == Guid.Empty)
                 {
                     var assignedItem = mapper.Map<OpsStageAssigned>(item);
                     assignedItem.Id = Guid.NewGuid();
@@ -51,6 +51,14 @@ namespace eFMS.API.Operation.DL.Services
                     assignedItem.CreatedDate = assignedItem.ModifiedDate = DateTime.Now;
                     assignedItem.UserCreated = currentUser.UserID;
                     dc.Add(assignedItem);
+                }
+                else
+                {
+                    var assignedToUpdate = dc.OpsStageAssigned.Find(item.Id);
+                    assignedToUpdate.UserModified = currentUser.UserID;
+                    assignedToUpdate.ModifiedDate = DateTime.Now;
+                    assignedToUpdate.OrderNumberProcessed = item.OrderNumberProcessed;
+                    dc.Update(assignedToUpdate);
                 }
             }
             if(listToDelete.Count() > 0)
@@ -95,13 +103,20 @@ namespace eFMS.API.Operation.DL.Services
             return results;
         }
 
-        public List<CatStageApiModel> GetNotAssigned(Guid jobId)
+        public List<OpsStageAssignedModel> GetNotAssigned(Guid jobId)
         {
             var data = DataContext.Get(x => x.JobId == jobId);
             var stages = catStageApi.GetAll().Result;
             if (stages == null) return null;
-            stages = stages.Where(x => !data.Any(assigned => assigned.StageId == x.Id)).ToList();
-            return stages;
+            var results = stages.Where(x => !data.Any(assigned => assigned.StageId == x.Id))
+                .Select(x => new OpsStageAssignedModel {
+                    Id = Guid.Empty,
+                    StageId = x.Id,
+                    Name = string.Empty,
+                    StageCode = x.Code,
+                    StageNameEN = x.StageNameEn
+                }).ToList();
+            return results;
         }
 
         private List<OpsStageAssignedModel> MapListToModel(IQueryable<OpsStageAssigned> data)

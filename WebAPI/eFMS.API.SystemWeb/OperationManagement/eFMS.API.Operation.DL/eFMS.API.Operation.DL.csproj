@@ -25,11 +25,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Common\LanguageSub.cs" />
     <Compile Remove="Infrastructure\ErrorHandler\ErrorMessages.cs" />
     <Compile Remove="Infrastructure\ErrorHandler\IErrorHandler.cs" />
-    <Compile Remove="IService\ICustomsDeclarationService.cs" />
-    <Compile Remove="Services\CustomsDeclarationService.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -54,7 +51,7 @@
       <HintPath>..\bin\netcoreapp2.2\eFMS.IdentityServer.DL.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.IdentityServer.Service">
-      <HintPath>..\bin\netcoreapp2.2\eFMS.IdentityServer.Service.dll</HintPath>
+      <HintPath>..\..\IdentityServer\bin\netcoreapp2.2\eFMS.IdentityServer.Service.dll</HintPath>
     </Reference>
     <Reference Include="ITL.NetCore.Common">
       <HintPath>..\bin\netcoreapp2.2\ITL.NetCore.Common.dll</HintPath>

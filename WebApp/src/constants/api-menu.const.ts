@@ -15,6 +15,7 @@ export class API_MENU {
         Setting: 44363,
         Documentation: 44366,
         ReportPreview: 53717,
+        Operation: 44365,
     }
 
     private PROTOCOL = "http://";
@@ -24,7 +25,7 @@ export class API_MENU {
      * Use HOST.Test to run on test environment
      * Use HOST.Staging to run on staging environment 
      */
-    private CURRENT_HOST: String =  environment.HOST.WEB_URL;  //this.HOST.Local;
+    private CURRENT_HOST: String = this.HOST.Local;  //environment.HOST.WEB_URL;  
 
     private getCurrentLanguage() {
         return localStorage.getItem(SystemConstants.CURRENT_LANGUAGE);
@@ -232,30 +233,6 @@ export class API_MENU {
         CatalogueLogViewer: {
             getCategory: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CategoryLog/GetCategory",
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CategoryLog/Paging"
-        },
-        EcusConnection:{
-            getAll:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/GetAll",
-            details:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/GetDetails",
-            addNew:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/Add",
-            update:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/Update",
-            delete:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/Delete",
-            paging:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "EcusConnection/Paging"
-        },
-        CustomClearance:{
-            getAll:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration",
-            getClearanceTypes:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/GetClearanceTypes",
-            paging:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/Paging",
-            details:this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/GetById/",
-            getByJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/GetBy",
-            query: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/Query",
-            updateToAJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/UpdateJobToClearances",
-            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/Update",
-            add: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/Add",
-            importClearancesFromEcus: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/ImportClearancesFromEcus",
-            deleteMultiple: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/DeleteMultiple",
-            downloadExcel: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/DownloadExcel",
-            uploadExel: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/upLoadFile",
-            import: this.getUrlMainPath(SystemConstants.MODULE_NAME.SETTING) + "CustomsDeclaration/Import"
         }
     }
 
@@ -327,6 +304,36 @@ export class API_MENU {
             checkAllowDelete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/CheckAllowDelete/",
             convertClearanceToJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/ConvertClearanceToJob",
             convertExistedClearancesToJobs: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/ConvertExistedClearancesToJobs"
+        }
+    }
+
+    /**
+     * OPERATION MODULE API URL DEFINITION 
+     */
+    public Operation = {
+        EcusConnection:{
+            getAll:this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "EcusConnection/GetAll",
+            details:this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "EcusConnection/GetDetails",
+            addNew:this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "EcusConnection/Add",
+            update:this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "EcusConnection/Update",
+            delete:this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "EcusConnection/Delete",
+            paging:this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "EcusConnection/Paging"
+        },
+        CustomClearance:{
+            getAll:this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration",
+            getClearanceTypes:this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration/GetClearanceTypes",
+            paging:this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration/Paging",
+            details:this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration/GetById/",
+            getByJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration/GetBy",
+            query: this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration/Query",
+            updateToAJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration/UpdateJobToClearances",
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration/Update",
+            add: this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration/Add",
+            importClearancesFromEcus: this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration/ImportClearancesFromEcus",
+            deleteMultiple: this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration/DeleteMultiple",
+            downloadExcel: this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration/DownloadExcel",
+            uploadExel: this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration/upLoadFile",
+            import: this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration/Import"
         }
     }
 

@@ -10,18 +10,5 @@
   "MSG_CODE_EXISTED": "Code has existed",
   "MSG_DELETE_FAIL_INCLUDED_CHILD": "Data include child. Delete denied",
   "EF_ANNOTATIONS_REQUIRED": "The [{0}] field is required",
-  "EF_ANNOTATIONS_STRING_LENGTH": "The [{0}] field must be charater trom {2}-{1} characters",
-  "MSG_CLEARANCENO_EXISTED": "Custom No [{0}] existed ! Please recheck it?", //"Clearance No has been existed"
-  "MSG_INVALID_DATE": "Invalid date format",
-  "MSG_INVALID_NUMBER": "Invalid number format",
-  "MSG_CUSTOM_CLEARANCE_NO_EMPTY": "Clearance No is not allow empty",
-  "MSG_CUSTOM_CLEARANCE_DATE_EMPTY": "Clearance Date is not allow empty",
-  "MSG_CUSTOM_CLEARANCE_CUSTOMER_CODE_EMPTY": "Customer Code is not allow empty",
-  "MSG_CUSTOM_CLEARANCE_MBL_EMPTY": "MBL is not allow empty",
-  "MSG_CUSTOM_CLEARANCE_GATEWAY_EMPTY": "Gateway is not allow empty",
-  "MSG_CUSTOM_CLEARANCE_CARGO_TYPE_EMPTY": "Cargo Type is not allow empty",
-  "MSG_CUSTOM_CLEARANCE_SERVICE_TYPE_EMPTY": "Service Type is not allow empty",
-  "MSG_CUSTOM_CLEARANCE_ROUTE_EMPTY": "Route is not allow empty",
-  "MSG_DUPLICATE_DATA": "{0} duplacate data",
-  "MSG_INVALID_MAX_LENGTH": "Should be at most {0} symbols"
+  "EF_ANNOTATIONS_STRING_LENGTH": "The [{0}] field must be charater trom {2}-{1} characters"
 }

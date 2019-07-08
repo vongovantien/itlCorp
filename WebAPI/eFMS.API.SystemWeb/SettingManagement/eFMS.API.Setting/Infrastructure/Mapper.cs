@@ -12,9 +12,6 @@ namespace eFMS.API.Setting.Infrastructure
             //CreateMap<SysUserGroup, SysUserGroupModel>();
             //CreateMap<SysUserGroupModel, SysUserGroup>();
             //CreateMap<SysUserGroupEditModel, SysUserGroupModel>();
-            CreateMap<SetEcusconnection, SetEcusConnectionModel > ();
-            CreateMap<CustomsDeclaration, CustomsDeclarationModel>();
-            CreateMap<CustomsDeclaration, CustomsDeclarationModel>();
         }
     }
 }

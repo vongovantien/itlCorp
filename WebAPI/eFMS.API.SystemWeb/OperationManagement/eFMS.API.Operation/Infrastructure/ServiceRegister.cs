@@ -41,6 +41,8 @@ namespace eFMS.API.Operation.Infrastructure
 
             services.AddTransient<ICurrentUser, CurrentUser>();
             services.AddTransient<IOpsStageAssignedService, OpsStageAssignedService>();
+            services.AddTransient<IEcusConnectionService, EcusConnectionService>();
+            services.AddTransient<ICustomsDeclarationService, CustomsDeclarationService>();
         }
 
         public static IServiceCollection AddCulture(this IServiceCollection services, IConfiguration configuration)
@@ -163,7 +165,15 @@ namespace eFMS.API.Operation.Infrastructure
         public static IServiceCollection AddCatelogueManagementApiServices(this IServiceCollection services)
         {
             services.AddHttpClient<ICatStageApiService, CatStageApiService>()
-                   .SetHandlerLifetime(TimeSpan.FromMinutes(5)); 
+                   .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+            services.AddHttpClient<ICatPartnerApiService, CatPartnerApiService>()
+                   .SetHandlerLifetime(TimeSpan.FromMinutes(5));  //Sample. Default lifetime is 5 minutes;
+            services.AddHttpClient<ICatPlaceApiService, CatPlaceApiService>()
+                   .SetHandlerLifetime(TimeSpan.FromMinutes(5));  //Sample. Default lifetime is 5 minutes;
+            services.AddHttpClient<ICatCountryApiService, CatCountryApiService>()
+                  .SetHandlerLifetime(TimeSpan.FromMinutes(5));  //Sample. Default lifetime is 5 minutes;
+            services.AddHttpClient<ICatCommodityApiService, CatCommodityApiService>()
+                  .SetHandlerLifetime(TimeSpan.FromMinutes(5));  //Sample. Default lifetime is 5 minutes;
             return services;
         }
 

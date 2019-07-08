@@ -37,8 +37,6 @@ namespace eFMS.API.Setting.Infrastructure
             services.AddTransient<IStringLocalizerFactory, JsonStringLocalizerFactory>();
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
             services.AddTransient<ICategoryLogService, CategoryLogService>();
-            services.AddTransient<IEcusConnectionService, EcusConnectionService>();
-            services.AddTransient<ICustomsDeclarationService, CustomsDeclarationService>();
             services.AddTransient<ICurrentUser, CurrentUser>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();

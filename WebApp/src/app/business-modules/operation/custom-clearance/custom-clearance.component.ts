@@ -63,7 +63,7 @@ export class CustomClearanceComponent implements OnInit {
     }
 
     async getListCustomsDeclaration() {
-        const res = await this.baseServices.postAsync(this.api_menu.ToolSetting.CustomClearance.paging + "?pageNumber=" + this.pager.currentPage + "&pageSize=" + this.pager.pageSize, this.searchObject, true, true);
+        const res = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.paging + "?pageNumber=" + this.pager.currentPage + "&pageSize=" + this.pager.pageSize, this.searchObject, true, true);
         console.log(res);
         this.listCustomDeclaration = res.data;
         this.pager.totalItems = res.totalItems;
@@ -135,7 +135,7 @@ export class CustomClearanceComponent implements OnInit {
         this.router.navigate(["/home/operation/custom-clearance-edit", { id: id }]);
     }
     async getDataFromEcus() {
-        await this.baseServices.postAsync(this.api_menu.ToolSetting.CustomClearance.importClearancesFromEcus, null, true, true);
+        await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.importClearancesFromEcus, null, true, true);
         this.pager.totalItems = 0;
         this.pager.currentPage = 1;
         this.getListCustomsDeclaration();
@@ -168,7 +168,7 @@ export class CustomClearanceComponent implements OnInit {
     }
 
     async delete() {
-        const response = await this.baseServices.putAsync(this.api_menu.ToolSetting.CustomClearance.deleteMultiple, this.customCheckedArray, true, true);
+        const response = await this.baseServices.putAsync(this.api_menu.Operation.CustomClearance.deleteMultiple, this.customCheckedArray, true, true);
         console.log(response);
         await this.initPager();
         await this.getListCustomsDeclaration();
@@ -258,7 +258,7 @@ export class CustomClearanceComponent implements OnInit {
 
     async export() {
         /**Prepare data */
-        var customClearances = await this.baseServices.postAsync(this.api_menu.ToolSetting.CustomClearance.query, this.searchObject);
+        var customClearances = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.query, this.searchObject);
         console.log(customClearances);
         //if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
         customClearances = lodash.map(customClearances, function (item, index) {

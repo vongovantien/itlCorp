@@ -1,21 +1,19 @@
-﻿using eFMS.API.Setting.DL.IService;
-using eFMS.API.Setting.DL.Models;
-using eFMS.API.Setting.Service.Contexts;
-using eFMS.API.Setting.Service.Models;
-using ITL.NetCore.Connection.EF;
-using MongoDB.Driver;
-using System.Collections.Generic;
-using System.Linq;
+﻿using AutoMapper;
+using eFMS.API.Catalogue.Service.Contexts;
+using eFMS.API.Operation.DL.Helper;
+using eFMS.API.Operation.DL.IService;
+using eFMS.API.Operation.DL.Models;
+using eFMS.API.Operation.DL.Models.Criteria;
+using eFMS.API.Operation.DL.Models.Ecus;
+using eFMS.API.Operation.Service.Models;
 using ITL.NetCore.Connection.BL;
-using AutoMapper;
-using eFMS.API.Setting.DL.Models.Criteria;
-using System.Data;
-using eFMS.API.Setting.DL.Models.Ecus;
-using eFMS.API.Setting.DL.Helpers;
+using ITL.NetCore.Connection.EF;
 using System;
-//using eFMS.API.Provider.Services.IService;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 
-namespace eFMS.API.Setting.DL.Services
+namespace eFMS.API.Operation.DL.Services
 {
     public class EcusConnectionService : RepositoryBase<SetEcusconnection, SetEcusConnectionModel>, IEcusConnectionService
     {
@@ -43,7 +41,7 @@ namespace eFMS.API.Setting.DL.Services
                 EcusConnection.Username = user?.Username;
                 EcusConnection.UserCreatedName = user_created?.Username;
                 EcusConnection.UserModifiedName = user_modified?.Username;
-                
+
             }
             return EcusConnection;
         }
@@ -58,13 +56,13 @@ namespace eFMS.API.Setting.DL.Services
                          from u in users
                          join em in dc.SysEmployee on u.EmployeeId equals em.Id
 
-                         select new {con,u,em}
+                         select new { con, u, em }
                 );
             if (query == null)
             {
                 return returnList;
             }
-            foreach(var item in query)
+            foreach (var item in query)
             {
                 SetEcusConnectionModel ecus = mapper.Map<SetEcusConnectionModel>(item.con);
                 ecus.Username = item.u.Username;
@@ -95,9 +93,9 @@ namespace eFMS.API.Setting.DL.Services
             if (criteria.All == null)
             {
                 list = list.Where(x => ((x.Username ?? "").Contains(criteria.Username ?? "")
-                && ((x.Name??"").Contains(criteria.Name??"")
-                && ((x.ServerName??"").Contains(criteria.ServerName??""))
-                && ((x.Dbname??"").Contains(criteria.Dbname??"")))
+                && ((x.Name ?? "").Contains(criteria.Name ?? "")
+                && ((x.ServerName ?? "").Contains(criteria.ServerName ?? ""))
+                && ((x.Dbname ?? "").Contains(criteria.Dbname ?? "")))
                 )).ToList();
             }
             else
@@ -146,10 +144,10 @@ namespace eFMS.API.Setting.DL.Services
                                     ON DTOKHAIMD._DToKhaiMDID = DTOKHAIMD_VNACCS2._DTOKHAIMDID
                               WHERE NAMDK = YEAR(GETDATE()) AND (MONTH(GETDATE()) - MONTH(NGAY_DK)) < 4";
 
-                string connectionString = @"Server=" + serverName + ",1433; Database=" + database + "; User ID=" + dbusername + "; Password=" + dbpassword;
+            string connectionString = @"Server=" + serverName + ",1433; Database=" + database + "; User ID=" + dbusername + "; Password=" + dbpassword;
             try
             {
-                var data = Helpers.Helper.ExecuteDataSet(connectionString, queryString);
+                var data = Helper.Helper.ExecuteDataSet(connectionString, queryString);
                 if (data != null)
                 {
                     DataTable dt = data.Tables[0];
