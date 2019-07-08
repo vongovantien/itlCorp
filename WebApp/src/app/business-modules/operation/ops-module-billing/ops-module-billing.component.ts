@@ -118,7 +118,7 @@ export class OpsModuleBillingComponent implements OnInit {
         this.getShipments();
     }
     async showCustomClearance(jobNo){
-        let responses = await this.baseServices.getAsync(this.api_menu.ToolSetting.CustomClearance.getByJob + "?jobNo=" + jobNo, false, true);
+        let responses = await this.baseServices.getAsync(this.api_menu.Operation.CustomClearance.getByJob + "?jobNo=" + jobNo, false, true);
         if(responses){
             this.customClearances = this.sortService.sort(responses, 'clearanceNo', true);;
         }
