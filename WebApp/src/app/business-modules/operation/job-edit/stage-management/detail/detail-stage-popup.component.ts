@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from "@angular/core";
 import { FormBuilder, FormGroup, AbstractControl, Validators } from "@angular/forms";
 
 import { PopupBase } from "src/app/modal.base";
@@ -14,7 +14,7 @@ import moment from "moment";
     templateUrl: "./detail-stage-popup.component.html",
     styleUrls: ['./detail-stage-popup.component.scss']
 })
-export class OpsModuleStageManagementDetailComponent extends PopupBase implements OnInit {
+export class OpsModuleStageManagementDetailComponent extends PopupBase implements OnInit, OnChanges {
 
     @Input() data: Stage = null;
     @Output() onSuccess: EventEmitter<any> = new EventEmitter<any>();
@@ -28,7 +28,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
 
     deadLineDate: AbstractControl;
 
-    statusStage: Array<any> = [
+    readonly statusStage: Array<any> = [
         {
             id: "InSchedule",
             text: "In Schedule"
@@ -54,15 +54,15 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             text: "Deleted"
         }
     ]
-    statusStageActive: string[] = [this.statusStage[0].id];
+    statusStageActive: any[] = [this.statusStage[0].id];
 
     systemUsers: User[] = [];
-    
-    mainPersonInCharge: string = '';
-    realPerSonInCharge: string = '';
+    selectedMainPersonInCharge: IPersonInCharge = null;
+    selectedRealPersonInCharge: IPersonInCharge = null;
 
-    //config for combo gird
-    configComboGrid: any = {
+
+    // config for combo gird
+    readonly configComboGrid: any = {
         placeholder: 'Please select',
         displayFields: [
             { field: 'username', label: 'UserName' },
@@ -70,7 +70,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
         ],
         source: this.systemUsers,
         selectedDisplayFields: ['username'],
-    }
+    };
 
     isSummited: boolean = false;
 
@@ -130,8 +130,14 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             deadLineDate: { startDate: moment(this.data.deadline || new Date()), endDate: moment(this.data.deadline || new Date()) }
         });
 
-        this.mainPersonInCharge = this.data.mainPersonInCharge;
-        this.statusStageActive = this.statusStage.filter((item: any) => item.id === (this.data.status) || ''.trim());
+        this.selectedMainPersonInCharge = Object.assign({}, { field: 'username', value: this.data.mainPersonInCharge });       
+        this.selectedRealPersonInCharge = Object.assign({}, { field: 'username', value: this.data.realPersonInCharge });
+
+        if (!!this.data.status) {
+            this.statusStageActive = this.statusStage.filter((item: any) => item.id === (this.data.status) || ''.trim());
+        } else {
+            this.statusStageActive = [this.statusStage[0]];
+        }
     }
 
     selected($event: any): void {
@@ -139,11 +145,11 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
     }
 
     onSelectMainPersonIncharge($event: User) {
-        this.mainPersonInCharge = $event.username;
+        this.selectedMainPersonInCharge.value = $event.username;
     }
 
-    onSelectRealPersonIncharge($event) {
-        this.realPerSonInCharge = $event.username;
+    onSelectRealPersonIncharge($event: User) {
+        this.selectedRealPersonInCharge.value = $event.username;
     }
 
     refreshValue($event: any) {
@@ -151,7 +157,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
 
     onSubmit(form: FormGroup) {
         this.isSummited = true;
-        if (!this.mainPersonInCharge) {
+        if (!this.selectedMainPersonInCharge.value) {
             return;
         } else {
             const body = {
@@ -160,13 +166,13 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
                 stageId: this.data.stageId,
                 name: this.data.name,
                 orderNumberProcessed: this.data.orderNumberProcessed,
-                mainPersonInCharge: this.mainPersonInCharge || "admin",
-                realPersonInCharge: this.realPerSonInCharge || "admin",
+                mainPersonInCharge: this.selectedMainPersonInCharge.value || "admin",
+                realPersonInCharge: this.selectedRealPersonInCharge.value || "admin",
                 processTime: form.value.processTime,
                 comment: form.value.comment,
                 description: form.value.description,
                 deadline: moment(form.value.deadLineDate.startDate).format('YYYY-MM-DDTHH:mm'),
-                status: this.statusStageActive[0] || this.statusStage[0].id
+                status: this.statusStageActive[0].id || this.statusStage[0].id
             };
 
             this._jobRepo.updateStageToJob(body).pipe(
@@ -187,8 +193,10 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
                 (errs: any) => {
                 },
                 // complete
-                () => { }
-            )
+                () => {
+                    this.isSummited = false;
+                }
+            );
         }
 
     }
@@ -213,4 +221,15 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             () => { }
         )
     }
+
+    onCancel() {
+        this.isSummited = false;
+        this.hide();
+    }
+}
+
+
+interface IPersonInCharge {
+    field: string;
+    value: string;
 }

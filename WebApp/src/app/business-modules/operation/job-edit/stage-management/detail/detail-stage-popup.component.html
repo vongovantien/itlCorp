@@ -55,15 +55,14 @@
                     </div>
                     <div class="row ">
                         <div class="col-lg-6 ">
-                            <div class="form-group" [ngClass]="{'m-form__group has-danger': isSummited && !mainPersonInCharge}">
+                            <div class="form-group" [ngClass]="{'m-form__group has-danger': isSummited && !selectedMainPersonInCharge.value}">
                                 <label class="form-control-label ">
                                     Main person incharge <span class="m--font-danger">(*)</span>
                                 </label>
-                                <app-combo-grid-virtual-scroll *ngIf="!!data" [currentActiveItemId]="{field:'id',value:(data.mainPersonInCharge || configComboGrid.placeholder)}" (itemSelected)="onSelectMainPersonIncharge($event) " [selectedDisplayFields]="configComboGrid.selectedDisplayFields "
-                                    [dataSources]="configComboGrid.source
+                                <app-combo-grid-virtual-scroll *ngIf="!!data" [currentActiveItemId]="selectedMainPersonInCharge" (itemSelected)="onSelectMainPersonIncharge($event) " [selectedDisplayFields]="configComboGrid.selectedDisplayFields " [dataSources]="configComboGrid.source
                                         " [displayFields]="configComboGrid.displayFields ">
                                 </app-combo-grid-virtual-scroll>
-                                <div class="form-control-feedback" *ngIf="isSummited && !mainPersonInCharge">
+                                <div class="form-control-feedback" *ngIf="isSummited && !selectedMainPersonInCharge.value">
                                     Main person in charge is required!
                                 </div>
                             </div>
@@ -74,7 +73,7 @@
                                     Real person incharge
                                 </label>
                                 <app-combo-grid-virtual-scroll *ngIf="!!data" (itemSelected)="onSelectRealPersonIncharge($event) " [selectedDisplayFields]="configComboGrid.selectedDisplayFields " [dataSources]="configComboGrid.source
-                                        " [displayFields]="configComboGrid.displayFields" [currentActiveItemId]="{field:'id',value:(data.realPersonInCharge || 'ss')}">
+                                        " [displayFields]="configComboGrid.displayFields" [currentActiveItemId]="selectedRealPersonInCharge">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -119,7 +118,7 @@
                                         </span>
                                     </span>
                                 </button>
-                                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase " (click)="hide()">
+                                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase " (click)="onCancel()">
                                     <span>
                                         <i class="la la-ban "></i>
                                         <span>
@@ -139,3 +138,4 @@
         </div>
     </div>
 </div>
+Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maiores atque ab voluptas neque optio quam! Consequuntur labore doloribus aperiam eveniet?

@@ -32,8 +32,41 @@ import { AutofocusDirective } from "../shared/directives/auto-focus.directive";
 import { ModalModule } from "ngx-bootstrap";
 import { RepositoryModule } from "./repositories/repository.module";
 import { ServiceModule } from "./services/service.module";
+import { SearchStage } from "./pipes";
 
 const Libary = [ModalModule.forRoot()];
+
+const APP_PIPES = [
+  SearchStage
+]
+
+const APP_COMPONENTS = [
+  TableLayoutComponent,
+  InputTableLayoutComponent,
+  BreadcrumbComponent,
+  DefaultButtonComponent,
+  PaginationComponent,
+  DeleteConfirmModalComponent,
+  SearchOptionsComponent,
+  InputFormComponent,
+  TableDetailComponent,
+  CloseModalButtonComponent,
+  ReportPreviewComponent,
+  ComboGridVirtualScrollComponent,
+  CfBeforeLeaveModalComponent,
+]
+
+const APP_DIRECTIVES = [
+  StyleCellDirective,
+  AutofocusDirective,
+  TwoDigitDecimaNumberDirective,
+  ThreeDigitDecimaNumberDirective,
+  IntergerInputDirective,
+  SpecialCharacterDirective,
+  EcusSpecicalCharacterAllowSpaceDirective,
+  EcusSpecicalCharacterNoSpaceDirective,
+
+]
 @NgModule({
   imports: [
     CommonModule,
@@ -46,52 +79,17 @@ const Libary = [ModalModule.forRoot()];
     ...Libary
   ],
   declarations: [
-    TableLayoutComponent,
-    StyleCellDirective,
-    InputTableLayoutComponent,
-    BreadcrumbComponent,
-    DefaultButtonComponent,
-    PaginationComponent,
-    DeleteConfirmModalComponent,
-    SearchOptionsComponent,
-    InputFormComponent,
-    TableDetailComponent,
-    CloseModalButtonComponent,
-    TwoDigitDecimaNumberDirective,
-    ThreeDigitDecimaNumberDirective,
-    IntergerInputDirective,
-    ReportPreviewComponent,
-    SpecialCharacterDirective,
-    EcusSpecicalCharacterAllowSpaceDirective,
-    EcusSpecicalCharacterNoSpaceDirective,
-    ComboGridVirtualScrollComponent,
-    CfBeforeLeaveModalComponent,
-    AutofocusDirective
+    ...APP_COMPONENTS,
+    ...APP_PIPES,
+    ...APP_DIRECTIVES
   ],
   exports: [
-    CommonModule,
     ScrollingModule,
-    TwoDigitDecimaNumberDirective,
-    ThreeDigitDecimaNumberDirective,
-    IntergerInputDirective,
-    TableLayoutComponent,
-    BreadcrumbComponent,
-    DefaultButtonComponent,
-    PaginationComponent,
-    DeleteConfirmModalComponent,
-    SearchOptionsComponent,
-    InputFormComponent,
-    TableDetailComponent,
-    CloseModalButtonComponent,
     NgProgressModule,
-    ReportPreviewComponent,
-    SpecialCharacterDirective,
-    EcusSpecicalCharacterAllowSpaceDirective,
-    EcusSpecicalCharacterNoSpaceDirective,
-    ComboGridVirtualScrollComponent,
-    CfBeforeLeaveModalComponent,
-    AutofocusDirective
+    ...APP_PIPES,
+    ...APP_DIRECTIVES,
+    ...APP_COMPONENTS
   ],
   providers: [API_MENU]
 })
-export class SharedModule {}
+export class SharedModule { }

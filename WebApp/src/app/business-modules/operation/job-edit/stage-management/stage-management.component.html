@@ -129,10 +129,8 @@
     </div>
 </div>
 
-<!--begin:: ops-add-stage-modal-->
+<!-- modal add stage -->
 <add-stage-popup [stages]="stageAvailable" [stageSelected]="stages" [id]="jobId" (onSuccess)="onAddSuccess()"></add-stage-popup>
-<!--end:: ops-add-stage-modal-->
 
-<!--begin:: ops-detail-stage-modal-->
+<!-- modal stage detail -->
 <detail-stage-popup [data]="selectedStage" (onSuccess)="onAddSuccess()"></detail-stage-popup>
-<!--end:: ops-detail-stage-modal-->

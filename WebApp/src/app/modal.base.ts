@@ -7,7 +7,8 @@ export abstract class PopupBase extends AppPage {
     @ViewChild("popup", { static: false }) popup: ModalDirective;
 
     options: ModalOptions = {
-        animated: false
+        animated: false,
+        keyboard: true
     };
 
     reset: any = null;
@@ -44,9 +45,7 @@ export abstract class PopupBase extends AppPage {
 
     // show poup
     show(options?: any): void {
-        console.log("popup is showing");
         this.setOptions(Object.assign(this.options, options));
-
         if (!this.popup.isShown) {
             if (typeof this.reset === "function") {
                 this.reset();
@@ -59,7 +58,6 @@ export abstract class PopupBase extends AppPage {
 
     // fn open popup
     open = (settings?: any, options?: any): any => {
-        console.log("open");
         this.setSettings(settings || {}).setOptions(options || {});
 
         if (!this.popup.isShown) {
@@ -67,19 +65,16 @@ export abstract class PopupBase extends AppPage {
         }
 
         return this;
-    };
+    }
 
     // close popup
     hide(): void {
-        console.log("hiding popup");
         this.popup.hide();
     }
 
     onHide($event: any) {
-        console.log("hided popup");
     }
 
     onShow($event: any) {
-        console.log("popup Showed");
     }
 }

@@ -18,14 +18,14 @@ import { Stage } from "src/app/shared/models/operation/stage";
 export class OpsModuleStageManagementComponent extends AppPage {
 
     @ViewChild(OpsModuleStageManagementAddStagePopupComponent, { static: false }) popupCreate: OpsModuleStageManagementAddStagePopupComponent;
-    @ViewChild(OpsModuleStageManagementDetailComponent, {static: false}) popupDetail: OpsModuleStageManagementDetailComponent;
+    @ViewChild(OpsModuleStageManagementDetailComponent, { static: false }) popupDetail: OpsModuleStageManagementDetailComponent;
 
     stages: Stage[] = [];
     stageAvailable: any[] = [];
     selectedStage: Stage = null;
 
     jobId: string = '';
-    
+
     constructor(
         private _spinner: NgxSpinnerService,
         private _jobRepo: JobRepo,
@@ -35,36 +35,35 @@ export class OpsModuleStageManagementComponent extends AppPage {
     }
 
     ngOnInit() {
-        this._activedRouter.params.subscribe( (param: any) => {
-            if(param.id) {
+        this._activedRouter.params.subscribe((param: any) => {
+            if (param.id) {
                 this.jobId = param.id;
                 this.getListStageJob(this.jobId);
                 this.getListStageAvailable(this.jobId);
             }
-        })
+        });
     }
 
     openPopUpCreateStage() {
-        this.popupCreate.show();
+        this.popupCreate.show({ backdrop: 'static', keyboard: true });
     }
 
     openPopupDetail() {
-        this.popupDetail.show()
+        this.popupDetail.show({ backdrop: 'static', keyboard: true });
     }
 
     getListStageJob(id: string) {
         this._spinner.show();
 
-       this._jobRepo.getListStageOfJob(id).pipe(
+        this._jobRepo.getListStageOfJob(id).pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),
             finalize(() => { this._spinner.hide() }),
         ).subscribe(
             (res: any[]) => {
                 if (res instanceof Error) {
-                    
-                }else {
-                    this.stages = res.map( (item: any) => new Stage(item));
+                } else {
+                    this.stages = res.map((item: any) => new Stage(item));
                 }
             },
             // error
@@ -81,38 +80,15 @@ export class OpsModuleStageManagementComponent extends AppPage {
         this._spinner.show();
 
         this._jobRepo.getListStageNotAssigned(id).pipe(
-             takeUntil(this.ngUnsubscribe),
-             catchError(this.catchError),
-             finalize(() => { this._spinner.hide() }),
-         ).subscribe(
-             (res: any[]) => {
-                 if (res instanceof Error) {
-                     
-                 } else {
-                     this.stageAvailable = res || [];
-                 }
-             },
-             // error
-             (errs: any) => {
-                 // this.handleErrors(errs)
-             },
-             // complete
-             () => { }
-         )
-    }
-
-    getDetail(id: string) {
-        this._jobRepo.getDetailStageOfJob(id).pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),
             finalize(() => { this._spinner.hide() }),
         ).subscribe(
             (res: any[]) => {
                 if (res instanceof Error) {
-                    
+
                 } else {
-                    this.selectedStage = new Stage(res);
-                    this.popupDetail.show();
+                    this.stageAvailable = res || [];
                 }
             },
             // error
@@ -124,7 +100,30 @@ export class OpsModuleStageManagementComponent extends AppPage {
         )
     }
 
-    //when add success stage into job
+    getDetail(id: string) {
+        this._jobRepo.getDetailStageOfJob(id).pipe(
+            takeUntil(this.ngUnsubscribe),
+            catchError(this.catchError),
+            finalize(() => { this._spinner.hide() }),
+        ).subscribe(
+            (res: any[]) => {
+                if (res instanceof Error) {
+
+                } else {
+                    this.selectedStage = new Stage(res);
+                    this.openPopupDetail();
+                }
+            },
+            // error
+            (errs: any) => {
+                // this.handleErrors(errs)
+            },
+            // complete
+            () => { }
+        )
+    }
+
+    // when add success stage into job
     onAddSuccess() {
         this.getListStageJob(this.jobId);
         this.getListStageAvailable(this.jobId);
