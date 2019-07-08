@@ -103,13 +103,20 @@ namespace eFMS.API.Operation.DL.Services
             return results;
         }
 
-        public List<CatStageApiModel> GetNotAssigned(Guid jobId)
+        public List<OpsStageAssignedModel> GetNotAssigned(Guid jobId)
         {
             var data = DataContext.Get(x => x.JobId == jobId);
             var stages = catStageApi.GetAll().Result;
             if (stages == null) return null;
-            stages = stages.Where(x => !data.Any(assigned => assigned.StageId == x.Id)).ToList();
-            return stages;
+            var results = stages.Where(x => !data.Any(assigned => assigned.StageId == x.Id))
+                .Select(x => new OpsStageAssignedModel {
+                    Id = Guid.Empty,
+                    StageId = x.Id,
+                    Name = string.Empty,
+                    StageCode = x.Code,
+                    StageNameEN = x.StageNameEn
+                }).ToList();
+            return results;
         }
 
         private List<OpsStageAssignedModel> MapListToModel(IQueryable<OpsStageAssigned> data)

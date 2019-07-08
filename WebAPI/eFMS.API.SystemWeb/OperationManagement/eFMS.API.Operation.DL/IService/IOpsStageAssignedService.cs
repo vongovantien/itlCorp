@@ -15,7 +15,7 @@ namespace eFMS.API.Operation.DL.IService
     {
         OpsStageAssignedModel GetBy(Guid id);
         List<OpsStageAssignedModel> GetByJob(Guid jobId);
-        List<CatStageApiModel> GetNotAssigned(Guid jobId);
+        List<OpsStageAssignedModel> GetNotAssigned(Guid jobId);
         HandleState AddMultipleStage(List<OpsStageAssignedEditModel> models, Guid jobId);
     }
 }
