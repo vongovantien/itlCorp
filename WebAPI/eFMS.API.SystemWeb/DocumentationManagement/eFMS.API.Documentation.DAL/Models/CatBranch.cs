@@ -31,7 +31,7 @@ namespace eFMS.API.Documentation.Service.Models
         public byte[] Logo { get; set; }
         public string Code { get; set; }
         public string UserCreated { get; set; }
-        public string DatetimeCreated { get; set; }
+        public DateTime? DatetimeCreated { get; set; }
 
         public virtual ICollection<SysUser> SysUser { get; set; }
         public virtual ICollection<SysUserOtherWorkPlace> SysUserOtherWorkPlace { get; set; }

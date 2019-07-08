@@ -247,6 +247,8 @@ namespace eFMS.API.Operation.Service.Models
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
+                entity.Property(e => e.CurrentStatus).HasMaxLength(10);
+
                 entity.Property(e => e.CustomerId)
                     .HasColumnName("CustomerID")
                     .HasMaxLength(50)

@@ -15,6 +15,7 @@ using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Operation.DL.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Common.NoSql;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Operation.DL.Services
 {
@@ -48,6 +49,7 @@ namespace eFMS.API.Operation.DL.Services
                     assignedItem.Id = Guid.NewGuid();
                     assignedItem.JobId = jobId;
                     assignedItem.Deadline = item.Deadline ?? null;
+                    assignedItem.Status = "InSchedule";
                     assignedItem.CreatedDate = assignedItem.ModifiedDate = DateTime.Now;
                     assignedItem.UserCreated = currentUser.UserID;
                     dc.Add(assignedItem);
@@ -117,6 +119,52 @@ namespace eFMS.API.Operation.DL.Services
                     StageNameEN = x.StageNameEn
                 }).ToList();
             return results;
+        }
+
+        public HandleState Update(OpsStageAssignedEditModel model)
+        {
+            var assigned = mapper.Map<OpsStageAssignedModel>(model);
+            assigned.UserModified = "admin"; //currentUser.UserID;
+            assigned.ModifiedDate = DateTime.Now;
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var stageAssigneds = DataContext.Get(x => x.JobId == model.JobId);
+            var job = dc.OpsTransaction.Find(model.JobId);
+            if(job.CurrentStatus != "Deleted" && job .CurrentStatus != "Completed")
+            {
+                if ((stageAssigneds.Count(x => x.Status == DataTypeEx.GetStageStatus(StageEnum.Overdue) || x.Status == DataTypeEx.GetStageStatus(StageEnum.Warning)) == 0
+                    || assigned.Status == DataTypeEx.GetStageStatus(StageEnum.Processing))
+                    && job.ServiceDate >= DateTime.Now)
+                {
+                    job.CurrentStatus = "Processing";
+                }
+                else if (stageAssigneds.Count(x => x.Status == DataTypeEx.GetStageStatus(StageEnum.Warning)) > 0 || assigned.Status == DataTypeEx.GetStageStatus(StageEnum.Warning))
+                {
+                    job.CurrentStatus = "Warning";
+                }
+                else if (stageAssigneds.Count(x => x.Status == DataTypeEx.GetStageStatus(StageEnum.Overdue)) > 0 || assigned.Status == DataTypeEx.GetStageStatus(StageEnum.Overdue))
+                {
+                    job.CurrentStatus = "Overdued";
+                }
+                else if (stageAssigneds.All(x => x.Status == DataTypeEx.GetStageStatus(StageEnum.Done)))
+                {
+                    job.CurrentStatus = "Completed";
+                }
+            }
+            var result = new HandleState();
+            try
+            {
+                result = DataContext.Update(assigned, x => x.Id == assigned.Id, false);
+                if (result.Success)
+                {
+                    dc.OpsTransaction.Update(job);
+                }
+                dc.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                result = new HandleState(ex.Message);
+            }
+            return result;
         }
 
         private List<OpsStageAssignedModel> MapListToModel(IQueryable<OpsStageAssigned> data)
