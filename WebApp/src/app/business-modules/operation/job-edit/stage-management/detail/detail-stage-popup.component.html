@@ -119,7 +119,7 @@
                                     Status
                                 </label>
                                 <ng-select [allowClear]="false" [items]="statusStage" [active]="statusStageActive"
-                                    [disabled]="disabled" (selected)="selected($event)" placeholder="Select filter">
+                                    (selected)="selected($event)" placeholder="Select filter">
                                 </ng-select>
                             </div>
                         </div>
