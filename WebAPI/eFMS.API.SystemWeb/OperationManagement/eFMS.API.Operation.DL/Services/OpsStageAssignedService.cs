@@ -129,25 +129,22 @@ namespace eFMS.API.Operation.DL.Services
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var stageAssigneds = DataContext.Get(x => x.JobId == model.JobId);
             var job = dc.OpsTransaction.Find(model.JobId);
-            if(job.CurrentStatus != "Deleted" && job .CurrentStatus != "Completed")
+            int hours = 3;
+            if (job.CurrentStatus != "Deleted" && job.CurrentStatus != "Completed")
             {
-                if ((stageAssigneds.Count(x => x.Status == DataTypeEx.GetStageStatus(StageEnum.Overdue) || x.Status == DataTypeEx.GetStageStatus(StageEnum.Warning)) == 0
-                    || assigned.Status == DataTypeEx.GetStageStatus(StageEnum.Processing))
-                    && job.ServiceDate >= DateTime.Now)
-                {
-                    job.CurrentStatus = "Processing";
-                }
-                else if (stageAssigneds.Count(x => x.Status == DataTypeEx.GetStageStatus(StageEnum.Warning)) > 0 || assigned.Status == DataTypeEx.GetStageStatus(StageEnum.Warning))
-                {
-                    job.CurrentStatus = "Warning";
-                }
-                else if (stageAssigneds.Count(x => x.Status == DataTypeEx.GetStageStatus(StageEnum.Overdue)) > 0 || assigned.Status == DataTypeEx.GetStageStatus(StageEnum.Overdue))
+                if (assigned.Status.Trim() == DataTypeEx.GetStageStatus(StageEnum.Overdue))
                 {
                     job.CurrentStatus = "Overdued";
                 }
-                else if (stageAssigneds.All(x => x.Status == DataTypeEx.GetStageStatus(StageEnum.Done)))
-                {
+                if ((assigned.Status.Trim() == DataTypeEx.GetStageStatus(StageEnum.Done) || assigned.Status.Trim() == DataTypeEx.GetStageStatus(StageEnum.Deleted)) 
+                    && stageAssigneds.All(x => (x.Status == DataTypeEx.GetStageStatus(StageEnum.Done) || x.Status == DataTypeEx.GetStageStatus(StageEnum.Deleted))
+                    && x.Id != model.Id))
+                { 
                     job.CurrentStatus = "Completed";
+                }
+                if(job.CurrentStatus.Trim() == "InSchedule" && assigned.Status.Trim() == DataTypeEx.GetStageStatus(StageEnum.Processing))
+                {
+                    job.CurrentStatus = "Processing";
                 }
             }
             var result = new HandleState();

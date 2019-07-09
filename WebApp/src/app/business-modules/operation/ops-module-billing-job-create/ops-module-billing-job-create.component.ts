@@ -140,18 +140,17 @@ export class OpsModuleBillingJobCreateComponent implements OnInit {
           this.OpsTransactionToAdd.serviceDate =
             this.OpsTransactionToAdd.serviceDate.startDate != null
               ? dataHelper.dateTimeToUTC(
-                  this.OpsTransactionToAdd.serviceDate.startDate
-                )
+                this.OpsTransactionToAdd.serviceDate.startDate
+              )
               : null;
           var res = await this.baseServices.postAsync(
             this.api_menu.Documentation.Operation.addNew,
             this.OpsTransactionToAdd
           );
-          if (res.status) {
+          if (res.status) {//job-edit/:id
             console.log(res);
             this.router.navigate([
-              "/home/operation/job-edit",
-              { id: res.data }
+              "/home/operation/job-edit/", res.data
             ]);
             this.OpsTransactionToAdd = new OpsTransaction();
             this.resetDisplay();
