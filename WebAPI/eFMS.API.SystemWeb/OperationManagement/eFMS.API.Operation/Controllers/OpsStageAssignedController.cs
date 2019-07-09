@@ -126,13 +126,14 @@ namespace eFMS.API.Operation.Controllers
         /// <param name="model">model to update</param>
         /// <returns></returns>
         [HttpPut("Update")]
-        [Authorize]
+        //[Authorize]
         public IActionResult Update(OpsStageAssignedEditModel model)
         {
-            var assigned = mapper.Map<OpsStageAssignedModel>(model);
-            assigned.UserModified = currentUser.UserID;
-            assigned.ModifiedDate = DateTime.Now;
-            var hs = opsStageAssignedService.Update(assigned, x => x.Id == model.Id);
+            //var assigned = mapper.Map<OpsStageAssignedModel>(model);
+            //assigned.UserModified = "admin"; //currentUser.UserID;
+            //assigned.ModifiedDate = DateTime.Now;
+            //var hs = opsStageAssignedService.Update(assigned, x => x.Id == model.Id);
+            var hs = opsStageAssignedService.Update(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

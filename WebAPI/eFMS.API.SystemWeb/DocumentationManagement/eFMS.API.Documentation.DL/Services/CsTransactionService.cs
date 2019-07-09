@@ -388,7 +388,6 @@ namespace eFMS.API.Documentation.DL.Services
                 RequestedDate = x.Key.RequestedDate,
                 FlightVesselName = x.Key.FlightVesselName,
                 VoyNo = x.Key.VoyNo,
-                //FlightVesselConfirmedDate = x.Key.FlightVesselConfirmedDate,
                 ShipmentType = x.Key.ShipmentType,
                 ServiceMode = x.Key.ServiceMode,
                 Commodity = x.Key.Commodity,
@@ -399,12 +398,10 @@ namespace eFMS.API.Documentation.DL.Services
                 RouteShipment = x.Key.RouteShipment,
                 Notes = x.Key.Notes,
                 Locked = x.Key.Locked,
-                //LockedDate = x.Key.LockedDate,
                 UserCreated = x.Key.UserCreated,
                 CreatedDate = x.Key.CreatedDate,
                 ModifiedDate = x.Key.ModifiedDate,
                 Inactive = x.Key.Inactive,
-                //InactiveOn = x.Key.InactiveOn,
                 SupplierName = x.Key.SupplierName,
                 CreatorName = x.Key.CreatorName,
                 SumCont = x.Key.SumCont,
@@ -421,7 +418,6 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return results;
         }
-
         public IQueryable<sp_GetTransaction> Query(CsTransactionCriteria criteria)
         {
             var transactionType = DataTypeEx.GetType(criteria.TransactionType);

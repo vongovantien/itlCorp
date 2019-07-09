@@ -15,6 +15,7 @@ using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Operation.DL.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Common.NoSql;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Operation.DL.Services
 {
@@ -48,6 +49,7 @@ namespace eFMS.API.Operation.DL.Services
                     assignedItem.Id = Guid.NewGuid();
                     assignedItem.JobId = jobId;
                     assignedItem.Deadline = item.Deadline ?? null;
+                    assignedItem.Status = "InSchedule";
                     assignedItem.CreatedDate = assignedItem.ModifiedDate = DateTime.Now;
                     assignedItem.UserCreated = currentUser.UserID;
                     dc.Add(assignedItem);
@@ -117,6 +119,49 @@ namespace eFMS.API.Operation.DL.Services
                     StageNameEN = x.StageNameEn
                 }).ToList();
             return results;
+        }
+
+        public HandleState Update(OpsStageAssignedEditModel model)
+        {
+            var assigned = mapper.Map<OpsStageAssignedModel>(model);
+            assigned.UserModified = "admin"; //currentUser.UserID;
+            assigned.ModifiedDate = DateTime.Now;
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var stageAssigneds = DataContext.Get(x => x.JobId == model.JobId);
+            var job = dc.OpsTransaction.Find(model.JobId);
+            int hours = 3;
+            if (job.CurrentStatus != "Deleted" && job.CurrentStatus != "Completed")
+            {
+                if (assigned.Status.Trim() == DataTypeEx.GetStageStatus(StageEnum.Overdue))
+                {
+                    job.CurrentStatus = "Overdued";
+                }
+                if ((assigned.Status.Trim() == DataTypeEx.GetStageStatus(StageEnum.Done) || assigned.Status.Trim() == DataTypeEx.GetStageStatus(StageEnum.Deleted)) 
+                    && stageAssigneds.All(x => (x.Status == DataTypeEx.GetStageStatus(StageEnum.Done) || x.Status == DataTypeEx.GetStageStatus(StageEnum.Deleted))
+                    && x.Id != model.Id))
+                { 
+                    job.CurrentStatus = "Completed";
+                }
+                if(job.CurrentStatus.Trim() == "InSchedule" && assigned.Status.Trim() == DataTypeEx.GetStageStatus(StageEnum.Processing))
+                {
+                    job.CurrentStatus = "Processing";
+                }
+            }
+            var result = new HandleState();
+            try
+            {
+                result = DataContext.Update(assigned, x => x.Id == assigned.Id, false);
+                if (result.Success)
+                {
+                    dc.OpsTransaction.Update(job);
+                }
+                dc.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                result = new HandleState(ex.Message);
+            }
+            return result;
         }
 
         private List<OpsStageAssignedModel> MapListToModel(IQueryable<OpsStageAssigned> data)

@@ -43,6 +43,7 @@ namespace eFMS.API.Documentation.DL.Services
             model.UserCreated = currentUser.UserID; //currentUser.UserID;
             model.ModifiedDate = model.CreatedDate;
             model.UserModified = model.UserCreated;
+            model.CurrentStatus = "InSchedule";
             int countNumberJob = ((eFMSDataContext)DataContext.DC).OpsTransaction.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
             model.JobNo = GenerateID.GenerateOPSJobID("LOG", countNumberJob);
             var entity = mapper.Map<OpsTransaction>(model);
