@@ -96,6 +96,9 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     @ViewChild('containerMasterForm', { static: true }) containerMasterForm: NgForm;
     // @ViewChild('containerSelect',{static:true}) containerSelect: ElementRef;
 
+    tab: string = '';
+    jobId: string = '';
+
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU,
         private route: ActivatedRoute,
@@ -106,7 +109,9 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         // this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
     }
     async ngOnInit() {
+
         this.route.params.subscribe(async (params: any) => {
+            this.tab = 'job-edit';
             this.getUnits();
             this.getPartners();
             this.getCurrencies();
@@ -122,6 +127,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             this.getContainerData();
             await this.getShipmentCommonData();
             if (!!params && !!params.id) {
+                this.jobId = params.id;
                 await this.getShipmentDetails(params.id);
                 if (this.opsTransaction != null) {
                     this.serviceDate = (this.opsTransaction.serviceDate !== null) ? { startDate: moment(this.opsTransaction.serviceDate), endDate: moment(this.opsTransaction.serviceDate) } : null;
@@ -134,8 +140,8 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
                     if (index > -1) { this.shipmentModeActive = [this.shipmentModes[index]] };
                     this.getAllSurCharges();
                     this.getShipmentContainer();
-                }
-                else {
+                    this.getCustomClearances();
+                } else {
                     this.serviceDate = null;
                     this.finishDate = null;
                 }
@@ -143,6 +149,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         })
 
     }
+
     async getShipmentContainer() {
         let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, { mblid: this.opsTransaction.id }, false, false);
         this.opsTransaction.csMawbcontainers = this.lstContainerTemp = this.lstMasterContainers = responses;
@@ -944,5 +951,10 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     getCustomClearances() {
         this.baseServices.setData("CurrentOpsTransaction", this.opsTransaction);
         this.isLoadClearance = true;
+    }
+
+    selectTab($event: any, tabName: string) {
+        this.tab = tabName;
+        // this.router.navigate([`home/operation/job-edit/${this.jobId}`], {queryParams: {tab: this.tab}});
     }
 }
