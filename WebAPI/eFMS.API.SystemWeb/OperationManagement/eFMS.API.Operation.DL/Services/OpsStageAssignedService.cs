@@ -132,17 +132,17 @@ namespace eFMS.API.Operation.DL.Services
             int hours = 3;
             if (job.CurrentStatus != "Deleted" && job.CurrentStatus != "Completed")
             {
-                if (assigned.Status.Trim() == DataTypeEx.GetStageStatus(StageEnum.Overdue))
+                if (assigned.Status?.Trim() == DataTypeEx.GetStageStatus(StageEnum.Overdue))
                 {
                     job.CurrentStatus = "Overdued";
                 }
-                if ((assigned.Status.Trim() == DataTypeEx.GetStageStatus(StageEnum.Done) || assigned.Status.Trim() == DataTypeEx.GetStageStatus(StageEnum.Deleted)) 
+                if ((assigned.Status?.Trim() == DataTypeEx.GetStageStatus(StageEnum.Done) || assigned.Status.Trim() == DataTypeEx.GetStageStatus(StageEnum.Deleted)) 
                     && stageAssigneds.All(x => (x.Status == DataTypeEx.GetStageStatus(StageEnum.Done) || x.Status == DataTypeEx.GetStageStatus(StageEnum.Deleted))
                     && x.Id != model.Id))
                 { 
                     job.CurrentStatus = "Completed";
                 }
-                if(job.CurrentStatus.Trim() == "InSchedule" && assigned.Status.Trim() == DataTypeEx.GetStageStatus(StageEnum.Processing))
+                if(job.CurrentStatus?.Trim() == "InSchedule" && assigned.Status.Trim() == DataTypeEx.GetStageStatus(StageEnum.Processing))
                 {
                     job.CurrentStatus = "Processing";
                 }
