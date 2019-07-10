@@ -3253,7 +3253,8 @@
                                         Quantity <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="number" class="form-control m-input m-input--square"
-                                        placeholder="Enter number" #OBHQuantityNameOps="ngModel" appIntergerInputCheck
+                                        onkeypress="return event.charCode == 46 || (event.charCode > 47 && event.charCode < 58)"
+                                        placeholder="Enter number" #OBHQuantityNameOps="ngModel"
                                         [(ngModel)]="OBHChargeToAdd.quantity" required (keyup)="calculateTotalEachOBH()"
                                         name="OBHQuantityNameOps">
                                     <div class="form-control-feedback"

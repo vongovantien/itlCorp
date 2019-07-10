@@ -666,9 +666,12 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
 
     saveNewCharge(id_form: string, form: NgForm, data: CsShipmentSurcharge, isContinue: boolean) {
         setTimeout(async () => {
-            var error = $('#' + id_form).find('div.has-danger');
-            if (error.length == 0) {
+            const error = $('#' + id_form).find('div.has-danger');
+            if (error.length === 0) {
                 data.hblid = this.opsTransaction.hblid;
+                if (data.quantity != null) {
+                    data.quantity = Number(data.quantity.toFixed(2));
+                }
                 var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, data);
                 if (res.status) {
                     form.onReset();
@@ -854,9 +857,6 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             }
         }, 300);
     }
-
-
-
 
 
     closeChargeForm(formId: string, form: NgForm) {
