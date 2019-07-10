@@ -20,7 +20,7 @@ export class Stage {
     status:string = ''; 
     userCreated: string = '';
     userModified: string = '';
-
+    doneDate: string = '';
  constructor(data?: any) {
     let self = this;
     _.forEach(data, (val, key) => {
