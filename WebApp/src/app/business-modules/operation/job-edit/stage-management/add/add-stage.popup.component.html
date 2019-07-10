@@ -21,7 +21,7 @@
                                         <div class="row">
                                             <div class="col-sm-1">
                                                 <label class="m-checkbox">
-                                                    <input type="checkbox">
+                                                    <input type="checkbox" [(ngModel)]="isMasterStageNotAssigned"  (change)="checkUncheckAllStage('stageNotAsigned')" >
                                                     <span></span>
                                                 </label>
                                             </div>
@@ -53,8 +53,8 @@
                                             <div class="col-sm-1">
                                                 <label class="m-checkbox">
                                                     <input type="checkbox"
-                                                        (change)="onChangeCheckBoxStage($event, stage, i)"
-                                                        value="{{stage}}">
+                                                        (change)="onChangeCheckBoxStage()"
+                                                        value="{{stage}}" [(ngModel)]="stage.isSelected">
                                                     <span></span>
                                                 </label>
                                             </div>
@@ -98,7 +98,7 @@
                                         <div class="row">
                                             <div class="col-sm-1">
                                                 <label class="m-checkbox">
-                                                    <input type="checkbox">
+                                                    <input type="checkbox" (change)="checkUncheckAllStage('stageSelected')" [(ngModel)]="isMasterStageSelected">
                                                     <span></span>
                                                 </label>
                                             </div>
@@ -131,8 +131,8 @@
                                             <div class="col-sm-1">
                                                 <label class="m-checkbox">
                                                     <input type="checkbox"
-                                                        (change)="onChangeCheckBoxStageSelected($event, stage, i)"
-                                                        value="{{stage}}">
+                                                        (change)="onChangeCheckBoxStageSelected()"
+                                                        value="{{stage}}" [(ngModel)]="stage.isSelected">
                                                     <span></span>
                                                 </label>
                                             </div>

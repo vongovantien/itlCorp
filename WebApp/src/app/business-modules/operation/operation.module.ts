@@ -29,7 +29,7 @@ import { ModalModule, TabsModule } from "ngx-bootstrap";
 import { OpsModuleStageManagementAddStagePopupComponent } from "./job-edit/stage-management/add/add-stage.popup.component";
 
 
-const Lib = [
+const LIB = [
     NgxDaterangepickerMd,
     DragDropModule,
     SelectModule,
@@ -44,7 +44,7 @@ const Lib = [
         FormsModule,
         ReactiveFormsModule,
         SharedModule,
-        ...Lib
+        ...LIB
 
     ],
     declarations: [

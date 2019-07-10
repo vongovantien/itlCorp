@@ -32,40 +32,9 @@
 <div class="m-content">
     <div class="row">
         <div class="col-12">
-            <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand" role="tablist">
-                <li class="nav-item m-tabs__item">
-                    <a class="nav-link m-tabs__link active" id="" href="#billing-job-detail-tabview-tab"
-                        data-toggle="tab" role="tab">
-                        Job detail
-                    </a>
-                </li>
-                <li class="nav-item m-tabs__item">
-                    <a class="nav-link m-tabs__link" id="" href="#custom-declaration-tabview-tab" data-toggle="tab"
-                        (click)="getCustomClearances()" role="tab">
-                        Custom declaration
-                    </a>
-                </li>
-                <li class="nav-item m-tabs__item">
-                    <a class="nav-link m-tabs__link" id="" href="#credit-debit-note-tabview-tab" data-toggle="tab"
-                        role="tab">
-                        Credit Note & Debit Note
-                    </a>
-
-                </li>
-                <li class="nav-item m-tabs__item">
-                    <a class="nav-link m-tabs__link" id="" href="#stage-management-tabview-tab" data-toggle="tab"
-                        role="tab">
-                        Stage management
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-    <!--begin:: tab-content -->
-    <div class="tab-content" id="">
-        <!--begin:: billing-job-detail-tabview-tab -->
-        <div class="tab-pane fade show active" role="tabpanel" id="billing-job-detail-tabview-tab">
+            <tabset type="tabs">
+                <tab heading="Job detail" (selectTab)="selectTab($event,'job-edit')">
+                    <div *ngIf="tab === 'job-edit'">
             <!--begin::Form-->
             <form novalidate #addOpsForm="ngForm" name="addOpsForm" (ngSubmit)="addOpsForm.form.valid">
 
@@ -1504,28 +1473,22 @@
             </div>
             <!--end:: m-portlet-->
         </div>
-        <!--end::billing-job-detail-tabview-tab-->
-
-        <!--begin:: custom-declaration-tabview-tab  -->
-        <div class="tab-pane fade" role="tabpanel" id="custom-declaration-tabview-tab">
-            <app-billing-custom-declaration *ngIf="isLoadClearance"></app-billing-custom-declaration>
+                </tab>
+                <tab heading="Custom declaration" (selectTab)="selectTab($event,'custom-declaration')">
+                    <app-billing-custom-declaration *ngIf="tab === 'custom-declaration' && isLoadClearance">
+                    </app-billing-custom-declaration>
+                </tab>
+                <tab heading="Credit Note & Debit Note" (selectTab)="selectTab($event,'cre-debit-note')">
+                    <app-ops-module-credit-debit-note *ngIf="tab === 'cre-debit-note'">
+                    </app-ops-module-credit-debit-note>
+                </tab>
+                <tab heading="Stage management" [active]="tab === 'stage'" (selectTab)="selectTab($event, 'stage')">
+                    <app-ops-module-stage-management *ngIf="tab === 'stage'" [data]="opsTransaction">
+                    </app-ops-module-stage-management>
+                </tab>
+            </tabset>
         </div>
-        <!--end::custom-declaration-tabview-tab -->
-
-        <!--begin:: credit-debit-note-tabview-tab -->
-        <div class="tab-pane fade" role="tabpanel" id="credit-debit-note-tabview-tab">
-            <app-ops-module-credit-debit-note></app-ops-module-credit-debit-note>
         </div>
-        <!--end::credit-debit-note-tabview-tab -->
-        <!--begin:: stage-management-tabview-tab -->
-        <div class="tab-pane fade" role="tabpanel" id="stage-management-tabview-tab">
-            <app-ops-module-stage-management [data]="opsTransaction"></app-ops-module-stage-management>
-        </div>
-        <!--end::stage-management-tabview-tab -->
-
-    </div>
-    <!--end:: tab-content-->
-
 </div>
 <!--end:: m-content-->
 

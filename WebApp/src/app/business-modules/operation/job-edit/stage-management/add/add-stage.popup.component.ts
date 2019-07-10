@@ -31,6 +31,9 @@ export class OpsModuleStageManagementAddStagePopupComponent extends PopupBase im
   keyword_stageSelected: string = '';
 
   isAdd: boolean = false;
+  isMasterStageSelected: boolean = false;
+  isMasterStageNotAssigned: boolean = false;
+
   constructor(
     private _jobRepo: JobRepo,
     private _spinner: NgxSpinnerService,
@@ -50,29 +53,46 @@ export class OpsModuleStageManagementAddStagePopupComponent extends PopupBase im
   }
 
 
-  onChangeCheckBoxStage($event: any, stage: StageModel, index: number) {
-    $event.target.checked ? this.tempStages1.push(stage) : this.tempStages1.splice(index, 1);
+  onChangeCheckBoxStage() {
+    this.isMasterStageNotAssigned = this.stages.every((item: any) => item.isSelected);
+    this.tempStages1 = this.getStageSelected(this.stages);
   }
 
-  onChangeCheckBoxStageSelected($event: any, stage: StageModel, index: number) {
-    $event.target.checked ? this.tempStages2.push(stage) : this.tempStages2.splice(index, 1);
+  onChangeCheckBoxStageSelected() {
+    this.isMasterStageSelected = this.selectedStages.every((item: any) => item.isSelected);
+    this.tempStages2 = this.getStageSelected(this.selectedStages);
   }
 
   onAddStage() {
+    for (const stage of this.tempStages1) {
+      stage.isSelected = false;
+    }
     this.selectedStages.push(...this.tempStages1);
+
     this.stages = this.stages.filter(
       (stage: any) => !_.includes(this.selectedStages, stage)
     );
 
+    if (!this.stages.length) {
+      this.isMasterStageNotAssigned = false;
+    }
     this.tempStages1 = [];
   }
 
   onRemoveStage() {
+    // map all stage was to not selected
+    for (const stage of this.tempStages2) {
+      stage.isSelected = false;
+    }
     this.stages.push(...this.tempStages2);
-
+    
     this.selectedStages = this.selectedStages.filter(
       (stage: any) => !_.includes(this.stages, stage)
     );
+
+    if (!this.selectedStages.length) {
+      this.isMasterStageSelected = false;
+    }
 
     this.tempStages2 = [];
   }
@@ -109,6 +129,8 @@ export class OpsModuleStageManagementAddStagePopupComponent extends PopupBase im
     )
   }
 
+
+
   onCancel() {
     this.hide();
     this.onSuccess.emit();
@@ -119,6 +141,40 @@ export class OpsModuleStageManagementAddStagePopupComponent extends PopupBase im
     );
 
     this.tempStages2 = [];
+    this.isMasterStageSelected = false;
+    this.isMasterStageNotAssigned = false;
+  }
+
+  checkUncheckAllStage(type: string) {
+    switch (type) {
+      case 'stageNotAsigned': {
+        for (const stage of this.stages) {
+          stage.isSelected = this.isMasterStageNotAssigned;
+        }
+
+        this.tempStages1 = this.getStageSelected(this.stages);
+        break;
+      }
+      case 'stageSelected': {
+        for (const stage of this.selectedStages) {
+          stage.isSelected = this.isMasterStageSelected;
+        }
+
+        this.tempStages2 = this.getStageSelected(this.selectedStages);
+        break;
+      }
+    }
+  }
+
+  // get stage with isSelected : true
+  getStageSelected(stages: any[]): any[] {
+    const stageIsSelected: any[] = [];
+    for (const stage of stages) {
+      if (stage.isSelected) {
+        stageIsSelected.push(stage);
+      }
+    }
+    return stageIsSelected;
   }
 
   drop(event: CdkDragDrop<string[]>) {
