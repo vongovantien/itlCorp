@@ -28,7 +28,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
 
     deadLineDate: AbstractControl;
 
-    readonly statusStage: Array<any> = [
+    statusStage: Array<any> = [
         {
             id: "InSchedule",
             text: "In Schedule"
@@ -53,8 +53,8 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             id: "Deleted",
             text: "Deleted"
         }
-    ]
-    statusStageActive: any[] = [this.statusStage[0].id];
+    ];
+    statusStageActive: any[] = [this.statusStage[0]];
 
     systemUsers: User[] = [];
     selectedMainPersonInCharge: IPersonInCharge = null;
@@ -86,6 +86,35 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
 
     ngOnChanges() {
         if (!!this.data) {
+            this.statusStage = [
+                {
+                    id: "InSchedule",
+                    text: "In Schedule"
+                },
+                {
+                    id: "Processing",
+                    text: "Processing"
+                },
+                {
+                    id: "Done",
+                    text: "Done"
+                },
+                {
+                    id: "Overdued",
+                    text: "Overdued"
+                },
+                {
+                    id: "Pending",
+                    text: "Pending"
+                },
+                {
+                    id: "Deleted",
+                    text: "Deleted"
+                }
+            ];
+            console.log(this.statusStage);
+            this.statusStageActive = [this.statusStage[0]];
+
             this.initFormUpdate();
         }
     }
@@ -134,14 +163,15 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
         this.selectedRealPersonInCharge = Object.assign({}, { field: 'username', value: this.data.realPersonInCharge });
 
         if (!!this.data.status) {
-            this.statusStageActive = this.statusStage.filter((item: any) => item.id === (this.data.status) || ''.trim());
+            this.statusStageActive = this.statusStage.filter((item: any) => item.id.trim() === this.data.status.trim());
         } else {
             this.statusStageActive = [this.statusStage[0]];
         }
     }
 
     selected($event: any): void {
-        this.statusStageActive[0] = $event.id;
+        this.statusStageActive[0].id = $event.id;
+        this.statusStageActive[0].text = $event.text;
     }
 
     onSelectMainPersonIncharge($event: User) {

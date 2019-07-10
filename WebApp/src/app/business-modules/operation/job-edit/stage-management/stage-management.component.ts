@@ -134,6 +134,7 @@ export class OpsModuleStageManagementComponent extends AppPage {
     onSearching(keyword: string) {
         clearTimeout(this.timeOutSearch);
         this.timeOutSearch = setTimeout(() => {
+            this.stages = this.currentStages;
             if (keyword.length >= 3) {
                 this.stages = this.stages.filter((item: Stage) => {
                     if (!!item) {

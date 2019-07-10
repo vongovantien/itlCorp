@@ -20,14 +20,14 @@ export class Stage {
     status: string = '';
     userCreated: string = '';
     userModified: string = '';
-
     isSelected?: boolean = false;
+    doneDate: string = '';
     constructor(data?: any) {
-        let self = this;
-        _.forEach(data, (val, key) => {
-            if (self.hasOwnProperty(key)) {
-                self[key] = val;
-            }
-        });
-    }
+    let self = this;
+    _.forEach(data, (val, key) => {
+        if (self.hasOwnProperty(key)) {
+            self[key] = val;
+        }
+    });
+  }
 }
