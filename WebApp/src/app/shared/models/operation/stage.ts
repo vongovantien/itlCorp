@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 export class Stage {
     comment: string = '';
     createdDate: string = '';
-    deadline:string = '';
+    deadline: string = '';
     departmentName: string = '';
     description: string = '';
     id: string = '';
@@ -14,19 +14,20 @@ export class Stage {
     orderNumberProcessed: number = 0;
     processTime: number = 0;
     realPersonInCharge: string = '';
-    stageCode:string = '';
+    stageCode: string = '';
     stageId: number = 0;
     stageNameEN: string = '';
-    status:string = ''; 
+    status: string = '';
     userCreated: string = '';
     userModified: string = '';
 
- constructor(data?: any) {
-    let self = this;
-    _.forEach(data, (val, key) => {
-        if (self.hasOwnProperty(key)) {
-            self[key] = val;
-        }
-    });
-  }
+    isSelected?: boolean = false;
+    constructor(data?: any) {
+        let self = this;
+        _.forEach(data, (val, key) => {
+            if (self.hasOwnProperty(key)) {
+                self[key] = val;
+            }
+        });
+    }
 }
