@@ -37,10 +37,10 @@ export class BillingCustomDeclarationComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private sortService: SortService) { }
 
-  async ngOnInit() {
+  ngOnInit() {
     this.pager.currentPage = 1;
     this.pager.totalItems = 0;
-    await this.stateChecking();
+    this.stateChecking();
   }
 
   async getCustomClearanesOfJob(jobNo: string) {
@@ -54,20 +54,31 @@ export class BillingCustomDeclarationComponent implements OnInit {
     this.setPageMaster(this.pager);
   }
 
-  async stateChecking() {
+  stateChecking() {
     this.baseServices.spinnerShow();
-    setTimeout(() => {
-      this.baseServices.dataStorage.subscribe(data => {
-        if (data["CurrentOpsTransaction"] != null) {
-          this.currentJob = data["CurrentOpsTransaction"];
+    // setTimeout(() => {
+    //   this.baseServices.dataStorage.subscribe(data => {
+    //     if (data["CurrentOpsTransaction"] != null) {
+    //       this.currentJob = data["CurrentOpsTransaction"];
 
-          if (this.currentJob != null) {
-            this.getCustomClearanesOfJob(this.currentJob.jobNo);
-            this.getCustomClearancesNotImported();
-          }
+    //       if (this.currentJob != null) {
+    //         this.getCustomClearanesOfJob(this.currentJob.jobNo);
+    //         this.getCustomClearancesNotImported();
+    //       }
+    //     }
+    //   });
+    // }, 1000);
+
+    this.baseServices.dataStorage.subscribe(data => {
+      if (data["CurrentOpsTransaction"] != null) {
+        this.currentJob = data["CurrentOpsTransaction"];
+
+        if (this.currentJob != null) {
+          this.getCustomClearanesOfJob(this.currentJob.jobNo);
+          this.getCustomClearancesNotImported();
         }
-      });
-    }, 1000);
+      }
+    });
 
     this.baseServices.spinnerHide();
   }
