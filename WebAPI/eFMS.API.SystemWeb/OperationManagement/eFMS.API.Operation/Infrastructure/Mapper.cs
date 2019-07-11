@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using eFMS.API.Operation.DL.Models;
 using eFMS.API.Operation.Service.Models;
+using eFMS.API.Operation.Service.ViewModels;
 
 namespace eFMS.API.Operation.Infrastructure
 {

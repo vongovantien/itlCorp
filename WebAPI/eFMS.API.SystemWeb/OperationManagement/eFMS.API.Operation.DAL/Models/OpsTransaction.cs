@@ -34,6 +34,7 @@ namespace eFMS.API.Operation.Service.Models
         public int? SumContainers { get; set; }
         public int? SumPackages { get; set; }
         public short? PackageTypeId { get; set; }
+        public string CurrentStatus { get; set; }
         public string UserCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? CreatedDate { get; set; }

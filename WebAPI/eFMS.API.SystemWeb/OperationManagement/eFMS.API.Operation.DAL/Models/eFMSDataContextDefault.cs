@@ -34,7 +34,7 @@ namespace eFMS.API.Operation.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
             modelBuilder.Entity<CatCommodity>(entity =>
             {
@@ -246,6 +246,8 @@ namespace eFMS.API.Operation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.CurrentStatus).HasMaxLength(10);
 
                 entity.Property(e => e.CustomerId)
                     .HasColumnName("CustomerID")
