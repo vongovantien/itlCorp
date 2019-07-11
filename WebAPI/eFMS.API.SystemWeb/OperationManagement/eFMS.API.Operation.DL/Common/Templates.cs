@@ -15,5 +15,13 @@ namespace eFMS.API.Operation.DL.Common
                 public static string ListName = "Areas";
             }
         }
+
+        public struct OpsTransaction
+        {
+            public struct NameCaching
+            {
+                public static string ListName = "Areas";
+            }
+        }
     }
 }
