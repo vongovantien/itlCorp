@@ -1,0 +1,33 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace eFMS.API.Catalogue.DL.Models
+{
+    public class CatPlaceImportModel
+    {
+        public Guid Id { get; set; }
+        public string Code { get; set; }
+        public string NameVn { get; set; }
+        public string NameEn { get; set; }
+        public string DisplayName { get; set; }
+        public string Address { get; set; }
+        public Guid? DistrictId { get; set; }
+        public string DistrictName { get; set; }
+        public Guid? ProvinceId { get; set; }
+        public string ProvinceName { get; set; }
+        public short? CountryId { get; set; }
+        public string CountryName { get; set; }
+        public string AreaId { get; set; }
+        public string AreaName { get; set; }
+        public string LocalAreaId { get; set; }
+        public string ModeOfTransport { get; set; }
+        public string PlaceTypeId { get; set; }
+        public string Note { get; set; }
+        public bool? Inactive { get; set; }
+        public DateTime? InactiveOn { get; set; }
+        public bool IsValid { get; set; }
+        public string Status { get; set; }
+    }
+}

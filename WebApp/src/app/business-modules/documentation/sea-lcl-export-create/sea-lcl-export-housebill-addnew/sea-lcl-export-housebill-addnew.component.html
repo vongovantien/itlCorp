@@ -1,0 +1,1505 @@
+<!--begin:: subheader-->
+<div class="m-subheader">
+    <div class="d-flex align-items-center">
+        <div class="mr-auto">
+            <!--begin:: breadcrumbs-->
+            <app-breadcrumb></app-breadcrumb>
+            <!--end:: breadcrumbs-->
+        </div>
+        <div class="c-button-actions">
+            <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-list-alt"></i>
+                    <span>
+                        Preview
+                    </span>
+                </span>
+            </button>
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
+                data-target="#import-housebill-detail-modal">
+                <span>
+                    <i class="la la-search"></i>
+                    <span>
+                        import house bill detail
+                    </span>
+                </span>
+            </button>
+            <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-save"></i>
+                    <span>
+                        save
+                    </span>
+                </span>
+            </button>
+            <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
+                data-target="#confirm-cancel-create-housebill-modal">
+                <span>
+                    <i class="la la-ban"></i>
+                    <span>
+                        cancel
+                    </span>
+                </span>
+            </button>
+        </div>
+    </div>
+</div>
+<!--end:: subheader-->
+
+<!--begin::m-content-->
+<div class="m-content">
+    <!--begin:: m-portlet-->
+    <div class="m-portlet">
+        <div class="m-portlet__body">
+            <!--begin::Form-->
+            <div class="m-form m-form--state">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Master bill of lading <span class="m--font-danger">(*)</span>
+                            </label>
+                            <input type="text" required class="form-control m-input m-input--square"
+                                placeholder="Enter text" name="MasterBillOfLadingName">
+                            <div class="form-control-feedback" style="display: none">
+                                Master bill of lading is required !
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Customer (Payer) <span class="m--font-danger">(*)</span>
+                            </label>
+                            <div class="dropdown e--combogrid">
+                                <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
+                                    data-toggle="dropdown" placeholder="Please select">
+                                <div class="dropdown-menu e--combogrid-content">
+                                    <div class="tabel-wrapper table-fixed">
+                                        <div class="table-head-fixed">
+                                            <div class="table-filter-block">
+                                                <div class="search-field">
+                                                    <input class="form-control m-input m-input--square" type="text"
+                                                        placeholder="Search...">
+                                                    <i class="icon-search"></i>
+                                                </div>
+                                            </div>
+                                            <div class="table-header">
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="col-xs-2">Partner ID</th>
+                                                            <th class="col-xs-3">Name ABBR</th>
+                                                            <th class="col-xs-5">Name EN</th>
+                                                            <th class="col-xs-2">Tax Code</th>
+                                                        </tr>
+                                                    </thead>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="table-body-scroll">
+                                            <table class="table table-hover">
+                                                <tbody>
+                                                    <ng-container>
+                                                        <tr class="data-row">
+                                                            <td class="col-xs-2">item.id</td>
+                                                            <td class="col-xs-3">item.shortName</td>
+                                                            <td class="col-xs-5">item.partnerNameEn</td>
+                                                            <td class="col-xs-2">item.taxCode</td>
+                                                        </tr>
+                                                    </ng-container>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-control-feedback" style="display: none">
+                                Customer is required
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Saleman in charge
+                            </label>
+                            <!-- <ng-select [allowClear]="true" [items]="listSaleMan" [disabled]="disabled"
+                                (data)="refreshValue($event)" *ngIf="listSaleMan.length>0" (selected)="
+                                HouseBillWorking.saleManId=$event.id;
+                                extend_data.saleman_nameEn=$event.text" (removed)="HouseBillWorking.saleManId=null"
+                                [active]="customerSaleman==null?'':customerSaleman" (typed)="getListSaleman($event.text)"
+                                placeholder="Select option">
+                            </ng-select> -->
+                            <ng-select [allowClear]="false" [items]="items" [disabled]="disabled"
+                                (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
+                                (typed)="typed($event)" placeholder="Select option">
+                            </ng-select>
+                        </div>
+                    </div>
+                </div>
+                <div class="div-inside bg-secondary">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Shipper <span class="m--font-danger">(*)</span>
+                                </label>
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please select">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="col-xs-2">Partner ID</th>
+                                                                <th class="col-xs-3">Name ABBR</th>
+                                                                <th class="col-xs-5">Name EN</th>
+                                                                <th class="col-xs-5">Tax Code</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <ng-container>
+                                                            <tr class="data-row">
+                                                                <td class="col-xs-2">item.id</td>
+                                                                <td class="col-xs-3">item.shortName</td>
+                                                                <td class="col-xs-5">item.partnerNameEn</td>
+                                                                <td class="col-xs-2">item.taxCode</td>
+                                                            </tr>
+                                                        </ng-container>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <textarea class="form-control m-input--square" id="" name="shipperDescription"
+                                    rows="3"></textarea>
+                                <div class="form-control-feedback" style="display: none">
+                                    Shipper is required
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Consignee <span class="m--font-danger">(*)</span>
+                                </label>
+                                <div class="dropdown e--combogrid" #selectedConsignee>
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please select">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="col-xs-2">Partner ID</th>
+                                                                <th class="col-xs-3">Name ABBR</th>
+                                                                <th class="col-xs-5">Name EN</th>
+                                                                <th class="col-xs-5">Tax Code</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <ng-container>
+                                                            <tr class="data-row">
+                                                                <td class="col-xs-2">item.id</td>
+                                                                <td class="col-xs-3">item.shortName</td>
+                                                                <td class="col-xs-5">item.partnerNameEn</td>
+                                                                <td class="col-xs-2">item.taxCode</td>
+                                                            </tr>
+                                                        </ng-container>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <textarea class="form-control m-input--square" id="" name="consigneeDescription"
+                                    rows="3"></textarea>
+                                <div class="form-control-feedback" style="display: none">
+                                    Consignee is required
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Notify party
+                                </label>
+                                <div class="dropdown e--combogrid" #selectedPartner>
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please select">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="col-xs-2">Partner ID</th>
+                                                                <th class="col-xs-3">Name ABBR</th>
+                                                                <th class="col-xs-5">Name EN</th>
+                                                                <th class="col-xs-5">Tax Code</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <ng-container>
+                                                            <tr class="data-row">
+                                                                <td class="col-xs-2">item.id</td>
+                                                                <td class="col-xs-3">item.shortName</td>
+                                                                <td class="col-xs-5">item.partnerNameEn</td>
+                                                                <td class="col-xs-2">item.taxCode</td>
+                                                            </tr>
+                                                        </ng-container>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <textarea class="form-control m-input--square" id="" name="notifyPartyDescription" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    House bill of lading no. <span class="m--font-danger">(*)</span>
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square"
+                                    placeholder="Enter text">
+                                <div class="form-control-feedback" style="display: none">
+                                    House bill of lading no is required
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    House bill of lading type <span class="m--font-danger">(*)</span>
+                                </label>
+                                <!-- <ng-select [allowClear]="true" [items]="listHouseBillLadingType"
+                                    [disabled]="disabled" (data)="refreshValue($event)"
+                                    (selected)="HouseBillWorking.hbltype=$event.id"
+                                    (removed)="HouseBillWorking.hbltype=null" (typed)="typed($event)"
+                                    placeholder="Select option">
+                                </ng-select> -->
+                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
+                                    (data)="refreshValue($event)" (selected)="selected($event)"
+                                    (removed)="removed($event)" (typed)="typed($event)" placeholder="Select option">
+                                </ng-select>
+                                <div class="form-control-feedback" style="display: none">
+                                    House bill of lading type is required
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Booking no.
+                                </label>
+                                <input type="text" required name="BookingNoName" class="form-control m-input m-input--square" placeholder="Enter text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Local vessel & voy no.
+                                </label>
+                                <input type="text" name="LocalVesselAndVoyNoName"
+                                    class="form-control m-input m-input--square" placeholder="Enter text">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Ocean vessel & voy no. <span class="m--font-danger">(*)</span>
+                                </label>
+                                <input type="text" required name="OceanVesselAndVoyNoName"
+                                    class="form-control m-input m-input--square" placeholder="Enter text">
+                                <div class="form-control-feedback" style="display: none">
+                                    Ocean vessel & voy no is required
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Point of country origin
+                                </label>
+
+                                <div class="dropdown e--combogrid" #selectedCountry>
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please select">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="col-xs-2">Country Code</th>
+                                                                <th class="col-xs-5">Name EN</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <ng-container>
+                                                            <tr class="data-row">
+                                                                <td class="col-xs-2">item.code</td>
+                                                                <td class="col-xs-5">item.nameEn</td>
+                                                            </tr>
+                                                        </ng-container>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Place of receipt <span class="m--font-danger">(*)</span>
+                                </label>
+
+                                <input type="text" name="PlaceOfReceipt" class="form-control m-input m-input--square"
+                                    placeholder="Enter text">
+                                <div class="form-control-feedback" style="display: none">
+                                    Place of receipt is required
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Port of loading <span class="m--font-danger">(*)</span>
+                                </label>
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please select">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="col-xs-2">Port Code</th>
+                                                                <th class="col-xs-2">Port Name</th>
+                                                                <th class="col-xs-5">Country</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <ng-container>
+                                                            <tr class="data-row">
+                                                                <td class="col-xs-2">item.code</td>
+                                                                <td class="col-xs-5">item.nameEN</td>
+                                                                <td class="col-xs-5">item.countryName</td>
+                                                            </tr>
+                                                        </ng-container>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-control-feedback" style="display: none">
+                                    Port of loading is required
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Port of discharge <span class="m--font-danger">(*)</span>
+                                </label>
+
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please select">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="col-xs-2">Port Code</th>
+                                                                <th class="col-xs-2">Port Name</th>
+                                                                <th class="col-xs-5">Country</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <ng-container>
+                                                            <tr class="data-row">
+                                                                <td class="col-xs-2">item.code</td>
+                                                                <td class="col-xs-5">item.nameEN</td>
+                                                                <td class="col-xs-5">item.countryName</td>
+                                                            </tr>
+                                                        </ng-container>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-control-feedback" style="display: none">
+                                    Port of discharge is required
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Place of delivery
+                                </label>
+                                <input type="text" name="PlaceOfDelivery" class="form-control m-input m-input--square"
+                                    placeholder="Enter text">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Final destination
+                                </label>
+                                <input type="text" name="FinalDestination" class="form-control m-input m-input--square"
+                                    placeholder="Enter text">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Freight payment <span class="m--font-danger">(*)</span>
+                                </label>
+                                <!-- <ng-select [allowClear]="true" [items]="listFreightPayment" [disabled]="disabled"
+                                    (data)="refreshValue($event)"
+                                    (selected)="HouseBillWorking.freightPayment=$event.id; HouseBillWorking.placeFreightPay = $event.id==='Prepaid'?'Origin':'Destination'"
+                                    (removed)="HouseBillWorking.freightPayment=null" (typed)="typed($event)"
+                                    placeholder="Select option">
+                                </ng-select> -->
+                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
+                                    (data)="refreshValue($event)" (selected)="selected($event)"
+                                    (removed)="removed($event)" (typed)="typed($event)" placeholder="Select option">
+                                </ng-select>
+                                <div class="form-control-feedback" style="display: none">
+                                    Freight payment is required
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Closing date
+                                </label>
+                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [autoApply]="true"
+                                        [(ngModel)]="selected" [maxDate]="maxDate" [singleDatePicker]="true"
+                                        name="closingDateName" placeholder="Select date" readonly />
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Sailling date <span class="m--font-danger">(*)</span>
+                                </label>
+                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}" [autoApply]="true"
+                                        [(ngModel)]="selected" [maxDate]="maxDate" [singleDatePicker]="true"
+                                        name="sailingDateName" placeholder="Select date" readonly />
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                    <div class="form-control-feedback" style="display: none">
+                                        Sailing date is required
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Freight payable at <span class="m--font-danger">(*)</span>
+                                </label>
+                                <input type="text" required name="FreightPayableAtName"
+                                    class="form-control m-input m-input--square" placeholder="Enter text">
+                                <div class="form-control-feedback" style="display: none">
+                                    Freight payable at is required
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="div-inside bg-secondary">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Forwarding agent
+                                </label>
+
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please select">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="col-xs-2">Partner ID</th>
+                                                                <th class="col-xs-2">Name ABBR</th>
+                                                                <th class="col-xs-5">Name EN</th>
+                                                                <th class="col-xs-5">Tax Code</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <ng-container>
+                                                            <tr class="data-row">
+                                                                <td class="col-xs-2">item.id</td>
+                                                                <td class="col-xs-5">item.shortName</td>
+                                                                <td class="col-xs-5">item.partnerNameEn</td>
+                                                                <td class="col-xs-5">item.taxCode</td>
+                                                            </tr>
+                                                        </ng-container>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <textarea class="form-control m-input--square" id="" name="forwardingAgent"
+                                        rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Number of origin B/L
+                                        </label>
+                                        <!-- <ng-select [allowClear]="true" [items]="listNumberOfOriginBL"
+                                            [active]="HouseBillWorking.originBlnumber==null?'':[{'text':HouseBillWorking.originBlnumber,'id':HouseBillWorking.originBlnumber}]"
+                                            [disabled]="disabled" (data)="refreshValue($event)"
+                                            (selected)="HouseBillWorking.originBlnumber=$event.id"
+                                            (removed)="HouseBillWorking.originBlnumber=null" (typed)="typed($event)"
+                                            placeholder="Select option">
+                                        </ng-select> -->
+                                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
+                                            (data)="refreshValue($event)" (selected)="selected($event)"
+                                            (removed)="removed($event)" (typed)="typed($event)"
+                                            placeholder="Select option">
+                                        </ng-select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Place and date of issue H-B/L
+                                        </label>
+                                        <input type="text" name="ReferenceNo"
+                                            class="form-control m-input m-input--square" placeholder="Enter text">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Reference no.
+                                        </label>
+                                        <input type="text" name="ReferenceNo"
+                                            class="form-control m-input m-input--square" placeholder="Enter text">
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Export reference no.
+                                        </label>
+                                        <input type="text" name="ExportReferenceNo"
+                                            class="form-control m-input m-input--square" placeholder="Enter text">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Delivery of good
+                                </label>
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please select">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="col-xs-2">Partner ID</th>
+                                                                <th class="col-xs-2">Name ABBR</th>
+                                                                <th class="col-xs-5">Name EN</th>
+                                                                <th class="col-xs-5">Tax Code</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <ng-container>
+                                                            <tr class="data-row">
+                                                                <td class="col-xs-2">item.id</td>
+                                                                <td class="col-xs-5">item.shortName</td>
+                                                                <td class="col-xs-5">item.partnerNameEn</td>
+                                                                <td class="col-xs-5">item.taxCode</td>
+                                                            </tr>
+                                                        </ng-container>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <textarea class="form-control m-input--square" id="" name="goodsDeliveryDescription"
+                                    rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Type of move
+                                        </label>
+                                        <!-- <ng-select [allowClear]="true" [items]="listTypeOfMove"
+                                            [active]="HouseBillWorking.moveType==null?'':[{'text':HouseBillWorking.moveType,'id':HouseBillWorking.moveType}]"
+                                            [disabled]="disabled" (data)="refreshValue($event)"
+                                            (selected)="HouseBillWorking.moveType=$event.id"
+                                            (removed)="HouseBillWorking.moveType=null" (typed)="typed($event)"
+                                            placeholder="Select option">
+                                        </ng-select> -->
+                                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
+                                            (data)="refreshValue($event)" (selected)="selected($event)"
+                                            (removed)="removed($event)" (typed)="typed($event)"
+                                            placeholder="Select option">
+                                        </ng-select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Purchase order no.
+                                        </label>
+                                        <input type="text" name="PurchaseOrderNo"
+                                            class="form-control m-input m-input--square" placeholder="Enter text">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Type of sevice
+                                        </label>
+                                        <!-- <ng-select [allowClear]="true" [items]="listTypeOfService"
+                                            [active]="HouseBillWorking.serviceType==null?'':[{'text':HouseBillWorking.serviceType,'id':HouseBillWorking.serviceType}]"
+                                            [disabled]="disabled" (data)="refreshValue($event)"
+                                            (selected)="HouseBillWorking.serviceType=$event.id"
+                                            (removed)="HouseBillWorking.serviceType=null" (typed)="typed($event)"
+                                            placeholder="Select option">
+                                        </ng-select> -->
+                                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
+                                            (data)="refreshValue($event)" (selected)="selected($event)"
+                                            (removed)="removed($event)" (typed)="typed($event)"
+                                            placeholder="Select option">
+                                        </ng-select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="div-inside bg-secondary">
+                    <div class="row">
+                        <div class="col-6">
+                            <h3 class="c-block-title">
+                                HBL Good Summary
+                            </h3>
+                        </div>
+                        <div class="col-6 m--align-right">
+                            <button type="button"
+                                class="btn btn-sm btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                                <span>
+                                    <i class="la la-refresh"></i>
+                                    <span>
+                                        Reset
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="col-xl-8">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Container No/ Sea No/ Marks No
+                                        </label>
+                                        <textarea class="form-control m-input--square" name="" 
+                                            rows="3">ContNo_1/SealNo_1/MarkNo_1, ContNo_2/SealNo_2/MarkNo_2</textarea>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Container Qty
+                                        </label>
+                                        <textarea class="form-control m-input--square" name="" rows="3">Part of container-1, Part of container-2</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Commodities
+                                        </label>
+                                        <textarea class="form-control m-input--square" name="commodityHB" id=""
+                                            rows="3">Steel, Consumer Good, Drug, Weapon</textarea>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Description of good
+                                        </label>
+                                        <textarea class="form-control m-input--square" name="desOfGoodsHB" id=""
+                                            rows="3">Description-1, Description-2, Description-3, Description-4</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Packages Qty <span class="m--font-danger">(*)</span>
+                                </label>
+                                <div class="input-group m-input-group m-input-group--square">
+                                    <input type="text" class="form-control m-input" aria-label="">
+                                    <div class="input-group-prepend">
+                                        <ng-select 
+                                            [allowClear]="false" 
+                                            [items]="packagesUnit" 
+                                            [active]="packagesUnitActive"
+                                            [disabled]="disabled" 
+                                            (data)="refreshValue($event)"
+                                            (selected)="selected($event)" 
+                                            (removed)="removed($event)" 
+                                            (typed)="typed($event)"
+                                            placeholder="">
+                                        </ng-select>
+                                    </div>
+                                </div>
+                                <div class="form-control-feedback" style="display: none">
+                                    Packages Qty is required !
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Total Gross Weight (KGS) <span class="m--font-danger">(*)</span>
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" name="" placeholder="">
+                                <div class="form-control-feedback" style="display: none">
+                                    Total Gross Weight is required !
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Total Volume (CBM) <span class="m--font-danger">(*)</span>
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" name="" placeholder="">
+                                <div class="form-control-feedback" style="display: none">
+                                    Total Volume is required !
+                                </div>
+                            </div>
+                            <div class="m--margin-bottom-5 m--margin-top-5">
+                                <button type="button"
+                                    class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                    data-toggle="modal" data-target="#hbl-list-of-goods-modal">
+                                    <span>
+                                        <i class="la la-list"></i>
+                                        <span>
+                                            list of goods
+                                        </span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="div-inside bg-secondary">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Shipping mark
+                                </label>
+                                <textarea class="form-control m-input--square" id="" name="ShippingMark" rows="3"  placeholder="Enter text"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    In word
+                                </label>
+                                <textarea class="form-control m-input--square" id="" name="InWord" rows="3"  placeholder="Enter text"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    On board status
+                                </label>
+                                <textarea class="form-control m-input--square" id="" name="OnBoardStatus" rows="3"  placeholder="Enter text"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--end::Form-->
+        </div>
+    </div>
+    <!--end::m-portlet-->
+
+    <!--begin:: form-actions-->
+    <div class="form-actions m--align-right">
+        <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+            <span>
+                <i class="la la la-save"></i>
+                <span>
+                    save
+                </span>
+            </span>
+        </button>
+        <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
+            data-target="#confirm-cancel-create-housebill-modal">
+            <span>
+                <i class="la la-ban"></i>
+                <span>
+                    cancel
+                </span>
+            </span>
+        </button>
+    </div>
+    <!--end:: form-actions-->
+
+</div>
+<!--end::m-content-->
+
+<!--begin::confirm-cancel-create-housebill-modal-->
+<div class="modal fade" id="confirm-cancel-create-housebill-modal" data-backdrop="static" role="dialog"
+    aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cancel</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-text-block">
+                    <span>All entered data will be discarded. <br> Are you sure you want to leave?</span>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    data-dismiss="modal" routerLink="/home/documentation/sea-lcl-export">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Yes
+                        </span>
+                    </span>
+                </button>
+                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            No
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::confirm-cancel-create-housebill-modal-->
+
+<!--begin::hbl-list-of-goods-modal-->
+<div class="modal fade" id="hbl-list-of-goods-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <form novalidate #containerListForm="ngForm" (ngSubmit)="containerListForm.form.valid">
+            <div class="modal-content m-form m-form--state">
+                <div class="modal-header">
+                    <h5 class="modal-title">Container List Module</h5>
+                    
+                    <button type="button" class="close" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>    
+                </div>
+                <div class="modal-body">
+
+                    <div class="container-list-table">
+                        <!--begin: Search Form -->
+                        <div class="m-form m-form--label-align-right m--margin-bottom-10">
+                            <div class="row align-items-center">
+                                <div class="col-lg-4 order-2 order-lg-1">
+                                    <div class="form-group">
+                                        <div class="m-input-icon m-input-icon--left">
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                placeholder="Search...">
+                                            <span class="m-input-icon__icon m-input-icon__icon--left">
+                                                <span>
+                                                    <i class="la la-search"></i>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
+                                    <button type="button"
+                                        class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                                        <span>
+                                            <i class="la la-download"></i>
+                                            <span>
+                                                import
+                                            </span>
+                                        </span>
+                                    </button>
+                                    <button type="button"
+                                        class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                                        <span>
+                                            <i class="la la-plus"></i>
+                                            <span>
+                                                add container
+                                            </span>
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <!--end: Search Form -->
+                        <!--begin: Datatable -->
+                        <div class="table-wrapper" id="" style="min-height: 300px">
+                            <table class="table table-striped table-brand table-editable">
+                                <thead class="">
+                                    <tr class="">
+                                        <th class="fixed-side"></th>
+                                        <th class="">
+                                            <span>
+                                                Cont Type
+                                            </span>
+                                        </th>
+                                        <th class="">
+                                            <span>
+                                                Cont Q'ty
+                                            </span>
+                                        </th>
+                                        <th class="">
+                                            <span>
+                                                Cont No.
+                                            </span>
+                                        </th>
+                                        <th class="">
+                                            <span>
+                                                Seal No.
+                                            </span>
+                                        </th>
+                                        <th class="">
+                                            <span>
+                                                Mark No.
+                                            </span>
+                                        </th>
+                                        <th class="">
+                                            <span>
+                                                Commodity
+                                            </span>
+                                        </th>
+                                        <th class="">
+                                            <span>
+                                                Package Type
+                                            </span>
+                                        </th>
+                                        <th class="">
+                                            <span>
+                                                Package Q'ty
+                                            </span>
+                                        </th>
+                                        <th class="">
+                                            <span>
+                                                Description of Good
+                                            </span>
+                                        </th>
+                                        <th class="">
+                                            <span>
+                                                G.W
+                                            </span>
+                                        </th>
+                                        <th class="">
+                                            <span>
+                                                CBM
+                                            </span>
+                                        </th>
+                                    </tr>
+                                </thead>
+
+
+                                <tbody id="hb-containers-list">
+                                    <ng-container>
+                                        <tr class="m-form m-form--state row-editing">
+                                            <td class="table-actions-col fixed-side">
+                                                <div class="table-actions control-editable" style="width: 70px">
+                                                    <button type="submit"
+                                                        class="btn btn-primary btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Save">
+                                                        <i class="la la-save"></i>
+                                                    </button>
+                                                    <button type="button"
+                                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Cancel">
+                                                        <i class="la la-ban"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    Cont Type <span class="m--font-danger">(*)</span>
+                                                </span>
+                                                <div class="control-editable">
+                                                    <!-- <ng-select [allowClear]="true" [items]="containerTypes"
+                                                        [disabled]="disabled" (data)="refreshValue($event)"
+                                                        (selected)="container.containerTypeId = $event.id;container.containerTypeName = $event.text"
+                                                        (removed)="container.containerTypeId = null;container.containerTypeName = null"
+                                                        (typed)="typed($event)" [active]="container.containerTypeActive"
+                                                        placeholder="Select filter">
+                                                    </ng-select> -->
+                                                    <ng-select 
+                                                        [allowClear]="true" 
+                                                        [items]="items" 
+                                                        [disabled]="disabled" 
+                                                        (data)="refreshValue($event)"
+                                                        (selected)="selected($event)" 
+                                                        (removed)="removed($event)" 
+                                                        (typed)="typed($event)"
+                                                        placeholder="Select filter">
+                                                    </ng-select>
+                                                    <div class="form-control-feedback" style="display: none">
+                                                        Container type is required.
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    Cont Q'ty
+                                                </span>
+                                                <div class="control-editable">
+                                                    <input type="number" class="form-control m-input m-input--square"
+                                                        min="1" value="1"
+                                                        placeholder="Please enter"
+                                                        name="conQuantity" required>
+                                                    <div class="form-control-feedback" style="display: none">
+                                                        Cont Q'ty must be a number
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    Cont No.
+                                                </span>
+                                                <div class="control-editable">
+                                                    <input type="text" class="form-control m-input m-input--square"
+                                                        placeholder="Please enter" autocomplete="nope"
+                                                        name="containerNo">
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    Seal No.
+                                                </span>
+                                                <div class="control-editable">
+                                                    <input type="text" class="form-control m-input m-input--square"
+                                                        placeholder="Please enter" autocomplete="nope"
+                                                        name="sealNo">
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    Mark No.
+                                                </span>
+                                                <div class="control-editable">
+                                                    <input type="text" class="form-control m-input m-input--square"
+                                                        placeholder="Please enter" autocomplete="nope"
+                                                        name="markNo">
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    Commodity
+                                                </span>
+                                                <div class="control-editable">
+                                                    <div class="dropdown e--combogrid">
+                                                        <input
+                                                            class="form-control m-input m-input--square dropdown-toggle"
+                                                            type="text" readonly data-toggle="dropdown"
+                                                            placeholder="Please selected">
+                                                        <div
+                                                            class="dropdown-menu  dropdown-menu-right e--combogrid-content">
+                                                            <div class="tabel-wrapper table-fixed">
+                                                                <div class="table-head-fixed">
+                                                                    <div class="table-filter-block">
+                                                                        <div class="search-field">
+                                                                            <input class="form-control m-input m-input--square"
+                                                                                type="text" placeholder="Search...">
+                                                                            <i class="icon-search"></i>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="table-header">
+                                                                        <table class="table table-hover">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th>Name EN</th>
+                                                                                    <th>Name VN</th>
+                                                                                    <th>Group</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="table-body-scroll">
+                                                                    <table class="table table-hover">
+                                                                        <tbody>
+                                                                            <tr class="data-row"
+                                                                                data-id="">
+                                                                                <td>commodity.commodityNameEn</td>
+                                                                                <td>commodity.commodityNameVn</td>
+                                                                                <td>commodity.commonityGroupNameEn
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    Package Type
+                                                </span>
+                                                <div class="control-editable">
+                                                    <!-- <ng-select [allowClear]="true" [items]="packageTypes"
+                                                        [disabled]="disabled" (data)="refreshValue($event)"
+                                                        (selected)="container.packageTypeId = $event.id; container.packageTypeName = $event.text"
+                                                        (removed)="container.packageTypeId = null; container.packageTypeName = null"
+                                                        (typed)="typed($event)" [active]="container.packageTypeActive"
+                                                        placeholder="Select filter">
+                                                    </ng-select> -->
+                                                    <ng-select 
+                                                        [allowClear]="true" 
+                                                        [items]="items" 
+                                                        [disabled]="disabled" 
+                                                        (data)="refreshValue($event)"
+                                                        (selected)="selected($event)" 
+                                                        (removed)="removed($event)" 
+                                                        (typed)="typed($event)"
+                                                        placeholder="Select filter">
+                                                    </ng-select>
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    Package Q'ty
+                                                </span>
+                                                <div class="control-editable">
+                                                    <input type="number" class="form-control m-input m-input--square"
+                                                        min="1"
+                                                        name="packageQuantity" 
+                                                        placeholder="Please enter"
+                                                        autocomplete="nope">
+                                                </div>
+                                            </td>
+                                            <td class="" style="width: 130px">
+                                                <span class="content-editable">
+                                                    Description of Good dài thiệt là dài đó nha Tem Tem
+                                                </span>
+                                                <div class="control-editable">
+                                                    <input type="text" class="form-control m-input m-input--square"
+                                                        autocomplete="nope"
+                                                        name="descriptionOfGood"
+                                                        placeholder="Please enter">
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    G.W
+                                                </span>
+                                                <div class="control-editable">
+                                                    <input type="number" class="form-control m-input m-input--square"
+                                                        placeholder="Please enter" 
+                                                        autocomplete="nope"
+                                                        name="containerGW" 
+                                                        min="0.01">
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    CBM
+                                                </span>
+                                                <div class="control-editable">
+                                                    <input type="number" class="form-control m-input m-input--square"
+                                                        placeholder="Please enter" 
+                                                        autocomplete="nope"
+                                                        name="containerCBM" min="0.01">
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="">
+                                            <td class="table-actions-col fixed-side">
+                                                <div class="table-actions" style="width: 70px">
+                                                    <button type="button"
+                                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Edit">
+                                                        <i class="la la-edit"></i>
+                                                    </button>
+                                                    <button type="button"
+                                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Remove">
+                                                        <i class="la la-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    container.containerTypeName
+                                                </span>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    container.quantity
+                                                </span>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    container.containerNo
+                                                </span>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    container.sealNo
+                                                </span>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    container.markNo
+                                                </span>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    container.commodityName
+                                                </span>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    container.packageTypeName
+                                                </span>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    container.packageQuantity
+                                                </span>
+                                            </td>
+                                            <td class="" style="width: 130px">
+                                                <span class="content-editable">
+                                                    container.description
+                                                </span>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    container.gw | number: '1.2-2'
+                                                </span>
+                                            </td>
+                                            <td class="">
+                                                <span class="content-editable">
+                                                    container.cbm
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                    </ng-container>
+                                </tbody>
+
+
+                            </table>
+                        </div>
+                        <!--end: Datatable -->
+                    </div>
+
+                </div>
+                <div class="modal-footer m--align-center">
+                    <button type="submit"
+                        class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                        <span>
+                            <i class="la la-save"></i>
+                            <span>
+                                save
+                            </span>
+                        </span>
+                    </button>
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                        <span>
+                            <i class="la la-ban"></i>
+                            <span>
+                                cancel
+                            </span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!--end::hbl-list-of-goods-modal-->
+
+<!--begin::import-housebill-detail-modal-->
+<div class="modal fade" id="import-housebill-detail-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <app-sea-lcl-export-housebill-detail-import></app-sea-lcl-export-housebill-detail-import>
+</div>
+<!--end::import-housebill-detail-modal-->

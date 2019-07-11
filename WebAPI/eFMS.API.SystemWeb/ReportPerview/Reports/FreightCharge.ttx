@@ -1,0 +1,7 @@
+FreightCharges	String	255	
+RevenueTons	String	50	
+RateCharges	String	50	
+PerCharges	String	50	
+Collect	Boolean		
+FC	Boolean		
+Curr	String	50	

@@ -1,0 +1,159 @@
+<!--begin:: subheader-->
+<div class="m-subheader">
+    <div class="d-flex align-items-center">
+        <div class="mr-auto">
+            <!--begin:: breadcrumbs-->
+            <app-breadcrumb></app-breadcrumb>
+            <!--end:: breadcrumbs-->
+        </div>
+        <div class="c-button-actions">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
+              data-target="#edit-currency-modal" (click)="showAdd()">
+              <span>
+                  <i class="icon-plus7"></i>
+                  <span>
+                      add new
+                  </span>
+              </span>
+          </button>
+          <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" disabled>
+              <span>
+                  <i class="la la-download"></i>
+                  <span>
+                      import
+                  </span>
+              </span>
+          </button>
+          <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="export()">
+              <span>
+                  <i class="la la-upload"></i>
+                  <span>
+                      export
+                  </span>
+              </span>
+          </button>
+            <!-- <app-default-button [buttonSetting]="addButtonSetting" [dataTarget]="addButtonSetting.dataTarget" (click)="showAdd()"></app-default-button>
+            <app-default-button [buttonSetting]="importButtonSetting" (click)="import()"></app-default-button>           
+            <app-default-button [buttonSetting]="exportButtonSetting" (click)="export()"></app-default-button> -->
+           
+        </div>
+    </div>
+</div>
+<!--end:: subheader-->
+<!--begin::m-content of stage-management-->
+<div class="m-content">
+    <!--begin:: m-portlet of search-form-->
+    <div class="m-portlet">
+        <div class="m-portlet__body">
+            <!--begin::Form-->
+            <div class="m-form">
+                <app-search-options [configSearch]="configSearch" (search)="onSearch($event)" (reset_search)=resetSearch($event)></app-search-options>
+            </div>
+            <!--end::Form-->
+        </div>
+    </div>
+    <!--end::m-portlet of search-form-->
+    <!--begin:: m-portlet-->
+    <div class="m-portlet">
+        <div class="m-portlet__body">
+            <!--begin::Content-->
+            <!--begin: Datatable of port-index-list-table -->
+            <app-table-layout [records]="currencies" [settings]="currenciesSettings" (sortChange)="onSortChange($event)"
+                [nameEditModal]="'edit-currency-modal'" [keySort]="keySortDefault" (edit)="showDetail($event)" (delete)="showConfirmDelete($event)">
+            </app-table-layout>
+            <!--end: Datatable of port-index-list-table -->
+            <!--begin::pagination-->
+            <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)"></app-pagination>
+            <!--end::pagination-->
+            <!--end::Content-->
+        </div>
+    </div>
+    <!--end:: m-portlets-->
+</div>
+<!--end::m-content of stage-management-->
+
+<!--begin::add-unit-modal-->
+<div class="modal fade" id="edit-currency-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-xs" role="document">
+        <div class="modal-content">
+            <form name="formAddEdit" #formAddEdit="ngForm" novalidate (ngSubmit)="formAddEdit.form.valid">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" *ngIf="currency.id == null">Add currency</h5>
+                    <h5 class="modal-title" *ngIf="currency.id">Edit currency</h5>
+                    <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button> -->
+                    <app-close-modal-button></app-close-modal-button>
+                </div>
+                <div class="modal-body">
+                    <!--begin::add-stage-management-form-->
+                    <div class="m-form m-form--state">
+
+                        <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && currencyCode.invalid }">
+                            <label class="col-lg-4 col-form-label form-control-label">
+                                Currency Code <span class="m--font-danger">(*)</span>
+                            </label>
+                            <div class="col-lg-8">
+                                <input type="text" [(ngModel)]="currency.id" (change)="currency.id=currency.id.trim()"
+                                    class="form-control m-input m-input--square" [disabled]="!isAddnew" #currencyCode="ngModel"
+                                    name="currencyCode" required placeholder="Please enter currency code" name="currencyCode"
+                                    autocomplete="nope">
+                                <div class="form-control-feedback" *ngIf="formAddEdit.submitted && currencyCode.invalid">
+                                    Currency Code is required
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && currencyName.invalid }">
+                            <label class="col-lg-4 col-form-label form-control-label">
+                                Currency Name <span class="m--font-danger">(*)</span>
+                            </label>
+                            <div class="col-lg-8">
+                                <input type="text" [(ngModel)]="currency.currencyName" (change)="currency.currencyName=currency.currencyName.trim()"
+                                    class="form-control m-input m-input--square" #currencyName="ngModel" required
+                                    minlength="3" name="currencyName" placeholder="Please enter currency name"
+                                    autocomplete="nope">
+                                <div class="form-control-feedback" *ngIf="formAddEdit.submitted && currencyName.invalid">
+                                    Currency Name is required at least 3 characters
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row" *ngIf="isAddnew == false">
+                            <label class="col-lg-4 col-form-label form-control-label">
+                                IsDefault
+                            </label>
+                            <div class="col-lg-8">
+                                <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
+                                    <input [checked]="currency.isDefault" (change)="currency.isDefault=!currency.isDefault"
+                                        name="currencyIsDefault" type="checkbox"><span></span></label>
+                            </div>
+                        </div>
+                        <div class="form-group row" *ngIf="isAddnew == false">
+                            <label class="col-lg-4 col-form-label form-control-label">
+                                Inactive
+                            </label>
+                            <div class="col-lg-8">
+                                <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
+                                    <input [checked]="currency.inactive" (change)="currency.inactive=!currency.inactive"
+                                        name="currencyIsActive" type="checkbox"><span></span></label>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <!--end:add-stage-management-form -->
+                    <!-- (click)="add_stage()" -->
+                </div>
+
+                <div class="modal-footer m--align-center c-button-actions">
+                    <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button>
+                    <app-default-button [buttonSetting]="cancelButtonSetting" (click)="onCancel()"></app-default-button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--end::add-unit-modal-->
+<app-delete-confirm-modal (delete)="onDelete($event)" [title]="'You want to delete this currency'"></app-delete-confirm-modal>

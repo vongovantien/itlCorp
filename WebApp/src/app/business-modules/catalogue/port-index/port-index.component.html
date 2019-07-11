@@ -1,0 +1,175 @@
+<!--begin:: subheader-->
+<div class="m-subheader">
+    <div class="d-flex align-items-center">
+        <div class="mr-auto">
+            <!--begin:: breadcrumbs-->
+            <app-breadcrumb></app-breadcrumb>
+            <!--end:: breadcrumbs-->
+        </div>
+        <div class="c-button-actions">
+            <app-default-button [buttonSetting]="addButtonSetting" [dataTarget]="addButtonSetting.dataTarget" (click)="showAdd()"></app-default-button>
+            <app-default-button [buttonSetting]="importButtonSetting" [routerLink]="['/home/catalogue/port-index-import']"></app-default-button>
+            <app-default-button [buttonSetting]="exportButtonSetting" (click)="export()"></app-default-button>
+        </div>
+    </div>
+</div>
+<!--end:: subheader-->
+<!--begin::m-content of Port-index-->
+<div class="m-content">
+    <!--begin:: m-portlet of search-form-->
+    <div class="m-portlet">
+        <div class="m-portlet__body">
+            <!--begin::Form-->
+            <div class="m-form">
+                <app-search-options 
+                    [configSearch]="configSearch" 
+                    (search)="onSearch($event)" 
+                    (reset_search)=resetSearch($event)>
+                </app-search-options>
+            </div>
+            <!--end::Form-->
+        </div>
+    </div>
+    <!--end::m-portlet of search-form-->
+    <!--begin:: m-portlet of port-index-table-->
+    <div class="m-portlet">
+        <div class="m-portlet__body">
+            <!--begin: Datatable of port-index-list-table -->
+            <app-table-layout [records]="portIndexs" [settings]="portIndexSettings" (sortChange)="onSortChange($event)" [nameEditModal]="'edit-port-index-modal'"
+                (edit)="showDetail($event)" (delete)="showConfirmDelete($event)">
+            </app-table-layout>
+            <!--end: Datatable of port-index-list-table -->
+            <!--begin::pagination-->
+            
+            <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)"></app-pagination>
+            <!--end::pagination-->
+        </div>
+    </div>
+    <!--end:: m-portlet of port-index-table-->
+</div>
+<!--end::m-content of Port-index-->
+
+<!--begin::add-port-index-modal-->
+<div class="modal fade" *ngIf="portIndex" id="edit-port-index-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <form name="formAddEdit" #formAddEdit="ngForm" novalidate (ngSubmit)="formAddEdit.form.valid">
+                <div class="modal-header">
+                    <h5 class="modal-title" *ngIf="portIndex.id == null">Add Port Index</h5>
+                    <h5 class="modal-title" *ngIf="portIndex.id">Edit Port Index</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="onCancel()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!--begin::add-port-index-form-->
+                    <div class="m-form m-form--state">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && code.invalid }">
+                                    <label class="form-control-label">
+                                        Port code <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="text" class="form-control m-input" placeholder="Please enter detail" name="code" autocomplete="nope" minlength="3"
+                                        [(ngModel)]="portIndex.code" #code="ngModel" (change)="portIndex.code = portIndex.code.trim()" [attr.disabled]="portIndex.id ? '' : null"
+                                        [ngClass]="{ 'm-input--square': formAddEdit.submitted && code.invalid }" required>
+                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && code.invalid" >
+                                        Code is required least 3 characters
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && portIndexeNameEN.invalid }">
+                                    <label class="form-control-label">
+                                        Name(EN) <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="text" class="form-control m-input" placeholder="Please enter name" name="portIndexeNameEN" autocomplete="nope" minlength="3"
+                                        [(ngModel)]="portIndex.nameEn" #portIndexeNameEN="ngModel" (change)="portIndex.nameEn = portIndex.nameEn.trim()" [ngClass]="{ 'm-input--square': formAddEdit.submitted && portIndexeNameEN.invalid }" required >
+                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && portIndexeNameEN.invalid" >
+                                            Name(EN) is required least 3 characters
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && portIndexeNameLocal.invalid }">
+                                    <label class="form-control-label">
+                                        Name(Local) <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input type="text" class="form-control m-input" placeholder="Please enter name" name="portIndexeNameLocal" autocomplete="nope" minlength="3"
+                                        [(ngModel)]="portIndex.nameVn" #portIndexeNameLocal="ngModel" (change)="portIndex.nameVn = portIndex.nameVn.trim()" [ngClass]="{ 'm-input--square': formAddEdit.submitted && portIndexeNameLocal.invalid }" required >
+                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && portIndexeNameLocal.invalid" >
+                                        Name(Local) is required least 3 characters
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && portIndex.countryID == null }">
+                                    <label class="form-control-label">
+                                        Country <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="countries" (data)="refreshValue($event)" 
+                                        [active]="countryActive" (selected)="portIndex.countryID = $event.id" (removed)="portIndex.countryID = null" (typed)="typed($event)"
+                                        placeholder="Select country">
+                                    </ng-select>
+                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && portIndex.countryID == null" >
+                                        Country is required
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label">
+                                            Zone (Optional)
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="areas" (data)="refreshValue($event)" [active]="areaActive"
+                                        (selected)="portIndex.areaID = $event.id" (removed)="portIndex.areaID = null" (typed)="typed($event)"
+                                        placeholder="Select zone">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group"  [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && portIndex.modeOfTransport == null }">
+                                    <label class="form-control-label">
+                                        Mode <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="modes" (data)="refreshValue($event)" [active]="modeActive"
+                                        (selected)="portIndex.modeOfTransport = $event.id" (removed)="portIndex.modeOfTransport = null" (typed)="typed($event)"
+                                        placeholder="Select mode">
+                                    </ng-select>
+                                    <div class="form-control-feedback" *ngIf="formAddEdit.submitted && portIndex.modeOfTransport == null" >
+                                        Mode is required
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" *ngIf="portIndex.id">
+                            <div class="col-lg-4">
+                                <div class="form-group m-form__group">
+                                    <div>
+                                        <label class="m-checkbox m-checkbox--bold">
+                                            <input type="checkbox" [checked]="portIndex.inactive" (change)="portIndex.inactive = !portIndex.inactive">
+                                            Inactive
+                                            <span></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end:add-port-index-form -->
+                </div>
+                <div class="modal-footer m--align-center c-button-actions">
+                    <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button>
+                    <app-default-button [buttonSetting]="cancelButtonSetting" (click)="onCancel()"></app-default-button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--end::add-port-index-modal-->
+
+<!--begin::confirm-delete-modal-->
+<app-delete-confirm-modal (delete)="onDelete($event)" [title]="'You want to delete this port index'"></app-delete-confirm-modal>
+<!--end::confirm-delete-modal-->

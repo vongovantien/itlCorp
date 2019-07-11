@@ -1,0 +1,216 @@
+import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
+import { FormBuilder, FormGroup, AbstractControl, Validators } from "@angular/forms";
+
+import { PopupBase } from "src/app/modal.base";
+import { JobRepo, SystemRepo } from "src/app/shared/repositories";
+import { User, Stage } from "src/app/shared/models";
+
+import { takeUntil, catchError, finalize } from "rxjs/operators";
+import { ToastrService } from "ngx-toastr";
+import moment from "moment";
+
+@Component({
+    selector: "detail-stage-popup",
+    templateUrl: "./detail-stage-popup.component.html",
+    styleUrls: ['./detail-stage-popup.component.scss']
+})
+export class OpsModuleStageManagementDetailComponent extends PopupBase implements OnInit {
+
+    @Input() data: Stage = null;
+    @Output() onSuccess: EventEmitter<any> = new EventEmitter<any>();
+
+    form: FormGroup;
+    stageName: AbstractControl;
+    processTime: AbstractControl;
+    description: AbstractControl;
+    comment: AbstractControl;
+    departmentName: AbstractControl;
+
+    deadLineDate: AbstractControl;
+
+    statusStage: Array<any> = [
+        {
+            id: "InSchedule",
+            text: "In Schedule"
+        },
+        {
+            id: "Processing",
+            text: "Processing"
+        },
+        {
+            id: "Done",
+            text: "Done"
+        },
+        {
+            id: "Overdued",
+            text: "Overdued"
+        },
+        {
+            id: "Pending",
+            text: "Pending"
+        },
+        {
+            id: "Deleted",
+            text: "Deleted"
+        }
+    ]
+    statusStageActive: string[] = [this.statusStage[0].id];
+
+    systemUsers: User[] = [];
+    
+    mainPersonInCharge: string = '';
+    realPerSonInCharge: string = '';
+
+    //config for combo gird
+    configComboGrid: any = {
+        placeholder: 'Please select',
+        displayFields: [
+            { field: 'username', label: 'UserName' },
+            { field: 'employeeNameEn', label: 'FullName' },
+        ],
+        source: this.systemUsers,
+        selectedDisplayFields: ['username'],
+    }
+
+    isSummited: boolean = false;
+
+    constructor(
+        private _fb: FormBuilder,
+        private _jobRepo: JobRepo,
+        private _toaster: ToastrService,
+        private _systemRepo: SystemRepo
+    ) {
+        super();
+        this.initForm();
+    }
+
+    ngOnChanges() {
+        if (!!this.data) {
+            this.initFormUpdate();
+        }
+    }
+
+    ngOnInit() {
+        this.getListSystemUser();
+    }
+
+    initForm() {
+        this.form = this._fb.group({
+            'stageName': [{ value: '', disabled: true }, Validators.compose([
+                Validators.required,
+            ])],
+            'processTime': [, Validators.compose([
+                Validators.min(1)
+            ])],
+            'departmentName': [{ value: '', disabled: true }, Validators.compose([
+                Validators.required,
+            ])],
+            'description': [''],
+            'comment': [''],
+            'deadLineDate': [{
+                startDate: null,
+                endDate: null
+            }],
+        });
+        this.stageName = this.form.controls['stageName'];
+        this.processTime = this.form.controls['processTime'];
+        this.description = this.form.controls['description'];
+        this.comment = this.form.controls['comment'];
+        this.departmentName = this.form.controls['departmentName'];
+        this.deadLineDate = this.form.controls['deadLineDate'];
+    }
+
+    initFormUpdate() {
+        this.form.setValue({
+            stageName: this.data.stageNameEN,
+            comment: this.data.comment || '',
+            departmentName: this.data.departmentName,
+            description: this.data.description || '',
+            processTime: this.data.processTime,
+            deadLineDate: { startDate: moment(this.data.deadline || new Date()), endDate: moment(this.data.deadline || new Date()) }
+        });
+
+        this.mainPersonInCharge = this.data.mainPersonInCharge;
+        this.statusStageActive = this.statusStage.filter((item: any) => item.id === (this.data.status) || ''.trim());
+    }
+
+    selected($event: any): void {
+        this.statusStageActive[0] = $event.id;
+    }
+
+    onSelectMainPersonIncharge($event: User) {
+        this.mainPersonInCharge = $event.username;
+    }
+
+    onSelectRealPersonIncharge($event) {
+        this.realPerSonInCharge = $event.username;
+    }
+
+    refreshValue($event: any) {
+    }
+
+    onSubmit(form: FormGroup) {
+        this.isSummited = true;
+        if (!this.mainPersonInCharge) {
+            return;
+        } else {
+            const body = {
+                id: this.data.id,
+                jobId: this.data.jobId,
+                stageId: this.data.stageId,
+                name: this.data.name,
+                orderNumberProcessed: this.data.orderNumberProcessed,
+                mainPersonInCharge: this.mainPersonInCharge || "admin",
+                realPersonInCharge: this.realPerSonInCharge || "admin",
+                processTime: form.value.processTime,
+                comment: form.value.comment,
+                description: form.value.description,
+                deadline: moment(form.value.deadLineDate.startDate).format('YYYY-MM-DDTHH:mm'),
+                status: this.statusStageActive[0] || this.statusStage[0].id
+            };
+
+            this._jobRepo.updateStageToJob(body).pipe(
+                takeUntil(this.ngUnsubscribe),
+                catchError(this.catchError),
+                finalize(() => { }),
+            ).subscribe(
+                (res: any) => {
+                    if (!res.status) {
+                        this._toaster.error(res.message, '', { positionClass: 'toast-bottom-right' });
+                    } else {
+                        this.onSuccess.emit();
+                        this._toaster.success(res.message, '', { positionClass: 'toast-bottom-right' });
+                        this.hide();
+                    }
+                },
+                // error
+                (errs: any) => {
+                },
+                // complete
+                () => { }
+            )
+        }
+
+    }
+
+    getListSystemUser() {
+        this._systemRepo.getListSystemUser().pipe(
+            takeUntil(this.ngUnsubscribe),
+            catchError(this.catchError),
+            finalize(() => { }),
+        ).subscribe(
+            (res: any[]) => {
+                if (!res) {
+                } else {
+                    this.systemUsers = res.map((item: any) => new User(item));
+                    this.configComboGrid.source = this.systemUsers;
+                }
+            },
+            // error
+            (errs: any) => {
+            },
+            // complete
+            () => { }
+        )
+    }
+}

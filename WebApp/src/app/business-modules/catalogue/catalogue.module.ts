@@ -1,15 +1,77 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+import { SharedModule } from '../../shared/shared.module';
 import { CatalogueRoutingModule } from './catalogue-routing.module';
-import { CatalogueComponent } from './catalogue/catalogue.component';
+import { LocationComponent } from './location/location.component';
+import { WarehouseComponent } from './warehouse/warehouse.component';
+import { PortIndexComponent } from './port-index/port-index.component';
+import { CommodityComponent } from './commodity/commodity.component';
+import { ChargeComponent } from './charge/charge.component';
+import { UnitComponent } from './unit/unit.component';
+import { StageManagementComponent } from './stage-management/stage-management.component';
+import { PartnerComponent } from './partner-data/partner.component';
+import { SelectModule } from 'ng2-select';
+import { FormsModule} from '@angular/forms';
+import { PartnerDataAddnewComponent } from './partner-data-addnew/partner-data-addnew.component';
+import { PartnerDataDetailComponent } from './partner-data-detail/partner-data-detail.component';
+import { ChargeAddnewComponent } from './charge-addnew/charge-addnew.component';
+import { CustomerComponent } from './partner-data/customer/customer.component';
+import { AgentComponent } from './partner-data/agent/agent.component';
+import { CarrierComponent } from './partner-data/carrier/carrier.component';
+import { ConsigneeComponent } from './partner-data/consignee/consignee.component';
+import { AirShipSupComponent } from './partner-data/air-ship-sup/air-ship-sup.component';
+import { ShipperComponent } from './partner-data/shipper/shipper.component';
+import { AllPartnerComponent } from './partner-data/all/all-partner.component';
+import { CurrencyComponent } from './currency/currency.component';
+import { ChargeDetailsComponent } from './charge-details/charge-details.component';
+import { WarehouseImportComponent } from './warehouse-import/warehouse-import.component';
+import { PortIndexImportComponent } from './port-index-import/port-index-import.component';
+import { LocationImportComponent } from './location-import/location-import.component';
+import { StageImportComponent } from './stage-import/stage-import.component';
+import { CommodityImportComponent } from './commodity-import/commodity-import.component';
+import { CommodityGroupImportComponent } from './commodity-group-import/commodity-group-import.component';
+import { PartnerDataImportComponent } from './partner-data-import/partner-data-import.component';
+import { ChargeImportComponent } from './charge-import/charge-import.component';
+import { ChargeImportAccountVoucherComponent } from './charge-import-account-voucher/charge-import-account-voucher.component';
+
 
 @NgModule({
   imports: [
     CommonModule,
-    CatalogueRoutingModule
-  ],
-  declarations: [CatalogueComponent],
-
+    CatalogueRoutingModule,
+    SharedModule,
+    FormsModule,
+    SelectModule],
+  declarations:
+    [LocationComponent,
+      WarehouseComponent,
+      PortIndexComponent,
+      CommodityComponent,
+      ChargeComponent,
+      UnitComponent,
+      StageManagementComponent,
+      PartnerComponent,
+      PartnerDataAddnewComponent,
+      PartnerDataDetailComponent,
+      ChargeAddnewComponent,
+      CustomerComponent,
+      AgentComponent,
+      CarrierComponent,
+      ConsigneeComponent,
+      AirShipSupComponent,
+      ShipperComponent,
+ 	    CurrencyComponent,
+      AllPartnerComponent,
+      ChargeDetailsComponent,
+      WarehouseImportComponent,
+      PortIndexImportComponent,
+      LocationImportComponent,
+      StageImportComponent,
+      CommodityImportComponent,
+      CommodityGroupImportComponent,
+      PartnerDataImportComponent,
+      ChargeImportComponent,
+      ChargeImportAccountVoucherComponent
+    ],
 })
 export class CatalogueModule { }
