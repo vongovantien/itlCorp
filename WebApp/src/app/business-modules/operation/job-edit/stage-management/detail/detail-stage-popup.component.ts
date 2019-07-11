@@ -112,7 +112,6 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
                     text: "Deleted"
                 }
             ];
-            console.log(this.statusStage);
             this.statusStageActive = [this.statusStage[0]];
 
             this.initFormUpdate();
@@ -159,7 +158,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             deadLineDate: { startDate: moment(this.data.deadline || new Date()), endDate: moment(this.data.deadline || new Date()) }
         });
 
-        this.selectedMainPersonInCharge = Object.assign({}, { field: 'username', value: this.data.mainPersonInCharge });       
+        this.selectedMainPersonInCharge = Object.assign({}, { field: 'username', value: this.data.mainPersonInCharge });
         this.selectedRealPersonInCharge = Object.assign({}, { field: 'username', value: this.data.realPersonInCharge });
 
         if (!!this.data.status) {
@@ -182,12 +181,14 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
         this.selectedRealPersonInCharge.value = $event.username;
     }
 
-    refreshValue($event: any) {
-    }
-
     onSubmit(form: FormGroup) {
         this.isSummited = true;
-        if (!this.selectedMainPersonInCharge.value) {
+
+        // validate before submit
+        if ((this.statusStageActive[0].id === 'Peding' || this.statusStageActive[0].id === "Deleted") && !form.value.comment) {
+            return;
+        }
+        if (!this.selectedMainPersonInCharge.value || this.selectedMainPersonInCharge.value === this.selectedRealPersonInCharge.value) {
             return;
         } else {
             const body = {
@@ -197,7 +198,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
                 name: this.data.name,
                 orderNumberProcessed: this.data.orderNumberProcessed,
                 mainPersonInCharge: this.selectedMainPersonInCharge.value || "admin",
-                realPersonInCharge: this.selectedRealPersonInCharge.value || "admin",
+                realPersonInCharge: this.selectedRealPersonInCharge.value,
                 processTime: form.value.processTime,
                 comment: form.value.comment,
                 description: form.value.description,
@@ -228,7 +229,6 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
                 }
             );
         }
-
     }
 
     getListSystemUser() {
