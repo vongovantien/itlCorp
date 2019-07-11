@@ -9,11 +9,15 @@ import { PartnerGroupEnum } from "src/app/shared/enums/partnerGroup.enum";
 import { NgForm } from "@angular/forms";
 import { Router } from "@angular/router";
 import { PlaceTypeEnum } from "src/app/shared/enums/placeType-enum";
+import { JobRepo } from "src/app/shared/repositories";
+import { PopupBase } from "src/app/modal.base";
+import { takeUntil, catchError, finalize } from "rxjs/operators";
+import { NgxSpinnerService } from "ngx-spinner";
 @Component({
   selector: "app-ops-module-billing-job-create",
   templateUrl: "./ops-module-billing-job-create.component.html"
 })
-export class OpsModuleBillingJobCreateComponent implements OnInit {
+export class OpsModuleBillingJobCreateComponent extends PopupBase implements OnInit {
   DataStorage: Object = null;
   productServices: any[] = [];
   serviceModes: any[] = [];
@@ -28,8 +32,11 @@ export class OpsModuleBillingJobCreateComponent implements OnInit {
   constructor(
     private baseServices: BaseService,
     private api_menu: API_MENU,
-    private router: Router
+    private router: Router,
+    private jobRepo: JobRepo,
+    private spinner: NgxSpinnerService,
   ) {
+    super();
     this.keepCalendarOpeningWithRange = true;
     this.selectedDate = Date.now();
     this.selectedRange = {
@@ -135,7 +142,7 @@ export class OpsModuleBillingJobCreateComponent implements OnInit {
     console.log(this.OpsTransactionToAdd);
     setTimeout(async () => {
       if (form.submitted) {
-        var error = $("#add-new-ops-job-form").find("div.has-danger");
+        const error = $("#add-new-ops-job-form").find("div.has-danger");
         if (error.length === 0) {
           this.OpsTransactionToAdd.serviceDate =
             this.OpsTransactionToAdd.serviceDate.startDate != null
@@ -143,19 +150,50 @@ export class OpsModuleBillingJobCreateComponent implements OnInit {
                 this.OpsTransactionToAdd.serviceDate.startDate
               )
               : null;
-          var res = await this.baseServices.postAsync(
-            this.api_menu.Documentation.Operation.addNew,
-            this.OpsTransactionToAdd
+          // var res = await this.baseServices.postAsync(
+          //   this.api_menu.Documentation.Operation.addNew,
+          //   this.OpsTransactionToAdd
+          // );
+          // var s = this.baseServices.post(this.api_menu.Documentation.Operation.addNew, this.OpsTransactionToAdd).toPromise();
+          // console.log(s);
+          this.jobRepo.addJob(this.OpsTransactionToAdd).pipe(
+            takeUntil(this.ngUnsubscribe),
+            catchError(this.catchError),
+            finalize(() => { this.spinner.hide(); })
+          ).subscribe(
+            (res: any[]) => {
+              console.log(res);
+            }
           );
-          if (res.status) {//job-edit/:id
-            console.log(res);
-            this.router.navigate([
-              "/home/operation/job-edit/", res.data
-            ]);
-            this.OpsTransactionToAdd = new OpsTransaction();
-            this.resetDisplay();
-            form.onReset();
-          }
+          // this._jobRepo.getDetailStageOfJob(id).pipe(
+          //   takeUntil(this.ngUnsubscribe),
+          //   catchError(this.catchError),
+          //   finalize(() => { this._spinner.hide() }),
+          // ).subscribe(
+          //   (res: any[]) => {
+          //     if (res instanceof Error) {
+
+          //     } else {
+          //       this.selectedStage = new Stage(res);
+          //       this.openPopupDetail();
+          //     }
+          //   },
+          //   // error
+          //   (errs: any) => {
+          //     // this.handleErrors(errs)
+          //   },
+          //   // complete
+          //   () => { }
+          // )
+          // if (res.status) {//job-edit/:id
+          //   console.log(res);
+          //   this.router.navigate([
+          //     "/home/operation/job-edit/", res.data
+          //   ]);
+          //   this.OpsTransactionToAdd = new OpsTransaction();
+          //   this.resetDisplay();
+          //   form.onReset();
+          // }
         }
       }
     }, 300);
