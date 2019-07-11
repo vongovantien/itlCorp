@@ -3,224 +3,37 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "eFMS-Web": {
+    "Fms-web-app": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
       "prefix": "app",
-      "schematics": {
-        "@schematics/angular:component": {
-          "styleext": "scss"
-        }
-      },
+      "schematics": {},
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/eFMS-Web",
+            "outputPath": "dist/Fms-web-app",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
-              "src/assets",
-              "src/manifest.json"
+              "src/assets"
             ],
             "styles": [
-              "src/assets/style-share/style.scss"
+              "src/styles.css",
+              "node_modules/bootstrap/dist/css/bootstrap.min.css"
             ],
-            "scripts": [
-              "node_modules/jquery/dist/jquery.min.js",
-              "src/assets/external-libraries/js/popper.min.js",
-              "node_modules/bootstrap/dist/js/bootstrap.min.js"
-            ],
-            "serviceWorker": true
+            "scripts": []
           },
           "configurations": {
-            "design": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.test.ts"
-                }
-              ]
-            },
-            "vi-dev": {
-              "fileReplacements": [
-                {
-                  "replace": "src/languages/language.en.ts",
-                  "with": "src/languages/language.vi.ts"
-                }
-              ]
-            },
-            "test": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.test.ts"
-                }
-              ]
-            },
-            "test-vi": {
-              "optimization": true,
-              "outputHashing": "none",
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": true,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
-              "baseHref": "/vi/",
-              "lazyModules": [
-                "src/app/business-modules/system/system.module",
-                "src/app/business-modules/catalogue/catalogue.module",
-                "src/app/business-modules/accounting/accounting.module",
-                "src/app/business-modules/documentation/documentation.module",
-                "src/app/business-modules/operation/operation.module",
-                "src/app/business-modules/report/report.module",
-                "src/app/business-modules/support/support.module",
-                "src/app/business-modules/tool-setting/tool.module",
-                "src/app/design-modules/design-modules.module"
-              ],
-              "outputPath": "dist/test/eFMS-vi/",
-              "i18nFile": "src/src/locale/messages.vi.xlf",
-              "i18nFormat": "xlf",
-              "i18nLocale": "vi",
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.test.ts"
-                },
-                {
-                  "replace": "src/languages/language.en.ts",
-                  "with": "src/languages/language.vi.ts"
-                }
-              ],
-              "serviceWorker": true
-            },
-            "staging-vi": {
-              "optimization": true,
-              "outputHashing": "none",
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": true,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
-              "baseHref": "/vi/",
-              "lazyModules": [
-                "src/app/business-modules/system/system.module",
-                "src/app/business-modules/catalogue/catalogue.module",
-                "src/app/business-modules/accounting/accounting.module",
-                "src/app/business-modules/documentation/documentation.module",
-                "src/app/business-modules/operation/operation.module",
-                "src/app/business-modules/report/report.module",
-                "src/app/business-modules/support/support.module",
-                "src/app/business-modules/tool-setting/tool.module",
-                "src/app/design-modules/design-modules.module"
-              ],
-              "outputPath": "dist/staging/eFMS-vi/",
-              "i18nFile": "src/src/locale/messages.vi.xlf",
-              "i18nFormat": "xlf",
-              "i18nLocale": "vi",
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.staging.ts"
-                },
-                {
-                  "replace": "src/languages/language.en.ts",
-                  "with": "src/languages/language.vi.ts"
-                }
-              ],
-              "serviceWorker": true
-            },
-            "test-en": {
-              "optimization": true,
-              "outputHashing": "none",
-              "sourceMap": false,
-              "extractCss": true,
-              "baseHref": "/en/",
-              "lazyModules": [
-                "src/app/business-modules/system/system.module",
-                "src/app/business-modules/catalogue/catalogue.module",
-                "src/app/business-modules/accounting/accounting.module",
-                "src/app/business-modules/documentation/documentation.module",
-                "src/app/business-modules/operation/operation.module",
-                "src/app/business-modules/report/report.module",
-                "src/app/business-modules/support/support.module",
-                "src/app/business-modules/tool-setting/tool.module",
-                "src/app/design-modules/design-modules.module"
-              ],
-              "namedChunks": true,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": true,
-              "buildOptimizer": true,
-              "outputPath": "dist/test/eFMS-en/",
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.test.ts"
-                }
-              ],
-              "serviceWorker": false,
-              "budgets": [
-                {
-                  "type": "bundle",
-                  "name": "vendor",
-                  "maximumWarning": "2mb",
-                  "maximumError": "5mb"
-                }
-              ]
-            },
-            "staging-en": {
-              "optimization": true,
-              "outputHashing": "none",
-              "sourceMap": false,
-              "extractCss": true,
-              "baseHref": "/en/",
-              "lazyModules": [
-                "src/app/business-modules/system/system.module",
-                "src/app/business-modules/catalogue/catalogue.module",
-                "src/app/business-modules/accounting/accounting.module",
-                "src/app/business-modules/documentation/documentation.module",
-                "src/app/business-modules/operation/operation.module",
-                "src/app/business-modules/report/report.module",
-                "src/app/business-modules/support/support.module",
-                "src/app/business-modules/tool-setting/tool.module",
-                "src/app/design-modules/design-modules.module"
-              ],
-              "namedChunks": true,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": true,
-              "buildOptimizer": true,
-              "outputPath": "dist/staging/eFMS-en/",
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.staging.ts"
-                }
-              ],
-              "serviceWorker": false,
-              "budgets": [
-                {
-                  "type": "bundle",
-                  "name": "vendor",
-                  "maximumWarning": "2mb",
-                  "maximumError": "5mb"
-                }
-              ]
-            },
             "production": {
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.test.ts"
+                  "with": "src/environments/environment.prod.ts"
                 }
               ],
               "optimization": true,
@@ -231,45 +44,25 @@
               "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
-              "buildOptimizer": true,
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "2mb",
-                  "maximumError": "5mb"
-                }
-              ],
-              "serviceWorker": true
+              "buildOptimizer": true
             }
           }
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "eFMS-Web:build"
+            "browserTarget": "Fms-web-app:build"
           },
           "configurations": {
-            "test": {
-              "browserTarget": "eFMS-Web:build:test"
-            },
-            "vi": {
-              "browserTarget": "eFMS-Web:build:vi"
-            },
-            "vi-dev": {
-              "browserTarget": "eFMS-Web:build:vi-dev"
-            },
-            "en": {
-              "browserTarget": "eFMS-Web:build:en"
-            },
-            "design": {
-              "browserTarget": "eFMS-Web:build:design"
+            "production": {
+              "browserTarget": "Fms-web-app:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "eFMS-Web:build"
+            "browserTarget": "Fms-web-app:build"
           }
         },
         "test": {
@@ -280,13 +73,12 @@
             "tsConfig": "src/tsconfig.spec.json",
             "karmaConfig": "src/karma.conf.js",
             "styles": [
-              "src/styles.sass"
+              "src/styles.css"
             ],
             "scripts": [],
             "assets": [
               "src/favicon.ico",
-              "src/assets",
-              "src/manifest.json"
+              "src/assets"
             ]
           }
         },
@@ -304,7 +96,7 @@
         }
       }
     },
-    "eFMS-Web-e2e": {
+    "Fms-web-app-e2e": {
       "root": "e2e/",
       "projectType": "application",
       "architect": {
@@ -312,11 +104,11 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "eFMS-Web:serve"
+            "devServerTarget": "Fms-web-app:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "eFMS-Web:serve:production"
+              "devServerTarget": "Fms-web-app:serve:production"
             }
           }
         },
@@ -332,5 +124,5 @@
       }
     }
   },
-  "defaultProject": "eFMS-Web"
+  "defaultProject": "Fms-web-app"
 }

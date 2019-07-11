@@ -1,15 +1,15 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { HomeComponent } from './home/home.component';
+import { SalesExecutiveComponent } from './sales-executive/sales-executive.component';
 
 const routes: Routes = [
   {
-    path:'home',
-    component:HomeComponent
+    path:'sales-executive',
+    component:SalesExecutiveComponent
   },
   {
     path:'',
-    redirectTo:'home',
+    redirectTo:'sales-executive',
     pathMatch:'full'
   }
 ];
@@ -18,4 +18,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class SystemRoutingModule { }
+export class SalesExecutiveRoutingModule { }

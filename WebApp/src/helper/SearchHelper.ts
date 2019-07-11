@@ -14,15 +14,15 @@ import * as lodash from 'lodash';
  * @param key_search 
  * @param condition 
  */
-export function PrepareListFieldSearch(current_list_fields_search = null, list_fields, key_search, condition) {
+export async function PrepareListFieldSearch(current_list_fields_search = null, list_fields, key_search, condition) {
 
     var list_fields_search: any[] = [];
     if (condition == 'and' || condition == 'AND') {
-        list_fields_search =  PrepareListFieldsSearchWithAndCondition(current_list_fields_search, list_fields, key_search);
+        list_fields_search = await PrepareListFieldsSearchWithAndCondition(current_list_fields_search, list_fields, key_search);
     }
 
     if (condition == 'or' || condition == 'OR') {
-        list_fields_search =  PrepareListFieldsSearchWithOrCondition(list_fields, key_search);
+        list_fields_search = await PrepareListFieldsSearchWithOrCondition(list_fields, key_search);
     }
 
     return list_fields_search;
@@ -35,13 +35,13 @@ export function PrepareListFieldSearch(current_list_fields_search = null, list_f
  * @param reference_source 
  * @param condition 
  */
-export function SearchEngine(list_keys_search: any[], reference_source: any[], condition) {
+export async function SearchEngine(list_keys_search: any[], reference_source: any[], condition) {
     var list_result: any[] = [];
     if (condition == 'and' || condition == 'AND') {
-        list_result =  SearchWithAndCondition(list_keys_search, reference_source);
+        list_result = await SearchWithAndCondition(list_keys_search, reference_source);
     }
     if (condition == 'or' || condition == 'OR') {
-        list_result =  SearchWithOrCondition(list_keys_search, reference_source);
+        list_result = await SearchWithOrCondition(list_keys_search, reference_source);
     }
 
     return list_result;
@@ -159,11 +159,13 @@ function PrepareListFieldsSearchWithAndCondition(current_list_fields_search, lis
             for (var i = 0; i < current_list_fields_search.length; i++) {
                 var obj_comp = Object.keys(current_list_fields_search[i])[0] === key;
                 if (obj_comp) {
+                    console.log(obj_comp);
                     index_existed = i;
                 }
             }
 
             if (index_existed != -1 && value != "") {
+                console.log(index_existed);
                 current_list_fields_search.splice(index_existed, 1, search_obj);
             }
             if (index_existed != -1 && value == "") {
