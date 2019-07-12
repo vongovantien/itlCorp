@@ -62,7 +62,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
 
 
     // config for combo gird
-    readonly configComboGrid: any = {
+    configComboGrid: Readonly<any> = {
         placeholder: 'Please select',
         displayFields: [
             { field: 'username', label: 'UserName' },
@@ -241,7 +241,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
                 if (!res) {
                 } else {
                     this.systemUsers = res.map((item: any) => new User(item));
-                    this.configComboGrid.source = this.systemUsers;
+                    Object.assign(this.configComboGrid, {source: this.systemUsers});
                 }
             },
             // error
