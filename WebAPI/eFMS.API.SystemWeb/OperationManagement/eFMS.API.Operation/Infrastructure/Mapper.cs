@@ -17,6 +17,7 @@ namespace eFMS.API.Operation.Infrastructure
             CreateMap<OpsStageAssignedEditModel, OpsStageAssignedModel>();
             CreateMap<SetEcusconnection, SetEcusConnectionModel>();
             CreateMap<CustomsDeclaration, CustomsDeclarationModel>();
+            CreateMap<CustomsDeclarationModel, CustomsDeclaration>();
         }
     }
 }
