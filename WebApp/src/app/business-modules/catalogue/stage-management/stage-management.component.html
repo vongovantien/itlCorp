@@ -10,13 +10,14 @@
             <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
                 data-target="#add-stage-management-modal">
                 <span>
-                    <i class="icon-plus7"></i>
+                    <i class="la la-plus"></i>
                     <span>
                         add new
                     </span>
                 </span>
             </button>
-            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" [routerLink]="['/home/catalogue/stage-import']" (click)="import()">
+            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                [routerLink]="['/home/catalogue/stage-import']" (click)="import()">
                 <span>
                     <i class="la la-download"></i>
                     <span>
@@ -52,24 +53,24 @@
                                     {{selected_filter}}
                                 </button>
                                 <div class="dropdown-menu">
-                                    <a class="dropdown-item active" (click)="select_filter('All',$event)" id="filter_all"
-                                        href="javascript:void(0)">
+                                    <a class="dropdown-item active" (click)="select_filter('All',$event)"
+                                        id="filter_all" href="javascript:void(0)">
                                         All
                                     </a>
                                     <a class="dropdown-item" (click)="select_filter('Stage ID',$event)" id="filter_id"
                                         href="javascript:void(0)">
                                         Stage ID
                                     </a>
-                                    <a class="dropdown-item" (click)="select_filter('Department',$event)" id="filter_role"
-                                        href="javascript:void(0)">
+                                    <a class="dropdown-item" (click)="select_filter('Department',$event)"
+                                        id="filter_role" href="javascript:void(0)">
                                         Department
                                     </a>
-                                    <a class="dropdown-item" (click)="select_filter('Name (EN)',$event)" id="filter_name_en"
-                                        href="javascript:void(0)">
+                                    <a class="dropdown-item" (click)="select_filter('Name (EN)',$event)"
+                                        id="filter_name_en" href="javascript:void(0)">
                                         Name (EN)
                                     </a>
-                                    <a class="dropdown-item" (click)="select_filter('Name (Local)',$event)" id="filter_name_vi"
-                                        href="javascript:void(0)">
+                                    <a class="dropdown-item" (click)="select_filter('Name (Local)',$event)"
+                                        id="filter_name_vi" href="javascript:void(0)">
                                         Name (Local)
                                     </a>
                                     <a class="dropdown-item" (click)="select_filter('Code',$event)" id="filter_type"
@@ -78,8 +79,8 @@
                                     </a>
                                 </div>
                             </div>
-                            <input type="text" class="form-control" aria-label="Text input with dropdown button" name="search_key"
-                                [(ngModel)]="search_key">
+                            <input type="text" class="form-control" aria-label="Text input with dropdown button"
+                                name="search_key" [(ngModel)]="search_key">
                             <div class="input-group-append">
                                 <button class="btn btn-primary" type="button" title="Search" (click)="search_stage()">
                                     <i class="la la-search"></i>
@@ -88,7 +89,8 @@
                         </div>
                     </div>
                     <div class="col-md-auto">
-                        <button type="reset" class="btn btn-block btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                        <button type="reset"
+                            class="btn btn-block btn-default m-btn--square m-btn--icon m-btn--uppercase"
                             (click)="reset_search()">
                             <span>
                                 <i class="la la-refresh"></i>
@@ -113,31 +115,38 @@
                     <thead>
                         <tr>
                             <th>Actions</th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'id'), 'sorting_desc': (!isDesc && sortKey == 'id') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'id'), 'sorting_desc': (!isDesc && sortKey == 'id') }"
                                 (click)="sort('id')">
                                 <span>Stage ID</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'deptName'), 'sorting_desc': (!isDesc && sortKey == 'deptName') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'deptName'), 'sorting_desc': (!isDesc && sortKey == 'deptName') }"
                                 (click)="sort('deptName')">
                                 <span>Department</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'code'), 'sorting_desc': (!isDesc && sortKey == 'code') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'code'), 'sorting_desc': (!isDesc && sortKey == 'code') }"
                                 (click)="sort('code')">
                                 <span>Code</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'stageNameVn'), 'sorting_desc': (!isDesc && sortKey == 'stageNameVn') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'stageNameVn'), 'sorting_desc': (!isDesc && sortKey == 'stageNameVn') }"
                                 (click)="sort('stageNameVn')">
                                 <span>Name (Local)</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'stageNameEn'), 'sorting_desc': (!isDesc && sortKey == 'stageNameEn') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'stageNameEn'), 'sorting_desc': (!isDesc && sortKey == 'stageNameEn') }"
                                 (click)="sort('stageNameEn')">
                                 <span>Name (EN)</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'descriptionVn'), 'sorting_desc': (!isDesc && sortKey == 'descriptionVn') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'descriptionVn'), 'sorting_desc': (!isDesc && sortKey == 'descriptionVn') }"
                                 (click)="sort('descriptionVn')">
                                 <span>Description (Local)</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'descriptionEn'), 'sorting_desc': (!isDesc && sortKey == 'descriptionEn') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'descriptionEn'), 'sorting_desc': (!isDesc && sortKey == 'descriptionEn') }"
                                 (click)="sort('descriptionEn')">
                                 <span>Description (EN)</span>
                             </th>
@@ -149,16 +158,18 @@
                     </thead>
                     <tbody *ngIf="ListStages">
                         <ng-container *ngIf="ListStages.length > 0; else norecord">
-                            
+
                             <tr *ngFor="let stage of ListStages;let i = index;">
                                 <td class="table-actions-col">
                                     <div class="table-actions" style="width: 70px">
-                                        <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        <button type="button"
+                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                             (click)="edit_stage(i,'confirm')" title="Edit stage" data-toggle="modal"
                                             data-target="#edit-stage-management-modal">
                                             <i class="la la-edit"></i>
                                         </button>
-                                        <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        <button type="button"
+                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                             (click)="remove_stage(i,'confirm')" title="Remove stage" data-toggle="modal"
                                             data-target="#confirm-delete-modal">
                                             <i class="la la-trash"></i>
@@ -245,24 +256,30 @@
                                     <input disabled type="text" class="form-control m-input m-input--square"
                                         [(ngModel)]="StageToAdd.id" name="id" placeholder="Please enter detail">
                                 </div> -->
-                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addStageForm.submitted && abbreviation.invalid }">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': addStageForm.submitted && abbreviation.invalid }">
                                     <label>
                                         Code <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <input type="text" required #abbreviation="ngModel" class="form-control m-input m-input--square"
-                                        [(ngModel)]="StageToAdd.code" name="abbreviation" placeholder="Please enter detail">
-                                    <div class="form-control-feedback" *ngIf="addStageForm.submitted && abbreviation.invalid">
+                                    <input type="text" required #abbreviation="ngModel"
+                                        class="form-control m-input m-input--square" [(ngModel)]="StageToAdd.code"
+                                        name="abbreviation" placeholder="Please enter detail">
+                                    <div class="form-control-feedback"
+                                        *ngIf="addStageForm.submitted && abbreviation.invalid">
                                         Code is required
                                     </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addStageForm.submitted && name.invalid }">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': addStageForm.submitted && name.invalid }">
                                     <label>
                                         Name (Local) <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <input type="text" required minlength="6" #name="ngModel" class="form-control m-input m-input--square"
-                                        [(ngModel)]="StageToAdd.stageNameVn" name="name" placeholder="Please enter detail">
+                                    <input type="text" required minlength="6" #name="ngModel"
+                                        class="form-control m-input m-input--square"
+                                        [(ngModel)]="StageToAdd.stageNameVn" name="name"
+                                        placeholder="Please enter detail">
                                     <!--  -->
                                     <div class="form-control-feedback" *ngIf="addStageForm.submitted && name.invalid">
                                         Name (Local) is required at least 6 characters
@@ -270,13 +287,17 @@
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addStageForm.submitted && name_en.invalid }">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': addStageForm.submitted && name_en.invalid }">
                                     <label>
                                         Name (EN) <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <input type="text" required minlength="6" #name_en="ngModel" class="form-control m-input m-input--square"
-                                        [(ngModel)]="StageToAdd.stageNameEn" name="name_en" placeholder="Please enter detail">
-                                    <div class="form-control-feedback" *ngIf="addStageForm.submitted && name_en.invalid">
+                                    <input type="text" required minlength="6" #name_en="ngModel"
+                                        class="form-control m-input m-input--square"
+                                        [(ngModel)]="StageToAdd.stageNameEn" name="name_en"
+                                        placeholder="Please enter detail">
+                                    <div class="form-control-feedback"
+                                        *ngIf="addStageForm.submitted && name_en.invalid">
                                         Name (EN) is required at least 6 characters
                                     </div>
                                 </div>
@@ -284,15 +305,18 @@
                         </div>
                         <div class="row">
                             <div class="col-lg-4">
-                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': addStageForm.submitted && StageToAdd.departmentId==null }">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': addStageForm.submitted && StageToAdd.departmentId==null }">
                                     <label>
                                         Department <span class="m--font-danger">(*)</span>
                                     </label>
                                     <ng-select [allowClear]="true" [items]="ListDepartment" *ngIf="resetNg2Select"
-                                        (data)="refreshValue($event)" (selected)="selected($event,'add')" (removed)="removed($event,'add')"
-                                        (typed)="typed($event)" placeholder="Select department">
+                                        (data)="refreshValue($event)" (selected)="selected($event,'add')"
+                                        (removed)="removed($event,'add')" (typed)="typed($event)"
+                                        placeholder="Select department">
                                     </ng-select>
-                                    <div class="form-control-feedback" *ngIf="addStageForm.submitted && StageToAdd.departmentId==null">
+                                    <div class="form-control-feedback"
+                                        *ngIf="addStageForm.submitted && StageToAdd.departmentId==null">
                                         Department is required
                                     </div>
                                     <!-- <input type="number" class="form-control m-input m-input--square" [(ngModel)]="StageToAdd.departmentId" name="role" placeholder="Please enter detail"> -->
@@ -305,8 +329,9 @@
                                     <label>
                                         Description (Local)
                                     </label>
-                                    <textarea class="form-control m-input m-input--square" [(ngModel)]="StageToAdd.descriptionVn"
-                                        name="description" placeholder="Please enter detail" rows="6"></textarea>
+                                    <textarea class="form-control m-input m-input--square"
+                                        [(ngModel)]="StageToAdd.descriptionVn" name="description"
+                                        placeholder="Please enter detail" rows="6"></textarea>
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -314,14 +339,16 @@
                                     <label>
                                         Description (EN)
                                     </label>
-                                    <textarea class="form-control m-input m-input--square" [(ngModel)]="StageToAdd.descriptionEn"
-                                        name="description_en" placeholder="Please enter detail" rows="6"></textarea>
+                                    <textarea class="form-control m-input m-input--square"
+                                        [(ngModel)]="StageToAdd.descriptionEn" name="description_en"
+                                        placeholder="Please enter detail" rows="6"></textarea>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer m--align-center c-button-actions">
-                        <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="add_stage(addStageForm,'yes')">
+                        <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                            (click)="add_stage(addStageForm,'yes')">
                             <span>
                                 <i class="la la-save"></i>
                                 <span>
@@ -329,7 +356,8 @@
                                 </span>
                             </span>
                         </button>
-                        <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="add_stage(addStageForm,'cancel')">
+                        <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase"
+                            (click)="add_stage(addStageForm,'cancel')">
                             <span>
                                 <i class="la la-ban"></i>
                                 <span>
@@ -349,8 +377,8 @@
 <!--end::add-stage-management-modal-->
 
 <!--begin::edit-stage-management-modal-->
-<div class="modal fade" id="edit-stage-management-modal" data-backdrop="static" role="dialog" aria-labelledby="" *ngIf="index_stage_edit!=null"
-    aria-hidden="true">
+<div class="modal fade" id="edit-stage-management-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    *ngIf="index_stage_edit!=null" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -373,40 +401,49 @@
                                         class="form-control m-input m-input--square" placeholder="Please enter detail"
                                         value="Stage ID">
                                 </div> -->
-                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': editStageForm.submitted && code_edt.invalid }">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': editStageForm.submitted && code_edt.invalid }">
                                     <label>
                                         Code <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="text" [(ngModel)]="ListStages[index_stage_edit].code" required
-                                        name="code_edit" #code_edt="ngModel" class="form-control m-input m-input--square"
-                                        placeholder="Please enter detail" value=" Code">
-                                    <div class="form-control-feedback" *ngIf="editStageForm.submitted && code_edt.invalid">
+                                        name="code_edit" #code_edt="ngModel"
+                                        class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                        value=" Code">
+                                    <div class="form-control-feedback"
+                                        *ngIf="editStageForm.submitted && code_edt.invalid">
                                         Code is required
                                     </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': editStageForm.submitted && name_local_edt.invalid }">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': editStageForm.submitted && name_local_edt.invalid }">
                                     <label>
                                         Name (Local) <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <input type="text" required minlength="6" #name_local_edt="ngModel" name="name_local_edt"
-                                        [(ngModel)]="ListStages[index_stage_edit].stageNameVn" class="form-control m-input m-input--square"
-                                        placeholder="Please enter detail" value="Name (VN)">
-                                    <div class="form-control-feedback" *ngIf="editStageForm.submitted && name_local_edt.invalid">
+                                    <input type="text" required minlength="6" #name_local_edt="ngModel"
+                                        name="name_local_edt" [(ngModel)]="ListStages[index_stage_edit].stageNameVn"
+                                        class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                        value="Name (VN)">
+                                    <div class="form-control-feedback"
+                                        *ngIf="editStageForm.submitted && name_local_edt.invalid">
                                         Name (Local) is required at least 6 characters
                                     </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <div class="form-group" [ngClass]="{ 'm-form__group has-danger': editStageForm.submitted && name_en_edt.invalid }">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': editStageForm.submitted && name_en_edt.invalid }">
                                     <label>
                                         Name (EN) <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <input type="text" [(ngModel)]="ListStages[index_stage_edit].stageNameEn"
-                                        required minlength="6" name="name_en_edt" #name_en_edt="ngModel" class="form-control m-input m-input--square"
-                                        placeholder="Please enter detail" value="Name (EN)">
-                                    <div class="form-control-feedback" *ngIf="editStageForm.submitted && name_en_edt.invalid">
+                                    <input type="text" [(ngModel)]="ListStages[index_stage_edit].stageNameEn" required
+                                        minlength="6" name="name_en_edt" #name_en_edt="ngModel"
+                                        class="form-control m-input m-input--square" placeholder="Please enter detail"
+                                        value="Name (EN)">
+                                    <div class="form-control-feedback"
+                                        *ngIf="editStageForm.submitted && name_en_edt.invalid">
                                         Name (EN) is required at least 6 characters
                                     </div>
                                 </div>
@@ -418,24 +455,27 @@
                                     <label>
                                         Department <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="ListDepartment" [active]="[ListDepartment[index_current_department]]"
+                                    <ng-select [allowClear]="true" [items]="ListDepartment"
+                                        [active]="[ListDepartment[index_current_department]]"
                                         (data)="refreshValue($event)" (selected)="selected($event,'edit')"
                                         *ngIf="resetNg2Select" (removed)="removed($event)" (typed)="typed($event)"
                                         placeholder="Select department">
                                     </ng-select>
-                                    <div class="form-control-feedback" *ngIf="editStageForm.submitted && this.ListStages[this.index_stage_edit].departmentId==null">
+                                    <div class="form-control-feedback"
+                                        *ngIf="editStageForm.submitted && this.ListStages[this.index_stage_edit].departmentId==null">
                                         Department is required
                                     </div>
                                     <!-- <input type="number" [(ngModel)]="ListStages[index_stage_edit].departmentId" class="form-control m-input m-input--square"
                                     placeholder="Please enter detail" value="Role"> -->
                                 </div>
-                                <div class="form-group row" >
+                                <div class="form-group row">
                                     <label class="col-lg-4 col-form-label form-control-label">
                                         Inactive
                                     </label>
                                     <div class="col-lg-8">
                                         <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
-                                            <input [checked]="ListStages[index_stage_edit].inactive" (change)="ListStages[index_stage_edit].inactive=!ListStages[index_stage_edit].inactive"
+                                            <input [checked]="ListStages[index_stage_edit].inactive"
+                                                (change)="ListStages[index_stage_edit].inactive=!ListStages[index_stage_edit].inactive"
                                                 name="stageIsActive" type="checkbox"><span></span></label>
                                     </div>
                                 </div>
@@ -446,7 +486,8 @@
                                     <label>
                                         Description (Local)
                                     </label>
-                                    <textarea name="des_local_edt" [(ngModel)]="ListStages[index_stage_edit].descriptionVn"
+                                    <textarea name="des_local_edt"
+                                        [(ngModel)]="ListStages[index_stage_edit].descriptionVn"
                                         class="form-control m-input m-input--square" placeholder="Please enter detail"
                                         rows="6">This is Description (VN)</textarea>
                                 </div>
@@ -472,7 +513,8 @@
                                     </span>
                                 </span>
                             </button>
-                            <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                            <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase"
+                                data-dismiss="modal">
                                 <span>
                                     <i class="la la-ban"></i>
                                     <span>
@@ -492,7 +534,8 @@
 <!--end::edit-stage-management-modal-->
 
 <!--begin::confirm-delete-modal-->
-<div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -507,8 +550,8 @@
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="remove_stage(-1,'yes')"
-                    data-dismiss="modal">
+                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)="remove_stage(-1,'yes')" data-dismiss="modal">
                     <span>
                         <i class="la la-save"></i>
                         <span>

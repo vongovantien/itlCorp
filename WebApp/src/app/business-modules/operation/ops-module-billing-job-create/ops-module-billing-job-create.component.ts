@@ -40,7 +40,6 @@ export class OpsModuleBillingJobCreateComponent extends PopupBase implements OnI
   ) {
     super();
     this.keepCalendarOpeningWithRange = true;
-    this.selectedDate = Date.now();
     this.selectedRange = {
       startDate: moment().startOf("month"),
       endDate: moment().endOf("month")
@@ -146,19 +145,7 @@ export class OpsModuleBillingJobCreateComponent extends PopupBase implements OnI
       if (form.submitted) {
         const error = $("#add-new-ops-job-form").find("div.has-danger");
         if (error.length === 0) {
-          // this.OpsTransactionToAdd.serviceDate =
-          //   this.OpsTransactionToAdd.serviceDate.startDate != null
-          //     ? dataHelper.dateTimeToUTC(
-          //       this.selectedDate.startDate
-          //     )
-          //     : null;
           this.OpsTransactionToAdd.serviceDate = this.selectedDate.startDate != null ? dataHelper.dateTimeToUTC(this.selectedDate.startDate) : null;
-          // var res = await this.baseServices.postAsync(
-          //   this.api_menu.Documentation.Operation.addNew,
-          //   this.OpsTransactionToAdd
-          // );
-          // var s = this.baseServices.post(this.api_menu.Documentation.Operation.addNew, this.OpsTransactionToAdd).toPromise();
-          // console.log(s);
           this.jobRepo.addJob(this.OpsTransactionToAdd).pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),

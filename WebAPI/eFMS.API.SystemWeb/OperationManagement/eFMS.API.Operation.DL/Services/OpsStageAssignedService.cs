@@ -177,7 +177,7 @@ namespace eFMS.API.Operation.DL.Services
                 assignedItem.StageNameEN = stage?.StageNameEn;
                 assignedItem.Status = assignedItem.Status?.Trim();
                 assignedItem.DepartmentName = stage == null? null: departments?.FirstOrDefault(x => x.Id == stage.DepartmentId)?.DeptName;
-                assignedItem.DoneDate = item.Status.Trim() == DataTypeEx.GetStageStatus(StageEnum.Done) ? item.ModifiedDate : null;
+                assignedItem.DoneDate = item.Status?.Trim() == DataTypeEx.GetStageStatus(StageEnum.Done) ? item.ModifiedDate : null;
                 results.Add(assignedItem);
             }
             return results;

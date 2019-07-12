@@ -622,8 +622,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             } else {
                 this.BuyingRateChargeToEdit.total = this.BuyingRateChargeToEdit.quantity * this.BuyingRateChargeToEdit.unitPrice + Math.abs(this.BuyingRateChargeToEdit.vatrate);
             }
-        }
-        else {
+        } else {
             if (this.BuyingRateChargeToAdd.vatrate >= 0) {
                 this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice * (1 + (this.BuyingRateChargeToAdd.vatrate / 100));
             } else {
@@ -680,7 +679,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
                 if (data.quantity != null) {
                     data.quantity = Number(data.quantity.toFixed(2));
                 }
-                var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, data);
+                const res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, data);
                 if (res.status) {
                     form.onReset();
                     this.resetDisplay();
@@ -690,8 +689,9 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
                     this.OBHChargeToAdd = new CsShipmentSurcharge();
                     this.baseServices.setData("CurrentOpsTransaction", this.opsTransaction);
                     this.baseServices.setData("ShipmentAdded", true);
-                    if (!isContinue)
+                    if (!isContinue) {
                         $('#' + id_form).modal('hide');
+                    }
                 }
             }
         }, 300);
@@ -852,9 +852,12 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     editCharge(id_form: string, form: NgForm, data: CsShipmentSurcharge) {
         setTimeout(async () => {
             if (form.submitted) {
-                var error = $('#' + id_form).find('div.has-danger');
-                if (error.length == 0) {
-                    var res = await this.baseServices.putAsync(this.api_menu.Documentation.CsShipmentSurcharge.update, data);
+                const error = $('#' + id_form).find('div.has-danger');
+                if (error.length === 0) {
+                    if (data.quantity != null) {
+                        data.quantity = Number(data.quantity.toFixed(2));
+                    }
+                    const res = await this.baseServices.putAsync(this.api_menu.Documentation.CsShipmentSurcharge.update, data);
                     if (res.status) {
                         $('#' + id_form).modal('hide');
                         this.getAllSurCharges();
