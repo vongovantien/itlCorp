@@ -94,7 +94,14 @@
                             <span>{{((i + 1) < 10) ? ('0' + (i + 1)) : (i + 1)}}</span>
                         </td>
                         <td class="sorting">
-                            <span>{{stage.status}}</span>
+                            <div [ngSwitch]="stage.status">
+                                <span class="text-muted" *ngSwitchCase="'InSchedule'">{{stage.status}}</span>
+                                <span class="text-primary" *ngSwitchCase="'Processing'">{{stage.status}}</span>
+                                <span class="text-danger" *ngSwitchCase="'Overdued'">{{stage.status}}</span>
+                                <span class="text-success" *ngSwitchCase="'Done'">{{stage.status}}</span>
+                                <span class="text-black-50" *ngSwitchCase="'Deleted'">{{stage.status}}</span>
+                                <span class="text-warning" *ngSwitchCase="'Pending'">{{stage.status}}</span>
+                            </div>
                         </td>
                         <td class="sorting">
                             <span>{{stage.stageCode}}</span>
