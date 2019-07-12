@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace eFMS.API.Operation.DL.Models.Criteria
+﻿namespace eFMS.API.Operation.DL.Models.Criteria
 {
     public class SetEcusConnectionCriteria : SetEcusConnectionModel
     {
