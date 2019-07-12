@@ -1,4 +1,4 @@
-Scaffold-DbContext "Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -Context eFMSDataContextDefault -Project eFMS.API.Operation.Service -Force -Tables CustomsDeclaration, opsStageAssigned, opsTransaction, setEcusconnection
+Scaffold-DbContext "Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -Context eFMSDataContextDefault -Project eFMS.API.Operation.Service -Force -Tables CustomsDeclaration, opsStageAssigned, opsTransaction, setEcusconnection, sysUser, sysEmployee, catCommodity, opsTransaction, opsStageAssigned
 protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
