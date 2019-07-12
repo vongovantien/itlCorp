@@ -2,13 +2,12 @@ import { Component, OnInit, OnChanges, Input, EventEmitter, Output } from "@angu
 import { moveItemInArray, CdkDragDrop } from "@angular/cdk/drag-drop";
 
 import { PopupBase } from "src/app/modal.base";
-import { StageModel } from "src/app/shared/models/catalogue/stage.model";
 import { JobRepo } from "src/app/shared/repositories";
 
 import { takeUntil, catchError, finalize } from "rxjs/operators";
 import { NgxSpinnerService } from "ngx-spinner";
 import { ToastrService } from "ngx-toastr";
-import * as _ from "lodash";
+import _ from "lodash";
 import { Stage } from "src/app/shared/models";
 
 @Component({
@@ -85,7 +84,7 @@ export class OpsModuleStageManagementAddStagePopupComponent extends PopupBase im
       stage.isSelected = false;
     }
     this.stages.push(...this.tempStages2);
-    
+
     this.selectedStages = this.selectedStages.filter(
       (stage: any) => !_.includes(this.stages, stage)
     );
@@ -100,11 +99,12 @@ export class OpsModuleStageManagementAddStagePopupComponent extends PopupBase im
   onSaveStage() {
     const data: any[] = this.selectedStages.map((stage: any, index: number) => new Stage(stage));
 
-    // assigne jobId
-    for (const stage of data) {
-      if (!stage.jobId) {
-        stage.jobId = this.id;
+    // assigne jobId, order
+    for (const [index, value] of <any>data.entries()) {
+      if (!value.jobId) {
+        value.jobId = this.id;
       }
+      value.orderNumberProcessed = index + 1;
     }
 
     this._spinner.show();
@@ -126,7 +126,7 @@ export class OpsModuleStageManagementAddStagePopupComponent extends PopupBase im
       (errs: any) => {
       },
       () => { }
-    )
+    );
   }
 
 
