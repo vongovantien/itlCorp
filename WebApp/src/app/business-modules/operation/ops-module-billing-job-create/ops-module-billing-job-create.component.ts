@@ -13,6 +13,7 @@ import { JobRepo } from "src/app/shared/repositories";
 import { PopupBase } from "src/app/modal.base";
 import { takeUntil, catchError, finalize } from "rxjs/operators";
 import { NgxSpinnerService } from "ngx-spinner";
+import { ToastrService } from "ngx-toastr";
 @Component({
   selector: "app-ops-module-billing-job-create",
   templateUrl: "./ops-module-billing-job-create.component.html"
@@ -35,6 +36,7 @@ export class OpsModuleBillingJobCreateComponent extends PopupBase implements OnI
     private router: Router,
     private jobRepo: JobRepo,
     private spinner: NgxSpinnerService,
+    private _toaster: ToastrService
   ) {
     super();
     this.keepCalendarOpeningWithRange = true;
@@ -144,12 +146,13 @@ export class OpsModuleBillingJobCreateComponent extends PopupBase implements OnI
       if (form.submitted) {
         const error = $("#add-new-ops-job-form").find("div.has-danger");
         if (error.length === 0) {
-          this.OpsTransactionToAdd.serviceDate =
-            this.OpsTransactionToAdd.serviceDate.startDate != null
-              ? dataHelper.dateTimeToUTC(
-                this.OpsTransactionToAdd.serviceDate.startDate
-              )
-              : null;
+          // this.OpsTransactionToAdd.serviceDate =
+          //   this.OpsTransactionToAdd.serviceDate.startDate != null
+          //     ? dataHelper.dateTimeToUTC(
+          //       this.selectedDate.startDate
+          //     )
+          //     : null;
+          this.OpsTransactionToAdd.serviceDate = this.selectedDate.startDate != null ? dataHelper.dateTimeToUTC(this.selectedDate.startDate) : null;
           // var res = await this.baseServices.postAsync(
           //   this.api_menu.Documentation.Operation.addNew,
           //   this.OpsTransactionToAdd
@@ -161,8 +164,18 @@ export class OpsModuleBillingJobCreateComponent extends PopupBase implements OnI
             catchError(this.catchError),
             finalize(() => { this.spinner.hide(); })
           ).subscribe(
-            (res: any[]) => {
-              console.log(res);
+            (res: any) => {
+              if (!res.status) {
+                this._toaster.error(res.message, '', { positionClass: 'toast-bottom-right' });
+              } else {
+                this.OpsTransactionToAdd = new OpsTransaction();
+                this.resetDisplay();
+                form.onReset();
+                this._toaster.success(res.message, '', { positionClass: 'toast-bottom-right' });
+                this.router.navigate([
+                  "/home/operation/job-edit/", res.data
+                ]);
+              }
             }
           );
           // this._jobRepo.getDetailStageOfJob(id).pipe(
