@@ -104,3 +104,6 @@ bin
 /WebAPI/eFMS.API.SystemWeb/OperationManagement/eFMS.API.Operation.DL/obj
 /WebAPI/eFMS.API.SystemWeb/OperationManagement/eFMS.API.Operation.DAL/obj
 /WebAPI/eFMS.API.SystemWeb/OperationManagement/eFMS.API.Operation/obj
+/WebAPI/eFMSWindowService/.vs/eFMSWindowService/DesignTimeBuild/.dtbcache
+/WebAPI/eFMSWindowService/.vs/eFMSWindowService/v15/Server/sqlite3/db.lock
+/WebAPI/eFMSWindowService/obj/Release/eFMSWindowService.csprojAssemblyReference.cache
