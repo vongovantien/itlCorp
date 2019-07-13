@@ -28,6 +28,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     productServices: any[] = [];
     serviceDate: any;
     finishDate: any;
+    exchangeRateDate: any;
     serviceModes: any[] = [];
     shipmentModes: any[] = [];
     customers: any[] = [];
@@ -183,9 +184,15 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             || this.opsTransaction.billingOpsId == null
             || this.opsTransaction.serviceDate == null
             || s
+            || this.opsTransaction.sumGrossWeight === 0
+            || this.opsTransaction.sumNetWeight === 0
+            || this.opsTransaction.sumCbm === 0
         ) {
             return;
         } else {
+            this.opsTransaction.sumGrossWeight = this.opsTransaction.sumGrossWeight != null ? Number(this.opsTransaction.sumGrossWeight.toFixed(2)) : null;
+            this.opsTransaction.sumNetWeight = this.opsTransaction.sumNetWeight != null ? Number(this.opsTransaction.sumNetWeight.toFixed(2)) : null;
+            this.opsTransaction.sumCbm = this.opsTransaction.sumCbm != null ? Number(this.opsTransaction.sumCbm.toFixed(2)) : null;
             await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.opsTransaction, true, true);
             await this.getShipmentDetails(this.opsTransaction.id);
         }
@@ -271,7 +278,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
      */
     changeEditMode(index: any) {
         this.getComboboxDataContainer(index);
-        if (this.lstMasterContainers[index].allowEdit == false || this.lstMasterContainers[index].allowEdit == undefined) {
+        if (this.lstMasterContainers[index].allowEdit === false || this.lstMasterContainers[index].allowEdit == undefined) {
             this.lstMasterContainers[index].allowEdit = true;
             this.lstMasterContainers[index].containerTypeActive = this.lstMasterContainers[index].containerTypeId != null ?
                 [{ id: this.lstMasterContainers[index].containerTypeId, text: this.lstMasterContainers[index].containerTypeName }] : [];
@@ -284,8 +291,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
                     this.lstMasterContainers[i].allowEdit = false;
                 }
             }
-        }
-        else {
+        } else {
             this.lstMasterContainers[index].allowEdit = false;
         }
     }
@@ -296,12 +302,15 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
      * @param index index of row in table
      */
     async saveNewContainer(index: any) {
-        // set quantity = 1 (if existed: containerNo || sealNo || markNo)
         if (this.lstMasterContainers[index].containerNo.length > 0 || this.lstMasterContainers[index].sealNo.length > 0 || this.lstMasterContainers[index].markNo.length > 0) {
             this.lstMasterContainers[index].quantity = 1;
         }
         this.lstMasterContainers[index].verifying = true;
-        if (this.lstMasterContainers[index].quantity == null || this.lstMasterContainers[index].containerTypeId == null) {
+        if (this.lstMasterContainers[index].quantity == null
+            || this.lstMasterContainers[index].containerTypeId == null
+            || this.lstMasterContainers[index].gw === 0 || this.lstMasterContainers[index].nw === 0
+            || this.lstMasterContainers[index].chargeAbleWeight === 0
+            || this.lstMasterContainers[index].cbm === 0) {
             this.saveContainerSuccess = false;
             return;
         }
@@ -348,7 +357,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
                     break;
                 }
             }
-            if (hasItemEdited == false) {
+            if (hasItemEdited === false) {
                 // continue
                 this.numberOfTimeSaveContainer = this.numberOfTimeSaveContainer + 1;
                 this.opsTransaction.sumGrossWeight = 0;
@@ -403,7 +412,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
      * init a new container
      */
     initNewContainer() {
-        var container = {
+        const container = {
             mawb: this.opsTransaction.id,
             containerTypeId: null,
             containerTypeName: '',
@@ -414,7 +423,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             markNo: '',
             unitOfMeasureId: 37,
             unitOfMeasureName: 'Kilogam',
-            unitOfMeasureActive: [{ "id": 37, "text": "Kilogam" }],
+            unitOfMeasureActive: [], ///[{ "id": 37, "text": "Kilogam" }],
             commodityId: null,
             commodityName: '',
             packageTypeId: null,
@@ -792,6 +801,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         if (type === 'SELL') {
             this.SellingRateChargeToEdit = cloneDeep(charge);
             this.SellingRateChargeToEdit.exchangeDate = { startDate: moment(this.SellingRateChargeToEdit.exchangeDate), endDate: moment(this.SellingRateChargeToEdit.exchangeDate) };
+            this.exchangeRateDate = { startDate: moment(this.SellingRateChargeToEdit.exchangeDate), endDate: moment(this.SellingRateChargeToEdit.exchangeDate) };
         }
         if (type === 'OBH') {
             this.OBHChargeToEdit = cloneDeep(charge);
@@ -856,6 +866,9 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
                 if (error.length === 0) {
                     if (data.quantity != null) {
                         data.quantity = Number(data.quantity.toFixed(2));
+                    }
+                    if (this.exchangeRateDate != null) {
+                        data.exchangeDate = this.exchangeRateDate.startDate != null ? dataHelper.dateTimeToUTC(this.exchangeRateDate.startDate) : null;
                     }
                     const res = await this.baseServices.putAsync(this.api_menu.Documentation.CsShipmentSurcharge.update, data);
                     if (res.status) {

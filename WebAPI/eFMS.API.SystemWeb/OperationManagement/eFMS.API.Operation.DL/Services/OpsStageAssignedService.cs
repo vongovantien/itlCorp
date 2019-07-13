@@ -92,6 +92,7 @@ namespace eFMS.API.Operation.DL.Services
                 result.StageCode = stages.FirstOrDefault(x => x.Id == result.StageId).Code;
                 result.StageNameEN = stages.FirstOrDefault(x => x.Id == result.StageId).StageNameEn;
                 result.DepartmentName = departments?.FirstOrDefault(x => x.Id == stage.DepartmentId)?.DeptName;
+                result.Description = result.Description != null ? result.Description : stages.FirstOrDefault(x => x.Id == result.StageId).DescriptionEn;
             }
             return result;
         }
@@ -178,6 +179,7 @@ namespace eFMS.API.Operation.DL.Services
                 assignedItem.Status = assignedItem.Status?.Trim();
                 assignedItem.DepartmentName = stage == null? null: departments?.FirstOrDefault(x => x.Id == stage.DepartmentId)?.DeptName;
                 assignedItem.DoneDate = item.Status?.Trim() == DataTypeEx.GetStageStatus(StageEnum.Done) ? item.ModifiedDate : null;
+                assignedItem.Description = assignedItem.Description != null ? assignedItem.Description : stages.FirstOrDefault(x => x.Id == item.StageId).DescriptionEn;
                 results.Add(assignedItem);
             }
             return results;
