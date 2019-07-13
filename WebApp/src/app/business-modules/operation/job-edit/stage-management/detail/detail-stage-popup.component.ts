@@ -62,7 +62,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
 
 
     // config for combo gird
-    readonly configComboGrid: any = {
+    configComboGrid: Readonly<any> = {
         placeholder: 'Please select',
         displayFields: [
             { field: 'username', label: 'UserName' },
@@ -146,6 +146,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
         this.comment = this.form.controls['comment'];
         this.departmentName = this.form.controls['departmentName'];
         this.deadLineDate = this.form.controls['deadLineDate'];
+
     }
 
     initFormUpdate() {
@@ -155,7 +156,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             departmentName: this.data.departmentName,
             description: this.data.description || '',
             processTime: this.data.processTime,
-            deadLineDate: { startDate: moment(this.data.deadline || new Date()), endDate: moment(this.data.deadline || new Date()) }
+            deadLineDate: !!this.data.deadline ? { startDate: moment(this.data.deadline), endDate: moment(this.data.deadline) } : null
         });
 
         this.selectedMainPersonInCharge = Object.assign({}, { field: 'username', value: this.data.mainPersonInCharge });
@@ -202,10 +203,9 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
                 processTime: form.value.processTime,
                 comment: form.value.comment,
                 description: form.value.description,
-                deadline: moment(form.value.deadLineDate.startDate).format('YYYY-MM-DDTHH:mm'),
+                deadline: !!form.value.deadLineDate.startDate ? moment(form.value.deadLineDate.startDate).format('YYYY-MM-DDTHH:mm') : null,
                 status: this.statusStageActive[0].id || this.statusStage[0].id
             };
-
             this._jobRepo.updateStageToJob(body).pipe(
                 takeUntil(this.ngUnsubscribe),
                 catchError(this.catchError),
@@ -241,7 +241,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
                 if (!res) {
                 } else {
                     this.systemUsers = res.map((item: any) => new User(item));
-                    this.configComboGrid.source = this.systemUsers;
+                    Object.assign(this.configComboGrid, {source: this.systemUsers});
                 }
             },
             // error

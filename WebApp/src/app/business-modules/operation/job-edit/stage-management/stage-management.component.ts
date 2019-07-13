@@ -65,7 +65,7 @@ export class OpsModuleStageManagementComponent extends AppPage {
         this._jobRepo.getListStageOfJob(id).pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),
-            finalize(() => { this._spinner.hide() }),
+            finalize(() => { this._spinner.hide(); }),
         ).subscribe(
             (res: any[]) => {
                 if (res instanceof Error) {
@@ -80,7 +80,7 @@ export class OpsModuleStageManagementComponent extends AppPage {
             },
             // complete
             () => { }
-        )
+        );
 
     }
 
@@ -90,7 +90,7 @@ export class OpsModuleStageManagementComponent extends AppPage {
         this._jobRepo.getListStageNotAssigned(id).pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),
-            finalize(() => { this._spinner.hide() }),
+            finalize(() => { this._spinner.hide(); }),
         ).subscribe(
             (res: any[]) => {
                 if (res instanceof Error) {
@@ -105,14 +105,14 @@ export class OpsModuleStageManagementComponent extends AppPage {
             },
             // complete
             () => { }
-        )
+        );
     }
 
     getDetail(id: string) {
         this._jobRepo.getDetailStageOfJob(id).pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),
-            finalize(() => { this._spinner.hide() }),
+            finalize(() => { this._spinner.hide(); }),
         ).subscribe(
             (res: any[]) => {
                 if (res instanceof Error) {
@@ -128,7 +128,7 @@ export class OpsModuleStageManagementComponent extends AppPage {
             },
             // complete
             () => { }
-        )
+        );
     }
 
     onSearching(keyword: string) {
