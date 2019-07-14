@@ -2,7 +2,7 @@
 export const environment = {
     production: false,
     HOST: {
-        WEB_URL: "localhost:",
-        INDENTITY_SERVER_URL: "https://localhost:44369"
+        WEB_URL: "test.api-efms.itlvn.com:",
+        INDENTITY_SERVER_URL: "http://test.api-efms.itlvn.com/indentityserver"
     }
 };

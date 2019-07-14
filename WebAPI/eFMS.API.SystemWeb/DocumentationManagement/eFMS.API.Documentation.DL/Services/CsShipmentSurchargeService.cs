@@ -211,13 +211,12 @@ namespace eFMS.API.Documentation.DL.Services
         private List<CsShipmentSurchargeDetailsModel> Query(Guid HbID, string type)
         {
             List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
-            var charges = DataContext.Get();
+            var charges = DataContext.Get(x => x.Hblid == HbID);
             if (!string.IsNullOrEmpty(type))
             {
                 charges = charges.Where(x => x.Type.ToLower() == type.ToLower());
             }
             var query = (from charge in charges
-                         where charge.Hblid == HbID 
                          join chargeDetail in ((eFMSDataContext)DataContext.DC).CatCharge on charge.ChargeId equals chargeDetail.Id
 
                          join partner in ((eFMSDataContext)DataContext.DC).CatPartner on charge.PaymentObjectId equals partner.Id into partnerGroup
