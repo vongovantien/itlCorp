@@ -2,7 +2,7 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { ExtendData } from '../../extend-data';
-import cloneDeep from 'lodash/cloneDeep'
+import cloneDeep from 'lodash/cloneDeep';
 import filter from 'lodash/filter';
 import moment from 'moment/moment';
 

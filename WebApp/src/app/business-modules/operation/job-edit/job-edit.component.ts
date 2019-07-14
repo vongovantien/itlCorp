@@ -16,6 +16,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { SurchargeTypeEnum } from 'src/app/shared/enums/csShipmentSurchargeType-enum';
 import { async } from 'rxjs/internal/scheduler/async';
 import { SortService } from 'src/app/shared/services/sort.service';
+import { BehaviorSubject } from 'rxjs';
 declare var $: any;
 
 @Component({
@@ -24,7 +25,7 @@ declare var $: any;
     styleUrls: ['./job-edit.component.scss']
 })
 export class OpsModuleBillingJobEditComponent implements OnInit {
-    opsTransaction: OpsTransaction = new OpsTransaction();
+    opsTransaction: OpsTransaction = null;
     productServices: any[] = [];
     serviceDate: any;
     finishDate: any;
@@ -858,7 +859,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
 
         return results;
     }
-
+    
     editCharge(id_form: string, form: NgForm, data: CsShipmentSurcharge) {
         setTimeout(async () => {
             if (form.submitted) {
@@ -964,10 +965,8 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     /**
      * get custom clearances
      */
-    isLoadClearance = false;
     getCustomClearances() {
         this.baseServices.setData("CurrentOpsTransaction", this.opsTransaction);
-        this.isLoadClearance = true;
     }
 
     selectTab($event: any, tabName: string) {

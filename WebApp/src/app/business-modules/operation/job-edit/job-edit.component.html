@@ -29,7 +29,7 @@
 <!--end:: subheader-->
 
 <!--begin:: m-content -->
-<div class="m-content">
+<div class="m-content" *ngIf="opsTransaction">
     <div class="row">
         <div class="col-12">
             <tabset type="tabs">
@@ -1542,7 +1542,7 @@
                     </div>
                 </tab>
                 <tab heading="Custom declaration" (selectTab)="selectTab($event,'custom-declaration')">
-                    <app-billing-custom-declaration *ngIf="tab === 'custom-declaration' && isLoadClearance">
+                    <app-billing-custom-declaration *ngIf="tab === 'custom-declaration'" [currentJob]="opsTransaction">
                     </app-billing-custom-declaration>
                 </tab>
                 <tab heading="Credit Note & Debit Note" (selectTab)="selectTab($event,'cre-debit-note')">
@@ -2067,7 +2067,7 @@
                                     [ngClass]="{ 'm-form__group has-danger': addBuyingRateChargeFormOps.submitted && BuyingRateChargeToAdd.chargeId==null}">
                                     <label class="form-control-label" for="" #selectedBuyingChargeCode>
                                         Charge <span class="m--font-danger">(*)</span>
-                                        <small class="m--margin-left-5 m--font-primary">Charge&nbsp;
+                                        <small class="m--margin-left-5 m--font-primary"> &nbsp;
                                             {{selectedBuyingChargeCode.value==null?'':selectedBuyingChargeCode.value}}
                                         </small>
                                     </label>
@@ -2368,7 +2368,7 @@
                                     [ngClass]="{ 'm-form__group has-danger': editBuyingRateChargeFormOps.submitted && BuyingRateChargeToEdit.chargeId==null}">
                                     <label class="form-control-label" for="" #selectedBuyingChargeCode>
                                         Charge <span class="m--font-danger">(*)</span>
-                                        <small class="m--margin-left-5 m--font-primary">Charge&nbsp;
+                                        <small class="m--margin-left-5 m--font-primary"> &nbsp;
                                             {{selectedBuyingChargeCode.value==null?'':selectedBuyingChargeCode.value}}
                                         </small>
                                     </label>
@@ -2662,7 +2662,7 @@
                                     [ngClass]="{ 'm-form__group has-danger': addSellingRateChargeFormOps.submitted && SellingRateChargeToAdd.chargeId==null}">
                                     <label class="form-control-label" for="" #selectedSellingChargeCode>
                                         Charge <span class="m--font-danger">(*)</span>
-                                        <small class="m--margin-left-5 m--font-primary">Charge&nbsp;
+                                        <small class="m--margin-left-5 m--font-primary"> &nbsp;
                                             {{selectedSellingChargeCode.value==null?'':selectedSellingChargeCode.value}}
                                         </small>
                                     </label>
@@ -2943,7 +2943,7 @@
                                     [ngClass]="{ 'm-form__group has-danger': editSellingRateChargeFormOps.submitted && SellingRateChargeToEdit.chargeId==null}">
                                     <label class="form-control-label" for="" #selectedBuyingChargeCode>
                                         Charge <span class="m--font-danger">(*)</span>
-                                        <small class="m--margin-left-5 m--font-primary">Charge&nbsp;
+                                        <small class="m--margin-left-5 m--font-primary"> &nbsp;
                                             {{selectedBuyingChargeCode.value==null?'':selectedBuyingChargeCode.value}}
                                         </small>
                                     </label>

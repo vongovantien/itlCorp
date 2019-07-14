@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, OnDestroy } from "@angular/core";
 import moment from "moment/moment";
 import { BaseService } from "src/services-base/base.service";
 import { API_MENU } from "src/constants/api-menu.const";
@@ -18,7 +18,7 @@ import { ToastrService } from "ngx-toastr";
   selector: "app-ops-module-billing-job-create",
   templateUrl: "./ops-module-billing-job-create.component.html"
 })
-export class OpsModuleBillingJobCreateComponent extends PopupBase implements OnInit {
+export class OpsModuleBillingJobCreateComponent extends PopupBase implements OnInit, OnDestroy {
   DataStorage: Object = null;
   productServices: any[] = [];
   serviceModes: any[] = [];
@@ -59,6 +59,9 @@ export class OpsModuleBillingJobCreateComponent extends PopupBase implements OnI
     this.getListBillingOps();
   }
 
+  ngOnDestroy(): void {
+    this.baseServices.dataStorage.unsubscribe();
+  }
   async getShipmentCommonData() {
     const data = await shipmentHelper.getOPSShipmentCommonData(
       this.baseServices,
