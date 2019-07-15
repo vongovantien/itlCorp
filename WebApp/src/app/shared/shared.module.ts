@@ -29,17 +29,24 @@ import { ComboGridVirtualScrollComponent } from "./common/combo-grid-virtual-scr
 import { RouterModule } from "@angular/router";
 import { CfBeforeLeaveModalComponent } from "./common/cf-before-leave-modal/cf-before-leave-modal.component";
 import { AutofocusDirective } from "../shared/directives/auto-focus.directive";
-import { ModalModule } from "ngx-bootstrap";
+import { ModalModule } from "ngx-bootstrap/modal";
 import { RepositoryModule } from "./repositories/repository.module";
 import { ServiceModule } from "./services/service.module";
 import { SearchStage } from "./pipes";
 import { DecimalNumberGreaterThan0Directive } from "./directives/decimal-number-greater-0.directive";
+import { ConfirmDeletePopupComponent } from "./common/popup/confirm-detele/confirm-delete.popup";
 
-const Libary = [ModalModule.forRoot()];
+const Libary = [
+  ModalModule.forRoot()
+];
 
 const APP_PIPES = [
   SearchStage
-]
+];
+
+const APP_POPUP = [
+  ConfirmDeletePopupComponent
+];
 
 const APP_COMPONENTS = [
   TableLayoutComponent,
@@ -55,7 +62,8 @@ const APP_COMPONENTS = [
   ReportPreviewComponent,
   ComboGridVirtualScrollComponent,
   CfBeforeLeaveModalComponent,
-]
+  ...APP_POPUP
+];
 
 const APP_DIRECTIVES = [
   StyleCellDirective,
@@ -67,7 +75,7 @@ const APP_DIRECTIVES = [
   EcusSpecicalCharacterAllowSpaceDirective,
   EcusSpecicalCharacterNoSpaceDirective,
   DecimalNumberGreaterThan0Directive
-]
+];
 @NgModule({
   imports: [
     CommonModule,

@@ -41,6 +41,7 @@ import { ScrollingModule } from "@angular/cdk/scrolling";
 import { DragDropModule } from "@angular/cdk/drag-drop";
 import { ModalModule } from "ngx-bootstrap";
 import { AuthInterceptor } from "./auth.interceptor";
+import { GlobalState } from "./global-state";
 // import { ChartModule } from 'angular-highcharts';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     // wheelPropagation: true
@@ -89,6 +90,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     ],
     providers: [
         AuthGuardService,
+        GlobalState,
         BaseService,
         CookieService,
         PagingService,
