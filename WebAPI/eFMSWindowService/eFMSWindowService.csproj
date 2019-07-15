@@ -40,6 +40,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
@@ -89,9 +90,17 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UpdateCurrentStatusOfJobService.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UpdateCurrentStatusOfJobService.Designer.cs">
+      <DependentUpon>UpdateCurrentStatusOfJobService.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <EntityDeploy Include="Models\eFMSModel.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>eFMSModel.Designer.cs</LastGenOutput>
@@ -99,7 +108,9 @@
     <None Include="Models\eFMSModel.edmx.diagram">
       <DependentUpon>eFMSModel.edmx</DependentUpon>
     </None>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Models\eFMSModel.Context.tt">

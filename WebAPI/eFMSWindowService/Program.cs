@@ -18,7 +18,8 @@ namespace eFMSWindowService
 #if DEBUG
             //If the mode is in debugging
             //create a new service instance
-            Service1 myService = new Service1();
+            //Service1 myService = new Service1();
+            UpdateCurrentStatusOfJobService myService = new UpdateCurrentStatusOfJobService();
             //call the start method - this will start the Timer.
             myService.Start();
             //Set the Thread to sleep
@@ -29,11 +30,12 @@ namespace eFMSWindowService
             //The following is the default code - You may fine tune
             //the code to create one instance of the service on the top
             //and use the instance variable in both debug and release mode
-            
+
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
-                new Service1()
+                //new Service1()
+                new UpdateCurrentStatusOfJobService()
             };
             ServiceBase.Run(ServicesToRun);
 #endif

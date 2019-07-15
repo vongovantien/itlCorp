@@ -21,6 +21,7 @@
     <EntitySetMapping Name="vw_catCurrencyExchangeNewest">
       <EntityTypeMapping TypeName="eFMSTestModel.vw_catCurrencyExchangeNewest">
         <MappingFragment StoreEntitySet="vw_catCurrencyExchangeNewest">
+          <ScalarProperty Name="CurrencyToID" ColumnName="CurrencyToID" />
           <ScalarProperty Name="DatetimeCreated" ColumnName="DatetimeCreated" />
           <ScalarProperty Name="Rate" ColumnName="Rate" />
           <ScalarProperty Name="CurrencyFromID" ColumnName="CurrencyFromID" />

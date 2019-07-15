@@ -25,6 +25,7 @@ warning 6002: The table/view 'eFMSTest.dbo.vw_catCurrencyExchangeNewest' does no
     </Key>
     <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="CurrencyFromID" Type="varchar" MaxLength="30" />
+    <Property Name="CurrencyToID" Type="varchar" MaxLength="30" />
     <Property Name="Rate" Type="decimal" Precision="18" Scale="4" Nullable="false" />
     <Property Name="DatetimeCreated" Type="smalldatetime" />
   </EntityType>
@@ -34,6 +35,7 @@ warning 6002: The table/view 'eFMSTest.dbo.vw_catCurrencyExchangeNewest' does no
       <DefiningQuery>SELECT 
     [vw_catCurrencyExchangeNewest].[ID] AS [ID], 
     [vw_catCurrencyExchangeNewest].[CurrencyFromID] AS [CurrencyFromID], 
+    [vw_catCurrencyExchangeNewest].[CurrencyToID] AS [CurrencyToID], 
     [vw_catCurrencyExchangeNewest].[Rate] AS [Rate], 
     [vw_catCurrencyExchangeNewest].[DatetimeCreated] AS [DatetimeCreated]
     FROM [dbo].[vw_catCurrencyExchangeNewest] AS [vw_catCurrencyExchangeNewest]</DefiningQuery>

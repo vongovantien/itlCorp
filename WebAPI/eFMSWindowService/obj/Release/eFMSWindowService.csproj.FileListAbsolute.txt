@@ -11,3 +11,16 @@ D:\Research\WindowService\eFMSWindowService\obj\Release\eFMSWindowService.csproj
 D:\Research\WindowService\eFMSWindowService\obj\Release\eFMSWindowService.csproj.CopyComplete
 D:\Research\WindowService\eFMSWindowService\obj\Release\eFMSWindowService.exe
 D:\Research\WindowService\eFMSWindowService\obj\Release\eFMSWindowService.pdb
+D:\eFMS\eFMS-WebApp\WebAPI\eFMSWindowService\bin\Release\eFMSWindowService.exe.config
+D:\eFMS\eFMS-WebApp\WebAPI\eFMSWindowService\bin\Release\eFMSWindowService.exe
+D:\eFMS\eFMS-WebApp\WebAPI\eFMSWindowService\bin\Release\eFMSWindowService.pdb
+D:\eFMS\eFMS-WebApp\WebAPI\eFMSWindowService\bin\Release\EntityFramework.dll
+D:\eFMS\eFMS-WebApp\WebAPI\eFMSWindowService\bin\Release\EntityFramework.SqlServer.dll
+D:\eFMS\eFMS-WebApp\WebAPI\eFMSWindowService\bin\Release\EntityFramework.xml
+D:\eFMS\eFMS-WebApp\WebAPI\eFMSWindowService\bin\Release\EntityFramework.SqlServer.xml
+D:\eFMS\eFMS-WebApp\WebAPI\eFMSWindowService\obj\Release\eFMSWindowService.ProjectInstaller.resources
+D:\eFMS\eFMS-WebApp\WebAPI\eFMSWindowService\obj\Release\eFMSWindowService.csproj.GenerateResource.cache
+D:\eFMS\eFMS-WebApp\WebAPI\eFMSWindowService\obj\Release\eFMSWindowService.csproj.CoreCompileInputs.cache
+D:\eFMS\eFMS-WebApp\WebAPI\eFMSWindowService\obj\Release\eFMSWindowService.csproj.CopyComplete
+D:\eFMS\eFMS-WebApp\WebAPI\eFMSWindowService\obj\Release\eFMSWindowService.exe
+D:\eFMS\eFMS-WebApp\WebAPI\eFMSWindowService\obj\Release\eFMSWindowService.pdb

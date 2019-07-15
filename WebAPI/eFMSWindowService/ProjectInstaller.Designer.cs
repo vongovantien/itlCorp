@@ -39,9 +39,9 @@
             // 
             // serviceInstaller1
             // 
-            this.serviceInstaller1.Description = "eFMSWindowService";  
+            this.serviceInstaller1.Description = "eFMSWindowService";
             this.serviceInstaller1.DisplayName = "eFMSWindowService.Demo";
-            this.serviceInstaller1.ServiceName = "Service1";
+            this.serviceInstaller1.ServiceName = "UpdateCurrentStatusOfJobService";
             // 
             // ProjectInstaller
             // 
