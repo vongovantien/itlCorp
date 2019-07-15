@@ -10,9 +10,19 @@ import { AccountReceivablePayableComponent } from './account-receivable-payable/
 import { SharedModule } from '../../shared/shared.module';
 import { SelectModule } from 'ng2-select';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { StatementOfAccountAddnewComponent } from './statement-of-account-addnew/statement-of-account-addnew.component';
-import { StatementOfAccountEditComponent } from './statement-of-account-edit/statement-of-account-edit.component';
-import { StatementOfAccountDetailComponent } from './statement-of-account-detail/statement-of-account-detail.component';
+import { TabsModule, ModalModule } from 'ngx-bootstrap';
+
+import { StatementOfAccountAddnewComponent } from './statement-of-account/add-new/add-new-soa.component';
+import { StatementOfAccountDetailComponent } from './statement-of-account/detail/detail-soa.component';
+import { StatementOfAccountEditComponent } from './statement-of-account/edit/edit-soa.component';
+import { StatementOfAccountSearchComponent } from './statement-of-account/components/poup/search-box-soa/search-box-soa.component';
+import { AccountReceivePayableComponent } from './statement-of-account/account-receive-payable/account-receive-payable.component';
+import { StatementOfAccountAddChargeComponent } from './statement-of-account/components/poup/add-charge/add-charge.popup';
+
+const COMPONENTS =[
+  StatementOfAccountSearchComponent,
+  StatementOfAccountAddChargeComponent
+];
 
 @NgModule({
   imports: [
@@ -21,7 +31,9 @@ import { StatementOfAccountDetailComponent } from './statement-of-account-detail
     SharedModule,
     FormsModule,
     SelectModule,
-    NgxDaterangepickerMd
+    NgxDaterangepickerMd,
+    TabsModule.forRoot(),
+    ModalModule.forRoot()
   ],
   declarations: [
       StatementOfAccountComponent, 
@@ -30,7 +42,9 @@ import { StatementOfAccountDetailComponent } from './statement-of-account-detail
       AccountReceivablePayableComponent, 
       StatementOfAccountAddnewComponent, 
       StatementOfAccountEditComponent, 
-      StatementOfAccountDetailComponent
+      StatementOfAccountDetailComponent,
+      AccountReceivePayableComponent,
+      ...COMPONENTS
     ]
 })
 export class AccountingModule { }

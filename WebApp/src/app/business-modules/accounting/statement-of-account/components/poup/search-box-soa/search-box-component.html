@@ -1,0 +1,139 @@
+<div class="search-box-soa">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-control-label" for="">
+                    Reference No
+                </label>
+                <textarea class="form-control m-input m-input--square" name="" id="" rows="5"></textarea>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label" for="">
+                            Partner
+                        </label>
+                        <div class="dropdown e--combogrid">
+                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected">
+                            <div class="dropdown-menu e--combogrid-content">
+                                <div class="tabel-wrapper table-fixed">
+                                    <div class="table-head-fixed">
+                                        <div class="table-filter-block">
+                                            <div class="search-field">
+                                                <input class="form-control m-input m-input--square" type="text" placeholder="Search...">
+                                                <i class="icon-search"></i>
+                                            </div>
+                                        </div>
+                                        <div class="table-header">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Partner Id</th>
+                                                        <th>Name ABBR</th>
+                                                        <th>Name EN</th>
+                                                        <th>Tax Code</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="table-body-scroll">
+                                        <table class="table table-hover">
+                                            <tbody>
+                                                <tr class="data-row data-selected">
+                                                    <td>Partner Id</td>
+                                                    <td>Name ABBR</td>
+                                                    <td>Name EN</td>
+                                                    <td>Tax Code</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label" for="">
+                            Issued Date
+                        </label>
+                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                            <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [(ngModel)]="selectedRange" [ranges]="ranges" [maxDate]="maxDate" [alwaysShowCalendars]="true" name="daterange"
+                                placeholder="From date - to date" readonly />
+                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                <span>
+                                    <i class="la la-calendar"></i>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label" for="">
+                            Status
+                        </label>
+                        <ng-select [allowClear]="true" [items]="statusSOA" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                        </ng-select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label" for="">
+                            Currency
+                        </label>
+                        <ng-select [allowClear]="true" [items]="currencyList" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label" for="">
+                            Office
+                        </label>
+                        <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label" for="">
+                            Personal Handle
+                        </label>
+                        <ng-select [allowClear]="false" [items]="userList" [active]="currentUser" disabled="true" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                        </ng-select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-actions">
+        <div class="row">
+            <div class="col-lg-6"></div>
+            <div class="col-lg-6 m--align-right">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-search"></i>
+                        <span>
+                            Search
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-refresh"></i>
+                        <span>
+                            Reset
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
