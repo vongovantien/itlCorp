@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import moment from 'moment/moment';
+import { Component, ViewChild } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
+import { StatementOfAccountAddChargeComponent } from '../components/poup/add-charge/add-charge.popup';
 
 @Component({
     selector: 'app-statement-of-account-edit',
@@ -8,11 +8,15 @@ import { AppPage } from 'src/app/app.base';
     styleUrls: ['./edit-soa.component.scss']
 })
 export class StatementOfAccountEditComponent extends AppPage {
-
+    @ViewChild(StatementOfAccountAddChargeComponent, { static: false }) addChargePopup: StatementOfAccountAddChargeComponent;
     constructor() {
         super();
     }
 
     ngOnInit() {
+    }
+
+    addCharge() {
+        this.addChargePopup.show();
     }
 }

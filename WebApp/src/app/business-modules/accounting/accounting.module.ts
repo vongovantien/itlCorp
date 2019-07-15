@@ -10,7 +10,7 @@ import { AccountReceivablePayableComponent } from './account-receivable-payable/
 import { SharedModule } from '../../shared/shared.module';
 import { SelectModule } from 'ng2-select';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { TabsModule, ModalModule } from 'ngx-bootstrap';
+import { TabsModule, ModalModule,CollapseModule, PaginationModule  } from 'ngx-bootstrap';
 
 import { StatementOfAccountAddnewComponent } from './statement-of-account/add-new/add-new-soa.component';
 import { StatementOfAccountDetailComponent } from './statement-of-account/detail/detail-soa.component';
@@ -19,7 +19,7 @@ import { StatementOfAccountSearchComponent } from './statement-of-account/compon
 import { AccountReceivePayableComponent } from './statement-of-account/account-receive-payable/account-receive-payable.component';
 import { StatementOfAccountAddChargeComponent } from './statement-of-account/components/poup/add-charge/add-charge.popup';
 
-const COMPONENTS =[
+const COMPONENTS = [
   StatementOfAccountSearchComponent,
   StatementOfAccountAddChargeComponent
 ];
@@ -33,7 +33,9 @@ const COMPONENTS =[
     SelectModule,
     NgxDaterangepickerMd,
     TabsModule.forRoot(),
-    ModalModule.forRoot()
+    ModalModule.forRoot(),
+    CollapseModule.forRoot(),
+    PaginationModule.forRoot() 
   ],
   declarations: [
       StatementOfAccountComponent, 

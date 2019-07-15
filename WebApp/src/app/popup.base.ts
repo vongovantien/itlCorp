@@ -46,8 +46,6 @@ export abstract class PopupBase extends AppPage {
     // show poup
     show(options?: any): void {
         this.setOptions(Object.assign(this.options, options));
-        console.log(this.options);
-
         if (!this.popup.isShown) {
             if (typeof this.reset === "function") {
                 this.reset();
