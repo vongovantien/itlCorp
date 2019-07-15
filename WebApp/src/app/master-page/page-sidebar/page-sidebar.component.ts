@@ -39,7 +39,7 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
     for (var i = 0; i < this.Menu.length; i++) {
       for (var j = 0; j < this.Menu[i].childs.length; j++) {
 
-        if (this.Menu[i].childs[j].route_child == current_child_route) {
+        if (router.includes(this.Menu[i].childs[j].route_child)) {
           this.Page_Info.parent = this.Menu[i].parent_name;
           this.Page_Info.children = this.Menu[i].childs[j].name;
           this.Page_Information.emit(this.Page_Info);
