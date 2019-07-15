@@ -4,7 +4,7 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" routerLink="/home/accounting/statement-of-account-add-new">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" [routerLink]="'/home/accounting/statement-of-account/new'">
                 <span>
                     <i class="la la-plus"></i>
                     <span>
@@ -91,7 +91,7 @@
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <a href="javascript:void(0)" routerLink="/home/accounting/statement-of-account-detail">123456789</a>
+                                                        <a href="javascript:void(0)" [routerLink]="'/home/accounting/statement-of-account/detail'">123456789</a>
                                                     </td>
                                                     <td>
                                                         <span>text</span>
