@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from "@angular/core";
 import { FormBuilder, FormGroup, AbstractControl, Validators } from "@angular/forms";
 
-import { PopupBase } from "src/app/modal.base";
+import { PopupBase } from "src/app/popup.base";
 import { JobRepo, SystemRepo } from "src/app/shared/repositories";
 import { User, Stage } from "src/app/shared/models";
 

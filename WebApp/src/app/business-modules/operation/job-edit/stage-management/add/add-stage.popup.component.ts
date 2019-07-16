@@ -1,7 +1,7 @@
 import { Component, OnInit, OnChanges, Input, EventEmitter, Output } from "@angular/core";
 import { moveItemInArray, CdkDragDrop } from "@angular/cdk/drag-drop";
 
-import { PopupBase } from "src/app/modal.base";
+import { PopupBase } from "src/app/popup.base";
 import { JobRepo } from "src/app/shared/repositories";
 
 import { takeUntil, catchError, finalize } from "rxjs/operators";

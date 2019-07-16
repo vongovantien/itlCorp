@@ -1,0 +1,269 @@
+<div class="modal fade" role="dialog" bsModal #popup="bs-modal" aria-hidden="true">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add charge</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--begin::Form-->
+                <div class="m-form m-form--state bg-secondary m--padding-15 m--margin-bottom-15">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Shipment
+                                </label>
+                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Debit/Credit Note
+                                </label>
+                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Type
+                                </label>
+                                <ng-select [allowClear]="true" [items]="['All', 'Debit', 'Credit']" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    OBH
+                                </label>
+                                <ng-select [allowClear]="true" [items]="['Yes', 'No']" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    In SOA
+                                </label>
+                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Charge
+                                </label>
+                                <div class="dropdown e--combogrid">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected">
+                                    <div class="dropdown-menu e--combogrid-content">
+                                        <div class="tabel-wrapper table-fixed">
+                                            <div class="table-head-fixed">
+                                                <div class="table-filter-block">
+                                                    <div class="search-field">
+                                                        <input class="form-control m-input m-input--square" type="text" placeholder="Search...">
+                                                        <i class="icon-search"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="table-header">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Charge Code</th>
+                                                                <th>Charge Name (EN)</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="table-body-scroll">
+                                                <table class="table table-hover">
+                                                    <tbody>
+                                                        <tr class="data-row data-selected">
+                                                            <td>Charge Code</td>
+                                                            <td>Charge Name</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions m--align-right">
+                        <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                            <span>
+                                <i class="la la-download"></i>
+                                <span>
+                                    Add
+                                </span>
+                            </span>
+                        </button>
+                        <button type="reset" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                            <span>
+                                <i class="la la-refresh"></i>
+                                <span>
+                                    Reset
+                                </span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+                <!--end::Form-->
+                <!--begin::Form-->
+                <div class="m-form m-form--state">
+                    <!--begin::m-portlet -->
+                    <!--begin: Search Form -->
+                    <div class="m-form m-form--label-align-right">
+                        <div class="row align-items-center">
+                            <div class="col-lg-4 order-2 order-lg-1">
+                                <div class="form-group">
+                                    <div class="m-input-icon m-input-icon--left">
+                                        <input type="text" class="form-control m-input m-input--square" placeholder="Search...">
+                                        <span class="m-input-icon__icon m-input-icon__icon--left">
+                                            <span>
+                                                <i class="la la-search"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end: Search Form -->
+                    <!--begin: Datatable-->
+                    <div class="table-wrapper  table-scrollable fit-height-div">
+                        <table class="table table-striped table-brand dataTable">
+                            <thead>
+                                <tr>
+                                    <th class="table-actions-col no-sorting">
+                                        <label class="m-checkbox">
+                                            <input type="checkbox" name="" class="all-charges-select">
+                                            <span></span>
+                                        </label>
+                                    </th>
+                                    <th class="sorting">
+                                        <span>Charge Code</span>
+                                    </th>
+                                    <th class="sorting">
+                                        <span>Charge Name</span>
+                                    </th>
+                                    <th class="sorting">
+                                        <span>JobID</span>
+                                    </th>
+                                    <th class="sorting">
+                                        <span>HBL</span>
+                                    </th>
+                                    <th class="sorting">
+                                        <span>MBL</span>
+                                    </th>
+                                    <th class="sorting">
+                                        <span>Custom No</span>
+                                    </th>
+                                    <th class="sorting">
+                                        <span>Debit</span>
+                                    </th>
+                                    <th class="sorting">
+                                        <span>Credit</span>
+                                    </th>
+                                    <th class="sorting">
+                                        <span>Currency</span>
+                                    </th>
+                                    <th class="sorting">
+                                        <span>Invoice No</span>
+                                    </th>
+                                    <th class="sorting">
+                                        <span>Services Date</span>
+                                    </th>
+                                    <th class="sorting">
+                                        <span>Note</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="tbody-group">
+                                <tr>
+                                    <td class="table-actions-col">
+                                        <div class="table-actions">
+                                            <label class="m-checkbox">
+                                                <input type="checkbox" name="" class="single-charges-select">
+                                                <span></span>
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span>Text</span>
+                                    </td>
+                                    <td>
+                                        <span>Text</span>
+                                    </td>
+                                    <td>
+                                        <span>Text</span>
+                                    </td>
+                                    <td>
+                                        <span>Text</span>
+                                    </td>
+                                    <td>
+                                        <span>Text</span>
+                                    </td>
+                                    <td>
+                                        <span>Text</span>
+                                    </td>
+                                    <td>
+                                        <span>Text</span>
+                                    </td>
+                                    <td>
+                                        <span>Text</span>
+                                    </td>
+                                    <td>
+                                        <span>Text</span>
+                                    </td>
+                                    <td>
+                                        <span>Text</span>
+                                    </td>
+                                    <td>
+                                        <span>Text</span>
+                                    </td>
+                                    <td>
+                                        <span>Text</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--end: Datatable-->
+                    <!--end::m-portlet -->
+                </div>
+                <!--end::Form-->
+            </div>
+            <div class="modal-footer m--align-center">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" routerLink="/home/accounting/statement-of-account-edit">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            add charge
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

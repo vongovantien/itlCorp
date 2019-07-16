@@ -1,0 +1,1 @@
+export * from './confirm-detele/confirm-delete.popup';

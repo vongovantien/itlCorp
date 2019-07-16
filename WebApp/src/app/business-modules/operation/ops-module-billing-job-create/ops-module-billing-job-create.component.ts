@@ -10,7 +10,7 @@ import { NgForm } from "@angular/forms";
 import { Router } from "@angular/router";
 import { PlaceTypeEnum } from "src/app/shared/enums/placeType-enum";
 import { JobRepo } from "src/app/shared/repositories";
-import { PopupBase } from "src/app/modal.base";
+import { PopupBase } from "src/app/popup.base";
 import { takeUntil, catchError, finalize } from "rxjs/operators";
 import { NgxSpinnerService } from "ngx-spinner";
 import { ToastrService } from "ngx-toastr";
