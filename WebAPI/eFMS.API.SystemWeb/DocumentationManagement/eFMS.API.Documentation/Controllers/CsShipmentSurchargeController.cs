@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.Service.Models;
@@ -11,7 +12,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
-using SystemManagementAPI.Resources;
 
 namespace eFMS.API.Documentation.Controllers
 {

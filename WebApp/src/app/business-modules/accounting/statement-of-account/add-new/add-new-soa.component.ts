@@ -11,7 +11,12 @@ export class StatementOfAccountAddnewComponent extends AppPage {
 
   @ViewChild(StatementOfAccountAddChargeComponent, { static: false }) addChargePopup: StatementOfAccountAddChargeComponent;
   isCollapsed: boolean = true;
-  
+  selectedRange: any;
+  dateMode: any[];
+  items: any[];
+  currencyList: any[];
+  servicesList: any[];
+
   constructor() {
 
     super();
@@ -24,4 +29,23 @@ export class StatementOfAccountAddnewComponent extends AppPage {
     this.addChargePopup.show();
   }
 
+  /**
+  * ng2-select
+  */
+  private value: any = {};
+  public selected(value: any): void {
+    console.log('Selected value is: ', value);
+  }
+
+  public removed(value: any): void {
+    console.log('Removed value is: ', value);
+  }
+
+  public typed(value: any): void {
+    console.log('New search input: ', value);
+  }
+
+  public refreshValue(value: any): void {
+    this.value = value;
+  }
 }

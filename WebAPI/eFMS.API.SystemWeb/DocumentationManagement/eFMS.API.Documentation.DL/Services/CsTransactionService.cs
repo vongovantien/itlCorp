@@ -97,7 +97,7 @@ namespace eFMS.API.Documentation.DL.Services
             var query = (from detail in ((eFMSDataContext)DataContext.DC).CsTransactionDetail
                          where detail.JobId == jobId
                          join surcharge in ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge on detail.Id equals surcharge.Hblid
-                         where surcharge.Soano != null || surcharge.OtherSoa != null
+                         where surcharge.Cdno != null || surcharge.Soano != null
                          select detail);
             if (query.Any())
             {

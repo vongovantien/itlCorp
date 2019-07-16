@@ -26,35 +26,23 @@ export class OpsModuleCreditDebitNoteComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // this.baseServices.dataStorage.subscribe(data => {
-    //   this.STORAGE_DATA = data;
-    //   if (this.STORAGE_DATA.isNewCDNote !== undefined) {
-    //     this.IsNewCDNote = this.STORAGE_DATA.isNewCDNote;
-    //     if (this.IsNewCDNote === true) {
-    //       this.getAllCDNote();
-    //     }
-    //   }
-
-    //   if (this.STORAGE_DATA.CurrentOpsTransaction !== undefined) {
-    //     this.CurrentHBID = this.STORAGE_DATA.CurrentOpsTransaction.hblid;
-    //     this.getAllCDNote();
-    //   }
-
-    // });
-    this.STORAGE_DATA = this.baseServices.dataStorage.value["isNewCDNote"];
-    if (this.STORAGE_DATA !== undefined) {
-      this.IsNewCDNote = this.STORAGE_DATA.isNewCDNote;
-      if (this.IsNewCDNote === true) {
-        this.getAllCDNote();
+    this.baseServices.dataStorage.subscribe(data => {
+      this.STORAGE_DATA = data;
+      if (this.STORAGE_DATA.isNewCDNote !== undefined) {
+        this.IsNewCDNote = this.STORAGE_DATA.isNewCDNote;
+        if (this.IsNewCDNote === true) {
+          this.getAllCDNote();
+        }
       }
+
       if (this.STORAGE_DATA.CurrentOpsTransaction !== undefined) {
         this.CurrentHBID = this.STORAGE_DATA.CurrentOpsTransaction.hblid;
         this.getAllCDNote();
       }
-    }
+
+    });
   }
   ngOnDestroy(): void {
-    this.baseServices.dataStorage.unsubscribe();
   }
 
   getAllCDNote() {

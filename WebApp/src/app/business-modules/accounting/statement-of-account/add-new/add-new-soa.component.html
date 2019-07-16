@@ -22,13 +22,15 @@
                                 Partner
                             </label>
                             <div class="dropdown e--combogrid">
-                                <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected">
+                                <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
+                                    data-toggle="dropdown" placeholder="Please selected">
                                 <div class="dropdown-menu e--combogrid-content">
                                     <div class="tabel-wrapper table-fixed">
                                         <div class="table-head-fixed">
                                             <div class="table-filter-block">
                                                 <div class="search-field">
-                                                    <input class="form-control m-input m-input--square" type="text" placeholder="Search...">
+                                                    <input class="form-control m-input m-input--square" type="text"
+                                                        placeholder="Search...">
                                                     <i class="icon-search"></i>
                                                 </div>
                                             </div>
@@ -68,7 +70,9 @@
                                 Date
                             </label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [(ngModel)]="selectedRange" [ranges]="ranges" [maxDate]="maxDate" [alwaysShowCalendars]="true" name="daterange"
+                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                    [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [(ngModel)]="selectedRange"
+                                    [ranges]="ranges" [alwaysShowCalendars]="true" name="daterange"
                                     placeholder="From date - to date" readonly />
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
@@ -83,7 +87,9 @@
                             <label class="form-control-label" for="">
                                 Date Mode
                             </label>
-                            <ng-select [allowClear]="true" [items]="dateMode" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                            <ng-select [allowClear]="true" [items]="dateMode" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select filter">
                             </ng-select>
                         </div>
                     </div>
@@ -94,7 +100,9 @@
                             <label class="form-control-label" for="">
                                 Type
                             </label>
-                            <ng-select [allowClear]="true" [items]="['All', 'Debit', 'Credit']" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                            <ng-select [allowClear]="true" [items]="['All', 'Debit', 'Credit']"
+                                (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
+                                (typed)="typed($event)" placeholder="Select filter">
                             </ng-select>
                         </div>
                     </div>
@@ -103,7 +111,9 @@
                             <label class="form-control-label" for="">
                                 OBH
                             </label>
-                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                            <ng-select [allowClear]="true" [items]="items" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select filter">
                             </ng-select>
                         </div>
                     </div>
@@ -112,7 +122,9 @@
                             <label class="form-control-label" for="">
                                 Currency
                             </label>
-                            <ng-select [allowClear]="true" [items]="currencyList" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                            <ng-select [allowClear]="true" [items]="currencyList" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select filter">
                             </ng-select>
                         </div>
                     </div>
@@ -123,7 +135,9 @@
                             <label class="form-control-label" for="">
                                 Services
                             </label>
-                            <ng-select [allowClear]="true" [items]="servicesList" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                            <ng-select [allowClear]="true" [items]="servicesList" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select filter">
                             </ng-select>
                         </div>
                     </div>
@@ -132,7 +146,9 @@
                             <label class="form-control-label" for="">
                                 Office
                             </label>
-                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                            <ng-select [allowClear]="true" [items]="items" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select filter">
                             </ng-select>
                         </div>
                     </div>
@@ -141,7 +157,9 @@
                             <label class="form-control-label" for="">
                                 Creator
                             </label>
-                            <ng-select [multiple]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select type">
+                            <ng-select [multiple]="true" [items]="items" (data)="refreshValue($event)"
+                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                placeholder="Select type">
                             </ng-select>
                         </div>
                     </div>
@@ -153,13 +171,15 @@
                                 Charge
                             </label>
                             <div class="dropdown e--combogrid">
-                                <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected">
+                                <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
+                                    data-toggle="dropdown" placeholder="Please selected">
                                 <div class="dropdown-menu e--combogrid-content">
                                     <div class="tabel-wrapper table-fixed">
                                         <div class="table-head-fixed">
                                             <div class="table-filter-block">
                                                 <div class="search-field">
-                                                    <input class="form-control m-input m-input--square" type="text" placeholder="Search...">
+                                                    <input class="form-control m-input m-input--square" type="text"
+                                                        placeholder="Search...">
                                                     <i class="icon-search"></i>
                                                 </div>
                                             </div>
@@ -236,10 +256,12 @@
                         </div>
                         <div class="row m--margin-top-15">
                             <div class="col-md-6">
-                                <span class="m--font-bolder">Total shipment:</span><span class="m--font-brand m--margin-left-5">0</span>
+                                <span class="m--font-bolder">Total shipment:</span><span
+                                    class="m--font-brand m--margin-left-5">0</span>
                             </div>
                             <div class="col-md-6">
-                                <span class="m--font-bolder">Total Charge:</span><span class="m--font-brand m--margin-left-5">0</span>
+                                <span class="m--font-bolder">Total Charge:</span><span
+                                    class="m--font-brand m--margin-left-5">0</span>
                             </div>
                         </div>
                     </div>
@@ -252,7 +274,9 @@
                                 </span>
                             </span>
                         </button>
-                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-left-10" (click)="addCharge()">
+                        <button type="button"
+                            class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-left-10"
+                            (click)="addCharge()">
                             <span>
                                 <i class="la la-plus"></i>
                                 <span>

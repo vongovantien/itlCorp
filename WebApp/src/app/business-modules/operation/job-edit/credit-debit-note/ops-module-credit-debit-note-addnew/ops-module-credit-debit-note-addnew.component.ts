@@ -48,7 +48,6 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit, OnDestro
     }
 
     ngOnDestroy(): void {
-        this.baseServices.dataStorage.unsubscribe();
     }
     getListSubjectPartner() {
         this.baseServices.get(this.api_menu.Documentation.CsShipmentSurcharge.getPartners + "?Id=" + this.currentHbID + "&IsHouseBillID=true").subscribe((data: any[]) => {

@@ -35,7 +35,8 @@
         <div class="m-portlet__body">
             <!--begin::Form-->
             <div class="m-form">
-                    <app-search-options [configSearch]="configSearch" (search)="onSearch($event)" (reset_search)=resetSearch($event)></app-search-options>
+                <app-search-options [configSearch]="configSearch" (search)="onSearch($event)"
+                    (reset_search)=resetSearch($event)></app-search-options>
                 <!-- <div class="row">
                     <div class="col">
                         <div class="input-group m-input-group m-input-group--square">
@@ -128,7 +129,8 @@
                                         title="Edit" data-toggle="modal" data-target="#edit-connection-modal">
                                         <i class="la la-edit"></i>
                                     </button>
-                                    <button type="button" (click)="indexConnectToDelete=i;deleteConfirm()" [disabled]="!item.inactive"
+                                    <button type="button" (click)="indexConnectToDelete=i;deleteConfirm()"
+                                        [disabled]="!item.inactive"
                                         class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Remove" data-toggle="modal"
                                         data-target="#confirm-delete-connection-modal">
@@ -137,7 +139,8 @@
                                 </div>
                             </td>
                             <td class="sorting">
-                                <a href="javascript:void(0)" data-toggle="modal" (click)="getEcusConnectionDetails(item.id)"
+                                <a href="javascript:void(0)" data-toggle="modal"
+                                    (click)="getEcusConnectionDetails(item.id)"
                                     data-target="#edit-connection-modal">{{item.name}}</a>
                             </td>
                             <td class="sorting">
@@ -337,170 +340,169 @@
         aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
-                
-                    <div class="modal-header">
-                        <h5 class="modal-title">Detail/Edit Connection</h5>
-                        <button type="button" class="close" (click)="closeModal(editEcusConnectForm)"
-                            aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body" *ngIf="EcusConnectionEdit!==null">
-                        <div class="m-form m-form m-form--state">
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <div class="form-group"
-                                        [ngClass]="{ 'm-form__group has-danger': editEcusConnectForm.submitted && edtEcusName.invalid}">
-                                        <label class="form-control-label" for="">
-                                            name <span class="m--font-danger">(*)</span>
-                                        </label>
-                                        <input ecusSpecicalCharacterAllowSpace type="text" 
-                                            (change)="EcusConnectionEdit.name=EcusConnectionEdit.name.trim()" required
-                                            class="form-control m-input m-input--square" #edtEcusName="ngModel"
-                                            [(ngModel)]="EcusConnectionEdit.name" autocomplete="nope" name="edtEcusName"
-                                            placeholder="">
-                                        <div class="form-control-feedback"
-                                            *ngIf="editEcusConnectForm.submitted && edtEcusName.invalid">
-                                            Name is required
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <div class="form-group"
-                                        [ngClass]="{ 'm-form__group has-danger': editEcusConnectForm.submitted && EcusConnectionEdit.userId===null}">
-                                        <label class="form-control-label" for="">
-                                            user name <span class="m--font-danger">(*)</span>
-                                        </label>
-                                        <ng-select [allowClear]="true" [items]="Users" [disabled]="disabled"
-                                            [active]="[{id:EcusConnectionEdit.userId,text:EcusConnectionEdit.username}]"
-                                            (selected)="EcusConnectionEdit.userId=$event.id;EcusConnectionEdit.username=$event.text"
-                                            (removed)="EcusConnectionEdit.userId=null" (typed)="typed($event)"
-                                            placeholder="Select filter">
-                                        </ng-select>
-                                        <div class="form-control-feedback"
-                                            *ngIf="editEcusConnectForm.submitted && EcusConnectionEdit.userId===null">
-                                            Username is required
-                                        </div>
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Detail/Edit Connection</h5>
+                    <button type="button" class="close" (click)="closeModal(editEcusConnectForm)" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" *ngIf="EcusConnectionEdit!==null">
+                    <div class="m-form m-form m-form--state">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': editEcusConnectForm.submitted && edtEcusName.invalid}">
+                                    <label class="form-control-label" for="">
+                                        name <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <input ecusSpecicalCharacterAllowSpace type="text"
+                                        (change)="EcusConnectionEdit.name=EcusConnectionEdit.name.trim()" required
+                                        class="form-control m-input m-input--square" #edtEcusName="ngModel"
+                                        [(ngModel)]="EcusConnectionEdit.name" autocomplete="nope" name="edtEcusName"
+                                        placeholder="">
+                                    <div class="form-control-feedback"
+                                        *ngIf="editEcusConnectForm.submitted && edtEcusName.invalid">
+                                        Name is required
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            server name
-                                        </label>
-                                        <input ecusSpecicalCharacterNoSpace [(ngModel)]="EcusConnectionEdit.serverName"
-                                            type="text" class="form-control m-input m-input--square" autocomplete="nope"
-                                            name="edtEcusServerName" placeholder="">
+                            <div class="col-lg-6">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': editEcusConnectForm.submitted && EcusConnectionEdit.userId===null}">
+                                    <label class="form-control-label" for="">
+                                        user name <span class="m--font-danger">(*)</span>
+                                    </label>
+                                    <ng-select [allowClear]="true" [items]="Users" [disabled]="disabled"
+                                        [active]="[{id:EcusConnectionEdit.userId,text:EcusConnectionEdit.username}]"
+                                        (selected)="EcusConnectionEdit.userId=$event.id;EcusConnectionEdit.username=$event.text"
+                                        (removed)="EcusConnectionEdit.userId=null" (typed)="typed($event)"
+                                        placeholder="Select filter">
+                                    </ng-select>
+                                    <div class="form-control-feedback"
+                                        *ngIf="editEcusConnectForm.submitted && EcusConnectionEdit.userId===null">
+                                        Username is required
                                     </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            database name
-                                        </label>
-                                        <input ecusSpecicalCharacterNoSpace [(ngModel)]="EcusConnectionEdit.dbname"
-                                            type="text" class="form-control m-input m-input--square" autocomplete="nope"
-                                            name="edtEcusDBName" placeholder="">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            database user name
-                                        </label>
-                                        <input ecusSpecicalCharacterNoSpace [(ngModel)]="EcusConnectionEdit.dbusername"
-                                            type="text" class="form-control m-input m-input--square" autocomplete="nope"
-                                            name="edtEcusDBUserName" placeholder="">
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            database password
-                                        </label>
-                                        <input [(ngModel)]="EcusConnectionEdit.dbpassword"
-                                            (change)="EcusConnectionEdit.dbpassword=EcusConnectionEdit.dbpassword.trim()"
-                                            type="text" class="form-control m-input m-input--square" autocomplete="nope"
-                                            name="edtEcusDBPass" placeholder="">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            status
-                                        </label>
-                                        <div>
-                                            <label class="m-checkbox">
-                                                <input type="checkbox" [checked]="!EcusConnectionEdit.inactive"
-                                                    name="edtEcusStatus"
-                                                    (change)="EcusConnectionEdit.inactive=!EcusConnectionEdit.inactive">
-                                                Active
-                                                <span></span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            Note
-                                        </label>
-                                        <input [(ngModel)]="EcusConnectionEdit.note"
-                                            (change)="EcusConnectionEdit.note=EcusConnectionEdit.note.trim()"
-                                            type="text" class="form-control m-input m-input--square" autocomplete="nope"
-                                            name="edtEcusNote" placeholder="">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6 m--margin-top-10 m--margin-bottom-5">
-                                    <span class="m--font-bolder">Create:</span>
-                                    <span
-                                        class="m--font-brand m--margin-left-5">{{EcusConnectionEdit.datetimeCreated | date:'dd/MM/yyyy h:mm:ss a'}}</span>
-                                    <span class="m--font-bolder m--margin-left-5">by</span>
-                                    <span
-                                        class="m--font-brand m--margin-left-5">{{EcusConnectionEdit.userCreatedName}}</span>
-                                </div>
-                                <div class="col-md-6 m--margin-top-10 m--margin-bottom-5">
-                                    <span class="m--font-bolder">Modified:</span>
-                                    <ng-container *ngIf="EcusConnectionEdit.userModified!==null">
-                                        <span
-                                            class="m--font-brand m--margin-left-5">{{EcusConnectionEdit.datetimeModified | date:'dd/MM/yyyy h:mm:ss a'}}</span>
-                                        <span class="m--font-bolder m--margin-left-5">by</span>
-                                        <span
-                                            class="m--font-brand m--margin-left-5">{{EcusConnectionEdit.userModifiedName}}</span>
-                                    </ng-container>
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        server name
+                                    </label>
+                                    <input ecusSpecicalCharacterNoSpace [(ngModel)]="EcusConnectionEdit.serverName"
+                                        type="text" class="form-control m-input m-input--square" autocomplete="nope"
+                                        name="edtEcusServerName" placeholder="">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        database name
+                                    </label>
+                                    <input ecusSpecicalCharacterNoSpace [(ngModel)]="EcusConnectionEdit.dbname"
+                                        type="text" class="form-control m-input m-input--square" autocomplete="nope"
+                                        name="edtEcusDBName" placeholder="">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        database user name
+                                    </label>
+                                    <input ecusSpecicalCharacterNoSpace [(ngModel)]="EcusConnectionEdit.dbusername"
+                                        type="text" class="form-control m-input m-input--square" autocomplete="nope"
+                                        name="edtEcusDBUserName" placeholder="">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        database password
+                                    </label>
+                                    <input [(ngModel)]="EcusConnectionEdit.dbpassword"
+                                        (change)="EcusConnectionEdit.dbpassword=EcusConnectionEdit.dbpassword.trim()"
+                                        type="text" class="form-control m-input m-input--square" autocomplete="nope"
+                                        name="edtEcusDBPass" placeholder="">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        status
+                                    </label>
+                                    <div>
+                                        <label class="m-checkbox">
+                                            <input type="checkbox" [checked]="!EcusConnectionEdit.inactive"
+                                                name="edtEcusStatus"
+                                                (change)="EcusConnectionEdit.inactive=!EcusConnectionEdit.inactive">
+                                            Active
+                                            <span></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Note
+                                    </label>
+                                    <input [(ngModel)]="EcusConnectionEdit.note"
+                                        (change)="EcusConnectionEdit.note=EcusConnectionEdit.note.trim()" type="text"
+                                        class="form-control m-input m-input--square" autocomplete="nope"
+                                        name="edtEcusNote" placeholder="">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 m--margin-top-10 m--margin-bottom-5">
+                                <span class="m--font-bolder">Create:</span>
+                                <span
+                                    class="m--font-brand m--margin-left-5">{{EcusConnectionEdit.datetimeCreated | date:'dd/MM/yyyy h:mm:ss a'}}</span>
+                                <span class="m--font-bolder m--margin-left-5">by</span>
+                                <span
+                                    class="m--font-brand m--margin-left-5">{{EcusConnectionEdit.userCreatedName}}</span>
+                            </div>
+                            <div class="col-md-6 m--margin-top-10 m--margin-bottom-5">
+                                <span class="m--font-bolder">Modified:</span>
+                                <ng-container *ngIf="EcusConnectionEdit.userModified!==null">
+                                    <span
+                                        class="m--font-brand m--margin-left-5">{{EcusConnectionEdit.datetimeModified | date:'dd/MM/yyyy h:mm:ss a'}}</span>
+                                    <span class="m--font-bolder m--margin-left-5">by</span>
+                                    <span
+                                        class="m--font-brand m--margin-left-5">{{EcusConnectionEdit.userModifiedName}}</span>
+                                </ng-container>
+                            </div>
+                        </div>
                     </div>
-                    <div class="modal-footer m--align-center c-button-actions">
-                        <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                </div>
+                <div class="modal-footer m--align-center c-button-actions">
+                    <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
                         (click)="SubmitEditConnect(editEcusConnectForm)">
+                        <span>
+                            <i class="la la-save"></i>
                             <span>
-                                <i class="la la-save"></i>
-                                <span>
-                                    edit
-                                </span>
+                                edit
                             </span>
-                        </button>
-                        <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="closeModal(editEcusConnectForm)">
+                        </span>
+                    </button>
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="closeModal(editEcusConnectForm)">
+                        <span>
+                            <i class="la la-ban"></i>
                             <span>
-                                <i class="la la-ban"></i>
-                                <span>
-                                    cancel
-                                </span>
+                                cancel
                             </span>
-                        </button>
-                    </div>
-              
+                        </span>
+                    </button>
+                </div>
+
             </div>
         </div>
     </div>
@@ -509,8 +511,8 @@
 <!--end::edit-ware-house-modal-->
 
 <!--begin::confirm-delete-modal-->
-<div class="modal fade" id="confirm-delete-connection-modal" data-backdrop="static" role="dialog" aria-labelledby="" *ngIf="indexConnectToDelete!==-1"
-    aria-hidden="true">
+<div class="modal fade" id="confirm-delete-connection-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    *ngIf="indexConnectToDelete!==-1" aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -521,11 +523,13 @@
             </div>
             <div class="modal-body">
                 <div class="confirm-text-block">
-                    <span>Do you want to delete <span class="m--font-bold">{{EcusConnections[indexConnectToDelete].username}} </span>item?</span>
+                    <span>Do you want to delete <span
+                            class="m--font-bold">{{EcusConnections[indexConnectToDelete].username}} </span>item?</span>
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button type="button" (click)="deleteConfirm(true)" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                <button type="button" (click)="deleteConfirm(true)"
+                    class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                     <span>
                         <i class="la la-save"></i>
                         <span>
