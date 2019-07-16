@@ -133,3 +133,5 @@ bin
 /WebAPI/eFMSWindowService/obj/Debug/edmxResourcesToEmbed/Models/eFMSModel.csdl
 /WebAPI/eFMSWindowService/obj/Debug/edmxResourcesToEmbed/Models/eFMSModel.msl
 /WebAPI/eFMSWindowService/obj/Debug/edmxResourcesToEmbed/Models/eFMSModel.ssdl
+/WebAPI/eFMSWindowService/.vs
+/WebAPI/eFMSWindowService/obj
