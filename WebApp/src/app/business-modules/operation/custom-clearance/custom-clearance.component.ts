@@ -10,7 +10,6 @@ import { ToastrService } from 'ngx-toastr';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
-//import { SystemConstants } from 'src/constants/system.const';
 import * as lodash from 'lodash';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
@@ -80,7 +79,6 @@ export class CustomClearanceComponent implements OnInit {
         });
     }
 
-
     setPage(pager: PagerSetting) {
         this.pager.currentPage = pager.currentPage;
         this.pager.pageSize = pager.pageSize;
@@ -116,8 +114,10 @@ export class CustomClearanceComponent implements OnInit {
     async resetSearch() {
         this.clearanceNo = '';
         this.selectedRange = { startDate: moment().subtract(30, 'days'), endDate: moment() };
+        this.selectedRangeImportDate = null;
         this.defaultImportStatus = ['Not imported'];
         this.defaultTypeClearance = ['All'];
+        this.currentUser = [localStorage.getItem('currently_userName')];
         this.searchObject = {};
         this.initPager();
         this.getListCustomsDeclaration();
@@ -163,7 +163,7 @@ export class CustomClearanceComponent implements OnInit {
             $('#btnDeleteCustomClearance').attr('data-target', '#confirm-delete-modal');
         } else {
             $('#btnDeleteCustomClearance').removeAttr('data-target');
-            this.toastr.warning('Not selected custom clearance', '', { positionClass: 'toast-bottom-right', closeButton: true, timeOut: 5000 });
+            $('#delete-alert-modal').modal('show');
         }
     }
 
