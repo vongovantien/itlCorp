@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, OnDestroy } from "@angular/core";
 import moment from "moment/moment";
 import { BaseService } from "src/services-base/base.service";
 import { API_MENU } from "src/constants/api-menu.const";
@@ -9,11 +9,16 @@ import { PartnerGroupEnum } from "src/app/shared/enums/partnerGroup.enum";
 import { NgForm } from "@angular/forms";
 import { Router } from "@angular/router";
 import { PlaceTypeEnum } from "src/app/shared/enums/placeType-enum";
+import { JobRepo } from "src/app/shared/repositories";
+import { PopupBase } from "src/app/modal.base";
+import { takeUntil, catchError, finalize } from "rxjs/operators";
+import { NgxSpinnerService } from "ngx-spinner";
+import { ToastrService } from "ngx-toastr";
 @Component({
   selector: "app-ops-module-billing-job-create",
   templateUrl: "./ops-module-billing-job-create.component.html"
 })
-export class OpsModuleBillingJobCreateComponent implements OnInit {
+export class OpsModuleBillingJobCreateComponent extends PopupBase implements OnInit, OnDestroy {
   DataStorage: Object = null;
   productServices: any[] = [];
   serviceModes: any[] = [];
@@ -28,10 +33,13 @@ export class OpsModuleBillingJobCreateComponent implements OnInit {
   constructor(
     private baseServices: BaseService,
     private api_menu: API_MENU,
-    private router: Router
+    private router: Router,
+    private jobRepo: JobRepo,
+    private spinner: NgxSpinnerService,
+    private _toaster: ToastrService
   ) {
+    super();
     this.keepCalendarOpeningWithRange = true;
-    this.selectedDate = Date.now();
     this.selectedRange = {
       startDate: moment().startOf("month"),
       endDate: moment().endOf("month")
@@ -51,6 +59,9 @@ export class OpsModuleBillingJobCreateComponent implements OnInit {
     this.getListBillingOps();
   }
 
+  ngOnDestroy(): void {
+    this.baseServices.dataStorage.unsubscribe();
+  }
   async getShipmentCommonData() {
     const data = await shipmentHelper.getOPSShipmentCommonData(
       this.baseServices,
@@ -135,27 +146,57 @@ export class OpsModuleBillingJobCreateComponent implements OnInit {
     console.log(this.OpsTransactionToAdd);
     setTimeout(async () => {
       if (form.submitted) {
-        var error = $("#add-new-ops-job-form").find("div.has-danger");
+        const error = $("#add-new-ops-job-form").find("div.has-danger");
         if (error.length === 0) {
-          this.OpsTransactionToAdd.serviceDate =
-            this.OpsTransactionToAdd.serviceDate.startDate != null
-              ? dataHelper.dateTimeToUTC(
-                this.OpsTransactionToAdd.serviceDate.startDate
-              )
-              : null;
-          var res = await this.baseServices.postAsync(
-            this.api_menu.Documentation.Operation.addNew,
-            this.OpsTransactionToAdd
+          this.OpsTransactionToAdd.serviceDate = this.selectedDate.startDate != null ? dataHelper.dateTimeToUTC(this.selectedDate.startDate) : null;
+          this.jobRepo.addJob(this.OpsTransactionToAdd).pipe(
+            takeUntil(this.ngUnsubscribe),
+            catchError(this.catchError),
+            finalize(() => { this.spinner.hide(); })
+          ).subscribe(
+            (res: any) => {
+              if (!res.status) {
+                this._toaster.error(res.message, '', { positionClass: 'toast-bottom-right' });
+              } else {
+                this.OpsTransactionToAdd = new OpsTransaction();
+                this.resetDisplay();
+                form.onReset();
+                this._toaster.success(res.message, '', { positionClass: 'toast-bottom-right' });
+                this.router.navigate([
+                  "/home/operation/job-edit/", res.data
+                ]);
+              }
+            }
           );
-          if (res.status) {//job-edit/:id
-            console.log(res);
-            this.router.navigate([
-              "/home/operation/job-edit/", res.data
-            ]);
-            this.OpsTransactionToAdd = new OpsTransaction();
-            this.resetDisplay();
-            form.onReset();
-          }
+          // this._jobRepo.getDetailStageOfJob(id).pipe(
+          //   takeUntil(this.ngUnsubscribe),
+          //   catchError(this.catchError),
+          //   finalize(() => { this._spinner.hide() }),
+          // ).subscribe(
+          //   (res: any[]) => {
+          //     if (res instanceof Error) {
+
+          //     } else {
+          //       this.selectedStage = new Stage(res);
+          //       this.openPopupDetail();
+          //     }
+          //   },
+          //   // error
+          //   (errs: any) => {
+          //     // this.handleErrors(errs)
+          //   },
+          //   // complete
+          //   () => { }
+          // )
+          // if (res.status) {//job-edit/:id
+          //   console.log(res);
+          //   this.router.navigate([
+          //     "/home/operation/job-edit/", res.data
+          //   ]);
+          //   this.OpsTransactionToAdd = new OpsTransaction();
+          //   this.resetDisplay();
+          //   form.onReset();
+          // }
         }
       }
     }, 300);

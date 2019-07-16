@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, Input } from '@angular/core';
 import { BaseService } from 'src/services-base/base.service';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
 import { API_MENU } from 'src/constants/api-menu.const';
@@ -7,8 +7,6 @@ import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagingService } from 'src/app/shared/common/pagination/paging-service';
 import { SystemConstants } from 'src/constants/system.const';
 import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
-import * as lodash from 'lodash';
-import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { SortService } from 'src/app/shared/services/sort.service';
 
 @Component({
@@ -17,7 +15,7 @@ import { SortService } from 'src/app/shared/services/sort.service';
   styleUrls: ['./billing-custom-declaration.component.scss']
 })
 export class BillingCustomDeclarationComponent implements OnInit {
-  currentJob: OpsTransaction;
+  @Input() currentJob: OpsTransaction;
   notImportedCustomClearances: any[];
   customClearances: any[];
   pager: PagerSetting = PAGINGSETTING;
@@ -40,12 +38,15 @@ export class BillingCustomDeclarationComponent implements OnInit {
   ngOnInit() {
     this.pager.currentPage = 1;
     this.pager.totalItems = 0;
-    this.stateChecking();
+    if (this.currentJob != null) {
+      this.getCustomClearanesOfJob(this.currentJob.jobNo);
+      this.getCustomClearancesNotImported();
+    }
   }
 
   async getCustomClearanesOfJob(jobNo: string) {
     this.importedData = await this.baseServices.getAsync(this.api_menu.Operation.CustomClearance.getByJob + "?jobNo=" + jobNo, false, true);
-    if(this.importedData != null){
+    if (this.importedData != null) {
       this.importedData.forEach(element => {
         element.isChecked = false;
       });
@@ -53,41 +54,12 @@ export class BillingCustomDeclarationComponent implements OnInit {
     this.dataImportedSearch = this.importedData;
     this.setPageMaster(this.pager);
   }
-
-  stateChecking() {
-    this.baseServices.spinnerShow();
-    // setTimeout(() => {
-    //   this.baseServices.dataStorage.subscribe(data => {
-    //     if (data["CurrentOpsTransaction"] != null) {
-    //       this.currentJob = data["CurrentOpsTransaction"];
-
-    //       if (this.currentJob != null) {
-    //         this.getCustomClearanesOfJob(this.currentJob.jobNo);
-    //         this.getCustomClearancesNotImported();
-    //       }
-    //     }
-    //   });
-    // }, 1000);
-
-    this.baseServices.dataStorage.subscribe(data => {
-      if (data["CurrentOpsTransaction"] != null) {
-        this.currentJob = data["CurrentOpsTransaction"];
-
-        if (this.currentJob != null) {
-          this.getCustomClearanesOfJob(this.currentJob.jobNo);
-          this.getCustomClearancesNotImported();
-        }
-      }
-    });
-
-    this.baseServices.spinnerHide();
-  }
   removeChecked() {
     this.checkAllImported = false;
-    let checkedData = this.importedData.filter(x => x.isChecked == true);
+    const checkedData = this.importedData.filter(x => x.isChecked === true);
     if (checkedData.length > 0) {
       for (let i = 0; i < checkedData.length; i++) {
-        let index = this.importedData.indexOf(x => x.id == checkedData[i].id);
+        const index = this.importedData.indexOf(x => x.id === checkedData[i].id);
         if (index > -1) {
           this.importedData[index] = true;
         }
@@ -101,19 +73,18 @@ export class BillingCustomDeclarationComponent implements OnInit {
     this.sortKey = property;
     if (isImported) {
       this.customClearances = this.sortService.sort(this.customClearances, property, this.isDesc);
-    }
-    else {
+    } else {
       this.notImportedCustomClearances = this.sortService.sort(this.notImportedCustomClearances, property, this.isDesc);
     }
   }
   async removeImported() {
-    let dataToUpdate = this.importedData.filter(x => x.isChecked == true);
+    const dataToUpdate = this.importedData.filter(x => x.isChecked === true);
     if (dataToUpdate.length > 0) {
       dataToUpdate.forEach(x => {
         x.jobNo = null;
       });
-      let responses = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.updateToAJob, dataToUpdate, false, true);
-      if(responses.success == true){
+      const responses = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.updateToAJob, dataToUpdate, false, true);
+      if (responses.success === true) {
         await this.getCustomClearanesOfJob(this.currentJob.jobNo);
         this.updateShipmentVolumn();
         this.getCustomClearancesNotImported();
@@ -136,7 +107,7 @@ export class BillingCustomDeclarationComponent implements OnInit {
   }
   async getCustomClearancesNotImported() {
     this.notImportedData = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.query, { "imPorted": false }, false, true);
-    if(this.notImportedData != null){
+    if (this.notImportedData != null) {
       this.notImportedData.forEach(element => {
         element.isChecked = false;
       });
@@ -149,16 +120,15 @@ export class BillingCustomDeclarationComponent implements OnInit {
       this.customClearances.forEach(x => {
         x.isChecked = true;
       });
-    }
-    else {
+    } else {
       this.customClearances.forEach(x => {
         x.isChecked = false;
       });
     }
-    let checkedData = this.customClearances.filter(x => x.isChecked == true);
+    const checkedData = this.customClearances.filter(x => x.isChecked === true);
     if (checkedData.length > 0) {
       for (let i = 0; i < checkedData.length; i++) {
-        let index = this.importedData.indexOf(x => x.id == checkedData[i].id);
+        const index = this.importedData.indexOf(x => x.id === checkedData[i].id);
         if (index > -1) {
           this.importedData[index] = true;
         }
@@ -170,16 +140,15 @@ export class BillingCustomDeclarationComponent implements OnInit {
       this.notImportedCustomClearances.forEach(x => {
         x.isChecked = true;
       });
-    }
-    else {
+    } else {
       this.notImportedCustomClearances.forEach(x => {
         x.isChecked = false;
       });
     }
-    let checkedData = this.notImportedCustomClearances.filter(x => x.isChecked == true);
+    const checkedData = this.notImportedCustomClearances.filter(x => x.isChecked === true);
     if (checkedData.length > 0) {
       for (let i = 0; i < checkedData.length; i++) {
-        let index = this.notImportedData.indexOf(x => x.id == checkedData[i].id);
+        const index = this.notImportedData.indexOf(x => x.id === checkedData[i].id);
         if (index > -1) {
           this.notImportedData[index] = true;
         }
@@ -187,13 +156,13 @@ export class BillingCustomDeclarationComponent implements OnInit {
     }
   }
   async updateJobToClearance() {
-    let dataToUpdate = this.notImportedData.filter(x => x.isChecked == true);
+    const dataToUpdate = this.notImportedData.filter(x => x.isChecked === true);
     if (dataToUpdate.length > 0) {
       dataToUpdate.forEach(x => {
         x.jobNo = this.currentJob.jobNo;
       });
-      let responses = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.updateToAJob, dataToUpdate, false, true);
-      if(responses.success == true){
+      const responses = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.updateToAJob, dataToUpdate, false, true);
+      if (responses.success === true) {
         await this.getCustomClearanesOfJob(this.currentJob.jobNo);
         this.updateShipmentVolumn();
         this.getCustomClearancesNotImported();
@@ -216,10 +185,10 @@ export class BillingCustomDeclarationComponent implements OnInit {
   }
   removeAllChecked() {
     this.checkAllNotImported = false;
-    let checkedData = this.notImportedCustomClearances.filter(x => x.isChecked == true);
+    const checkedData = this.notImportedCustomClearances.filter(x => x.isChecked === true);
     if (checkedData.length > 0) {
       for (let i = 0; i < checkedData.length; i++) {
-        let index = this.notImportedData.indexOf(x => x.id == checkedData[i].id);
+        const index = this.notImportedData.indexOf(x => x.id === checkedData[i].id);
         if (index > -1) {
           this.notImportedData[index] = true;
         }
@@ -248,7 +217,7 @@ export class BillingCustomDeclarationComponent implements OnInit {
   searchClearanceNotImported(event) {
     this.pager.totalItems = 0;
     this.cdr.detectChanges();
-    let keySearch = this.searchString.trim().toLocaleLowerCase();
+    const keySearch = this.searchString.trim().toLocaleLowerCase();
     if (keySearch !== null && keySearch.length < 2 && keySearch.length > 0) {
       return 0;
     }

@@ -37,7 +37,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 data = DataContext.Get();
                 RedisCacheHelper.SetObject(cache, Templates.CatStage.NameCaching.ListName, data);
             }
-            return data?.Select(x => mapper.Map<CatStageModel>(x));
+            return data?.OrderBy(x => x.Code).Select(x => mapper.Map<CatStageModel>(x));
         } 
 
         public HandleState AddStage(CatStageModel catStage)

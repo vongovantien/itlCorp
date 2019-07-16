@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input, OnDestroy } from '@angular/core';
 import filter from 'lodash/filter';
 import map from 'lodash/map';
 import concat from 'lodash/concat'
@@ -10,13 +10,14 @@ import { AcctSOA } from 'src/app/shared/models/document/acctSoa.model';
 import { async } from 'rxjs/internal/scheduler/async';
 import { NgForm } from '@angular/forms';
 import { SortService } from 'src/app/shared/services/sort.service';
+import { BehaviorSubject } from 'rxjs';
 declare var $: any;
 @Component({
     selector: 'app-ops-module-credit-debit-note-addnew',
     templateUrl: './ops-module-credit-debit-note-addnew.component.html',
     styleUrls: ['./ops-module-credit-debit-note-addnew.component.scss']
 })
-export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit {
+export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit, OnDestroy {
 
     isDisplay: boolean = true;
     CDNoteWorking: AcctSOA = new AcctSOA();
@@ -26,9 +27,9 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit {
         { text: 'INVOICE', id: 'INVOICE' }
     ];
 
-    listSubjectPartner: any[] = []; 
+    listSubjectPartner: any[] = [];
     constListSubjectPartner: any[] = [];
-    listChargeOfPartner: any[] = []; 
+    listChargeOfPartner: any[] = [];
     listRemainingCharges: any[] = [];
     constListChargeOfPartner: any[] = [];
     STORAGE_DATA: any = null;
@@ -46,6 +47,9 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit {
         this.StateChecking();
     }
 
+    ngOnDestroy(): void {
+        this.baseServices.dataStorage.unsubscribe();
+    }
     getListSubjectPartner() {
         this.baseServices.get(this.api_menu.Documentation.CsShipmentSurcharge.getPartners + "?Id=" + this.currentHbID + "&IsHouseBillID=true").subscribe((data: any[]) => {
             this.listSubjectPartner = cloneDeep(data);
@@ -63,7 +67,7 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit {
                 }
                 return o;
             });
-            this.listChargeOfPartner = this.sortServices.sort(this.listChargeOfPartner,"chargeCode",true)
+            this.listChargeOfPartner = this.sortServices.sort(this.listChargeOfPartner, "chargeCode", true)
             this.constListChargeOfPartner = cloneDeep(this.listChargeOfPartner);
             console.log(this.listChargeOfPartner);
             this.setChargesForCDNote();
@@ -71,7 +75,7 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit {
             this.baseServices.setData("listChargeOfPartner", this.listChargeOfPartner);
             this.baseServices.setData("currentPartnerId", partnerId);
             setTimeout(() => {
-                 this.checkSttAllNode();
+                this.checkSttAllNode();
             }, 100);
         }
 
@@ -318,10 +322,10 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit {
                 this.getListSubjectPartner();
 
             }
-            if((this.STORAGE_DATA.ShipmentUpdated!==undefined && this.STORAGE_DATA.ShipmentUpdated)||(this.STORAGE_DATA.ShipmentAdded!==undefined && this.STORAGE_DATA.ShipmentAdded)){
+            if ((this.STORAGE_DATA.ShipmentUpdated !== undefined && this.STORAGE_DATA.ShipmentUpdated) || (this.STORAGE_DATA.ShipmentAdded !== undefined && this.STORAGE_DATA.ShipmentAdded)) {
                 this.getListSubjectPartner();
-                this.baseServices.setData("ShipmentAdded",false);
-                this.baseServices.setData("ShipmentUpdated",false);
+                this.baseServices.setData("ShipmentAdded", false);
+                this.baseServices.setData("ShipmentUpdated", false);
             }
             if (this.STORAGE_DATA.listChargeOfPartner !== undefined) {
                 this.listChargeOfPartner = cloneDeep(this.STORAGE_DATA.listChargeOfPartner);

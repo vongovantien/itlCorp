@@ -11,7 +11,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
   providedIn: 'root'
 })
 
-export class  BaseService implements ErrorHandler {
+export class BaseService implements ErrorHandler {
 
   private headers: HttpHeaders;
   protected baseUrl: string;
@@ -21,7 +21,8 @@ export class  BaseService implements ErrorHandler {
    * 
    */
   private _DataStorage: BehaviorSubject<Object> = new BehaviorSubject({ "default": "hello world !" });
-  public dataStorage = this._DataStorage.asObservable();
+  //public dataStorage = this._DataStorage.asObservable();
+  public dataStorage = this._DataStorage;
   public setData(key: string, value: any) {
     this._DataStorage.next({ ...this._DataStorage.value, [key]: value });
   }
@@ -51,7 +52,7 @@ export class  BaseService implements ErrorHandler {
    * you must handle error or state by yourself
    * @param url 
    */
-  public get(url: string){
+  public get(url: string) {
 
     var token = 'Bearer ' + localStorage.getItem("access_token");
     this.headers = this.headers.set("Authorization", token);

@@ -1163,14 +1163,14 @@
                     </tr>
                 </tfoot>
             </table>
-        </div>       
+        </div>
         <!--end: table -->
     </div>
 </div>
 <!--end:: m-portlet-->
 
 
-<form novalidate #addBuyingRateChargeForm="ngForm" name="addBuyingRateChargeForm" 
+<form novalidate #addBuyingRateChargeForm="ngForm" name="addBuyingRateChargeForm"
     (ngSubmit)="addBuyingRateChargeForm.form.valid">
     <!--begin:: add-buying-rate-modal-->
     <div class="modal fade" id="add-buying-rate-modal" data-backdrop="static" role="dialog" aria-labelledby=""
@@ -1209,12 +1209,12 @@
                                         [dataSources]="lstBuyingRateChargesComboBox"
                                         [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
                                     </app-combo-grid-virtual-scroll>
-                                    
+
                                     <div class="form-control-feedback"
                                         *ngIf="addBuyingRateChargeForm.submitted && BuyingRateChargeToAdd.chargeId==null">
                                         Charge is required
                                     </div>
-                                    
+
                                 </div>
                             </div>
 
@@ -1299,7 +1299,7 @@
                                         [selectedDisplayFields]="['unitNameEn']" [dataSources]="comboBoxData.lstUnit"
                                         [displayFields]="[{'field':'unitNameEn','label':'Name EN'},{'field':'unitType','label':'Unit type'}]">
                                     </app-combo-grid-virtual-scroll>
-                                   
+
                                     <div class="form-control-feedback"
                                         *ngIf="addBuyingRateChargeForm.submitted && BuyingRateChargeToAdd.unitId==null">
                                         Unit is required
@@ -1448,8 +1448,8 @@
 </form>
 
 <!--begin:: edit-buying-rate-modal-->
-<form novalidate #editBuyingRateChargeForm="ngForm" name="editBuyingRateChargeForm"
-    *ngIf="BuyingRateChargeToEdit!=null" (ngSubmit)="editBuyingRateChargeForm.form.valid">
+<form novalidate #editBuyingRateChargeForm="ngForm" name="editBuyingRateChargeForm" *ngIf="BuyingRateChargeToEdit!=null"
+    (ngSubmit)="editBuyingRateChargeForm.form.valid">
     <div class="modal fade" id="edit-buying-rate-modal" data-backdrop="static" role="dialog" aria-labelledby=""
         aria-hidden="true">
         <div class="modal-dialog c-modal-fullscreen" role="document">
@@ -1486,7 +1486,7 @@
                                         [dataSources]="lstBuyingRateChargesComboBox"
                                         [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
                                     </app-combo-grid-virtual-scroll>
-                                   
+
                                     <div class="form-control-feedback"
                                         *ngIf="editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.chargeId==null">
                                         Charge is required
@@ -1536,13 +1536,13 @@
                                         BuyingRateChargeToEdit.partnerName=$event.shortName;"
                                         [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
                                         [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
-                                    </app-combo-grid-virtual-scroll>                                  
+                                    </app-combo-grid-virtual-scroll>
 
                                     <div class="form-control-feedback"
                                         *ngIf="editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.paymentObjectId==null">
                                         Partner name is required !
                                     </div>
-                                    
+
                                     <div class="form-control-feedback"
                                         *ngIf="!editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.objectBePaid!==null && BuyingRateChargeToEdit.paymentObjectId==null">
                                         Partner does not exist !
@@ -1583,7 +1583,7 @@
                                         [selectedDisplayFields]="['unitNameEn']" [dataSources]="comboBoxData.lstUnit"
                                         [displayFields]="[{'field':'unitNameEn','label':'Name EN'},{'field':'unitType','label':'Unit type'}]">
                                     </app-combo-grid-virtual-scroll>
-                         
+
                                     <div class="form-control-feedback"
                                         *ngIf="editBuyingRateChargeForm.submitted && BuyingRateChargeToEdit.unitId==null">
                                         Unit is required
@@ -1781,7 +1781,7 @@
                                         calculateTotalEachSelling()" [selectedDisplayFields]="['charge.chargeNameEn']"
                                         [dataSources]="lstSellingRateChargesComboBox"
                                         [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
-                                    </app-combo-grid-virtual-scroll>                                  
+                                    </app-combo-grid-virtual-scroll>
 
                                     <div class="form-control-feedback"
                                         *ngIf="addSellingRateChargeForm.submitted && SellingRateChargeToAdd.chargeId==null">
@@ -1824,7 +1824,7 @@
                                         [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
                                         [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                     </app-combo-grid-virtual-scroll>
-                                    
+
                                     <div class="form-control-feedback"
                                         *ngIf="addSellingRateChargeForm.submitted && SellingRateChargeToAdd.paymentObjectId==null">
                                         Partner name is required !
@@ -1869,7 +1869,7 @@
                                         [selectedDisplayFields]="['unitNameEn']" [dataSources]="comboBoxData.lstUnit"
                                         [displayFields]="[{'field':'unitNameEn','label':'Name EN'},{'field':'unitType','label':'Unit type'}]">
                                     </app-combo-grid-virtual-scroll>
-                                   
+
                                     <div class="form-control-feedback"
                                         *ngIf="addSellingRateChargeForm.submitted && SellingRateChargeToAdd.chargeId==null">
                                         Unit is required
@@ -2040,7 +2040,7 @@
                                         [dataSources]="lstBuyingRateChargesComboBox"
                                         [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
                                     </app-combo-grid-virtual-scroll>
-                                  
+
                                     <div class="form-control-feedback"
                                         *ngIf="editSellingRateChargeForm.submitted && SellingRateChargeToEdit.chargeId==null">
                                         Charge is required
@@ -2088,7 +2088,7 @@
                                         [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
                                         [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                     </app-combo-grid-virtual-scroll>
-      
+
                                     <div class="form-control-feedback"
                                         *ngIf="editSellingRateChargeForm.submitted && SellingRateChargeToEdit.paymentObjectId==null">
                                         Partner name is required !
@@ -2133,7 +2133,7 @@
                                                     SellingRateChargeToEdit.unit=$event.unitNameEn"
                                         [selectedDisplayFields]="['unitNameEn']" [dataSources]="comboBoxData.lstUnit"
                                         [displayFields]="[{'field':'unitNameEn','label':'Name EN'},{'field':'unitType','label':'Unit type'}]">
-                                    </app-combo-grid-virtual-scroll>                                 
+                                    </app-combo-grid-virtual-scroll>
 
                                     <div class="form-control-feedback"
                                         *ngIf="editSellingRateChargeForm.submitted && SellingRateChargeToEdit.unitId==null">
@@ -2308,8 +2308,7 @@
                                             class="m--margin-left-5 m--font-primary">{{selectedOBHChargeCode.value==null?'':selectedOBHChargeCode.value}}&nbsp;</small>
                                     </label>
 
-                                    <app-combo-grid-virtual-scroll
-                                        [disabled]="OBHChargeToAdd.soano!==null"
+                                    <app-combo-grid-virtual-scroll [disabled]="OBHChargeToAdd.soano!==null"
                                         [currentActiveItemId]="{field:'charge.id',value:OBHChargeToAdd.chargeId}"
                                         (itemSelected)="OBHChargeToAdd.chargeId=$event.charge.id;
                                         OBHChargeToAdd.unitId=$event.charge.unitId;
@@ -2320,7 +2319,7 @@
                                         [dataSources]="lstOBHChargesComboBox"
                                         [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
                                     </app-combo-grid-virtual-scroll>
-                                    
+
                                     <div class="form-control-feedback"
                                         *ngIf="addOBHChargeForm.submitted && OBHChargeToAdd.chargeId==null">
                                         Charge is required
@@ -2336,14 +2335,13 @@
                                         Receiver
                                     </label>
 
-                                    <app-combo-grid-virtual-scroll
-                                        [disabled]="OBHChargeToAdd.soano!==null"
+                                    <app-combo-grid-virtual-scroll [disabled]="OBHChargeToAdd.soano!==null"
                                         [currentActiveItemId]="{field:'id',value:OBHChargeToAdd.receiverId}"
                                         (itemSelected)="OBHChargeToAdd.receiverId = $event.id"
                                         [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
                                         [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                     </app-combo-grid-virtual-scroll>
-                                   
+
                                     <div class="form-control-feedback"
                                         *ngIf="addOBHChargeForm.submitted && (OBHChargeToAdd.receiverId==null || OBHChargeToAdd.receiverId==OBHChargeToAdd.payerId)">
                                         Receiver name is required and do not same with payer!
@@ -2360,8 +2358,7 @@
                                         Payer
                                     </label>
 
-                                    <app-combo-grid-virtual-scroll
-                                        [disabled]="OBHChargeToAdd.soano!==null"
+                                    <app-combo-grid-virtual-scroll [disabled]="OBHChargeToAdd.soano!==null"
                                         [currentActiveItemId]="{field:'id',value:OBHChargeToAdd.payerId}"
                                         (itemSelected)="OBHChargeToAdd.payerId  = $event.id"
                                         [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
@@ -2384,8 +2381,8 @@
                                         Quantity
                                     </label>
                                     <input type="text" class="form-control m-input m-input--square"
-                                        [disabled]="OBHChargeToAdd.soano!==null"
-                                        placeholder="Enter text" #OBHQuantityName="ngModel" appIntergerInputCheck
+                                        [disabled]="OBHChargeToAdd.soano!==null" placeholder="Enter text"
+                                        #OBHQuantityName="ngModel" appIntergerInputCheck
                                         [(ngModel)]="OBHChargeToAdd.quantity" required (keyup)="calculateTotalEachOBH()"
                                         name="OBHQuantityName">
                                     <div class="form-control-feedback"
@@ -2402,15 +2399,15 @@
                                         Unit
                                     </label>
 
-                                    <app-combo-grid-virtual-scroll
-                                        [disabled]="OBHChargeToAdd.soano!==null"
+                                    <app-combo-grid-virtual-scroll [disabled]="OBHChargeToAdd.soano!==null"
                                         [currentActiveItemId]="{field:'id',value:OBHChargeToAdd.unitId}"
                                         (itemSelected)="OBHChargeToAdd.unitId=$event.id"
                                         [selectedDisplayFields]="['unitNameEn']" [dataSources]="comboBoxData.lstUnit"
                                         [displayFields]="[{'field':'unitNameEn','label':'Name EN'},{'field':'unitType','label':'Unit type'}]">
-                                    </app-combo-grid-virtual-scroll>                                   
+                                    </app-combo-grid-virtual-scroll>
 
-                                    <div class="form-control-feedback" *ngIf="addOBHChargeForm.submitted && OBHChargeToAdd.chargeId==null">
+                                    <div class="form-control-feedback"
+                                        *ngIf="addOBHChargeForm.submitted && OBHChargeToAdd.chargeId==null">
                                         Unit is required
                                     </div>
 
@@ -2423,10 +2420,9 @@
                                         Unit price
                                     </label>
                                     <input type="text" class="form-control m-input m-input--square"
-                                        [disabled]="OBHChargeToAdd.soano!==null"
-                                        [(ngModel)]="OBHChargeToAdd.unitPrice" placeholder="Enter text" required
-                                        name="OBHUnitPriceName" #OBHUnitPriceName="ngModel"
-                                        (keyup)="calculateTotalEachOBH()">
+                                        [disabled]="OBHChargeToAdd.soano!==null" [(ngModel)]="OBHChargeToAdd.unitPrice"
+                                        placeholder="Enter text" required name="OBHUnitPriceName"
+                                        #OBHUnitPriceName="ngModel" (keyup)="calculateTotalEachOBH()">
                                     <div class="form-control-feedback"
                                         *ngIf="addOBHChargeForm.submitted &&(OBHUnitPriceName.invalid || (0 >= OBHChargeToAdd.unitPrice))">
                                         Unit Price is required and must be larger than 0 !
@@ -2460,8 +2456,8 @@
                                         VAT
                                     </label>
                                     <input type="number" max="100" name="OBHChargeVATName" required
-                                        [disabled]="OBHChargeToAdd.soano!==null"
-                                        #OBHChargeVATName="ngModel" [(ngModel)]="OBHChargeToAdd.vatrate"
+                                        [disabled]="OBHChargeToAdd.soano!==null" #OBHChargeVATName="ngModel"
+                                        [(ngModel)]="OBHChargeToAdd.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         (keyup)="calculateTotalEachOBH()">
                                     <div class="form-control-feedback"
@@ -2571,20 +2567,20 @@
 
                                     <app-combo-grid-virtual-scroll
                                         [currentActiveItemId]="{field:'charge.id',value:OBHChargeToEdit.chargeId}"
-                                        [disabled]="OBHChargeToEdit.soano!=null"
-                                        (itemSelected)="OBHChargeToEdit.chargeId=$event.charge.id;
+                                        [disabled]="OBHChargeToEdit.soano!=null" (itemSelected)="OBHChargeToEdit.chargeId=$event.charge.id;
                                                         OBHChargeToEdit.unitId=$event.charge.unitId;
                                                         OBHChargeToEdit.unitPrice=$event.charge.unitPrice;
                                                         OBHChargeToEdit.vatrate = $event.charge.vatrate;
                                                         OBHChargeToEdit.chargeCode=$event.charge.code;
                                                         OBHChargeToEdit.unit=$event.unit;
-                                                        calculateTotalEachOBH(true)" 
+                                                        calculateTotalEachOBH(true)"
                                         [selectedDisplayFields]="['charge.chargeNameEn']"
                                         [dataSources]="lstOBHChargesComboBox"
                                         [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
-                                    </app-combo-grid-virtual-scroll>                                    
+                                    </app-combo-grid-virtual-scroll>
 
-                                    <div class="form-control-feedback" *ngIf="editOBHChargeForm.submitted && OBHChargeToEdit.chargeId==null">
+                                    <div class="form-control-feedback"
+                                        *ngIf="editOBHChargeForm.submitted && OBHChargeToEdit.chargeId==null">
                                         Charge is required
                                     </div>
 
@@ -2597,16 +2593,16 @@
                                         Receiver
                                     </label>
 
-                                    <app-combo-grid-virtual-scroll
-                                        [disabled]="OBHChargeToEdit.soano!=null"
+                                    <app-combo-grid-virtual-scroll [disabled]="OBHChargeToEdit.soano!=null"
                                         [currentActiveItemId]="{field:'id',value:OBHChargeToEdit.receiverId,hardValue:OBHChargeToEdit.receiverName}"
                                         (itemSelected)="OBHChargeToEdit.receiverId = $event.id;
                                                         OBHChargeToEdit.receiverName = $event.shortName;"
                                         [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
                                         [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                     </app-combo-grid-virtual-scroll>
-                                    
-                                    <div class="form-control-feedback" *ngIf="editOBHChargeForm.submitted && OBHChargeToEdit.receiverId==null">
+
+                                    <div class="form-control-feedback"
+                                        *ngIf="editOBHChargeForm.submitted && OBHChargeToEdit.receiverId==null">
                                         Receiver name is required !
                                     </div>
 
@@ -2619,16 +2615,16 @@
                                         Payer
                                     </label>
 
-                                    <app-combo-grid-virtual-scroll
-                                        [disabled]="OBHChargeToEdit.soano!=null"
+                                    <app-combo-grid-virtual-scroll [disabled]="OBHChargeToEdit.soano!=null"
                                         [currentActiveItemId]="{field:'id',value:OBHChargeToEdit.payerId,hardValue:OBHChargeToEdit.payerName}"
                                         (itemSelected)="OBHChargeToEdit.payerId = $event.id;
                                                         OBHChargeToEdit.payerName = $event.shortName;"
                                         [selectedDisplayFields]="['shortName']" [dataSources]="comboBoxData.lstPartner"
                                         [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                     </app-combo-grid-virtual-scroll>
-                                   
-                                    <div class="form-control-feedback" *ngIf="editOBHChargeForm.submitted && OBHChargeToEdit.payerId==null">
+
+                                    <div class="form-control-feedback"
+                                        *ngIf="editOBHChargeForm.submitted && OBHChargeToEdit.payerId==null">
                                         Receiver name is required !
                                     </div>
 
@@ -2660,18 +2656,17 @@
                                         Unit
                                     </label>
 
-                                    <app-combo-grid-virtual-scroll
-                                        [disabled]="OBHChargeToEdit.soano!=null"
+                                    <app-combo-grid-virtual-scroll [disabled]="OBHChargeToEdit.soano!=null"
                                         [currentActiveItemId]="{field:'id',value:OBHChargeToEdit.unitId,hardValue:OBHChargeToEdit.unit}"
                                         (itemSelected)="OBHChargeToEdit.unitId = $event.id;
                                                         OBHChargeToEdit.unit = $event.unitNameEn"
                                         [selectedDisplayFields]="['unitNameEn']" [dataSources]="comboBoxData.lstUnit"
                                         [displayFields]="[{'field':'unitNameEn','label':'Name EN'},{'field':'unitType','label':'Unit type'}]">
-                                    </app-combo-grid-virtual-scroll>                                    
+                                    </app-combo-grid-virtual-scroll>
 
                                     <div class="form-control-feedback"
-                                            *ngIf="editOBHChargeForm.submitted && OBHChargeToEdit.unitId==null">
-                                            Unit is required
+                                        *ngIf="editOBHChargeForm.submitted && OBHChargeToEdit.unitId==null">
+                                        Unit is required
                                     </div>
 
                                 </div>

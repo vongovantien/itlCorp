@@ -99,7 +99,7 @@ namespace eFMS.API.Documentation.Controllers
             var existedMessage = CheckExist(model);
             if (existedMessage != null)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
+                return Ok(new ResultHandle { Status = false, Message = existedMessage });
             }
             model.Hblid = Guid.NewGuid();
             var hs = transactionService.Add(model);
