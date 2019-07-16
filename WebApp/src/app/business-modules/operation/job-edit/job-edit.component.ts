@@ -16,6 +16,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { SurchargeTypeEnum } from 'src/app/shared/enums/csShipmentSurchargeType-enum';
 import { async } from 'rxjs/internal/scheduler/async';
 import { SortService } from 'src/app/shared/services/sort.service';
+import { BehaviorSubject } from 'rxjs';
 declare var $: any;
 
 @Component({
@@ -24,10 +25,11 @@ declare var $: any;
     styleUrls: ['./job-edit.component.scss']
 })
 export class OpsModuleBillingJobEditComponent implements OnInit {
-    opsTransaction: OpsTransaction = new OpsTransaction();
+    opsTransaction: OpsTransaction = null;
     productServices: any[] = [];
     serviceDate: any;
     finishDate: any;
+    exchangeRateDate: any;
     serviceModes: any[] = [];
     shipmentModes: any[] = [];
     customers: any[] = [];
@@ -66,7 +68,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
 
     isDisplay: boolean = true;
     BuyingRateChargeToEdit: any = null;
-    SellingRateChargeToEdit: any = null
+    SellingRateChargeToEdit: any = null;
     OBHChargeToEdit: any = null;
 
     totalSellingUSD: number = 0;
@@ -93,6 +95,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     commodities: any[];
     packageTypes: any[] = [];
     weightMesurements: any[];
+    currentActiveItemDefault: { id: null, text: null }[] = [];
     @ViewChild('containerMasterForm', { static: true }) containerMasterForm: NgForm;
     // @ViewChild('containerSelect',{static:true}) containerSelect: ElementRef;
 
@@ -146,25 +149,24 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
                     this.finishDate = null;
                 }
             }
-        })
+        });
 
     }
 
     async getShipmentContainer() {
-        let responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, { mblid: this.opsTransaction.id }, false, false);
+        const responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, { mblid: this.opsTransaction.id }, false, false);
         this.opsTransaction.csMawbcontainers = this.lstContainerTemp = this.lstMasterContainers = responses;
     }
     async confirmDelete() {
-        let respone = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.checkAllowDelete + this.opsTransaction.id, false, true);
-        if (respone == true) {
+        const respone = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.checkAllowDelete + this.opsTransaction.id, false, true);
+        if (respone === true) {
             $('#confirm-delete-job-modal').modal('show');
-        }
-        else {
+        } else {
             $('#confirm-can-not-delete-job-modal').modal('show');
         }
     }
     async deleteJob() {
-        let respone = await this.baseServices.deleteAsync(this.api_menu.Documentation.Operation.delete + this.opsTransaction.id, true, true);
+        const respone = await this.baseServices.deleteAsync(this.api_menu.Documentation.Operation.delete + this.opsTransaction.id, true, true);
         if (respone.status) {
             $('#confirm-delete-job-modal').modal('hide');
             this.router.navigate(["/home/operation/job-management"]);
@@ -174,24 +176,29 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         console.log(this.opsTransaction);
         this.opsTransaction.serviceDate = this.serviceDate.startDate != null ? dataHelper.dateTimeToUTC(this.serviceDate.startDate) : null;
         this.opsTransaction.finishDate = this.finishDate.startDate != null ? dataHelper.dateTimeToUTC(this.finishDate.startDate) : null;
-        let s = this.finishDate.startDate != null && this.serviceDate.startDate != null && (this.finishDate.startDate < this.serviceDate.startDate);
+        const s = this.finishDate.startDate != null && this.serviceDate.startDate != null && (this.finishDate.startDate < this.serviceDate.startDate);
         if (form.invalid || this.opsTransaction.shipmentMode == null
-            || (this.opsTransaction.pod == this.opsTransaction.pol && this.opsTransaction.pod != null && this.opsTransaction.pol != null)
+            || (this.opsTransaction.pod === this.opsTransaction.pol && this.opsTransaction.pod != null && this.opsTransaction.pol != null)
             || this.opsTransaction.serviceMode == null
             || this.opsTransaction.productService == null
             || this.opsTransaction.customerId == null
             || this.opsTransaction.billingOpsId == null
             || this.opsTransaction.serviceDate == null
             || s
+            || this.opsTransaction.sumGrossWeight === 0
+            || this.opsTransaction.sumNetWeight === 0
+            || this.opsTransaction.sumCbm === 0
         ) {
             return;
-        }
-        else {
-            var response = await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.opsTransaction, true, true);
+        } else {
+            this.opsTransaction.sumGrossWeight = this.opsTransaction.sumGrossWeight != null ? Number(this.opsTransaction.sumGrossWeight.toFixed(2)) : null;
+            this.opsTransaction.sumNetWeight = this.opsTransaction.sumNetWeight != null ? Number(this.opsTransaction.sumNetWeight.toFixed(2)) : null;
+            this.opsTransaction.sumCbm = this.opsTransaction.sumCbm != null ? Number(this.opsTransaction.sumCbm.toFixed(2)) : null;
+            await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.opsTransaction, true, true);
             await this.getShipmentDetails(this.opsTransaction.id);
         }
     }
-    //-------------     Container   -------------------//
+    // -------------     Container   ------------------- //
     /**
      * Show popup & init new first row( if container list is null)
      */
@@ -207,7 +214,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
      * Close popup, assign list container to current job & remove last row that is not saved
      */
     closeContainerPopup() {
-        let index = this.lstMasterContainers.findIndex(x => x.isNew == true);
+        const index = this.lstMasterContainers.findIndex(x => x.isNew == true);
         if (index > -1 && this.lstMasterContainers.length > 1) {
             this.lstMasterContainers.splice(index, 1);
         }
@@ -232,10 +239,9 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             }
         }
         // 2.
-        if (hasItemEdited == false) {
+        if (hasItemEdited === false) {
             this.lstMasterContainers.push(this.initNewContainer());
-        }
-        else {
+        } else {
             this.saveNewContainer(index);
             if (this.saveContainerSuccess) {
                 this.lstMasterContainers.push(this.initNewContainer());
@@ -245,7 +251,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
 
     /**
      * search container in list container
-     * @param keySearch 
+     * @param keySearch key to search in container list
      */
     searchContainer(keySearch: any) {
         keySearch = keySearch != null ? keySearch.trim().toLowerCase() : "";
@@ -273,7 +279,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
      */
     changeEditMode(index: any) {
         this.getComboboxDataContainer(index);
-        if (this.lstMasterContainers[index].allowEdit == false || this.lstMasterContainers[index].allowEdit == undefined) {
+        if (this.lstMasterContainers[index].allowEdit === false || this.lstMasterContainers[index].allowEdit == undefined) {
             this.lstMasterContainers[index].allowEdit = true;
             this.lstMasterContainers[index].containerTypeActive = this.lstMasterContainers[index].containerTypeId != null ?
                 [{ id: this.lstMasterContainers[index].containerTypeId, text: this.lstMasterContainers[index].containerTypeName }] : [];
@@ -282,12 +288,11 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             this.lstMasterContainers[index].unitOfMeasureActive = this.lstMasterContainers[index].unitOfMeasureID != null ?
                 [{ id: this.lstMasterContainers[index].unitOfMeasureID, text: this.lstMasterContainers[index].unitOfMeasureName }] : [];
             for (let i = 0; i < this.lstMasterContainers.length; i++) {
-                if (i != index) {
+                if (i !== index) {
                     this.lstMasterContainers[i].allowEdit = false;
                 }
             }
-        }
-        else {
+        } else {
             this.lstMasterContainers[index].allowEdit = false;
         }
     }
@@ -298,36 +303,36 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
      * @param index index of row in table
      */
     async saveNewContainer(index: any) {
-        //set quantity = 1 (if existed: containerNo || sealNo || markNo)
         if (this.lstMasterContainers[index].containerNo.length > 0 || this.lstMasterContainers[index].sealNo.length > 0 || this.lstMasterContainers[index].markNo.length > 0) {
             this.lstMasterContainers[index].quantity = 1;
         }
         this.lstMasterContainers[index].verifying = true;
-        if (this.lstMasterContainers[index].quantity == null || this.lstMasterContainers[index].containerTypeId == null) {
+        if (this.lstMasterContainers[index].quantity == null
+            || this.lstMasterContainers[index].containerTypeId == null
+            || this.lstMasterContainers[index].gw === 0 || this.lstMasterContainers[index].nw === 0
+            || this.lstMasterContainers[index].chargeAbleWeight === 0
+            || this.lstMasterContainers[index].cbm === 0) {
             this.saveContainerSuccess = false;
             return;
         }
-        //Check duplicate( Cont Type && Cont Q'ty && Container No && Package Type)
+        // Check duplicate( Cont Type && Cont Q'ty && Container No && Package Type)
         let existedItems = this.lstMasterContainers.filter(x => x.containerTypeId == this.lstMasterContainers[index].containerTypeId
             && x.quantity == this.lstMasterContainers[index].quantity);
         if (this.lstMasterContainers[index].containerNo.length != 0 && this.lstMasterContainers[index].packageTypeId != null) {
             existedItems = existedItems.filter(x => x.containerNo == this.lstMasterContainers[index].containerNo
                 && x.packageTypeId == this.lstMasterContainers[index].packageTypeId);
-        }
-        else {
+        } else {
             existedItems = [];
         }
-        //set row is invalid
+        // set row is invalid
         if (existedItems.length > 1) {
             this.lstMasterContainers[index].inValidRow = true;
             this.saveContainerSuccess = false;
-        }
-        else {
-            //set row is saved
+        } else {
+            // set row is saved
             if (this.lstMasterContainers[index].isNew == true) {
                 this.lstMasterContainers[index].isNew = false;
-            }
-            else {
+            } else {
                 this.lstMasterContainers[index].inValidRow = false;
                 this.lstMasterContainers[index].containerTypeActive = this.lstMasterContainers[index].containerTypeId != null ? [{ id: this.lstMasterContainers[index].containerTypeId, text: this.lstMasterContainers[index].containerTypeName }] : [];
                 this.lstMasterContainers[index].packageTypeActive = this.lstMasterContainers[index].packageTypeId != null ? [{ id: this.lstMasterContainers[index].packageTypeId, text: this.lstMasterContainers[index].packageTypeName }] : [];
@@ -353,8 +358,8 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
                     break;
                 }
             }
-            if (hasItemEdited == false) {
-                //continue
+            if (hasItemEdited === false) {
+                // continue
                 this.numberOfTimeSaveContainer = this.numberOfTimeSaveContainer + 1;
                 this.opsTransaction.sumGrossWeight = 0;
                 this.opsTransaction.sumNetWeight = 0;
@@ -408,7 +413,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
      * init a new container
      */
     initNewContainer() {
-        var container = {
+        const container = {
             mawb: this.opsTransaction.id,
             containerTypeId: null,
             containerTypeName: '',
@@ -419,7 +424,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             markNo: '',
             unitOfMeasureId: 37,
             unitOfMeasureName: 'Kilogam',
-            unitOfMeasureActive: [{ "id": 37, "text": "Kilogam" }],
+            unitOfMeasureActive: [], ///[{ "id": 37, "text": "Kilogam" }],
             commodityId: null,
             commodityName: '',
             packageTypeId: null,
@@ -511,12 +516,11 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
                 this.containerTypes = dataHelper.prepareNg2SelectData(this.listContainerType, 'id', 'unitNameEn');
                 this.packageTypes = dataHelper.prepareNg2SelectData(this.listPackageTypes, 'id', 'unitNameEn');
                 this.weightMesurements = dataHelper.prepareNg2SelectData(this.listWeightMesurement, 'id', 'unitNameEn');
-            }
-            else {
+            } else {
                 if (this.lstMasterContainers[index]["id"] != null) {
-                    let conts = this.listContainerType.filter(x => x.inactive == false);
-                    let packs = this.listPackageTypes.filter(x => x.inactive == false);
-                    let weights = this.listWeightMesurement.filter(x => x.inactive == false);
+                    let conts = this.listContainerType.filter(x => x.inactive === false);
+                    let packs = this.listPackageTypes.filter(x => x.inactive === false);
+                    let weights = this.listWeightMesurement.filter(x => x.inactive === false);
                     this.containerTypes = dataHelper.prepareNg2SelectData(conts, 'id', 'unitNameEn');
                     this.packageTypes = dataHelper.prepareNg2SelectData(packs, 'id', 'unitNameEn');
                     this.weightMesurements = dataHelper.prepareNg2SelectData(weights, 'id', 'unitNameEn');
@@ -527,7 +531,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             this.containerTypes = [];
         }
     }
-    //-------------    End Container   -------------------//
+    // -------------    End Container   -------------------//
 
     async getWarehouses() {
         this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { placeType: PlaceTypeEnum.Warehouse, inactive: false }).subscribe((res: any) => {
@@ -609,10 +613,16 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         });
     }
 
-    public getCurrencies() {
-        this.baseServices.get(this.api_menu.Catalogue.Currency.getAll).subscribe((res: any) => {
-            this.lstCurrencies = prepareNg2SelectData(res, "id", "currencyName");
-        });
+    public getCurrencies(isAddNew = true) {
+        if (isAddNew === true) {
+            this.baseServices.post(this.api_menu.Catalogue.Currency.getAllByQuery, { inactive: false }).subscribe((res: any) => {
+                this.lstCurrencies = prepareNg2SelectData(res, "id", "id");
+            });
+        } else {
+            this.baseServices.get(this.api_menu.Catalogue.Currency.getAll).subscribe((res: any) => {
+                this.lstCurrencies = prepareNg2SelectData(res, "id", "id");
+            });
+        }
     }
 
     calculateTotalEachBuying(isEdit: boolean = false) {
@@ -622,8 +632,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             } else {
                 this.BuyingRateChargeToEdit.total = this.BuyingRateChargeToEdit.quantity * this.BuyingRateChargeToEdit.unitPrice + Math.abs(this.BuyingRateChargeToEdit.vatrate);
             }
-        }
-        else {
+        } else {
             if (this.BuyingRateChargeToAdd.vatrate >= 0) {
                 this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice * (1 + (this.BuyingRateChargeToAdd.vatrate / 100));
             } else {
@@ -674,10 +683,13 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
 
     saveNewCharge(id_form: string, form: NgForm, data: CsShipmentSurcharge, isContinue: boolean) {
         setTimeout(async () => {
-            var error = $('#' + id_form).find('div.has-danger');
-            if (error.length == 0) {
+            const error = $('#' + id_form).find('div.has-danger');
+            if (error.length === 0) {
                 data.hblid = this.opsTransaction.hblid;
-                var res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, data);
+                if (data.quantity != null) {
+                    data.quantity = Number(data.quantity.toFixed(2));
+                }
+                const res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, data);
                 if (res.status) {
                     form.onReset();
                     this.resetDisplay();
@@ -687,8 +699,9 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
                     this.OBHChargeToAdd = new CsShipmentSurcharge();
                     this.baseServices.setData("CurrentOpsTransaction", this.opsTransaction);
                     this.baseServices.setData("ShipmentAdded", true);
-                    if (!isContinue)
+                    if (!isContinue) {
                         $('#' + id_form).modal('hide');
+                    }
                 }
             }
         }, 300);
@@ -789,6 +802,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         if (type === 'SELL') {
             this.SellingRateChargeToEdit = cloneDeep(charge);
             this.SellingRateChargeToEdit.exchangeDate = { startDate: moment(this.SellingRateChargeToEdit.exchangeDate), endDate: moment(this.SellingRateChargeToEdit.exchangeDate) };
+            this.exchangeRateDate = { startDate: moment(this.SellingRateChargeToEdit.exchangeDate), endDate: moment(this.SellingRateChargeToEdit.exchangeDate) };
         }
         if (type === 'OBH') {
             this.OBHChargeToEdit = cloneDeep(charge);
@@ -845,13 +859,19 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
 
         return results;
     }
-
+    
     editCharge(id_form: string, form: NgForm, data: CsShipmentSurcharge) {
         setTimeout(async () => {
             if (form.submitted) {
-                var error = $('#' + id_form).find('div.has-danger');
-                if (error.length == 0) {
-                    var res = await this.baseServices.putAsync(this.api_menu.Documentation.CsShipmentSurcharge.update, data);
+                const error = $('#' + id_form).find('div.has-danger');
+                if (error.length === 0) {
+                    if (data.quantity != null) {
+                        data.quantity = Number(data.quantity.toFixed(2));
+                    }
+                    if (this.exchangeRateDate != null) {
+                        data.exchangeDate = this.exchangeRateDate.startDate != null ? dataHelper.dateTimeToUTC(this.exchangeRateDate.startDate) : null;
+                    }
+                    const res = await this.baseServices.putAsync(this.api_menu.Documentation.CsShipmentSurcharge.update, data);
                     if (res.status) {
                         $('#' + id_form).modal('hide');
                         this.getAllSurCharges();
@@ -864,20 +884,18 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     }
 
 
-
-
-
     closeChargeForm(formId: string, form: NgForm) {
         form.onReset();
         this.resetDisplay();
         $('#' + formId).modal("hide");
 
+        this.currentActiveItemDefault = [];
         this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
         this.SellingRateChargeToAdd = new CsShipmentSurcharge();
         this.OBHChargeToAdd = new CsShipmentSurcharge();
 
         this.BuyingRateChargeToEdit = null;
-        this.SellingRateChargeToEdit = null
+        this.SellingRateChargeToEdit = null;
         this.OBHChargeToEdit = null;
 
     }
@@ -947,10 +965,8 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     /**
      * get custom clearances
      */
-    isLoadClearance = false;
     getCustomClearances() {
         this.baseServices.setData("CurrentOpsTransaction", this.opsTransaction);
-        this.isLoadClearance = true;
     }
 
     selectTab($event: any, tabName: string) {

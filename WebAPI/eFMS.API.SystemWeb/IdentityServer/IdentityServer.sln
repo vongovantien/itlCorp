@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eFMS.IdentityServer.Service
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eFMS.IdentityServer", "eFMS.IdentityServer\eFMS.IdentityServer.csproj", "{6DAD0667-A593-4388-A3F0-BE36A03C1BB0}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eFMS.IdentityServer.DL", "eFMS.IdentityServer.DL\eFMS.IdentityServer.DL.csproj", "{B04AA5B7-4D76-4328-9AF0-2A3B8E198690}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{6DAD0667-A593-4388-A3F0-BE36A03C1BB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6DAD0667-A593-4388-A3F0-BE36A03C1BB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6DAD0667-A593-4388-A3F0-BE36A03C1BB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B04AA5B7-4D76-4328-9AF0-2A3B8E198690}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B04AA5B7-4D76-4328-9AF0-2A3B8E198690}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B04AA5B7-4D76-4328-9AF0-2A3B8E198690}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B04AA5B7-4D76-4328-9AF0-2A3B8E198690}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

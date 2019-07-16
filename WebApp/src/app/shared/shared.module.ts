@@ -33,6 +33,7 @@ import { ModalModule } from "ngx-bootstrap";
 import { RepositoryModule } from "./repositories/repository.module";
 import { ServiceModule } from "./services/service.module";
 import { SearchStage } from "./pipes";
+import { DecimalNumberGreaterThan0Directive } from "./directives/decimal-number-greater-0.directive";
 
 const Libary = [ModalModule.forRoot()];
 
@@ -65,7 +66,7 @@ const APP_DIRECTIVES = [
   SpecialCharacterDirective,
   EcusSpecicalCharacterAllowSpaceDirective,
   EcusSpecicalCharacterNoSpaceDirective,
-
+  DecimalNumberGreaterThan0Directive
 ]
 @NgModule({
   imports: [

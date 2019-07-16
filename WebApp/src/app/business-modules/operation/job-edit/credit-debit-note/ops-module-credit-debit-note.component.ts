@@ -1,9 +1,10 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
-import cloneDeep from 'lodash/cloneDeep'
+import cloneDeep from 'lodash/cloneDeep';
 import filter from 'lodash/filter';
 import moment from 'moment/moment';
+import { BehaviorSubject } from 'rxjs';
 
 
 declare var $: any;
@@ -12,7 +13,7 @@ declare var $: any;
   templateUrl: './ops-module-credit-debit-note.component.html',
   styleUrls: ['./ops-module-credit-debit-note.component.scss']
 })
-export class OpsModuleCreditDebitNoteComponent implements OnInit {
+export class OpsModuleCreditDebitNoteComponent implements OnInit, OnDestroy {
   listCDNotes: any[] = [];
   constListCDNotes: any[] = [];
   IsNewCDNote: boolean = false;
@@ -22,25 +23,38 @@ export class OpsModuleCreditDebitNoteComponent implements OnInit {
     private baseServices: BaseService,
     private api_menu: API_MENU
   ) {
-    this.baseServices.dataStorage.subscribe(data => {
-      this.STORAGE_DATA = data;
-      if (this.STORAGE_DATA.isNewCDNote !== undefined) {
-        this.IsNewCDNote = this.STORAGE_DATA.isNewCDNote;
-        if (this.IsNewCDNote === true) {
-          this.getAllCDNote();
-        }
-      }
+  }
 
+  ngOnInit() {
+    // this.baseServices.dataStorage.subscribe(data => {
+    //   this.STORAGE_DATA = data;
+    //   if (this.STORAGE_DATA.isNewCDNote !== undefined) {
+    //     this.IsNewCDNote = this.STORAGE_DATA.isNewCDNote;
+    //     if (this.IsNewCDNote === true) {
+    //       this.getAllCDNote();
+    //     }
+    //   }
+
+    //   if (this.STORAGE_DATA.CurrentOpsTransaction !== undefined) {
+    //     this.CurrentHBID = this.STORAGE_DATA.CurrentOpsTransaction.hblid;
+    //     this.getAllCDNote();
+    //   }
+
+    // });
+    this.STORAGE_DATA = this.baseServices.dataStorage.value["isNewCDNote"];
+    if (this.STORAGE_DATA !== undefined) {
+      this.IsNewCDNote = this.STORAGE_DATA.isNewCDNote;
+      if (this.IsNewCDNote === true) {
+        this.getAllCDNote();
+      }
       if (this.STORAGE_DATA.CurrentOpsTransaction !== undefined) {
         this.CurrentHBID = this.STORAGE_DATA.CurrentOpsTransaction.hblid;
         this.getAllCDNote();
       }
-
-    });
+    }
   }
-
-  ngOnInit() {
-
+  ngOnDestroy(): void {
+    this.baseServices.dataStorage.unsubscribe();
   }
 
   getAllCDNote() {
@@ -53,7 +67,7 @@ export class OpsModuleCreditDebitNoteComponent implements OnInit {
 
 
   openEdit(soaNo: string) {
-      this.baseServices.setData("CurrentSOANo",soaNo);
+    this.baseServices.setData("CurrentSOANo", soaNo);
   }
 
   SearchCDNotes(search_key: string) {
@@ -61,57 +75,57 @@ export class OpsModuleCreditDebitNoteComponent implements OnInit {
     search_key = search_key.trim().toLowerCase();
     var listBranch: any[] = [];
     this.listCDNotes = filter(cloneDeep(this.constListCDNotes), function (x: any) {
-        var root = false;
-        var branch = false;
-        if (x.partnerNameEn == null ? "" : x.partnerNameEn.toLowerCase().includes(search_key)) {
-            root = true;
+      var root = false;
+      var branch = false;
+      if (x.partnerNameEn == null ? "" : x.partnerNameEn.toLowerCase().includes(search_key)) {
+        root = true;
+      }
+      var listSOA: any[] = []
+      for (var i = 0; i < x.listSOA.length; i++) {
+        const date = moment(x.listSOA[i].soa.datetimeCreated).format('DD/MM/YYYY');
+        if (x.listSOA[i].soa.type.toLowerCase().includes(search_key) ||
+          x.listSOA[i].total_charge.toString().toLowerCase() === search_key ||
+          x.listSOA[i].soa.total.toString().toLowerCase().includes(search_key) ||
+          x.listSOA[i].soa.userCreated.toLowerCase().includes(search_key) ||
+          x.listSOA[i].soa.code.toLowerCase().includes(search_key) ||
+          x.listSOA[i].soa.code.toLowerCase().includes(search_key) ||
+          date.includes(search_key)) {
+          listSOA.push(x.listSOA[i]);
+          branch = true;
         }
-        var listSOA: any[] = []
-        for (var i = 0; i < x.listSOA.length; i++) {
-            const date = moment(x.listSOA[i].soa.datetimeCreated).format('DD/MM/YYYY');
-            if (x.listSOA[i].soa.type.toLowerCase().includes(search_key) ||
-                x.listSOA[i].total_charge.toString().toLowerCase() === search_key ||
-                x.listSOA[i].soa.total.toString().toLowerCase().includes(search_key) ||
-                x.listSOA[i].soa.userCreated.toLowerCase().includes(search_key) ||
-                x.listSOA[i].soa.code.toLowerCase().includes(search_key) ||
-                x.listSOA[i].soa.code.toLowerCase().includes(search_key) ||
-                date.includes(search_key)) {
-                listSOA.push(x.listSOA[i]);
-                branch = true;
-            }
-        }
-        if (listSOA.length > 0) {
-            listBranch.push({
-                partnerID: x.id,
-                list: listSOA
-            });
-        }
+      }
+      if (listSOA.length > 0) {
+        listBranch.push({
+          partnerID: x.id,
+          list: listSOA
+        });
+      }
 
-        return (root || branch);
+      return (root || branch);
 
     });
     for (var i = 0; i < this.listCDNotes.length; i++) {
-        for (var k = 0; k < listBranch.length; k++) {
-            if (this.listCDNotes[i].id === listBranch[k].partnerID) {
-                this.listCDNotes[i].listSOA = listBranch[k].list;
-            }
+      for (var k = 0; k < listBranch.length; k++) {
+        if (this.listCDNotes[i].id === listBranch[k].partnerID) {
+          this.listCDNotes[i].listSOA = listBranch[k].list;
         }
+      }
     }
-}
+  }
 
-cdNoteIdToDelete: string = null;
-async DeleteCDNote(stt: string, cdNoteId: string = null) {
+  cdNoteIdToDelete: string = null;
+  async DeleteCDNote(stt: string, cdNoteId: string = null) {
     if (stt == "confirm") {
-        console.log(cdNoteId);
-        this.cdNoteIdToDelete = cdNoteId;
+      console.log(cdNoteId);
+      this.cdNoteIdToDelete = cdNoteId;
     }
     if (stt == "ok") {
-        var res = await this.baseServices.deleteAsync(this.api_menu.Documentation.AcctSOA.delete + "?cdNoteId=" + this.cdNoteIdToDelete);
-        if (res.status) {
-            this.getAllCDNote();
-        }
+      var res = await this.baseServices.deleteAsync(this.api_menu.Documentation.AcctSOA.delete + "?cdNoteId=" + this.cdNoteIdToDelete);
+      if (res.status) {
+        this.getAllCDNote();
+      }
     }
-}
+  }
 
 
 }

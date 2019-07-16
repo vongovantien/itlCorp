@@ -36,4 +36,11 @@ export class JobRepo {
         return this._api.put(`${environment.HOST.WEB_URL}/${this.MODULE}/api/${this.VERSION}/vi/OpsStageAssigned/Update`, body);
 
     }
+
+    //#region ops job billing 
+    addJob(body: any = {}) {
+        // return this._api.post(`${environment.HOST.WEB_URL}44366/api/${this.VERSION}/vi/OpsTransaction/Add`, body);
+        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/OpsTransaction/Add`, body);
+    }
+    //#endregion
 }
