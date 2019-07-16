@@ -80,7 +80,6 @@ export class CustomClearanceComponent implements OnInit {
         });
     }
 
-
     setPage(pager: PagerSetting) {
         this.pager.currentPage = pager.currentPage;
         this.pager.pageSize = pager.pageSize;
@@ -116,8 +115,10 @@ export class CustomClearanceComponent implements OnInit {
     async resetSearch() {
         this.clearanceNo = '';
         this.selectedRange = { startDate: moment().subtract(30, 'days'), endDate: moment() };
+        this.selectedRangeImportDate = null;
         this.defaultImportStatus = ['Not imported'];
         this.defaultTypeClearance = ['All'];
+        this.currentUser = [localStorage.getItem('currently_userName')];
         this.searchObject = {};
         this.initPager();
         this.getListCustomsDeclaration();
