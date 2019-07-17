@@ -1,7 +1,7 @@
 import { Component, OnInit, Output, EventEmitter, AfterViewInit } from '@angular/core';
 import { Router, NavigationEnd, NavigationStart, } from '@angular/router';
 import { language } from 'src/languages/language.en';
-import { BaseService } from 'src/services-base/base.service';
+import { BaseService } from 'src/app/shared/services/base.service';
 import $ from 'jquery';
 
 @Component({

@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { API_MENU } from 'src/constants/api-menu.const';
-import { BaseService } from 'src/services-base/base.service';
+import { BaseService } from 'src/app/shared/services/base.service';
 import cloneDeep from 'lodash/cloneDeep';
 declare var $: any;
 

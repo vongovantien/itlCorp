@@ -5,7 +5,7 @@ import { catCurrency } from 'src/app/shared/models/catalogue/catCurrency.model';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { SortService } from 'src/app/shared/services/sort.service';
-import { BaseService } from 'src/services-base/base.service';
+import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';

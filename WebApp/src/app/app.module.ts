@@ -12,10 +12,10 @@ import { HttpModule } from "@angular/http";
 import { LoginComponent } from "./login/login.component";
 import { MasterPageComponent } from "./master-page/master-page.component";
 import { NotfoundPageComponent } from "./notfound-page/notfound-page.component";
-import { BaseService } from "src/services-base/base.service";
+import { BaseService } from "src/app/shared/services/base.service";
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 import { ToastrModule } from "ngx-toastr";
-import { PagingService } from "./shared/common/pagination/paging-service";
+import { PagingService } from "./shared/services/paging-service";
 import { CommonModule } from "@angular/common";
 import {
     PerfectScrollbarModule,
@@ -28,7 +28,7 @@ import { CookieService } from "ngx-cookie-service";
 import { OAuthModule } from "angular-oauth2-oidc";
 import { NgxSpinnerModule } from "ngx-spinner";
 import { NgProgressModule } from "@ngx-progressbar/core";
-import { AuthGuardService } from "src/services-base/auth-guard.service";
+import { AuthGuardService } from "src/app/shared/services/auth-guard.service";
 // import { ServiceWorkerModule } from '@angular/service-worker';
 // import { environment } from '../environments/environment';
 // import { ServiceWorkerModule } from '@angular/service-worker';
@@ -62,20 +62,20 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     ],
     imports: [
         // ServiceWorkerModule.register('ngsw-worker.js', { enabled: true}),
-        ScrollingModule,
-        SharedModule,
+        // ScrollingModule,
+        // SharedModule,
         CommonModule,
         BrowserModule,
         AppRoutingModule,
         FormsModule,
-        HttpModule,
         HttpClientModule,
         BrowserAnimationsModule, // required animations module
         ToastrModule.forRoot(), // ToastrModule added
         NgxSpinnerModule,
-        NgProgressModule,
+        // NgProgressModule,
         PerfectScrollbarModule,
-        SelectModule, // Scrollbar
+        // SelectModule,
+         // Scrollbar
         OAuthModule.forRoot({
             resourceServer: {
                 allowedUrls: ["**"],
@@ -84,27 +84,30 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         }),
         NgxDaterangepickerMd,
         HighchartsChartModule,
-        DragDropModule,
+        // DragDropModule,
         // ChartModule // add ChartModule to your imports
-        ModalModule.forRoot()
+        // ModalModule.forRoot()
     ],
     providers: [
-        AuthGuardService,
+        // AuthGuardService,
         GlobalState,
-        BaseService,
+        // BaseService,
         CookieService,
-        PagingService,
+        // PagingService,
         {
             provide: PERFECT_SCROLLBAR_CONFIG, // Scrollbar
             useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG // Scrollbar
         },
         {
-			provide: HTTP_INTERCEPTORS,
+		    provide: HTTP_INTERCEPTORS,
 			useClass: AuthInterceptor,
 			multi: true,
-		}
+        }
+        
     ],
+
     bootstrap: [AppComponent],
     exports: [ScrollingModule]
 })
 export class AppModule {}
+

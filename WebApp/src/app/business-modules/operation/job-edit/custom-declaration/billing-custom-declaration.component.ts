@@ -1,10 +1,10 @@
 import { Component, OnInit, ChangeDetectorRef, Input } from '@angular/core';
-import { BaseService } from 'src/services-base/base.service';
+import { BaseService } from 'src/app/shared/services/base.service';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
-import { PagingService } from 'src/app/shared/common/pagination/paging-service';
+import { PagingService } from 'src/app/shared/services/paging-service';
 import { SystemConstants } from 'src/constants/system.const';
 import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
 import { SortService } from 'src/app/shared/services/sort.service';

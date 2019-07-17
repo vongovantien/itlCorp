@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgProgress, NgProgressComponent } from '@ngx-progressbar/core';
-import { PagingService } from 'src/app/shared/common/pagination/paging-service';
-import { BaseService } from 'src/services-base/base.service';
+import { PagingService } from 'src/app/shared/services/paging-service';
+import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PAGINGSETTING } from 'src/constants/paging.const';

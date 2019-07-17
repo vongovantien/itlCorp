@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import lodash from 'lodash';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BaseService } from 'src/services-base/base.service';
+import { BaseService } from 'src/app/shared/services/base.service';
 import { ToastrService } from 'ngx-toastr';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 declare var $: any;

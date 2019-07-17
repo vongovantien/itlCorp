@@ -4,7 +4,7 @@ import { PORTINDEXCOLUMNSETTING } from './port-index.columns';
 import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
-import { BaseService } from 'src/services-base/base.service';
+import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';

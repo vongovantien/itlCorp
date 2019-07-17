@@ -2,6 +2,9 @@ import { NgModule } from '@angular/core';
 import { ExcelService } from './excel.service';
 import { SortService } from './sort.service';
 import { ApiService } from './api.service';
+import { PagingService } from './paging-service';
+import { BaseService } from './base.service';
+import { AuthGuardService } from './auth-guard.service';
 
 @NgModule({
     declarations: [],
@@ -10,7 +13,10 @@ import { ApiService } from './api.service';
     providers: [
         ExcelService,
         SortService,
-        ApiService
+        ApiService,
+        PagingService,
+        BaseService,
+        AuthGuardService
     ],
 })
 export class ServiceModule {}

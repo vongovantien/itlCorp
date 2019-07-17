@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import moment from 'moment/moment';
-import { BaseService } from 'src/services-base/base.service';
+import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { CatLogViewer } from 'src/app/shared/models/tool-setting/catalogue';
 import { SelectComponent } from 'ng2-select';

@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { API_MENU } from 'src/constants/api-menu.const';
-import { BaseService } from 'src/services-base/base.service';
+import { BaseService } from 'src/app/shared/services/base.service';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { NgForm } from '@angular/forms';
 import { SelectComponent } from 'ng2-select';

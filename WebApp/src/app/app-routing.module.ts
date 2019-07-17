@@ -3,7 +3,7 @@ import { Routes, RouterModule, PreloadingStrategy, PreloadAllModules } from '@an
 import { LoginComponent } from './login/login.component';
 import { MasterPageComponent } from './master-page/master-page.component';
 import { NotfoundPageComponent } from './notfound-page/notfound-page.component';
-import { AuthGuardService } from 'src/services-base/auth-guard.service';
+import { AuthGuardService } from 'src/app/shared/services/auth-guard.service';
 import { DashboardComponent } from './dashboard/dashboard.component';
 
 const routes: Routes = [

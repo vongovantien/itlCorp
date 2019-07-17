@@ -5,7 +5,7 @@ import { SortService } from '../../../shared/services/sort.service';
 import { ButtonModalSetting } from '../../../shared/models/layout/button-modal-setting.model';
 import { ButtonType } from '../../../shared/enums/type-button.enum';
 import { PagerSetting } from '../../../shared/models/layout/pager-setting.model';
-import { BaseService } from 'src/services-base/base.service';
+import { BaseService } from 'src/app/shared/services/base.service';
 import { NgForm } from '@angular/forms';
 import { SystemConstants } from '../../../../constants/system.const';
 import { API_MENU } from '../../../../constants/api-menu.const';

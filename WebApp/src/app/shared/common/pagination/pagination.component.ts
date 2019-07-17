@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { PagerSetting } from '../../models/layout/pager-setting.model';
-import { PagingService } from './paging-service';
+import { PagingService } from '../../services/paging-service';
 
 @Component({
   selector: 'app-pagination',

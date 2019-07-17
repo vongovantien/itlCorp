@@ -1,6 +1,6 @@
 
 import { Component, OnInit} from '@angular/core';
-import { BaseService } from 'src/services-base/base.service';
+import { BaseService } from 'src/app/shared/services/base.service';
 import { Router} from '@angular/router';
 
 @Component({

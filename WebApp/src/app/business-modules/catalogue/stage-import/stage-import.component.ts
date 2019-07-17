@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { PagingService } from 'src/app/shared/common/pagination/paging-service';
-import { BaseService } from 'src/services-base/base.service';
+import { PagingService } from 'src/app/shared/services/paging-service';
+import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';

@@ -7,7 +7,7 @@ import { CookieService } from 'ngx-cookie-service';
 import crypto_js from 'crypto-js';
 import { NgForm } from '@angular/forms';
 import { authConfig } from '../shared/authenticate/authConfig';
-import { BaseService } from 'src/services-base/base.service';
+import { BaseService } from 'src/app/shared/services/base.service';
 import $ from 'jquery';
 
 @Component({

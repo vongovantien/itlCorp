@@ -1,14 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgProgress, NgProgressComponent } from '@ngx-progressbar/core';
-import { PagingService } from 'src/app/shared/common/pagination/paging-service';
-import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
-import { SortService } from 'src/app/shared/services/sort.service';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { SystemConstants } from 'src/constants/system.const';
 import { language } from 'src/languages/language.en';
+import { PagingService, BaseService, SortService } from 'src/app/shared/services';
 declare var $: any;
 
 @Component({

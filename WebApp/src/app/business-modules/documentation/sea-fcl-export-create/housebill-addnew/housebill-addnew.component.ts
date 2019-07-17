@@ -12,7 +12,7 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import * as dataHelper from 'src/helper/data.helper';
 import * as shipmentHelper from 'src/helper/shipment.helper';
-import { BaseService } from 'src/services-base/base.service';
+import { BaseService } from 'src/app/shared/services/base.service';
 import cloneDeep from 'lodash/cloneDeep';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 

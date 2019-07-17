@@ -1,6 +1,6 @@
 import { Component, OnInit,ElementRef } from '@angular/core';
 import findIndex from 'lodash/findIndex';
-import { BaseService } from 'src/services-base/base.service';
+import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { NgForm } from '@angular/forms';
 import { CatChargeToAddOrUpdate } from 'src/app/shared/models/catalogue/catChargeToAddOrUpdate.model';

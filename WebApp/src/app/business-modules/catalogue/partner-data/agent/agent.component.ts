@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild,Output,EventEmitter } from '@angular/core'
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
-import { BaseService } from 'src/services-base/base.service';
+import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';

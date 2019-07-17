@@ -1,6 +1,6 @@
 import { Component, OnInit} from '@angular/core';
 import findIndex from 'lodash/findIndex';
-import { BaseService } from 'src/services-base/base.service';
+import { BaseService } from 'src/app/shared/services/base.service';
 import { ToastrService } from 'ngx-toastr';
 import { API_MENU } from 'src/constants/api-menu.const';
 
