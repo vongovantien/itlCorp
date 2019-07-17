@@ -4,7 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 @Injectable()
 export class GlobalState {
 
-    public _data = new BehaviorSubject<Object>({ data: 'default' });
+    public _data = new BehaviorSubject<Object>({ event: 'default', data: null });
 
     public _dataStream$ = this._data.asObservable();
 
@@ -27,10 +27,11 @@ export class GlobalState {
         }
     }
 
-    subscribe(event: string, callback: Function) {
-        const subscribers = this._subscriptions.get(event) || [];
+    subscribe(event: string, callback: Function): any {
+        let subscribers = this._subscriptions.get(event) || [];
+        subscribers = [];
         subscribers.push(callback);
-        this._subscriptions.set(event, subscribers);
+        return this._subscriptions.set(event, subscribers);
     }
 
     _onEvent(data: any) {
@@ -44,3 +45,4 @@ export class GlobalState {
         return this._data[event] || null;
     }
 }
+

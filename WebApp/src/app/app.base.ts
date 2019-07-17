@@ -23,7 +23,8 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
   ngOnInit(): void { }
 
   ngOnDestroy(): void {
-    this.ngUnsubscribe.unsubscribe();
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
   }
 
   ngDoCheck(): void { }
