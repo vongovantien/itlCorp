@@ -62,7 +62,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
 
 
     // config for combo gird
-    configComboGrid: Readonly<any> = {
+    configComboGrid: any = {
         placeholder: 'Please select',
         displayFields: [
             { field: 'username', label: 'UserName' },

@@ -40,7 +40,6 @@ export class HeaderComponent implements OnInit,AfterViewInit {
     const url_arr = url.split("/");
     var current_lang_index =  url_arr.indexOf(host)+1; 
 
-    console.log({URL:url,HOST:host,URL_ARR:url_arr,CURRENT_CLIENT_LANGUAGE:url_arr[current_lang_index],INDEX:current_lang_index});
     return url_arr[current_lang_index];
   }
 

@@ -1,5 +1,5 @@
 import { OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit } from "@angular/core";
-import { Subject, Observable } from "rxjs";
+import { Observable, Subject } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 
 import moment from "moment";
@@ -16,7 +16,9 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
     "This Month": [moment().startOf("month"), moment().endOf("month")],
     "Last Month": [moment().subtract(1, "month").startOf("month"), moment().subtract(1, "month").endOf("month")]
   };
-  constructor() { }
+  maxDate: any = moment();
+  constructor() { 
+  }
 
   ngOnInit(): void { }
 
@@ -47,4 +49,18 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
   catchError(error: HttpErrorResponse): Observable<any> {
     return Observable.throw(error || 'Có lỗi xảy, Vui lòng kiểm tra lại !');
   }
+
+  removed(value:any):void {
+  }
+ 
+  refreshValue(value:any):void {
+  }
+}
+
+  // config for <app-combo-grid-virtual-scroll>
+export interface IComboGirdConfig {
+  placeholder: string;
+  displayFields: any[];
+  dataSource: any[];
+  selectedDisplayFields: any[];
 }
