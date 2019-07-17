@@ -16,7 +16,7 @@
                                 <label class="form-control-label" for="">
                                     Shipment
                                 </label>
-                                <ng-select [allowClear]="true" [items]="items" data)="refreshValue($event)"
+                                <ng-select [allowClear]="true" [items]="items" (data)="refreshValue($event)"
                                     (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
                                     placeholder="Select filter">
                                 </ng-select>
