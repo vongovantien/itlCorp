@@ -1,225 +1,16 @@
 <!--begin:: subheader-->
-<div class="m-subheader">
+<!-- <div class="m-subheader">
     <div class="d-flex align-items-center">
         <div class="mr-auto">
             <app-breadcrumb></app-breadcrumb>
         </div>
     </div>
-</div>
+</div> -->
 <!--end:: subheader-->
 
-<!--begin:: m-content -->
-<div class="m-content">
-    <!--begin:: m-portlet-->
-    <div class="m-portlet">
-        <!--begin::Form-->
-        <div class="m-form m-form--state">
-            <div class="m-portlet__body">
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Partner
-                            </label>
-                            <div class="dropdown e--combogrid">
-                                <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected">
-                                <div class="dropdown-menu e--combogrid-content">
-                                    <div class="tabel-wrapper table-fixed">
-                                        <div class="table-head-fixed">
-                                            <div class="table-filter-block">
-                                                <div class="search-field">
-                                                    <input class="form-control m-input m-input--square" type="text" placeholder="Search...">
-                                                    <i class="icon-search"></i>
-                                                </div>
-                                            </div>
-                                            <div class="table-header">
-                                                <table class="table table-hover">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Partner Id</th>
-                                                            <th>Name ABBR</th>
-                                                            <th>Name EN</th>
-                                                            <th>Tax Code</th>
-                                                        </tr>
-                                                    </thead>
-                                                </table>
-                                            </div>
-                                        </div>
-                                        <div class="table-body-scroll">
-                                            <table class="table table-hover">
-                                                <tbody>
-                                                    <tr class="data-row data-selected">
-                                                        <td>Partner Id</td>
-                                                        <td>Name ABBR</td>
-                                                        <td>Name EN</td>
-                                                        <td>Tax Code</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Date
-                            </label>
-                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [(ngModel)]="selectedRange" [ranges]="ranges" [maxDate]="maxDate" [alwaysShowCalendars]="true" name="daterange"
-                                    placeholder="From date - to date" readonly />
-                                <span class="m-input-icon__icon m-input-icon__icon--right">
-                                    <span>
-                                        <i class="la la-calendar"></i>
-                                    </span>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Date Mode
-                            </label>
-                            <ng-select [allowClear]="true" [items]="dateMode" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
-                            </ng-select>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Type
-                            </label>
-                            <ng-select [allowClear]="true" [items]="['All', 'Debit', 'Credit']" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
-                            </ng-select>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                OBH
-                            </label>
-                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
-                            </ng-select>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Currency
-                            </label>
-                            <ng-select [allowClear]="true" [items]="currencyList" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
-                            </ng-select>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Services
-                            </label>
-                            <ng-select [allowClear]="true" [items]="servicesList" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
-                            </ng-select>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Office
-                            </label>
-                            <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
-                            </ng-select>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Creator
-                            </label>
-                            <ng-select [multiple]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select type">
-                            </ng-select>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Charge
-                            </label>
-                            <div class="dropdown e--combogrid">
-                                <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected">
-                                <div class="dropdown-menu e--combogrid-content">
-                                    <div class="tabel-wrapper table-fixed">
-                                        <div class="table-head-fixed">
-                                            <div class="table-filter-block">
-                                                <div class="search-field">
-                                                    <input class="form-control m-input m-input--square" type="text" placeholder="Search...">
-                                                    <i class="icon-search"></i>
-                                                </div>
-                                            </div>
-                                            <div class="table-header">
-                                                <table class="table table-hover">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Charge Code</th>
-                                                            <th>Charge Name (EN)</th>
-                                                        </tr>
-                                                    </thead>
-                                                </table>
-                                            </div>
-                                        </div>
-                                        <div class="table-body-scroll">
-                                            <table class="table table-hover">
-                                                <tbody>
-                                                    <tr class="data-row data-selected">
-                                                        <td>Charge Code</td>
-                                                        <td>Charge Name</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-8">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Note
-                            </label>
-                            <textarea class="form-control m-input m-input--square" name="" id="" rows="1"></textarea>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-actions">
-                    <div class="row">
-                        <div class="col-lg-6"></div>
-                        <div class="col-lg-6 m--align-right">
-                            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                                <span>
-                                    <i class="la la-download"></i>
-                                    <span>
-                                        Apply
-                                    </span>
-                                </span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!--end::Form-->
-    </div>
-    <!--end:: m-portlets-->
+<div class="m-content add-new-soa-wp">
+   <form-create-soa></form-create-soa>
 
-    <!--begin:: m-portlet-->
     <div class="m-portlet">
         <div class="m-portlet__body">
             <!--begin:: search-form-->
@@ -236,10 +27,12 @@
                         </div>
                         <div class="row m--margin-top-15">
                             <div class="col-md-6">
-                                <span class="m--font-bolder">Total shipment:</span><span class="m--font-brand m--margin-left-5">0</span>
+                                <span class="m--font-bolder">Total shipment:</span><span
+                                    class="m--font-brand m--margin-left-5">0</span>
                             </div>
                             <div class="col-md-6">
-                                <span class="m--font-bolder">Total Charge:</span><span class="m--font-brand m--margin-left-5">0</span>
+                                <span class="m--font-bolder">Total Charge:</span><span
+                                    class="m--font-brand m--margin-left-5">0</span>
                             </div>
                         </div>
                     </div>
@@ -252,7 +45,9 @@
                                 </span>
                             </span>
                         </button>
-                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-left-10" (click)="addCharge()">
+                        <button type="button"
+                            class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-left-10"
+                            (click)="addCharge()">
                             <span>
                                 <i class="la la-plus"></i>
                                 <span>
@@ -363,37 +158,6 @@
                     </tbody>
                 </table>
             </div>
-            <div class="pagination-nav">
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="tatable__pager-size" style="max-width: 190px">
-                            <div class="select-box">
-                                <select class="form-control m-input m-input--square" id="" aria-label="">
-                                    <option value="1">15 line/screen</option>
-                                    <option value="2">30 line/screen</option>
-                                    <option value="3">50 line/screen</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <!-- <nav aria-label="">
-                            <ul class="pagination justify-content-end">
-                                <li class="page-item"><a class="page-link" href="javascript:void(0)">First</a></li>
-                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Back</a></li>
-                                <li class="page-item active"><a class="page-link" href="javascript:void(0)">1</a></li>
-                                <li class="page-item"><a class="page-link" href="javascript:void(0)">2</a></li>
-                                <li class="page-item"><a class="page-link" href="javascript:void(0)">3</a></li>
-                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Next</a></li>
-                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Last</a></li>
-                            </ul>
-                        </nav> -->
-                        <div>
-                            <pagination [totalItems]="30"></pagination>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -447,7 +211,7 @@
         </div>
     </div>
 
-    <div class="form-actions m--align-right">
+    <div class="form-actions m--align-center">
         <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
             <span>
                 <i class="la la-save"></i>
@@ -466,6 +230,5 @@
         </button>
     </div>
 </div>
-<!--end:: m-content-->
 
 <soa-add-charge-popup></soa-add-charge-popup>

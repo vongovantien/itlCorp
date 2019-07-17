@@ -1,0 +1,166 @@
+<div class="m-portlet">
+    <div class="m-form m-form--state">
+        <div class="m-portlet__body">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label">
+                            Partner
+                            <span class="text-danger">*</span>
+                        </label>
+                        <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPartner"
+                            (itemSelected)="onSelectDataFormInfo($event, 'partner')"
+                            [selectedDisplayFields]="configPartner.selectedDisplayFields"
+                            [dataSources]="configPartner.dataSource" [displayFields]="configPartner.displayFields ">
+                        </app-combo-grid-virtual-scroll>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label">
+                            Date
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                            <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                [(ngModel)]="selected" [showCustomRangeLabel]="true"
+                                [keepCalendarOpeningWithRange]="true" [alwaysShowCalendars]="true" [ranges]="ranges"
+                                placeholder="From date - to date" [showClearButton]="false"
+                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [showCancel]="true"
+                                readonly />
+                            <span class=" m-input-icon__icon m-input-icon__icon--right">
+                                <span>
+                                    <i class="la la-calendar"></i>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label">
+                            Date Mode
+                        </label>
+                        <ng-select [items]="dateModes" (selected)="onSelectDataFormInfo($event, 'date-mode')"
+                            placeholder="Select Date Mode">
+                        </ng-select>
+
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label">
+                            Type
+                        </label>
+                        <ng-select [items]="types" (selected)="onSelectDataFormInfo($event, 'type')"
+                            [active]="selectedType">
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label">
+                            OBH
+                        </label>
+                        <ng-select [items]="obhs" (selected)="onSelectDataFormInfo($event, 'obh')"
+                            [active]="selectedObh">
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label">
+                            Currency
+                        </label>
+                        <ng-select [active]="selectedCurrency" [items]="currencyList"
+                            (selected)="onSelectDataFormInfo($event, 'currency')">
+                        </ng-select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label" for="">
+                            Services
+                        </label>
+                        <ng-select [multiple]="true" (removed)="onRemoveService($event)" [active]="selectedService"
+                            [items]="services" (selected)="onSelectDataFormInfo($event, 'service')">
+                        </ng-select>
+                        {{selectedService | json}}
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label" for="">
+                            Office
+                        </label>
+                        <ng-select [items]="items" (selected)="onSelectDataFormInfo($event, 'office')"
+                            placeholder="Select office">
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label">
+                            Creator
+                        </label>
+                        <ng-select (removed)="onRemoveUser($event)" [multiple]="true" [active]="selectedUser"
+                            [items]="users" (selected)="onSelectDataFormInfo($event,'user')"
+                            placeholder="Select user">
+                        </ng-select>
+                        {{selectedUser | json}}
+                    </div>
+                </div>
+            </div>
+            <div class="row form-charge">
+                <div class="col-lg-8">
+                    <div class="form-group">
+                        <label class="form-control-label" for="">
+                            Charge
+                        </label>
+                        <div class="charge-list-selected" *ngIf="!!selectedCharges.length">
+                            <ul class="list-unstyled list">
+                                <li class="charge-list-item d-flex justify-content-between align-items-center" *ngFor="let chargeItem of selectedCharges; let i = index; trackBy: trackByFn">
+                                    <div>{{chargeItem.value}}</div>
+                                    <a title="Delete" (click)="onRemoveCharge(i)">
+                                        <i class="la la-close"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCharge"
+                            (itemSelected)="onSelectDataFormInfo($event, 'charge')"
+                            [dataSources]="configCharge.dataSource" [displayFields]="configCharge.displayFields ">
+                        </app-combo-grid-virtual-scroll>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label">
+                            Note
+                        </label>
+                        <textarea class="form-control m-input m-input--square" name="" id="" rows="1"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <div class="row">
+                    <div class="col-lg-6"></div>
+                    <div class="col-lg-6 m--align-right">
+                        <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                            <span>
+                                <i class="la la-download"></i>
+                                <span>
+                                    Apply
+                                </span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

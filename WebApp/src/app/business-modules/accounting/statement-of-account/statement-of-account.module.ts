@@ -10,9 +10,10 @@ import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
 import { TabsModule, ModalModule, CollapseModule, PaginationModule } from 'ngx-bootstrap';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { StatementOfAccountSearchComponent } from './components/poup/search-box-soa/search-box-soa.component';
+import { StatementOfAccountSearchComponent } from './components/search-box-soa/search-box-soa.component';
 import { StatementOfAccountAddChargeComponent } from './components/poup/add-charge/add-charge.popup';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { StatementOfAccountFormCreateComponent } from './components/form-create-soa/form-create-soa.component';
 
 const routing: Routes = [
     { path: "", component: StatementOfAccountComponent },
@@ -24,7 +25,8 @@ const routing: Routes = [
 
 const COMPONENTS = [
     StatementOfAccountSearchComponent,
-    StatementOfAccountAddChargeComponent
+    StatementOfAccountAddChargeComponent,
+    StatementOfAccountFormCreateComponent
 ];
 
 @NgModule({
