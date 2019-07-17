@@ -399,11 +399,11 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Soano == cdNote.Code).ToList();
+                    var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Cdno == cdNote.Code).ToList();
                     var isOtherSOA = false;
                     foreach(var item in charges)
                     {
-                        if (item.OtherSoa != null)
+                        if (item.Soano != null)
                         {
                             isOtherSOA = true;
                         }

@@ -37,7 +37,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var charge = DataContext.Where(x => x.Id == chargeId).FirstOrDefault();
                 if (charge == null)
                     hs = new HandleState("Charge not found! ");
-                if(charge!=null && (charge.Soano != null || charge.OtherSoa!=null))
+                if(charge!=null && (charge.Cdno != null || charge.Soano!=null))
                 {
                     hs = new HandleState("Cannot delete, this charge is containing Credit Debit Note/SOA no!");
                 }

@@ -30,8 +30,8 @@
                                     Clearance No <span class="m--font-danger">(*)</span>
                                 </label>
                                 <input type="text" [(ngModel)]="customDeclaration.clearanceNo"
-                                    (change)="customDeclaration.clearanceNo=customDeclaration.clearanceNo.trim()" maxlength="50"
-                                    class="form-control m-input m-input--square" #clearance_no="ngModel"
+                                    (change)="customDeclaration.clearanceNo=customDeclaration.clearanceNo.trim()"
+                                    maxlength="50" class="form-control m-input m-input--square" #clearance_no="ngModel"
                                     onkeypress="return event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)"
                                     name="clearance_no" required placeholder="Enter text" autoFocus>
                                 <div class="form-control-feedback" *ngIf="updateForm.submitted && clearance_no.invalid">
@@ -66,9 +66,8 @@
                                 <div class="m-input-icon m-input-icon--right down">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                        [(ngModel)]="_clearanceDate" [singleDatePicker]="true"
-                                        #singledater="ngModel" name="singledater" placeholder="Select date" readonly
-                                        required />
+                                        [(ngModel)]="_clearanceDate" [singleDatePicker]="true" #singledater="ngModel"
+                                        name="singledater" placeholder="Select date" readonly required />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -247,7 +246,7 @@
                                 <input type="number" class="form-control m-input m-input--square"
                                     [(ngModel)]="customDeclaration.grossWeight" name="gross_weight"
                                     onkeypress="return event.charCode == 46 || (event.charCode > 47 && event.charCode < 58)"
-                                    #gross_weight="ngModel" placeholder="">
+                                    #gross_weight="ngModel" placeholder="Enter number">
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -385,7 +384,7 @@
                     </button>
                 </ng-template>
                 <button *ngIf="customDeclaration.jobNo; else allowSaveAndConvert" type="" disabled="true"
-                    class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" >
+                    class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
                     <span>
                         <i class="la la la-save"></i>
                         <span>
@@ -394,7 +393,8 @@
                     </span>
                 </button>
                 <ng-template #allowSaveAndConvert>
-                    <button type="" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)="convertClearanceToShipment(updateForm)">
+                    <button type="" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="convertClearanceToShipment(updateForm)">
                         <span>
                             <i class="la la la-save"></i>
                             <span>

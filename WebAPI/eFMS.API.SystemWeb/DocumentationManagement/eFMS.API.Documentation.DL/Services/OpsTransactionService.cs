@@ -13,6 +13,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,14 +28,16 @@ namespace eFMS.API.Documentation.DL.Services
         //private ICatPartnerApiService catPartnerApi;
         //private ISysUserApiService sysUserApi;
         private readonly ICurrentUser currentUser;
+        private readonly IStringLocalizer stringLocalizer;
 
-        public OpsTransactionService(IContextBase<OpsTransaction> repository, IMapper mapper, ICurrentUser user) : base(repository, mapper)
+        public OpsTransactionService(IContextBase<OpsTransaction> repository, IMapper mapper, ICurrentUser user, IStringLocalizer<LanguageSub> localizer) : base(repository, mapper)
         {
             //catStageApi = stageApi;
             //catplaceApi = placeApi;
             //catPartnerApi = partnerApi;
             //sysUserApi = userApi;
             currentUser = user;
+            stringLocalizer = localizer;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -124,7 +127,7 @@ namespace eFMS.API.Documentation.DL.Services
             var query = (from detail in ((eFMSDataContext)DataContext.DC).OpsTransaction
                          where detail.Id == jobId
                          join surcharge in ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge on detail.Id equals surcharge.Hblid
-                         where surcharge.Soano != null || surcharge.OtherSoa != null
+                         where surcharge.Cdno != null || surcharge.Soano != null
                          select detail);
             if (query.Any())
             {
@@ -224,7 +227,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if(CheckExist(model.CustomsDeclaration, model.CustomsDeclaration.Id))
                 {
-                    result = new HandleState("Existed Code");
+                    result = new HandleState(stringLocalizer[LanguageSub.MSG_CLEARANCENO_EXISTED, model.CustomsDeclaration.ClearanceNo].Value);
                     return result;
                 }
                 if(model.CustomsDeclaration.JobNo == null)

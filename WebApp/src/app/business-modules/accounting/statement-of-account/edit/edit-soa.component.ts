@@ -9,6 +9,9 @@ import { StatementOfAccountAddChargeComponent } from '../components/poup/add-cha
 })
 export class StatementOfAccountEditComponent extends AppPage {
     @ViewChild(StatementOfAccountAddChargeComponent, { static: false }) addChargePopup: StatementOfAccountAddChargeComponent;
+    currencyList: any[];
+    selectedRange: any;
+    maxDate: any;
     constructor() {
         super();
     }
@@ -18,5 +21,25 @@ export class StatementOfAccountEditComponent extends AppPage {
 
     addCharge() {
         this.addChargePopup.show();
+    }
+
+    /**
+    * ng2-select
+    */
+    private value: any = {};
+    public selected(value: any): void {
+        console.log('Selected value is: ', value);
+    }
+
+    public removed(value: any): void {
+        console.log('Removed value is: ', value);
+    }
+
+    public typed(value: any): void {
+        console.log('New search input: ', value);
+    }
+
+    public refreshValue(value: any): void {
+        this.value = value;
     }
 }

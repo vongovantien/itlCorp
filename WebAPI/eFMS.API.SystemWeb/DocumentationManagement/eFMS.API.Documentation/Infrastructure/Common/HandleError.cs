@@ -1,10 +1,7 @@
 ﻿using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Common;
 using ITL.NetCore.Common;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using SystemManagementAPI.Resources;
 
 namespace eFMS.API.Shipment.Infrastructure.Common
 {

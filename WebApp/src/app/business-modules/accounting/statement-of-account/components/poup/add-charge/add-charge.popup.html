@@ -16,7 +16,9 @@
                                 <label class="form-control-label" for="">
                                     Shipment
                                 </label>
-                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                <ng-select [allowClear]="true" [items]="items" data)="refreshValue($event)"
+                                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                    placeholder="Select filter">
                                 </ng-select>
                             </div>
                         </div>
@@ -25,7 +27,9 @@
                                 <label class="form-control-label" for="">
                                     Debit/Credit Note
                                 </label>
-                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                <ng-select [allowClear]="true" [items]="items" (data)="refreshValue($event)"
+                                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                    placeholder="Select filter">
                                 </ng-select>
                             </div>
                         </div>
@@ -34,7 +38,9 @@
                                 <label class="form-control-label" for="">
                                     Type
                                 </label>
-                                <ng-select [allowClear]="true" [items]="['All', 'Debit', 'Credit']" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                <ng-select [allowClear]="true" [items]="['All', 'Debit', 'Credit']"
+                                    (data)="refreshValue($event)" (selected)="selected($event)"
+                                    (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
                                 </ng-select>
                             </div>
                         </div>
@@ -45,7 +51,9 @@
                                 <label class="form-control-label" for="">
                                     OBH
                                 </label>
-                                <ng-select [allowClear]="true" [items]="['Yes', 'No']" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                <ng-select [allowClear]="true" [items]="['Yes', 'No']" (data)="refreshValue($event)"
+                                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                    placeholder="Select filter">
                                 </ng-select>
                             </div>
                         </div>
@@ -54,7 +62,9 @@
                                 <label class="form-control-label" for="">
                                     In SOA
                                 </label>
-                                <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
+                                <ng-select [allowClear]="true" [items]="items" (data)="refreshValue($event)"
+                                    (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
+                                    placeholder="Select filter">
                                 </ng-select>
                             </div>
                         </div>
@@ -64,13 +74,15 @@
                                     Charge
                                 </label>
                                 <div class="dropdown e--combogrid">
-                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected">
+                                    <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                        readonly data-toggle="dropdown" placeholder="Please selected">
                                     <div class="dropdown-menu e--combogrid-content">
                                         <div class="tabel-wrapper table-fixed">
                                             <div class="table-head-fixed">
                                                 <div class="table-filter-block">
                                                     <div class="search-field">
-                                                        <input class="form-control m-input m-input--square" type="text" placeholder="Search...">
+                                                        <input class="form-control m-input m-input--square" type="text"
+                                                            placeholder="Search...">
                                                         <i class="icon-search"></i>
                                                     </div>
                                                 </div>
@@ -130,7 +142,8 @@
                             <div class="col-lg-4 order-2 order-lg-1">
                                 <div class="form-group">
                                     <div class="m-input-icon m-input-icon--left">
-                                        <input type="text" class="form-control m-input m-input--square" placeholder="Search...">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            placeholder="Search...">
                                         <span class="m-input-icon__icon m-input-icon__icon--left">
                                             <span>
                                                 <i class="la la-search"></i>
@@ -247,7 +260,8 @@
                 <!--end::Form-->
             </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" routerLink="/home/accounting/statement-of-account-edit">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal"
+                    routerLink="/home/accounting/statement-of-account-edit">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -255,7 +269,8 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
+                    data-dismiss="modal">
                     <span>
                         <i class="la la-ban"></i>
                         <span>

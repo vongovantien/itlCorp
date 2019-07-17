@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
@@ -11,7 +12,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
-using SystemManagementAPI.Resources;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -29,7 +29,7 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICsTransactionService csTransactionService;
         private readonly ICurrentUser currentUser;
-        private ICsShipmentSurchargeService surchargeService;
+        private readonly ICsShipmentSurchargeService surchargeService;
 
         /// <summary>
         /// constructor

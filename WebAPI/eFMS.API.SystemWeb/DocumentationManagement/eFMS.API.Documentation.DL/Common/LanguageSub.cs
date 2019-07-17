@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SystemManagementAPI.Resources
+namespace eFMS.API.Documentation.DL.Common
 {
     public class LanguageSub
     {
@@ -35,5 +35,6 @@ namespace SystemManagementAPI.Resources
         public static readonly string MSG_MAWB_EXISTED = "MSG_MAWB_EXISTED";
         public static readonly string MSG_HBNO_EXISTED = "MSG_HBNO_EXISTED";
         public static readonly string MSG_NOT_ALLOW_DELETED = "MSG_NOT_ALLOW_DELETED";
+        public static readonly string MSG_CLEARANCENO_EXISTED = "MSG_CLEARANCENO_EXISTED";
     }
 }

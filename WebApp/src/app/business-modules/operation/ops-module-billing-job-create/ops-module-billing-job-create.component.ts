@@ -14,6 +14,7 @@ import { PopupBase } from "src/app/popup.base";
 import { takeUntil, catchError, finalize } from "rxjs/operators";
 import { NgxSpinnerService } from "ngx-spinner";
 import { ToastrService } from "ngx-toastr";
+import { Subscription } from "rxjs";
 @Component({
   selector: "app-ops-module-billing-job-create",
   templateUrl: "./ops-module-billing-job-create.component.html"
@@ -29,7 +30,6 @@ export class OpsModuleBillingJobCreateComponent extends PopupBase implements OnI
   listPort: any[] = [];
   listBillingOps: any[] = [];
   OpsTransactionToAdd: OpsTransaction = new OpsTransaction();
-
   constructor(
     private baseServices: BaseService,
     private api_menu: API_MENU,
@@ -60,7 +60,7 @@ export class OpsModuleBillingJobCreateComponent extends PopupBase implements OnI
   }
 
   ngOnDestroy(): void {
-    this.baseServices.dataStorage.unsubscribe();
+    // this.baseServices.dataStorage.unsubscribe();
   }
   async getShipmentCommonData() {
     const data = await shipmentHelper.getOPSShipmentCommonData(
