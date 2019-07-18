@@ -17,9 +17,20 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
+                <!-- <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
                     <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
                         data-toggle="modal" data-target="#ops-add-credit-debit-note-modal">
+                        <span>
+                            <i class="la la-plus"></i>
+                            <span>
+                                create credit/debit note
+                            </span>
+                        </span>
+                    </button>
+                </div> -->
+                <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
+                    <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="openPopUpCreateCDNote()">
                         <span>
                             <i class="la la-plus"></i>
                             <span>
@@ -141,7 +152,7 @@
 <!--end:: m-portlet-->
 
 <!--begin:: add-credit-debit-note-modal-->
-<app-ops-module-credit-debit-note-addnew></app-ops-module-credit-debit-note-addnew>
+<app-ops-module-credit-debit-note-addnew [currentJob]="currentJob"></app-ops-module-credit-debit-note-addnew>
 <!--end:: add-credit-debit-note-modal-->
 
 <!--begin:: detail-credit-debit-note-modal-->

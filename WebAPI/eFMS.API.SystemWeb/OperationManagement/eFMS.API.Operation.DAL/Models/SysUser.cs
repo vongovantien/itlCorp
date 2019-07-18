@@ -5,14 +5,6 @@ namespace eFMS.API.Operation.Service.Models
 {
     public partial class SysUser
     {
-        public SysUser()
-        {
-            SysAuthorizationAssignToNavigation = new HashSet<SysAuthorization>();
-            SysAuthorizationUser = new HashSet<SysAuthorization>();
-            SysUserOtherWorkPlace = new HashSet<SysUserOtherWorkPlace>();
-            SysUserRole = new HashSet<SysUserRole>();
-        }
-
         public string Id { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
@@ -27,12 +19,5 @@ namespace eFMS.API.Operation.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
-
-        public virtual SysUserGroup UserGroup { get; set; }
-        public virtual CatBranch WorkPlace { get; set; }
-        public virtual ICollection<SysAuthorization> SysAuthorizationAssignToNavigation { get; set; }
-        public virtual ICollection<SysAuthorization> SysAuthorizationUser { get; set; }
-        public virtual ICollection<SysUserOtherWorkPlace> SysUserOtherWorkPlace { get; set; }
-        public virtual ICollection<SysUserRole> SysUserRole { get; set; }
     }
 }

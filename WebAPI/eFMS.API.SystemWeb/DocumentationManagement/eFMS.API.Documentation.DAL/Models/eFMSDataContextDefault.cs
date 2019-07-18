@@ -15,7 +15,7 @@ namespace eFMS.API.Documentation.Service.Models
         {
         }
 
-        public virtual DbSet<AcctCd> AcctCd { get; set; }
+        public virtual DbSet<AcctCdnote> AcctCdnote { get; set; }
         public virtual DbSet<CatArea> CatArea { get; set; }
         public virtual DbSet<CatBranch> CatBranch { get; set; }
         public virtual DbSet<CatCharge> CatCharge { get; set; }
@@ -90,9 +90,9 @@ namespace eFMS.API.Documentation.Service.Models
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
-            modelBuilder.Entity<AcctCd>(entity =>
+            modelBuilder.Entity<AcctCdnote>(entity =>
             {
-                entity.ToTable("acctCD");
+                entity.ToTable("acctCDNote");
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
@@ -1437,16 +1437,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.ContainerType)
-                    .WithMany(p => p.CsMawbcontainerContainerType)
-                    .HasForeignKey(d => d.ContainerTypeId)
-                    .HasConstraintName("FK_csMAWBContainer_catUnit1");
-
-                entity.HasOne(d => d.UnitOfMeasure)
-                    .WithMany(p => p.CsMawbcontainerUnitOfMeasure)
-                    .HasForeignKey(d => d.UnitOfMeasureId)
-                    .HasConstraintName("FK_csMAWBContainer_catUnit");
             });
 
             modelBuilder.Entity<CsShipmentHawbdetail>(entity =>
@@ -2242,12 +2232,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.Job)
-                    .WithMany(p => p.CsTransactionDetail)
-                    .HasForeignKey(d => d.JobId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_csTransactionDetail_csTransaction");
             });
 
             modelBuilder.Entity<CustomsDeclaration>(entity =>

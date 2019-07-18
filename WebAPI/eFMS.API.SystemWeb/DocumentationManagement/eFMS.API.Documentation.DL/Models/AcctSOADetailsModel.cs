@@ -28,7 +28,7 @@ namespace eFMS.API.Documentation.DL.Models
         public bool IsLocked { get; set; }
         public decimal? Volum { get; set; }
         public List<CsShipmentSurchargeDetailsModel> ListSurcharges { get; set; }
-        public AcctSoa Soa { get; set; }
+        public AcctCdnote CDNote { get; set; }
         public decimal? TotalCredit { get; set; }
         public decimal? TotalDebit { get; set; }
     }

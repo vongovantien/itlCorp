@@ -149,7 +149,7 @@ export class OpsModuleBillingJobCreateComponent extends PopupBase implements OnI
         const error = $("#add-new-ops-job-form").find("div.has-danger");
         if (error.length === 0) {
           this.OpsTransactionToAdd.serviceDate = this.selectedDate.startDate != null ? dataHelper.dateTimeToUTC(this.selectedDate.startDate) : null;
-          this.jobRepo.addJob(this.OpsTransactionToAdd).pipe(
+          this.jobRepo.addOPSJob(this.OpsTransactionToAdd).pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),
             finalize(() => { this.spinner.hide(); })
@@ -168,35 +168,6 @@ export class OpsModuleBillingJobCreateComponent extends PopupBase implements OnI
               }
             }
           );
-          // this._jobRepo.getDetailStageOfJob(id).pipe(
-          //   takeUntil(this.ngUnsubscribe),
-          //   catchError(this.catchError),
-          //   finalize(() => { this._spinner.hide() }),
-          // ).subscribe(
-          //   (res: any[]) => {
-          //     if (res instanceof Error) {
-
-          //     } else {
-          //       this.selectedStage = new Stage(res);
-          //       this.openPopupDetail();
-          //     }
-          //   },
-          //   // error
-          //   (errs: any) => {
-          //     // this.handleErrors(errs)
-          //   },
-          //   // complete
-          //   () => { }
-          // )
-          // if (res.status) {//job-edit/:id
-          //   console.log(res);
-          //   this.router.navigate([
-          //     "/home/operation/job-edit/", res.data
-          //   ]);
-          //   this.OpsTransactionToAdd = new OpsTransaction();
-          //   this.resetDisplay();
-          //   form.onReset();
-          // }
         }
       }
     }, 300);

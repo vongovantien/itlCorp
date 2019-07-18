@@ -6,26 +6,30 @@ import cloneDeep from 'lodash/cloneDeep'
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 // import { ExtendData } from '../../../extend-data';
-import { AcctSOA } from 'src/app/shared/models/document/acctSoa.model';
+import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
 import { async } from 'rxjs/internal/scheduler/async';
 import { NgForm } from '@angular/forms';
 import { SortService } from 'src/app/shared/services/sort.service';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
+import { SubjectSubscriber, Subject } from 'rxjs/internal/Subject';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
+import { PopupBase } from 'src/app/popup.base';
 declare var $: any;
 @Component({
     selector: 'app-ops-module-credit-debit-note-addnew',
     templateUrl: './ops-module-credit-debit-note-addnew.component.html',
     styleUrls: ['./ops-module-credit-debit-note-addnew.component.scss']
 })
-export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit, OnDestroy {
-
+export class OpsModuleCreditDebitNoteAddnewComponent extends PopupBase implements OnInit, OnDestroy {
+    @Input() currentJob: OpsTransaction = null;
     isDisplay: boolean = true;
-    CDNoteWorking: AcctSOA = new AcctSOA();
+    CDNoteWorking: AcctCDNote = new AcctCDNote();
     noteTypes = [
         { text: 'CREDIT', id: 'CREDIT' },
         { text: 'DEBIT', id: 'DEBIT' },
         { text: 'INVOICE', id: 'INVOICE' }
     ];
+    currentHbID: any = null;
 
     listSubjectPartner: any[] = [];
     constListSubjectPartner: any[] = [];
@@ -33,21 +37,21 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit, OnDestro
     listRemainingCharges: any[] = [];
     constListChargeOfPartner: any[] = [];
     STORAGE_DATA: any = null;
-    currentHbID: any = null;
 
     constructor(
         private baseServices: BaseService,
         private sortServices: SortService,
         private api_menu: API_MENU
     ) {
-
+        super();
     }
 
     ngOnInit() {
-        this.StateChecking();
-    }
-
-    ngOnDestroy(): void {
+        if (this.currentJob != null) {
+            this.currentHbID = this.currentJob.hblid;
+            this.getListSubjectPartner();
+        }
+        //this.StateChecking();
     }
     getListSubjectPartner() {
         this.baseServices.get(this.api_menu.Documentation.CsShipmentSurcharge.getPartners + "?Id=" + this.currentHbID + "&IsHouseBillID=true").subscribe((data: any[]) => {
@@ -61,12 +65,12 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit, OnDestro
             this.listChargeOfPartner = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getChargesByPartner + "?Id=" + this.currentHbID + "&partnerID=" + partnerId + "&IsHouseBillId=true");
             this.CDNoteWorking.listShipmentSurcharge = [];
             this.listChargeOfPartner = map(this.listChargeOfPartner, function (o) {
-                for (var i = 0; i < o.listCharges.length; i++) {
+                for (let i = 0; i < o.listCharges.length; i++) {
                     o.listCharges[i].isRemaining = false;
                 }
                 return o;
             });
-            this.listChargeOfPartner = this.sortServices.sort(this.listChargeOfPartner, "chargeCode", true)
+            this.listChargeOfPartner = this.sortServices.sort(this.listChargeOfPartner, "chargeCode", true);
             this.constListChargeOfPartner = cloneDeep(this.listChargeOfPartner);
             console.log(this.listChargeOfPartner);
             this.setChargesForCDNote();
@@ -148,13 +152,13 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit, OnDestro
 
     removeSelectedCharges() {
         const chargesElements = $('.single-charge-select');
-        for (var i = 0; i < chargesElements.length; i++) {
+        for (let i = 0; i < chargesElements.length; i++) {
             const selected: boolean = $(chargesElements[i]).prop("checked");
             if (selected) {
                 const indexSingle = parseInt($(chargesElements[i]).attr("data-id"));
                 var parentElement = $(chargesElements[i]).closest('tbody').find('input.group-charge-hb-select')[0];
 
-                const indexParent = 0;//parseInt($(parentElement).attr("data-id"));
+                const indexParent = 0; // parseInt($(parentElement).attr("data-id"));
                 $(parentElement).prop("checked", false);
 
                 this.listChargeOfPartner[indexParent].listCharges[indexSingle].isRemaining = true;
@@ -204,11 +208,11 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit, OnDestro
 
 
     selectSingleCharge(event: any, indexCharge: number) {
-        var groupCheck = $(event.target).closest('tbody').find('input.group-charge-hb-select').first();
-        var charges = $(event.target).closest('tbody').find('input.single-charge-select');
-        var allcheck = true;
-        for (var i = 0; i < charges.length; i++) {
-            if ($(charges[i]).prop('checked') != true) {
+        const groupCheck = $(event.target).closest('tbody').find('input.group-charge-hb-select').first();
+        const charges = $(event.target).closest('tbody').find('input.single-charge-select');
+        let allcheck = true;
+        for (let i = 0; i < charges.length; i++) {
+            if ($(charges[i]).prop('checked') !== true) {
                 allcheck = false;
             }
         }
@@ -224,24 +228,25 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit, OnDestro
     CreateCDNote(form: NgForm) {
         setTimeout(async () => {
             if (form.submitted) {
-                var errors = $('#ops-add-credit-debit-note-modal').find('div.has-danger');
-                if (errors.length == 0) {
-                    this.CDNoteWorking.jobId = this.STORAGE_DATA.CurrentOpsTransaction.id;
+                const errors = $('#ops-add-credit-debit-note-modal').find('div.has-danger');
+                if (errors.length === 0) {
+                    this.CDNoteWorking.jobId = this.currentJob.id;
                     this.CDNoteWorking.total = this.totalDebit - this.totalCredit;
-                    this.CDNoteWorking.currencyId = "USD" // in the future , this id must be local currency of each country
+                    this.CDNoteWorking.currencyId = "USD"; // in the future , this id must be local currency of each country
                     this.CDNoteWorking.listShipmentSurcharge = filter(this.CDNoteWorking.listShipmentSurcharge, function (o: any) {
                         return !o.isRemaining;
                     });
+                    console.log(this.CDNoteWorking.listShipmentSurcharge);
+                    // console.log(this.CDNoteWorking);
+                    // const res = await this.baseServices.postAsync(this.api_menu.Documentation.AcctSOA.addNew, this.CDNoteWorking);
+                    // if (res.status) {
+                    //     this.hide();
+                    //     //$('#ops-add-credit-debit-note-modal').modal('hide');
+                    //     this.CDNoteWorking = new AcctCDNote();
+                    //     this.baseServices.setData("listChargeOfPartner", []);
+                    //     this.resetAddSOAForm();
 
-                    console.log(this.CDNoteWorking);
-                    var res = await this.baseServices.postAsync(this.api_menu.Documentation.AcctSOA.addNew, this.CDNoteWorking);
-                    if (res.status) {
-                        $('#ops-add-credit-debit-note-modal').modal('hide');
-                        this.CDNoteWorking = new AcctSOA();
-                        this.baseServices.setData("listChargeOfPartner", []);
-                        this.resetAddSOAForm();
-
-                    }
+                    // }
                 }
             }
         }, 300);
@@ -259,9 +264,9 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit, OnDestro
     closeModal(form: NgForm, id_modal: string) {
         form.onReset();
         this.resetAddSOAForm();
-        this.CDNoteWorking = new AcctSOA();
+        this.CDNoteWorking = new AcctCDNote();
         this.baseServices.setData("listChargeOfPartner", []);
-        $('#' + id_modal).modal('hide');
+        this.hide();
     }
 
 
@@ -311,25 +316,30 @@ export class OpsModuleCreditDebitNoteAddnewComponent implements OnInit, OnDestro
        * you can access data from `dataStorage` like code below, you should check if data have any change with current value, if you dont check 
        * and call HTTP request or something like that can cause a `INFINITY LOOP`.  
     */
+    subscribe: Subject<any> = new Subject();
     StateChecking() {
-        this.baseServices.dataStorage.subscribe(data => {
+        this.subscribe = <any>this.baseServices.dataStorage.subscribe(data => {
 
             this.STORAGE_DATA = data;
-            if (this.STORAGE_DATA.CurrentOpsTransaction !== undefined && this.currentHbID !== this.STORAGE_DATA.CurrentOpsTransaction.hblid) {
+            // if (this.STORAGE_DATA.CurrentOpsTransaction !== undefined && this.currentHbID !== this.STORAGE_DATA.CurrentOpsTransaction.hblid) {
 
-                this.currentHbID = this.STORAGE_DATA.CurrentOpsTransaction.hblid;
-                this.getListSubjectPartner();
+            //     this.currentHbID = this.STORAGE_DATA.CurrentOpsTransaction.hblid;
+            //     this.getListSubjectPartner();
 
-            }
-            if ((this.STORAGE_DATA.ShipmentUpdated !== undefined && this.STORAGE_DATA.ShipmentUpdated) || (this.STORAGE_DATA.ShipmentAdded !== undefined && this.STORAGE_DATA.ShipmentAdded)) {
-                this.getListSubjectPartner();
-                this.baseServices.setData("ShipmentAdded", false);
-                this.baseServices.setData("ShipmentUpdated", false);
-            }
-            if (this.STORAGE_DATA.listChargeOfPartner !== undefined) {
-                this.listChargeOfPartner = cloneDeep(this.STORAGE_DATA.listChargeOfPartner);
-                this.constListChargeOfPartner = cloneDeep(this.STORAGE_DATA.listChargeOfPartner);
-            }
+            // }
+            // if ((this.STORAGE_DATA.ShipmentUpdated !== undefined && this.STORAGE_DATA.ShipmentUpdated) || (this.STORAGE_DATA.ShipmentAdded !== undefined && this.STORAGE_DATA.ShipmentAdded)) {
+            //     this.getListSubjectPartner();
+            //     this.baseServices.setData("ShipmentAdded", false);
+            //     this.baseServices.setData("ShipmentUpdated", false);
+            // }
+            // if (this.STORAGE_DATA.listChargeOfPartner !== undefined) {
+            //     this.listChargeOfPartner = cloneDeep(this.STORAGE_DATA.listChargeOfPartner);
+            //     this.constListChargeOfPartner = cloneDeep(this.STORAGE_DATA.listChargeOfPartner);
+            // }
         });
+    }
+
+    ngOnDestroy(): void {
+        this.subscribe.unsubscribe();
     }
 }

@@ -1,7 +1,8 @@
-import { Component, OnInit, AfterViewChecked, Input, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, Input, ChangeDetectorRef, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
-import { AcctSoaDetails } from 'src/app/shared/models/document/acctSoaDetails.model';
+import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDetails.model';
+import { Subject } from 'rxjs/internal/Subject';
 declare var $: any;
 
 @Component({
@@ -9,14 +10,13 @@ declare var $: any;
   templateUrl: './ops-module-credit-debit-note-detail.component.html',
   styleUrls: ['./ops-module-credit-debit-note-detail.component.scss']
 })
-export class OpsModuleCreditDebitNoteDetailComponent implements OnInit, AfterViewChecked {
-
+export class OpsModuleCreditDebitNoteDetailComponent implements OnInit, AfterViewChecked, OnDestroy {
 
   open: boolean = false;
   STORAGE_DATA: any = null;
   currentSOANo: string = null;
   currentJobID: string = null;
-  CDNoteDetails: AcctSoaDetails = null;
+  CDNoteDetails: AcctCDNoteDetails = null;
   previewModalId = "preview-modal";
   dataReport: any;
 
@@ -54,8 +54,10 @@ export class OpsModuleCreditDebitNoteDetailComponent implements OnInit, AfterVie
    * you can access data from `dataStorage` like code below, you should check if data have any change with current value, if you dont check 
    * and call HTTP request or something like that can cause a `INFINITY LOOP`.  
    */
+
+  subscribe: Subject<any> = new Subject();
   StateChecking() {
-    this.baseServices.dataStorage.subscribe(data => {
+    this.subscribe = <any>this.baseServices.dataStorage.subscribe(data => {
       this.STORAGE_DATA = data;
       if (this.STORAGE_DATA.CurrentSOANo !== undefined && this.currentSOANo !== this.STORAGE_DATA.CurrentSOANo) {
         this.currentSOANo = this.STORAGE_DATA.CurrentSOANo;
@@ -71,20 +73,23 @@ export class OpsModuleCreditDebitNoteDetailComponent implements OnInit, AfterVie
 
   }
 
-  Close(){
+  ngOnDestroy(): void {
+    this.subscribe.unsubscribe();
+  }
+  Close() {
     $('#ops-credit-debit-note-detail-modal').modal('hide');
   }
 
-  async Preview(){
+  async Preview() {
     this.dataReport = null;
-    if(this.CDNoteDetails.listSurcharges.length===0){
+    if (this.CDNoteDetails.listSurcharges.length === 0) {
       this.baseServices.errorToast("This credit debit node must have at least 1 surcharge !");
-    }else{
-      var response = await this.baseServices.postAsync(this.api_menu.Documentation.AcctSOA.previewCDNote,this.CDNoteDetails);
+    } else {
+      var response = await this.baseServices.postAsync(this.api_menu.Documentation.AcctSOA.previewCDNote, this.CDNoteDetails);
       console.log(response);
       this.dataReport = response;
       var _this = this;
-      var checkExist = setInterval(function() {
+      var checkExist = setInterval(function () {
         if ($('#frame').length) {
             console.log("Exists!");
             $('#' + _this.previewModalId).modal('show');
@@ -92,7 +97,7 @@ export class OpsModuleCreditDebitNoteDetailComponent implements OnInit, AfterVie
         }
      }, 100);
     }
-}
+  }
 
-  
+
 }

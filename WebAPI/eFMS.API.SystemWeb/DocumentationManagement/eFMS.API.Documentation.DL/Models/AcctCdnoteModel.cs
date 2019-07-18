@@ -5,7 +5,7 @@ using System.Text;
 
 namespace eFMS.API.Documentation.DL.Models
 {
-    public class AcctSOAModel : AcctSoa
+    public class AcctCdnoteModel : AcctCdnote
     {
         public List<CsShipmentSurcharge> listShipmentSurcharge { get; set; }
     }

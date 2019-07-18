@@ -19,28 +19,28 @@ namespace eFMS.API.Documentation.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    public class AcctSOAController : ControllerBase
+    public class AcctCDNoteController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly IAcctSOAServices acctSOAServices;
+        private readonly IAcctCDNoteServices cdNoteServices;
         private readonly ICurrentUser currentUser;
 
-        public AcctSOAController(IStringLocalizer<LanguageSub> localizer, IAcctSOAServices service, ICurrentUser user)
+        public AcctCDNoteController(IStringLocalizer<LanguageSub> localizer, IAcctCDNoteServices service, ICurrentUser user)
         {
             stringLocalizer = localizer;
-            acctSOAServices = service;
+            cdNoteServices = service;
             currentUser = user;
         }
 
         [HttpPost]
         [Route("Add")]
         [Authorize]
-        public IActionResult AddNew(AcctSOAModel model)
+        public IActionResult AddNew(AcctCdnoteModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
             model.UserCreated = currentUser.UserID;
             model.DatetimeCreated = DateTime.Now;
-            var hs = acctSOAServices.AddNewSOA(model);
+            var hs = cdNoteServices.AddNewCDNote(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -54,12 +54,12 @@ namespace eFMS.API.Documentation.Controllers
         [HttpPut]
         [Route("Update")]
         [Authorize]
-        public IActionResult Update(AcctSOAModel model)
+        public IActionResult Update(AcctCdnoteModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
             model.UserCreated = currentUser.UserID;
             model.DatetimeCreated = DateTime.Now;
-            var hs = acctSOAServices.UpdateSOA(model);
+            var hs = cdNoteServices.UpdateCDNote(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -74,7 +74,7 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult Delete(Guid cdNoteId)
         {
-            var hs = acctSOAServices.DeleteSOA(cdNoteId);
+            var hs = cdNoteServices.DeleteCDNote(cdNoteId);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -89,7 +89,7 @@ namespace eFMS.API.Documentation.Controllers
         //[Authorize]
         public List<object> Get(Guid Id,bool IsHouseBillID)
         {
-            return acctSOAServices.GroupSOAByPartner(Id, IsHouseBillID);
+            return cdNoteServices.GroupCDNoteByPartner(Id, IsHouseBillID);
         }
 
         [HttpGet]
@@ -97,14 +97,14 @@ namespace eFMS.API.Documentation.Controllers
         //[Authorize]
         public AcctSOADetailsModel Get(Guid JobId,string soaNo)
         {
-            return acctSOAServices.GetSOADetails(JobId, soaNo);
+            return cdNoteServices.GetCDNoteDetails(JobId, soaNo);
         }
 
         [HttpPost]
         [Route("PreviewOpsCdNote")]
         public IActionResult PreviewOpsCdNote(AcctSOADetailsModel model)
         {
-            var result = acctSOAServices.Preview(model);
+            var result = cdNoteServices.Preview(model);
             return Ok(result);
         }
 

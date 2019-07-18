@@ -1546,7 +1546,7 @@
                     </app-billing-custom-declaration>
                 </tab>
                 <tab heading="Credit Note & Debit Note" (selectTab)="selectTab($event,'cre-debit-note')">
-                    <app-ops-module-credit-debit-note *ngIf="tab === 'cre-debit-note'">
+                    <app-ops-module-credit-debit-note *ngIf="tab === 'cre-debit-note'" [currentJob]="opsTransaction">
                     </app-ops-module-credit-debit-note>
                 </tab>
                 <tab heading="Stage management" [active]="tab === 'stage'" (selectTab)="selectTab($event, 'stage')">

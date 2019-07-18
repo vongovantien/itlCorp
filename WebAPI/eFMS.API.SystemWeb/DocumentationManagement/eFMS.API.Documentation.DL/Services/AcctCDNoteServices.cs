@@ -18,9 +18,9 @@ using System.Text;
 
 namespace eFMS.API.Documentation.DL.Services
 {
-    public class AcctSOAServices : RepositoryBase<AcctSoa,AcctSOAModel>,IAcctSOAServices
+    public class AcctCDNoteServices : RepositoryBase<AcctCdnote, AcctCdnoteModel>, IAcctCDNoteServices
     {
-        public AcctSOAServices(IContextBase<AcctSoa> repository,IMapper mapper) : base(repository, mapper)
+        public AcctCDNoteServices(IContextBase<AcctCdnote> repository,IMapper mapper) : base(repository, mapper)
         {
 
         }
@@ -44,12 +44,12 @@ namespace eFMS.API.Documentation.DL.Services
             return (new string(head)  +"-"+ new string(body)).ToUpper();
         }
 
-        public HandleState AddNewSOA(AcctSOAModel model)
+        public HandleState AddNewCDNote(AcctCdnoteModel model)
         {
             try
             {
 
-                var soa = mapper.Map<AcctSoa>(model);
+                var soa = mapper.Map<AcctCdnote>(model);
                 soa.Id = Guid.NewGuid();
                 soa.Code = RandomCode();
                 DataContext.Add(soa);
@@ -77,12 +77,12 @@ namespace eFMS.API.Documentation.DL.Services
 
         }
 
-        public HandleState UpdateSOA(AcctSOAModel model)
+        public HandleState UpdateCDNote(AcctCdnoteModel model)
         {
             try
             {
                 var soa = DataContext.First(x => (x.Id == model.Id && x.Code == model.Code));
-                soa = mapper.Map<AcctSoa>(model);
+                soa = mapper.Map<AcctCdnote>(model);
                 if (soa == null)
                 {
                     throw new Exception("CD Note not found !");
@@ -121,7 +121,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         }
 
-        public List<object> GroupSOAByPartner(Guid id, bool IsHouseBillID)
+        public List<object> GroupCDNoteByPartner(Guid id, bool IsHouseBillID)
         {
             try
             {
@@ -253,10 +253,10 @@ namespace eFMS.API.Documentation.DL.Services
             return listCharges;
         }
 
-        public AcctSOADetailsModel GetSOADetails(Guid JobId, string SOACode)
+        public AcctSOADetailsModel GetCDNoteDetails(Guid JobId, string CDNoteCode)
         {
             
-            var Soa = DataContext.Where(x => x.Code == SOACode).FirstOrDefault();
+            var Soa = DataContext.Where(x => x.Code == CDNoteCode).FirstOrDefault();
             var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == Soa.PartnerId).FirstOrDefault();
 
             CatPlace pol = new CatPlace();
@@ -283,7 +283,7 @@ namespace eFMS.API.Documentation.DL.Services
                 return null;
             }
             
-            var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Soano == SOACode).ToList();
+            var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Soano == CDNoteCode).ToList();
 
             List<CsTransactionDetail> HBList = new List<CsTransactionDetail>();
             List<CsShipmentSurchargeDetailsModel> listSurcharges = new List<CsShipmentSurchargeDetailsModel>();
@@ -380,14 +380,14 @@ namespace eFMS.API.Documentation.DL.Services
             SoaDetails.IsLocked = false;
             SoaDetails.Volum = volum;
             SoaDetails.ListSurcharges = listSurcharges;
-            SoaDetails.Soa = Soa;
+            SoaDetails.CDNote = Soa;
 
 
             return SoaDetails;
 
         }
 
-        public HandleState DeleteSOA(Guid idSoA)
+        public HandleState DeleteCDNote(Guid idSoA)
         {
             var hs = new HandleState();
             try
@@ -449,7 +449,7 @@ namespace eFMS.API.Documentation.DL.Services
             var parameter = new AcctSOAReportParams
             {
                DBTitle = "N/A",
-               DebitNo = model.Soa.Code,
+               DebitNo = model.CDNote.Code,
                TotalDebit = model.TotalDebit==null? "N/A": model.TotalDebit.ToString(),
                TotalCredit = model.TotalCredit == null ? "N/A" : model.TotalCredit.ToString(),
                DueToTitle = "N/A",
@@ -499,7 +499,7 @@ namespace eFMS.API.Documentation.DL.Services
                         PortofLading = model.PolName,
                         PortofUnlading = model.PodName,
                         MAWB = model.MbLadingNo,
-                        Invoice = model.Soa.InvoiceNo,
+                        Invoice = model.CDNote.InvoiceNo,
                         EstimatedVessel = "N/A",
                         ArrivalDate = null,
                         Noofpieces = null,
