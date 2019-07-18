@@ -7,44 +7,36 @@ import { AccoutingComponent } from './accouting.component';
 
 const routes: Routes = [
   {
-    path: '', component: AccoutingComponent, children: [
-      {
-        path: 'statement-of-account', redirectTo: 'statement-of-account', pathMatch: 'full', data: {
-          name: "Account Receivable Payable",
-          level: 2
-        }
-      },
-      {
-        path: 'statement-of-account', loadChildren: () => import('./statement-of-account/statement-of-account.module').then(m => m.StatementOfAccountModule),
-      },
-      {
-        path: 'account-receivable-payable', component: AccountReceivablePayableComponent, data: {
-          name: "Account Receivable Payable",
-          level: 2
-        }
-      },
-      {
-        path: 'account-receivable-payable', component: AccountReceivablePayableComponent, data: {
-          name: "Account Receivable Payable",
-          level: 2
-        }
-      },
-      {
-        path: 'advance-payment', component: AdvancePaymentComponent, data: {
-          name: "Advance Payment",
-          level: 2
-        }
-      },
-      {
-        path: 'settlement-payment', component: SettlementPaymentComponent, data: {
-          name: "Settlement Payment",
-          level: 2
-        }
-      },
-
-      // TODO another MODULE...
-    ]
+    path: '', component: AccoutingComponent
   },
+  {
+    path: 'statement-of-account', loadChildren: () => import('./statement-of-account/statement-of-account.module').then(m => m.StatementOfAccountModule),
+  },
+  {
+    path: 'account-receivable-payable', component: AccountReceivablePayableComponent, data: {
+      name: "Account Receivable Payable",
+      level: 2
+    }
+  },
+  {
+    path: 'account-receivable-payable', component: AccountReceivablePayableComponent, data: {
+      name: "Account Receivable Payable",
+      level: 2
+    }
+  },
+  {
+    path: 'advance-payment', component: AdvancePaymentComponent, data: {
+      name: "Advance Payment",
+      level: 2
+    }
+  },
+  {
+    path: 'settlement-payment', component: SettlementPaymentComponent, data: {
+      name: "Settlement Payment",
+      level: 2
+    }
+  },
+  // TODO another MODULE...
 ];
 
 export const routing: ModuleWithProviders = RouterModule.forChild(routes);
