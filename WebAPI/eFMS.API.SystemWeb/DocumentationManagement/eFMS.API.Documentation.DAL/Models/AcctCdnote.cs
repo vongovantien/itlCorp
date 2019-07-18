@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace eFMS.API.Documentation.Service.Models
 {
-    public partial class AcctCd
+    public partial class AcctCdnote
     {
         public Guid Id { get; set; }
         public string Code { get; set; }

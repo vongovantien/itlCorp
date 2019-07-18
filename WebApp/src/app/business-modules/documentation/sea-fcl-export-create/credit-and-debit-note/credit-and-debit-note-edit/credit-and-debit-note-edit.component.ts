@@ -3,11 +3,11 @@ import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import filter from 'lodash/filter';
 import map from 'lodash/map';
-import concat from 'lodash/concat'
-import cloneDeep from 'lodash/cloneDeep'
+import concat from 'lodash/concat';
+import cloneDeep from 'lodash/cloneDeep';
 import groupBy from 'lodash/groupBy';
 import { ExtendData } from '../../../extend-data';
-import { AcctSOA } from 'src/app/shared/models/document/acctSoa.model';
+import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
 import { NgForm } from '@angular/forms';
 declare var $: any;
 
@@ -23,7 +23,7 @@ export class CreditAndDebitNoteEditComponent implements OnInit {
   isDisplayAddSoaForm: boolean = true;
 
   @Output() addNewRemainingCharges = new EventEmitter<any>();
-  EditingCDNote: AcctSOA = new AcctSOA();
+  EditingCDNote: AcctCDNote = new AcctCDNote();
   @Input() set editingCdNote(cdNote: any) {
     if (cdNote != null) {
       this.EditingCDNote = cdNote.soa;
@@ -60,7 +60,7 @@ export class CreditAndDebitNoteEditComponent implements OnInit {
       }
 
     }
-    
+
     this.totalCreditDebitCalculate();
     this.constListChargeOfPartner = cloneDeep(this.listChargeOfPartner);
     this.addNewRemainingCharges.emit(this.constListChargeOfPartner);
@@ -218,7 +218,7 @@ export class CreditAndDebitNoteEditComponent implements OnInit {
       setTimeout(() => {
         this.updated.emit(false);
       }, 1000);
-      this.EditingCDNote = new AcctSOA();
+      this.EditingCDNote = new AcctCDNote();
     }
   }
 
@@ -230,7 +230,7 @@ export class CreditAndDebitNoteEditComponent implements OnInit {
   }
 
 
-  
+
   SearchCharge(search_key: string) {
     // listChargeOfPartner
     this.listChargeOfPartner = cloneDeep(this.constListChargeOfPartner);

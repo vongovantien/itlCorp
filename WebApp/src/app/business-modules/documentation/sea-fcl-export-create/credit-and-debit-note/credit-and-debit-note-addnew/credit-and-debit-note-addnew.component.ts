@@ -6,7 +6,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { ExtendData } from '../../../extend-data';
-import { AcctSOA } from 'src/app/shared/models/document/acctSoa.model';
+import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
 
 declare var $: any;
 // import * as $ from 'jquery';
@@ -18,7 +18,7 @@ import { NgForm } from '@angular/forms';
 })
 export class CreditAndDebitNoteAddnewComponent implements OnInit {
 
-  CDNoteWorking: AcctSOA = new AcctSOA();
+  CDNoteWorking: AcctCDNote = new AcctCDNote();
   isDisplayAddSoaForm: boolean = true;
   noteTypes = [
     { text: 'CREDIT', id: 'CREDIT' },
@@ -50,14 +50,14 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
 
 
   getListSubjectPartner() {
-    this.baseServices.get(this.api_menu.Documentation.CsShipmentSurcharge.getPartners + "?Id=" + ExtendData.currentJobID+"&IsHouseBillID=false").subscribe((data: any[]) => {
+    this.baseServices.get(this.api_menu.Documentation.CsShipmentSurcharge.getPartners + "?Id=" + ExtendData.currentJobID + "&IsHouseBillID=false").subscribe((data: any[]) => {
       this.listSubjectPartner = cloneDeep(data);
       this.constListSubjectPartner = cloneDeep(data);
     });
   }
   async getListCharges(partnerId: string) {
-    if(ExtendData.currentJobID!==null && partnerId!=null){
-      this.listChargeOfPartner = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getChargesByPartner + "?Id=" + ExtendData.currentJobID + "&partnerID=" + partnerId+"&IsHouseBillId=false");
+    if (ExtendData.currentJobID !== null && partnerId != null) {
+      this.listChargeOfPartner = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getChargesByPartner + "?Id=" + ExtendData.currentJobID + "&partnerID=" + partnerId + "&IsHouseBillId=false");
       this.CDNoteWorking.listShipmentSurcharge = [];
       this.listChargeOfPartner = map(this.listChargeOfPartner, function (o) {
         for (var i = 0; i < o.listCharges.length; i++) {
@@ -156,7 +156,7 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
           var res = await this.baseServices.postAsync(this.api_menu.Documentation.AcctSOA.addNew, this.CDNoteWorking);
           if (res.status) {
             $('#add-credit-debit-note-modal').modal('hide');
-            this.CDNoteWorking = new AcctSOA();
+            this.CDNoteWorking = new AcctCDNote();
             this.listChargeOfPartner = [];
             this.resetAddSOAForm();
           }
@@ -199,11 +199,11 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
   }
 
 
-  closeModal(form:NgForm,id_modal:string){
+  closeModal(form: NgForm, id_modal: string) {
     form.onReset();
-    $('#'+id_modal).modal('hide');
+    $('#' + id_modal).modal('hide');
     this.resetAddSOAForm();
-}
+  }
 
 
 

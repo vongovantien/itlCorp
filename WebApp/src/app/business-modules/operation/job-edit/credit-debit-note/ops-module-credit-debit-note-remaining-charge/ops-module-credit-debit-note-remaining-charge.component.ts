@@ -2,6 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angu
 import { API_MENU } from 'src/constants/api-menu.const';
 import { BaseService } from 'src/services-base/base.service';
 import cloneDeep from 'lodash/cloneDeep';
+import { Subject } from 'rxjs';
 declare var $: any;
 
 @Component({
@@ -10,9 +11,6 @@ declare var $: any;
   styleUrls: ['./ops-module-credit-debit-note-remaining-charge.component.scss']
 })
 export class OpsModuleCreditDebitNoteRemainingChargeComponent implements OnInit, OnDestroy {
-  ngOnDestroy(): void {
-    // this.baseServices.dataStorage.unsubscribe();
-  }
   STORAGE_DATA: any = null;
   listChargeOfPartner: any[] = []
   partnerId: string = null;
@@ -21,8 +19,9 @@ export class OpsModuleCreditDebitNoteRemainingChargeComponent implements OnInit,
     private api_menu: API_MENU
   ) { }
 
+  subscribe: Subject<any> = new Subject();
   ngOnInit() {
-    this.baseServices.dataStorage.subscribe(data => {
+    this.subscribe = <any>this.baseServices.dataStorage.subscribe(data => {
       this.STORAGE_DATA = data;
       if (this.STORAGE_DATA.listChargeOfPartner !== undefined) {
         this.listChargeOfPartner = cloneDeep(this.STORAGE_DATA.listChargeOfPartner);
@@ -34,6 +33,9 @@ export class OpsModuleCreditDebitNoteRemainingChargeComponent implements OnInit,
     });
   }
 
+  ngOnDestroy(): void {
+    this.subscribe.unsubscribe();
+  }
   addCharges() {
     const chargesElements = $('.single-charge-select');
     for (var i = 0; i < chargesElements.length; i++) {

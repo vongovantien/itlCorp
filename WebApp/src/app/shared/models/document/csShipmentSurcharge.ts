@@ -1,5 +1,5 @@
-export class CsShipmentSurcharge{
-    id: String =  "00000000-0000-0000-0000-000000000000";
+export class CsShipmentSurcharge {
+    id: String = "00000000-0000-0000-0000-000000000000";
     hblid: String = null;
     type: String = null;
     chargeId: String = null;
@@ -32,23 +32,24 @@ export class CsShipmentSurcharge{
     chiefAccountantId: String = null;
     chiefAccountantDate: Date = null;
     chiefAccountantStatus: String = null;
-    chiefAccountantNote: String = null; 
+    chiefAccountantNote: String = null;
     status: String = null;
     userCreated: String = null;
     datetimeCreated: Date = null;
     userModified: String = null;
     datetimeModified: Date = null;
-    exchangeRate:number = null;
-    chargeCode:String = null;
-    unit:String = null;
-    hwbno:String = null;
-    soaadjustmentReason:String = null;
+    exchangeRate: number = null;
+    chargeCode: String = null;
+    unit: String = null;
+    hwbno: String = null;
+    soaadjustmentReason: String = null;
     soaadjustmentRequestedDate: Date = null;
     soaadjustmentRequestor: String = null;
     soaclosed: Boolean = null;
+    cdno: String = null;
     soano: String = null;
     currency: String = null;
-    nameEn:String = null;
+    nameEn: String = null;
     otherSoa: String = null;
     partnerName: String = null;
     payerName: String = null;
@@ -60,5 +61,5 @@ export class CsShipmentSurcharge{
     unlockedSoasaleManDate: Date = null;
     unlockedSoasaleManStatus: String = null;
 
-    isRemaining:Boolean = null;
+    isRemaining: Boolean = null;
 }

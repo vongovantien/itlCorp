@@ -183,7 +183,7 @@ namespace eFMS.API.Documentation.DL.Services
             var parameter = new AcctSOAReportParams
             {
                 DBTitle = "DB title",
-                DebitNo = model.Soa.Code,
+                DebitNo = model.CDNote.Code,
                 TotalDebit = model.TotalDebit?.ToString(),
                 TotalCredit = model.TotalCredit?.ToString(),
                 DueToTitle = "",

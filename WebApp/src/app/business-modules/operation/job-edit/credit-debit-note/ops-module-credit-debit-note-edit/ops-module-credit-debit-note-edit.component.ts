@@ -1,12 +1,13 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { BaseService } from 'src/services-base/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import filter from 'lodash/filter';
 import map from 'lodash/map';
 import concat from 'lodash/concat'
 import cloneDeep from 'lodash/cloneDeep'
-import { AcctSOA } from 'src/app/shared/models/document/acctSoa.model';
+import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
 import { NgForm } from '@angular/forms';
+import { Subject } from 'rxjs/internal/Subject';
 declare var $: any;
 
 @Component({
@@ -14,13 +15,12 @@ declare var $: any;
   templateUrl: './ops-module-credit-debit-note-edit.component.html',
   styleUrls: ['./ops-module-credit-debit-note-edit.component.scss']
 })
-export class OpsModuleCreditDebitNoteEditComponent implements OnInit {
-
-  listChargeOfPartner: any[] = []; 
+export class OpsModuleCreditDebitNoteEditComponent implements OnInit, OnDestroy {
+  listChargeOfPartner: any[] = [];
   listRemainingCharges: any[] = [];
   constListChargeOfPartner: any[] = [];
   isDisplay: boolean = true;
-  EditingCDNote: AcctSOA = new AcctSOA();
+  EditingCDNote: AcctCDNote = new AcctCDNote();
   STORAGE_DATA: any = null;
   currentHbID: string = null;
   constructor(
@@ -187,7 +187,7 @@ export class OpsModuleCreditDebitNoteEditComponent implements OnInit {
       $('#ops-credit-debit-note-edit-modal').modal('hide');
       $('#ops-credit-debit-note-detail-modal').modal('show');
       this.baseServices.setData("SOAUpdated", true);
-      this.EditingCDNote = new AcctSOA();
+      this.EditingCDNote = new AcctCDNote();
     }
   }
 
@@ -250,14 +250,15 @@ export class OpsModuleCreditDebitNoteEditComponent implements OnInit {
     $('#ops-credit-debit-note-detail-modal').modal('show');
   }
 
-      /**
-         * This function use to check changing data from `dataStorage` in BaseService 
-         * `dataStorage` is something same like store in `ReactJs` or `VueJS` and allow store any data that belong app's life circle
-         * you can access data from `dataStorage` like code below, you should check if data have any change with current value, if you dont check 
-         * and call HTTP request or something like that can cause a `INFINITY LOOP`.  
-      */
+  /**
+     * This function use to check changing data from `dataStorage` in BaseService 
+     * `dataStorage` is something same like store in `ReactJs` or `VueJS` and allow store any data that belong app's life circle
+     * you can access data from `dataStorage` like code below, you should check if data have any change with current value, if you dont check 
+     * and call HTTP request or something like that can cause a `INFINITY LOOP`.  
+  */
+  subscribe: Subject<any> = new Subject();
   StateChecking() {
-    this.baseServices.dataStorage.subscribe(data => {
+    this.subscribe = <any>this.baseServices.dataStorage.subscribe(data => {
       this.STORAGE_DATA = data;
       if (this.STORAGE_DATA.CDNoteEditing !== undefined && this.EditingCDNote !== this.STORAGE_DATA.CDNoteEditing.soa) {
         this.EditingCDNote = this.STORAGE_DATA.CDNoteEditing.soa;
@@ -275,6 +276,10 @@ export class OpsModuleCreditDebitNoteEditComponent implements OnInit {
         this.constListChargeOfPartner = cloneDeep(this.STORAGE_DATA.listChargeOfPartner);
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.subscribe.unsubscribe();
   }
 
 

@@ -1,5 +1,5 @@
 import { SystemConstants } from "./system.const";
-import {environment} from 'src/environments/environment';
+import { environment } from 'src/environments/environment';
 
 export class API_MENU {
     private HOST = {
@@ -25,7 +25,7 @@ export class API_MENU {
      * Use HOST.Test to run on test environment
      * Use HOST.Staging to run on staging environment 
      */
-    private CURRENT_HOST: String =  environment.HOST.WEB_URL;  //this.HOST.Local;
+    private CURRENT_HOST: String = environment.HOST.WEB_URL;  //this.HOST.Local;
 
     private getCurrentLanguage() {
         return localStorage.getItem(SystemConstants.CURRENT_LANGUAGE);
@@ -48,7 +48,7 @@ export class API_MENU {
             return this.PROTOCOL + this.HOST.Staging + "/" + Module + "/api/v" + this.getCurrentVersion() + "/" + this.getCurrentLanguage() + "/";
         }
     }
-    private getReportPath(Module:string){
+    private getReportPath(Module: string) {
         if (this.CURRENT_HOST == this.HOST.Local) {
             return this.PROTOCOL + this.HOST.Local + this.getPort(Module) + "/Default.aspx";
         }
@@ -69,11 +69,11 @@ export class API_MENU {
      */
     public Catalogue = {
         CatPlace: {
-            query: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) +  "CatPlace/Query",
-            paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) +  "CatPlace/Paging",
-            getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) +  "CatPlace/",
+            query: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/Query",
+            paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/Paging",
+            getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/",
             //getBy: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/GetBy",
-            add: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) +  "CatPlace/Add",
+            add: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/Add",
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/",
             delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/",
             getProvinces: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPlace/GetProvinces",
@@ -86,7 +86,7 @@ export class API_MENU {
         PartnerData: {
             query: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/Query",
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/Paging",
-            customerPaging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/PagingCustomer" ,
+            customerPaging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/PagingCustomer",
             getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/",
             add: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/Add",
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatPartner/",
@@ -103,24 +103,24 @@ export class API_MENU {
             query: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommonity/Query",
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommonity/Paging",
             getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommonity/",
-            add: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) +  "CatCommonity/add",
+            add: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommonity/add",
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommonity/",
             delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommonity/",
-            uploadFile : this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommonity/uploadFile",
-            import : this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommonity/import",
-            downloadExcel : this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommonity/downloadExcel",
+            uploadFile: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommonity/uploadFile",
+            import: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommonity/import",
+            downloadExcel: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommonity/downloadExcel",
         },
         CommodityGroup: {
             query: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommodityGroup/Query",
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommodityGroup/Paging",
             getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommodityGroup/",
-            add: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) +  "CatCommodityGroup/add",
+            add: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommodityGroup/add",
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommodityGroup/",
             delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommodityGroup/",
             getAllByLanguage: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommodityGroup/GetByLanguage",
-            uploadFile : this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommodityGroup/uploadFile",
-            import : this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommodityGroup/import",
-            downloadExcel : this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommodityGroup/downloadExcel",
+            uploadFile: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommodityGroup/uploadFile",
+            import: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommodityGroup/import",
+            downloadExcel: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCommodityGroup/downloadExcel",
         },
         Stage_Management: {
             query: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatStage/query",
@@ -142,24 +142,24 @@ export class API_MENU {
             delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit/Delete/",
             getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit",
             getUnitTypes: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatUnit/GetUnitTypes"
-        },    
+        },
         Charge: {
             query: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/Query",
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/Paging",
             addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/addnew",
-            delete:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/delete/",
-            getById:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/getById/",
-            update:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/update",
-            uploadExel: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE)+"CatCharge/uploadFile",
+            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/delete/",
+            getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/getById/",
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/update",
+            uploadExel: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/uploadFile",
             import: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/import",
             downloadExcel: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCharge/downloadExcel",
         },
-        Charge_DefaultAccount:{
-            uploadExel: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE)+"CatChargeDefaultAccount/uploadFile",
+        Charge_DefaultAccount: {
+            uploadExel: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatChargeDefaultAccount/uploadFile",
             import: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatChargeDefaultAccount/import",
             downloadExcel: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatChargeDefaultAccount/downloadExcel",
         },
-        Country:{            
+        Country: {
             query: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/query",
             getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/getAll",
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCountry/paging",
@@ -175,14 +175,14 @@ export class API_MENU {
         Area: {
             getAllByLanguage: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatArea/GetByLanguage"
         },
-        Currency:{
-            getAll:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/getAll",
-            getAllByQuery:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/getAllByQuery",
+        Currency: {
+            getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/getAll",
+            getAllByQuery: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/getAllByQuery",
             getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/getById/",
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/paging",
-            addNew:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/add",
-            update:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/update",
-            delete:this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/",
+            addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/add",
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/update",
+            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.CATALOUGE) + "CatCurrency/",
         }
     }
 
@@ -192,7 +192,7 @@ export class API_MENU {
     public System = {
         User_Management: {
             getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser",
-            login : this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser/login",
+            login: this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser/login",
             getUserByID: this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser/GetById/",
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser/Paging"
         },
@@ -241,7 +241,7 @@ export class API_MENU {
      */
     public Documentation = {
         Terminology: {
-            getShipmentCommonData : this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "Terminology/getShipmentCommonData",
+            getShipmentCommonData: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "Terminology/getShipmentCommonData",
             getOPSShipmentCommonData: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "Terminology/GetOPSShipmentCommonData"
         },
         CsTransaction: {
@@ -268,7 +268,7 @@ export class API_MENU {
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsMawbcontainer/Update",
             getHBLConts: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsMawbcontainer/GetHBConts",
         },
-        CsShipmentSurcharge:{
+        CsShipmentSurcharge: {
             addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/Add",
             update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/Update",
             delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/Delete",
@@ -277,12 +277,12 @@ export class API_MENU {
             getChargesByPartner: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShipmentSurcharge/GroupByListHB",
         },
         AcctSOA: {
-            addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/Add",
-            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/Update",
-            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/Delete",
-            getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/Get",
-            getDetails: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/GetDetails",            
-            previewCDNote: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctSOA/PreviewOpsCdNote"
+            addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctCDNote/Add",
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctCDNote/Update",
+            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctCDNote/Delete",
+            getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctCDNote/Get",
+            getDetails: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctCDNote/GetDetails",
+            previewCDNote: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "AcctCDNote/PreviewOpsCdNote"
         },
         CsManifest: {
             get: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsManifest/",
@@ -295,11 +295,11 @@ export class API_MENU {
             previewSI: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShippingInstruction/PreviewFCLShippingInstruction",
             previewOCL: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "CsShippingInstruction/PreviewFCLOCL"
         },
-        Operation:{
+        Operation: {
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/Paging",
-            addNew:this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/Add",
-            update:this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/Update",
-            delete:this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/Delete/",
+            addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/Add",
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/Update",
+            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/Delete/",
             getById: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction",
             checkAllowDelete: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/CheckAllowDelete/",
             convertClearanceToJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.Documentation) + "OpsTransaction/ConvertClearanceToJob",
@@ -311,19 +311,19 @@ export class API_MENU {
      * OPERATION MODULE API URL DEFINITION 
      */
     public Operation = {
-        EcusConnection:{
-            getAll:this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "EcusConnection/GetAll",
-            details:this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "EcusConnection/GetDetails",
-            addNew:this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "EcusConnection/Add",
-            update:this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "EcusConnection/Update",
-            delete:this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "EcusConnection/Delete",
-            paging:this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "EcusConnection/Paging"
+        EcusConnection: {
+            getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "EcusConnection/GetAll",
+            details: this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "EcusConnection/GetDetails",
+            addNew: this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "EcusConnection/Add",
+            update: this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "EcusConnection/Update",
+            delete: this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "EcusConnection/Delete",
+            paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "EcusConnection/Paging"
         },
-        CustomClearance:{
-            getAll:this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration",
-            getClearanceTypes:this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration/GetClearanceTypes",
-            paging:this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration/Paging",
-            details:this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration/GetById/",
+        CustomClearance: {
+            getAll: this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration",
+            getClearanceTypes: this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration/GetClearanceTypes",
+            paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration/Paging",
+            details: this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration/GetById/",
             getByJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration/GetBy",
             query: this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration/Query",
             updateToAJob: this.getUrlMainPath(SystemConstants.MODULE_NAME.OPERATION) + "CustomsDeclaration/UpdateJobToClearances",

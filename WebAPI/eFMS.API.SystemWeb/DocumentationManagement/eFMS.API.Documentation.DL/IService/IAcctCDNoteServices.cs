@@ -12,13 +12,13 @@ using System.Text;
 
 namespace eFMS.API.Documentation.DL.IService
 {
-    public interface IAcctSOAServices : IRepositoryBase<AcctSoa,AcctSOAModel>
+    public interface IAcctCDNoteServices : IRepositoryBase<AcctCdnote, AcctCdnoteModel>
     {
-        HandleState AddNewSOA(AcctSOAModel model);
-        HandleState UpdateSOA(AcctSOAModel model);
-        HandleState DeleteSOA(Guid idSoA);
-        List<object> GroupSOAByPartner(Guid JobId,bool IsHouseBillID);
-        AcctSOADetailsModel GetSOADetails(Guid JobId, string SOACode);
+        HandleState AddNewCDNote(AcctCdnoteModel model);
+        HandleState UpdateCDNote(AcctCdnoteModel model);
+        HandleState DeleteCDNote(Guid idCDNote);
+        List<object> GroupCDNoteByPartner(Guid JobId,bool IsHouseBillID);
+        AcctSOADetailsModel GetCDNoteDetails(Guid JobId, string CDNoteCode);
         Crystal Preview(AcctSOADetailsModel model);
 
     }
