@@ -1,3 +1,36 @@
 :host /deep/ {
+    .summary-wp {
+        min-height: 200px;
+        background: transparent;
+        border: none;
+        box-shadow: none;
 
+        .card-header {
+            background: none;
+            border-bottom: 0;
+        }
+        .m-portlet__head {
+            border-bottom :0;
+        }
+        .panel {
+            .m-portlet__head-text{
+                .hide {
+                    display:none;
+                }
+                .show {
+                    display:initial;
+                }
+            }
+            &.panel-open {
+                .m-portlet__head-text{
+                    .hide {
+                        display:initial;
+                    }
+                    .show {
+                        display:none;
+                    }
+                }
+            }
+        }
+    }
 }

@@ -23,7 +23,7 @@
                         </label>
                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                [(ngModel)]="selected" [showCustomRangeLabel]="true"
+                                [(ngModel)]="selectedRangeDate" [showCustomRangeLabel]="true"
                                 [keepCalendarOpeningWithRange]="true" [alwaysShowCalendars]="true" [ranges]="ranges"
                                 placeholder="From date - to date" [showClearButton]="false"
                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [showCancel]="true"
@@ -142,7 +142,7 @@
                         <label class="form-control-label">
                             Note
                         </label>
-                        <textarea class="form-control m-input m-input--square" name="" id="" rows="1"></textarea>
+                        <textarea class="form-control m-input m-input--square" rows="4" [(ngModel)]="note" name="note"></textarea>
                     </div>
                 </div>
             </div>
@@ -150,7 +150,7 @@
                 <div class="row">
                     <div class="col-lg-6"></div>
                     <div class="col-lg-6 m--align-right">
-                        <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                        <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSearchCharge()">
                             <span>
                                 <i class="la la-download"></i>
                                 <span>

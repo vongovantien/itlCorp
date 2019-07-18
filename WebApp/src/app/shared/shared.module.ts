@@ -74,7 +74,7 @@ const APP_DIRECTIVES = [
   SpecialCharacterDirective,
   EcusSpecicalCharacterAllowSpaceDirective,
   EcusSpecicalCharacterNoSpaceDirective,
-  DecimalNumberGreaterThan0Directive
+  DecimalNumberGreaterThan0Directive,
 ];
 @NgModule({
   imports: [

@@ -14,110 +14,110 @@ const routes: Routes = [
 
     {
         path: '',
-        redirectTo: 'login', 
+        redirectTo: 'login',
         pathMatch: 'full'
-    },    
-  
+    },
+
     /**
      * Lazy load business modules
      */
 
     {
         path: 'home',
-        canActivate:[AuthGuardService],
+        canActivate: [AuthGuardService],
         component: MasterPageComponent,
         children: [
             {
-                path:'dashboard',
-                component:DashboardComponent
+                path: 'dashboard',
+                component: DashboardComponent
             },
             {
-                path: 'system',  
-                loadChildren:() => import('./business-modules/system/system.module').then(m => m.SystemModule),
-                data:{
-                    name:"System",
-                    path:"system",
-                    level:1
+                path: 'system',
+                loadChildren: () => import('./business-modules/system/system.module').then(m => m.SystemModule),
+                data: {
+                    name: "System",
+                    path: "system",
+                    level: 1
                 }
             },
             {
                 path: 'catalogue',
                 // loadChildren: './business-modules/catalogue/catalogue.module#CatalogueModule',
-                loadChildren:() => import('./business-modules/catalogue/catalogue.module').then(m => m.CatalogueModule),
-                data:{
-                    name:"Catalogue",
-                    path:"catalogue",
-                    level:1
+                loadChildren: () => import('./business-modules/catalogue/catalogue.module').then(m => m.CatalogueModule),
+                data: {
+                    name: "Catalogue",
+                    path: "catalogue",
+                    level: 1
                 }
-            },        
+            },
             {
-                path:'accounting',
+                path: 'accounting',
                 // loadChildren:'./business-modules/accounting/accounting.module#AccountingModule',
-                loadChildren:() => import('./business-modules/accounting/accounting.module').then(m => m.AccountingModule),
-                data:{
-                    name:"Accounting",
-                    path:"accounting",
-                    level:1
+                loadChildren: () => import('./business-modules/accounting/accounting.module').then(m => m.AccountingModule),
+                data: {
+                    name: "Accounting",
+                    path: "accounting",
+                    level: 1
                 }
             },
             {
-                path:'documentation',
+                path: 'documentation',
                 // loadChildren:'./business-modules/documentation/documentation.module#DocumentationModule',
-                loadChildren:() => import('./business-modules/documentation/documentation.module').then(m => m.DocumentationModule),
-                data:{
-                    name:"Documentation",
-                    path:"documentation",
-                    level:1
+                loadChildren: () => import('./business-modules/documentation/documentation.module').then(m => m.DocumentationModule),
+                data: {
+                    name: "Documentation",
+                    path: "documentation",
+                    level: 1
                 }
             },
             {
-                path:'operation',
+                path: 'operation',
                 // loadChildren:'./business-modules/operation/operation.module#OperationModule',
-                loadChildren:() => import('./business-modules/operation/operation.module').then(m => m.OperationModule),
-                data:{
-                    name:"Operation",
-                    path:"operation",
-                    level:1
+                loadChildren: () => import('./business-modules/operation/operation.module').then(m => m.OperationModule),
+                data: {
+                    name: "Operation",
+                    path: "operation",
+                    level: 1
                 }
             },
             {
-                path:'report',
+                path: 'report',
                 // loadChildren:'./business-modules/report/report.module#ReportModule',
-                loadChildren:() => import('./business-modules/report/report.module').then(m => m.ReportModule),
-                data:{
-                    name:"Report",
-                    path:"report",
-                    level:1
+                loadChildren: () => import('./business-modules/report/report.module').then(m => m.ReportModule),
+                data: {
+                    name: "Report",
+                    path: "report",
+                    level: 1
                 }
             },
             {
-                path:'support',
+                path: 'support',
                 // loadChildren:'./business-modules/support/support.module#SupportModule',
-                loadChildren:() => import('./business-modules/support/support.module').then(m => m.SupportModule),
-                data:{
-                    name:"Support",
-                    path:"support",
-                    level:1
+                loadChildren: () => import('./business-modules/support/support.module').then(m => m.SupportModule),
+                data: {
+                    name: "Support",
+                    path: "support",
+                    level: 1
                 }
             },
             {
-                path:'tool',
+                path: 'tool',
                 // loadChildren:'./business-modules/tool-setting/tool.module#ToolModule',
-                loadChildren:() => import('./business-modules/tool-setting/tool.module').then(m => m.ToolModule),
-                data:{
-                    name:"Tool",
-                    path:"tool",
-                    level:1
+                loadChildren: () => import('./business-modules/tool-setting/tool.module').then(m => m.ToolModule),
+                data: {
+                    name: "Tool",
+                    path: "tool",
+                    level: 1
                 }
             },
             {
-                path:'designs-zone',
+                path: 'designs-zone',
                 // loadChildren:'./design-modules/design-modules.module#DesignModulesModule',
-                loadChildren:() => import('./design-modules/design-modules.module').then(m => m.DesignModulesModule),
-                data:{
-                    name:"Design Zone",
-                    path:"design-zone",
-                    level:1
+                loadChildren: () => import('./design-modules/design-modules.module').then(m => m.DesignModulesModule),
+                data: {
+                    name: "Design Zone",
+                    path: "design-zone",
+                    level: 1
                 }
             }
         ]
@@ -127,18 +127,18 @@ const routes: Routes = [
      * PAGE NOT FOUND 
      */
     {
-        path:'page-not-found',
-        component:NotfoundPageComponent
+        path: 'page-not-found',
+        component: NotfoundPageComponent
     },
     {
-        path:'**',
-        redirectTo:'page-not-found',
-        pathMatch:'full'
+        path: '**',
+        redirectTo: 'page-not-found',
+        pathMatch: 'full'
     }
 ];
 
 @NgModule({
-    imports: [RouterModule.forRoot(routes,{useHash:true})],
+    imports: [RouterModule.forRoot(routes, { useHash: true })],
     exports: [RouterModule]
 })
 export class AppRoutingModule { }

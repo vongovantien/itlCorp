@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { AppPage, IComboGirdConfig } from 'src/app/app.base';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { takeUntil, switchMap } from 'rxjs/operators';
@@ -10,6 +10,9 @@ import { GlobalState } from 'src/app/global-state';
     styleUrls: ['./form-create-soa.component.scss']
 })
 export class StatementOfAccountFormCreateComponent extends AppPage {
+
+    @Output() onApply: EventEmitter<any> = new EventEmitter<any>();
+
     configPartner: IComboGirdConfig = {
         placeholder: 'Please select',
         displayFields: [],
@@ -23,6 +26,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         dataSource: [],
         selectedDisplayFields: [],
     };
+
+    selectedRangeDate: any = null;
 
     selectedPartner: any = {};
     selectedCharge: any = {};
@@ -45,7 +50,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
     services: any[] = [];
     selectedService: any[] = [];
-
+    note: string = '';
     constructor(
         private _sysRepo: SystemRepo,
         private _globalState: GlobalState
@@ -199,5 +204,22 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
             this.selectedService = [];
             this.selectedService.push(data);
         }
+    }
+
+    onSearchCharge() {
+        const body = {
+            partner: this.selectedPartner,
+            date: this.selectedRangeDate,
+            dateMode: this.selectedDateMode,
+            type: this.selectedType,
+            obh: this.selectedObh,
+            currency: this.selectedCurrency,
+            services: this.selectedService,
+            office: null,
+            creator: this.selectedUser,
+            charges: this.selectedCharges,
+            note: this.note
+        };
+        this.onApply.emit(body);
     }
 }
