@@ -35,6 +35,7 @@ import { ServiceModule } from "./services/service.module";
 import { SearchStage } from "./pipes";
 import { DecimalNumberGreaterThan0Directive } from "./directives/decimal-number-greater-0.directive";
 import { ConfirmDeletePopupComponent } from "./common/popup/confirm-detele/confirm-delete.popup";
+import { RowTableDirective } from "./directives";
 
 const Libary = [
   ModalModule.forRoot()
@@ -74,7 +75,8 @@ const APP_DIRECTIVES = [
   SpecialCharacterDirective,
   EcusSpecicalCharacterAllowSpaceDirective,
   EcusSpecicalCharacterNoSpaceDirective,
-  DecimalNumberGreaterThan0Directive
+  DecimalNumberGreaterThan0Directive,
+  RowTableDirective
 ];
 @NgModule({
   imports: [

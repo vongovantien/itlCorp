@@ -14,6 +14,7 @@ import { StatementOfAccountSearchComponent } from './components/search-box-soa/s
 import { StatementOfAccountAddChargeComponent } from './components/poup/add-charge/add-charge.popup';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { StatementOfAccountFormCreateComponent } from './components/form-create-soa/form-create-soa.component';
+import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 
 const routing: Routes = [
     { path: "", component: StatementOfAccountComponent },
@@ -48,8 +49,8 @@ const COMPONENTS = [
         TabsModule.forRoot(),
         ModalModule.forRoot(),
         CollapseModule.forRoot(),
-        PaginationModule.forRoot()
-
+        PaginationModule.forRoot(),
+        PerfectScrollbarModule,
     ],
     exports: [],
     providers: [],
