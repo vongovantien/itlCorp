@@ -84,7 +84,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
     }
 
     onChangeCheckBoxCharge($event: Event) {
-        console.log($event);
         this.isCheckAllCharge = this.charges.every((item: any) => item.isSelected);
     }
 
@@ -99,6 +98,5 @@ export class StatementOfAccountAddnewComponent extends AppList {
     }
 
     onSearchCharge(data: any) {
-        console.log(data);
     }
 }
