@@ -75,7 +75,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         // NgProgressModule,
         PerfectScrollbarModule,
         // SelectModule,
-         // Scrollbar
+        // Scrollbar
         OAuthModule.forRoot({
             resourceServer: {
                 allowedUrls: ["**"],
@@ -99,15 +99,15 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
             useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG // Scrollbar
         },
         {
-		    provide: HTTP_INTERCEPTORS,
-			useClass: AuthInterceptor,
-			multi: true,
+            provide: HTTP_INTERCEPTORS,
+            useClass: AuthInterceptor,
+            multi: true,
         }
-        
+
     ],
 
     bootstrap: [AppComponent],
     exports: [ScrollingModule]
 })
-export class AppModule {}
+export class AppModule { }
 
