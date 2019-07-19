@@ -254,7 +254,7 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "eFMS-Web:build"
+            "browserTarget": "eFMS-Web:build:design"
           },
           "configurations": {
             "test": {
