@@ -16,6 +16,7 @@ namespace eFMS.API.Documentation.Service.Models
         }
 
         public virtual DbSet<AcctCdnote> AcctCdnote { get; set; }
+        public virtual DbSet<AcctSoa> AcctSoa { get; set; }
         public virtual DbSet<CatArea> CatArea { get; set; }
         public virtual DbSet<CatBranch> CatBranch { get; set; }
         public virtual DbSet<CatCharge> CatCharge { get; set; }
@@ -180,6 +181,44 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UnlockedSaleManDate).HasColumnType("datetime");
 
                 entity.Property(e => e.UnlockedSaleManStatus)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<AcctSoa>(entity =>
+            {
+                entity.ToTable("acctSOA");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Currency).HasMaxLength(10);
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.SoaformDate)
+                    .HasColumnName("SOAFormDate")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.Soano)
+                    .HasColumnName("SOANo")
+                    .HasMaxLength(7)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SoatoDate)
+                    .HasColumnName("SOAToDate")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.Status)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
@@ -1688,6 +1727,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.Cdclosed)
+                    .HasColumnName("CDClosed")
+                    .HasDefaultValueSql("((0))");
+
                 entity.Property(e => e.Cdno)
                     .HasColumnName("CDNo")
                     .HasMaxLength(50)
@@ -1790,7 +1833,9 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Soaclosed).HasColumnName("SOAClosed");
+                entity.Property(e => e.Soaclosed)
+                    .HasColumnName("SOAClosed")
+                    .HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.Soano)
                     .HasColumnName("SOANo")
@@ -2145,7 +2190,7 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Hwbno)
                     .HasColumnName("HWBNo")
-                    .HasMaxLength(50)
+                    .HasMaxLength(200)
                     .IsUnicode(false);
 
                 entity.Property(e => e.InWord).HasMaxLength(4000);
@@ -2170,7 +2215,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Mawb)
                     .HasColumnName("MAWB")
-                    .HasMaxLength(800);
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.MoveType).HasMaxLength(160);
 

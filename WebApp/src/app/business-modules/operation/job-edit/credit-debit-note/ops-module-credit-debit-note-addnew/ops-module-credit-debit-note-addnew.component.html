@@ -41,7 +41,7 @@
                                         </label>
                                         <app-combo-grid-virtual-scroll [dataSources]="listSubjectPartner"
                                             [currentActiveItemId]="{field:'id',value:CDNoteWorking.partnerId}"
-                                            (itemSelected)="CDNoteWorking.partnerId=$event.id;CDNoteWorking.partnerName=$event.partnerNameEn;getListCharges($event.id);totalCreditDebitCalculate()"
+                                            (itemSelected)="CDNoteWorking.partnerId=$event.id;CDNoteWorking.partnerName=$event.partnerNameEn;confirmYes($event.id);totalCreditDebitCalculate()"
                                             [selectedDisplayFields]="['partnerNameEn']"
                                             [displayFields]="[{'field':'accountNo','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Partner Name'},{'field':'taxCode','label':'Tax Code'}]">
                                         </app-combo-grid-virtual-scroll>
@@ -259,7 +259,7 @@
     aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-//header">
                 <h5 class="modal-title">Alert</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -286,3 +286,5 @@
     </div>
 </div> -->
 <!--end::alert-cannot-create-note-modal-->
+
+<app-change-partner-confirm-modal (confirmPartner)="confirmChangePartner($event)"></app-change-partner-confirm-modal>

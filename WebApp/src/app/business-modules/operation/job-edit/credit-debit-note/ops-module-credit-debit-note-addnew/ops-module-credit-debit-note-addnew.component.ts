@@ -15,6 +15,7 @@ import { SubjectSubscriber, Subject } from 'rxjs/internal/Subject';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
 import { PopupBase } from 'src/app/popup.base';
 import { NotSelectedAlertModalComponent } from './not-selected-alert-modal/not-selected-alert-modal.component';
+import { ChangePartnerConfirmModalComponent } from './change-partner-confirm-modal/change-partner-confirm-modal.component';
 declare var $: any;
 @Component({
     selector: 'app-ops-module-credit-debit-note-addnew',
@@ -23,6 +24,7 @@ declare var $: any;
 })
 export class OpsModuleCreditDebitNoteAddnewComponent extends PopupBase implements OnInit, OnDestroy {
     @ViewChild(NotSelectedAlertModalComponent, { static: false }) popupNotSelectedAlert: NotSelectedAlertModalComponent;
+    @ViewChild(ChangePartnerConfirmModalComponent, { static: false }) popupConfirmChangePartner: ChangePartnerConfirmModalComponent;
     @Input() currentJob: OpsTransaction = null;
     isDisplay: boolean = true;
     CDNoteWorking: AcctCDNote = new AcctCDNote();
@@ -54,8 +56,6 @@ export class OpsModuleCreditDebitNoteAddnewComponent extends PopupBase implement
             this.currentHbID = this.currentJob.hblid;
             this.getListSubjectPartner();
         }
-        console.log('Total Credit:' + this.totalCredit);
-        console.log('Total Debit:' + this.totalDebit);
         //this.StateChecking();
     }
     getListSubjectPartner() {
@@ -64,8 +64,12 @@ export class OpsModuleCreditDebitNoteAddnewComponent extends PopupBase implement
             this.constListSubjectPartner = cloneDeep(data);
         });
     }
-
-    async getListCharges(partnerId: string) {
+    partnerIdNewChange: string = null;
+    confirmYes(partnerId: string) {
+        this.partnerIdNewChange = partnerId;
+        this.popupConfirmChangePartner.show();
+    }
+    async getListCharges(partnerId: String) {
         if (this.currentHbID !== null && partnerId != null) {
             this.listChargeOfPartner = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getChargesByPartner + "?Id=" + this.currentHbID + "&partnerID=" + partnerId + "&IsHouseBillId=true");
             this.CDNoteWorking.listShipmentSurcharge = [];
@@ -269,15 +273,15 @@ export class OpsModuleCreditDebitNoteAddnewComponent extends PopupBase implement
                     }
                     // console.log(this.CDNoteWorking.listShipmentSurcharge);
                     // console.log(this.CDNoteWorking);
-                    // const res = await this.baseServices.postAsync(this.api_menu.Documentation.AcctSOA.addNew, this.CDNoteWorking);
-                    // // if (res.status) {
-                    // //     this.hide();
-                    // //     //$('#ops-add-credit-debit-note-modal').modal('hide');
-                    // //     this.CDNoteWorking = new AcctCDNote();
-                    // //     this.baseServices.setData("listChargeOfPartner", []);
-                    // //     this.resetAddSOAForm();
+                    const res = await this.baseServices.postAsync(this.api_menu.Documentation.AcctSOA.addNew, this.CDNoteWorking);
+                    if (res.status) {
+                        this.hide();
+                        // $('#ops-add-credit-debit-note-modal').modal('hide');
+                        this.CDNoteWorking = new AcctCDNote();
+                        // this.baseServices.setData("listChargeOfPartner", []);
+                        this.resetAddSOAForm();
 
-                    // // }
+                    }
                 }
             }
         }, 300);
@@ -423,5 +427,13 @@ export class OpsModuleCreditDebitNoteAddnewComponent extends PopupBase implement
         // this.listChargeOfPartner = this.constListChargeOfPartner;
         // this.baseServices.setData("listChargeOfPartner", this.constListChargeOfPartner);
         // this.totalCreditDebitCalculate()
+    }
+    confirmChangePartner(event: boolean) {
+        if (event) {
+            this.CDNoteWorking.partnerId = this.partnerIdNewChange;
+            this.getListCharges(this.partnerIdNewChange);
+        } else {
+            this.partnerIdNewChange = null;
+        }
     }
 }

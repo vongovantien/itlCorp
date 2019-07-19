@@ -1,7 +1,6 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { AppPage, IComboGirdConfig } from 'src/app/app.base';
 import { SystemRepo } from 'src/app/shared/repositories';
-import { takeUntil, switchMap } from 'rxjs/operators';
 import { GlobalState } from 'src/app/global-state';
 
 @Component({

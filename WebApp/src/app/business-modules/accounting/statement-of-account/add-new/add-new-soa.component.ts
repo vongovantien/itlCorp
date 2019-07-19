@@ -5,8 +5,8 @@ import { SystemRepo } from 'src/app/shared/repositories';
 import { GlobalState } from 'src/app/global-state';
 import { AppList } from 'src/app/app.list';
 
-import { takeUntil } from 'rxjs/operators';
-import { forkJoin } from 'rxjs';
+import { takeUntil } from 'node_modules/rxjs/operators';
+import { forkJoin } from 'node_modules/rxjs';
 @Component({
     selector: 'app-statement-of-account-new',
     templateUrl: './add-new-soa.component.html',
@@ -77,7 +77,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
         const data = { code: '', name: 'Name', jobId: 'XXXX', hbl: 'HBL no', mbl: 'MBL no', customNo: 'Customer no', debit: '12313', credit: '456', currency: 'VND', invoiceNo: '123', serviceDate: 'dd/mm/yyyy', note: 'lorem 10', isSelected: false };
 
         for (let index = 1; index < 50; index++) {
-            results.push(Object.assign({}, data, {code: Math.random()}));
+            results.push(Object.assign({}, data, { code: Math.random() }));
         }
 
         return results;
@@ -90,7 +90,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
     checkUncheckAllCharge() {
         for (const charge of this.charges) {
             charge.isSelected = this.isCheckAllCharge;
-          }
+        }
     }
 
     onCreateSOA() {

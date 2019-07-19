@@ -1,10 +1,10 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
-import * as lodash from 'lodash';
+import { Component, OnInit, ViewChild, AfterViewInit } from 'node_modules/@angular/core';
+import * as lodash from 'node_modules/lodash';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
-import { NgForm } from '@angular/forms';
+import { NgForm } from 'node_modules/@angular/forms';
 import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
 import { CatPlaceModel } from 'src/app/shared/models/catalogue/catPlace.model';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
@@ -16,7 +16,7 @@ import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from 'node_modules/@angular/router';
 declare var $: any;
 
 @Component({
@@ -24,9 +24,9 @@ declare var $: any;
   templateUrl: './location.component.html',
   styleUrls: ['./location.component.sass']
 })
-export class LocationComponent implements OnInit,AfterViewInit {
+export class LocationComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
-   
+
 
   }
 
@@ -72,17 +72,17 @@ export class LocationComponent implements OnInit,AfterViewInit {
 
   searchKey: string = "";
 
-  searchKeyCountryTab:string = "";
-  searchKeyProvinceTab:string = "";
-  searchKeyDistrictTab:string = "";
-  searchKeyWardTab:string = "";
+  searchKeyCountryTab: string = "";
+  searchKeyProvinceTab: string = "";
+  searchKeyDistrictTab: string = "";
+  searchKeyWardTab: string = "";
   CURRENT_LANGUAGE = localStorage.getItem(SystemConstants.CURRENT_LANGUAGE);
 
-  fieldNameByLanguage(field){
-    if(this.CURRENT_LANGUAGE.toLowerCase()===SystemConstants.DEFAULT_LANGUAGE.toLowerCase()){
-      return field+"EN";
-    }else{
-      return field+"VN";
+  fieldNameByLanguage(field) {
+    if (this.CURRENT_LANGUAGE.toLowerCase() === SystemConstants.DEFAULT_LANGUAGE.toLowerCase()) {
+      return field + "EN";
+    } else {
+      return field + "VN";
     }
   }
 
@@ -116,20 +116,20 @@ export class LocationComponent implements OnInit,AfterViewInit {
     condition: "OR",
   }
   searchObject: any = { condition: "OR" };
-  @ViewChild(PaginationComponent,{static:false}) child;
+  @ViewChild(PaginationComponent, { static: false }) child;
 
   /**
    * END OF VARIABLES DEFINITIONS
    */
 
   constructor(
-    private route:ActivatedRoute,
+    private route: ActivatedRoute,
     private excelService: ExcelService,
     private baseServices: BaseService,
     private api_menu: API_MENU,
-    private sortService: SortService) { 
+    private sortService: SortService) {
 
-    }
+  }
 
   resetNg2SelectCountry = true;
   resetNg2SelectProvince = true;
@@ -168,30 +168,30 @@ export class LocationComponent implements OnInit,AfterViewInit {
 
   }
 
-  showAdd(){
+  showAdd() {
     this.ngSelectDataProvinces = [];
-    this.ngSelectDataDistricts = [];    
+    this.ngSelectDataDistricts = [];
   }
-  ngSelectData(sourceData:any){
-    var dataReturn:any=null;
-    var isCountry :Boolean = false;
+  ngSelectData(sourceData: any) {
+    var dataReturn: any = null;
+    var isCountry: Boolean = false;
 
-    if(sourceData[0].placeTypeID==undefined){
+    if (sourceData[0].placeTypeID == undefined) {
       isCountry = true;
     }
 
     if (this.CURRENT_LANGUAGE.toLowerCase() == SystemConstants.DEFAULT_LANGUAGE.toLowerCase()) {
-      if(isCountry){
-        dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.nameEn, "id": x.id }));    
-      }else{
-        dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.nameEn, "id": x.id }));    
-      }  
+      if (isCountry) {
+        dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.nameEn, "id": x.id }));
+      } else {
+        dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.nameEn, "id": x.id }));
+      }
     } else {
-      if(isCountry){
-        dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.nameVn, "id": x.id }));    
-      }else{
-        dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.nameVn, "id": x.id }));     
-      }      
+      if (isCountry) {
+        dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.nameVn, "id": x.id }));
+      } else {
+        dataReturn = sourceData.map(x => ({ "text": x.code + " - " + x.nameVn, "id": x.id }));
+      }
     }
     return dataReturn;
   }
@@ -204,53 +204,53 @@ export class LocationComponent implements OnInit,AfterViewInit {
     this.getWards();
     this.getAllCountries();
   }
-  activeTab:string = "country";
-  changeTab(activeTab){
+  activeTab: string = "country";
+  changeTab(activeTab) {
     this.activeTab = activeTab;
-    if(activeTab==="country"){
-        this.pager.currentPage = 1;
-        //this.pager.pageSize = 10;
-        this.pager.totalItems = this.totalItemCountries;
-        this.child.setPage(this.pager.currentPage);
+    if (activeTab === "country") {
+      this.pager.currentPage = 1;
+      //this.pager.pageSize = 10;
+      this.pager.totalItems = this.totalItemCountries;
+      this.child.setPage(this.pager.currentPage);
     }
-    if(activeTab==="province"){
+    if (activeTab === "province") {
       this.pager.currentPage = 1;
       //this.pager.pageSize = 10;
       this.pager.totalItems = this.totalItemProvinces;
       this.child.setPage(this.pager.currentPage);
     }
-    if(activeTab==="district"){
+    if (activeTab === "district") {
       this.pager.currentPage = 1;
       //this.pager.pageSize = 10;
       this.pager.totalItems = this.totalItemDistricts;
       this.child.setPage(this.pager.currentPage);
     }
-    if(activeTab==="ward"){
-       this.pager.currentPage = 1;
-       //this.pager.pageSize = 10;
-       this.pager.totalItems = this.totalItemWards;
-       this.child.setPage(this.pager.currentPage);
+    if (activeTab === "ward") {
+      this.pager.currentPage = 1;
+      //this.pager.pageSize = 10;
+      this.pager.totalItems = this.totalItemWards;
+      this.child.setPage(this.pager.currentPage);
     }
-}
+  }
 
 
-  async setPage(pager:PagerSetting) {
-    this.pager.currentPage = pager.currentPage; 
+  async setPage(pager: PagerSetting) {
+    this.pager.currentPage = pager.currentPage;
     this.pager.totalPages = pager.totalPages;
     this.pager.pageSize = pager.pageSize
-    if(this.activeTab==="country"){
+    if (this.activeTab === "country") {
       this.ListCountries = await this.getCountries();
     }
-    if(this.activeTab==="province"){
+    if (this.activeTab === "province") {
       this.ListProvinceCities = await this.getProvinceCities();
     }
-    if(this.activeTab==="district"){
+    if (this.activeTab === "district") {
       this.ListDistricts = await this.getDistrict();
     }
-    if(this.activeTab==="ward"){
+    if (this.activeTab === "ward") {
       this.ListWards = await this.getWards();
     }
-    
+
   }
 
   setPageAfterAdd() {
@@ -310,10 +310,10 @@ export class LocationComponent implements OnInit,AfterViewInit {
     await this.getCountries();
   }
 
-  totalItemCountries:number = null;
-  totalItemProvinces:number = null;
-  totalItemDistricts:number = null;
-  totalItemWards:number = null;
+  totalItemCountries: number = null;
+  totalItemProvinces: number = null;
+  totalItemDistricts: number = null;
+  totalItemWards: number = null;
 
   async getCountries() {
     const response = await this.baseServices.postAsync(this.api_menu.Catalogue.Country.paging + "?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.searchObject, false, true);
@@ -332,7 +332,7 @@ export class LocationComponent implements OnInit,AfterViewInit {
         this.pager.totalItems = 0;
         await this.getCountries();
         this.getAllCountries();
-        if(response){
+        if (response) {
           //this.setPageAfterAdd();
           form.onReset();
           $('#add-country-modal').modal('hide');
@@ -353,7 +353,7 @@ export class LocationComponent implements OnInit,AfterViewInit {
     if (action == "yes") {
       if (form.form.status != "INVALID") {
         const res = await this.baseServices.putAsync(this.api_menu.Catalogue.Country.update, this.CountryToUpdate);
-        if(res){
+        if (res) {
           await this.getCountries();
           await this.getProvinceCities();
           form.onReset();
@@ -375,7 +375,7 @@ export class LocationComponent implements OnInit,AfterViewInit {
     if (action == "yes") {
       if (this.ObjectToDelete == "country") {
         await this.baseServices.deleteAsync(this.api_menu.Catalogue.Country.delete + this.idCountryToDelete);
-        await this.getCountries();        
+        await this.getCountries();
         this.setPageAfterDelete();
       }
 
@@ -391,12 +391,12 @@ export class LocationComponent implements OnInit,AfterViewInit {
         this.setPageAfterDelete();
       }
 
-      if(this.ObjectToDelete == "ward"){
+      if (this.ObjectToDelete == "ward") {
         await this.baseServices.deleteAsync(this.api_menu.Catalogue.CatPlace.delete + this.idWardToDelete);
         await this.getWards();
         this.setPageAfterDelete();
       }
-     
+
     }
   }
 
@@ -458,7 +458,7 @@ export class LocationComponent implements OnInit,AfterViewInit {
         this.pager.totalItems = 0;
         await this.getProvinceCities();
         console.log(response);
-        if(response){
+        if (response) {
           //this.setPageAfterAdd();
           form.onReset();
           this.resetNgSelect("all");
@@ -476,7 +476,7 @@ export class LocationComponent implements OnInit,AfterViewInit {
   }
 
   idProvinceCityToUpdate: string = "";
-  async showUpdateProvince(id) {    
+  async showUpdateProvince(id) {
     this.idProvinceCityToUpdate = id;
     this.ProvinceCityToUpdate = await this.baseServices.getAsync(this.api_menu.Catalogue.CatPlace.getById + id);
 
@@ -493,7 +493,7 @@ export class LocationComponent implements OnInit,AfterViewInit {
       if (form.form.status != "INVALID" && this.ProvinceCityToUpdate.countryId != null) {
         console.log(JSON.stringify(this.ProvinceCityToUpdate));
         const res = await this.baseServices.putAsync(this.api_menu.Catalogue.CatPlace.update + this.idProvinceCityToUpdate, this.ProvinceCityToUpdate);
-        if(res){
+        if (res) {
           await this.getProvinceCities();
           form.onReset();
           $('#update-city-province-modal').modal('hide');
@@ -521,7 +521,7 @@ export class LocationComponent implements OnInit,AfterViewInit {
    * START DISTRICT METHODS
    */
 
- 
+
   async searchInDistrictTab() {
 
     this.searchObject = {};
@@ -568,7 +568,7 @@ export class LocationComponent implements OnInit,AfterViewInit {
         const response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.add, this.DistrictToAdd);
         this.pager.totalItems = 0;
         await this.getDistrict();
-        if(response){
+        if (response) {
           this.setPageAfterAdd();
           form.onReset();
           this.resetNgSelect("all");
@@ -584,7 +584,7 @@ export class LocationComponent implements OnInit,AfterViewInit {
     }
   }
 
-  
+
 
   idDistrictToUpdate: string = "";
   async showUpdateDistrict(id) {
@@ -615,7 +615,7 @@ export class LocationComponent implements OnInit,AfterViewInit {
     if (action == "yes") {
       if (form.form.status != "INVALID" && this.DistrictToUpdate.countryId != null && this.DistrictToUpdate.provinceId != null) {
         const res = await this.baseServices.putAsync(this.api_menu.Catalogue.CatPlace.update + this.idDistrictToUpdate, this.DistrictToUpdate);
-        if(res){
+        if (res) {
           await this.getDistrict();
           form.onReset();
           $('#update-district-modal').modal('hide');
@@ -638,8 +638,8 @@ export class LocationComponent implements OnInit,AfterViewInit {
   ngSelectDataProvinces: any = [];
   ngSelectDataDistricts: any = [];
 
-  async getAllCountries(){
-    var countries = await this.baseServices.getAsync(this.api_menu.Catalogue.Country.getAll,false,false);
+  async getAllCountries() {
+    var countries = await this.baseServices.getAsync(this.api_menu.Catalogue.Country.getAll, false, false);
     this.ngSelectDataCountries = this.ngSelectData(countries);
   }
 
@@ -679,7 +679,7 @@ export class LocationComponent implements OnInit,AfterViewInit {
     this.selectedFilterWardTab = this.listFilterWardTab[0].filter;
     await this.getWards();
   }
-  
+
 
   public async getWards() {
     this.searchObject.placeType = PlaceTypeEnum.Ward;
@@ -700,8 +700,8 @@ export class LocationComponent implements OnInit,AfterViewInit {
         this.WardToAdd.placeType = PlaceTypeEnum.Ward;
         const response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.add, this.WardToAdd);
         this.pager.totalItems = 0;
-        await this.getWards();        
-        if(response){
+        await this.getWards();
+        if (response) {
           //this.setPageAfterAdd();
           form.onReset();
           this.resetNgSelect("all");
@@ -755,7 +755,7 @@ export class LocationComponent implements OnInit,AfterViewInit {
     console.log(this.WardToUpdate);
     if (action == "yes") {
       if (form.form.status != "INVALID" && this.WardToUpdate.countryId != null && this.WardToUpdate.provinceId != null && this.WardToUpdate.districtId) {
-        const res = await this.baseServices.putAsync(this.api_menu.Catalogue.CatPlace.update + this.idWardoUpdate, this.WardToUpdate);        
+        const res = await this.baseServices.putAsync(this.api_menu.Catalogue.CatPlace.update + this.idWardoUpdate, this.WardToUpdate);
         if (res) {
           await this.getWards();
           form.onReset();
@@ -769,7 +769,7 @@ export class LocationComponent implements OnInit,AfterViewInit {
     }
   }
 
-  idWardToDelete:any = null;
+  idWardToDelete: any = null;
   prepareDeleteWard(id) {
     this.idWardToDelete = id;
     this.ObjectToDelete = "ward";
@@ -807,17 +807,17 @@ export class LocationComponent implements OnInit,AfterViewInit {
         this.DistrictToAdd.countryId = value.id;
         this.DistrictToAdd.provinceId = null;
         let provinces = await dataHelper.getProvinces(value.id, this.baseServices, this.api_menu);
-        this.ngSelectDataProvinces = provinces.length==0 ?[]: this.ngSelectData(provinces);
+        this.ngSelectDataProvinces = provinces.length == 0 ? [] : this.ngSelectData(provinces);
         this.resetNgSelect("province");
       }
       if (type_location == "ward") {
         this.WardToAdd.countryId = value.id;
         this.WardToAdd.provinceId = null;
         this.WardToAdd.districtId = null;
-        this.ngSelectDataDistricts=[];
+        this.ngSelectDataDistricts = [];
         this.ngSelectDataProvinces = [];
         let provinces = await dataHelper.getProvinces(value.id, this.baseServices, this.api_menu);
-        this.ngSelectDataProvinces = provinces.length==0 ?[]: this.ngSelectData(provinces);
+        this.ngSelectDataProvinces = provinces.length == 0 ? [] : this.ngSelectData(provinces);
         this.resetNgSelect("province");
         this.resetNgSelect("district");
       }
@@ -829,7 +829,7 @@ export class LocationComponent implements OnInit,AfterViewInit {
         this.DistrictToUpdate.countryId = value.id;
         this.DistrictToUpdate.provinceId = null;
         let provinces = await dataHelper.getProvinces(value.id, this.baseServices, this.api_menu);
-        this.ngSelectDataProvinces = provinces.length==0 ?[]: this.ngSelectData(provinces);
+        this.ngSelectDataProvinces = provinces.length == 0 ? [] : this.ngSelectData(provinces);
         this.resetNgSelect("province");
       }
       if (type_location == "ward") {
@@ -839,9 +839,9 @@ export class LocationComponent implements OnInit,AfterViewInit {
         this.currentActiveDistrict = [];
         this.currentActiveProvince = [];
         let provinces = await dataHelper.getProvinces(value.id, this.baseServices, this.api_menu);
-        this.ngSelectDataProvinces = provinces.length==0 ?[]: this.ngSelectData(provinces);
+        this.ngSelectDataProvinces = provinces.length == 0 ? [] : this.ngSelectData(provinces);
         this.resetNgSelect("province");
-        this.resetNgSelect("district");   
+        this.resetNgSelect("district");
       }
     }
 
@@ -857,7 +857,7 @@ export class LocationComponent implements OnInit,AfterViewInit {
         this.WardToAdd.provinceId = value.id;
         this.WardToAdd.districtId = null;
         let districts = await dataHelper.getDistricts(this.WardToAdd.countryId, this.WardToAdd.provinceId, this.baseServices, this.api_menu);
-        this.ngSelectDataDistricts = districts.length==0 ? []: this.ngSelectData(districts);
+        this.ngSelectDataDistricts = districts.length == 0 ? [] : this.ngSelectData(districts);
         this.resetNgSelect("ward");
       }
 
@@ -867,12 +867,12 @@ export class LocationComponent implements OnInit,AfterViewInit {
         this.DistrictToUpdate.provinceId = value.id;
       }
       if (type_location == "ward") {
-        this.WardToUpdate.provinceId = value.id;        
+        this.WardToUpdate.provinceId = value.id;
         this.WardToAdd.districtId = null;
-        this.currentActiveDistrict=[];
+        this.currentActiveDistrict = [];
         // this.currentActiveProvince = [value]
         let districts = await dataHelper.getDistricts(this.WardToUpdate.countryId, this.WardToUpdate.provinceId, this.baseServices, this.api_menu);
-        this.ngSelectDataDistricts = districts.length==0 ? []: this.ngSelectData(districts);
+        this.ngSelectDataDistricts = districts.length == 0 ? [] : this.ngSelectData(districts);
         this.resetNgSelect("district");
       }
     }
@@ -913,7 +913,7 @@ export class LocationComponent implements OnInit,AfterViewInit {
       this.DistrictToUpdate.countryId = null;
       this.DistrictToUpdate.provinceId = null;
       this.ngSelectDataProvinces = [];
-      this.currentActiveProvince =[] ;     
+      this.currentActiveProvince = [];
       this.resetNgSelect("province");
     }
 
@@ -960,7 +960,7 @@ export class LocationComponent implements OnInit,AfterViewInit {
       this.WardToUpdate.provinceId = null;
       this.WardToUpdate.districtId = null;
       this.ngSelectDataDistricts = [];
-      this.currentActiveDistrict =[];
+      this.currentActiveDistrict = [];
       this.resetNgSelect("district");
     }
 
@@ -980,184 +980,184 @@ export class LocationComponent implements OnInit,AfterViewInit {
 
   isDesc = true;
   sortKey: string = "code";
-  sort(property){
+  sort(property) {
     this.isDesc = !this.isDesc;
     this.sortKey = property;
-    if(this.activeTab==="country"){
+    if (this.activeTab === "country") {
       this.ListCountries = this.sortService.sort(this.ListCountries, property, this.isDesc);
     }
-    if(this.activeTab==="province"){
+    if (this.activeTab === "province") {
       this.ListProvinceCities = this.sortService.sort(this.ListProvinceCities, property, this.isDesc);
     }
-    if(this.activeTab==="district"){
+    if (this.activeTab === "district") {
       this.ListDistricts = this.sortService.sort(this.ListDistricts, property, this.isDesc);
     }
-    if(this.activeTab==="ward"){
+    if (this.activeTab === "ward") {
       this.ListWards = this.sortService.sort(this.ListWards, property, this.isDesc);
     }
   }
 
 
 
-   async import(){
-   
+  async import() {
+
   }
 
-  async export(){
-    if(this.activeTab==='country'){
+  async export() {
+    if (this.activeTab === 'country') {
       await this.exportCountry();
     }
-    if(this.activeTab==='province'){
+    if (this.activeTab === 'province') {
       await this.exportProvince();
     }
-    if(this.activeTab==='district'){
+    if (this.activeTab === 'district') {
       await this.exportDistrict();
     }
-    if(this.activeTab==='ward'){
+    if (this.activeTab === 'ward') {
       await this.exportTownWard()
     }
   }
 
-  async exportCountry(){
-    var countries = await this.baseServices.postAsync(this.api_menu.Catalogue.Country.query,this.searchObject);
-    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.ENGLISH_API){
-        countries = lodash.map(countries,function(country,index){
-          return [
-            index+1,
-            country['code'],
-            country['nameEn'],
-            country['nameVn'],
-            (country['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
-          ]
-        });
-    }
-
-    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.VIETNAM_API){
-      countries = lodash.map(countries,function(country,index){
+  async exportCountry() {
+    var countries = await this.baseServices.postAsync(this.api_menu.Catalogue.Country.query, this.searchObject);
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
+      countries = lodash.map(countries, function (country, index) {
         return [
-          index+1,
+          index + 1,
           country['code'],
           country['nameEn'],
           country['nameVn'],
-          (country['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+          (country['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+        ]
+      });
+    }
+
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
+      countries = lodash.map(countries, function (country, index) {
+        return [
+          index + 1,
+          country['code'],
+          country['nameEn'],
+          country['nameVn'],
+          (country['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
         ]
       });
     }
 
     /**Set up stylesheet */
-    var exportModel:ExportExcel = new ExportExcel();
-    exportModel.fileName = "Countries List";    
+    var exportModel: ExportExcel = new ExportExcel();
+    exportModel.fileName = "Countries List";
     const currrently_user = localStorage.getItem('currently_userName');
     exportModel.title = "Countries List";
     exportModel.author = currrently_user;
     exportModel.sheetName = "Sheet 1";
     exportModel.header = [
-      {name:"No.",width:10},
-      {name:"Country Code",width:10},
-      {name:"English Name",width:20},
-      {name:"Local Name",width:20},
-      {name:"Inactive",width:20}
+      { name: "No.", width: 10 },
+      { name: "Country Code", width: 10 },
+      { name: "English Name", width: 20 },
+      { name: "Local Name", width: 20 },
+      { name: "Inactive", width: 20 }
     ]
     exportModel.data = countries;
     this.excelService.generateExcel(exportModel);
   }
 
 
-  async exportProvince(){
+  async exportProvince() {
     this.searchObject.placeType = PlaceTypeEnum.Province;
-    var provinces = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query,this.searchObject);
-    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.ENGLISH_API){
-      provinces = lodash.map(provinces,function(province,index){
-          return [
-            index+1,
-            province['code'],
-            province['name_EN'],
-            province['name_VN'],
-            province['countryNameEN'],
-            (province['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
-          ]
-        });
+    var provinces = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, this.searchObject);
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
+      provinces = lodash.map(provinces, function (province, index) {
+        return [
+          index + 1,
+          province['code'],
+          province['name_EN'],
+          province['name_VN'],
+          province['countryNameEN'],
+          (province['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+        ]
+      });
     }
 
-    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.VIETNAM_API){
-      provinces = lodash.map(provinces,function(province,index){
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
+      provinces = lodash.map(provinces, function (province, index) {
         return [
-          index+1,
+          index + 1,
           province['code'],
           province['name_EN'],
           province['name_VN'],
           province['countryNameVN'],
-          (province['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+          (province['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
         ]
       });
     }
 
     /**Set up stylesheet */
-    var exportModel:ExportExcel = new ExportExcel();
-    exportModel.fileName = "Provinces List";    
+    var exportModel: ExportExcel = new ExportExcel();
+    exportModel.fileName = "Provinces List";
     const currrently_user = localStorage.getItem('currently_userName');
     exportModel.title = "Provinces List";
     exportModel.author = currrently_user;
     exportModel.sheetName = "Sheet 1";
     exportModel.header = [
-      {name:"No.",width:10},
-      {name:"Province Code",width:20},
-      {name:"English Name",width:20},
-      {name:"Local Name",width:20},
-      {name:"Country",width:20},
-      {name:"Inactive",width:20}
+      { name: "No.", width: 10 },
+      { name: "Province Code", width: 20 },
+      { name: "English Name", width: 20 },
+      { name: "Local Name", width: 20 },
+      { name: "Country", width: 20 },
+      { name: "Inactive", width: 20 }
     ]
     exportModel.data = provinces;
     this.excelService.generateExcel(exportModel);
 
   }
 
-  async exportDistrict(){
+  async exportDistrict() {
     this.searchObject.placeType = PlaceTypeEnum.District;
-    var districts = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query,this.searchObject);
-    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.ENGLISH_API){
-      districts = lodash.map(districts,function(dist,index){
-          return [
-            index+1,
-            dist['code'],
-            dist['name_EN'],
-            dist['name_VN'],
-            dist['provinceNameEN'],
-            dist['countryNameEN'],
-            (dist['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
-          ]
-        });
+    var districts = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, this.searchObject);
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
+      districts = lodash.map(districts, function (dist, index) {
+        return [
+          index + 1,
+          dist['code'],
+          dist['name_EN'],
+          dist['name_VN'],
+          dist['provinceNameEN'],
+          dist['countryNameEN'],
+          (dist['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+        ]
+      });
     }
 
-    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.VIETNAM_API){
-      districts = lodash.map(districts,function(dist,index){
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
+      districts = lodash.map(districts, function (dist, index) {
         return [
-          index+1,
+          index + 1,
           dist['code'],
           dist['name_EN'],
           dist['name_VN'],
           dist['provinceNameVN'],
           dist['countryNameVN'],
-          (dist['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+          (dist['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
         ]
       });
     }
 
     /**Set up stylesheet */
-    var exportModel:ExportExcel = new ExportExcel();
-    exportModel.fileName = "Districts List";    
+    var exportModel: ExportExcel = new ExportExcel();
+    exportModel.fileName = "Districts List";
     const currrently_user = localStorage.getItem('currently_userName');
     exportModel.title = "Districts List";
     exportModel.author = currrently_user;
     exportModel.sheetName = "Sheet 1";
     exportModel.header = [
-      {name:"No.",width:10},
-      {name:"District Code",width:20},
-      {name:"English Name",width:20},
-      {name:"Local Name",width:20},
-      {name:"Province",width:20},
-      {name:"Country",width:20},
-      {name:"Inactive",width:20}
+      { name: "No.", width: 10 },
+      { name: "District Code", width: 20 },
+      { name: "English Name", width: 20 },
+      { name: "Local Name", width: 20 },
+      { name: "Province", width: 20 },
+      { name: "Country", width: 20 },
+      { name: "Inactive", width: 20 }
     ]
     exportModel.data = districts;
     this.excelService.generateExcel(exportModel);
@@ -1165,55 +1165,55 @@ export class LocationComponent implements OnInit,AfterViewInit {
   }
 
 
-  async exportTownWard(){
+  async exportTownWard() {
     this.searchObject.placeType = PlaceTypeEnum.Ward;
-    var wards = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query,this.searchObject);
-    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.ENGLISH_API){
-      wards = lodash.map(wards,function(ward,index){
-          return [
-            index+1,
-            ward['code'],
-            ward['name_EN'],
-            ward['name_VN'],
-            ward['districtNameEN'],
-            ward['provinceNameEN'],
-            ward['countryNameEN'],
-            (ward['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
-          ]
-        });
+    var wards = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, this.searchObject);
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
+      wards = lodash.map(wards, function (ward, index) {
+        return [
+          index + 1,
+          ward['code'],
+          ward['name_EN'],
+          ward['name_VN'],
+          ward['districtNameEN'],
+          ward['provinceNameEN'],
+          ward['countryNameEN'],
+          (ward['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+        ]
+      });
     }
 
-    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.VIETNAM_API){
-      wards = lodash.map(wards,function(ward,index){
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
+      wards = lodash.map(wards, function (ward, index) {
         return [
-          index+1,
+          index + 1,
           ward['code'],
           ward['name_EN'],
           ward['name_VN'],
           ward['districtNameVN'],
           ward['provinceNameVN'],
           ward['countryNameVN'],
-          (ward['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+          (ward['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
         ]
       });
     }
 
     /**Set up stylesheet */
-    var exportModel:ExportExcel = new ExportExcel();
-    exportModel.fileName = "Town-Ward List";    
+    var exportModel: ExportExcel = new ExportExcel();
+    exportModel.fileName = "Town-Ward List";
     const currrently_user = localStorage.getItem('currently_userName');
     exportModel.title = "Town-Ward List";
     exportModel.author = currrently_user;
     exportModel.sheetName = "Sheet 1";
     exportModel.header = [
-      {name:"No.",width:10},
-      {name:"Town-Ward Code",width:20},
-      {name:"English Name",width:20},
-      {name:"Local Name",width:20},
-      {name:"District",width:20},
-      {name:"Province",width:20},
-      {name:"Country",width:20},
-      {name:"Inactive",width:20}
+      { name: "No.", width: 10 },
+      { name: "Town-Ward Code", width: 20 },
+      { name: "English Name", width: 20 },
+      { name: "Local Name", width: 20 },
+      { name: "District", width: 20 },
+      { name: "Province", width: 20 },
+      { name: "Country", width: 20 },
+      { name: "Inactive", width: 20 }
     ]
     exportModel.data = wards;
     this.excelService.generateExcel(exportModel);

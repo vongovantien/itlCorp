@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, ViewChild, EventEmitter, Output } from 'node_modules/@angular/core';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
@@ -13,7 +13,7 @@ import { BaseService } from 'src/app/shared/services/base.service';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { SystemConstants } from 'src/constants/system.const';
-import * as lodash from 'lodash';
+import * as lodash from 'node_modules/lodash';
 
 @Component({
   selector: 'app-all-partner',
@@ -26,11 +26,11 @@ export class AllPartnerComponent implements OnInit {
   partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
   criteria: any = { partnerGroup: PartnerGroupEnum.ALL };
   isDesc: boolean = false;
-  
-  @ViewChild(PaginationComponent,{static:false}) child; 
+
+  @ViewChild(PaginationComponent, { static: false }) child;
   @Output() deleteConfirm = new EventEmitter<Partner>();
   @Output() detail = new EventEmitter<Partner>();
-  constructor(private baseService: BaseService, 
+  constructor(private baseService: BaseService,
     private api_menu: API_MENU,
     private excelService: ExcelService,
     private sortService: SortService) { }
@@ -42,15 +42,15 @@ export class AllPartnerComponent implements OnInit {
     this.getPartnerData(pager, this.criteria);
   }
   async getPartnerData(pager: PagerSetting, criteria?: any) {
-    if(criteria != undefined){
+    if (criteria != undefined) {
       this.criteria = criteria;
     }
-    let responses = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, false, true);
+    let responses = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, false, true);
     this.partners = responses.data;
     this.pager.totalItems = responses.totalItems;
   }
   onSortChange(column) {
-    if(column.dataType != 'boolean'){
+    if (column.dataType != 'boolean') {
       let property = column.primaryKey;
       this.isDesc = !this.isDesc;
       this.partners = this.sortService.sort(this.partners, property, this.isDesc);
@@ -63,12 +63,12 @@ export class AllPartnerComponent implements OnInit {
     this.detail.emit(item);
   }
 
-  async exportAll(){
-    var partnerdata = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.query,this.criteria);
-    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API){
-      partnerdata = lodash.map(partnerdata,function(pd,index){
+  async exportAll() {
+    var partnerdata = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.query, this.criteria);
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
+      partnerdata = lodash.map(partnerdata, function (pd, index) {
         return [
-          index+1,
+          index + 1,
           pd['id'],
           pd['partnerNameEn'],
           pd['shortName'],
@@ -78,14 +78,14 @@ export class AllPartnerComponent implements OnInit {
           pd['fax'],
           pd['userCreatedName'],
           pd['datetimeModified'],
-          (pd['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+          (pd['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
         ]
       });
     }
-    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API){
-      partnerdata = lodash.map(partnerdata,function(pd,index){
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
+      partnerdata = lodash.map(partnerdata, function (pd, index) {
         return [
-          index+1,
+          index + 1,
           pd['id'],
           pd['partnerNameVn'],
           pd['shortName'],
@@ -95,11 +95,11 @@ export class AllPartnerComponent implements OnInit {
           pd['fax'],
           pd['userCreatedName'],
           pd['datetimeModified'],
-          (pd['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+          (pd['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
         ]
       });
     }
-    
+
 
     const exportModel: ExportExcel = new ExportExcel();
     exportModel.title = "Partner Data - All";

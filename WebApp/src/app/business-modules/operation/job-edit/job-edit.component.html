@@ -2383,6 +2383,7 @@
                                             calculateTotalEachBuying(true);"
                                         [selectedDisplayFields]="['charge.chargeNameEn']"
                                         [dataSources]="lstBuyingRateChargesComboBox"
+                                        [disabled]="BuyingRateChargeToEdit.cdno"
                                         [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
                                     </app-combo-grid-virtual-scroll>
 
@@ -2403,9 +2404,9 @@
                                     <ng-select [allowClear]="true" [items]="[
                                                 { 'text': 'AGENT', 'id': 'AGENT' },
                                                 { 'text': 'SHIPPING LINE','id': 'SHIPPING' },
-                                                { 'text': 'OTHER', 'id': 'OTHER' }]" [disabled]="disabled"
+                                                { 'text': 'OTHER', 'id': 'OTHER' }]"
                                         [active]="[{'text':BuyingRateChargeToEdit.objectBePaid,'id':BuyingRateChargeToEdit.objectBePaid}]"
-                                        (data)="refreshValue($event)" [disabled]="BuyingRateChargeToEdit.soano!=null"
+                                        (data)="refreshValue($event)" [disabled]="BuyingRateChargeToEdit.cdno"
                                         (selected)="BuyingRateChargeToEdit.objectBePaid=$event.id;
                                         BuyingRateChargeToEdit.objectBePaid==='AGENT'? BuyingRateChargeToEdit.paymentObjectId=opsTransaction.agentId:null;
                                         BuyingRateChargeToEdit.objectBePaid==='SHIPPING'? BuyingRateChargeToEdit.paymentObjectId=opsTransaction.supplierId:null;
@@ -2429,7 +2430,7 @@
                                         Partner name <span class="m--font-danger">(*)</span>
                                     </label>
                                     <app-combo-grid-virtual-scroll
-                                        [disabled]="BuyingRateChargeToEdit.objectBePaid!=='OTHER' || BuyingRateChargeToEdit.soano!=null"
+                                        [disabled]="BuyingRateChargeToEdit.objectBePaid!=='OTHER' || BuyingRateChargeToEdit.cdno != null"
                                         [currentActiveItemId]="{field:'id',value:BuyingRateChargeToEdit.paymentObjectId}"
                                         (itemSelected)="BuyingRateChargeToEdit.paymentObjectId = $event.id"
                                         [selectedDisplayFields]="['shortName']" [dataSources]="lstPartners"
@@ -2458,7 +2459,7 @@
                                     <div class="input-group m-input-group m-input-group--square">
                                         <input type="number" required class="form-control m-input m-input--square"
                                             decimalNumberGreaterThan0 placeholder="Enter number"
-                                            [disabled]="BuyingRateChargeToEdit.soano!=null"
+                                            [disabled]="BuyingRateChargeToEdit.cdno"
                                             name="buyingRateChangeQuantityNameOps"
                                             #buyingRateChangeQuantityNameOps="ngModel"
                                             [(ngModel)]="BuyingRateChargeToEdit.quantity"
@@ -2486,7 +2487,7 @@
                                         Unit <span class="m--font-danger">(*)</span>
                                     </label>
 
-                                    <app-combo-grid-virtual-scroll [disabled]="BuyingRateChargeToEdit.soano!=null"
+                                    <app-combo-grid-virtual-scroll [disabled]="BuyingRateChargeToEdit.cdno"
                                         [currentActiveItemId]="{field:'id',value:BuyingRateChargeToEdit.unitId}"
                                         (itemSelected)="BuyingRateChargeToEdit.unitId=$event.id"
                                         [selectedDisplayFields]="['unitNameEn']" [dataSources]="lstUnits"
@@ -2508,7 +2509,7 @@
                                         Unit price <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="number" class="form-control m-input m-input--square"
-                                        [disabled]="BuyingRateChargeToEdit.soano!=null"
+                                        [disabled]="BuyingRateChargeToEdit.cdno"
                                         [(ngModel)]="BuyingRateChargeToEdit.unitPrice"
                                         (keyup)="calculateTotalEachBuying(true)" placeholder="Enter number"
                                         #BuyingRateChargeUnitPriceNameOps="ngModel" required
@@ -2529,7 +2530,7 @@
                                     </label>
 
                                     <ng-select [allowClear]="true" [items]="lstCurrencies"
-                                        [disabled]="BuyingRateChargeToEdit.soano!=null"
+                                        [disabled]="BuyingRateChargeToEdit.cdno"
                                         [active]="[{'text':BuyingRateChargeToEdit.currency,'id':BuyingRateChargeToEdit.currencyId}]"
                                         (data)="refreshValue($event)"
                                         (selected)="BuyingRateChargeToEdit.currencyId=$event.id"
@@ -2549,8 +2550,7 @@
                                         VAT <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="number" max="100" name="BuyingRateChargeVATNameOps" required
-                                        [disabled]="BuyingRateChargeToEdit.soano!=null"
-                                        #BuyingRateChargeVATNameOps="ngModel"
+                                        [disabled]="BuyingRateChargeToEdit.cdno" #BuyingRateChargeVATNameOps="ngModel"
                                         [(ngModel)]="BuyingRateChargeToEdit.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter number"
                                         (keyup)="calculateTotalEachBuying(true)">
@@ -2577,6 +2577,7 @@
                                         Doc no
                                     </label>
                                     <input type="text" [(ngModel)]="BuyingRateChargeToEdit.docNo"
+                                        [disabled]="BuyingRateChargeToEdit.cdno"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="BuyingRateChargeDocNameOps">
                                 </div>
@@ -2587,7 +2588,7 @@
                                         Note
                                     </label>
                                     <input type="text" [(ngModel)]="BuyingRateChargeToEdit.notes"
-                                        [disabled]="BuyingRateChargeToEdit.soano!=null"
+                                        [disabled]="BuyingRateChargeToEdit.cdno"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="BuyingRateChargeNoteNameOps">
                                 </div>
@@ -2600,7 +2601,7 @@
                                     <div>
                                         <label class="m-checkbox m-checkbox--bold">
                                             <input type="checkbox" name="BuyingRateChargeKickBackNameOps"
-                                                [disabled]="BuyingRateChargeToEdit.soano!=null"
+                                                [disabled]="BuyingRateChargeToEdit.cdno"
                                                 [(ngModel)]="BuyingRateChargeToEdit.kickBack">
                                             Kick back
                                             <span></span>
@@ -2614,7 +2615,8 @@
                 </div>
                 <div class="modal-footer m--align-center">
                     <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="BuyingRateChargeToEdit.exchangeDate=(BuyingRateChargeToEdit.exchangeDate)==null?null:BuyingRateChargeToEdit.exchangeDate.startDate;
-                        editCharge('ops-edit-buying-rate-modal',editBuyingRateChargeFormOps,BuyingRateChargeToEdit)">
+                        editCharge('ops-edit-buying-rate-modal',editBuyingRateChargeFormOps,BuyingRateChargeToEdit)"
+                        [disabled]="BuyingRateChargeToEdit.cdno">
                         <span>
                             <i class="la la-save"></i>
                             <span>
@@ -2958,6 +2960,7 @@
                                             calculateTotalEachSelling(true);"
                                         [selectedDisplayFields]="['charge.chargeNameEn']"
                                         [dataSources]="lstSellingRateChargesComboBox"
+                                        [disabled]="SellingRateChargeToEdit.cdno"
                                         [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
                                     </app-combo-grid-virtual-scroll>
 
@@ -2978,9 +2981,9 @@
                                     <ng-select [allowClear]="true" [items]="[
                                                 { 'text': 'AGENT', 'id': 'AGENT' },
                                                 { 'text': 'CUSTOMER','id': 'CUSTOMER' },
-                                                { 'text': 'OTHER', 'id': 'OTHER' }]" [disabled]="disabled"
+                                                { 'text': 'OTHER', 'id': 'OTHER' }]"
                                         [active]="[{'text':SellingRateChargeToEdit.objectBePaid,'id':SellingRateChargeToEdit.objectBePaid}]"
-                                        (data)="refreshValue($event)" [disabled]="SellingRateChargeToEdit.soano!=null"
+                                        (data)="refreshValue($event)" [disabled]="SellingRateChargeToEdit.cdno"
                                         (selected)="SellingRateChargeToEdit.objectBePaid=$event.id;
                                         SellingRateChargeToEdit.objectBePaid==='AGENT'? SellingRateChargeToEdit.paymentObjectId=opsTransaction.agentId:null;
                                         SellingRateChargeToEdit.objectBePaid==='CUSTOMER'? SellingRateChargeToEdit.paymentObjectId=opsTransaction.supplierId:null;
@@ -3004,7 +3007,7 @@
                                         Partner name <span class="m--font-danger">(*)</span>
                                     </label>
                                     <app-combo-grid-virtual-scroll
-                                        [disabled]="SellingRateChargeToEdit.objectBePaid!=='OTHER' || SellingRateChargeToEdit.soano!=null"
+                                        [disabled]="SellingRateChargeToEdit.objectBePaid!=='OTHER' || SellingRateChargeToEdit"
                                         [currentActiveItemId]="{field:'id',value:SellingRateChargeToEdit.paymentObjectId}"
                                         (itemSelected)="SellingRateChargeToEdit.paymentObjectId = $event.id"
                                         [selectedDisplayFields]="['shortName']" [dataSources]="lstPartners"
@@ -3033,7 +3036,7 @@
                                     <div class="input-group m-input-group m-input-group--square">
                                         <input type="number" required class="form-control m-input m-input--square"
                                             decimalNumberGreaterThan0 placeholder="Enter number"
-                                            [disabled]="SellingRateChargeToEdit.soano!=null"
+                                            [disabled]="SellingRateChargeToEdit.cdno"
                                             name="sellingRateChangeQuantityNameOps"
                                             #sellingRateChangeQuantityNameOps="ngModel"
                                             [(ngModel)]="SellingRateChargeToEdit.quantity"
@@ -3061,7 +3064,7 @@
                                         Unit <span class="m--font-danger">(*)</span>
                                     </label>
 
-                                    <app-combo-grid-virtual-scroll [disabled]="SellingRateChargeToEdit.soano!=null"
+                                    <app-combo-grid-virtual-scroll [disabled]="SellingRateChargeToEdit.cdno"
                                         [currentActiveItemId]="{field:'id',value:SellingRateChargeToEdit.unitId}"
                                         (itemSelected)="SellingRateChargeToEdit.unitId=$event.id"
                                         [selectedDisplayFields]="['unitNameEn']" [dataSources]="lstUnits"
@@ -3083,7 +3086,7 @@
                                         Unit price <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="number" class="form-control m-input m-input--square"
-                                        [disabled]="SellingRateChargeToEdit.soano!=null"
+                                        [disabled]="SellingRateChargeToEdit.cdno"
                                         [(ngModel)]="SellingRateChargeToEdit.unitPrice"
                                         (keyup)="calculateTotalEachSelling(true)" placeholder="Enter number"
                                         #SellingRateChargeUnitPriceNameOps="ngModel" required
@@ -3104,7 +3107,7 @@
                                     </label>
 
                                     <ng-select [allowClear]="true" [items]="lstCurrencies"
-                                        [disabled]="SellingRateChargeToEdit.soano!=null"
+                                        [disabled]="SellingRateChargeToEdit.cdno"
                                         [active]="[{'text':SellingRateChargeToEdit.currency,'id':SellingRateChargeToEdit.currencyId}]"
                                         (data)="refreshValue($event)"
                                         (selected)="SellingRateChargeToEdit.currencyId=$event.id"
@@ -3124,8 +3127,7 @@
                                         VAT <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="number" max="100" name="SellingRateChargeVATNameOps" required
-                                        [disabled]="SellingRateChargeToEdit.soano!=null"
-                                        #SellingRateChargeVATNameOps="ngModel"
+                                        [disabled]="SellingRateChargeToEdit.cdno" #SellingRateChargeVATNameOps="ngModel"
                                         [(ngModel)]="SellingRateChargeToEdit.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter number"
                                         (keyup)="calculateTotalEachSelling(true)">
@@ -3153,6 +3155,7 @@
                                         Doc no
                                     </label>
                                     <input type="text" [(ngModel)]="SellingRateChargeToEdit.docNo"
+                                        [disabled]="SellingRateChargeToEdit.cdno"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="SellingRateChargeDocNameOps">
                                 </div>
@@ -3163,7 +3166,7 @@
                                         Note
                                     </label>
                                     <input type="text" [(ngModel)]="SellingRateChargeToEdit.notes"
-                                        [disabled]="SellingRateChargeToEdit.soano!=null"
+                                        [disabled]="SellingRateChargeToEdit.cdno"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="SellingRateChargeNoteNameOps">
                                 </div>
@@ -3176,6 +3179,7 @@
                                     <div class="m-input-icon m-input-icon--right down">
                                         <input type="text" class="form-control m-input m-input--square"
                                             ngxDaterangepickerMd [autoApply]="true"
+                                            [attr.disabled]="SellingRateChargeToEdit.cdno"
                                             [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
                                             [(ngModel)]="exchangeRateDate" [singleDatePicker]="true"
                                             name="exchangeRateDate" readonly />
@@ -3199,7 +3203,7 @@
                                     <div>
                                         <label class="m-checkbox m-checkbox--bold">
                                             <input type="checkbox" name="SellingRateChargeKickBackNameOps"
-                                                [disabled]="SellingRateChargeToEdit.soano!=null"
+                                                [disabled]="SellingRateChargeToEdit.cdno"
                                                 [(ngModel)]="SellingRateChargeToEdit.kickBack">
                                             Kick back
                                             <span></span>
@@ -3213,7 +3217,8 @@
                 </div>
                 <div class="modal-footer m--align-center">
                     <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="SellingRateChargeToEdit.exchangeDate=(SellingRateChargeToEdit.exchangeDate)==null?null:SellingRateChargeToEdit.exchangeDate.startDate;
-                    editCharge('ops-edit-selling-rate-modal',editSellingRateChargeFormOps,SellingRateChargeToEdit)">
+                    editCharge('ops-edit-selling-rate-modal',editSellingRateChargeFormOps,SellingRateChargeToEdit)"
+                        [disabled]="SellingRateChargeToEdit.cdno">
                         <span>
                             <i class="la la-save"></i>
                             <span>
@@ -3514,7 +3519,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title">Edit OBH rate</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                        (click)="resetChargeForm('ops-edit-obh-charge-modal',editOBHChargeFormOps)">
+                        (click)="closeChargeForm('ops-edit-obh-charge-modal',editOBHChargeFormOps)">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -3532,7 +3537,7 @@
 
                                     <app-combo-grid-virtual-scroll
                                         [currentActiveItemId]="{field:'charge.id',value:OBHChargeToEdit.chargeId}"
-                                        [disabled]="OBHChargeToEdit.soano!=null" (itemSelected)="OBHChargeToEdit.chargeId=$event.charge.id;
+                                        [disabled]="OBHChargeToEdit.cdno" (itemSelected)="OBHChargeToEdit.chargeId=$event.charge.id;
                                                                 OBHChargeToEdit.unitId=$event.charge.unitId;
                                                                 OBHChargeToEdit.unitPrice=$event.charge.unitPrice;
                                                                 OBHChargeToEdit.vatrate = $event.charge.vatrate;
@@ -3558,7 +3563,7 @@
                                         Receiver <span class="m--font-danger">(*)</span>
                                     </label>
 
-                                    <app-combo-grid-virtual-scroll [disabled]="OBHChargeToEdit.soano!=null"
+                                    <app-combo-grid-virtual-scroll [disabled]="OBHChargeToEdit.cdno"
                                         [currentActiveItemId]="{field:'id',value:OBHChargeToEdit.receiverId,hardValue:OBHChargeToEdit.receiverName}"
                                         (itemSelected)="OBHChargeToEdit.receiverId = $event.id;
                                                                     OBHChargeToEdit.receiverName = $event.shortName;"
@@ -3580,7 +3585,7 @@
                                         Payer <span class="m--font-danger">(*)</span>
                                     </label>
 
-                                    <app-combo-grid-virtual-scroll [disabled]="OBHChargeToEdit.soano!=null"
+                                    <app-combo-grid-virtual-scroll [disabled]="OBHChargeToEdit.cdno"
                                         [currentActiveItemId]="{field:'id',value:OBHChargeToEdit.payerId,hardValue:OBHChargeToEdit.payerName}"
                                         (itemSelected)="OBHChargeToEdit.payerId = $event.id;
                                                                         OBHChargeToEdit.payerName = $event.shortName;"
@@ -3606,7 +3611,7 @@
                                     <input type="number" class="form-control m-input m-input--square"
                                         placeholder="Enter number" #OBHQuantityNameEdtOps="ngModel"
                                         decimalNumberGreaterThan0 [(ngModel)]="OBHChargeToEdit.quantity" required
-                                        [disabled]="OBHChargeToEdit.soano!=null" (keyup)="calculateTotalEachOBH(true)"
+                                        [disabled]="OBHChargeToEdit.cdno" (keyup)="calculateTotalEachOBH(true)"
                                         name="OBHQuantityNameEdtOps">
                                     <div class="form-control-feedback"
                                         *ngIf="editOBHChargeFormOps.submitted && OBHQuantityNameEdtOps.invalid">
@@ -3625,7 +3630,7 @@
                                         Unit <span class="m--font-danger">(*)</span>
                                     </label>
 
-                                    <app-combo-grid-virtual-scroll [disabled]="OBHChargeToEdit.soano!=null"
+                                    <app-combo-grid-virtual-scroll [disabled]="OBHChargeToEdit.cdno"
                                         [currentActiveItemId]="{field:'id',value:OBHChargeToEdit.unitId,hardValue:OBHChargeToEdit.unit}"
                                         (itemSelected)="OBHChargeToEdit.unitId = $event.id;
                                                                     OBHChargeToEdit.unit = $event.unitNameEn"
@@ -3647,7 +3652,7 @@
                                         Unit price <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="number" class="form-control m-input m-input--square"
-                                        [disabled]="OBHChargeToEdit.soano!=null" [(ngModel)]="OBHChargeToEdit.unitPrice"
+                                        [disabled]="OBHChargeToEdit.cdno" [(ngModel)]="OBHChargeToEdit.unitPrice"
                                         placeholder="Enter number" required name="OBHUnitPriceNameEdtOps"
                                         #OBHUnitPriceNameEdtOps="ngModel" (keyup)="calculateTotalEachOBH(true)">
                                     <div class="form-control-feedback"
@@ -3665,7 +3670,7 @@
                                         Currency
                                     </label>
                                     <ng-select [allowClear]="true" [items]="lstCurrencies"
-                                        [disabled]="OBHChargeToEdit.soano!=null"
+                                        [disabled]="OBHChargeToEdit.cdno"
                                         [active]="[{'text':OBHChargeToEdit.currency,'id':OBHChargeToEdit.currencyId}]"
                                         (data)="refreshValue($event)" (selected)="OBHChargeToEdit.currencyId=$event.id"
                                         (removed)="OBHChargeToEdit.currencyId=null" (typed)="getListCurrency($event)"
@@ -3684,7 +3689,7 @@
                                         VAT
                                     </label>
                                     <input type="number" max="100" name="OBHChargeVATNameEdtOps" required
-                                        [disabled]="OBHChargeToEdit.soano!=null" #OBHChargeVATNameEdtOps="ngModel"
+                                        [disabled]="OBHChargeToEdit.cdno" #OBHChargeVATNameEdtOps="ngModel"
                                         [(ngModel)]="OBHChargeToEdit.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter number"
                                         (keyup)="calculateTotalEachOBH(true)">
@@ -3711,9 +3716,8 @@
                                         Doc no
                                     </label>
                                     <input type="text" [(ngModel)]="OBHChargeToEdit.docNo"
-                                        [disabled]="OBHChargeToEdit.soano!=null"
-                                        class="form-control m-input m-input--square" placeholder="Enter text"
-                                        name="OBHChargeDocNameEdtOps">
+                                        [disabled]="OBHChargeToEdit.cdno" class="form-control m-input m-input--square"
+                                        placeholder="Enter text" name="OBHChargeDocNameEdtOps">
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -3722,9 +3726,8 @@
                                         Note
                                     </label>
                                     <input type="text" [(ngModel)]="OBHChargeToEdit.notes"
-                                        [disabled]="OBHChargeToEdit.soano!=null"
-                                        class="form-control m-input m-input--square" placeholder="Enter text"
-                                        name="OBHChargeNoteNameEdtOps">
+                                        [disabled]="OBHChargeToEdit.cdno" class="form-control m-input m-input--square"
+                                        placeholder="Enter text" name="OBHChargeNoteNameEdtOps">
                                 </div>
                             </div>
                             <!-- <div class="col-lg-4">
@@ -3752,7 +3755,8 @@
                 </div>
                 <div class="modal-footer m--align-center">
                     <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="OBHChargeToEdit.exchangeDate=(OBHChargeToEdit.exchangeDate)==null?null:OBHChargeToEdit.exchangeDate.startDate;
-                        editCharge('ops-edit-obh-charge-modal',editOBHChargeFormOps,OBHChargeToEdit)">
+                        editCharge('ops-edit-obh-charge-modal',editOBHChargeFormOps,OBHChargeToEdit)"
+                        [disabled]="OBHChargeToEdit.cdno">
                         <span>
                             <i class="la la-save"></i>
                             <span>
@@ -3761,7 +3765,7 @@
                         </span>
                     </button>
                     <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                        (click)="resetChargeForm('ops-edit-obh-charge-modal',editOBHChargeFormOps)"
+                        (click)="closeChargeForm('ops-edit-obh-charge-modal',editOBHChargeFormOps)"
                         data-dismiss="modal">
                         <span>
                             <i class="la la-ban"></i>

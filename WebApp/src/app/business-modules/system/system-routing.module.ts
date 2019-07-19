@@ -1,5 +1,5 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { NgModule } from 'node_modules/@angular/core';
+import { Routes, RouterModule } from 'node_modules/@angular/router';
 import { CompanyInfoComponent } from './company-info/company-info.component';
 import { DepartmentComponent } from './department/department.component';
 import { GroupComponent } from './group/group.component';
@@ -14,29 +14,29 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
-    path:'company-info',
-    component:CompanyInfoComponent
+    path: 'company-info',
+    component: CompanyInfoComponent
   },
   {
-    path:'department',
-    component:DepartmentComponent
+    path: 'department',
+    component: DepartmentComponent
   },
   {
-    path:'group',
-    component:GroupComponent
+    path: 'group',
+    component: GroupComponent
   },
   {
-    path:'permission',
-    component:PermissionComponent
+    path: 'permission',
+    component: PermissionComponent
   },
   {
-    path:'role',
-    component:RoleComponent
+    path: 'role',
+    component: RoleComponent
   },
   {
-    path:'user-management',
-    component:UserManagementComponent
-  }  
+    path: 'user-management',
+    component: UserManagementComponent
+  }
 ];
 
 @NgModule({

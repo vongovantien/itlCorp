@@ -28,6 +28,7 @@ import { OpsModuleStageManagementDetailComponent } from "./job-edit/stage-manage
 import { ModalModule, TabsModule } from "ngx-bootstrap";
 import { OpsModuleStageManagementAddStagePopupComponent } from "./job-edit/stage-management/add/add-stage.popup.component";
 import { NotSelectedAlertModalComponent } from './job-edit/credit-debit-note/ops-module-credit-debit-note-addnew/not-selected-alert-modal/not-selected-alert-modal.component';
+import { ChangePartnerConfirmModalComponent } from './job-edit/credit-debit-note/ops-module-credit-debit-note-addnew/change-partner-confirm-modal/change-partner-confirm-modal.component';
 
 
 const LIB = [
@@ -70,7 +71,9 @@ const LIB = [
 
         OpsModuleStageManagementAddStagePopupComponent,
 
-        NotSelectedAlertModalComponent
+        NotSelectedAlertModalComponent,
+
+        ChangePartnerConfirmModalComponent
     ]
 })
 export class OperationModule {}

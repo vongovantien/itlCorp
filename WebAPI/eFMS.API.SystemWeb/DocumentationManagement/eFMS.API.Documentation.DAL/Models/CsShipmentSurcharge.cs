@@ -50,6 +50,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string UnlockedSoadirectorStatus { get; set; }
         public DateTime? UnlockedSoadirectorDate { get; set; }
         public bool? Soaclosed { get; set; }
+        public bool? Cdclosed { get; set; }
         public string Cdno { get; set; }
         public string Soano { get; set; }
         public string UserCreated { get; set; }

@@ -38,30 +38,25 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
   }
   subscribe: Subject<any> = new Subject();
   ngOnInit() {
-    // this.subscribe = <any>this.baseServices.dataStorage.subscribe(data => {
-    //   this.STORAGE_DATA = data;
-    //   if (this.STORAGE_DATA.isNewCDNote !== undefined) {
-    //     this.IsNewCDNote = this.STORAGE_DATA.isNewCDNote;
-    //     if (this.IsNewCDNote === true) {
-    //       this.getAllCDNote();
-    //     }
-    //   }
-
-    //   // if (this.STORAGE_DATA.CurrentOpsTransaction !== undefined) {
-    //   //   this.CurrentHBID = this.STORAGE_DATA.CurrentOpsTransaction.hblid;
-    //   //   this.getAllCDNote();
-    //   // }
-
-    // });
     this.CurrentHBID = this.currentJob.hblid;
+    this.subscribe = <any>this.baseServices.dataStorage.subscribe(data => {
+      this.STORAGE_DATA = data;
+      if (this.STORAGE_DATA.isNewCDNote !== undefined) {
+        this.IsNewCDNote = this.STORAGE_DATA.isNewCDNote;
+        if (this.IsNewCDNote === true) {
           this.getAllCDNote();
         }
+      } else {
+        this.getAllCDNote();
+      }
+    });
+  }
   ngOnDestroy(): void {
     this.subscribe.unsubscribe();
-      }
+  }
   openPopUpCreateCDNote() {
     this.popupCreate.show({ backdrop: 'static', keyboard: true });
-      }
+  }
   getAllCDNote() {
     // this.baseServices.get(this.api_menu.Documentation.AcctSOA.getAll + "?Id=" + this.CurrentHBID + "&IsHouseBillID=true").subscribe((data: any) => {
     //   this.listCDNotes = cloneDeep(data);
@@ -80,7 +75,7 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
         } else {
           this.listCDNotes = cloneDeep(res);
           this.constListCDNotes = cloneDeep(res);
-  }
+        }
       },
       // error
       (errs: any) => {

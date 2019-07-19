@@ -68,9 +68,6 @@
                         <th class="sorting">
                             <span>Create Date</span>
                         </th>
-                        <th class="sorting">
-                            <span>SOA No</span>
-                        </th>
                     </tr>
                 </thead>
                 <tbody class="tbody-group" *ngFor="let item of listCDNotes;let i = index;">
@@ -92,7 +89,7 @@
                         <td colspan="8">
                             <div class="collapse show" id="id-cd-001">
                                 <table class="table">
-                                    <tbody *ngFor="let s of item.listSOA;let k = index;">
+                                    <tbody *ngFor="let s of item.listCDNote;let k = index;">
                                         <tr class="">
                                             <td class="table-actions-col">
                                                 <div class="table-actions">
@@ -100,39 +97,36 @@
                                                         class="btn btn-brand btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                         title="Edit" data-toggle="modal"
                                                         data-target="#ops-credit-debit-note-detail-modal"
-                                                        (click)="openEdit(s.soa.code)">
+                                                        (click)="openEdit(s.cdNote.code)">
                                                         <i class="la la-list"></i>
                                                     </button>
                                                     <button type="button"
                                                         class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        (click)="DeleteCDNote('confirm',s.soa.id)" title="Remove"
+                                                        (click)="DeleteCDNote('confirm',s.cdNote.id)" title="Remove"
                                                         data-toggle="modal" data-target="#confirm-delete-CDnote-modal">
                                                         <i class="la la-trash"></i>
                                                     </button>
                                                 </div>
                                             </td>
                                             <td>
-                                                <span>{{s.soa.type}}</span>
+                                                <span>{{s.cdNote.type}}</span>
                                             </td>
                                             <td>
                                                 <a class="" href="javascript:void(0)" data-toggle="modal"
                                                     data-target="#ops-credit-debit-note-detail-modal"
-                                                    (click)="openEdit(s.soa.code)">{{s.soa.code}}</a>
+                                                    (click)="openEdit(s.cdNote.code)">{{s.cdNote.code}}</a>
                                             </td>
                                             <td>
                                                 <span>{{s.total_charge}}</span>
                                             </td>
                                             <td>
-                                                <span>{{s.soa.total}}</span>
+                                                <span>{{s.cdNote.total}}</span>
                                             </td>
                                             <td>
-                                                <span>{{s.soa.userCreated}}</span>
+                                                <span>{{s.cdNote.userCreated}}</span>
                                             </td>
                                             <td>
-                                                <span>{{s.soa.datetimeCreated | date:'dd/MM/yyyy'}}</span>
-                                            </td>
-                                            <td>
-                                                <span>Other SOA No</span>
+                                                <span>{{s.cdNote.datetimeCreated | date:'dd/MM/yyyy'}}</span>
                                             </td>
                                         </tr>
                                     </tbody>

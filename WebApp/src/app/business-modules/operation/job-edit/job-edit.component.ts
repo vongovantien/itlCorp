@@ -971,6 +971,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
 
     selectTab($event: any, tabName: string) {
         this.tab = tabName;
+        this.getAllSurCharges();
         // this.router.navigate([`home/operation/job-edit/${this.jobId}`], {queryParams: {tab: this.tab}});
     }
 }
