@@ -2,7 +2,6 @@ import { Component, Output, EventEmitter } from '@angular/core';
 import { AppPage, IComboGirdConfig } from 'src/app/app.base';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { GlobalState } from 'src/app/global-state';
-
 @Component({
     selector: 'form-create-soa',
     templateUrl: './form-create-soa.component.html',
@@ -50,6 +49,9 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     services: any[] = [];
     selectedService: any[] = [];
     note: string = '';
+
+    isSubmited: boolean = false;
+
     constructor(
         private _sysRepo: SystemRepo,
         private _globalState: GlobalState
@@ -65,8 +67,6 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         this.getUser();
         this.getCharge();
     }
-
-
 
     getPartner() {
         const partners: any[] = [
@@ -85,16 +85,17 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
     getCharge() {
         const charges: any[] = [
-            { code: 'Charge CODE 1', name: 'Name Abbr 1' },
-            { code: 'Charge CODE 2', name: 'Name Abbr 2' },
-            { code: 'Charge CODE 3', name: 'Name Abbr 3' },
+            { code: 'All', name: 'All', id: -1 },
+            { code: Math.random(), name: 'Name Abbr 1', id: Math.random() },
+            { code: Math.random(), name: 'Name Abbr 2', id: Math.random() },
+            { code: Math.random(), name: 'Name Abbr 3', id: Math.random() },
         ];
         this.configCharge.dataSource.push(...charges);
         this.configCharge.displayFields = [
             { field: 'code', label: 'Charge Code' },
             { field: 'name', label: 'Charge Name EN ' },
         ];
-        this.configCharge.selectedDisplayFields = ['code', 'name'];
+        this.configCharge.selectedDisplayFields = ['code'];
     }
 
     initBasicData() {
@@ -136,6 +137,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         switch (type.toLowerCase()) {
             case 'partner':
                 this.selectedPartner = { field: 'code', value: data.code };
+                console.log(this.selectedPartner); 
                 break;
             case 'date-mode':
                 this.selectedDateMode = data;
@@ -161,8 +163,9 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 this.selectedUser.push(data);
                 break;
             case 'charge':
-                this.selectedCharge = { field: 'code', value: data.code };
-                this.selectedCharges.push(this.selectedCharge);
+                this.selectedCharges.push(data);
+                this.detectChargeWithAllOption(data);
+
                 break;
             default:
                 break;
@@ -205,7 +208,19 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         }
     }
 
+    detectChargeWithAllOption(data?: any) {
+        if (!this.selectedCharges.every((value: any) => value.id > 0)) {
+            this.selectedCharges.splice(this.selectedCharges.findIndex((item: any) => item.id < 0), 1);
+
+            this.selectedCharges = [];
+            this.selectedCharges.push(data);
+        }
+    }
+
     onSearchCharge() {
+        console.log(this.selectedRangeDate);
+        this.isSubmited = true;
+
         const body = {
             partner: this.selectedPartner,
             date: this.selectedRangeDate,

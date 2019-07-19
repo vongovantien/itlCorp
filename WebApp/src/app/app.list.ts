@@ -5,7 +5,11 @@ export abstract class AppList extends AppPage {
   sort: string = null;
   order: any = false;
   keyword: string = '';
- 
+  requestList: any = null;
+
+  constructor() {
+    super();
+  }
 
   setSortBy(sort?: string, order?: boolean): void {
     this.sort = sort ? sort : 'code';
@@ -13,14 +17,12 @@ export abstract class AppList extends AppPage {
   }
 
   sortBy(sort: string): void {
-
     if (!!sort) {
-      // this.setSortBy(sort, this.sort !== sort ? 'asc' : (this.order === 'desc' ? 'asc' : 'desc'));
       this.setSortBy(sort, this.sort !== sort ? true : !this.order);
 
-      // if (typeof (this.request) === 'function') {
-      //   this.request(this.sort, this.order);
-      // }
+      if (typeof (this.requestList) === 'function') {
+        this.requestList(this.sort, this.order);   // local or server
+      }
     }
   }
 

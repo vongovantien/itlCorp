@@ -1,8 +1,11 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Injectable, OnDestroy } from '@angular/core';
+import { BehaviorSubject, Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Injectable()
-export class GlobalState {
+export class GlobalState implements OnDestroy {
+
+    ngUnsub: Subject<any> = new Subject<any>();
 
     public _data = new BehaviorSubject<Object>({ event: 'default', data: null });
 
@@ -11,7 +14,7 @@ export class GlobalState {
     public _subscriptions: Map<string, Function[]> = new Map<string, Function[]>();
 
     constructor() {
-        this._dataStream$.subscribe((data: any) => this._onEvent(data));
+        this._dataStream$.pipe(takeUntil(this.ngUnsub)).subscribe((data: any) => this._onEvent(data));
     }
 
     notifyDataChanged(event: string | number, value: any) {
@@ -43,6 +46,12 @@ export class GlobalState {
 
     getCurrentData(event: string) {
         return this._data[event] || null;
+    }
+
+
+    ngOnDestroy(): void {
+        this.ngUnsub.next();
+        this.ngUnsub.complete();
     }
 }
 
