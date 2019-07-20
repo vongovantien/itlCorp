@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from 'node_modules/@angular/core';
 import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
 import { PORTINDEXCOLUMNSETTING } from './port-index.columns';
 import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
@@ -8,16 +8,16 @@ import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
-import { NgForm } from '@angular/forms';
-import { SelectComponent } from 'ng2-select';
+import { NgForm } from 'node_modules/@angular/forms';
+import { SelectComponent } from 'node_modules/ng2-select';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { SystemConstants } from 'src/constants/system.const';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
-import * as lodash from 'lodash';
+import * as lodash from 'node_modules/lodash';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { ExcelService } from 'src/app/shared/services/excel.service';
-import {PlaceTypeEnum} from 'src/app/shared/enums/placeType-enum';
+import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 declare var $: any;
 import * as dataHelper from 'src/helper/data.helper';
 
@@ -52,14 +52,14 @@ export class PortIndexComponent implements OnInit {
     typeButton: ButtonType.cancel
   };
   configSearch: any = {
-    settingFields: this.portIndexSettings.filter(x => x.allowSearch == true).map(x=>({"fieldName": x.primaryKey,"displayName": x.header})),
+    settingFields: this.portIndexSettings.filter(x => x.allowSearch == true).map(x => ({ "fieldName": x.primaryKey, "displayName": x.header })),
     typeSearch: TypeSearch.outtab
   };
-  @ViewChild('formAddEdit',{static:false}) form: NgForm;
-  @ViewChild('chooseCountry',{static:false}) public ngSelectCountry: SelectComponent;
-  @ViewChild('chooseArea',{static:false}) public ngSelectArea: SelectComponent;
-  @ViewChild('chooseMode',{static:false}) public ngSelectMode: SelectComponent;
-  @ViewChild(PaginationComponent,{static:false}) child;
+  @ViewChild('formAddEdit', { static: false }) form: NgForm;
+  @ViewChild('chooseCountry', { static: false }) public ngSelectCountry: SelectComponent;
+  @ViewChild('chooseArea', { static: false }) public ngSelectArea: SelectComponent;
+  @ViewChild('chooseMode', { static: false }) public ngSelectMode: SelectComponent;
+  @ViewChild(PaginationComponent, { static: false }) child;
   countries: any[];
   areas: any[];
   modes: any[];
@@ -71,9 +71,9 @@ export class PortIndexComponent implements OnInit {
   constructor(private baseService: BaseService,
     private api_menu: API_MENU,
     private sortService: SortService,
-    private excelService: ExcelService,) {
+    private excelService: ExcelService, ) {
 
-     }
+  }
 
   ngOnInit() {
     this.initPager();
@@ -92,11 +92,11 @@ export class PortIndexComponent implements OnInit {
   }
   async getPortIndexs(pager: PagerSetting) {
     let responses = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, true, true);
-    if(responses != null){
+    if (responses != null) {
       this.portIndexs = responses.data;
       this.pager.totalItems = responses.totalItems;
     }
-    else{
+    else {
       this.portIndexs = [];
       this.pager.totalItems = 0;
     }
@@ -177,8 +177,8 @@ export class PortIndexComponent implements OnInit {
 
   async update() {
     var response = await this.baseService.putAsync(this.api_menu.Catalogue.CatPlace.update + this.portIndex.id, this.portIndex, true, true);
-    if(response != null){
-      if(response.status){
+    if (response != null) {
+      if (response.status) {
         this.initPortIndex();
         $('#edit-port-index-modal').modal('hide');
         this.getPortIndexs(this.pager);
@@ -188,8 +188,8 @@ export class PortIndexComponent implements OnInit {
 
   async addNew() {
     let response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.add, this.portIndex, true, true);
-    if(response != null){
-      if(response.status){
+    if (response != null) {
+      if (response.status) {
         this.initPager();
         this.getPortIndexs(this.pager);
         $('#edit-port-index-modal').modal('hide');
@@ -209,28 +209,28 @@ export class PortIndexComponent implements OnInit {
   }
   async getModeOfTransport() {
     let responses = await this.baseService.getAsync(this.api_menu.Catalogue.CatPlace.getModeOfTransport, false, false);
-    if(responses != null){
+    if (responses != null) {
       this.modes = dataHelper.prepareNg2SelectData(responses, 'id', 'name');
     }
-    else{
+    else {
       this.modes = [];
     }
   }
   async getAreas() {
     let responses = await this.baseService.getAsync(this.api_menu.Catalogue.Area.getAllByLanguage, false, false);
-    if(responses != null){
+    if (responses != null) {
       this.areas = dataHelper.prepareNg2SelectData(responses, 'id', 'name');
     }
-    else{
+    else {
       this.areas = [];
     }
   }
   async getCountries() {
     let responses = await this.baseService.getAsync(this.api_menu.Catalogue.Country.getAllByLanguage, false, true);
-    if(responses != null){
+    if (responses != null) {
       this.countries = dataHelper.prepareNg2SelectData(responses, 'id', 'name');
     }
-    else{
+    else {
       this.countries = [];
     }
   }
@@ -253,31 +253,30 @@ export class PortIndexComponent implements OnInit {
     this.areaActive = this.getDistrictAactive(this.portIndex.areaID);
     this.modeActive = this.getModeActive(this.portIndex.modeOfTransport);
   }
-  getModeActive(modeOfTransport: string){
+  getModeActive(modeOfTransport: string) {
     let index = this.modes.findIndex(x => x.id == modeOfTransport);
-    if(index > -1){
+    if (index > -1) {
       return [this.modes[index]];
     }
-    else{
+    else {
       return [];
     }
   }
   getDistrictAactive(areaID: string) {
     let index = this.areas.findIndex(x => x.id == areaID);
-    if(index > -1){
+    if (index > -1) {
       return [this.areas[index]];
     }
-    else{
+    else {
       return [];
     }
   }
   getCountryActive(countryID: number) {
     let index = this.countries.findIndex(x => x.id == countryID);
-    if(index > -1)
-    {
+    if (index > -1) {
       return [this.countries[index]];
     }
-    else{
+    else {
       return [];
     }
   }
@@ -293,7 +292,7 @@ export class PortIndexComponent implements OnInit {
         this.setPageAfterDelete();
       }, err => {
         this.baseService.spinnerHide();
-        this.baseService.handleError(err);        
+        this.baseService.handleError(err);
       });
     }
   }
@@ -313,35 +312,35 @@ export class PortIndexComponent implements OnInit {
       this.portIndexs = this.sortService.sort(this.portIndexs, property, this.isDesc);
     }
   }
-  async export(){
-    var portIndexes = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.query,this.criteria);
+  async export() {
+    var portIndexes = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.query, this.criteria);
     console.log(portIndexes);
-    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.ENGLISH_API){
-      portIndexes = lodash.map(portIndexes,function(pi,index){
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
+      portIndexes = lodash.map(portIndexes, function (pi, index) {
         return [
-          index+1,
+          index + 1,
           pi['code'],
           pi['name_EN'],
           pi['name_VN'],
           pi['countryNameEN'],
           pi['areaNameEN'],
           pi['modeOfTransport'],
-          (pi['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+          (pi['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
         ]
-      }); 
+      });
     }
 
-    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.VIETNAM_API){
-      portIndexes = lodash.map(portIndexes,function(pi,index){
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
+      portIndexes = lodash.map(portIndexes, function (pi, index) {
         return [
-          index+1,
+          index + 1,
           pi['code'],
           pi['name_EN'],
           pi['name_VN'],
           pi['countryNameVN'],
           pi['areaNameVN'],
           pi['modeOfTransport'],
-          (pi['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+          (pi['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
         ]
       });
     }
@@ -351,21 +350,21 @@ export class PortIndexComponent implements OnInit {
     const currrently_user = localStorage.getItem('currently_userName');
     exportModel.author = currrently_user;
     exportModel.header = [
-      {name:"No.",width:10},
-      {name:"Code",width:20},
-      {name:"Name EN",width:20},
-      {name:"Name VN",width:20},
-      {name:"Country",width:20},
-      {name:"Zone",width:20},
-      {name:"Mode",width:20},
-      {name:"Inactive",width:20}
+      { name: "No.", width: 10 },
+      { name: "Code", width: 20 },
+      { name: "Name EN", width: 20 },
+      { name: "Name VN", width: 20 },
+      { name: "Country", width: 20 },
+      { name: "Zone", width: 20 },
+      { name: "Mode", width: 20 },
+      { name: "Inactive", width: 20 }
     ]
     exportModel.data = portIndexes;
     exportModel.fileName = "PortIndex";
-    
+
     this.excelService.generateExcel(exportModel);
-   
-    
+
+
   }
 
 }

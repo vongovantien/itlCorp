@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewChild, Output, EventEmitter } from 'node_modules/@angular/core';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
@@ -12,7 +12,7 @@ import { SortService } from 'src/app/shared/services/sort.service';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { SystemConstants } from 'src/constants/system.const';
-import * as lodash from 'lodash';
+import * as lodash from 'node_modules/lodash';
 
 @Component({
   selector: 'app-customer',
@@ -24,7 +24,7 @@ export class CustomerComponent implements OnInit {
   pager: PagerSetting = PAGINGSETTING;
   partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
   criteria: any = { partnerGroup: PartnerGroupEnum.CUSTOMER };
-  @ViewChild(PaginationComponent,{static:false}) child; 
+  @ViewChild(PaginationComponent, { static: false }) child;
   @Output() deleteConfirm = new EventEmitter<Partner>();
   @Output() detail = new EventEmitter<any>();
   constructor(private baseService: BaseService,
@@ -35,26 +35,26 @@ export class CustomerComponent implements OnInit {
   ngOnInit() {
   }
   async getPartnerData(pager: PagerSetting, criteria?: any) {
-    if(criteria != undefined){
+    if (criteria != undefined) {
       this.criteria = criteria;
     }
-    let responses = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.customerPaging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, false, true);
+    let responses = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.customerPaging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, false, true);
     this.customers = responses.data;
     this.pager.totalItems = responses.totalItems;
   }
   showConfirmDelete(item) {
     this.deleteConfirm.emit(item);
   }
-  showDetail(item){
+  showDetail(item) {
     this.detail.emit(item);
   }
 
-  async exportCustomers(){
-    var customers = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.query,this.criteria);
-    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API){
-      customers = lodash.map(customers,function(cus,index){
+  async exportCustomers() {
+    var customers = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.query, this.criteria);
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
+      customers = lodash.map(customers, function (cus, index) {
         return [
-          index+1,
+          index + 1,
           cus['id'],
           cus['partnerNameEn'],
           cus['shortName'],
@@ -64,14 +64,14 @@ export class CustomerComponent implements OnInit {
           cus['fax'],
           cus['userCreatedName'],
           cus['datetimeModified'],
-          (cus['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+          (cus['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
         ]
       });
     }
-    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API){
-      customers = lodash.map(customers,function(cus,index){
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
+      customers = lodash.map(customers, function (cus, index) {
         return [
-          index+1,
+          index + 1,
           cus['id'],
           cus['partnerNameVn'],
           cus['shortName'],
@@ -81,11 +81,11 @@ export class CustomerComponent implements OnInit {
           cus['fax'],
           cus['userCreatedName'],
           cus['datetimeModified'],
-          (cus['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+          (cus['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
         ]
       });
     }
-    
+
 
     const exportModel: ExportExcel = new ExportExcel();
     exportModel.title = "Partner Data - Customers";
@@ -112,7 +112,7 @@ export class CustomerComponent implements OnInit {
 
   isDesc = true;
   sortKey: string = "id";
-  sort(property){
+  sort(property) {
     this.isDesc = !this.isDesc;
     this.sortKey = property;
     this.customers.forEach(element => {

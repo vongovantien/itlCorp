@@ -1,5 +1,5 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgModule } from 'node_modules/@angular/core';
+import { CommonModule } from 'node_modules/@angular/common';
 
 import { SystemRoutingModule } from './system-routing.module';
 import { UserManagementComponent } from './user-management/user-management.component';

@@ -1,10 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import * as lodash from 'lodash';
+import { Component, OnInit, ViewChild } from 'node_modules/@angular/core';
+import * as lodash from 'node_modules/lodash';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
-import { Router } from '@angular/router';
+import { Router } from 'node_modules/@angular/router';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { ExcelService } from 'src/app/shared/services/excel.service';
@@ -27,7 +27,7 @@ export class ChargeComponent implements OnInit {
     private router: Router,
     private sortService: SortService) {
 
-     }
+  }
 
   listFilter = [
     { filter: "All", field: "all" }, { filter: "Code", field: "code" },
@@ -45,7 +45,7 @@ export class ChargeComponent implements OnInit {
   searchObject: any = {};
 
 
-  @ViewChild(PaginationComponent,{static:false}) child:any;
+  @ViewChild(PaginationComponent, { static: false }) child: any;
 
   async ngOnInit() {
     await this.getCharges();
@@ -93,7 +93,7 @@ export class ChargeComponent implements OnInit {
 
   async getCharges() {
     var response = await this.baseServices.postAsync(this.api_menu.Catalogue.Charge.paging + "?pageNumber=" + this.pager.currentPage + "&pageSize=" + this.pager.pageSize, this.searchObject, false, true);
-    if(response){
+    if (response) {
       this.ListCharges = response.data;
       console.log(this.ListCharges);
       this.pager.totalItems = response.totalItems;

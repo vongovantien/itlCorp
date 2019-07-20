@@ -49,17 +49,17 @@ namespace eFMS.API.Documentation.DL.Services
             try
             {
 
-                var soa = mapper.Map<AcctCdnote>(model);
-                soa.Id = Guid.NewGuid();
-                soa.Code = RandomCode();
-                DataContext.Add(soa);
+                var cdNote = mapper.Map<AcctCdnote>(model);
+                cdNote.Id = Guid.NewGuid();
+                cdNote.Code = RandomCode();
+                DataContext.Add(cdNote);
 
                 foreach (var c in model.listShipmentSurcharge)
                 {
                     var charge = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Id == c.Id).FirstOrDefault();
                     if (charge != null)
                     {
-                        charge.Soano = soa.Code;
+                        charge.Cdno = cdNote.Code;
                         charge.Soaclosed = true;
                         charge.DatetimeModified = DateTime.Now;
                         charge.UserModified = "admin";
@@ -81,26 +81,26 @@ namespace eFMS.API.Documentation.DL.Services
         {
             try
             {
-                var soa = DataContext.First(x => (x.Id == model.Id && x.Code == model.Code));
-                soa = mapper.Map<AcctCdnote>(model);
-                if (soa == null)
+                var cdNote = DataContext.First(x => (x.Id == model.Id && x.Code == model.Code));
+                cdNote = mapper.Map<AcctCdnote>(model);
+                if (cdNote == null)
                 {
                     throw new Exception("CD Note not found !");
                 }
-                var stt = DataContext.Update(soa, x => x.Id == soa.Id);
+                var stt = DataContext.Update(cdNote, x => x.Id == cdNote.Id);
                 if (stt.Success)
                 {
-                    var chargesOfSOA = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Soano == soa.Code).ToList();
+                    var chargesOfSOA = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Cdno == cdNote.Code).ToList();
                     foreach (var item in chargesOfSOA)
                     {
-                        item.Soano = null;
+                        item.Cdno = null;
                     }
                     foreach (var item in model.listShipmentSurcharge)
                     {
                         var charge = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Id == item.Id).FirstOrDefault();
                         if (charge != null)
                         {
-                            charge.Soano = soa.Code;
+                            charge.Cdno = cdNote.Code;
                             charge.Soaclosed = true;
                             charge.DatetimeModified = DateTime.Now;
                             charge.UserModified = "admin"; // need update in the future 
@@ -190,17 +190,17 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach(var item in listPartners)
                 {
                     var jobId = IsHouseBillID == true ? ((eFMSDataContext)DataContext.DC).OpsTransaction.Where(x => x.Hblid == id).FirstOrDefault()?.Id : id;
-                    var SOA = DataContext.Where(x => x.PartnerId == item.Id && x.JobId== jobId).ToList();
-                    List<object> listSOA = new List<object>();
-                    foreach(var soa in SOA)
+                    var cdNotes = DataContext.Where(x => x.PartnerId == item.Id && x.JobId== jobId).ToList();
+                    List<object> listCDNote = new List<object>();
+                    foreach(var cdNote in cdNotes)
                     {
-                        var chargesOfSOA = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Soano == soa.Code).ToList();
-                        listSOA.Add(new { soa, total_charge= chargesOfSOA.Count });                      
+                        var chargesOfCDNote = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Cdno == cdNote.Code).ToList();
+                        listCDNote.Add(new { cdNote, total_charge= chargesOfCDNote.Count });                      
 
                     }
 
-                    var obj = new { item.PartnerNameEn, item.PartnerNameVn, item.Id, listSOA };
-                    if (listSOA.Count > 0)
+                    var obj = new { item.PartnerNameEn, item.PartnerNameVn, item.Id, listCDNote };
+                    if (listCDNote.Count > 0)
                     {
                         returnList.Add(obj);
                     }
@@ -262,23 +262,23 @@ namespace eFMS.API.Documentation.DL.Services
             CatPlace pol = new CatPlace();
             CatPlace pod = new CatPlace();
 
-            var Shipment1 = ((eFMSDataContext)DataContext.DC).CsTransaction.Where(x => x.Id == JobId).FirstOrDefault();
-            var Shipment2 = ((eFMSDataContext)DataContext.DC).OpsTransaction.Where(x => x.Id == JobId).FirstOrDefault();
+            var transaction = ((eFMSDataContext)DataContext.DC).CsTransaction.Where(x => x.Id == JobId).FirstOrDefault();
+            var opsTansaction = ((eFMSDataContext)DataContext.DC).OpsTransaction.Where(x => x.Id == JobId).FirstOrDefault();
 
-            if(Shipment1 != null)
+            if(transaction != null)
             {
-                pol = ((eFMSDataContext)DataContext.DC).CatPlace.Where(x => x.Id == Shipment1.Pol).FirstOrDefault();
-                pod = ((eFMSDataContext)DataContext.DC).CatPlace.Where(x => x.Id == Shipment1.Pod).FirstOrDefault();
+                pol = ((eFMSDataContext)DataContext.DC).CatPlace.Where(x => x.Id == transaction.Pol).FirstOrDefault();
+                pod = ((eFMSDataContext)DataContext.DC).CatPlace.Where(x => x.Id == transaction.Pod).FirstOrDefault();
             }
             else
             {
-                pol = ((eFMSDataContext)DataContext.DC).CatPlace.Where(x => x.Id == Shipment2.Pol).FirstOrDefault();
-                pod = ((eFMSDataContext)DataContext.DC).CatPlace.Where(x => x.Id == Shipment2.Pod).FirstOrDefault();
+                pol = ((eFMSDataContext)DataContext.DC).CatPlace.Where(x => x.Id == opsTansaction.Pol).FirstOrDefault();
+                pod = ((eFMSDataContext)DataContext.DC).CatPlace.Where(x => x.Id == opsTansaction.Pod).FirstOrDefault();
             }
 
             
 
-            if ((Shipment1==null && Shipment2==null) || Soa == null || partner==null)
+            if ((transaction == null && opsTansaction == null) || Soa == null || partner==null)
             {
                 return null;
             }
@@ -296,7 +296,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 charge.Currency = ((eFMSDataContext)DataContext.DC).CatCurrency.First(x => x.Id == charge.CurrencyId).CurrencyName;
                 charge.ExchangeRate = (exchangeRate != null && exchangeRate.Rate != 0) ? exchangeRate.Rate : 1;
-                charge.hwbno = hb!=null ? hb.Hwbno : Shipment2.Hwbno;
+                charge.hwbno = hb!=null ? hb.Hwbno : opsTansaction.Hwbno;
                 charge.Unit = ((eFMSDataContext)DataContext.DC).CatUnit.First(x => x.Id == charge.UnitId).UnitNameEn;
                 charge.ChargeCode = catCharge.Code;
                 charge.NameEn = catCharge.ChargeNameEn;
@@ -308,9 +308,17 @@ namespace eFMS.API.Documentation.DL.Services
                      
                 HBList = HBList.Distinct().ToList().OrderBy(x => x?.Hwbno).ToList();
             }
-
-            var hbOfLadingNo = Shipment2!=null? Shipment2.Hwbno: string.Empty;
-            var mbOfLadingNo = Shipment2!=null? Shipment2.JobNo: string.Empty;
+            var hbOfLadingNo = string.Empty;
+            var mbOfLadingNo = string.Empty;
+            if (transaction != null)
+            {
+                hbOfLadingNo = transaction?.Mawb;
+            }
+            else
+            {
+                hbOfLadingNo = opsTansaction?.Hwbno;
+                mbOfLadingNo = opsTansaction?.Mblno;
+            }
             var hbConstainers = string.Empty;
             decimal? volum = 0;
             foreach(var item in HBList)
@@ -359,31 +367,39 @@ namespace eFMS.API.Documentation.DL.Services
             //    //charges
 
             //};
+            AcctSOADetailsModel soaDetails = new AcctSOADetailsModel();
+            soaDetails.PartnerNameEn = partner?.PartnerNameEn;
+            soaDetails.PartnerShippingAddress = partner?.AddressShippingEn;
+            soaDetails.PartnerTel = partner?.Tel;
+            soaDetails.PartnerTaxcode = partner?.TaxCode;
+            soaDetails.PartnerId = partner?.Id;
+            soaDetails.HbLadingNo = hbOfLadingNo;
+            soaDetails.MbLadingNo = mbOfLadingNo;
+            soaDetails.JobId = transaction != null ? transaction.Id : opsTansaction.Id;
+            soaDetails.JobNo = transaction != null ? transaction.JobNo : opsTansaction.JobNo;
+            soaDetails.Pol = pol?.NameEn;
+            if (soaDetails.PolCountry != null)
+            {
+                soaDetails.PolCountry = pol == null ? null : countries.FirstOrDefault(x => x.Id == pol.CountryId)?.NameEn;
+            }
+            soaDetails.Pod = pod?.NameEn;
+            if (countries != null)
+            {
+                soaDetails.PodCountry = pod == null ? null : countries.FirstOrDefault(x => x.Id == pod.CountryId)?.NameEn;
+            }
+            soaDetails.Vessel = transaction != null ? transaction.FlightVesselName : opsTansaction.FlightVessel;
+            soaDetails.HbConstainers = hbConstainers;
+            soaDetails.Etd = transaction != null ? transaction.Etd : opsTansaction.ServiceDate;
+            soaDetails.Eta = transaction != null ? transaction.Eta : opsTansaction.FinishDate;
+            soaDetails.IsLocked = false;
+            soaDetails.Volum = volum;
+            soaDetails.ListSurcharges = listSurcharges;
+            soaDetails.CDNote = Soa;
+            soaDetails.ProductService = opsTansaction.ProductService;
 
-            AcctSOADetailsModel SoaDetails = new AcctSOADetailsModel();
-            SoaDetails.PartnerNameEn = partner?.PartnerNameEn;
-            SoaDetails.PartnerShippingAddress = partner?.AddressShippingEn;
-            SoaDetails.PartnerTel = partner?.Tel;
-            SoaDetails.PartnerTaxcode = partner?.TaxCode;
-            SoaDetails.PartnerId = partner?.Id;
-            SoaDetails.HbLadingNo = hbOfLadingNo;
-            SoaDetails.MbLadingNo = mbOfLadingNo;
-            SoaDetails.JobId = Shipment1 != null ? Shipment1.Id : Shipment2.Id;
-            SoaDetails.Pol = pol?.NameEn;
-            SoaDetails.PolCountry = pol == null ? null : countries.Where(x => x.Id == pol.CountryId).FirstOrDefault()?.NameEn;
-            SoaDetails.Pod = pod?.NameEn;
-            SoaDetails.PodCountry = pod == null ? null : countries.Where(x => x.Id == pod.CountryId).FirstOrDefault()?.NameEn;
-            SoaDetails.Vessel = Shipment1 != null ? Shipment1.FlightVesselName : Shipment2.FlightVessel;
-            SoaDetails.HbConstainers = hbConstainers;
-            SoaDetails.Etd = Shipment1 != null ? Shipment1.Etd : Shipment2.ServiceDate;
-            SoaDetails.Eta = Shipment1 != null ? Shipment1.Eta : Shipment2.FinishDate;
-            SoaDetails.IsLocked = false;
-            SoaDetails.Volum = volum;
-            SoaDetails.ListSurcharges = listSurcharges;
-            SoaDetails.CDNote = Soa;
 
 
-            return SoaDetails;
+            return soaDetails;
 
         }
 
@@ -419,7 +435,7 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             foreach (var item in charges)
                             {
-                                item.Soano = null;
+                                item.Cdno = null;
                                 item.UserModified = cdNote.UserModified;
                                 item.DatetimeModified = DateTime.Now;
                                 ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Update(item);

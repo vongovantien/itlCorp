@@ -10,8 +10,8 @@ import { ChargeComponent } from './charge/charge.component';
 import { UnitComponent } from './unit/unit.component';
 import { StageManagementComponent } from './stage-management/stage-management.component';
 import { PartnerComponent } from './partner-data/partner.component';
-import { SelectModule } from 'ng2-select';
-import { FormsModule} from '@angular/forms';
+import { SelectModule } from 'node_modules/ng2-select';
+import { FormsModule } from 'node_modules/@angular/forms';
 import { PartnerDataAddnewComponent } from './partner-data-addnew/partner-data-addnew.component';
 import { PartnerDataDetailComponent } from './partner-data-detail/partner-data-detail.component';
 import { ChargeAddnewComponent } from './charge-addnew/charge-addnew.component';
@@ -60,7 +60,7 @@ import { ChargeImportAccountVoucherComponent } from './charge-import-account-vou
       ConsigneeComponent,
       AirShipSupComponent,
       ShipperComponent,
- 	    CurrencyComponent,
+      CurrencyComponent,
       AllPartnerComponent,
       ChargeDetailsComponent,
       WarehouseImportComponent,

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewChild, Output, EventEmitter } from 'node_modules/@angular/core';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
@@ -13,7 +13,7 @@ import { SortService } from 'src/app/shared/services/sort.service';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { SystemConstants } from 'src/constants/system.const';
-import * as lodash from 'lodash';
+import * as lodash from 'node_modules/lodash';
 
 @Component({
   selector: 'app-air-ship-sup',
@@ -27,7 +27,7 @@ export class AirShipSupComponent implements OnInit {
   criteria: any = { partnerGroup: PartnerGroupEnum.AIRSHIPSUP };
   isDesc: boolean = false;
   keySortDefault: string = "id";
-  @ViewChild(PaginationComponent,{static:false}) child; 
+  @ViewChild(PaginationComponent, { static: false }) child;
   @Output() deleteConfirm = new EventEmitter<any>();
   @Output() detail = new EventEmitter<any>();
   constructor(private baseService: BaseService,
@@ -41,21 +41,21 @@ export class AirShipSupComponent implements OnInit {
     this.getPartnerData(pager, this.criteria);
   }
   async getPartnerData(pager: PagerSetting, criteria?: any) {
-    if(criteria != undefined){
+    if (criteria != undefined) {
       this.criteria = criteria;
     }
-    let responses = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.paging+"?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, false, true);
+    let responses = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, false, true);
     this.airShips = responses.data;
     this.pager.totalItems = responses.totalItems;
   }
   onSortChange(column) {
-    if(column.dataType != 'boolean'){
+    if (column.dataType != 'boolean') {
       let property = column.primaryKey;
       this.isDesc = !this.isDesc;
       this.airShips = this.sortService.sort(this.airShips, property, this.isDesc);
     }
   }
-  
+
   showConfirmDelete(item) {
     //this.partner = item;
     this.deleteConfirm.emit(item);
@@ -64,12 +64,12 @@ export class AirShipSupComponent implements OnInit {
     this.detail.emit(item);
   }
 
-  async exportAirShipSup(){
-    var airShipSup = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.query,this.criteria);
-    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API){
-      airShipSup = lodash.map(airShipSup,function(ashs,index){
+  async exportAirShipSup() {
+    var airShipSup = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.query, this.criteria);
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
+      airShipSup = lodash.map(airShipSup, function (ashs, index) {
         return [
-          index+1,
+          index + 1,
           ashs['id'],
           ashs['partnerNameEn'],
           ashs['shortName'],
@@ -79,14 +79,14 @@ export class AirShipSupComponent implements OnInit {
           ashs['fax'],
           ashs['userCreatedName'],
           ashs['datetimeModified'],
-          (ashs['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+          (ashs['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
         ]
       });
     }
-    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API){
-      airShipSup = lodash.map(airShipSup,function(ashs,index){
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
+      airShipSup = lodash.map(airShipSup, function (ashs, index) {
         return [
-          index+1,
+          index + 1,
           ashs['id'],
           ashs['partnerNameVn'],
           ashs['shortName'],
@@ -96,11 +96,11 @@ export class AirShipSupComponent implements OnInit {
           ashs['fax'],
           ashs['userCreatedName'],
           ashs['datetimeModified'],
-          (ashs['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+          (ashs['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
         ]
       });
     }
-    
+
 
     const exportModel: ExportExcel = new ExportExcel();
     exportModel.title = "Partner Data - Air Ship Sup";

@@ -15,6 +15,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string HbLadingNo { get; set; }
         public string MbLadingNo { get; set; }
         public Guid JobId { get; set; }
+        public string JobNo { get; set; }
         public string Pol { get; set; }
         public string PolName { get; set; }
         public string PolCountry { get; set; }
@@ -31,5 +32,6 @@ namespace eFMS.API.Documentation.DL.Models
         public AcctCdnote CDNote { get; set; }
         public decimal? TotalCredit { get; set; }
         public decimal? TotalDebit { get; set; }
+        public string ProductService { get; set; }
     }
 }

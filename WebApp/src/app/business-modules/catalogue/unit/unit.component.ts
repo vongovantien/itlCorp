@@ -7,7 +7,7 @@ import { NgForm } from '@angular/forms';
 import { CatUnitModel } from 'src/app/shared/models/catalogue/catUnit.model';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PAGINGSETTING } from 'src/constants/paging.const';
-import * as lodash from 'lodash';
+import * as lodash from 'node_modules/lodash';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { SystemConstants } from 'src/constants/system.const';
@@ -35,19 +35,19 @@ export class UnitComponent implements OnInit {
   unitTypes: any[];
   currentUnitType: any = [];
   titleConfirmDelete = "Do you want to delete this unit";
-  @ViewChild(PaginationComponent,{static:false}) child;
+  @ViewChild(PaginationComponent, { static: false }) child;
 
-    constructor (
+  constructor(
     private excelService: ExcelService,
     private baseServices: BaseService,
     private api_menu: API_MENU,
-    private sortService: SortService) { 
-      // this.sourceData = this.baseServices.dataStorage.subscribe(data=>{
-      //   this.sourceData = data;
-      //   console.log(this.sourceData);
-      // });
-      
-    }
+    private sortService: SortService) {
+    // this.sourceData = this.baseServices.dataStorage.subscribe(data=>{
+    //   this.sourceData = data;
+    //   console.log(this.sourceData);
+    // });
+
+  }
 
   async ngOnInit() {
     this.initPager();
@@ -110,12 +110,12 @@ export class UnitComponent implements OnInit {
     }
   }
 
-  async getUnitTypes(){
+  async getUnitTypes() {
     const response = await this.baseServices.getAsync(this.api_menu.Catalogue.Unit.getUnitTypes, false, false);
-    if(response){
-      this.unitTypes = response.map(x=>({"text":x.displayName,"id":x.value}));
+    if (response) {
+      this.unitTypes = response.map(x => ({ "text": x.displayName, "id": x.value }));
     }
-    else{
+    else {
       this.unitTypes = [];
     }
   }
@@ -128,9 +128,9 @@ export class UnitComponent implements OnInit {
   async showUpdateUnit(id) {
     this.currentUnitType = [];
     this.UnitToUpdate = await this.baseServices.getAsync(this.api_menu.Catalogue.Unit.getById + id, false, true);
-    if(this.UnitToUpdate != null){
+    if (this.UnitToUpdate != null) {
       const index = this.unitTypes.findIndex(x => x.id == this.UnitToUpdate.unitType);
-      if(index > -1){
+      if (index > -1) {
         this.currentUnitType = [this.unitTypes[index]];
       }
     }
@@ -140,7 +140,7 @@ export class UnitComponent implements OnInit {
     if (action == "yes") {
       if (form.form.status != "INVALID") {
         const res = await this.baseServices.putAsync(this.api_menu.Catalogue.Unit.update, this.UnitToUpdate);
-        if(res){
+        if (res) {
           this.initPager();
           await this.getUnits();
           form.onReset();
@@ -204,31 +204,31 @@ export class UnitComponent implements OnInit {
   async export() {
     /**Prepare data */
     var units = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, this.searchObject);
-    
-    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.ENGLISH_API){
 
-      units = lodash.map(units, function (unit,index) {
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
+
+      units = lodash.map(units, function (unit, index) {
         return [
-          index+1,
+          index + 1,
           unit.code,
           unit.unitNameVn,
           unit.unitNameEn,
           unit.descriptionEn,
           unit.descriptionVn,
-          (unit.inactive===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+          (unit.inactive === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
         ]
       });
     }
-    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.VIETNAM_API){
-      units = lodash.map(units, function (unit,index) {
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
+      units = lodash.map(units, function (unit, index) {
         return [
-          index+1,
+          index + 1,
           unit.code,
           unit.unitNameVn,
           unit.unitNameEn,
           unit.descriptionEn,
           unit.descriptionVn,
-          (unit.inactive===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+          (unit.inactive === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
         ]
       });
     }
@@ -247,7 +247,7 @@ export class UnitComponent implements OnInit {
       { name: "Name En", width: 25 },
       { name: "Description En", width: 25 },
       { name: "Description Vn", width: 25 },
-      { name: "Inactive", width: 25 }];   
+      { name: "Inactive", width: 25 }];
 
     exportModel.data = units;
     this.excelService.generateExcel(exportModel);
@@ -259,12 +259,12 @@ export class UnitComponent implements OnInit {
 
   /*ng-select 2
   */
- value: any;
- selected(value: any): void{
-  this.UnitToAdd.unitType = value.id;
-  this.UnitToUpdate.unitType = value.id;
- }
- refreshValue(value: any): void {
+  value: any;
+  selected(value: any): void {
+    this.UnitToAdd.unitType = value.id;
+    this.UnitToUpdate.unitType = value.id;
+  }
+  refreshValue(value: any): void {
     this.value = value;
   }
   public removed(value: any): void {

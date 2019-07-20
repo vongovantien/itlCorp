@@ -5,8 +5,8 @@ import { SystemRepo } from 'src/app/shared/repositories';
 import { GlobalState } from 'src/app/global-state';
 import { AppList } from 'src/app/app.list';
 
-import { takeUntil } from 'rxjs/operators';
-import { forkJoin } from 'rxjs';
+import { takeUntil } from 'node_modules/rxjs/operators';
+import { forkJoin } from 'node_modules/rxjs';
 import { SortService } from 'src/app/shared/services';
 @Component({
     selector: 'app-statement-of-account-new',
