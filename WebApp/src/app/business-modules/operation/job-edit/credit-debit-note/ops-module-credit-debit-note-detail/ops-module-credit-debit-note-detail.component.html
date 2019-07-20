@@ -1,11 +1,10 @@
-<div class="modal fade" id="ops-credit-debit-note-detail-modal" data-backdrop="static" role="dialog" aria-labelledby=""
-    aria-hidden="true">
+<div class="modal fade" bsModal #popup="bs-modal" role="dialog" *ngIf="!!CDNoteDetails">
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content">
-            <div class="modal-header" *ngIf="CDNoteDetails!=null">
+            <div class="modal-header">
                 <h5 class="modal-title">Detail<span class="m--margin-left-5">Credit Note</span>&nbsp;<span
                         class="m--font-danger m--margin-left-5">{{CDNoteDetails.cdNote.code}}</span></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" (click)="hide()">
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <div class="modal-actions c-button-actions">
@@ -19,186 +18,104 @@
                     </button>
                 </div>
             </div>
-            <div class="modal-body" *ngIf="CDNoteDetails!=null">
-                <!--begin::Form-->
+            <div class="modal-body">
                 <div class="m-form m-form--state">
                     <div class="div-inside bg-secondary m--margin-bottom-15">
                         <div class="row">
-                            <div class="col-xl-4">
-                                <div class="m--margin-bottom-10">
-                                    <div class="m--margin-top-5">
-                                        <span class="m--font-bolder">
-                                            Subject To :
-                                        </span>
-                                        <span>{{CDNoteDetails.partnerNameEn}}</span>
-                                    </div>
-                                    <div class="m--margin-top-5">
-                                        <span class="m--font-bolder">
-                                            Address:
-                                        </span>
-                                        <span>{{CDNoteDetails.partnerShippingAddress}}</span>
-                                    </div>
-                                    <div class="m--margin-top-5">
-                                        <span class="m--font-bolder">
-                                            Tel:
-                                        </span>
-                                        <span>{{CDNoteDetails.partnerTel}}</span>
-                                    </div>
-                                    <div class="m--margin-top-5">
-                                        <span class="m--font-bolder">
-                                            Taxcode:
-                                        </span>
-                                        <span>{{CDNoteDetails.partnerTaxcode}}</span>
-                                    </div>
+                            <div class="col-lg-4">
+                                <div class>
+                                    <span class="font-weight-bold"> Subject To : </span>
+                                    {{CDNoteDetails.partnerNameEn}}
                                 </div>
-                                <div class="m--margin-bottom-10">
-                                    <!-- <span class="m--font-bolder">
-                                        House Bill of Lading
-                                    </span>
-                                    <span>{{CDNoteDetails.partnerTaxcode}}</span> -->
+                                <div class="d-flex">
+                                    <span class="font-weight-bold"> Address: </span>
+                                    {{CDNoteDetails.partnerShippingAddress}}
+                                </div>
+                                <div>
+                                    <span class="font-weight-bold"> Tel: </span>
+                                    {{CDNoteDetails.partnerTel}}
+                                </div>
+                                <div>
+                                    <span class="font-weight-bold"> Taxcode: </span>
+                                    {{CDNoteDetails.partnerTaxcode}}
+                                </div>
+                                <div class="m--margin-top-10">
                                     <div class="m--margin-top-5">
-                                        <span class="m--font-bolder">
-                                            Port of Loading:
-                                        </span>
-                                        <span>{{ CDNoteDetails.pol }}, {{CDNoteDetails.polCountry}}</span>
+                                        <span class="font-weight-bold"> Port of Loading: </span>
+                                        {{ CDNoteDetails.pol }}, {{CDNoteDetails.polCountry}}
                                     </div>
                                     <div class="m--margin-top-5">
-                                        <span class="m--font-bolder">
-                                            Port of Destination:
-                                        </span>
-                                        <span>{{ CDNoteDetails.pod }}, {{CDNoteDetails.podCountry}}</span>
+                                        <span class="font-weight-bold"> Port of Destination: </span>
+                                        {{ CDNoteDetails.pod }}, {{CDNoteDetails.podCountry}}
                                     </div>
                                     <div class="m--margin-top-5">
-                                        <span class="m--font-bolder">
-                                            Package Quantity:
-                                        </span>
-                                        <span></span>
+                                        <span class="font-weight-bold"> Package Quantity: </span>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-xl-8">
-                                <div class="row">
-                                    <div class="col-xl-6">
-                                        <div class="m--margin-bottom-10">
-                                            <span class="m--font-bolder">
-                                                Job ID:
-                                            </span>
-                                            <span>{{CDNoteDetails.jobNo}}</span>
-                                        </div>
+                            <div class="col-lg-4">
+                                <div>
+                                    <span class="font-weight-bold"> Job ID: </span>
+                                    {{CDNoteDetails.jobId}}
+                                </div>
+                                <div>
+                                    <span class="font-weight-bold"> Master Bill of Lading No: </span>
+                                    {{CDNoteDetails.mbLadingNo}}
+                                </div>
+                                <div>
+                                    <span class="font-weight-bold"> Service Mode: </span>
+                                    {{CDNoteDetails.serviceMode}}
+                                </div>
+                                <div>
+                                    <span class="font-weight-bold"> Service Date: </span>
+                                    {{'dd/mm/yyyy'}}
+                                </div>
+                                <div class="m--margin-top-10">
+                                    <div class="m--margin-top-5">
+                                        <span class="font-weight-bold"> GW: </span>
+                                        {{ CDNoteDetails.pol }}, {{CDNoteDetails.polCountry}}
                                     </div>
-                                    <div class="col-xl-6">
-                                        <div class="m--margin-bottom-10">
-                                            <span class="m--font-bolder">
-                                                Master Bill of Lading:
-                                            </span>
-                                            <span>{{CDNoteDetails.mbLadingNo}}</span>
-                                        </div>
+                                    <div class="m--margin-top-5">
+                                        <span class="font-weight-bold">Container Quantity: </span>
+                                        {{ CDNoteDetails.hbConstainers }}
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-xl-6">
-                                        <div class="m--margin-bottom-10">
-                                            <span class="m--font-bolder">
-                                                Product Service:
-                                            </span>
-                                            <span>{{CDNoteDetails.pol}} , {{CDNoteDetails.polCountry}}</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-6">
-                                        <div class="m--margin-bottom-10">
-                                            <span class="m--font-bolder">
-                                                Port of destination:
-                                            </span>
-                                            <span>{{CDNoteDetails.pod}} , {{CDNoteDetails.podCountry}}</span>
-                                        </div>
-                                    </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div>
+                                    <span class="font-weight-bold"> House Bill of Lading No: </span>
+                                    {{CDNoteDetails.hbLadingNo}}
                                 </div>
-                                <div class="row">
-                                    <div class="col-xl-6">
-                                        <div class="m--margin-bottom-10">
-                                            <span class="m--font-bolder">
-                                                Estimated Time of Departure:
-                                            </span>
-                                            <span>{{CDNoteDetails.etd | date : 'dd/MM/yyyy'}}</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-6">
-                                        <div class="m--margin-bottom-10">
-                                            <span class="m--font-bolder">
-                                                Estimated Time of Arrival:
-                                            </span>
-                                            <span>{{CDNoteDetails.eta | date : 'dd/MM/yyyy'}}</span>
-                                        </div>
-                                    </div>
+                                <div>
+                                    <span class="font-weight-bold">Product Service: </span>
+                                    {{CDNoteDetails.productService}}
                                 </div>
-                                <div class="row">
-                                    <div class="col-xl-6">
-                                        <div class="m--margin-bottom-10">
-                                            <span class="m--font-bolder">
-                                                Vessel:
-                                            </span>
-                                            <span>{{CDNoteDetails.vessel}}</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-6">
-                                        <div class="m--margin-bottom-10">
-                                            <span class="m--font-bolder">
-                                                Volume:
-                                            </span>
-                                            <span>{{CDNoteDetails.volum}} CBM</span>
-                                        </div>
-                                    </div>
+                                <div>
+                                    <span class="font-weight-bold">Shipment Mode: </span>
+                                    {{CDNoteDetails.jobNo}}
                                 </div>
-                                <div class="row">
-                                    <div class="col-xl-6">
-                                        <div class="m--margin-bottom-10">
-                                            <span class="m--font-bolder">
-                                                Container Quantity:
-                                            </span>
-                                            <span>{{CDNoteDetails.hbConstainers}}</span>
-                                        </div>
+                                <div>
+                                    <span class="font-weight-bold">Finish Date: </span>
+                                    {{CDNoteDetails.etd | date: 'dd/MM/yyyy'}}
+                                </div>
+                                <div class="m--margin-top-10">
+                                    <div class="m--margin-top-5">
+                                        <span class="font-weight-bold"> CPM: </span>
+                                        -
                                     </div>
-                                    <div class="col-xl-6">
-                                        <div class="m--margin-bottom-10">
-                                            <span class="m--font-bolder">
-                                                SOA:
-                                            </span>
-                                            <span>{{CDNoteDetails.cdNote.code}}</span>
-                                        </div>
-                                        <div class="m--margin-bottom-10">
-                                            <span class="m--font-bolder">
-                                                Locked:
-                                            </span>
-                                            <span class="m--font-brand">{{CDNoteDetails.isLocked.toString()}}</span>
-                                            <!-- <span class="m--font-danger">Yes</span> -->
-                                        </div>
+                                    <div class="m--margin-top-5">
+                                        <span class="font-weight-bold">SOA: </span>
+                                        {{CDNoteDetails.cdNote.code}}
+                                    </div>
+                                    <div class="m--margin-top-5">
+                                        <span class="font-weight-bold">Locked: </span>
+                                        {{CDNoteDetails.isLocked.toString()}}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!--begin::m-portlet -->
-                    <!--begin: Search Form -->
-                    <!-- <div class="m-form m-form--label-align-right">
-                    <div class="row align-items-center">
-                        <div class="col-lg-4 order-2 order-lg-1">
-                            <div class="form-group">
-                                <div class="m-input-icon m-input-icon--left">
-                                    <input type="text" class="form-control m-input m-input--square"
-                                        placeholder="Search...">
-                                    <span class="m-input-icon__icon m-input-icon__icon--left">
-                                        <span>
-                                            <i class="la la-search"></i>
-                                        </span>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
-                    <!--end: Search Form -->
-                    <!--begin: Datatable-->
                     <div class="table-wrapper fit-height-div">
                         <table class="table table-striped table-brand dataTable">
                             <thead>
@@ -280,25 +197,23 @@
                             </tbody>
                         </table>
                     </div>
-                    <!--end: Datatable-->
                     <div class="m--margin-top-10">
                         <div class="m-alert m-alert--square alert alert-info m--align-right m--marginless">
                             <div class="row">
                                 <div class="col">
-                                    <!-- <strong>Total Credit:</strong><span class="m--margin-left-5">123456789</span> -->
+                                    <strong>Total Credit:</strong><span class="m--margin-left-5">123456789</span>
                                 </div>
                                 <div class="col-md-auto">
-                                    <!-- <strong>Total Dedit:</strong> <span class="m--margin-left-5">123456789</span> -->
+                                    <strong>Total Dedit:</strong> <span class="m--margin-left-5">123456789</span>
                                 </div>
                             </div>
                         </div>
                         <div class="m-alert m-alert--square alert alert-brand m--align-right m--marginless">
-                            <!-- <strong>Balance Amount:</strong><span class="m--margin-left-5">Total Credit - Total Dedit</span> -->
+                            <strong>Balance Amount:</strong><span class="m--margin-left-5">Total Credit - Total
+                                Dedit</span>
                         </div>
                     </div>
-                    <!--end::m-portlet -->
                 </div>
-                <!--end::Form-->
             </div>
             <div class="modal-footer m--align-center">
                 <button class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
@@ -318,8 +233,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                    data-dismiss="modal">
+                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" (click)="hide">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
@@ -332,6 +246,4 @@
     </div>
 </div>
 
-<!--end::preview-test-modal-->
 <app-report-preview [data]="dataReport" *ngIf="dataReport" [modalId]="previewModalId"></app-report-preview>
-<!--end::preview-modal-->

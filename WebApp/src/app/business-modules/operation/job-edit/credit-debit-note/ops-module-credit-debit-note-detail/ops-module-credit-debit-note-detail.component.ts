@@ -3,6 +3,7 @@ import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDetails.model';
 import { Subject } from 'rxjs/internal/Subject';
+import { PopupBase } from 'src/app/popup.base';
 declare var $: any;
 
 @Component({
@@ -10,9 +11,16 @@ declare var $: any;
   templateUrl: './ops-module-credit-debit-note-detail.component.html',
   styleUrls: ['./ops-module-credit-debit-note-detail.component.scss']
 })
-export class OpsModuleCreditDebitNoteDetailComponent implements OnInit, AfterViewChecked, OnDestroy {
+export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
 
-  open: boolean = false;
+  constructor(
+    private baseServices: BaseService,
+    private api_menu: API_MENU,
+    private cdr: ChangeDetectorRef
+  ) {
+    super();
+   }
+
   STORAGE_DATA: any = null;
   currentSOANo: string = null;
   currentJobID: string = null;
@@ -20,16 +28,11 @@ export class OpsModuleCreditDebitNoteDetailComponent implements OnInit, AfterVie
   previewModalId = "preview-modal";
   dataReport: any;
 
+  subscribe: Subject<any> = new Subject();
+
   ngAfterViewChecked(): void {
-    this.open = true;
     this.cdr.detectChanges();
   }
-
-  constructor(
-    private baseServices: BaseService,
-    private api_menu: API_MENU,
-    private cdr: ChangeDetectorRef
-  ) { }
 
   ngOnInit() {
     this.StateChecking();
@@ -47,15 +50,6 @@ export class OpsModuleCreditDebitNoteDetailComponent implements OnInit, AfterVie
     this.baseServices.setData("CDNoteDetails", this.CDNoteDetails);
   }
 
-
-  /**
-   * This function use to check changing data from `dataStorage` in BaseService 
-   * `dataStorage` is something same like store in `ReactJs` or `VueJS` and allow store any data that belong app's life circle
-   * you can access data from `dataStorage` like code below, you should check if data have any change with current value, if you dont check 
-   * and call HTTP request or something like that can cause a `INFINITY LOOP`.  
-   */
-
-  subscribe: Subject<any> = new Subject();
   StateChecking() {
     this.subscribe = <any>this.baseServices.dataStorage.subscribe(data => {
       this.STORAGE_DATA = data;
@@ -74,7 +68,8 @@ export class OpsModuleCreditDebitNoteDetailComponent implements OnInit, AfterVie
   }
 
   ngOnDestroy(): void {
-    this.subscribe.unsubscribe();
+    this.subscribe.next();
+    this.subscribe.complete();
   }
   Close() {
     $('#ops-credit-debit-note-detail-modal').modal('hide');
