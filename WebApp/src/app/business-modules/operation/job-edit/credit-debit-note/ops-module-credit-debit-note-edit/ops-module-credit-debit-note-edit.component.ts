@@ -3,11 +3,12 @@ import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import filter from 'lodash/filter';
 import map from 'lodash/map';
-import concat from 'lodash/concat'
-import cloneDeep from 'lodash/cloneDeep'
+import concat from 'lodash/concat';
+import cloneDeep from 'lodash/cloneDeep';
 import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
 import { NgForm } from '@angular/forms';
 import { Subject } from 'rxjs/internal/Subject';
+import { PopupBase } from 'src/app/popup.base';
 declare var $: any;
 
 @Component({
@@ -15,7 +16,7 @@ declare var $: any;
   templateUrl: './ops-module-credit-debit-note-edit.component.html',
   styleUrls: ['./ops-module-credit-debit-note-edit.component.scss']
 })
-export class OpsModuleCreditDebitNoteEditComponent implements OnInit, OnDestroy {
+export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements OnInit, OnDestroy {
   listChargeOfPartner: any[] = [];
   listRemainingCharges: any[] = [];
   constListChargeOfPartner: any[] = [];
@@ -26,7 +27,9 @@ export class OpsModuleCreditDebitNoteEditComponent implements OnInit, OnDestroy 
   constructor(
     private baseServices: BaseService,
     private api_menu: API_MENU
-  ) { }
+  ) {
+    super();
+  }
 
   ngOnInit() {
     this.StateChecking();
@@ -250,12 +253,12 @@ export class OpsModuleCreditDebitNoteEditComponent implements OnInit, OnDestroy 
     $('#ops-credit-debit-note-detail-modal').modal('show');
   }
 
-      /**
-         * This function use to check changing data from `dataStorage` in BaseService 
-         * `dataStorage` is something same like store in `ReactJs` or `VueJS` and allow store any data that belong app's life circle
-         * you can access data from `dataStorage` like code below, you should check if data have any change with current value, if you dont check 
-         * and call HTTP request or something like that can cause a `INFINITY LOOP`.  
-      */
+  /**
+     * This function use to check changing data from `dataStorage` in BaseService 
+     * `dataStorage` is something same like store in `ReactJs` or `VueJS` and allow store any data that belong app's life circle
+     * you can access data from `dataStorage` like code below, you should check if data have any change with current value, if you dont check 
+     * and call HTTP request or something like that can cause a `INFINITY LOOP`.  
+  */
   subscribe: Subject<any> = new Subject();
   StateChecking() {
     this.subscribe = <any>this.baseServices.dataStorage.subscribe(data => {

@@ -17,7 +17,7 @@ namespace eFMS.API.Documentation.DL.IService
         OpsTransactionResult Paging(OpsTransactionCriteria criteria, int page, int size, out int rowsCount);
         OpsTransactionModel GetDetails(Guid id);
         bool CheckAllowDelete(Guid jobId);
-        Crystal PreviewCDNOte(AcctSOADetailsModel model);
+        Crystal PreviewCDNOte(AcctCDNoteDetailsModel model);
         HandleState ConvertClearanceToJob(OpsTransactionClearanceModel model);
         HandleState ConvertExistedClearancesToJobs(List<OpsTransactionClearanceModel> list);
     }

@@ -1,8 +1,9 @@
-import { Component, OnInit, AfterViewChecked, Input, ChangeDetectorRef, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, OnDestroy, ChangeDetectorRef } from '@angular/core';
+
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDetails.model';
-import { Subject } from 'rxjs/internal/Subject';
+import { Subject } from 'rxjs';
 declare var $: any;
 
 @Component({
@@ -91,11 +92,11 @@ export class OpsModuleCreditDebitNoteDetailComponent implements OnInit, AfterVie
       var _this = this;
       var checkExist = setInterval(function () {
         if ($('#frame').length) {
-            console.log("Exists!");
-            $('#' + _this.previewModalId).modal('show');
-            clearInterval(checkExist);
+          console.log("Exists!");
+          $('#' + _this.previewModalId).modal('show');
+          clearInterval(checkExist);
         }
-     }, 100);
+      }, 100);
     }
   }
 

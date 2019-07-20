@@ -50,6 +50,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     selectedService: any[] = [];
     note: string = '';
 
+    items: any[] = [];
+
     isSubmited: boolean = false;
 
     constructor(
@@ -137,7 +139,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         switch (type.toLowerCase()) {
             case 'partner':
                 this.selectedPartner = { field: 'code', value: data.code };
-                console.log(this.selectedPartner); 
+                console.log(this.selectedPartner);
                 break;
             case 'date-mode':
                 this.selectedDateMode = data;

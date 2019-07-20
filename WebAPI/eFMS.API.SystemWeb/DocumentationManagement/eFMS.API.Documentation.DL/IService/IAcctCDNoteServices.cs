@@ -18,8 +18,8 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState UpdateCDNote(AcctCdnoteModel model);
         HandleState DeleteCDNote(Guid idCDNote);
         List<object> GroupCDNoteByPartner(Guid JobId,bool IsHouseBillID);
-        AcctSOADetailsModel GetCDNoteDetails(Guid JobId, string CDNoteCode);
-        Crystal Preview(AcctSOADetailsModel model);
+        AcctCDNoteDetailsModel GetCDNoteDetails(Guid JobId, string CDNoteCode);
+        Crystal Preview(AcctCDNoteDetailsModel model);
 
     }
 }

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace eFMS.API.Documentation.DL.Models
 {
-    public class AcctSOADetailsModel
+    public class AcctCDNoteDetailsModel
     {
         public string PartnerNameEn { get; set; }
         public string PartnerShippingAddress { get; set; }
@@ -33,5 +33,6 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal? TotalCredit { get; set; }
         public decimal? TotalDebit { get; set; }
         public string ProductService { get; set; }
+        public string ServiceMode { get; set; }
     }
 }

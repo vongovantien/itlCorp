@@ -1,8 +1,8 @@
 ﻿using CrystalDecisions.CrystalReports.Engine;
 using CrystalDecisions.Web;
-using ITL.COMMON;
-using ITL.Connection.OLEDB;
-using ITL.WebCrystalReport;
+//using ITL.COMMON;
+//using ITL.Connection.OLEDB;
+//using ITL.WebCrystalReport;
 using Newtonsoft.Json;
 using ReportPerview.Common;
 using ReportPerview.Models;

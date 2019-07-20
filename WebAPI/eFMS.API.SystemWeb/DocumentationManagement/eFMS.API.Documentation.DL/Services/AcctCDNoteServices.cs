@@ -253,44 +253,44 @@ namespace eFMS.API.Documentation.DL.Services
             return listCharges;
         }
 
-        public AcctSOADetailsModel GetCDNoteDetails(Guid JobId, string CDNoteCode)
+        public AcctCDNoteDetailsModel GetCDNoteDetails(Guid JobId, string CDNoteCode)
         {
             
-            var Soa = DataContext.Where(x => x.Code == CDNoteCode).FirstOrDefault();
-            var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == Soa.PartnerId).FirstOrDefault();
+            var cdNote = DataContext.Where(x => x.Code == CDNoteCode).FirstOrDefault();
+            var partner = ((eFMSDataContext)DataContext.DC).CatPartner.FirstOrDefault(x => x.Id == cdNote.PartnerId);
 
             CatPlace pol = new CatPlace();
             CatPlace pod = new CatPlace();
 
-            var transaction = ((eFMSDataContext)DataContext.DC).CsTransaction.Where(x => x.Id == JobId).FirstOrDefault();
-            var opsTansaction = ((eFMSDataContext)DataContext.DC).OpsTransaction.Where(x => x.Id == JobId).FirstOrDefault();
+            var transaction = ((eFMSDataContext)DataContext.DC).CsTransaction.FirstOrDefault(x => x.Id == JobId);
+            var opsTansaction = ((eFMSDataContext)DataContext.DC).OpsTransaction.FirstOrDefault(x => x.Id == JobId);
 
             if(transaction != null)
             {
-                pol = ((eFMSDataContext)DataContext.DC).CatPlace.Where(x => x.Id == transaction.Pol).FirstOrDefault();
-                pod = ((eFMSDataContext)DataContext.DC).CatPlace.Where(x => x.Id == transaction.Pod).FirstOrDefault();
+                pol = ((eFMSDataContext)DataContext.DC).CatPlace.FirstOrDefault(x => x.Id == transaction.Pol);
+                pod = ((eFMSDataContext)DataContext.DC).CatPlace.FirstOrDefault(x => x.Id == transaction.Pod);
             }
             else
             {
-                pol = ((eFMSDataContext)DataContext.DC).CatPlace.Where(x => x.Id == opsTansaction.Pol).FirstOrDefault();
-                pod = ((eFMSDataContext)DataContext.DC).CatPlace.Where(x => x.Id == opsTansaction.Pod).FirstOrDefault();
+                pol = ((eFMSDataContext)DataContext.DC).CatPlace.FirstOrDefault(x => x.Id == opsTansaction.Pol);
+                pod = ((eFMSDataContext)DataContext.DC).CatPlace.FirstOrDefault(x => x.Id == opsTansaction.Pod);
             }
 
             
 
-            if ((transaction == null && opsTansaction == null) || Soa == null || partner==null)
+            if ((transaction == null && opsTansaction == null) || cdNote == null || partner==null)
             {
                 return null;
             }
             
-            var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Soano == CDNoteCode).ToList();
+            var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Cdno == CDNoteCode).ToList();
 
             List<CsTransactionDetail> HBList = new List<CsTransactionDetail>();
             List<CsShipmentSurchargeDetailsModel> listSurcharges = new List<CsShipmentSurchargeDetailsModel>();
             foreach(var item in charges)
             {
                 var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item);               
-                var hb = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.Id == item.Hblid).FirstOrDefault();
+                var hb = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.FirstOrDefault(x => x.Id == item.Hblid);
                 var catCharge = ((eFMSDataContext)DataContext.DC).CatCharge.First(x => x.Id == charge.ChargeId);
                 var exchangeRate = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == item.ExchangeDate.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == "VND" && x.Inactive == false)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
 
@@ -336,38 +336,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             var countries = ((eFMSDataContext)DataContext.DC).CatCountry.ToList();
-
-
-
-            //var returnObj = new
-            //{
-            //    partnerNameEn = partner?.PartnerNameEn,
-            //    partnerShippingAddress = partner?.AddressShippingEn,
-            //    partnerTel = partner?.Tel,
-            //    partnerTaxcode = partner?.TaxCode,
-            //    partnerId = partner?.Id,
-            //    hbLadingNo = hbOfLadingNo,
-            //    mbLadingNo = mbOfLadingNo,
-            //    jobId = Shipment1 != null? Shipment1.Id:Shipment2.Id, 
-            //    pol = pol?.NameEn,
-            //    polCountry = pol==null?null:countries.Where(x => x.Id == pol.CountryId).FirstOrDefault()?.NameEn,
-
-            //    pod = pod?.NameEn,
-            //    podCountry = pod==null?null:countries.Where(x => x.Id == pod.CountryId).FirstOrDefault()?.NameEn,
-
-            //    vessel = Shipment1!=null?Shipment1.FlightVesselName:Shipment2.FlightVessel, 
-            //    hbConstainers,
-            //    etd= Shipment1!=null?Shipment1.Etd:Shipment2.ServiceDate,  //Shipment?.Etd,
-            //    eta= Shipment1!=null?Shipment1.Eta:Shipment2.FinishDate, //Shipment?.Eta,
-            //    //soaNo = Soa.Code,
-            //    isLocked = false, // need update later 
-            //    volum,
-            //    listSurcharges,
-            //    Soa
-            //    //charges
-
-            //};
-            AcctSOADetailsModel soaDetails = new AcctSOADetailsModel();
+            AcctCDNoteDetailsModel soaDetails = new AcctCDNoteDetailsModel();
             soaDetails.PartnerNameEn = partner?.PartnerNameEn;
             soaDetails.PartnerShippingAddress = partner?.AddressShippingEn;
             soaDetails.PartnerTel = partner?.Tel;
@@ -394,8 +363,9 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.IsLocked = false;
             soaDetails.Volum = volum;
             soaDetails.ListSurcharges = listSurcharges;
-            soaDetails.CDNote = Soa;
+            soaDetails.CDNote = cdNote;
             soaDetails.ProductService = opsTansaction.ProductService;
+            soaDetails.ServiceMode = opsTansaction.ServiceMode;
 
 
 
@@ -455,7 +425,7 @@ namespace eFMS.API.Documentation.DL.Services
             return hs;
         }
 
-        public Crystal Preview(AcctSOADetailsModel model)
+        public Crystal Preview(AcctCDNoteDetailsModel model)
         {
             if (model == null)
             {

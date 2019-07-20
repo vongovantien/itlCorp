@@ -173,7 +173,7 @@ namespace eFMS.API.Documentation.DL.Services
             return list;
         }
 
-        public Crystal PreviewCDNOte(AcctSOADetailsModel model)
+        public Crystal PreviewCDNOte(AcctCDNoteDetailsModel model)
         {
             if (model == null)
             {

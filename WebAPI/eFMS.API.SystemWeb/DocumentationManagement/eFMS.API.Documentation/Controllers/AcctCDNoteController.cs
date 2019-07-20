@@ -95,14 +95,14 @@ namespace eFMS.API.Documentation.Controllers
         [HttpGet]
         [Route("GetDetails")]
         //[Authorize]
-        public AcctSOADetailsModel Get(Guid JobId,string soaNo)
+        public AcctCDNoteDetailsModel Get(Guid JobId,string soaNo)
         {
             return cdNoteServices.GetCDNoteDetails(JobId, soaNo);
         }
 
         [HttpPost]
         [Route("PreviewOpsCdNote")]
-        public IActionResult PreviewOpsCdNote(AcctSOADetailsModel model)
+        public IActionResult PreviewOpsCdNote(AcctCDNoteDetailsModel model)
         {
             var result = cdNoteServices.Preview(model);
             return Ok(result);
