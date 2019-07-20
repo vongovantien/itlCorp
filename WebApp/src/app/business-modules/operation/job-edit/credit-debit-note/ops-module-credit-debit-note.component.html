@@ -1,7 +1,6 @@
 <!--begin:: m-portlet-->
 <div class="m-portlet">
     <div class="m-portlet__body">
-        <!--begin: Search Form -->
         <div class="m-form m-form--label-align-right m--margin-bottom-10">
             <div class="row align-items-center">
                 <div class="col-lg-4 order-2 order-lg-1">
@@ -41,8 +40,6 @@
                 </div>
             </div>
         </div>
-        <!--end: Search Form -->
-        <!--begin: Datatable-->
         <div class="table-wrapper table-scrollable" id="">
             <table class="table table-striped table-brand table-collapse-group dataTable">
                 <thead>
@@ -71,7 +68,6 @@
                     </tr>
                 </thead>
                 <tbody class="tbody-group" *ngFor="let item of listCDNotes;let i = index;">
-                    <!-- begin collapse-toggle-row -->
                     <tr class="collapse-toggle-row tgroup">
                         <td colspan="8">
                             <label class="btn-toggle-collapse m--font-danger" title="view more" data-toggle="collapse"
@@ -83,8 +79,6 @@
                                 class="tgroup-title">{{item.partnerNameEn}}</span>
                         </td>
                     </tr>
-                    <!-- end of collapse-toggle-row -->
-                    <!-- begin collapse-panel-row -->
                     <tr class="collapse-panel-row">
                         <td colspan="8">
                             <div class="collapse show" id="id-cd-001">
@@ -95,15 +89,12 @@
                                                 <div class="table-actions">
                                                     <button type="button"
                                                         class="btn btn-brand btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Edit" data-toggle="modal"
-                                                        data-target="#ops-credit-debit-note-detail-modal"
-                                                        (click)="openEdit(s.cdNote.code)">
+                                                        title="Edit" (click)="openEdit(s.cdNote.code)">
                                                         <i class="la la-list"></i>
                                                     </button>
                                                     <button type="button"
                                                         class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        (click)="DeleteCDNote('confirm',s.cdNote.id)" title="Remove"
-                                                        data-toggle="modal" data-target="#confirm-delete-CDnote-modal">
+                                                        (click)="onDeleteCDNote(s.cdNote.id)" title="Remove">
                                                         <i class="la la-trash"></i>
                                                     </button>
                                                 </div>
@@ -112,9 +103,7 @@
                                                 <span>{{s.cdNote.type}}</span>
                                             </td>
                                             <td>
-                                                <a class="" href="javascript:void(0)" data-toggle="modal"
-                                                    data-target="#ops-credit-debit-note-detail-modal"
-                                                    (click)="openEdit(s.cdNote.code)">{{s.cdNote.code}}</a>
+                                                <a (click)="openEdit(s.cdNote.code)">{{s.cdNote.code}}</a>
                                             </td>
                                             <td>
                                                 <span>{{s.total_charge}}</span>
@@ -134,72 +123,19 @@
                             </div>
                         </td>
                     </tr>
-                    <!--end of collapse-panel-row -->
-
-
                 </tbody>
             </table>
         </div>
-        <!--end: Datatable-->
     </div>
 </div>
-<!--end:: m-portlet-->
 
-<!--begin:: add-credit-debit-note-modal-->
 <app-ops-module-credit-debit-note-addnew [currentJob]="currentJob"></app-ops-module-credit-debit-note-addnew>
-<!--end:: add-credit-debit-note-modal-->
 
-<!--begin:: detail-credit-debit-note-modal-->
 <app-ops-module-credit-debit-note-detail></app-ops-module-credit-debit-note-detail>
-<!--end:: detail-credit-debit-note-modal-->
 
-<!--begin:: edit-credit-debit-note-modal-->
 <app-ops-module-credit-debit-note-edit></app-ops-module-credit-debit-note-edit>
-<!--end:: edit-credit-debit-note-modal-->
 
-<!--begin:: add-remaining-charge-modal-->
 <app-ops-module-credit-debit-note-remaining-charge></app-ops-module-credit-debit-note-remaining-charge>
-<!--end:: add-remaining-charge-modal-->
 
-
-<!--begin::confirm-delete-modal-->
-<div class="modal fade" id="confirm-delete-CDnote-modal" data-backdrop="static" role="dialog" aria-labelledby=""
-    aria-hidden="true">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Delete Credit/Debit Note</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="confirm-text-block">
-                    <span>All relate infomation will be lost. Are you sure you want to delete this Credit/Debit
-                        Note?</span>
-                </div>
-            </div>
-            <div class="modal-footer m--align-center c-button-actions">
-                <button type="button" (click)="DeleteCDNote('ok')"
-                    class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span>
-                            Yes
-                        </span>
-                    </span>
-                </button>
-                <button type="reset" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                    data-dismiss="modal">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            Cancel
-                        </span>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-<!--end::confirm-delete-modal-->
+<confirm-delete-popup [title]="'Delete Credit/Debit Note'" [body]="'All relate infomation will be lost. Are you sure you want to delete this Credit/Debit
+Note?'" (onSubmit)="deleteCDNote()"></confirm-delete-popup>
