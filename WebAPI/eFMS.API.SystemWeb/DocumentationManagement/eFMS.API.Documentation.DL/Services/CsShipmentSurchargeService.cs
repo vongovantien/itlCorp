@@ -192,7 +192,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var houseBill = ((eFMSDataContext)DataContext.DC).OpsTransaction.Where(x => x.Hblid == Id).FirstOrDefault();
                 listCharges = Query(Id, null);
                 listCharges = listCharges.Where(x => (x.PayerId == PartnerId || x.ReceiverId == PartnerId || x.PaymentObjectId == PartnerId)).ToList();
-                listCharges = listCharges.Where(x => (x.Cdno == null || x.Cdno.Trim() == "")).ToList();
+                //listCharges = listCharges.Where(x => x.Cdno != null).ToList();
 
                 //foreach (var item in listCharges)
                 //{

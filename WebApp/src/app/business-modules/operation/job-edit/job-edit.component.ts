@@ -773,6 +773,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
                 this.ListBuyingRateCharges = res;
                 this.ConstListBuyingRateCharges = res;
                 this.totalBuyingCharge();
+                console.log(this.ListBuyingRateCharges);
             }
             if (type === 'SELL') {
                 this.ListSellingRateCharges = res;

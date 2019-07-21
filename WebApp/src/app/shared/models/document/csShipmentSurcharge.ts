@@ -62,4 +62,5 @@ export class CsShipmentSurcharge {
     unlockedSoasaleManStatus: String = null;
 
     isRemaining: Boolean = null;
+    isSelected: boolean = null;
 }

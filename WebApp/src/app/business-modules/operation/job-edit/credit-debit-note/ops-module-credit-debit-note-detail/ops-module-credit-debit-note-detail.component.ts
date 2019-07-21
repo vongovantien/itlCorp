@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewChecked, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, OnDestroy, ChangeDetectorRef, ViewChild, Output, EventEmitter, Input } from '@angular/core';
 
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
@@ -9,68 +9,47 @@ declare var $: any;
 
 @Component({
   selector: 'app-ops-module-credit-debit-note-detail',
-  templateUrl: './ops-module-credit-debit-note-detail.component.html',
-  styleUrls: ['./ops-module-credit-debit-note-detail.component.scss']
+  templateUrl: './ops-module-credit-debit-note-detail.component.html'
 })
 export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
-
   constructor(
     private baseServices: BaseService,
     private api_menu: API_MENU,
     private cdr: ChangeDetectorRef
   ) {
     super();
-   }
+  }
+  @Output() openEditCDNote = new EventEmitter<AcctCDNoteDetails>();
+  @Input() CDNoteDetails: AcctCDNoteDetails = null;
 
   STORAGE_DATA: any = null;
   currentSOANo: string = null;
   currentJobID: string = null;
-  CDNoteDetails: AcctCDNoteDetails = null;
+
   previewModalId = "preview-modal";
   dataReport: any;
 
   subscribe: Subject<any> = new Subject();
-
-  ngAfterViewChecked(): void {
-    this.cdr.detectChanges();
-  }
+  totalCredit: number = 0;
+  totalDebit: number = 0;
 
   ngOnInit() {
-    this.StateChecking();
   }
-
-  async getSOADetails(soaNo: string) {
-    this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.currentJobID + "&soaNo=" + soaNo);
-    console.log(this.CDNoteDetails);
-  }
-
 
   editCDNote() {
-    $('#ops-credit-debit-note-detail-modal').modal('hide');
-    $('#ops-credit-debit-note-edit-modal').modal('show');
+    // $('#ops-credit-debit-note-detail-modal').modal('hide');
+    // $('#ops-credit-debit-note-edit-modal').modal('show');
+    this.hide();
+    //this.popupEditCreditDebit.show();
     this.baseServices.setData("CDNoteDetails", this.CDNoteDetails);
-  }
-
-  StateChecking() {
-    this.subscribe = <any>this.baseServices.dataStorage.subscribe(data => {
-      this.STORAGE_DATA = data;
-      if (this.STORAGE_DATA.CurrentSOANo !== undefined && this.currentSOANo !== this.STORAGE_DATA.CurrentSOANo) {
-        this.currentSOANo = this.STORAGE_DATA.CurrentSOANo;
-        this.getSOADetails(this.currentSOANo);
-      }
-      if (this.STORAGE_DATA.CurrentOpsTransaction !== undefined) {
-        this.currentJobID = this.STORAGE_DATA.CurrentOpsTransaction.id;
-      }
-      if (this.STORAGE_DATA.SOAUpdated !== undefined && this.STORAGE_DATA.SOAUpdated) {
-        this.getSOADetails(this.currentSOANo);
-      }
-    });
-
+    this.openEditCDNote.emit(this.CDNoteDetails);
   }
 
   ngOnDestroy(): void {
-    this.subscribe.next();
-    this.subscribe.complete();
+    // this.subscribe.next();
+    // this.subscribe.complete();
+
+    this.subscribe.unsubscribe();
   }
   Close() {
     $('#ops-credit-debit-note-detail-modal').modal('hide');
@@ -81,11 +60,11 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
     if (this.CDNoteDetails.listSurcharges.length === 0) {
       this.baseServices.errorToast("This credit debit node must have at least 1 surcharge !");
     } else {
-      var response = await this.baseServices.postAsync(this.api_menu.Documentation.AcctSOA.previewCDNote, this.CDNoteDetails);
+      const response = await this.baseServices.postAsync(this.api_menu.Documentation.AcctSOA.previewCDNote, this.CDNoteDetails);
       console.log(response);
       this.dataReport = response;
-      var _this = this;
-      var checkExist = setInterval(function () {
+      const _this = this;
+      const checkExist = setInterval(function () {
         if ($('#frame').length) {
           console.log("Exists!");
           $('#' + _this.previewModalId).modal('show');

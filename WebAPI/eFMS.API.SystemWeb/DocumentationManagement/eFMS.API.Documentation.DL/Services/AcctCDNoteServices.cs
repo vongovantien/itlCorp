@@ -11,6 +11,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,17 +53,35 @@ namespace eFMS.API.Documentation.DL.Services
                 var cdNote = mapper.Map<AcctCdnote>(model);
                 cdNote.Id = Guid.NewGuid();
                 cdNote.Code = RandomCode();
-                DataContext.Add(cdNote);
+                var hs = DataContext.Add(cdNote);
 
-                foreach (var c in model.listShipmentSurcharge)
+                if (hs.Success)
                 {
-                    var charge = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Id == c.Id).FirstOrDefault();
-                    if (charge != null)
+                    foreach (var c in model.listShipmentSurcharge)
                     {
-                        charge.Cdno = cdNote.Code;
-                        charge.Soaclosed = true;
-                        charge.DatetimeModified = DateTime.Now;
-                        charge.UserModified = "admin";
+                        var charge = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Id == c.Id).FirstOrDefault();
+                        if (charge != null)
+                        {
+                            charge.Cdno = cdNote.Code;
+                            charge.Soaclosed = true;
+                            charge.DatetimeModified = DateTime.Now;
+                            charge.UserModified = "admin";
+                        }
+                        ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Update(charge);
+                    }
+                    var jobOpsTrans = ((eFMSDataContext)DataContext.DC).OpsTransaction.FirstOrDefault();
+                    if (jobOpsTrans != null)
+                    {
+                        jobOpsTrans.UserModified = model.UserModified;
+                        jobOpsTrans.ModifiedDate = DateTime.Now;
+                        ((eFMSDataContext)DataContext.DC).OpsTransaction.Update(jobOpsTrans);
+                    }
+                    var jobCSTrans = ((eFMSDataContext)DataContext.DC).CsTransaction.FirstOrDefault();
+                    if (jobCSTrans != null)
+                    {
+                        jobCSTrans.UserModified = model.UserModified;
+                        jobCSTrans.ModifiedDate = DateTime.Now;
+                        ((eFMSDataContext)DataContext.DC).CsTransaction.Update(jobCSTrans);
                     }
                 }
                 ((eFMSDataContext)DataContext.DC).SaveChanges();
@@ -90,25 +109,39 @@ namespace eFMS.API.Documentation.DL.Services
                 var stt = DataContext.Update(cdNote, x => x.Id == cdNote.Id);
                 if (stt.Success)
                 {
-                    var chargesOfSOA = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Cdno == cdNote.Code).ToList();
-                    foreach (var item in chargesOfSOA)
+                    var chargesOfCDNote = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Cdno == cdNote.Code).ToList();
+                    foreach (var item in chargesOfCDNote)
                     {
                         item.Cdno = null;
                     }
                     foreach (var item in model.listShipmentSurcharge)
                     {
-                        var charge = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Id == item.Id).FirstOrDefault();
+                        var charge = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.FirstOrDefault(x => x.Id == item.Id);
                         if (charge != null)
                         {
                             charge.Cdno = cdNote.Code;
-                            charge.Soaclosed = true;
+                            charge.Cdclosed = true;
                             charge.DatetimeModified = DateTime.Now;
                             charge.UserModified = "admin"; // need update in the future 
                             ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Update(charge);
                         }
                     }
+                    var jobOpsTrans = ((eFMSDataContext)DataContext.DC).OpsTransaction.FirstOrDefault();
+                    if(jobOpsTrans != null)
+                    {
+                        jobOpsTrans.UserModified = model.UserModified;
+                        jobOpsTrans.ModifiedDate = DateTime.Now;
+                        ((eFMSDataContext)DataContext.DC).OpsTransaction.Update(jobOpsTrans);
+                    }
+                    var jobCSTrans = ((eFMSDataContext)DataContext.DC).CsTransaction.FirstOrDefault();
+                    if(jobCSTrans != null)
+                    {
+                        jobCSTrans.UserModified = model.UserModified;
+                        jobCSTrans.ModifiedDate = DateTime.Now;
+                        ((eFMSDataContext)DataContext.DC).CsTransaction.Update(jobCSTrans);
+                    }
+                    ((eFMSDataContext)DataContext.DC).SaveChanges();
                 }
-                ((eFMSDataContext)DataContext.DC).SaveChanges();
 
                 return new HandleState();
 
@@ -411,7 +444,20 @@ namespace eFMS.API.Documentation.DL.Services
                                 ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Update(item);
                             }
                             ((eFMSDataContext)DataContext.DC).SaveChanges();
-
+                            var jobOpsTrans = ((eFMSDataContext)DataContext.DC).OpsTransaction.FirstOrDefault();
+                            if (jobOpsTrans != null)
+                            {
+                                //jobOpsTrans.UserModified = model.UserModified;
+                                jobOpsTrans.ModifiedDate = DateTime.Now;
+                                ((eFMSDataContext)DataContext.DC).OpsTransaction.Update(jobOpsTrans);
+                            }
+                            var jobCSTrans = ((eFMSDataContext)DataContext.DC).CsTransaction.FirstOrDefault();
+                            if (jobCSTrans != null)
+                            {
+                                //jobCSTrans.UserModified = model.UserModified;
+                                jobCSTrans.ModifiedDate = DateTime.Now;
+                                ((eFMSDataContext)DataContext.DC).CsTransaction.Update(jobCSTrans);
+                            }
                         }
                         
                     }

@@ -4,6 +4,66 @@
         <name>eFMS.API.Documentation</name>
     </assembly>
     <members>
+        <member name="T:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.LanguageSub},eFMS.API.Documentation.DL.IService.ICsShipmentSurchargeService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+            <summary>
+            constructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="service"></param>
+            <param name="user"></param>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetByHouseBill(System.Guid,System.String)">
+            <summary>
+            get list of surcharge by house bill and type
+            </summary>
+            <param name="hbId"></param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetByListHouseBill(System.Guid,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            get list of surcharge by house bill anf partner id
+            </summary>
+            <param name="Id"></param>
+            <param name="partnerID"></param>
+            <param name="IsHouseBillID"></param>
+            <param name="getAll"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetPartners(System.Guid,System.Boolean)">
+            <summary>
+            get partners have surcharge
+            </summary>
+            <param name="Id"></param>
+            <param name="IsHouseBillID"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.AddNew(eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel)">
+            <summary>
+            add new surcharge
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.Update(eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel)">
+            <summary>
+            update an existed surcharge
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.Delete(System.Guid)">
+            <summary>
+            delete an existed surcharge
+            </summary>
+            <param name="chargId"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsTransactionController">
             <summary>
             A base class for an MVC controller without view support.

@@ -15,6 +15,9 @@ using SystemManagementAPI.Infrastructure.Middlewares;
 
 namespace eFMS.API.Documentation.Controllers
 {
+    /// <summary>
+    /// A base class for an MVC controller without view support.
+    /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
@@ -24,6 +27,13 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICsShipmentSurchargeService csShipmentSurchargeService;
         private readonly ICurrentUser currentUser;
+
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="localizer"></param>
+        /// <param name="service"></param>
+        /// <param name="user"></param>
         public CsShipmentSurchargeController(IStringLocalizer<LanguageSub> localizer,ICsShipmentSurchargeService service, ICurrentUser user)
         {
             stringLocalizer = localizer;
@@ -31,6 +41,12 @@ namespace eFMS.API.Documentation.Controllers
             currentUser = user;
         }
 
+        /// <summary>
+        /// get list of surcharge by house bill and type
+        /// </summary>
+        /// <param name="hbId"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("GetByHB")]
         public IActionResult GetByHouseBill(Guid hbId,string type)
@@ -39,6 +55,14 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(csShipmentSurchargeService.GetByHB(hbId,type));
         }
 
+        /// <summary>
+        /// get list of surcharge by house bill anf partner id
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <param name="partnerID"></param>
+        /// <param name="IsHouseBillID"></param>
+        /// <param name="getAll"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("GroupByListHB")]
         public List<object> GetByListHouseBill(Guid Id,string partnerID,bool IsHouseBillID,bool getAll=false)
@@ -47,6 +71,12 @@ namespace eFMS.API.Documentation.Controllers
             return csShipmentSurchargeService.GroupChargeByHB(Id, partnerID,IsHouseBillID,getAll);
         }
 
+        /// <summary>
+        /// get partners have surcharge
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <param name="IsHouseBillID"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("GetPartners")]
         public List<CatPartner> GetPartners(Guid Id,bool IsHouseBillID)
@@ -55,7 +85,11 @@ namespace eFMS.API.Documentation.Controllers
             return csShipmentSurchargeService.GetAllParner(Id, IsHouseBillID);
         }
 
-
+        /// <summary>
+        /// add new surcharge
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Add")]
         [Authorize]
@@ -73,6 +107,11 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// update an existed surcharge
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPut]
         [Route("Update")]
         [Authorize]
@@ -92,6 +131,11 @@ namespace eFMS.API.Documentation.Controllers
 
         }
 
+        /// <summary>
+        /// delete an existed surcharge
+        /// </summary>
+        /// <param name="chargId"></param>
+        /// <returns></returns>
         [HttpDelete]
         [Route("Delete")]
         //[Authorize]

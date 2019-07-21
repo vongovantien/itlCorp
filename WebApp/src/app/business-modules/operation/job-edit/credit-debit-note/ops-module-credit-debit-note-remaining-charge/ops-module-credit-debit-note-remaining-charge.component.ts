@@ -1,84 +1,45 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { API_MENU } from 'src/constants/api-menu.const';
-import { BaseService } from 'src/app/shared/services/base.service';
-import cloneDeep from 'lodash/cloneDeep';
-import { Subject } from 'rxjs';
+import filter from 'lodash/filter';
 declare var $: any;
 
 @Component({
   selector: 'app-ops-module-credit-debit-note-remaining-charge',
-  templateUrl: './ops-module-credit-debit-note-remaining-charge.component.html',
-  styleUrls: ['./ops-module-credit-debit-note-remaining-charge.component.scss']
+  templateUrl: './ops-module-credit-debit-note-remaining-charge.component.html'
 })
-export class OpsModuleCreditDebitNoteRemainingChargeComponent implements OnInit, OnDestroy {
+export class OpsModuleCreditDebitNoteRemainingChargeComponent implements OnInit {
   STORAGE_DATA: any = null;
-  listChargeOfPartner: any[] = []
+  @Input() listChargeOfPartner: any[] = [];
+  @Output() newlistCharge = new EventEmitter<any>();
   partnerId: string = null;
+  checkAllCharge: boolean = false;
   constructor(
-    private baseServices: BaseService,
-    private api_menu: API_MENU
   ) { }
 
-  subscribe: Subject<any> = new Subject();
   ngOnInit() {
-    this.subscribe = <any>this.baseServices.dataStorage.subscribe(data => {
-      this.STORAGE_DATA = data;
-      if (this.STORAGE_DATA.listChargeOfPartner !== undefined) {
-        this.listChargeOfPartner = cloneDeep(this.STORAGE_DATA.listChargeOfPartner);
-      }
-
-      if (this.STORAGE_DATA.currentPartnerId !== undefined) {
-        this.partnerId = cloneDeep(this.STORAGE_DATA.currentPartnerId);
-      }
-    });
   }
+  removeAllChargeSelected() {
+    this.checkAllCharge = false;
+  }
+  checkAllChange() {
+    if (this.listChargeOfPartner[0].listCharges !== null) {
+      if (this.checkAllCharge) {
 
-  ngOnDestroy(): void {
-    this.subscribe.unsubscribe();
+        this.listChargeOfPartner[0].listCharges.forEach(element => {
+          element.isSelected = true;
+        });
+      } else {
+        this.listChargeOfPartner[0].listCharges.forEach(element => {
+          element.isSelected = false;
+        });
+      }
+    }
   }
   addCharges() {
-    const chargesElements = $('.single-charge-select');
-    for (var i = 0; i < chargesElements.length; i++) {
-      const selected: boolean = $(chargesElements[i]).prop("checked");
-      if (selected) {
-        const indexSingle = parseInt($(chargesElements[i]).attr("data-id"));
-        var parentElement = $(chargesElements[i]).closest('tbody').find('input.group-charge-hb-select')[0];
-        const indexParent = 0; //parseInt($(parentElement).attr("data-id"));
-        $(parentElement).prop("checked", false);
-        this.listChargeOfPartner[indexParent].listCharges[indexSingle].isRemaining = false;
-      }
-    }
-    this.baseServices.setData("listChargeOfPartner", this.listChargeOfPartner);
-
+    this.listChargeOfPartner[0].listCharges = filter(this.listChargeOfPartner[0].listCharges, function (o: any) {
+      o.isRemaining = false;
+      return o.isSelected;
+    });
+    this.newlistCharge.emit(this.listChargeOfPartner);
   }
-
-
-  selectAllChargeInGroup(event: any, indexGroup: number) {
-    const isSelecAll = event.target.checked;
-    var charges = $(event.target).closest('tbody').find('input.single-charge-select')
-    for (var i = 0; i < charges.length; i++) {
-      $(charges[i]).prop('checked', isSelecAll ? true : false);
-    }
-  }
-
-
-  selectSingleCharge(event: any, indexCharge: number) {
-    var groupCheck = $(event.target).closest('tbody').find('input.group-charge-hb-select').first();
-    var charges = $(event.target).closest('tbody').find('input.single-charge-select');
-    var allcheck = true;
-    for (var i = 0; i < charges.length; i++) {
-      if ($(charges[i]).prop('checked') != true) {
-        allcheck = false;
-      }
-    }
-    $(groupCheck).prop('checked', allcheck ? true : false);
-  }
-
-
-  checkToDisplay(item: any) {
-    var s = item.listCharges.map((x: any) => x.isRemaining).indexOf(true) != -1;
-    return s;
-  }
-
-
 }

@@ -13,22 +13,22 @@ import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { CDNoteRepo } from 'src/app/shared/repositories';
 import { OpsModuleCreditDebitNoteDetailComponent } from './ops-module-credit-debit-note-detail/ops-module-credit-debit-note-detail.component';
 import { ConfirmDeletePopupComponent } from 'src/app/shared/common/popup';
+import { OpsModuleCreditDebitNoteEditComponent } from './ops-module-credit-debit-note-edit/ops-module-credit-debit-note-edit.component';
+import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDetails.model';
 
 
 declare var $: any;
 @Component({
     selector: 'app-ops-module-credit-debit-note',
-    templateUrl: './ops-module-credit-debit-note.component.html',
-    styleUrls: ['./ops-module-credit-debit-note.component.scss']
+    templateUrl: './ops-module-credit-debit-note.component.html'
 })
 export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit, OnDestroy {
 
     @Input() currentJob: OpsTransaction;
-
     @ViewChild(OpsModuleCreditDebitNoteAddnewComponent, { static: false }) popupCreate: OpsModuleCreditDebitNoteAddnewComponent;
     @ViewChild(OpsModuleCreditDebitNoteDetailComponent, { static: false }) poupDetail: OpsModuleCreditDebitNoteDetailComponent;
     @ViewChild(ConfirmDeletePopupComponent, { static: false }) confirmDeletePopup: ConfirmDeletePopupComponent;
-
+    @ViewChild(OpsModuleCreditDebitNoteEditComponent, { static: false }) popupEdit: OpsModuleCreditDebitNoteEditComponent;
     listCDNotes: any[] = [];
     constListCDNotes: any[] = [];
     IsNewCDNote: boolean = false;
@@ -98,12 +98,54 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
             () => { }
         );
     }
-
-    openEdit(soaNo: string) {
-        this.baseServices.setData("CurrentSOANo", soaNo);
-        this.poupDetail.show();
+    CDNoteDetails: AcctCDNoteDetails = null
+    async openDetails(soaNo: string) {
+        this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.currentJob.id + "&soaNo=" + soaNo);
+        if (this.CDNoteDetails != null) {
+            if (this.CDNoteDetails.listSurcharges != null) {
+                this.totalCreditDebitCalculate();
+            }
+            this.poupDetail.show({ backdrop: 'static' });
+        }
     }
 
+    totalCreditDebitCalculate() {
+        let totalCredit = 0;
+        let totalDebit = 0;
+        for (let i = 0; i < this.CDNoteDetails.listSurcharges.length; i++) {
+            const c = this.CDNoteDetails.listSurcharges[i];
+            if (c.type === "BUY" || c.type === "LOGISTIC" || (c.type === "OBH" && this.CDNoteDetails.partnerId === c.payerId)) {
+                // calculate total credit
+                totalCredit += (c.total * c.exchangeRate);
+            }
+            if (c.type === "SELL" || (c.type === "OBH" && this.CDNoteDetails.partnerId === c.receiverId)) {
+                // calculate total debit 
+                totalDebit += (c.total * c.exchangeRate);
+            }
+
+        }
+        this.CDNoteDetails.totalCredit = totalCredit;
+        this.CDNoteDetails.totalDebit = totalDebit;
+    }
+    openEditCDNotePopUp(event) {
+        this.CDNoteDetails = null;
+        console.log(event);
+        if (event != null) {
+            this.CDNoteDetails = event;
+            this.baseServices.setData("CDNoteDetails", event);
+            this.popupEdit.show({ backdrop: 'static' });
+        }
+    }
+    async closeEditModal(event) {
+        console.log(event);
+        this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.currentJob.id + "&soaNo=" + this.CDNoteDetails.cdNote.code);
+        if (this.CDNoteDetails != null) {
+            if (this.CDNoteDetails.listSurcharges != null) {
+                this.totalCreditDebitCalculate();
+            }
+            this.poupDetail.show({ backdrop: 'static' });
+        }
+    }
     SearchCDNotes(search_key: string) {
         this.listCDNotes = cloneDeep(this.constListCDNotes)
         search_key = search_key.trim().toLowerCase();
