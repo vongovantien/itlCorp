@@ -2,11 +2,11 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 
 @Component({
-    selector: 'confirm-delete-popup',
-    templateUrl: './confirm-delete.popup.html',
-    styleUrls: ['./confirm-delete.popup.scss']
+    selector: 'confirm-popup',
+    templateUrl: './confirm.popup.html',
+    styleUrls: ['./confirm.popup.scss']
 })
-export class ConfirmDeletePopupComponent extends PopupBase {
+export class ConfirmPopupComponent extends PopupBase {
 
     @Input() title: string = 'Notification';
     @Input() body: string = 'You are not allow to delete';
