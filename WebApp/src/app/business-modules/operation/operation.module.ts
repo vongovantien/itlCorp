@@ -29,6 +29,7 @@ import { ModalModule, TabsModule } from "ngx-bootstrap";
 import { OpsModuleStageManagementAddStagePopupComponent } from "./job-edit/stage-management/add/add-stage.popup.component";
 import { NotSelectedAlertModalComponent } from './job-edit/credit-debit-note/ops-module-credit-debit-note-addnew/not-selected-alert-modal/not-selected-alert-modal.component';
 import { ChangePartnerConfirmModalComponent } from './job-edit/credit-debit-note/ops-module-credit-debit-note-addnew/change-partner-confirm-modal/change-partner-confirm-modal.component';
+import { NgProgressModule } from "@ngx-progressbar/core";
 
 
 const LIB = [
@@ -37,6 +38,8 @@ const LIB = [
     SelectModule,
     TabsModule.forRoot(),
     ModalModule.forRoot(),
+    NgProgressModule,
+
 
 ]
 @NgModule({

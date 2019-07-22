@@ -33,6 +33,7 @@ import { CommodityGroupImportComponent } from './commodity-group-import/commodit
 import { PartnerDataImportComponent } from './partner-data-import/partner-data-import.component';
 import { ChargeImportComponent } from './charge-import/charge-import.component';
 import { ChargeImportAccountVoucherComponent } from './charge-import-account-voucher/charge-import-account-voucher.component';
+import { NgProgressModule } from '@ngx-progressbar/core';
 
 
 @NgModule({
@@ -41,7 +42,9 @@ import { ChargeImportAccountVoucherComponent } from './charge-import-account-vou
     CatalogueRoutingModule,
     SharedModule,
     FormsModule,
-    SelectModule],
+    NgProgressModule,
+    SelectModule
+  ],
   declarations:
     [LocationComponent,
       WarehouseComponent,

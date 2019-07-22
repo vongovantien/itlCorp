@@ -12,9 +12,9 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { CDNoteRepo } from 'src/app/shared/repositories';
 import { OpsModuleCreditDebitNoteDetailComponent } from './ops-module-credit-debit-note-detail/ops-module-credit-debit-note-detail.component';
-import { ConfirmDeletePopupComponent } from 'src/app/shared/common/popup';
 import { OpsModuleCreditDebitNoteEditComponent } from './ops-module-credit-debit-note-edit/ops-module-credit-debit-note-edit.component';
 import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDetails.model';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 
 declare var $: any;
@@ -27,7 +27,7 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
     @Input() currentJob: OpsTransaction;
     @ViewChild(OpsModuleCreditDebitNoteAddnewComponent, { static: false }) popupCreate: OpsModuleCreditDebitNoteAddnewComponent;
     @ViewChild(OpsModuleCreditDebitNoteDetailComponent, { static: false }) poupDetail: OpsModuleCreditDebitNoteDetailComponent;
-    @ViewChild(ConfirmDeletePopupComponent, { static: false }) confirmDeletePopup: ConfirmDeletePopupComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(OpsModuleCreditDebitNoteEditComponent, { static: false }) popupEdit: OpsModuleCreditDebitNoteEditComponent;
     listCDNotes: any[] = [];
     constListCDNotes: any[] = [];
