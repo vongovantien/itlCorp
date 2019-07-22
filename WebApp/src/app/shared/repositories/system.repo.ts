@@ -21,10 +21,28 @@ export class SystemRepo {
         // return this._api.get(`${environment.HOST.WEB_URL}/${this.MODULE}/api/${this.VERSION}/vi/SysUser`);
     }
 
-    getListCurrency(page: number, size: number) {
-        return this._api.post(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatCurrency/paging`, {}, {
-            page: '' + page,
-            size: '' + size
-        });
+    getListCurrency(page?: number, size?: number) {
+        if(!!page && !!size) {
+            return this._api.post(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatCurrency/paging`, {}, {
+                page: '' + page,
+                size: '' + size
+            });
+        } else {
+            return this._api.get(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatCurrency/getAll`);
+        }
+        
+    }
+
+    getListPartner(page?: number, size?: number, data?: any) {
+        if (!!page && !!size) {
+            return this._api.post(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatPartner/paging`, {}, {
+                page: '' + page,
+                size: '' + size
+            });
+        } else {
+            return this._api.post(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatPartner/Query`, data);
+
+        }
+
     }
 }
