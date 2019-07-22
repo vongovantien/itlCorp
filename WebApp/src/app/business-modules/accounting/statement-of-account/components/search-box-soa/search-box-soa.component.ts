@@ -38,21 +38,14 @@ export class StatementOfAccountSearchComponent extends AppPage {
 
     constructor(
         private _sysRepo: SystemRepo,
-        protected _toast: ToastrService,
         private _globalState: GlobalState) {
-        super(_toast);
+        super();
     }
 
     ngOnInit(): void {
         this.getBasicData();
         this.getStatus();
 
-    }
-
-    getPartner() {
-        this._sysRepo.getListPartner(1, 15).pipe(
-
-        )
     }
 
     getBasicData() {
@@ -87,7 +80,6 @@ export class StatementOfAccountSearchComponent extends AppPage {
                 },
                 (errs: any) => {
                     console.log(errs + '');
-
                     // TODO handle errors
                 },
                 // complete
