@@ -13,10 +13,10 @@ import { NgForm } from '@angular/forms';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
 import filter from 'lodash/filter';
 import cloneDeep from 'lodash/cloneDeep';
-import { SurchargeTypeEnum } from 'src/app/shared/enums/csShipmentSurchargeType-enum';
-import { async } from 'rxjs/internal/scheduler/async';
 import { SortService } from 'src/app/shared/services/sort.service';
-import { BehaviorSubject } from 'rxjs';
+import { OpsModuleCreditDebitNoteDetailComponent } from './credit-debit-note/ops-module-credit-debit-note-detail/ops-module-credit-debit-note-detail.component';
+import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDetails.model';
+import { OpsModuleCreditDebitNoteEditComponent } from './credit-debit-note/ops-module-credit-debit-note-edit/ops-module-credit-debit-note-edit.component';
 declare var $: any;
 
 @Component({
@@ -25,6 +25,9 @@ declare var $: any;
     styleUrls: ['./job-edit.component.scss']
 })
 export class OpsModuleBillingJobEditComponent implements OnInit {
+
+    @ViewChild(OpsModuleCreditDebitNoteDetailComponent, { static: false }) poupDetail: OpsModuleCreditDebitNoteDetailComponent;
+    @ViewChild(OpsModuleCreditDebitNoteEditComponent, { static: false }) popupEdit: OpsModuleCreditDebitNoteEditComponent;
     opsTransaction: OpsTransaction = null;
     productServices: any[] = [];
     serviceDate: any;
@@ -826,8 +829,53 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         }
     }
 
-    openCreditDebitNote() {
+    CDNoteDetails: AcctCDNoteDetails = null;
+    async openCreditDebitNote(soaNo: string) {
+        this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.opsTransaction.id + "&soaNo=" + soaNo);
+        if (this.CDNoteDetails != null) {
+            if (this.CDNoteDetails.listSurcharges != null) {
+                this.totalCreditDebitCalculate();
+            }
+            this.poupDetail.show({ backdrop: 'static' });
+        }
+    }
 
+    openEditCDNotePopUp(event) {
+        this.CDNoteDetails = null;
+        console.log(event);
+        if (event != null) {
+            this.CDNoteDetails = event;
+            //this.baseServices.setData("CDNoteDetails", event);
+            this.popupEdit.show({ backdrop: 'static' });
+        }
+    }
+    async closeEditModal(event) {
+        console.log(event);
+        this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.opsTransaction.id + "&soaNo=" + this.CDNoteDetails.cdNote.code);
+        if (this.CDNoteDetails != null) {
+            if (this.CDNoteDetails.listSurcharges != null) {
+                this.totalCreditDebitCalculate();
+            }
+            this.poupDetail.show({ backdrop: 'static' });
+        }
+    }
+    totalCreditDebitCalculate() {
+        let totalCredit = 0;
+        let totalDebit = 0;
+        for (let i = 0; i < this.CDNoteDetails.listSurcharges.length; i++) {
+            const c = this.CDNoteDetails.listSurcharges[i];
+            if (c.type === "BUY" || c.type === "LOGISTIC" || (c.type === "OBH" && this.CDNoteDetails.partnerId === c.payerId)) {
+                // calculate total credit
+                totalCredit += (c.total * c.exchangeRate);
+            }
+            if (c.type === "SELL" || (c.type === "OBH" && this.CDNoteDetails.partnerId === c.receiverId)) {
+                // calculate total debit 
+                totalDebit += (c.total * c.exchangeRate);
+            }
+
+        }
+        this.CDNoteDetails.totalCredit = totalCredit;
+        this.CDNoteDetails.totalDebit = totalDebit;
     }
 
 
@@ -860,7 +908,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
 
         return results;
     }
-    
+
     editCharge(id_form: string, form: NgForm, data: CsShipmentSurcharge) {
         setTimeout(async () => {
             if (form.submitted) {

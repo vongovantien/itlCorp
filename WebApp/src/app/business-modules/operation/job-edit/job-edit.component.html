@@ -798,9 +798,13 @@
                                                             </span>
                                                         </td>
                                                         <td>
-                                                            <a href="javascript:void(0)" data-toggle="modal"
+                                                            <!-- <a href="javascript:void(0)" data-toggle="modal"
                                                                 data-target="#detail-credit-debit-note-modal"
-                                                                (click)="openCreditDebitNote()">
+                                                                (click)="openCreditDebitNote(charge.cdno)">
+                                                                {{ charge.cdno }}
+                                                            </a> -->
+                                                            <a href="javascript:void(0)"
+                                                                (click)="openCreditDebitNote(charge.cdno)">
                                                                 {{ charge.cdno }}
                                                             </a>
                                                         </td>
@@ -3976,3 +3980,9 @@
     </div>
 </div>
 <!--end::confirm-cancel-job-modal-->
+
+<app-ops-module-credit-debit-note-detail [CDNoteDetails]="CDNoteDetails" (openEditCDNote)="openEditCDNotePopUp($event)">
+</app-ops-module-credit-debit-note-detail>
+
+<app-ops-module-credit-debit-note-edit [cdNoteDetails]="CDNoteDetails" (isCloseModal)="closeEditModal($event)">
+</app-ops-module-credit-debit-note-edit>

@@ -98,7 +98,7 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
             () => { }
         );
     }
-    CDNoteDetails: AcctCDNoteDetails = null
+    CDNoteDetails: AcctCDNoteDetails = null;
     async openDetails(soaNo: string) {
         this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.currentJob.id + "&soaNo=" + soaNo);
         if (this.CDNoteDetails != null) {
@@ -132,7 +132,7 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
         console.log(event);
         if (event != null) {
             this.CDNoteDetails = event;
-            this.baseServices.setData("CDNoteDetails", event);
+            //this.baseServices.setData("CDNoteDetails", event);
             this.popupEdit.show({ backdrop: 'static' });
         }
     }
