@@ -1,10 +1,10 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from 'node_modules/@angular/core';
-import * as lodash from 'node_modules/lodash';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import * as lodash from 'lodash';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
-import { NgForm } from 'node_modules/@angular/forms';
+import { NgForm } from '@angular/forms';
 import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
 import { CatPlaceModel } from 'src/app/shared/models/catalogue/catPlace.model';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
@@ -16,7 +16,7 @@ import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
-import { ActivatedRoute } from 'node_modules/@angular/router';
+import { ActivatedRoute } from '@angular/router';
 declare var $: any;
 
 @Component({

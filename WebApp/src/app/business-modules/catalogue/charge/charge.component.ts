@@ -1,10 +1,10 @@
-import { Component, OnInit, ViewChild } from 'node_modules/@angular/core';
-import * as lodash from 'node_modules/lodash';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import * as lodash from 'lodash';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
-import { Router } from 'node_modules/@angular/router';
+import { Router } from '@angular/router';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { ExcelService } from 'src/app/shared/services/excel.service';

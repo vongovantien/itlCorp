@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, EventEmitter, Output } from 'node_modules/@angular/core';
+import { Component, OnInit, ViewChild, EventEmitter, Output } from '@angular/core';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
@@ -13,7 +13,7 @@ import { BaseService } from 'src/app/shared/services/base.service';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { SystemConstants } from 'src/constants/system.const';
-import * as lodash from 'node_modules/lodash';
+import * as lodash from 'lodash';
 
 @Component({
   selector: 'app-all-partner',

@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild } from 'node_modules/@angular/core';
-import { ActivatedRoute, Router } from 'node_modules/@angular/router';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BaseService } from 'src/app/shared/services/base.service';
-import { ToastrService } from 'node_modules/ngx-toastr';
+import { ToastrService } from 'ngx-toastr';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
-import { NgForm } from 'node_modules/@angular/forms';
-import { SelectComponent } from 'node_modules/ng2-select';
+import { NgForm } from '@angular/forms';
+import { SelectComponent } from 'ng2-select';
 import { SortService } from 'src/app/shared/services/sort.service';
 
 @Component({

@@ -8,11 +8,20 @@ export class ApiService {
     baseUrl: string = '//';
     private _headers: {} = {};
     constructor(protected _http: HttpClient,
-        ) {
+    ) {
     }
 
-    setHeaders (headers: any = {}) {
-        this._headers  = Object.assign({}, this._headers, headers);
+    getApiUrl(apiUrl: string, port: string | number, module: string) {
+        if (apiUrl.includes('localhost')) {
+            apiUrl = `${apiUrl}${port}`;
+        } else {
+            apiUrl = `${apiUrl}/${module}`;
+        }
+        return apiUrl;
+    }
+
+    setHeaders(headers: any = {}) {
+        this._headers = Object.assign({}, this._headers, headers);
         return this;
     }
 
@@ -29,23 +38,23 @@ export class ApiService {
         return localStorage.getItem(SystemConstants.CURRENT_VERSION);
     }
 
-    post(url: string, data?: any, params?: any, headers?: any){
+    post(url: string, data?: any, params?: any, headers?: any) {
         return this._http
-          .post(this.setUrl(url), data, {
-            params,
-            headers: Object.assign({}, this._headers, headers)
-          })
+            .post(this.setUrl(url), data, {
+                params,
+                headers: Object.assign({}, this._headers, headers)
+            })
     };
 
-    put(url: string, data?: any, params?: any, headers?: any){
+    put(url: string, data?: any, params?: any, headers?: any) {
         return this._http
-          .put(this.setUrl(url), data, {
-            params,
-            headers: Object.assign({}, this._headers, headers)
-          })
-      };
+            .put(this.setUrl(url), data, {
+                params,
+                headers: Object.assign({}, this._headers, headers)
+            })
+    };
 
     get(url: string = '', params?: any, headers: any = {}) {
-        return this._http.get(this.setUrl(url), {params, headers});
+        return this._http.get(this.setUrl(url), { params, headers });
     };
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from 'node_modules/@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
@@ -11,7 +11,7 @@ import { language } from 'src/languages/language.en';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
-import { NgProgressComponent } from 'node_modules/@ngx-progressbar/core';
+import { NgProgressComponent } from '@ngx-progressbar/core';
 declare var $: any;
 
 @Component({

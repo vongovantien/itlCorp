@@ -1,12 +1,12 @@
-import { Component, OnInit, ViewChild } from 'node_modules/@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { StageModel } from 'src/app/shared/models/catalogue/stage.model';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
-import { NgForm } from 'node_modules/@angular/forms';
+import { NgForm } from '@angular/forms';
 import { SortService } from 'src/app/shared/services/sort.service';
-import * as lodash from 'node_modules/lodash';
+import * as lodash from 'lodash';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { ExcelService } from 'src/app/shared/services/excel.service';

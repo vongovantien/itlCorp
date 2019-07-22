@@ -1,8 +1,8 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import filter from 'lodash/filter';
 import map from 'lodash/map';
-import concat from 'lodash/concat'
-import cloneDeep from 'lodash/cloneDeep'
+import concat from 'lodash/concat';
+import cloneDeep from 'lodash/cloneDeep';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { ExtendData } from '../../../extend-data';

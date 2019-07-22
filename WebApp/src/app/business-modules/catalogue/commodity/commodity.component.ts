@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from 'node_modules/@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { CommodityGroup } from 'src/app/shared/models/catalogue/commonity-group.model';
@@ -11,13 +11,13 @@ import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-se
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
-import { NgForm } from 'node_modules/@angular/forms';
+import { NgForm } from '@angular/forms';
 import { Commodity } from 'src/app/shared/models/catalogue/commodity.model';
 import { COMMODITYCOLUMNSETTING } from './commodity.column';
-import { SelectComponent } from 'node_modules/ng2-select';
+import { SelectComponent } from 'ng2-select';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { ExcelService } from 'src/app/shared/services/excel.service';
-import * as lodash from 'node_modules/lodash';
+import * as lodash from 'lodash';
 import { SystemConstants } from 'src/constants/system.const';
 import { SearchOptionsComponent } from '../../../shared/common/search-options/search-options.component';
 declare var $: any;

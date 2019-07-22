@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from 'node_modules/@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
 import { PARTNERDATACOLUMNSETTING } from './partner-data.columns';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
@@ -12,7 +12,7 @@ import { CustomerComponent } from './customer/customer.component';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
-import { Router } from 'node_modules/@angular/router';
+import { Router } from '@angular/router';
 import { AirShipSupComponent } from './air-ship-sup/air-ship-sup.component';
 import { CarrierComponent } from './carrier/carrier.component';
 import { ShipperComponent } from './shipper/shipper.component';

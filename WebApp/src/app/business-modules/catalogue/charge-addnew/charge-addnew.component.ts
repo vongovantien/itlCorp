@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import findIndex from 'node_modules/lodash/findIndex';
+import findIndex from 'lodash/findIndex';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
-import { NgForm } from 'node_modules/@angular/forms';
+import { NgForm } from '@angular/forms';
 import { CatChargeToAddOrUpdate } from 'src/app/shared/models/catalogue/catChargeToAddOrUpdate.model';
 import { CatChargeDefaultAccount } from 'src/app/shared/models/catalogue/catChargeDefaultAccount.model';
-import { Router } from 'node_modules/@angular/router';
+import { Router } from '@angular/router';
 
 // import {DataHelper} from 'src/helper/data.helper';
 declare var $: any;

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from 'node_modules/@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
 import { PORTINDEXCOLUMNSETTING } from './port-index.columns';
 import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
@@ -8,18 +8,18 @@ import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
-import { NgForm } from 'node_modules/@angular/forms';
-import { SelectComponent } from 'node_modules/ng2-select';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { SystemConstants } from 'src/constants/system.const';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
-import * as lodash from 'node_modules/lodash';
+import * as _ from 'lodash';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 declare var $: any;
 import * as dataHelper from 'src/helper/data.helper';
+import { NgForm } from '@angular/forms';
+import { SelectComponent } from 'ng2-select';
 
 @Component({
   selector: 'app-port-index',
@@ -316,7 +316,7 @@ export class PortIndexComponent implements OnInit {
     var portIndexes = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.query, this.criteria);
     console.log(portIndexes);
     if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-      portIndexes = lodash.map(portIndexes, function (pi, index) {
+      portIndexes = _.map(portIndexes, function (pi, index) {
         return [
           index + 1,
           pi['code'],
@@ -331,7 +331,7 @@ export class PortIndexComponent implements OnInit {
     }
 
     if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-      portIndexes = lodash.map(portIndexes, function (pi, index) {
+      portIndexes = _.map(portIndexes, function (pi, index) {
         return [
           index + 1,
           pi['code'],

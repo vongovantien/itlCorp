@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from 'node_modules/@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PagingService } from 'src/app/shared/services/paging-service';
 import { SortService } from 'src/app/shared/services/sort.service';
@@ -9,7 +9,7 @@ import { PAGINGSETTING } from 'src/constants/paging.const';
 import { SystemConstants } from 'src/constants/system.const';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { language } from 'src/languages/language.en';
-import { NgProgressComponent } from 'node_modules/@ngx-progressbar/core';
+import { NgProgressComponent } from '@ngx-progressbar/core';
 declare var $: any;
 
 @Component({
