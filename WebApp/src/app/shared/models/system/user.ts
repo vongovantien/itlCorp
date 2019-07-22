@@ -1,12 +1,10 @@
-import * as _ from 'lodash';
-
 export class User {
     id: string = '';
     username: string = '';
     password: string = '';
     userGroupId: string = '';
     employeeId: string = '';
-    workPlaceId: string  = '';
+    workPlaceId: string = '';
     refuseEmail: string = '';
     ldapObjectGuid: string = '';
     userCreated: string = '';
@@ -18,10 +16,10 @@ export class User {
 
     constructor(data?: any) {
         let self = this;
-        _.forEach(data, (val, key) => {
+        for (const key in data) {
             if (self.hasOwnProperty(key)) {
-                self[key] = val;
+                self[key] = data[key];
             }
-        });
-      }
+        }
+    }
 }
