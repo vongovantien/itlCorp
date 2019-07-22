@@ -15,47 +15,11 @@
                         <label class="form-control-label" for="">
                             Partner
                         </label>
-                        <div class="dropdown e--combogrid">
-                            <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly
-                                data-toggle="dropdown" placeholder="Please selected">
-                            <div class="dropdown-menu e--combogrid-content">
-                                <div class="tabel-wrapper table-fixed">
-                                    <div class="table-head-fixed">
-                                        <div class="table-filter-block">
-                                            <div class="search-field">
-                                                <input class="form-control m-input m-input--square" type="text"
-                                                    placeholder="Search...">
-                                                <i class="icon-search"></i>
-                                            </div>
-                                        </div>
-                                        <div class="table-header">
-                                            <table class="table table-hover">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Partner Id</th>
-                                                        <th>Name ABBR</th>
-                                                        <th>Name EN</th>
-                                                        <th>Tax Code</th>
-                                                    </tr>
-                                                </thead>
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <div class="table-body-scroll">
-                                        <table class="table table-hover">
-                                            <tbody>
-                                                <tr class="data-row data-selected">
-                                                    <td>Partner Id</td>
-                                                    <td>Name ABBR</td>
-                                                    <td>Name EN</td>
-                                                    <td>Tax Code</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPartner"
+                            (itemSelected)="onSelectDataFormSearch($event, 'partner')"
+                            [selectedDisplayFields]="configPartner.selectedDisplayFields"
+                            [dataSources]="configPartner.dataSource" [displayFields]="configPartner.displayFields">
+                        </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -81,10 +45,12 @@
                         <label class="form-control-label" for="">
                             Status
                         </label>
-                        <ng-select [allowClear]="true" [items]="statusSOA" (data)="refreshValue($event)"
-                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                            placeholder="Select filter">
-                        </ng-select>
+                        <div class="form-group">
+                            <select class="form-control" [(ngModel)]="selectedStatus" name="status"
+                                (ngModelChange)="onSelectDataFormSearch($event, 'status')">
+                                <option *ngFor="let status of statusSOA" [ngValue]="status">{{status.title}}</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -94,9 +60,8 @@
                         <label class="form-control-label" for="">
                             Currency
                         </label>
-                        <ng-select [allowClear]="true" [items]="currencyList" (data)="refreshValue($event)"
-                            (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                            placeholder="Select filter">
+                        <ng-select [items]="currencyList" (selected)="onSelectDataFormSearch($event, 'currency')"
+                            placeholder="Select currency">
                         </ng-select>
                     </div>
                 </div>
@@ -116,9 +81,8 @@
                         <label class="form-control-label" for="">
                             Personal Handle
                         </label>
-                        <ng-select [allowClear]="false" [items]="userList" [active]="currentUser" disabled="true"
-                            (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
-                            (typed)="typed($event)" placeholder="Select filter">
+                        <ng-select [items]="users" [active]="currentUser" placeholder="Select user"
+                            (selected)="onSelectDataFormSearch($event, 'user')">
                         </ng-select>
                     </div>
                 </div>
@@ -129,7 +93,8 @@
         <div class="row">
             <div class="col-lg-6"></div>
             <div class="col-lg-6 m--align-right">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)="search()">
                     <span>
                         <i class="la la-search"></i>
                         <span>
@@ -137,7 +102,8 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)="reset()">
                     <span>
                         <i class="la la-refresh"></i>
                         <span>

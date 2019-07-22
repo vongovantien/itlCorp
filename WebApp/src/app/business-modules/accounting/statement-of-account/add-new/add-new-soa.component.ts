@@ -1,13 +1,16 @@
 import { Component, ViewChild } from '@angular/core';
-
-import { StatementOfAccountAddChargeComponent } from '../components/poup/add-charge/add-charge.popup';
-import { SystemRepo } from 'src/app/shared/repositories';
-import { GlobalState } from 'src/app/global-state';
+import { forkJoin } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
-
-import { takeUntil } from 'node_modules/rxjs/operators';
-import { forkJoin } from 'node_modules/rxjs';
+import { GlobalState } from 'src/app/global-state';
+import { SystemRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
+import { StatementOfAccountAddChargeComponent } from '../components/poup/add-charge/add-charge.popup';
+
+
+
+
+
 @Component({
     selector: 'app-statement-of-account-new',
     templateUrl: './add-new-soa.component.html',

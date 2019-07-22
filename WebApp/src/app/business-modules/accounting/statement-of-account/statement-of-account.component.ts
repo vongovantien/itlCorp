@@ -1,5 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
+import { Component, OnInit, ViewChild } from "@angular/core";
+import { ConfirmPopupComponent, InfoPopupComponent } from "src/app/shared/common/popup";
+
 
 @Component({
     selector: 'app-statement-of-account',
@@ -11,8 +12,6 @@ export class StatementOfAccountComponent implements OnInit {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
 
-
-
     constructor() {
     }
 
@@ -21,7 +20,7 @@ export class StatementOfAccountComponent implements OnInit {
 
     onDeleteSOA() {
         // this.confirmPopup.show();
-        this.infoPopup.show();
+        // this.infoPopup.show();
 
     }
 
