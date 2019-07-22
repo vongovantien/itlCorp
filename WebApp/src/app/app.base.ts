@@ -3,6 +3,8 @@ import { Observable, Subject } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 
 import moment from "moment";
+import { UtilityHelper } from "src/helper";
+import { ToastrService } from "ngx-toastr";
 
 export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit {
 
@@ -17,9 +19,10 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
     "Last Month": [moment().subtract(1, "month").startOf("month"), moment().subtract(1, "month").endOf("month")]
   };
   maxDate: any = moment();
+
+  utility: UtilityHelper = new UtilityHelper();
   constructor() { 
   }
-
   ngOnInit(): void { }
 
   ngOnDestroy(): void {
