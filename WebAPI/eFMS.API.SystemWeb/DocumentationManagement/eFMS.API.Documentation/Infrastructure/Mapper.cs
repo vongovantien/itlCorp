@@ -2,6 +2,7 @@
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Documentation.Service.ViewModels;
+using System.Collections.Generic;
 
 namespace eFMS.API.Shipment.Infrastructure
 {
@@ -27,6 +28,11 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<CsManifestEditModel, CsManifest>();
             CreateMap<CsShippingInstructionModel, CsShippingInstruction>();
             CreateMap<CsShipmentSurchargeModel, CsShipmentSurcharge>();
+
+            CreateMap<spc_GetListChargeShipmentMaster, ChargeShipmentModel>();
+
+            CreateMap<AcctSoa, AcctSoaModel>();
+            CreateMap<AcctSoaModel, AcctSoa>();
         }
     }
 }

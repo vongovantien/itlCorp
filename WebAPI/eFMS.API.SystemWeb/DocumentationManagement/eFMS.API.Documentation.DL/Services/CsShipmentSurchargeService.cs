@@ -1,13 +1,18 @@
 ﻿using AutoMapper;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Documentation.Service.ViewModels;
 using ITL.NetCore.Common;
+using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 
@@ -263,6 +268,43 @@ namespace eFMS.API.Documentation.DL.Services
                 listCharges.Add(charge);
             }
             return listCharges;
+        }
+
+        public ChargeShipmentResult GetListChargeShipment(ChargeShipmentCriteria criteria)
+        {
+            var chargeShipmentList = GetSpcChargeShipment(criteria).ToList();
+            var dataMap = mapper.Map<List<spc_GetListChargeShipmentMaster>,List<ChargeShipmentModel>>(chargeShipmentList);
+            var result = new ChargeShipmentResult
+            {
+                ChargeShipments = dataMap,
+                TotalShipment = chargeShipmentList.Where(x=>x.HBL != null).GroupBy(x=>x.HBL).Count(),
+                TotalCharge = chargeShipmentList.Count(),
+                AmountDebitLocal = chargeShipmentList.Sum(x=>x.AmountDebitLocal),
+                AmountCreditLocal = chargeShipmentList.Sum(x=>x.AmountCreditLocal),
+                AmountDebitUSD = chargeShipmentList.Sum(x=>x.AmountDebitUSD),
+                AmountCreditUSD = chargeShipmentList.Sum(x=>x.AmountCreditUSD),
+            };
+            result.AmountBalanceLocal = result.AmountDebitLocal - result.AmountCreditLocal;
+            result.AmountBalanceUSD = result.AmountDebitUSD - result.AmountCreditUSD;
+            return result;
+        }
+
+        private List<spc_GetListChargeShipmentMaster> GetSpcChargeShipment(ChargeShipmentCriteria criteria)
+        {
+            DbParameter[] parameters =
+            {
+                SqlParam.GetParameter("CurrencyLocal", criteria.CurrencyLocal),
+                SqlParam.GetParameter("CustomerID", criteria.CustomerID),
+                SqlParam.GetParameter("DateType", criteria.DateType),
+                SqlParam.GetParameter("FromDate", criteria.FromDate),
+                SqlParam.GetParameter("ToDate", criteria.ToDate),
+                SqlParam.GetParameter("Type", criteria.Type),
+                SqlParam.GetParameter("IsOBH", criteria.IsOBH),
+                SqlParam.GetParameter("StrServices", criteria.StrServices),
+                SqlParam.GetParameter("StrCreators", criteria.StrCreators),
+                SqlParam.GetParameter("StrCharges", criteria.StrCharges)
+            };
+            return ((eFMSDataContext)DataContext.DC).ExecuteProcedure<spc_GetListChargeShipmentMaster>(parameters);
         }
     }
 }
