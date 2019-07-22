@@ -1019,9 +1019,13 @@
                                                             </span>
                                                         </td>
                                                         <td>
-                                                            <a href="javascript:void(0)" data-toggle="modal"
+                                                            <!-- <a href="javascript:void(0)" data-toggle="modal"
                                                                 data-target="#detail-credit-debit-note-modal"
                                                                 (click)="openCreditDebitNote()">
+                                                                {{ charge.cdno }}
+                                                            </a> -->
+                                                            <a href="javascript:void(0)"
+                                                                (click)="openCreditDebitNote(charge.cdno)">
                                                                 {{ charge.cdno }}
                                                             </a>
                                                         </td>
@@ -1245,8 +1249,12 @@
                                                             </span>
                                                         </td>
                                                         <td>
-                                                            <a href="javascript:void(0)" data-toggle="modal"
+                                                            <!-- <a href="javascript:void(0)" data-toggle="modal"
                                                                 data-target="#detail-credit-debit-note-modal">
+                                                                {{ charge.cdno }}
+                                                            </a> -->
+                                                            <a href="javascript:void(0)"
+                                                                (click)="openCreditDebitNote(charge.cdno)">
                                                                 {{ charge.cdno }}
                                                             </a>
                                                         </td>
@@ -1426,10 +1434,10 @@
                                                             </span>
                                                         </td>
                                                         <td>
-                                                            <a href="javascript:void(0)" data-toggle="modal"
+                                                            <!-- <a href="javascript:void(0)" data-toggle="modal"
                                                                 data-target="#detail-credit-debit-note-modal">
                                                                 Credit/ Debit note
-                                                            </a>
+                                                            </a> -->
                                                         </td>
                                                         <td>
                                                             <span>
@@ -2165,7 +2173,7 @@
                                     </label>
                                     <div class="input-group m-input-group m-input-group--square">
                                         <input type="number" required class="form-control m-input m-input--square"
-                                            placeholder="Enter number" name="buyingRateChangeQuantityNameOps"
+                                            min="0" placeholder="Enter number" name="buyingRateChangeQuantityNameOps"
                                             decimalNumberGreaterThan0 #buyingRateChangeQuantityNameOps="ngModel"
                                             [(ngModel)]="BuyingRateChargeToAdd.quantity"
                                             (keyup)="calculateTotalEachBuying()">
@@ -2467,7 +2475,7 @@
                                             name="buyingRateChangeQuantityNameOps"
                                             #buyingRateChangeQuantityNameOps="ngModel"
                                             [(ngModel)]="BuyingRateChargeToEdit.quantity"
-                                            (keyup)="calculateTotalEachBuying(true)">
+                                            (keyup)="calculateTotalEachBuying(true)" min="0">
                                         <!-- <div class="input-group-prepend">
                                             <button type="button" class="btn btn-secondary">
                                                 CBM
@@ -2597,6 +2605,32 @@
                                         name="BuyingRateChargeNoteNameOps">
                                 </div>
                             </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Exchange rate date
+                                    </label>
+                                    <div class="m-input-icon m-input-icon--right down">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [autoApply]="true"
+                                            [attr.disabled]="BuyingRateChargeToEdit.cdno"
+                                            [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                            [(ngModel)]="exchangeRateDate" [singleDatePicker]="true"
+                                            name="exchangeRateDate" readonly />
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                    <div class="form-control-feedback"
+                                        *ngIf="editBuyingRateChargeFormOps.submitted && this.exchangeRateDate.startDate != null && this.exchangeRateDate.startDate != null && (this.exchangeRateDate.startDate < this.exchangeRateDate.startDate)">
+                                        Finish Date must more greater or equal Service Date
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
@@ -2758,7 +2792,7 @@
                                     <div class="input-group m-input-group m-input-group--square">
                                         <input type="number" required class="form-control m-input m-input--square"
                                             decimalNumberGreaterThan0 placeholder="Enter number"
-                                            name="sellingRateChangeQuantityNameOps"
+                                            name="sellingRateChangeQuantityNameOps" min="0"
                                             #sellingRateChangeQuantityNameOps="ngModel"
                                             [(ngModel)]="SellingRateChargeToAdd.quantity"
                                             (keyup)="calculateTotalEachSelling()">
@@ -3040,7 +3074,7 @@
                                     <div class="input-group m-input-group m-input-group--square">
                                         <input type="number" required class="form-control m-input m-input--square"
                                             decimalNumberGreaterThan0 placeholder="Enter number"
-                                            [disabled]="SellingRateChargeToEdit.cdno"
+                                            [disabled]="SellingRateChargeToEdit.cdno" min="0"
                                             name="sellingRateChangeQuantityNameOps"
                                             #sellingRateChangeQuantityNameOps="ngModel"
                                             [(ngModel)]="SellingRateChargeToEdit.quantity"
@@ -3348,7 +3382,7 @@
                                     <label class="form-control-label" for="">
                                         Quantity <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <input type="number" class="form-control m-input m-input--square"
+                                    <input type="number" class="form-control m-input m-input--square" min="0"
                                         decimalNumberGreaterThan0 placeholder="Enter number"
                                         #OBHQuantityNameOps="ngModel" [(ngModel)]="OBHChargeToAdd.quantity" required
                                         (keyup)="calculateTotalEachOBH()" name="OBHQuantityNameOps">
@@ -3612,7 +3646,7 @@
                                     <label class="form-control-label" for="">
                                         Quantity <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <input type="number" class="form-control m-input m-input--square"
+                                    <input type="number" class="form-control m-input m-input--square" min="0"
                                         placeholder="Enter number" #OBHQuantityNameEdtOps="ngModel"
                                         decimalNumberGreaterThan0 [(ngModel)]="OBHChargeToEdit.quantity" required
                                         [disabled]="OBHChargeToEdit.cdno" (keyup)="calculateTotalEachOBH(true)"

@@ -12,12 +12,11 @@ export class ApiService {
     }
 
     getApiUrl(apiUrl: string, port: string | number, module: string) {
-        if (apiUrl.includes('localhost')) {
-            apiUrl = `${apiUrl}${port}`;
+        if (apiUrl.includes('123123')) {
+            return `${apiUrl}${port}`;
         } else {
-            apiUrl = `${apiUrl}/${module}`;
+            return `${apiUrl}/${module}`;
         }
-        return apiUrl;
     }
 
     setHeaders(headers: any = {}) {

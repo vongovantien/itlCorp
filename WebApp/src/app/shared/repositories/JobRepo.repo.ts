@@ -10,6 +10,7 @@ export class JobRepo {
     private baseApi: string = environment.HOST.WEB_URL;
     constructor(protected _api: ApiService) {
         this.baseApi = _api.getApiUrl(this.baseApi, 44365, this.MODULE);
+        console.log(this.baseApi);
     }
 
     getListStageOfJob(jobId: string) {
@@ -40,8 +41,8 @@ export class JobRepo {
 
     //#region ops job billing 
     addOPSJob(body: any = {}) {
-        return this._api.post(`${environment.HOST.WEB_URL}44366/api/${this.VERSION}/vi/OpsTransaction/Add`, body);
-        // return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/OpsTransaction/Add`, body);
+        // return this._api.post(`${this.baseApi}/api/${this.VERSION}/vi/OpsTransaction/Add`, body);
+        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/OpsTransaction/Add`, body);
     }
     //#endregion
 }
