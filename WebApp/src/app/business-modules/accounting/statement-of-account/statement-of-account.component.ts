@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ConfirmDeletePopupComponent } from 'src/app/shared/common/popup';
+import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 
 @Component({
     selector: 'app-statement-of-account',
@@ -7,7 +7,10 @@ import { ConfirmDeletePopupComponent } from 'src/app/shared/common/popup';
     styleUrls: ['./statement-of-account.component.scss']
 })
 export class StatementOfAccountComponent implements OnInit {
-    @ViewChild(ConfirmDeletePopupComponent, { static: false }) confirmPopup: ConfirmDeletePopupComponent;
+
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
+    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+
 
 
     constructor() {
@@ -17,7 +20,9 @@ export class StatementOfAccountComponent implements OnInit {
     }
 
     onDeleteSOA() {
-        this.confirmPopup.show();
+        // this.confirmPopup.show();
+        this.infoPopup.show();
+
     }
 
 }
