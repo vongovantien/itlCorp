@@ -7,6 +7,6 @@ namespace eFMS.API.Documentation.DL.Models
 {
     public class AcctSoaModel : AcctSoa
     {
-
+        public List<Guid> SurchargeIds { get; set; }
     }
 }
