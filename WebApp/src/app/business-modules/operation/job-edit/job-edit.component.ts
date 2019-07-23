@@ -191,6 +191,8 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             || this.opsTransaction.sumGrossWeight === 0
             || this.opsTransaction.sumNetWeight === 0
             || this.opsTransaction.sumCbm === 0
+            || this.opsTransaction.sumPackages === 0
+            || this.opsTransaction.sumContainers === 0
         ) {
             return;
         } else {
@@ -217,7 +219,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
      * Close popup, assign list container to current job & remove last row that is not saved
      */
     closeContainerPopup() {
-        const index = this.lstMasterContainers.findIndex(x => x.isNew == true);
+        const index = this.lstMasterContainers.findIndex(x => x.isNew === true);
         if (index > -1 && this.lstMasterContainers.length > 1) {
             this.lstMasterContainers.splice(index, 1);
         }
@@ -280,6 +282,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     /**
      * change mode of row(editing - not editing)
      */
+    containerToChangeEdit: any = null;
     changeEditMode(index: any) {
         this.getComboboxDataContainer(index);
         if (this.lstMasterContainers[index].allowEdit === false || this.lstMasterContainers[index].allowEdit == undefined) {
@@ -298,6 +301,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         } else {
             this.lstMasterContainers[index].allowEdit = false;
         }
+        this.containerToChangeEdit = Object.assign({}, this.lstMasterContainers[index]);
     }
 
     saveContainerSuccess = false;
@@ -333,7 +337,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             this.saveContainerSuccess = false;
         } else {
             // set row is saved
-            if (this.lstMasterContainers[index].isNew == true) {
+            if (this.lstMasterContainers[index].isNew === true) {
                 this.lstMasterContainers[index].isNew = false;
             } else {
                 this.lstMasterContainers[index].inValidRow = false;
@@ -341,10 +345,25 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
                 this.lstMasterContainers[index].packageTypeActive = this.lstMasterContainers[index].packageTypeId != null ? [{ id: this.lstMasterContainers[index].packageTypeId, text: this.lstMasterContainers[index].packageTypeName }] : [];
                 this.lstMasterContainers[index].unitOfMeasureActive = this.lstMasterContainers[index].unitOfMeasureId != null ? [{ id: this.lstMasterContainers[index].unitOfMeasureId, text: this.lstMasterContainers[index].unitOfMeasureName }] : [];
             }
+            this.roundWeight(index);
             this.saveContainerSuccess = true;
             this.lstMasterContainers[index].allowEdit = false;
         }
         this.lstContainerTemp = Object.assign([], this.lstMasterContainers);
+    }
+    roundWeight(index: number) {
+        if (this.lstMasterContainers[index].gw != null) {
+            this.lstMasterContainers[index].gw = Number(this.lstMasterContainers[index].gw.toFixed(2));
+        }
+        if (this.lstMasterContainers[index].nw != null) {
+            this.lstMasterContainers[index].nw = Number(this.lstMasterContainers[index].nw.toFixed(2));
+        }
+        if (this.lstMasterContainers[index].cbm != null) {
+            this.lstMasterContainers[index].cbm = Number(this.lstMasterContainers[index].cbm.toFixed(2));
+        }
+        if (this.lstMasterContainers[index].chargeAbleWeight != null) {
+            this.lstMasterContainers[index].chargeAbleWeight = Number(this.lstMasterContainers[index].chargeAbleWeight.toFixed(2));
+        }
     }
     /**
      * save list container
@@ -389,12 +408,14 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
      * @param index 
      */
     cancelNewContainer(index: number) {
-        if (this.lstMasterContainers[index].isNew == true) {
+        if (this.lstMasterContainers[index].isNew === true) {
             this.lstMasterContainers.splice(index, 1);
-        }
-        else {
+        } else {
+            this.lstMasterContainers[index] = this.containerToChangeEdit;
             this.lstMasterContainers[index].allowEdit = false;
+            this.containerToChangeEdit = null;
         }
+
     }
 
     /**
@@ -801,16 +822,25 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     prepareEditCharge(type: 'BUY' | 'SELL' | 'OBH', charge: any) {
         if (type === 'BUY') {
             this.BuyingRateChargeToEdit = cloneDeep(charge);
-            this.BuyingRateChargeToEdit.exchangeDate = { startDate: moment(this.BuyingRateChargeToEdit.exchangeDate), endDate: moment(this.BuyingRateChargeToEdit.exchangeDate) };
+            //this.BuyingRateChargeToEdit.exchangeDate = { startDate: moment(this.BuyingRateChargeToEdit.exchangeDate), endDate: moment(this.BuyingRateChargeToEdit.exchangeDate) };
+            if (this.BuyingRateChargeToEdit.exchangeDate != null) {
+                this.exchangeRateDate = { startDate: moment(this.BuyingRateChargeToEdit.exchangeDate), endDate: moment(this.BuyingRateChargeToEdit.exchangeDate) };
+            }
         }
         if (type === 'SELL') {
             this.SellingRateChargeToEdit = cloneDeep(charge);
-            this.SellingRateChargeToEdit.exchangeDate = { startDate: moment(this.SellingRateChargeToEdit.exchangeDate), endDate: moment(this.SellingRateChargeToEdit.exchangeDate) };
-            this.exchangeRateDate = { startDate: moment(this.SellingRateChargeToEdit.exchangeDate), endDate: moment(this.SellingRateChargeToEdit.exchangeDate) };
+            if (this.SellingRateChargeToEdit.exchangeDate != null) {
+                this.exchangeRateDate = { startDate: moment(this.SellingRateChargeToEdit.exchangeDate), endDate: moment(this.SellingRateChargeToEdit.exchangeDate) };
+            }
+            //this.SellingRateChargeToEdit.exchangeDate = { startDate: moment(this.SellingRateChargeToEdit.exchangeDate), endDate: moment(this.SellingRateChargeToEdit.exchangeDate) };
+
         }
         if (type === 'OBH') {
             this.OBHChargeToEdit = cloneDeep(charge);
-            this.OBHChargeToEdit.exchangeDate = { startDate: moment(this.OBHChargeToEdit.exchangeDate), endDate: moment(this.OBHChargeToEdit.exchangeDate) };
+            //this.OBHChargeToEdit.exchangeDate = { startDate: moment(this.OBHChargeToEdit.exchangeDate), endDate: moment(this.OBHChargeToEdit.exchangeDate) };
+            if (this.OBHChargeToEdit.exchangeDate != null) {
+                this.exchangeRateDate = { startDate: moment(this.OBHChargeToEdit.exchangeDate), endDate: moment(this.OBHChargeToEdit.exchangeDate) };
+            }
         }
     }
 

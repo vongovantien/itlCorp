@@ -461,7 +461,7 @@
                                                         <input type="number"
                                                             class="form-control m-input m-input--square"
                                                             placeholder="Enter number" name="sumGrossWeight"
-                                                            [(ngModel)]="opsTransaction.sumGrossWeight"
+                                                            [(ngModel)]="opsTransaction.sumGrossWeight" min="0.01"
                                                             decimalNumberGreaterThan0 #sumGrossWeight="ngModel">
                                                         <div class="form-control-feedback"
                                                             *ngIf="addOpsForm.submitted && opsTransaction.sumGrossWeight == 0">
@@ -477,7 +477,7 @@
                                                         </label>
                                                         <input type="number"
                                                             class="form-control m-input m-input--square"
-                                                            placeholder="Enter number" name="sumNetWeight"
+                                                            placeholder="Enter number" name="sumNetWeight" min="0.01"
                                                             [(ngModel)]="opsTransaction.sumNetWeight"
                                                             decimalNumberGreaterThan0 #sumNetWeight="ngModel">
                                                         <div class="form-control-feedback"
@@ -493,7 +493,7 @@
                                                             CBM
                                                         </label>
                                                         <input type="number"
-                                                            class="form-control m-input m-input--square"
+                                                            class="form-control m-input m-input--square" min="0.01"
                                                             placeholder="Enter number" name="sumCbm"
                                                             [(ngModel)]="opsTransaction.sumCbm"
                                                             decimalNumberGreaterThan0 #sumCbm="ngModel">
@@ -506,7 +506,8 @@
                                             </div>
                                             <div class="row">
                                                 <div class="col-xl-4">
-                                                    <div class="form-group">
+                                                    <div class="form-group"
+                                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.sumPackages == 0}">
                                                         <label class="form-control-label" for="">
                                                             Packages Qty
                                                         </label>
@@ -526,10 +527,16 @@
                                                                 </ng-select>
                                                             </div>
                                                         </div>
+
+                                                        <div class="form-control-feedback"
+                                                            *ngIf="addOpsForm.submitted && opsTransaction.sumPackages == 0">
+                                                            Packages Qty must be greater than 0
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-xl-4">
-                                                    <div class="form-group">
+                                                    <div class="form-group"
+                                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.sumContainers == 0}">
                                                         <label class="form-control-label" for="">
                                                             Container Qty
                                                         </label>
@@ -539,6 +546,10 @@
                                                             placeholder="Enter number"
                                                             [(ngModel)]="opsTransaction.sumContainers"
                                                             #sumContainers="ngModel">
+                                                        <div class="form-control-feedback"
+                                                            *ngIf="addOpsForm.submitted && opsTransaction.sumContainers == 0">
+                                                            Container Qty must be greater than 0
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-xl-4">
@@ -1749,13 +1760,13 @@
                                             </td>
                                             <td class="">
                                                 <div class="control-editable"
-                                                    [ngClass]="{ 'has-danger': containerMasterForm.submitted && conQuantity.invalid && container.verifying}">
+                                                    [ngClass]="{ 'has-danger': (containerMasterForm.submitted && conQuantity.invalid && container.verifying) || (containerMasterForm.submitted && container.chargeAbleWeight == 0)}">
                                                     <input type="number" class="form-control m-input m-input--square"
                                                         min="1" max="2147483647" value="1" appIntergerInputCheck
                                                         placeholder="Enter number" [(ngModel)]="container.quantity"
                                                         name="conQuantity" #conQuantity="ngModel" required>
                                                     <div class="form-control-feedback"
-                                                        *ngIf="containerMasterForm.submitted && conQuantity.invalid && container.verifying">
+                                                        *ngIf="(containerMasterForm.submitted && conQuantity.invalid && container.verifying) || (containerMasterForm.submitted && container.chargeAbleWeight == 0)">
                                                         Cont Q'ty must be a number
                                                     </div>
                                                 </div>
@@ -1885,7 +1896,7 @@
                                                     <input type="number" class="form-control m-input m-input--square"
                                                         placeholder="Enter number" autocomplete="nope"
                                                         [(ngModel)]="container.cbm" name="containerCBM" min="0.01"
-                                                        appTwoDigitDecimaNumber #containerCBM="ngModel">
+                                                        decimalNumberGreaterThan0 #containerCBM="ngModel">
                                                     <div class="form-control-feedback"
                                                         *ngIf="containerMasterForm.submitted && container.cbm == 0">
                                                         CBM must be greater than 0.
@@ -1957,12 +1968,12 @@
                                             </td>
                                             <td class="">
                                                 <span class="content-editable">
-                                                    {{ container.nw | number: '1.2-2' }}
+                                                    {{ container.gw | number: '1.2-2' }}
                                                 </span>
                                             </td>
                                             <td class="">
                                                 <span class="content-editable">
-                                                    {{ container.gw | number: '1.2-2' }}
+                                                    {{ container.nw | number: '1.2-2' }}
                                                 </span>
                                             </td>
                                             <td class="">
@@ -1999,7 +2010,7 @@
                         </span>
                     </button>
                     <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                        data-dismiss="modal">
+                        data-dismiss="modal" (click)="closeContainerPopup()">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -3768,25 +3779,30 @@
                                         placeholder="Enter text" name="OBHChargeNoteNameEdtOps">
                                 </div>
                             </div>
-                            <!-- <div class="col-lg-4">
+                            <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
                                         Exchange rate date
                                     </label>
                                     <div class="m-input-icon m-input-icon--right down">
                                         <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [autoApply]="true" [disabled]=""
+                                            ngxDaterangepickerMd [autoApply]="true"
+                                            [attr.disabled]="OBHChargeToEdit.cdno"
                                             [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                            [(ngModel)]="selectedDate" [singleDatePicker]="true"
-                                            name="OBHExchangeDateNameEdt" readonly />
+                                            [(ngModel)]="exchangeRateDate" [singleDatePicker]="true"
+                                            name="exchangeRateDate" readonly />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
                                             <span>
                                                 <i class="la la-calendar"></i>
                                             </span>
                                         </span>
                                     </div>
+                                    <div class="form-control-feedback"
+                                        *ngIf="editOBHChargeFormOps.submitted && this.exchangeRateDate.startDate != null && this.exchangeRateDate.startDate != null && (this.exchangeRateDate.startDate < this.exchangeRateDate.startDate)">
+                                        Finish Date must more greater or equal Service Date
+                                    </div>
                                 </div>
-                            </div> -->
+                            </div>
                         </div>
                     </div>
                     <!--end::Form-->
