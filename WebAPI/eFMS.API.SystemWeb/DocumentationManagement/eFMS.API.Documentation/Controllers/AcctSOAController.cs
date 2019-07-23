@@ -57,15 +57,18 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Add")]
-        //[Authorize]
+        [Authorize]
         public IActionResult AddNew(AcctSoaModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+
             model.Status = "New";
             model.DatetimeCreated = DateTime.Now;
             model.DatetimeModified = DateTime.Now;
-            model.UserCreated = model.UserModified = "admin"; //currentUser.UserID;
-            var hs = acctSOAService.Add(model);
+            model.UserCreated = model.UserModified = currentUser.UserID;
+
+            var hs = acctSOAService.AddSOA(model);
+
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -74,5 +77,6 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+
     }
 }
