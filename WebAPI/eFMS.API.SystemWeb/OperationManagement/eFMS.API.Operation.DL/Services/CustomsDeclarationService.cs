@@ -475,16 +475,44 @@ namespace eFMS.API.Operation.DL.Services
                         item.IsValid = false;
                         item.MblidValid = false;
                     }
+
+                    //Check input character special, number
+                    Regex pattern = new Regex(@"^[a-zA-Z0-9 ./_-]*$");
+                    if(!pattern.IsMatch(_mbl))
+                    {
+                        item.Mblid = stringLocalizer[LanguageSub.MSG_CUSTOM_INVALID_CHARACTER_SPECIAL];
+                        item.IsValid = false;
+                        item.MblidValid = false;
+                    }
                 }
 
-                //Check valid maxlength for HblId
+                //Check empty for HBL
                 string _hbl = item.Hblid;
                 item.HblidValid = true;
-                if (!string.IsNullOrEmpty(_hbl) && _hbl.Length > 50)
+                if (string.IsNullOrEmpty(_hbl))
                 {
-                    item.Hblid = string.Format(stringLocalizer[LanguageSub.MSG_INVALID_MAX_LENGTH], 50);
+                    item.Hblid = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_HBL_EMPTY];
                     item.IsValid = false;
                     item.HblidValid = false;
+                }
+                else
+                {
+                    //Check valid maxlength for HblId
+                    if (_hbl.Length > 50)
+                    {
+                        item.Hblid = string.Format(stringLocalizer[LanguageSub.MSG_INVALID_MAX_LENGTH], 50);
+                        item.IsValid = false;
+                        item.HblidValid = false;
+                    }
+
+                    //Check input character special, number
+                    Regex pattern = new Regex(@"^[a-zA-Z0-9 ./_-]*$");
+                    if (!pattern.IsMatch(_hbl))
+                    {
+                        item.Hblid = stringLocalizer[LanguageSub.MSG_CUSTOM_INVALID_CHARACTER_SPECIAL];
+                        item.IsValid = false;
+                        item.HblidValid = false;
+                    }
                 }
 
                 //Check empty & exist data for Gateway
@@ -526,8 +554,18 @@ namespace eFMS.API.Operation.DL.Services
                     }
                     else
                     {
-                        item.GrossWeight = Convert.ToDecimal(_grossWeight);
-                        item.GrossWeightStr = _grossWeight;
+                        var valueConvert = Convert.ToDecimal(_grossWeight);
+                        if (valueConvert < 0)
+                        {                           
+                            item.GrossWeightStr = stringLocalizer[LanguageSub.MSG_INVALID_NEGATIVE];
+                            item.IsValid = false;
+                            item.GrossWeightValid = false;
+                        }
+                        else
+                        {
+                            item.GrossWeight = Math.Round(valueConvert, 2);
+                            item.GrossWeightStr = item.GrossWeight.ToString();
+                        }
                     }
                 }
 
@@ -545,8 +583,18 @@ namespace eFMS.API.Operation.DL.Services
                     }
                     else
                     {
-                        item.NetWeight = Convert.ToDecimal(_netWeight);
-                        item.NetWeightStr = _netWeight;
+                        var valueConvert = Convert.ToDecimal(_netWeight);
+                        if (valueConvert < 0)
+                        {                            
+                            item.NetWeightStr = stringLocalizer[LanguageSub.MSG_INVALID_NEGATIVE];
+                            item.IsValid = false;
+                            item.NetWeightValid = false;
+                        }
+                        else
+                        {
+                            item.NetWeight = Math.Round(valueConvert, 2);
+                            item.NetWeightStr = item.NetWeight.ToString();
+                        }
                     }
                 }
 
@@ -564,8 +612,18 @@ namespace eFMS.API.Operation.DL.Services
                     }
                     else
                     {
-                        item.Cbm = Convert.ToDecimal(_cbm);
-                        item.CbmStr = _cbm;
+                        var valueConvert = Convert.ToDecimal(_cbm);
+                        if (valueConvert < 0)
+                        {                            
+                            item.CbmStr = stringLocalizer[LanguageSub.MSG_INVALID_NEGATIVE];
+                            item.IsValid = false;
+                            item.CbmValid = false;
+                        }
+                        else
+                        {
+                            item.Cbm = Math.Round(valueConvert, 2);
+                            item.CbmStr = item.Cbm.ToString();
+                        }
                     }
                 }
 
@@ -583,8 +641,18 @@ namespace eFMS.API.Operation.DL.Services
                     }
                     else
                     {
-                        item.QtyCont = Convert.ToInt32(_qtyCont);
-                        item.QtyContStr = _qtyCont;
+                        var valueConvert = Convert.ToInt32(_qtyCont);
+                        if (valueConvert < 0)
+                        {                          
+                            item.QtyContStr = stringLocalizer[LanguageSub.MSG_INVALID_NEGATIVE];
+                            item.IsValid = false;
+                            item.QtyContValid = false;
+                        }
+                        else
+                        {
+                            item.QtyCont = valueConvert;
+                            item.QtyContStr = _qtyCont;
+                        }
                     }
                 }
 
@@ -602,8 +670,18 @@ namespace eFMS.API.Operation.DL.Services
                     }
                     else
                     {
-                        item.Pcs = Convert.ToInt32(_pcs);
-                        item.PcsStr = _pcs;
+                        var valueConvert = Convert.ToInt32(_pcs);
+                        if (valueConvert < 0)
+                        {                           
+                            item.PcsStr = stringLocalizer[LanguageSub.MSG_INVALID_NEGATIVE];
+                            item.IsValid = false;
+                            item.PcsValid = false;
+                        }
+                        else
+                        {
+                            item.Pcs = valueConvert;
+                            item.PcsStr = _pcs;
+                        }
                     }
                 }
 
@@ -622,30 +700,6 @@ namespace eFMS.API.Operation.DL.Services
                     else
                     {
                         item.CommodityName = dc.CatCommodity.Where(x => x.Code == _commodity).First().CommodityNameEn;
-                    }
-                }
-
-                //Check empty & exist data for CargoType
-                string _cargoType = item.CargoType;
-                item.CargoTypeValid = true;
-                if (string.IsNullOrEmpty(_cargoType))
-                {
-                    item.CargoType = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_CARGO_TYPE_EMPTY];
-                    item.IsValid = false;
-                    item.CargoTypeValid = false;
-                }
-                else
-                {
-                    var isFound = CustomData.CargoTypes.Any(x => x.Value == _cargoType);
-                    if (!isFound)
-                    {
-                        item.CargoType = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
-                        item.IsValid = false;
-                        item.CargoTypeValid = false;
-                    }
-                    else
-                    {
-                        item.CargoType = CustomData.CargoTypes.Where(x => x.Value == _cargoType).First().Value;
                     }
                 }
 
@@ -670,6 +724,34 @@ namespace eFMS.API.Operation.DL.Services
                     else
                     {
                         item.ServiceType = CustomData.ServiceTypes.Where(x => x.Value == _serviceType).First().Value;
+                    }
+                }
+
+                //Check empty & exist data for CargoType
+                string _cargoType = item.CargoType;
+                item.CargoTypeValid = true;
+                if (!item.ServiceType.Equals("Air") && !item.ServiceType.Equals("Express") && string.IsNullOrEmpty(_cargoType))
+                {
+                    item.CargoType = stringLocalizer[LanguageSub.MSG_CUSTOM_CLEARANCE_CARGO_TYPE_EMPTY];
+                    item.IsValid = false;
+                    item.CargoTypeValid = false;
+                }
+                else if (item.ServiceType.Equals("Air") || item.ServiceType.Equals("Express"))
+                {
+                    item.CargoType = null;
+                }
+                else
+                {
+                    var isFound = CustomData.CargoTypes.Any(x => x.Value == _cargoType);
+                    if (!isFound)
+                    {
+                        item.CargoType = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
+                        item.IsValid = false;
+                        item.CargoTypeValid = false;
+                    }
+                    else
+                    {
+                        item.CargoType = CustomData.CargoTypes.Where(x => x.Value == _cargoType).First().Value;
                     }
                 }
 
