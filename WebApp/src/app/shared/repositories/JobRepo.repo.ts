@@ -7,10 +7,7 @@ export class JobRepo {
 
     private MODULE: string = 'operation';
     private VERSION: string = 'v1';
-    // private baseApi: string = environment.HOST.WEB_URL;
     constructor(protected _api: ApiService) {
-        // this.baseApi = _api.getApiUrl(this.baseApi, 44365, this.MODULE);
-        //console.log(this.baseApi);
     }
 
     getListStageOfJob(jobId: string) {

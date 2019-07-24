@@ -24,6 +24,7 @@ export class CustomClearanceEditComponent implements OnInit {
     listUnit: any = [];
     _clearanceDate: any;
     listUser: any[] = [];
+    isConvertJob: boolean = false;
 
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU,
@@ -49,11 +50,11 @@ export class CustomClearanceEditComponent implements OnInit {
     }
     getListUser() {
         this.baseServices.get(this.api_menu.System.User_Management.getAll).subscribe((res: any) => {
-        this.listUser = res.map(x => ({ "text": x.username, "id": x.id }));
-    }, err => {
-        this.listUser = [];
-        this.baseServices.handleError(err);
-    });
+            this.listUser = res.map(x => ({ "text": x.username, "id": x.id }));
+        }, err => {
+            this.listUser = [];
+            this.baseServices.handleError(err);
+        });
     }
 
     async getCustomCleanranceById(id) {
@@ -143,32 +144,35 @@ export class CustomClearanceEditComponent implements OnInit {
             }
         }
     }
-    async convertClearanceToShipment(formUpdate: NgForm){
-        if (this.strCustomerCurrent == '' || this.strPortCurrent == '') return;
-        if (this.serviceTypeCurrent[0] != 'Air' && this.serviceTypeCurrent[0] != 'Express') {
-            if (this.cargoTypeCurrent.length == 0) return;
+    async convertClearanceToShipment(formUpdate: NgForm) {
+        if (this.strCustomerCurrent === '' || this.strPortCurrent === ''
+            || this.typeClearanceCurrent.length === 0
+            || this.customDeclaration.hblid == null || this.customDeclaration.hblid === ''
+            || this.customDeclaration.mblid == null || this.customDeclaration.mblid === '') { return; }
+        if (this.serviceTypeCurrent[0] !== 'Air' && this.serviceTypeCurrent[0] !== 'Express') {
+            if (this.cargoTypeCurrent.length === 0) { return; }
         }
-        if (formUpdate.form.status != "INVALID" && this._clearanceDate.endDate != null) {
+        if (formUpdate.form.status !== "INVALID" && this._clearanceDate.endDate != null) {
             this.customDeclaration.partnerTaxCode = this.strCustomerCurrent;
-            //this.customDeclaration.clearanceDate = moment(this.customDeclaration.clearanceDate.endDate._d).format('YYYY-MM-DD');
+            // this.customDeclaration.clearanceDate = moment(this.customDeclaration.clearanceDate.endDate._d).format('YYYY-MM-DD');
             this.customDeclaration.clearanceDate = moment(this._clearanceDate.endDate._d).format('YYYY-MM-DD');
             this.customDeclaration.serviceType = this.serviceTypeCurrent[0];
             this.customDeclaration.gateway = this.strPortCurrent;
             this.customDeclaration.type = this.typeClearanceCurrent[0];
             this.customDeclaration.route = this.routeClearanceCurrent[0];
-            this.customDeclaration.cargoType = (this.serviceTypeCurrent[0] == 'Air' || this.serviceTypeCurrent[0] == 'Express') ? null : this.cargoTypeCurrent[0];
+            this.customDeclaration.cargoType = (this.serviceTypeCurrent[0] === 'Air' || this.serviceTypeCurrent[0] === 'Express') ? null : this.cargoTypeCurrent[0];
             this.customDeclaration.exportCountryCode = this.strCountryExportCurrent;
             this.customDeclaration.importCountryCode = this.strCountryImportCurrent;
             this.customDeclaration.commodityCode = this.strCommodityCurrent;
             this.customDeclaration.unitCode = this.strUnitCurrent;
 
-            let shipment = this.mapClearanceToShipment();
-            var response = await this.baseServices.postAsync(this.api_menu.Documentation.Operation.convertClearanceToJob, { opsTransaction : shipment, customsDeclaration: this.customDeclaration }, true, true);
+            const shipment = this.mapClearanceToShipment();
+            const response = await this.baseServices.postAsync(this.api_menu.Documentation.Operation.convertClearanceToJob, { opsTransaction: shipment, customsDeclaration: this.customDeclaration }, true, true);
             if (response.status) {
                 this.getCustomCleanranceById(this.customDeclaration.id);
             } else {
-                //reset lại _clearanceDate
-                //this.customDeclaration.clearanceDate = this.customDeclaration.clearanceDate == null ? this.customDeclaration.clearanceDate : { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate) };
+                // reset lại _clearanceDate
+                // this.customDeclaration.clearanceDate = this.customDeclaration.clearanceDate == null ? this.customDeclaration.clearanceDate : { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate) };
                 this._clearanceDate = this.customDeclaration.clearanceDate == null ? this.customDeclaration.clearanceDate : { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate) };
             }
         }
@@ -176,30 +180,29 @@ export class CustomClearanceEditComponent implements OnInit {
 
     mapClearanceToShipment() {
         let shipment = new OpsTransaction();
-        let index = this.listCustomer.findIndex(x => x.taxCode == this.customDeclaration.partnerTaxCode);
-        if(index > -1){
-            let customer = this.listCustomer[index];
+        let index = this.listCustomer.findIndex(x => x.taxCode === this.customDeclaration.partnerTaxCode);
+        if (index > -1) {
+            const customer = this.listCustomer[index];
             shipment.customerId = customer.id;
-            shipment.salemanId = customer.salemanId;
-            index = this.listPort.findIndex(x => x.code == this.customDeclaration.gateway);
-            if(index > -1){
-                if(this.customDeclaration.type == "Export"){
+            shipment.salemanId = customer.salePersonId;
+            shipment.serviceMode = this.customDeclaration.type;
+            index = this.listPort.findIndex(x => x.code === this.customDeclaration.gateway);
+            if (index > -1) {
+                if (this.customDeclaration.type === "Export") {
                     shipment.pol = this.listPort[index].id;
                 }
-                if(this.customDeclaration.type == "Import"){
+                if (this.customDeclaration.type === "Import") {
                     shipment.pod = this.listPort[index].id;
                 }
             }
-            if(this.customDeclaration.serviceType == "Sea")
-            {
-                if(this.customDeclaration.cargoType == "FCL"){
-                    shipment.productService = "Sea FCL";
+            if (this.customDeclaration.serviceType === "Sea") {
+                if (this.customDeclaration.cargoType === "FCL") {
+                    shipment.productService = "SeaFCL";
                 }
-                if(this.customDeclaration.cargoType == "LCL"){
-                    shipment.productService = "Sea LCL";
+                if (this.customDeclaration.cargoType === "LCL") {
+                    shipment.productService = "SeaLCL";
                 }
-            }
-            else{
+            } else {
                 shipment.productService = this.customDeclaration.serviceType;
             }
             shipment.shipmentMode = "External";
@@ -209,21 +212,19 @@ export class CustomClearanceEditComponent implements OnInit {
             shipment.sumGrossWeight = this.customDeclaration.grossWeight;
             shipment.sumNetWeight = this.customDeclaration.netWeight;
             shipment.sumCbm = this.customDeclaration.cbm;
-            let claim = localStorage.getItem('id_token_claims_obj');
-            let currenctUser = JSON.parse(claim)["id"];
+            const claim = localStorage.getItem('id_token_claims_obj');
+            const currenctUser = JSON.parse(claim)["id"];
             shipment.billingOpsId = currenctUser;
-            index = this.listUnit.findIndex(x => x.code == this.customDeclaration.unitCode);
-            if(index > -1){
+            index = this.listUnit.findIndex(x => x.code === this.customDeclaration.unitCode);
+            if (index > -1) {
                 shipment.packageTypeID = this.listUnit[index].id;
             }
-        }
-        else{
-            this.baseServices.errorToast("Không đủ điều kiện để tạo job mới");
+        } else {
+            this.baseServices.errorToast("Không có customer để tạo job mới");
             shipment = null;
         }
-        if(this.customDeclaration.clearanceDate == null)
-        {
-            this.baseServices.errorToast("Không đủ điều kiện để tạo job mới");
+        if (this.customDeclaration.clearanceDate == null) {
+            this.baseServices.errorToast("Không có clearance date để tạo job mới");
             shipment = null;
         }
         return shipment;

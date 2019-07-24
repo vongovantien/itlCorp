@@ -31,7 +31,9 @@ namespace eFMS.API.Documentation.DL.Common
         [Description("Finish")]
         Finish = 5,
         [Description("Canceled")]
-        Canceled = 6
+        Canceled = 6,
+        [Description("Warning")]
+        Warning = 7
     }
     public enum StageEnum
     {

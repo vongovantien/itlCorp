@@ -153,7 +153,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_NOT_ALLOW_DELETED].Value });
             }
-            var hs = transactionService.Delete(x => x.Id == id);
+            var hs = transactionService.SoftDeleteJob(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -180,11 +180,12 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("ConvertClearanceToJob")]
+        [Authorize]
         public IActionResult ConvertClearanceToJob(OpsTransactionClearanceModel model)
         {
             var hs = transactionService.ConvertClearanceToJob(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[LanguageSub.MSG_CLEARANCE_CONVERT_TO_JOB].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);
@@ -198,11 +199,12 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="list"></param>
         /// <returns></returns>
         [HttpPost("ConvertExistedClearancesToJobs")]
+        [Authorize]
         public IActionResult ConvertExistedClearancesToJobs([FromBody]List<OpsTransactionClearanceModel> list)
         {
             HandleState hs = transactionService.ConvertExistedClearancesToJobs(list);
             var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[LanguageSub.MSG_LIST_CLEARANCE_CONVERT_TO_JOB].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);

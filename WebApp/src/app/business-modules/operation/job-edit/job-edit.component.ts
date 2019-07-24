@@ -70,8 +70,8 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     OBHChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
 
     isDisplay: boolean = true;
-    BuyingRateChargeToEdit: any = null;
-    SellingRateChargeToEdit: any = null;
+    BuyingRateChargeToEdit: CsShipmentSurcharge = null;
+    SellingRateChargeToEdit: CsShipmentSurcharge = null;
     OBHChargeToEdit: any = null;
 
     totalSellingUSD: number = 0;
@@ -650,51 +650,60 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     }
 
     calculateTotalEachBuying(isEdit: boolean = false) {
+        let total = 0;
         if (isEdit) {
             if (this.BuyingRateChargeToEdit.vatrate >= 0) {
-                this.BuyingRateChargeToEdit.total = this.BuyingRateChargeToEdit.quantity * this.BuyingRateChargeToEdit.unitPrice * (1 + (this.BuyingRateChargeToEdit.vatrate / 100));
+                total = this.BuyingRateChargeToEdit.quantity * this.BuyingRateChargeToEdit.unitPrice * (1 + (this.BuyingRateChargeToEdit.vatrate / 100));
             } else {
-                this.BuyingRateChargeToEdit.total = this.BuyingRateChargeToEdit.quantity * this.BuyingRateChargeToEdit.unitPrice + Math.abs(this.BuyingRateChargeToEdit.vatrate);
+                total = this.BuyingRateChargeToEdit.quantity * this.BuyingRateChargeToEdit.unitPrice + Math.abs(this.BuyingRateChargeToEdit.vatrate);
             }
+            this.BuyingRateChargeToEdit.total = Number(total.toFixed(2));
         } else {
             if (this.BuyingRateChargeToAdd.vatrate >= 0) {
-                this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice * (1 + (this.BuyingRateChargeToAdd.vatrate / 100));
+                total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice * (1 + (this.BuyingRateChargeToAdd.vatrate / 100));
             } else {
-                this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice + Math.abs(this.BuyingRateChargeToAdd.vatrate);
+                total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice + Math.abs(this.BuyingRateChargeToAdd.vatrate);
             }
+            this.BuyingRateChargeToAdd.total = Number(total.toFixed(2));
         }
     }
 
     calculateTotalEachSelling(isEdit: boolean = false) {
+        let total = 0;
         if (isEdit) {
             if (this.SellingRateChargeToEdit.vatrate >= 0) {
-                this.SellingRateChargeToEdit.total = this.SellingRateChargeToEdit.quantity * this.SellingRateChargeToEdit.unitPrice * (1 + (this.SellingRateChargeToEdit.vatrate / 100));
+                total = this.SellingRateChargeToEdit.quantity * this.SellingRateChargeToEdit.unitPrice * (1 + (this.SellingRateChargeToEdit.vatrate / 100));
             } else {
-                this.SellingRateChargeToEdit.total = this.SellingRateChargeToEdit.quantity * this.SellingRateChargeToEdit.unitPrice + Math.abs(this.SellingRateChargeToEdit.vatrate);
+                total = this.SellingRateChargeToEdit.quantity * this.SellingRateChargeToEdit.unitPrice + Math.abs(this.SellingRateChargeToEdit.vatrate);
             }
+            this.SellingRateChargeToEdit.total = Number(total.toFixed(2));
         } else {
             if (this.SellingRateChargeToAdd.vatrate >= 0) {
-                this.SellingRateChargeToAdd.total = this.SellingRateChargeToAdd.quantity * this.SellingRateChargeToAdd.unitPrice * (1 + (this.SellingRateChargeToAdd.vatrate / 100));
+                total = this.SellingRateChargeToAdd.quantity * this.SellingRateChargeToAdd.unitPrice * (1 + (this.SellingRateChargeToAdd.vatrate / 100));
             } else {
-                this.SellingRateChargeToAdd.total = this.SellingRateChargeToAdd.quantity * this.SellingRateChargeToAdd.unitPrice + Math.abs(this.SellingRateChargeToAdd.vatrate);
+                total = this.SellingRateChargeToAdd.quantity * this.SellingRateChargeToAdd.unitPrice + Math.abs(this.SellingRateChargeToAdd.vatrate);
             }
+            this.SellingRateChargeToAdd.total = Number(total.toFixed(2));
         }
     }
 
 
     calculateTotalEachOBH(isEdit: boolean = false) {
+        let total = 0;
         if (isEdit) {
             if (this.OBHChargeToEdit.vatrate >= 0) {
-                this.OBHChargeToEdit.total = this.OBHChargeToEdit.quantity * this.OBHChargeToEdit.unitPrice * (1 + (this.OBHChargeToEdit.vatrate / 100));
+                total = this.OBHChargeToEdit.quantity * this.OBHChargeToEdit.unitPrice * (1 + (this.OBHChargeToEdit.vatrate / 100));
             } else {
-                this.OBHChargeToEdit.total = this.OBHChargeToEdit.quantity * this.OBHChargeToEdit.unitPrice + Math.abs(this.OBHChargeToEdit.vatrate);
+                total = this.OBHChargeToEdit.quantity * this.OBHChargeToEdit.unitPrice + Math.abs(this.OBHChargeToEdit.vatrate);
             }
+            this.OBHChargeToEdit.total = total;
         } else {
             if (this.OBHChargeToAdd.vatrate >= 0) {
-                this.OBHChargeToAdd.total = this.OBHChargeToAdd.quantity * this.OBHChargeToAdd.unitPrice * (1 + (this.OBHChargeToAdd.vatrate / 100));
+                total = this.OBHChargeToAdd.quantity * this.OBHChargeToAdd.unitPrice * (1 + (this.OBHChargeToAdd.vatrate / 100));
             } else {
-                this.OBHChargeToAdd.total = this.OBHChargeToAdd.quantity * this.OBHChargeToAdd.unitPrice + Math.abs(this.OBHChargeToAdd.vatrate);
+                total = this.OBHChargeToAdd.quantity * this.OBHChargeToAdd.unitPrice + Math.abs(this.OBHChargeToAdd.vatrate);
             }
+            this.OBHChargeToAdd.total = total;
         }
     }
 

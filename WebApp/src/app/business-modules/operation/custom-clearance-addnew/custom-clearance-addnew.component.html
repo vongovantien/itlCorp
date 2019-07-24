@@ -27,7 +27,8 @@
                                 </label>
                                 <input type="text" [(ngModel)]="customDeclaration.clearanceNo" placeholder="Enter text"
                                     (change)="customDeclaration.clearanceNo=customDeclaration.clearanceNo.trim()"
-                                    maxlength="50" class="form-control m-input m-input--square" #clearance_no="ngModel"
+                                    autocomplete="nope" maxlength="50" class="form-control m-input m-input--square"
+                                    #clearance_no="ngModel"
                                     onkeypress="return event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)"
                                     name="clearance_no" required placeholder="" autoFocus>
                                 <div class="form-control-feedback" *ngIf="addForm.submitted && clearance_no.invalid">
@@ -81,35 +82,37 @@
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': addForm.submitted && customDeclaration.hblid == null && isConvertJob }">
+                                [ngClass]="{ 'm-form__group has-danger': addForm.submitted && (customDeclaration.hblid == null || customDeclaration.hblid == '') && isConvertJob }">
                                 <label class="form-control-label" for="">
                                     HBL/HAWB <span class="m--font-danger"
-                                        *ngIf="addForm.submitted && customDeclaration.hblid == null && isConvertJob">(*)</span>
+                                        *ngIf="addForm.submitted && (customDeclaration.hblid == null || customDeclaration.hblid == '') && isConvertJob">(*)</span>
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
-                                    [(ngModel)]="customDeclaration.hblid" name="hblid" #hblib="ngModel" maxlength="50"
+                                    autocomplete="nope" [(ngModel)]="customDeclaration.hblid" name="hblid"
+                                    #hblib="ngModel" maxlength="50"
                                     (change)="customDeclaration.hblid=customDeclaration.hblid.trim()"
                                     onkeypress="return event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)">
                                 <div class="form-control-feedback"
-                                    *ngIf="addForm.submitted && customDeclaration.hblid == null && isConvertJob">
+                                    *ngIf="addForm.submitted && (customDeclaration.hblid == null || customDeclaration.hblid == '') && isConvertJob">
                                     HBL/HAWB is required
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': addForm.submitted && customDeclaration.mblid == null && isConvertJob }">
+                                [ngClass]="{ 'm-form__group has-danger': addForm.submitted && (customDeclaration.mblid == null || customDeclaration.mblid == '') && isConvertJob }">
                                 <label class="form-control-label" for="">
                                     MBL/MAWB <span class="m--font-danger"
-                                        *ngIf="addForm.submitted && customDeclaration.mblid == null && isConvertJob">(*)</span>
+                                        *ngIf="addForm.submitted && (customDeclaration.mblid == null || customDeclaration.mblid == '') && isConvertJob">(*)</span>
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
-                                    [(ngModel)]="customDeclaration.mblid" name="mblid" #mblib="ngModel" maxlength="50"
+                                    autocomplete="nope" [(ngModel)]="customDeclaration.mblid" name="mblid"
+                                    #mblib="ngModel" maxlength="50"
                                     (change)="customDeclaration.mblid=customDeclaration.mblid.trim()"
                                     onkeypress="return event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)">
                                 <div class="form-control-feedback"
-                                    *ngIf="addForm.submitted && customDeclaration.hblmblidd == null && isConvertJob">
-                                    HBL/HAWB is required
+                                    *ngIf="addForm.submitted && (customDeclaration.mblid == null || customDeclaration.mblid == '') && isConvertJob">
+                                    MBL/MAWB is required
                                 </div>
                             </div>
                         </div>
@@ -255,9 +258,9 @@
                                 <label class="form-control-label" for="">
                                     Gross Weight
                                 </label>
-                                <input type="number" class="form-control m-input m-input--square"
+                                <input type="number" class="form-control m-input m-input--square" min="0"
                                     placeholder="Enter number" [(ngModel)]="customDeclaration.grossWeight"
-                                    name="gross_weight"
+                                    name="gross_weight" autocomplete="nope"
                                     onkeypress="return event.charCode == 46 || (event.charCode > 47 && event.charCode < 58)"
                                     #gross_weight="ngModel">
                             </div>
@@ -267,9 +270,9 @@
                                 <label class="form-control-label" for="">
                                     Net Weight
                                 </label>
-                                <input type="number" class="form-control m-input m-input--square"
+                                <input type="number" class="form-control m-input m-input--square" min="0"
                                     placeholder="Enter number" [(ngModel)]="customDeclaration.netWeight"
-                                    name="net_weight"
+                                    name="net_weight" autocomplete="nope"
                                     onkeypress="return event.charCode == 46 || (event.charCode > 47 && event.charCode < 58)"
                                     #net_weight="ngModel">
                             </div>
@@ -281,8 +284,9 @@
                                 <label class="form-control-label" for="">
                                     CBM
                                 </label>
-                                <input type="number" class="form-control m-input m-input--square"
-                                    placeholder="Enter number" [(ngModel)]="customDeclaration.cbm" name="cbm"
+                                <input type="number" class="form-control m-input m-input--square" min="0"
+                                    autocomplete="nope" placeholder="Enter number" [(ngModel)]="customDeclaration.cbm"
+                                    name="cbm"
                                     onkeypress="return event.charCode == 46 || (event.charCode > 47 && event.charCode < 58)"
                                     #cbm="ngModel">
                             </div>
@@ -292,8 +296,9 @@
                                 <label class="form-control-label" for="">
                                     Qty Cont
                                 </label>
-                                <input type="number" class="form-control m-input m-input--square"
-                                    placeholder="Enter number" [(ngModel)]="customDeclaration.qtyCont" name="qty_cont"
+                                <input type="number" class="form-control m-input m-input--square" min="0"
+                                    autocomplete="nope" placeholder="Enter number"
+                                    [(ngModel)]="customDeclaration.qtyCont" name="qty_cont"
                                     onkeypress="return (event.charCode > 47 && event.charCode < 58)"
                                     #qty_cont="ngModel">
                             </div>
@@ -304,8 +309,8 @@
                                     Package Qty
                                 </label>
                                 <div class="input-group m-input-group m-input-group--square">
-                                    <input type="number" class="form-control m-input" aria-label=""
-                                        [(ngModel)]="customDeclaration.pcs" name="pcs"
+                                    <input type="number" class="form-control m-input" aria-label="" min="0"
+                                        [(ngModel)]="customDeclaration.pcs" name="pcs" autocomplete="nope"
                                         onkeypress="return (event.charCode > 47 && event.charCode < 58)" #pcs="ngModel"
                                         placeholder="Enter number">
                                     <div class="input-group-prepend">

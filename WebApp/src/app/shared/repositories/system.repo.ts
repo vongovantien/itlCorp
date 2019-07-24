@@ -8,12 +8,6 @@ export class SystemRepo {
     private MODULE: string = 'System';
     private baseApi: string = environment.HOST.WEB_URL;
     constructor(private _api: ApiService) {
-        // this.baseApi = this._api.getApiUrl(this.baseApi, 44360, this.MODULE);
-        // if (this.baseApi.includes('localhost')) {
-        //     this.baseApi = `${this.baseApi}44360`;
-        // } else {
-        //     this.baseApi = `${this.baseApi}/${this.MODULE}`;
-        // }
     }
 
     getListSystemUser() {

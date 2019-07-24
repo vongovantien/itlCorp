@@ -11,7 +11,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string POLName { get; set; }
         public int CurrentStageId { get; set; }
         public string CurentStageCode { get; set; }
-        public string CurrentStatus { get; set; }
         public string AgentName { get; set; }
         public string SupplierName { get; set; }
 

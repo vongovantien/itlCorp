@@ -46,7 +46,16 @@ namespace eFMS.API.Documentation.DL.Services
             model.UserCreated = currentUser.UserID; //currentUser.UserID;
             model.ModifiedDate = model.CreatedDate;
             model.UserModified = model.UserCreated;
-            model.CurrentStatus = "InSchedule";
+            //model.CurrentStatus = "InSchedule";
+            var dayStatus = (int)(model.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
+            if(dayStatus > 0)
+            {
+                model.CurrentStatus = TermData.InSchedule;
+            }
+            else
+            {
+                model.CurrentStatus = TermData.Processing;
+            }
             int countNumberJob = ((eFMSDataContext)DataContext.DC).OpsTransaction.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
             model.JobNo = GenerateID.GenerateOPSJobID("LOG", countNumberJob);
             var entity = mapper.Map<OpsTransaction>(model);
@@ -127,7 +136,7 @@ namespace eFMS.API.Documentation.DL.Services
             var query = (from detail in ((eFMSDataContext)DataContext.DC).OpsTransaction
                          where detail.Id == jobId
                          join surcharge in ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge on detail.Id equals surcharge.Hblid
-                         where surcharge.Cdno != null || surcharge.Soano != null
+                         where surcharge.Cdno != null || surcharge.Soano != null || surcharge.PaymentRefNo != null
                          select detail);
             if (query.Any())
             {
@@ -233,12 +242,22 @@ namespace eFMS.API.Documentation.DL.Services
                 if(model.CustomsDeclaration.JobNo == null)
                 {
                     model.OpsTransaction.Id = Guid.NewGuid();
+                    model.OpsTransaction.Hblid = Guid.NewGuid();
                     model.OpsTransaction.CreatedDate = DateTime.Now;
                     model.OpsTransaction.UserCreated = currentUser.UserID; //currentUser.UserID;
                     model.OpsTransaction.ModifiedDate = DateTime.Now;
                     model.OpsTransaction.UserModified = currentUser.UserID;
                     int countNumberJob = ((eFMSDataContext)DataContext.DC).OpsTransaction.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
                     model.OpsTransaction.JobNo = GenerateID.GenerateOPSJobID("LOG", countNumberJob);
+                    var dayStatus = (int)(model.OpsTransaction.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
+                    if (dayStatus > 0)
+                    {
+                        model.OpsTransaction.CurrentStatus = TermData.InSchedule;
+                    }
+                    else
+                    {
+                        model.OpsTransaction.CurrentStatus = TermData.Processing;
+                    }
                     var transaction = mapper.Map<OpsTransaction>(model.OpsTransaction);
                     DataContext.Add(transaction, false);
                 }
@@ -292,25 +311,37 @@ namespace eFMS.API.Documentation.DL.Services
             var result = new HandleState();
             try
             {
+                int i = 0;
                 foreach (var item in list)
                 {
                     if (item.CustomsDeclaration.JobNo == null)
                     {
                         item.OpsTransaction.Id = Guid.NewGuid();
+                        item.OpsTransaction.Hblid = Guid.NewGuid();
                         item.OpsTransaction.CreatedDate = DateTime.Now;
                         item.OpsTransaction.UserCreated = currentUser.UserID; //currentUser.UserID;
                         item.OpsTransaction.ModifiedDate = DateTime.Now;
                         item.OpsTransaction.UserModified = currentUser.UserID;
                         int countNumberJob = ((eFMSDataContext)DataContext.DC).OpsTransaction.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
-                        item.OpsTransaction.JobNo = GenerateID.GenerateOPSJobID("LOG", countNumberJob);
+                        item.OpsTransaction.JobNo = GenerateID.GenerateOPSJobID("LOG", (countNumberJob + i));
+                        var dayStatus = (int)(item.OpsTransaction.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
+                        if (dayStatus > 0)
+                        {
+                            item.OpsTransaction.CurrentStatus = TermData.InSchedule;
+                        }
+                        else
+                        {
+                            item.OpsTransaction.CurrentStatus = TermData.Processing;
+                        }
                         var transaction = mapper.Map<OpsTransaction>(item.OpsTransaction);
                         DataContext.Add(transaction, false);
 
                         item.CustomsDeclaration.JobNo = item.OpsTransaction.JobNo;
-                        item.CustomsDeclaration.UserModified = "admin";
+                        item.CustomsDeclaration.UserModified = currentUser.UserID;
                         item.CustomsDeclaration.DatetimeModified = DateTime.Now;
                         var clearance = mapper.Map<CustomsDeclaration>(item.CustomsDeclaration);
                         ((eFMSDataContext)DataContext.DC).CustomsDeclaration.Update(clearance);
+                        i = i + 1;
                     }
                 }
                 ((eFMSDataContext)DataContext.DC).SaveChanges();
@@ -318,6 +349,22 @@ namespace eFMS.API.Documentation.DL.Services
             catch (Exception ex)
             {
                 result = new HandleState(ex.Message);
+            }
+            return result;
+        }
+
+        public HandleState SoftDeleteJob(Guid id)
+        {
+            var result = new HandleState();
+            var job = DataContext.First(x => x.Id == id);
+            if(job == null)
+            {
+                result = new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
+            }
+            else
+            {
+                job.CurrentStatus = TermData.Canceled;
+                result = DataContext.Update(job, x => x.Id == id);
             }
             return result;
         }

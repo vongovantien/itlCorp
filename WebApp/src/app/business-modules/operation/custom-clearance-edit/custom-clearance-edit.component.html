@@ -84,27 +84,39 @@
                     </div>
                     <div class="row">
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': updateForm.submitted && (customDeclaration.hblid == null || customDeclaration.hblid == '') && isConvertJob }">
                                 <label class="form-control-label" for="">
-                                    HBL/HAWB
+                                    HBL/HAWB <span class="m--font-danger"
+                                        *ngIf="updateForm.submitted && (customDeclaration.hblid == null || customDeclaration.hblid == '') && isConvertJob">(*)</span>
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square"
                                     [(ngModel)]="customDeclaration.hblid" name="hblid" #hblib="ngModel"
                                     (change)="customDeclaration.hblid=customDeclaration.hblid.trim()" maxlength="50"
                                     onkeypress="return event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)"
                                     placeholder="Enter text">
+                                <div class="form-control-feedback"
+                                    *ngIf="updateForm.submitted && (customDeclaration.hblid == null || customDeclaration.hblid == '') && isConvertJob">
+                                    HBL/HAWB is required
+                                </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': updateForm.submitted && (customDeclaration.mblid == null || customDeclaration.mblid == '') && isConvertJob }">
                                 <label class="form-control-label" for="">
-                                    MBL/MAWB
+                                    MBL/MAWB <span class="m--font-danger"
+                                        *ngIf="updateForm.submitted && (customDeclaration.mblid == null || customDeclaration.mblid == '') && isConvertJob">(*)</span>
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square"
-                                    [(ngModel)]="customDeclaration.mblid" name="mblid" #mblib="ngModel"
-                                    (change)="customDeclaration.mblid=customDeclaration.mblid.trim()" maxlength="50"
-                                    onkeypress="return event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)"
-                                    placeholder="Enter text">
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                                    autocomplete="nope" [(ngModel)]="customDeclaration.mblid" name="mblid"
+                                    #mblib="ngModel" maxlength="50"
+                                    (change)="customDeclaration.mblid=customDeclaration.mblid.trim()"
+                                    onkeypress="return event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)">
+                                <div class="form-control-feedback"
+                                    *ngIf="updateForm.submitted && (customDeclaration.mblid == null || customDeclaration.mblid == '') && isConvertJob">
+                                    MBL/MAWB is required
+                                </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -140,15 +152,21 @@
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': updateForm.submitted && typeClearanceCurrent.length==0 && isConvertJob }">
                                 <label class="form-control-label" for="">
-                                    Type
+                                    Type <span class="m--font-danger"
+                                        *ngIf="updateForm.submitted && typeClearanceCurrent.length==0 && isConvertJob">(*)</span>
                                 </label>
                                 <ng-select [allowClear]="true" [items]="typeClearance" [disabled]="disabled"
                                     [active]="typeClearanceCurrent" (data)="refreshValue($event)"
                                     (selected)="selectedTypeClearance($event)" (removed)="removedTypeClearance($event)"
                                     (typed)="typed($event)" placeholder="Select filter">
                                 </ng-select>
+                                <div class="form-control-feedback"
+                                    *ngIf="updateForm.submitted && typeClearanceCurrent.length==0 && isConvertJob">
+                                    Type is required
+                                </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -364,7 +382,7 @@
             <div class="form-actions m--align-right">
                 <button *ngIf="customDeclaration.jobNo; else allowSave" type="" disabled="true" hidden="true"
                     class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="updateCustomClearance(updateForm)">
+                    (click)="isConvertJob = false; updateCustomClearance(updateForm)">
                     <span>
                         <i class="la la la-save"></i>
                         <span>
@@ -394,7 +412,7 @@
                 </button>
                 <ng-template #allowSaveAndConvert>
                     <button type="" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                        (click)="convertClearanceToShipment(updateForm)">
+                        (click)="isConvertJob = true;convertClearanceToShipment(updateForm)">
                         <span>
                             <i class="la la la-save"></i>
                             <span>

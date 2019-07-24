@@ -36,5 +36,7 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string MSG_HBNO_EXISTED = "MSG_HBNO_EXISTED";
         public static readonly string MSG_NOT_ALLOW_DELETED = "MSG_NOT_ALLOW_DELETED";
         public static readonly string MSG_CLEARANCENO_EXISTED = "MSG_CLEARANCENO_EXISTED";
+        public static readonly string MSG_LIST_CLEARANCE_CONVERT_TO_JOB = "MSG_LIST_CLEARANCE_CONVERT_TO_JOB";
+        public static readonly string MSG_CLEARANCE_CONVERT_TO_JOB = "MSG_CLEARANCE_CONVERT_TO_JOB";
     }
 }

@@ -38,5 +38,6 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public Nullable<DateTime> ModifiedDate { get; set; }
         public string POLName { get; set; }
         public string PODName { get; set; }
+        public string CurrentStatus { get; set; }
     }
 }

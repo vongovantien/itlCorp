@@ -365,17 +365,15 @@
                                                 <td>
                                                     <ng-container *ngIf="item.currentStatus">
                                                         <span class="m-badge m-badge--primary m-badge--wide"
-                                                            *ngIf="stageConts.inSchedule">{{ item.currentStatus }}</span>
+                                                            *ngIf="item.currentStatus == jobStatusConts.inSchedule">{{ item.currentStatus }}</span>
                                                         <span class="m-badge m-badge--info m-badge--wide"
-                                                            *ngIf="stageConts.processing">{{ item.currentStatus }}</span>
+                                                            *ngIf="item.currentStatus == jobStatusConts.processing">{{ item.currentStatus }}</span>
                                                         <span class="m-badge m-badge--warning m-badge--wide"
-                                                            *ngIf="stageConts.warning">{{ item.currentStatus }}</span>
+                                                            *ngIf="item.currentStatus == jobStatusConts.warning">{{ item.currentStatus }}</span>
                                                         <span class="m-badge m-badge--danger m-badge--wide"
-                                                            *ngIf="stageConts.overdued">{{ item.currentStatus }}</span>
+                                                            *ngIf="item.currentStatus == jobStatusConts.overdued">{{ item.currentStatus }}</span>
                                                         <span class="m-badge m-badge--success m-badge--wide"
-                                                            *ngIf="stageConts.completed">{{ item.currentStatus }}</span>
-                                                        <span class="m-badge m-badge--dark m-badge--wide"
-                                                            *ngIf="stageConts.deleted">{{ item.currentStatus }}</span>
+                                                            *ngIf="item.currentStatus == jobStatusConts.finish">{{ item.currentStatus }}</span>
                                                     </ng-container>
                                                 </td>
                                             </tr>
@@ -545,7 +543,7 @@
 
 <!--begin::confirm-delete-job-modal-->
 <div class="modal fade" id="confirm-delete-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
-    aria-hidden="true">
+    *ngIf="itemToDelete" aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -556,7 +554,8 @@
             </div>
             <div class="modal-body">
                 <div class="confirm-text-block">
-                    <span>Do you want to delete <span class="m--font-bold">job Name</span>item?</span>
+                    <span>Do you want to delete <span class="m--font-bold">job No
+                            {{ itemToDelete.jobNo }}</span>?</span>
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
