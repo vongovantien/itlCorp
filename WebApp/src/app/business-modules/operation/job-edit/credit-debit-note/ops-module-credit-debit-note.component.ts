@@ -198,6 +198,7 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
         const res = await this.baseServices.deleteAsync(this.api_menu.Documentation.AcctSOA.delete + "?cdNoteId=" + this.cdNoteIdToDelete);
         if (res.status) {
             this.getAllCDNote();
+            this.confirmDeletePopup.hide();
         }
     }
 

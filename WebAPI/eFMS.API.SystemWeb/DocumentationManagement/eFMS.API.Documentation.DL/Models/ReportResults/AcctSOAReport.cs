@@ -76,7 +76,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string CompanyName { get; set; }
         public string CompanyDescription { get; set; }
         public string CompanyAddress1 { get; set; }
-        public string ComapnyAddress2 { get; set; }
+        public string CompanyAddress2 { get; set; }
         public string Website { get; set; }
         public string IbanCode { get; set; }
         public string AccountName { get; set; }
@@ -91,7 +91,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string IssueInv { get; set; }
         public string InvoiceInfo { get; set; }
         public string Contact { get; set; }
-        public string IssueDate { get; set; }
+        public string IssuedDate { get; set; }
         public string OtherRef { get; set; }
 
     }

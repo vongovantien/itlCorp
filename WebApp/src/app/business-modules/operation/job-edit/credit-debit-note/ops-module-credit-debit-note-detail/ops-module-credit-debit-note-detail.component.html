@@ -2,12 +2,13 @@
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content" *ngIf="!!CDNoteDetails">
             <div class="modal-header">
-                <h5 class="modal-title">Detail<span class="m--margin-left-5">Credit Note</span>&nbsp;<span
+                <h5 class="modal-title">Detail<span class="m--margin-left-5">{{ CDNoteDetails.cdNote.type }}
+                        Note</span>&nbsp;<span
                         class="m--font-danger m--margin-left-5">{{CDNoteDetails.cdNote.code}}</span></h5>
                 <button type="button" class="close" (click)="hide()">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <div class="modal-actions c-button-actions">
+                <!-- <div class="modal-actions c-button-actions">
                     <button class="btn btn-sm btn-default m-btn--square m-btn--icon" (click)="Preview()">
                         <span>
                             <i class="la la-file-text-o"></i>
@@ -16,7 +17,7 @@
                             </span>
                         </span>
                     </button>
-                </div>
+                </div> -->
             </div>
             <div class="modal-body">
                 <div class="m-form m-form--state">

@@ -2234,7 +2234,7 @@
                                         Unit price <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="number" class="form-control m-input m-input--square"
-                                        [(ngModel)]="BuyingRateChargeToAdd.unitPrice"
+                                        autocomplete="nope" [(ngModel)]="BuyingRateChargeToAdd.unitPrice"
                                         (change)="calculateTotalEachBuying()" (keyup)="calculateTotalEachBuying()"
                                         placeholder="Enter number" #BuyingRateChargeUnitPriceNameOps="ngModel" required
                                         name="BuyingRateChargeUnitPriceNameOps">
@@ -2298,7 +2298,7 @@
                                     <label class="form-control-label" for="">
                                         Doc no
                                     </label>
-                                    <input type="text" [(ngModel)]="BuyingRateChargeToAdd.docNo"
+                                    <input type="text" [(ngModel)]="BuyingRateChargeToAdd.docNo" autocomplete="nope"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="BuyingRateChargeDocNameOps">
                                 </div>
@@ -2308,7 +2308,7 @@
                                     <label class="form-control-label" for="">
                                         Note
                                     </label>
-                                    <input type="text" [(ngModel)]="BuyingRateChargeToAdd.notes"
+                                    <input type="text" [(ngModel)]="BuyingRateChargeToAdd.notes" autocomplete="nope"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="BuyingRateChargeNoteNameOps">
                                 </div>
@@ -2534,7 +2534,7 @@
                                     </label>
                                     <input type="number" class="form-control m-input m-input--square"
                                         [disabled]="BuyingRateChargeToEdit.cdno"
-                                        [(ngModel)]="BuyingRateChargeToEdit.unitPrice"
+                                        [(ngModel)]="BuyingRateChargeToEdit.unitPrice" autocomplete="nope"
                                         (keyup)="calculateTotalEachBuying(true)"
                                         (change)="calculateTotalEachBuying(true)" placeholder="Enter number"
                                         #BuyingRateChargeUnitPriceNameOps="ngModel" required
@@ -2555,8 +2555,7 @@
                                     </label>
 
                                     <ng-select [allowClear]="true" [items]="lstCurrencies"
-                                        [disabled]="BuyingRateChargeToEdit.cdno"
-                                        [active]="[{'text':BuyingRateChargeToEdit.currency,'id':BuyingRateChargeToEdit.currencyId}]"
+                                        [disabled]="BuyingRateChargeToEdit.cdno" [active]="buyingRateChargeActive"
                                         (data)="refreshValue($event)"
                                         (selected)="BuyingRateChargeToEdit.currencyId=$event.id"
                                         (removed)="BuyingRateChargeToEdit.currencyId=null" placeholder="Select filter">
@@ -2576,7 +2575,7 @@
                                     </label>
                                     <input type="number" max="100" name="BuyingRateChargeVATNameOps" required
                                         [disabled]="BuyingRateChargeToEdit.cdno" #BuyingRateChargeVATNameOps="ngModel"
-                                        [(ngModel)]="BuyingRateChargeToEdit.vatrate"
+                                        [(ngModel)]="BuyingRateChargeToEdit.vatrate" autocomplete="nope"
                                         class="form-control m-input m-input--square" placeholder="Enter number"
                                         (keyup)="calculateTotalEachBuying(true)"
                                         (change)="calculateTotalEachBuying(true)">
@@ -2603,7 +2602,7 @@
                                         Doc no
                                     </label>
                                     <input type="text" [(ngModel)]="BuyingRateChargeToEdit.docNo"
-                                        [disabled]="BuyingRateChargeToEdit.cdno"
+                                        [disabled]="BuyingRateChargeToEdit.cdno" autocomplete="nope"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="BuyingRateChargeDocNameOps">
                                 </div>
@@ -2614,7 +2613,7 @@
                                         Note
                                     </label>
                                     <input type="text" [(ngModel)]="BuyingRateChargeToEdit.notes"
-                                        [disabled]="BuyingRateChargeToEdit.cdno"
+                                        [disabled]="BuyingRateChargeToEdit.cdno" autocomplete="nope"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="BuyingRateChargeNoteNameOps">
                                 </div>
@@ -2806,7 +2805,7 @@
                                     <div class="input-group m-input-group m-input-group--square">
                                         <input type="number" required class="form-control m-input m-input--square"
                                             decimalNumberGreaterThan0 placeholder="Enter number"
-                                            name="sellingRateChangeQuantityNameOps" min="0"
+                                            name="sellingRateChangeQuantityNameOps" min="0" autocomplete="nope"
                                             #sellingRateChangeQuantityNameOps="ngModel"
                                             [(ngModel)]="SellingRateChargeToAdd.quantity"
                                             (keyup)="calculateTotalEachSelling()"
@@ -2857,7 +2856,7 @@
                                         Unit price <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="number" class="form-control m-input m-input--square"
-                                        [(ngModel)]="SellingRateChargeToAdd.unitPrice"
+                                        [(ngModel)]="SellingRateChargeToAdd.unitPrice" autocomplete="nope"
                                         (keyup)="calculateTotalEachSelling()" (change)="calculateTotalEachSelling()"
                                         placeholder="Enter number" #SellingRateChargeUnitPriceNameOps="ngModel" required
                                         name="SellingRateChargeUnitPriceNameOps">
@@ -2895,7 +2894,7 @@
                                         VAT <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="number" name="SellingRateChargeVATNameOps" required
-                                        #SellingRateChargeVATNameOps="ngModel"
+                                        #SellingRateChargeVATNameOps="ngModel" autocomplete="nope"
                                         [(ngModel)]="SellingRateChargeToAdd.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter number"
                                         (keyup)="calculateTotalEachSelling()" (change)="calculateTotalEachSelling()">
@@ -2921,7 +2920,7 @@
                                     <label class="form-control-label" for="">
                                         Doc no
                                     </label>
-                                    <input type="text" [(ngModel)]="SellingRateChargeToAdd.docNo"
+                                    <input type="text" [(ngModel)]="SellingRateChargeToAdd.docNo" autocomplete="nope"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="SellingRateChargeDocNameOps">
                                 </div>
@@ -2931,7 +2930,7 @@
                                     <label class="form-control-label" for="">
                                         Note
                                     </label>
-                                    <input type="text" [(ngModel)]="SellingRateChargeToAdd.notes"
+                                    <input type="text" [(ngModel)]="SellingRateChargeToAdd.notes" autocomplete="nope"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="SellingRateChargeNoteNameOps">
                                 </div>
@@ -3090,7 +3089,7 @@
                                         <input type="number" required class="form-control m-input m-input--square"
                                             decimalNumberGreaterThan0 placeholder="Enter number"
                                             [disabled]="SellingRateChargeToEdit.cdno" min="0"
-                                            name="sellingRateChangeQuantityNameOps"
+                                            name="sellingRateChangeQuantityNameOps" autocomplete="nope"
                                             #sellingRateChangeQuantityNameOps="ngModel"
                                             [(ngModel)]="SellingRateChargeToEdit.quantity"
                                             (keyup)="calculateTotalEachSelling(true)"
@@ -3142,7 +3141,7 @@
                                     <input type="number" class="form-control m-input m-input--square"
                                         [disabled]="SellingRateChargeToEdit.cdno"
                                         [(ngModel)]="SellingRateChargeToEdit.unitPrice"
-                                        (keyup)="calculateTotalEachSelling(true)"
+                                        (keyup)="calculateTotalEachSelling(true)" autocomplete="nope"
                                         (change)="calculateTotalEachSelling(true)" placeholder="Enter number"
                                         #SellingRateChargeUnitPriceNameOps="ngModel" required
                                         name="SellingRateChargeUnitPriceNameOps">
@@ -3162,8 +3161,7 @@
                                     </label>
 
                                     <ng-select [allowClear]="true" [items]="lstCurrencies"
-                                        [disabled]="SellingRateChargeToEdit.cdno"
-                                        [active]="[{'text':SellingRateChargeToEdit.currency,'id':SellingRateChargeToEdit.currencyId}]"
+                                        [disabled]="SellingRateChargeToEdit.cdno" [active]="sellingRateChargeActive"
                                         (data)="refreshValue($event)"
                                         (selected)="SellingRateChargeToEdit.currencyId=$event.id"
                                         (removed)="SellingRateChargeToEdit.currencyId=null" placeholder="Select filter">
@@ -3183,7 +3181,7 @@
                                     </label>
                                     <input type="number" max="100" name="SellingRateChargeVATNameOps" required
                                         [disabled]="SellingRateChargeToEdit.cdno" #SellingRateChargeVATNameOps="ngModel"
-                                        [(ngModel)]="SellingRateChargeToEdit.vatrate"
+                                        [(ngModel)]="SellingRateChargeToEdit.vatrate" autocomplete="nope"
                                         class="form-control m-input m-input--square" placeholder="Enter number"
                                         (keyup)="calculateTotalEachSelling(true)"
                                         (change)="calculateTotalEachSelling(true)">
@@ -3210,7 +3208,7 @@
                                     <label class="form-control-label" for="">
                                         Doc no
                                     </label>
-                                    <input type="text" [(ngModel)]="SellingRateChargeToEdit.docNo"
+                                    <input type="text" [(ngModel)]="SellingRateChargeToEdit.docNo" autocomplete="nope"
                                         [disabled]="SellingRateChargeToEdit.cdno"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="SellingRateChargeDocNameOps">
@@ -3221,7 +3219,7 @@
                                     <label class="form-control-label" for="">
                                         Note
                                     </label>
-                                    <input type="text" [(ngModel)]="SellingRateChargeToEdit.notes"
+                                    <input type="text" [(ngModel)]="SellingRateChargeToEdit.notes" autocomplete="nope"
                                         [disabled]="SellingRateChargeToEdit.cdno"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="SellingRateChargeNoteNameOps">
@@ -3319,7 +3317,7 @@
                                 <div class="form-group"
                                     [ngClass]="{ 'm-form__group has-danger': addOBHChargeFormOps.submitted && OBHChargeToAdd.chargeId==null}">
                                     <label class="form-control-label" for="" #selectedOBHChargeCode>
-                                        Charge <span class="m--font-danger">(*)</span> 
+                                        Charge <span class="m--font-danger">(*)</span>
                                         <small
                                             class="m--margin-left-5 m--font-primary">{{selectedOBHChargeCode.value==null?'':selectedOBHChargeCode.value}}&nbsp;</small>
                                     </label>
@@ -3405,7 +3403,7 @@
                                         decimalNumberGreaterThan0 placeholder="Enter number"
                                         #OBHQuantityNameOps="ngModel" [(ngModel)]="OBHChargeToAdd.quantity" required
                                         (keyup)="calculateTotalEachOBH()" (change)="calculateTotalEachOBH()"
-                                        name="OBHQuantityNameOps">
+                                        autocomplete="nope" name="OBHQuantityNameOps">
                                     <div class="form-control-feedback"
                                         *ngIf="addOBHChargeFormOps.submitted && OBHQuantityNameOps.invalid">
                                         Quantity is required !
@@ -3449,9 +3447,10 @@
                                         Unit price <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="number" class="form-control m-input m-input--square"
-                                        [(ngModel)]="OBHChargeToAdd.unitPrice" placeholder="Enter number" required
-                                        name="OBHUnitPriceNameOps" #OBHUnitPriceNameOps="ngModel"
-                                        (keyup)="calculateTotalEachOBH()" (change)="calculateTotalEachOBH()">
+                                        autocomplete="nope" [(ngModel)]="OBHChargeToAdd.unitPrice"
+                                        placeholder="Enter number" required name="OBHUnitPriceNameOps"
+                                        #OBHUnitPriceNameOps="ngModel" (keyup)="calculateTotalEachOBH()"
+                                        (change)="calculateTotalEachOBH()">
                                     <div class="form-control-feedback"
                                         *ngIf="addOBHChargeFormOps.submitted &&(OBHUnitPriceNameOps.invalid || (0 >= OBHChargeToAdd.unitPrice))">
                                         Unit Price is required and must be larger than 0 !
@@ -3488,7 +3487,8 @@
                                         VAT <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="number" max="100" name="OBHRateChargeVATNameOps" required
-                                        #OBHRateChargeVATNameOps="ngModel" [(ngModel)]="OBHChargeToAdd.vatrate"
+                                        autocomplete="nope" #OBHRateChargeVATNameOps="ngModel"
+                                        [(ngModel)]="OBHChargeToAdd.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter number"
                                         (keyup)="calculateTotalEachOBH()" (change)="calculateTotalEachOBH()">
                                     <div class="form-control-feedback"
@@ -3513,7 +3513,7 @@
                                     <label class="form-control-label" for="">
                                         Doc no
                                     </label>
-                                    <input type="text" [(ngModel)]="OBHChargeToAdd.docNo"
+                                    <input type="text" [(ngModel)]="OBHChargeToAdd.docNo" autocomplete="nope"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="OBHChargeDocNameOps">
                                 </div>
@@ -3523,7 +3523,7 @@
                                     <label class="form-control-label" for="">
                                         Note
                                     </label>
-                                    <input type="text" [(ngModel)]="OBHChargeToAdd.notes"
+                                    <input type="text" [(ngModel)]="OBHChargeToAdd.notes" autocomplete="nope"
                                         class="form-control m-input m-input--square" placeholder="Enter text"
                                         name="OBHChargeNoteNameOps">
                                 </div>
@@ -3589,7 +3589,7 @@
                                 <div class="form-group"
                                     [ngClass]="{ 'm-form__group has-danger': editOBHChargeFormOps.submitted && OBHChargeToEdit.chargeId==null}">
                                     <label class="form-control-label" for="">
-                                        Charge <span class="m--font-danger">(*)</span> 
+                                        Charge <span class="m--font-danger">(*)</span>
                                         <small
                                             class="m--margin-left-5 m--font-primary">{{OBHChargeToEdit.chargeCode}}</small>
                                     </label>
@@ -3668,7 +3668,7 @@
                                         Quantity <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="number" class="form-control m-input m-input--square" min="0"
-                                        placeholder="Enter number" #OBHQuantityNameEdtOps="ngModel"
+                                        autocomplete="nope" placeholder="Enter number" #OBHQuantityNameEdtOps="ngModel"
                                         decimalNumberGreaterThan0 [(ngModel)]="OBHChargeToEdit.quantity" required
                                         [disabled]="OBHChargeToEdit.cdno" (keyup)="calculateTotalEachOBH(true)"
                                         (change)="calculateTotalEachOBH(true)" name="OBHQuantityNameEdtOps">
@@ -3711,10 +3711,10 @@
                                         Unit price <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input type="number" class="form-control m-input m-input--square"
-                                        [disabled]="OBHChargeToEdit.cdno" [(ngModel)]="OBHChargeToEdit.unitPrice"
-                                        placeholder="Enter number" required name="OBHUnitPriceNameEdtOps"
-                                        #OBHUnitPriceNameEdtOps="ngModel" (keyup)="calculateTotalEachOBH(true)"
-                                        (change)="calculateTotalEachOBH(true)">
+                                        autocomplete="nope" [disabled]="OBHChargeToEdit.cdno"
+                                        [(ngModel)]="OBHChargeToEdit.unitPrice" placeholder="Enter number" required
+                                        name="OBHUnitPriceNameEdtOps" #OBHUnitPriceNameEdtOps="ngModel"
+                                        (keyup)="calculateTotalEachOBH(true)" (change)="calculateTotalEachOBH(true)">
                                     <div class="form-control-feedback"
                                         *ngIf="editOBHChargeFormOps.submitted &&(OBHUnitPriceNameEdtOps.invalid || (0 >= OBHChargeToEdit.unitPrice))">
                                         Unit Price is required and must be larger than 0 !
@@ -3730,8 +3730,7 @@
                                         Currency
                                     </label>
                                     <ng-select [allowClear]="true" [items]="lstCurrencies"
-                                        [disabled]="OBHChargeToEdit.cdno"
-                                        [active]="[{'text':OBHChargeToEdit.currency,'id':OBHChargeToEdit.currencyId}]"
+                                        [disabled]="OBHChargeToEdit.cdno" [active]="obhChargeActive"
                                         (data)="refreshValue($event)" (selected)="OBHChargeToEdit.currencyId=$event.id"
                                         (removed)="OBHChargeToEdit.currencyId=null" (typed)="getListCurrency($event)"
                                         placeholder="Select filter">
@@ -3749,8 +3748,8 @@
                                         VAT
                                     </label>
                                     <input type="number" max="100" name="OBHChargeVATNameEdtOps" required
-                                        [disabled]="OBHChargeToEdit.cdno" #OBHChargeVATNameEdtOps="ngModel"
-                                        [(ngModel)]="OBHChargeToEdit.vatrate"
+                                        autocomplete="nope" [disabled]="OBHChargeToEdit.cdno"
+                                        #OBHChargeVATNameEdtOps="ngModel" [(ngModel)]="OBHChargeToEdit.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter number"
                                         (keyup)="calculateTotalEachOBH(true)" (change)="calculateTotalEachOBH(true)">
                                     <div class="form-control-feedback"
@@ -3775,7 +3774,7 @@
                                     <label class="form-control-label" for="">
                                         Doc no
                                     </label>
-                                    <input type="text" [(ngModel)]="OBHChargeToEdit.docNo"
+                                    <input type="text" [(ngModel)]="OBHChargeToEdit.docNo" autocomplete="nope"
                                         [disabled]="OBHChargeToEdit.cdno" class="form-control m-input m-input--square"
                                         placeholder="Enter text" name="OBHChargeDocNameEdtOps">
                                 </div>
@@ -3785,7 +3784,7 @@
                                     <label class="form-control-label" for="">
                                         Note
                                     </label>
-                                    <input type="text" [(ngModel)]="OBHChargeToEdit.notes"
+                                    <input type="text" [(ngModel)]="OBHChargeToEdit.notes" autocomplete="nope"
                                         [disabled]="OBHChargeToEdit.cdno" class="form-control m-input m-input--square"
                                         placeholder="Enter text" name="OBHChargeNoteNameEdtOps">
                                 </div>
