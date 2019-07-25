@@ -33,6 +33,9 @@ namespace eFMS.API.Shipment.Infrastructure
 
             CreateMap<AcctSoa, AcctSoaModel>();
             CreateMap<AcctSoaModel, AcctSoa>();
+            CreateMap<spc_GetListAcctSOAByMaster, AcctSOAResult>();
+            CreateMap<spc_GetListAcctSOAByMaster, AcctSOADetailResult>();
+            CreateMap<spc_GetListChargeShipmentMasterBySOANo, ChargeShipmentModel>();
         }
     }
 }
