@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
-import { JobRepo, SystemRepo } from './index';
-import { CDNoteRepo } from './cdNote.repo';
+import { JobRepo, SystemRepo, CDNoteRepo, AccoutingRepo } from '.';
 
 @NgModule({
     providers: [
         JobRepo,
         SystemRepo,
-        CDNoteRepo
+        CDNoteRepo,
+        AccoutingRepo
     ],
 })
 export class RepositoryModule {
