@@ -53,17 +53,17 @@ export class ChargeAddnewComponent implements OnInit {
   // ];
 
   ngDataService = [
-    { text: "Landing Truckinng", id: "LT" },
-    { text: "Air Import", id: "AI" },
-    { text: "Air Export", id: "AE" },
-    { text: "Sea Import", id: "SI" },
-    { text: "Sea Export", id: "SE" },
-    { text: "Sea Export FCL", id: "SEF" },
-    { text: "Sea Import FCL", id: "SIF" },
-    { text: "Sea Export LCL", id: "SEL" },
-    { text: "Sea Import LCL", id: "SIL" },
-    { text: "Sea Export Consol", id: "SEC" },
-    { text: "Sea Import Consol", id: "SIC" }
+    { text:"Inland Trucking", id:"IT" },
+    { text:"Air Import",id:"AI" },
+    { text:"Air Export",id:"AE" },
+    { text:"Sea Import",id:"SI" },
+    { text:"Sea Export",id:"SE" },      
+    { text:"Sea FCL Export",id:"SFE" },
+    { text:"Sea FCL Import",id:"SFI" },
+    { text:"Sea LCL Export",id:"SLE" },
+    { text:"Sea LCL Import",id:"SLI" },
+    { text:"Sea Consol Export",id:"SCE" },
+    { text:"Sea Consol Import",id:"SCI" }
   ];
 
   async ngOnInit() {
