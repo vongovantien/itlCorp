@@ -19,15 +19,39 @@
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.AcctSOAController.Get">
             <summary>
-            get the list of acctSOA
+            get the list of SOA
             </summary>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.AcctSOAController.AddNew(eFMS.API.Documentation.DL.Models.AcctSoaModel)">
             <summary>
-            add new acctSOA
+            add new SOA
             </summary>
             <param name="model">object to add</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSOAController.Paging(eFMS.API.Documentation.DL.Models.Criteria.AcctSOACriteria,System.Int32,System.Int32)">
+            <summary>
+            get and paging the list of SOA by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
+            <param name="pageNumber">page to retrieve data</param>
+            <param name="pageSize">number items per page</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSOAController.Delete(System.String)">
+            <summary>
+            delete an existed item
+            </summary>
+            <param name="soaNo">soaNo of existed item that want to delete</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSOAController.GetBySoaNoAndCurrencyLocal(System.String,System.String)">
+            <summary>
+            get SOA by soaNo and currencyLocal
+            </summary>
+            <param name="soaNo">soaNo that want to retrieve SOA</param>
+            <param name="currencyLocal">currencyLocal that want to retrieve SOA</param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController">

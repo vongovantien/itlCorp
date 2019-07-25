@@ -1,8 +1,10 @@
 ﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.NoSql;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
@@ -40,7 +42,7 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
-        /// get the list of acctSOA
+        /// get the list of SOA
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -51,7 +53,7 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
-        /// add new acctSOA
+        /// add new SOA
         /// </summary>
         /// <param name="model">object to add</param>
         /// <returns></returns>
@@ -78,5 +80,55 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// get and paging the list of SOA by conditions
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <param name="pageNumber">page to retrieve data</param>
+        /// <param name="pageSize">number items per page</param>
+        /// <returns></returns>
+        [HttpPost("Paging")]
+        public IActionResult Paging(AcctSOACriteria criteria, int pageNumber, int pageSize)
+        {
+            var data = acctSOAService.Paging(criteria, pageNumber, pageSize, out int totalItems);
+            var result = new { data, totalItems, pageNumber, pageSize };
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// delete an existed item
+        /// </summary>
+        /// <param name="soaNo">soaNo of existed item that want to delete</param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpDelete]
+        [Route("Delete")]
+        public IActionResult Delete(string soaNo)
+        {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
+            var hs = acctSOAService.Delete(x => x.Soano == soaNo);
+            //Update SOANo = NULL for ShipmentSurcharge
+            acctSOAService.UpdateSOASurCharge(soaNo);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// get SOA by soaNo and currencyLocal
+        /// </summary>
+        /// <param name="soaNo">soaNo that want to retrieve SOA</param>
+        /// <param name="currencyLocal">currencyLocal that want to retrieve SOA</param>
+        /// <returns></returns>
+        [HttpGet("GetBySoaNo/{soaNo}&{currencyLocal}")]
+        public IActionResult GetBySoaNoAndCurrencyLocal(string soaNo, string currencyLocal)
+        {
+            var results = acctSOAService.GetBySoaNoAndCurrencyLocal(soaNo, currencyLocal);
+            return Ok(results);
+        }
     }
 }
