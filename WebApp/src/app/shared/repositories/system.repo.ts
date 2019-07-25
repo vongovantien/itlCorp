@@ -11,8 +11,8 @@ export class SystemRepo {
     }
 
     getListSystemUser() {
-        return this._api.get(`${environment.HOST.WEB_URL}44360/api/${this.VERSION}/vi/SysUser`);
-        // return this._api.get(`${environment.HOST.WEB_URL}/${this.MODULE}/api/${this.VERSION}/vi/SysUser`);
+        // return this._api.get(`${environment.HOST.WEB_URL}44360/api/${this.VERSION}/vi/SysUser`);
+        return this._api.get(`${environment.HOST.WEB_URL}/${this.MODULE}/api/${this.VERSION}/vi/SysUser`);
     }
 
     getListCurrency(page?: number, size?: number) {
@@ -35,8 +35,17 @@ export class SystemRepo {
             });
         } else {
             return this._api.post(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatPartner/Query`, data);
-
         }
+    }
 
+    getListCharge(page?: number, size?: number) {
+        if (!!page && !!size) {
+            return this._api.post(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatCharge/paging`, {}, {
+                page: '' + page,
+                size: '' + size
+            });
+        } else {
+            return this._api.post(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatCharge/Query`, {});
+        }
     }
 }
