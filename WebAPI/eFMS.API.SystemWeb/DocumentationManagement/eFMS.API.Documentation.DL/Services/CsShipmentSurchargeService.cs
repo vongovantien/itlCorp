@@ -298,7 +298,6 @@ namespace eFMS.API.Documentation.DL.Services
                 SqlParam.GetParameter("ToDate", criteria.ToDate),
                 SqlParam.GetParameter("Type", criteria.Type),
                 SqlParam.GetParameter("IsOBH", criteria.IsOBH),
-                SqlParam.GetParameter("StrServices", criteria.StrServices),
                 SqlParam.GetParameter("StrCreators", criteria.StrCreators),
                 SqlParam.GetParameter("StrCharges", criteria.StrCharges)
             };

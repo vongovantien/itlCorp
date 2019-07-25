@@ -52,7 +52,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("Paging")]
         public IActionResult Get(CatChargeCriteria criteria,int pageNumber,int pageSize)
         {
-          var data = catChargeService.GetCharges(criteria, pageNumber, pageSize, out int rowCount);
+            var data = catChargeService.GetCharges(criteria, pageNumber, pageSize, out int rowCount);
             var result = new { data, totalItems = rowCount, pageNumber, pageSize };
             return Ok(result);
         }
@@ -317,6 +317,17 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
             }
+        }
+
+        /// <summary>
+        /// get list services
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetServices")]
+        public IActionResult GetServices()
+        {
+            var results = catChargeService.GetServicesData();
+            return Ok(results);
         }
     }
 }

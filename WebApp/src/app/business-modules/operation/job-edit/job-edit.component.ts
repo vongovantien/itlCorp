@@ -606,20 +606,20 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     }
 
     public getListBuyingRateCharges() {
-        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'CREDIT', serviceTypeId: 'SEF' }).subscribe(res => {
+        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'CREDIT', serviceTypeId: 'CL' }).subscribe(res => {
             this.lstBuyingRateChargesComboBox = res['data'];
         });
 
     }
 
     public getListSellingRateCharges() {
-        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'DEBIT', serviceTypeId: 'SEF' }).subscribe(res => {
+        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'DEBIT', serviceTypeId: 'CL' }).subscribe(res => {
             this.lstSellingRateChargesComboBox = res['data'];
         });
     }
 
     public getListOBHCharges() {
-        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'OBH', serviceTypeId: 'SEF' }).subscribe(res => {
+        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'OBH', serviceTypeId: 'CL' }).subscribe(res => {
             this.lstOBHChargesComboBox = res['data'];
         });
     }

@@ -290,5 +290,10 @@ namespace eFMS.API.Catalogue.DL.Services
                 return new HandleState(ex.Message);
             }
         }
+
+        public object GetServicesData()
+        {
+            return CustomData.Services;
+        }
     }
 }
