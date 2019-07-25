@@ -182,14 +182,15 @@ export class OpsModuleCreditDebitNoteAddnewComponent extends PopupBase implement
                     });
                     if (this.CDNoteWorking.listShipmentSurcharge.length === 0) {
                         this.popupNotSelectedAlert.show();
-                    }
-                    const res = await this.baseServices.postAsync(this.api_menu.Documentation.AcctSOA.addNew, this.CDNoteWorking);
-                    if (res.status) {
-                        this.hide();
-                        // $('#ops-add-credit-debit-note-modal').modal('hide');
-                        this.CDNoteWorking = new AcctCDNote();
-                        this.resetAddSOAForm();
-
+                    } else {
+                        const res = await this.baseServices.postAsync(this.api_menu.Documentation.AcctSOA.addNew, this.CDNoteWorking);
+                        if (res.status) {
+                            this.hide();
+                            // $('#ops-add-credit-debit-note-modal').modal('hide');
+                            this.CDNoteWorking = new AcctCDNote();
+                            this.resetAddSOAForm();
+    
+                        }
                     }
                 }
             }

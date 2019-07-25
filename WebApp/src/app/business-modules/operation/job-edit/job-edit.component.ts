@@ -99,6 +99,9 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     packageTypes: any[] = [];
     weightMesurements: any[];
     currentActiveItemDefault: { id: null, text: null }[] = [];
+    buyingRateChargeActive = [];
+    sellingRateChargeActive = [];
+    obhChargeActive = [];
     @ViewChild('containerMasterForm', { static: true }) containerMasterForm: NgForm;
     // @ViewChild('containerSelect',{static:true}) containerSelect: ElementRef;
 
@@ -831,6 +834,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     prepareEditCharge(type: 'BUY' | 'SELL' | 'OBH', charge: any) {
         if (type === 'BUY') {
             this.BuyingRateChargeToEdit = cloneDeep(charge);
+            this.buyingRateChargeActive = [{'text': this.BuyingRateChargeToEdit.currency, 'id': this.BuyingRateChargeToEdit.currencyId}]
             //this.BuyingRateChargeToEdit.exchangeDate = { startDate: moment(this.BuyingRateChargeToEdit.exchangeDate), endDate: moment(this.BuyingRateChargeToEdit.exchangeDate) };
             if (this.BuyingRateChargeToEdit.exchangeDate != null) {
                 this.exchangeRateDate = { startDate: moment(this.BuyingRateChargeToEdit.exchangeDate), endDate: moment(this.BuyingRateChargeToEdit.exchangeDate) };
@@ -838,6 +842,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         }
         if (type === 'SELL') {
             this.SellingRateChargeToEdit = cloneDeep(charge);
+            this.sellingRateChargeActive = [{'text': this.SellingRateChargeToEdit.currency,' id': this.SellingRateChargeToEdit.currencyId}];
             if (this.SellingRateChargeToEdit.exchangeDate != null) {
                 this.exchangeRateDate = { startDate: moment(this.SellingRateChargeToEdit.exchangeDate), endDate: moment(this.SellingRateChargeToEdit.exchangeDate) };
             }
@@ -846,6 +851,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         }
         if (type === 'OBH') {
             this.OBHChargeToEdit = cloneDeep(charge);
+            this.obhChargeActive = [{'text': this.OBHChargeToEdit.currency,'id':this.OBHChargeToEdit.currencyId}];
             //this.OBHChargeToEdit.exchangeDate = { startDate: moment(this.OBHChargeToEdit.exchangeDate), endDate: moment(this.OBHChargeToEdit.exchangeDate) };
             if (this.OBHChargeToEdit.exchangeDate != null) {
                 this.exchangeRateDate = { startDate: moment(this.OBHChargeToEdit.exchangeDate), endDate: moment(this.OBHChargeToEdit.exchangeDate) };
