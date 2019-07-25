@@ -318,5 +318,16 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
             }
         }
+
+        /// <summary>
+        /// get list services
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetServices")]
+        public IActionResult GetServices()
+        {
+            var results = catChargeService.GetServicesData();
+            return Ok(results);
+        }
     }
 }

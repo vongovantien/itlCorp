@@ -49,20 +49,19 @@ export class ChargeDetailsComponent implements OnInit {
   activeType: any = null;
   activeServices: any = null;
 
-
   /**
    * Need to update ngDataServices by get data from databse after implement documentation module 
    */
   ngDataService = [
-    { text: "Landing Truckinng", id: "LT" },
+    { text: "Inland Trucking", id: "IT" },
     { text: "Air Import", id: "AI" },
     { text: "Air Export", id: "AE" },
     { text: "Sea Import", id: "SI" },
     { text: "Sea Export", id: "SE" },
-    { text: "Sea FCL Export", id: "SFCLE" },
-    { text: "Sea FCL Import", id: "SFCLI" },
-    { text: "Sea LCL Export", id: "SLCLE" },
-    { text: "Sea LCL Import", id: "SLCLI" },
+    { text: "Sea FCL Export", id: "SFE" },
+    { text: "Sea FCL Import", id: "SFI" },
+    { text: "Sea LCL Export", id: "SLE" },
+    { text: "Sea LCL Import", id: "SLI" },
     { text: "Sea Consol Export", id: "SCE" },
     { text: "Sea Consol Import", id: "SCI" }
   ];
