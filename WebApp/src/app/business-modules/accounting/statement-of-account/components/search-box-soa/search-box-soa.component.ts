@@ -6,7 +6,6 @@ import { GlobalState } from 'src/app/global-state';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { Currency, Partner, User } from 'src/app/shared/models';
 import { SystemRepo } from 'src/app/shared/repositories';
-import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'soa-search-box',
@@ -57,7 +56,6 @@ export class StatementOfAccountSearchComponent extends AppPage {
             .subscribe(
                 ([dataCurrency, dataSystemUser, dataPartner]: any) => {
                     this.partners = this.mapModel(dataPartner, Partner);
-
                     this.currencyList = <any>this.utility.prepareNg2SelectData(this.mapModel(dataCurrency, Currency), 'id', 'currencyName');
 
                     this.users = <any>this.utility.prepareNg2SelectData(this.mapModel(dataSystemUser, User), 'id', 'username');

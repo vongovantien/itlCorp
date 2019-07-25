@@ -2,6 +2,12 @@ import { Component, Output, EventEmitter } from '@angular/core';
 import { AppPage, IComboGirdConfig } from 'src/app/app.base';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { GlobalState } from 'src/app/global-state';
+import { catchError } from 'rxjs/operators';
+import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
+import _ from 'lodash';
+import { Charge } from 'src/app/shared/models';
+import moment from 'moment';
+
 @Component({
     selector: 'form-create-soa',
     templateUrl: './form-create-soa.component.html',
@@ -18,6 +24,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         selectedDisplayFields: [],
     };
 
+    charges: Charge[] = [];
     configCharge: IComboGirdConfig = {
         placeholder: 'Please select',
         displayFields: [],
@@ -71,41 +78,92 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     }
 
     getPartner() {
-        const partners: any[] = [
-            { code: 'TAX CODE 1', name: 'Name Abbr 1', nameEn: 'Name EN 1' },
-            { code: 'TAX CODE 2', name: 'Name Abbr 2', nameEn: 'Name EN 2' },
-            { code: 'TAX CODE 3', name: 'Name Abbr 3', nameEn: 'Name EN 3' },
-        ];
-        this.configPartner.dataSource.push(...partners);
-        this.configPartner.displayFields = [
-            { field: 'code', label: 'Taxcode' },
-            { field: 'name', label: 'Name' },
-            { field: 'nameEn', label: 'Customer Name' },
-        ];
-        this.configPartner.selectedDisplayFields = ['code'];
+        this._sysRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, inactive: false })
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (dataPartner: any) => {
+                    this.configPartner.dataSource = dataPartner;
+                    this.configPartner.displayFields = [
+                        { field: 'taxCode', label: 'Taxcode' },
+                        { field: 'partnerNameEn', label: 'Name' },
+                        { field: 'partnerNameVn', label: 'Customer Name' },
+                    ];
+                    this.configPartner.selectedDisplayFields = ['partnerNameEn'];
+                },
+                (errs: any) => {
+                    console.log(errs + '');
+                    // TODO handle errors
+                },
+                // complete
+                () => { }
+            );
+    }
+
+    getCurrency() {
+        this._sysRepo.getListCurrency()
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (dataCurrency: any) => {
+                    this.currencyList = (dataCurrency).map((item: any) => ({ id: item.id, text: item.id }));
+                    this.selectedCurrency = [this.currencyList.filter((curr) => curr.id === "VND")[0]];
+                },
+                (errs: any) => {
+                    console.log(errs + '');
+                    // TODO handle errors
+                },
+                // complete
+                () => { }
+            );
+    }
+
+    getUser() {
+        this._sysRepo.getListSystemUser()
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (dataUser: any) => {
+                    this.users = (dataUser || []).map((item: any) => ({ id: item.id, text: item.id }));
+                    this.selectedUser = [this.users.filter((i: any) => i.id === 'admin')[0]];
+                },
+                (errs: any) => {
+                    console.log(errs + '');
+                    // TODO handle errors
+                },
+                // complete
+                () => { }
+            );
     }
 
     getCharge() {
-        const charges: any[] = [
-            { code: 'All', name: 'All', id: -1 },
-            { code: Math.random(), name: 'Name Abbr 1', id: Math.random() },
-            { code: Math.random(), name: 'Name Abbr 2', id: Math.random() },
-            { code: Math.random(), name: 'Name Abbr 3', id: Math.random() },
-        ];
-        this.configCharge.dataSource.push(...charges);
-        this.configCharge.displayFields = [
-            { field: 'code', label: 'Charge Code' },
-            { field: 'name', label: 'Charge Name EN ' },
-        ];
-        this.configCharge.selectedDisplayFields = ['code'];
+        this._sysRepo.getListCharge()
+            .pipe(catchError(this.catchError))
+            .subscribe((data) => {
+                this.charges = data;
+                this.charges.push(new Charge({ code: 'All', id: 'All', chargeNameEn: 'All' }));
+
+                this.configCharge.dataSource = data || [];
+                this.configCharge.displayFields = [
+                    { field: 'code', label: 'Charge Code' },
+                    { field: 'chargeNameEn', label: 'Charge Name EN ' },
+                ];
+                this.configCharge.selectedDisplayFields = ['code'];
+            },
+                (errs: any) => {
+                    console.log(errs + '');
+                    // TODO handle errors
+                },
+                // complete
+                () => { }
+            );
+
     }
 
     initBasicData() {
         this.dateModes = [
-            { text: 'Created Date', id: 1 },
-            { text: 'Service Date', id: 2 },
-            { text: 'Invoice Issued Date', id: 3 },
+            { text: 'Created Date', id: 'CreatedDate' },
+            { text: 'Service Date', id: 'ServiceDate' },
+            { text: 'Invoice Issued Date', id: 'InvoiceIssuedDate' },
         ];
+        this.selectedDateMode = [this.dateModes[0]];
 
         this.types = [
             { id: 1, text: 'All' },
@@ -121,16 +179,19 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         this.selectedObh = [this.obhs[1]];
 
         this.services = [
-            { text: 'All', id: -1 },
-            { text: 'Logistic (operation)', id: 1 },
-            { text: 'Air Import', id: 2 },
-            { text: 'Air Export', id: 3 },
-            { text: 'Sea FCL Export', id: 4 },
-            { text: 'Sea LCL Export', id: 5 },
-            { text: 'Sea LCL Import', id: 6 },
-            { text: 'Sea Consol Export', id: 7 },
-            { text: 'Sea Consol Import ', id: 9 },
-            { text: 'Trucking Inland', id: 8 },
+            { text: 'All', id: 'All' },
+            { text: 'Logistic (operation)', id: 'LGO' },
+            { text: "Air Import", id: "AI" },
+            { text: "Air Export", id: "AE" },
+            { text: "Sea Import", id: "SI" },
+            { text: "Sea Export", id: "SE" },
+            { text: "Sea FCL Export", id: "SFE" },
+            { text: "Sea FCL Import", id: "SFI" },
+            { text: "Sea LCL Export", id: "SLE" },
+            { text: "Sea LCL Import", id: "SLI" },
+            { text: "Sea Consol Export", id: "SCE" },
+            { text: "Sea Consol Import", id: "SCI" },
+            { text: "Inland Trucking", id: "IT" },
         ];
         this.selectedService = [this.services[0]];
     }
@@ -138,11 +199,10 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     onSelectDataFormInfo(data: any, type: string) {
         switch (type.toLowerCase()) {
             case 'partner':
-                this.selectedPartner = { field: 'code', value: data.code };
-                console.log(this.selectedPartner);
+                this.selectedPartner = { field: data.partnerNameEn, value: data.id };
                 break;
             case 'date-mode':
-                this.selectedDateMode = data;
+                this.selectedDateMode = [data];
                 break;
             case 'type':
                 this.selectedType = [data];
@@ -152,22 +212,39 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 break;
             case 'office':
                 break;
+            case 'currency':
+                this.selectedCurrency = [data];
+                break;
             case 'service':
-                if (data.id < 0) {
+                // * reset selected charges & dataSource.
+                this.selectedCharges = [];
+                this.configCharge.dataSource = this.charges;
+
+                if (data.id === 'All') {
                     this.selectedService = [];
-                    this.selectedService.push({ "id": -1, "text": "All" });
+                    this.selectedService.push({ id: 'All', text: "All" });
+
+                    this.configCharge.dataSource = this.charges;
                 } else {
                     this.selectedService.push(data);
                     this.detectServiceWithAllOption(data);
+
+                    // ? filter charge when add service
+                    this.configCharge.dataSource = this.filterChargeWithService(this.configCharge.dataSource, this.selectedService.map((service: any) => service.id));
+                    this.configCharge.dataSource.push(new Charge({ code: 'All', id: 'All', chargeNameEn: 'All' }));
                 }
                 break;
             case 'user':
                 this.selectedUser.push(data);
                 break;
             case 'charge':
-                this.selectedCharges.push(data);
-                this.detectChargeWithAllOption(data);
-
+                if (data.id === 'All') {
+                    this.selectedCharges = [];
+                    this.selectedCharges.push({ id: 'All', code: 'All', chargeNameEn: 'All' });
+                } else {
+                    this.selectedCharges.push(data);
+                    this.detectChargeWithAllOption(data);
+                }
                 break;
             default:
                 break;
@@ -177,6 +254,10 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     onRemoveService(data: any) {
         this.selectedService.splice(this.selectedService.findIndex((item: any) => item.id === data.id), 1);
         this.detectServiceWithAllOption();
+
+        // ! filter charge when delete service
+        this.configCharge.dataSource = this.filterChargeWithService(this.configCharge.dataSource, this.selectedService.map((service: any) => service.id));
+
     }
 
     onRemoveUser(data: any) {
@@ -187,23 +268,9 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         this.selectedCharges.splice(index, 1);
     }
 
-    getCurrency() {
-        this._globalState.subscribe('currency', (data: any) => {
-            this.currencyList = (data.data || []).map((item: any) => ({ id: item.id, text: item.id }));
-            this.selectedCurrency = [this.currencyList[0]];
-        });
-    }
-
-    getUser() {
-        this._globalState.subscribe('system-user', (data: any) => {
-            this.users = (data || []).map((item: any) => ({ id: item.id, text: item.id }));
-            this.selectedUser = [this.users[0]];
-        });
-    }
-
     detectServiceWithAllOption(data?: any) {
-        if (!this.selectedService.every((value: any) => value.id > 0)) {
-            this.selectedService.splice(this.selectedService.findIndex((item: any) => item.id < 0), 1);
+        if (!this.selectedService.every((value: any) => value.id !== 'All')) {
+            this.selectedService.splice(this.selectedService.findIndex((item: any) => item.id === 'All'), 1);
 
             this.selectedService = [];
             this.selectedService.push(data);
@@ -211,8 +278,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     }
 
     detectChargeWithAllOption(data?: any) {
-        if (!this.selectedCharges.every((value: any) => value.id > 0)) {
-            this.selectedCharges.splice(this.selectedCharges.findIndex((item: any) => item.id < 0), 1);
+        if (!this.selectedCharges.every((value: any) => value.id !== 'All')) {
+            this.selectedCharges.splice(this.selectedCharges.findIndex((item: any) => item.id === 'All'), 1);
 
             this.selectedCharges = [];
             this.selectedCharges.push(data);
@@ -220,22 +287,42 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     }
 
     onSearchCharge() {
-        console.log(this.selectedRangeDate);
         this.isSubmited = true;
+        if (this.isSubmited && !this.selectedRangeDate.startDate || !this.selectedPartner.value) {
+            return;
+        } else {
+            const body = {
+                currencyLocal: 'VND', //todo: get currency local follow location or login info
+                currency: this.selectedCurrency[0].id,
+                customerID: this.selectedPartner.value || '',
+                dateType: this.selectedDateMode[0].id,
+                fromDate: moment(this.selectedRangeDate.startDate).format("YYYY-MM-DD"),
+                toDate: moment(this.selectedRangeDate.endDate).format("YYYY-MM-DD"),
+                type: this.selectedType[0].text,
+                isOBH: this.selectedObh[0].id === 1 ? true : false,
+                strCreators: this.selectedUser.map((item: any) => item.id).toString(),
+                strCharges: this.selectedCharges.map((item: any) => item.code).toString(),
+                note: this.note
+            };
+            this.onApply.emit(body);
+        }
 
-        const body = {
-            partner: this.selectedPartner,
-            date: this.selectedRangeDate,
-            dateMode: this.selectedDateMode,
-            type: this.selectedType,
-            obh: this.selectedObh,
-            currency: this.selectedCurrency,
-            services: this.selectedService,
-            office: null,
-            creator: this.selectedUser,
-            charges: this.selectedCharges,
-            note: this.note
-        };
-        this.onApply.emit(body);
+    }
+
+    filterChargeWithService(charges: any[], keys: any[]) {
+        const result: any[] = [];
+        for (const charge of charges) {
+            if (charge.hasOwnProperty('serviceTypeId')) {
+                if (typeof (charge.serviceTypeId) !== 'object') {
+                    charge.serviceTypeId = charge.serviceTypeId.split(";").filter((i: string) => Boolean(i));
+                }
+            }
+            for (const key of charge.serviceTypeId) {
+                if (_.includes(keys, key)) {
+                    result.push(charge);
+                }
+            }
+        }
+        return _.uniq(result);
     }
 }

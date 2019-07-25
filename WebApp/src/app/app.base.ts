@@ -4,7 +4,6 @@ import { HttpErrorResponse } from "@angular/common/http";
 
 import moment from "moment";
 import { UtilityHelper } from "src/helper";
-import { ToastrService } from "ngx-toastr";
 
 export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit {
 

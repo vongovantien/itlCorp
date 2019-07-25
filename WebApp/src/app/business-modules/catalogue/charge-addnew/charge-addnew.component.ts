@@ -113,7 +113,7 @@ export class ChargeAddnewComponent implements OnInit {
   async addCharge(form: NgForm) {
 
     if (form.form.status != "INVALID" && this.validatateDefaultAcountLine() && this.isSameVoucherType == false) {
-      delete this.ChargeToAdd.charge.Id;
+      delete this.ChargeToAdd.charge.id;
       var response = await this.baseServices.postAsync(this.api_menu.Catalogue.Charge.addNew, this.ChargeToAdd, true, true);
       if (response) {
         this.router.navigate(["/home/catalogue/charge"]);

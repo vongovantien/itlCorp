@@ -2,14 +2,14 @@
     <div class="m-form m-form--state">
         <div class="m-portlet__body">
             <div class="row">
-                <div class="col-lg-4">
+                <div class="col-lg-4" *ngIf="!!configPartner">
                     <div class="form-group"
                         [ngClass]="{'m-form__group has-danger': isSubmited && !selectedPartner.value}">
                         <label class="form-control-label">
                             Partner
                             <span class="text-danger">*</span>
                         </label>
-                        <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPartner"
+                        <app-combo-grid-virtual-scroll  [currentActiveItemId]="selectedPartner"
                             (itemSelected)="onSelectDataFormInfo($event, 'partner')"
                             [selectedDisplayFields]="configPartner.selectedDisplayFields"
                             [dataSources]="configPartner.dataSource" [displayFields]="configPartner.displayFields">
@@ -48,7 +48,7 @@
                         <label class="form-control-label">
                             Date Mode
                         </label>
-                        <ng-select [items]="dateModes" (selected)="onSelectDataFormInfo($event, 'date-mode')"
+                        <ng-select [items]="dateModes" (selected)="onSelectDataFormInfo($event, 'date-mode')" [active]="selectedDateMode"
                             placeholder="Select Date Mode">
                         </ng-select>
 
@@ -96,7 +96,6 @@
                         <ng-select [multiple]="true" (removed)="onRemoveService($event)" [active]="selectedService"
                             [items]="services" (selected)="onSelectDataFormInfo($event, 'service')">
                         </ng-select>
-                        {{selectedService | json}}
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -131,7 +130,7 @@
                                 <li class="charge-list-item d-flex justify-content-between align-items-center"
                                     *ngFor="let chargeItem of selectedCharges; let i = index; trackBy: trackByFn">
 
-                                    <div *ngIf="chargeItem.id > 0 else all">{{chargeItem.code}} - {{chargeItem.name}}
+                                    <div *ngIf="chargeItem.id !== 'All' else all">{{chargeItem.code}} - {{chargeItem.chargeNameEn}}
                                     </div>
                                     <ng-template #all>All</ng-template>
                                     <a title="Delete" (click)="onRemoveCharge(i)">
