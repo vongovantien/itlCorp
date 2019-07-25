@@ -30,11 +30,11 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <span class="m--font-bolder">Total shipment:</span><span
-                                        class="m--font-brand m--margin-left-5">0</span>
+                                        class="m--font-brand m--margin-left-5">{{totalShipment}}</span>
                                 </div>
                                 <div class="col-md-6">
                                     <span class="m--font-bolder">Total Charge:</span><span
-                                        class="m--font-brand m--margin-left-5">0</span>
+                                        class="m--font-brand m--margin-left-5">{{totalCharge}}</span>
                                 </div>
                             </div>
                         </div>
@@ -83,6 +83,14 @@
                             </tr>
                         </thead>
                         <tbody class="tbody-group">
+                            <tr *ngIf="!charges.length">
+                                <td colspan="100">
+                                    <div class="no-data">
+                                        <i class="flaticon-coins"></i>
+                                        <span class="no-data-text">No records found</span>
+                                    </div>
+                                </td>
+                            </tr>
                             <tr *ngFor="let charge of charges; let i = index; trackBy: trackByFn">
                                 <td class="table-actions-col">
                                     <div class="table-actions">
@@ -96,7 +104,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span>{{charge.code}}</span>
+                                    <span>{{charge.chargeCode}}</span>
                                 </td>
                                 <td>
                                     <span>{{charge.name}}</span>
@@ -126,7 +134,7 @@
                                     <span>{{charge.invoiceNo}}</span>
                                 </td>
                                 <td>
-                                    <span>{{charge.serviceDate}}</span>
+                                    <span>{{charge.serviceDate | date: 'dd/MM/yyyy'}}</span>
                                 </td>
                                 <td>
                                     <span>{{charge.note}}</span>
@@ -172,19 +180,33 @@
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody *ngIf="!!dataCharge">
                                 <tr class="text-center">
                                     <td>
-                                        <span>Local (VNĐ)</span>
+                                        <span>VNĐ</span>
                                     </td>
                                     <td>
-                                        <span>100</span>
+                                        <span>{{dataCharge.amountCreditLocal | number: '.0-2'}}</span>
                                     </td>
                                     <td>
-                                        <span>10</span>
+                                        <span>{{dataCharge.amountDebitLocal | number: '.0-2'}}</span>
                                     </td>
                                     <td>
-                                        <span>23</span>
+                                        <span>{{dataCharge.amountBalanceLocal | number: '.0-2'}}</span>
+                                    </td>
+                                </tr>
+                                <tr class="text-center">
+                                    <td>
+                                        <span>USD</span>
+                                    </td>
+                                    <td>
+                                        <span>{{dataCharge.amountCreditUSD | number: '.0-2'}}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{dataCharge.amountDebitUSD | number: '.0-2'}}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{dataCharge.amountBalanceUSD | number: '.0-2'}}</span>
                                     </td>
                                 </tr>
                             </tbody>

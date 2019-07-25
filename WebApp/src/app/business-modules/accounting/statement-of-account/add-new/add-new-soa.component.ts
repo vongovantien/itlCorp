@@ -1,13 +1,14 @@
 import { Component, ViewChild } from '@angular/core';
-
-import { StatementOfAccountAddChargeComponent } from '../components/poup/add-charge/add-charge.popup';
-import { SystemRepo } from 'src/app/shared/repositories';
-import { GlobalState } from 'src/app/global-state';
+import { forkJoin } from 'rxjs';
+import { takeUntil, catchError } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
-
-import { takeUntil } from 'node_modules/rxjs/operators';
-import { forkJoin } from 'node_modules/rxjs';
+import { GlobalState } from 'src/app/global-state';
+import { SystemRepo, AccoutingRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
+import { StatementOfAccountAddChargeComponent } from '../components/poup/add-charge/add-charge.popup';
+import { ToastrService } from 'ngx-toastr';
+
+
 @Component({
     selector: 'app-statement-of-account-new',
     templateUrl: './add-new-soa.component.html',
@@ -20,14 +21,21 @@ export class StatementOfAccountAddnewComponent extends AppList {
     charges: any[] = [];
     headers: any = null;
 
+    totalShipment: number = 0;
+    totalCharge: number = 0;
+
     isCollapsed: boolean = true;
 
     isCheckAllCharge: boolean = false;
 
+    dataCharge: any = null;
+    dataSearch: any = {};
     constructor(
         private _sysRepo: SystemRepo,
         private _globalState: GlobalState,
-        private _sortService: SortService
+        private _sortService: SortService,
+        private _accountRepo: AccoutingRepo,
+        private _toastService: ToastrService
     ) {
         super();
         this.requestList = this.sortLocal;
@@ -48,7 +56,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
             { title: 'Services Date', field: 'serviceDate', sortable: true },
             { title: 'Note', field: 'action', sortable: true },
         ];
-        this.getBasicData();
+        // this.getBasicData();
         this.getListCharge();
     }
 
@@ -78,12 +86,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
 
     getListCharge() {
         const results: any[] = [];
-        const data = { code: '', name: 'Name', jobId: 'XXXX', hbl: 'HBL no', mbl: 'MBL no', customNo: 'Customer no', debit: '12313', credit: '456', currency: 'VND', invoiceNo: '123', serviceDate: 'dd/mm/yyyy', note: 'lorem 10', isSelected: false };
-
-        for (let index = 1; index < 10; index++) {
-            results.push(Object.assign({}, data, { code: Math.floor(Math.random() * 10 + 1) }, { jobId: Math.floor(Math.random() * 20 + 1) }));
-        }
-
         this.charges = results;
     }
 
@@ -103,9 +105,66 @@ export class StatementOfAccountAddnewComponent extends AppList {
     }
 
     onCreateSOA() {
+        const chargeChecked = this.charges.filter((charge: any) => charge.isSelected);
+        if (!chargeChecked.length) {
+            this._toastService.warning(`SOA Don't have any charges in this period, Please check it again! `, '', { positionClass: 'toast-bottom-right' });
+            return;
+        } else {
+            const body = {
+                surchargeIds: chargeChecked.map((item: any) => item.id),
+                soaformDate: this.dataSearch.fromDate,
+                soatoDate: this.dataSearch.toDate,
+                currency: this.dataSearch.currency,
+                note: this.dataSearch.note
+            };
+            console.log(body);
+
+            this._accountRepo.createSOA(body)
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (res: any) => {
+                        if (res.status) {
+                            this._toastService.success(res.message, '', { positionClass: 'toast-bottom-right' });
+
+                            // ? search charge
+                            this.onSearchCharge(this.dataSearch);
+
+                            // ? reset checkbox
+                            this.isCheckAllCharge = false;
+
+                        } else {
+                            // TODO: handle error
+                        }
+                    },
+                    (errs: any) => {
+
+                    },
+                    () => {
+
+                    }
+                );
+        }
 
     }
 
-    onSearchCharge(data: any) {
+    onSearchCharge(dataSearch: any) {
+        this.dataSearch = dataSearch;
+        this._accountRepo.getListChargeShipment(dataSearch)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.dataCharge = res;
+                    this.charges = res.chargeShipments || [];
+                    this.totalCharge = res.totalCharge;
+                    this.totalShipment = res.totalShipment;
+                    console.log(this.charges);
+                },
+                (errs: any) => {
+                    console.log(errs);
+                    // Todo: handle error
+                },
+                () => { }
+            );
     }
+
 }

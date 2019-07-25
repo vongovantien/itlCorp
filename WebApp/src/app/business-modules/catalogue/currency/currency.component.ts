@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
 import { CURRENCYCOLUMNSETTING } from '../currency/currency.columns';
-import { catCurrency } from 'src/app/shared/models/catalogue/catCurrency.model';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { SortService } from 'src/app/shared/services/sort.service';
@@ -16,6 +15,7 @@ import * as lodash from 'lodash';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import {ExportExcel} from 'src/app/shared/models/layout/exportExcel.models';
 import { SystemConstants } from 'src/constants/system.const';
+import { Currency } from 'src/app/shared/models';
 
 declare var $: any;
 
@@ -25,8 +25,8 @@ declare var $: any;
   styleUrls: ['./currency.component.scss']
 })
 export class CurrencyComponent implements OnInit {
-  currencies: Array<catCurrency>;
-  currency: catCurrency = new catCurrency();
+  currencies: Array<Currency>;
+  currency: Currency = new Currency();
   currenciesSettings: ColumnSetting[] = CURRENCYCOLUMNSETTING;
   pager: PagerSetting = PAGINGSETTING;
   criteria: any = {};
@@ -120,11 +120,11 @@ export class CurrencyComponent implements OnInit {
   }
   showAdd() {
     this.isAddnew = true;
-    this.currency = new catCurrency();
+    this.currency = new Currency();
   }
   onCancel() {
     this.form.onReset();
-    this.currency = new catCurrency();
+    this.currency = new Currency();
     this.setPage(this.pager);
   }
   onSubmit() {
