@@ -284,8 +284,6 @@ namespace eFMS.API.Documentation.DL.Services
                 AmountDebitUSD = chargeShipmentList.Sum(x=>x.AmountDebitUSD),
                 AmountCreditUSD = chargeShipmentList.Sum(x=>x.AmountCreditUSD),
             };
-            result.AmountBalanceLocal = result.AmountDebitLocal - result.AmountCreditLocal;
-            result.AmountBalanceUSD = result.AmountDebitUSD - result.AmountCreditUSD;
             return result;
         }
 
