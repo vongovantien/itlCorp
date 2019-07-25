@@ -189,7 +189,8 @@ export class OpsModuleCreditDebitNoteAddnewComponent extends PopupBase implement
                             // $('#ops-add-credit-debit-note-modal').modal('hide');
                             this.CDNoteWorking = new AcctCDNote();
                             this.resetAddSOAForm();
-    
+                            this.listChargeOfPartner = [];
+
                         }
                     }
                 }

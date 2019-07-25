@@ -202,7 +202,7 @@ namespace eFMS.API.Documentation.DL.Services
                 CompanyName = "",
                 CompanyDescription="",
                 CompanyAddress1 = "",
-                ComapnyAddress2 = "",
+                CompanyAddress2 = "",
                 Website = "efms.itlvn.com",
                 IbanCode = "",
                 AccountName = "",

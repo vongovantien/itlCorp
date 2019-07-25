@@ -491,7 +491,7 @@ namespace eFMS.API.Documentation.DL.Services
                SayWordAll = "N/A",
                CompanyName = "N/A",
                CompanyAddress1 = "N/A",
-               ComapnyAddress2 = "N/A",
+               CompanyAddress2 = "N/A",
                CompanyDescription = "N/A",
                Website = "efms.itlvn.com",
                IbanCode = "N/A",
@@ -507,7 +507,7 @@ namespace eFMS.API.Documentation.DL.Services
                IssueInv = "N/A",
                InvoiceInfo = "N/A",
                Contact = "N/A",
-               IssueDate = DateTime.Now.ToString(),
+               IssuedDate = DateTime.Now.ToString(),
                OtherRef = "N/A"
             };
             var listSOA = new List<AcctSOAReport>();
@@ -539,9 +539,9 @@ namespace eFMS.API.Documentation.DL.Services
                         Delivery = null,
                         HWBNO = model.HbLadingNo,
                         Description = "N/A",
-                        Quanity = null,
+                        Quanity = item.Quantity,
                         QUnit = "N/A",
-                        UnitPrice = null,
+                        UnitPrice = item.UnitPrice,
                         VAT = null,
                         Debit = model.TotalDebit,
                         Credit = model.TotalCredit,
@@ -568,7 +568,7 @@ namespace eFMS.API.Documentation.DL.Services
                         Cuakhau = "N/A",
                         DeliveryPlace = null,
                         TransDate = null,
-                        Unit = "N/A",
+                        Unit = "USD",
                         UnitPieaces = "N/A"                                                             
 
                     };
