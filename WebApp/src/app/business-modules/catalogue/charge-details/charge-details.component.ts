@@ -63,7 +63,8 @@ export class ChargeDetailsComponent implements OnInit {
     { text: "Sea LCL Export", id: "SLE" },
     { text: "Sea LCL Import", id: "SLI" },
     { text: "Sea Consol Export", id: "SCE" },
-    { text: "Sea Consol Import", id: "SCI" }
+    { text: "Sea Consol Import", id: "SCI" },
+    { text: "Custom Logistic", id: "CL" }
   ];
 
   async ngOnInit() {
