@@ -11,7 +11,6 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public DateTime ToDate { get; set; }
         public string Type { get; set; }
         public bool IsOBH { get; set; }
-        public string StrServices {get;set;}
         public string StrCreators { get; set; }
         public string StrCharges { get; set; }
     }
