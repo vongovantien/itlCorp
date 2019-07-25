@@ -34,5 +34,10 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal? TotalDebit { get; set; }
         public string ProductService { get; set; }
         public string ServiceMode { get; set; }
+        public DateTime? ServiceDate { get; set; }
+        public decimal? CBM { get; set; }
+        public decimal? GW { get; set; }
+        public decimal? SumContainers { get; set; }
+        public decimal? SumPackages { get; set; }
     }
 }

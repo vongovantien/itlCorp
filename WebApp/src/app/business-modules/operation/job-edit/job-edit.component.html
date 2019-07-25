@@ -461,7 +461,7 @@
                                                         <input type="number"
                                                             class="form-control m-input m-input--square"
                                                             placeholder="Enter number" name="sumGrossWeight"
-                                                            [(ngModel)]="opsTransaction.sumGrossWeight"
+                                                            [(ngModel)]="opsTransaction.sumGrossWeight" min="0.01"
                                                             decimalNumberGreaterThan0 #sumGrossWeight="ngModel">
                                                         <div class="form-control-feedback"
                                                             *ngIf="addOpsForm.submitted && opsTransaction.sumGrossWeight == 0">
@@ -477,7 +477,7 @@
                                                         </label>
                                                         <input type="number"
                                                             class="form-control m-input m-input--square"
-                                                            placeholder="Enter number" name="sumNetWeight"
+                                                            placeholder="Enter number" name="sumNetWeight" min="0.01"
                                                             [(ngModel)]="opsTransaction.sumNetWeight"
                                                             decimalNumberGreaterThan0 #sumNetWeight="ngModel">
                                                         <div class="form-control-feedback"
@@ -493,7 +493,7 @@
                                                             CBM
                                                         </label>
                                                         <input type="number"
-                                                            class="form-control m-input m-input--square"
+                                                            class="form-control m-input m-input--square" min="0.01"
                                                             placeholder="Enter number" name="sumCbm"
                                                             [(ngModel)]="opsTransaction.sumCbm"
                                                             decimalNumberGreaterThan0 #sumCbm="ngModel">
@@ -506,7 +506,8 @@
                                             </div>
                                             <div class="row">
                                                 <div class="col-xl-4">
-                                                    <div class="form-group">
+                                                    <div class="form-group"
+                                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.sumPackages == 0}">
                                                         <label class="form-control-label" for="">
                                                             Packages Qty
                                                         </label>
@@ -526,10 +527,16 @@
                                                                 </ng-select>
                                                             </div>
                                                         </div>
+
+                                                        <div class="form-control-feedback"
+                                                            *ngIf="addOpsForm.submitted && opsTransaction.sumPackages == 0">
+                                                            Packages Qty must be greater than 0
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-xl-4">
-                                                    <div class="form-group">
+                                                    <div class="form-group"
+                                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsTransaction.sumContainers == 0}">
                                                         <label class="form-control-label" for="">
                                                             Container Qty
                                                         </label>
@@ -539,6 +546,10 @@
                                                             placeholder="Enter number"
                                                             [(ngModel)]="opsTransaction.sumContainers"
                                                             #sumContainers="ngModel">
+                                                        <div class="form-control-feedback"
+                                                            *ngIf="addOpsForm.submitted && opsTransaction.sumContainers == 0">
+                                                            Container Qty must be greater than 0
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-xl-4">
@@ -798,9 +809,13 @@
                                                             </span>
                                                         </td>
                                                         <td>
-                                                            <a href="javascript:void(0)" data-toggle="modal"
+                                                            <!-- <a href="javascript:void(0)" data-toggle="modal"
                                                                 data-target="#detail-credit-debit-note-modal"
-                                                                (click)="openCreditDebitNote()">
+                                                                (click)="openCreditDebitNote(charge.cdno)">
+                                                                {{ charge.cdno }}
+                                                            </a> -->
+                                                            <a href="javascript:void(0)"
+                                                                (click)="openCreditDebitNote(charge.cdno)">
                                                                 {{ charge.cdno }}
                                                             </a>
                                                         </td>
@@ -1015,9 +1030,13 @@
                                                             </span>
                                                         </td>
                                                         <td>
-                                                            <a href="javascript:void(0)" data-toggle="modal"
+                                                            <!-- <a href="javascript:void(0)" data-toggle="modal"
                                                                 data-target="#detail-credit-debit-note-modal"
                                                                 (click)="openCreditDebitNote()">
+                                                                {{ charge.cdno }}
+                                                            </a> -->
+                                                            <a href="javascript:void(0)"
+                                                                (click)="openCreditDebitNote(charge.cdno)">
                                                                 {{ charge.cdno }}
                                                             </a>
                                                         </td>
@@ -1241,8 +1260,12 @@
                                                             </span>
                                                         </td>
                                                         <td>
-                                                            <a href="javascript:void(0)" data-toggle="modal"
+                                                            <!-- <a href="javascript:void(0)" data-toggle="modal"
                                                                 data-target="#detail-credit-debit-note-modal">
+                                                                {{ charge.cdno }}
+                                                            </a> -->
+                                                            <a href="javascript:void(0)"
+                                                                (click)="openCreditDebitNote(charge.cdno)">
                                                                 {{ charge.cdno }}
                                                             </a>
                                                         </td>
@@ -1422,10 +1445,10 @@
                                                             </span>
                                                         </td>
                                                         <td>
-                                                            <a href="javascript:void(0)" data-toggle="modal"
+                                                            <!-- <a href="javascript:void(0)" data-toggle="modal"
                                                                 data-target="#detail-credit-debit-note-modal">
                                                                 Credit/ Debit note
-                                                            </a>
+                                                            </a> -->
                                                         </td>
                                                         <td>
                                                             <span>
@@ -1737,13 +1760,13 @@
                                             </td>
                                             <td class="">
                                                 <div class="control-editable"
-                                                    [ngClass]="{ 'has-danger': containerMasterForm.submitted && conQuantity.invalid && container.verifying}">
+                                                    [ngClass]="{ 'has-danger': (containerMasterForm.submitted && conQuantity.invalid && container.verifying) || (containerMasterForm.submitted && container.chargeAbleWeight == 0)}">
                                                     <input type="number" class="form-control m-input m-input--square"
                                                         min="1" max="2147483647" value="1" appIntergerInputCheck
                                                         placeholder="Enter number" [(ngModel)]="container.quantity"
                                                         name="conQuantity" #conQuantity="ngModel" required>
                                                     <div class="form-control-feedback"
-                                                        *ngIf="containerMasterForm.submitted && conQuantity.invalid && container.verifying">
+                                                        *ngIf="(containerMasterForm.submitted && conQuantity.invalid && container.verifying) || (containerMasterForm.submitted && container.chargeAbleWeight == 0)">
                                                         Cont Q'ty must be a number
                                                     </div>
                                                 </div>
@@ -1873,7 +1896,7 @@
                                                     <input type="number" class="form-control m-input m-input--square"
                                                         placeholder="Enter number" autocomplete="nope"
                                                         [(ngModel)]="container.cbm" name="containerCBM" min="0.01"
-                                                        appTwoDigitDecimaNumber #containerCBM="ngModel">
+                                                        decimalNumberGreaterThan0 #containerCBM="ngModel">
                                                     <div class="form-control-feedback"
                                                         *ngIf="containerMasterForm.submitted && container.cbm == 0">
                                                         CBM must be greater than 0.
@@ -1945,12 +1968,12 @@
                                             </td>
                                             <td class="">
                                                 <span class="content-editable">
-                                                    {{ container.nw | number: '1.2-2' }}
+                                                    {{ container.gw | number: '1.2-2' }}
                                                 </span>
                                             </td>
                                             <td class="">
                                                 <span class="content-editable">
-                                                    {{ container.gw | number: '1.2-2' }}
+                                                    {{ container.nw | number: '1.2-2' }}
                                                 </span>
                                             </td>
                                             <td class="">
@@ -1987,7 +2010,7 @@
                         </span>
                     </button>
                     <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                        data-dismiss="modal">
+                        data-dismiss="modal" (click)="closeContainerPopup()">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -2161,10 +2184,10 @@
                                     </label>
                                     <div class="input-group m-input-group m-input-group--square">
                                         <input type="number" required class="form-control m-input m-input--square"
-                                            placeholder="Enter number" name="buyingRateChangeQuantityNameOps"
+                                            min="0" placeholder="Enter number" name="buyingRateChangeQuantityNameOps"
                                             decimalNumberGreaterThan0 #buyingRateChangeQuantityNameOps="ngModel"
                                             [(ngModel)]="BuyingRateChargeToAdd.quantity"
-                                            (keyup)="calculateTotalEachBuying()">
+                                            (change)="calculateTotalEachBuying()" (keyup)="calculateTotalEachBuying()">
                                         <!-- <div class="input-group-prepend">
                                             <button type="button" class="btn btn-secondary">
                                                 CBM
@@ -2210,10 +2233,10 @@
                                     <label class="form-control-label" for="">
                                         Unit price <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square"
+                                    <input type="number" class="form-control m-input m-input--square"
                                         [(ngModel)]="BuyingRateChargeToAdd.unitPrice"
-                                        (keyup)="calculateTotalEachBuying()" placeholder="Enter number"
-                                        #BuyingRateChargeUnitPriceNameOps="ngModel" required
+                                        (change)="calculateTotalEachBuying()" (keyup)="calculateTotalEachBuying()"
+                                        placeholder="Enter number" #BuyingRateChargeUnitPriceNameOps="ngModel" required
                                         name="BuyingRateChargeUnitPriceNameOps">
                                     <div class="form-control-feedback"
                                         *ngIf="addBuyingRateChargeFormOps.submitted &&(BuyingRateChargeUnitPriceNameOps.invalid || (0 >= BuyingRateChargeToAdd.unitPrice))">
@@ -2252,7 +2275,7 @@
                                         #BuyingRateChargeVATNameOps="ngModel"
                                         [(ngModel)]="BuyingRateChargeToAdd.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter number"
-                                        (keyup)="calculateTotalEachBuying()">
+                                        (change)="calculateTotalEachBuying()" (keyup)="calculateTotalEachBuying()">
                                     <div class="form-control-feedback"
                                         *ngIf="addBuyingRateChargeFormOps.submitted && (BuyingRateChargeVATNameOps.invalid || BuyingRateChargeToAdd.vatrate >100)">
                                         VAT is required and must be less than or equal 100
@@ -2369,7 +2392,7 @@
                                     <label class="form-control-label" for="" #selectedBuyingChargeCode>
                                         Charge <span class="m--font-danger">(*)</span>
                                         <small class="m--margin-left-5 m--font-primary"> &nbsp;
-                                            {{selectedBuyingChargeCode.value==null?'':selectedBuyingChargeCode.value}}
+                                            {{selectedBuyingChargeCode.value==null?BuyingRateChargeToEdit.chargeCode:selectedBuyingChargeCode.value}}
                                         </small>
                                     </label>
 
@@ -2463,7 +2486,8 @@
                                             name="buyingRateChangeQuantityNameOps"
                                             #buyingRateChangeQuantityNameOps="ngModel"
                                             [(ngModel)]="BuyingRateChargeToEdit.quantity"
-                                            (keyup)="calculateTotalEachBuying(true)">
+                                            (keyup)="calculateTotalEachBuying(true)" min="0"
+                                            (change)="calculateTotalEachBuying(true)">
                                         <!-- <div class="input-group-prepend">
                                             <button type="button" class="btn btn-secondary">
                                                 CBM
@@ -2511,7 +2535,8 @@
                                     <input type="number" class="form-control m-input m-input--square"
                                         [disabled]="BuyingRateChargeToEdit.cdno"
                                         [(ngModel)]="BuyingRateChargeToEdit.unitPrice"
-                                        (keyup)="calculateTotalEachBuying(true)" placeholder="Enter number"
+                                        (keyup)="calculateTotalEachBuying(true)"
+                                        (change)="calculateTotalEachBuying(true)" placeholder="Enter number"
                                         #BuyingRateChargeUnitPriceNameOps="ngModel" required
                                         name="BuyingRateChargeUnitPriceNameOps">
                                     <div class="form-control-feedback"
@@ -2553,7 +2578,8 @@
                                         [disabled]="BuyingRateChargeToEdit.cdno" #BuyingRateChargeVATNameOps="ngModel"
                                         [(ngModel)]="BuyingRateChargeToEdit.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter number"
-                                        (keyup)="calculateTotalEachBuying(true)">
+                                        (keyup)="calculateTotalEachBuying(true)"
+                                        (change)="calculateTotalEachBuying(true)">
                                     <div class="form-control-feedback"
                                         *ngIf="editBuyingRateChargeFormOps.submitted && (BuyingRateChargeVATNameOps.invalid || BuyingRateChargeToEdit.vatrate > 100)">
                                         VAT is required and must be less than or equal 100
@@ -2593,6 +2619,32 @@
                                         name="BuyingRateChargeNoteNameOps">
                                 </div>
                             </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Exchange rate date
+                                    </label>
+                                    <div class="m-input-icon m-input-icon--right down">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [autoApply]="true"
+                                            [attr.disabled]="BuyingRateChargeToEdit.cdno"
+                                            [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                            [(ngModel)]="exchangeRateDate" [singleDatePicker]="true"
+                                            name="exchangeRateDate" readonly />
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                    <div class="form-control-feedback"
+                                        *ngIf="editBuyingRateChargeFormOps.submitted && this.exchangeRateDate.startDate != null && this.exchangeRateDate.startDate != null && (this.exchangeRateDate.startDate < this.exchangeRateDate.startDate)">
+                                        Finish Date must more greater or equal Service Date
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
@@ -2754,10 +2806,11 @@
                                     <div class="input-group m-input-group m-input-group--square">
                                         <input type="number" required class="form-control m-input m-input--square"
                                             decimalNumberGreaterThan0 placeholder="Enter number"
-                                            name="sellingRateChangeQuantityNameOps"
+                                            name="sellingRateChangeQuantityNameOps" min="0"
                                             #sellingRateChangeQuantityNameOps="ngModel"
                                             [(ngModel)]="SellingRateChargeToAdd.quantity"
-                                            (keyup)="calculateTotalEachSelling()">
+                                            (keyup)="calculateTotalEachSelling()"
+                                            (change)="calculateTotalEachSelling()">
                                         <!-- <div class="input-group-prepend">
                                             <button type="button" class="btn btn-secondary">
                                                 CBM
@@ -2805,8 +2858,8 @@
                                     </label>
                                     <input type="number" class="form-control m-input m-input--square"
                                         [(ngModel)]="SellingRateChargeToAdd.unitPrice"
-                                        (keyup)="calculateTotalEachSelling()" placeholder="Enter number"
-                                        #SellingRateChargeUnitPriceNameOps="ngModel" required
+                                        (keyup)="calculateTotalEachSelling()" (change)="calculateTotalEachSelling()"
+                                        placeholder="Enter number" #SellingRateChargeUnitPriceNameOps="ngModel" required
                                         name="SellingRateChargeUnitPriceNameOps">
                                     <div class="form-control-feedback"
                                         *ngIf="addSellingRateChargeFormOps.submitted &&(SellingRateChargeUnitPriceNameOps.invalid || (0 >= SellingRateChargeToAdd.unitPrice))">
@@ -2845,7 +2898,7 @@
                                         #SellingRateChargeVATNameOps="ngModel"
                                         [(ngModel)]="SellingRateChargeToAdd.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter number"
-                                        (keyup)="calculateTotalEachSelling()">
+                                        (keyup)="calculateTotalEachSelling()" (change)="calculateTotalEachSelling()">
                                     <div class="form-control-feedback"
                                         *ngIf="addSellingRateChargeFormOps.submitted && (SellingRateChargeVATNameOps.invalid || SellingRateChargeToAdd.vatrate > 100)">
                                         VAT is required and must be less than or equal 100
@@ -2943,10 +2996,10 @@
                             <div class="col-lg-4">
                                 <div class="form-group"
                                     [ngClass]="{ 'm-form__group has-danger': editSellingRateChargeFormOps.submitted && SellingRateChargeToEdit.chargeId==null}">
-                                    <label class="form-control-label" for="" #selectedBuyingChargeCode>
+                                    <label class="form-control-label" for="" #selectedSellingChargeCode>
                                         Charge <span class="m--font-danger">(*)</span>
                                         <small class="m--margin-left-5 m--font-primary"> &nbsp;
-                                            {{selectedBuyingChargeCode.value==null?'':selectedBuyingChargeCode.value}}
+                                            {{selectedSellingChargeCode.value==null?SellingRateChargeToEdit.chargeCode:selectedSellingChargeCode.value}}
                                         </small>
                                     </label>
 
@@ -2956,7 +3009,7 @@
                                         SellingRateChargeToEdit.unitId=$event.charge.unitId;
                                         SellingRateChargeToEdit.unitPrice=$event.charge.unitPrice;
                                         SellingRateChargeToEdit.vatrate=$event.charge.vatrate;
-                                            selectedBuyingChargeCode.value=$event.charge.code;
+                                        selectedSellingChargeCode.value=$event.charge.code;
                                             calculateTotalEachSelling(true);"
                                         [selectedDisplayFields]="['charge.chargeNameEn']"
                                         [dataSources]="lstSellingRateChargesComboBox"
@@ -3036,11 +3089,12 @@
                                     <div class="input-group m-input-group m-input-group--square">
                                         <input type="number" required class="form-control m-input m-input--square"
                                             decimalNumberGreaterThan0 placeholder="Enter number"
-                                            [disabled]="SellingRateChargeToEdit.cdno"
+                                            [disabled]="SellingRateChargeToEdit.cdno" min="0"
                                             name="sellingRateChangeQuantityNameOps"
                                             #sellingRateChangeQuantityNameOps="ngModel"
                                             [(ngModel)]="SellingRateChargeToEdit.quantity"
-                                            (keyup)="calculateTotalEachSelling(true)">
+                                            (keyup)="calculateTotalEachSelling(true)"
+                                            (change)="calculateTotalEachSelling(true)">
                                         <!-- <div class="input-group-prepend">
                                             <button type="button" class="btn btn-secondary">
                                                 CBM
@@ -3088,7 +3142,8 @@
                                     <input type="number" class="form-control m-input m-input--square"
                                         [disabled]="SellingRateChargeToEdit.cdno"
                                         [(ngModel)]="SellingRateChargeToEdit.unitPrice"
-                                        (keyup)="calculateTotalEachSelling(true)" placeholder="Enter number"
+                                        (keyup)="calculateTotalEachSelling(true)"
+                                        (change)="calculateTotalEachSelling(true)" placeholder="Enter number"
                                         #SellingRateChargeUnitPriceNameOps="ngModel" required
                                         name="SellingRateChargeUnitPriceNameOps">
                                     <div class="form-control-feedback"
@@ -3130,7 +3185,8 @@
                                         [disabled]="SellingRateChargeToEdit.cdno" #SellingRateChargeVATNameOps="ngModel"
                                         [(ngModel)]="SellingRateChargeToEdit.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter number"
-                                        (keyup)="calculateTotalEachSelling(true)">
+                                        (keyup)="calculateTotalEachSelling(true)"
+                                        (change)="calculateTotalEachSelling(true)">
                                     <div class="form-control-feedback"
                                         *ngIf="editSellingRateChargeFormOps.submitted && (SellingRateChargeVATNameOps.invalid || SellingRateChargeToEdit.vatrate > 100)">
                                         VAT is required and must be less than or equal 100
@@ -3263,7 +3319,8 @@
                                 <div class="form-group"
                                     [ngClass]="{ 'm-form__group has-danger': addOBHChargeFormOps.submitted && OBHChargeToAdd.chargeId==null}">
                                     <label class="form-control-label" for="" #selectedOBHChargeCode>
-                                        Charge <span class="m--font-danger">(*)</span> <small
+                                        Charge <span class="m--font-danger">(*)</span> 
+                                        <small
                                             class="m--margin-left-5 m--font-primary">{{selectedOBHChargeCode.value==null?'':selectedOBHChargeCode.value}}&nbsp;</small>
                                     </label>
 
@@ -3344,10 +3401,11 @@
                                     <label class="form-control-label" for="">
                                         Quantity <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <input type="number" class="form-control m-input m-input--square"
+                                    <input type="number" class="form-control m-input m-input--square" min="0"
                                         decimalNumberGreaterThan0 placeholder="Enter number"
                                         #OBHQuantityNameOps="ngModel" [(ngModel)]="OBHChargeToAdd.quantity" required
-                                        (keyup)="calculateTotalEachOBH()" name="OBHQuantityNameOps">
+                                        (keyup)="calculateTotalEachOBH()" (change)="calculateTotalEachOBH()"
+                                        name="OBHQuantityNameOps">
                                     <div class="form-control-feedback"
                                         *ngIf="addOBHChargeFormOps.submitted && OBHQuantityNameOps.invalid">
                                         Quantity is required !
@@ -3393,7 +3451,7 @@
                                     <input type="number" class="form-control m-input m-input--square"
                                         [(ngModel)]="OBHChargeToAdd.unitPrice" placeholder="Enter number" required
                                         name="OBHUnitPriceNameOps" #OBHUnitPriceNameOps="ngModel"
-                                        (keyup)="calculateTotalEachOBH()">
+                                        (keyup)="calculateTotalEachOBH()" (change)="calculateTotalEachOBH()">
                                     <div class="form-control-feedback"
                                         *ngIf="addOBHChargeFormOps.submitted &&(OBHUnitPriceNameOps.invalid || (0 >= OBHChargeToAdd.unitPrice))">
                                         Unit Price is required and must be larger than 0 !
@@ -3432,7 +3490,7 @@
                                     <input type="number" max="100" name="OBHRateChargeVATNameOps" required
                                         #OBHRateChargeVATNameOps="ngModel" [(ngModel)]="OBHChargeToAdd.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter number"
-                                        (keyup)="calculateTotalEachOBH()">
+                                        (keyup)="calculateTotalEachOBH()" (change)="calculateTotalEachOBH()">
                                     <div class="form-control-feedback"
                                         *ngIf="addOBHChargeFormOps.submitted && (OBHRateChargeVATNameOps.invalid || OBHChargeToAdd.vatrate > 100)">
                                         VAT is required and must be less than or equal 100
@@ -3531,7 +3589,8 @@
                                 <div class="form-group"
                                     [ngClass]="{ 'm-form__group has-danger': editOBHChargeFormOps.submitted && OBHChargeToEdit.chargeId==null}">
                                     <label class="form-control-label" for="">
-                                        Charge <span class="m--font-danger">(*)</span> <small
+                                        Charge <span class="m--font-danger">(*)</span> 
+                                        <small
                                             class="m--margin-left-5 m--font-primary">{{OBHChargeToEdit.chargeCode}}</small>
                                     </label>
 
@@ -3608,11 +3667,11 @@
                                     <label class="form-control-label" for="">
                                         Quantity <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <input type="number" class="form-control m-input m-input--square"
+                                    <input type="number" class="form-control m-input m-input--square" min="0"
                                         placeholder="Enter number" #OBHQuantityNameEdtOps="ngModel"
                                         decimalNumberGreaterThan0 [(ngModel)]="OBHChargeToEdit.quantity" required
                                         [disabled]="OBHChargeToEdit.cdno" (keyup)="calculateTotalEachOBH(true)"
-                                        name="OBHQuantityNameEdtOps">
+                                        (change)="calculateTotalEachOBH(true)" name="OBHQuantityNameEdtOps">
                                     <div class="form-control-feedback"
                                         *ngIf="editOBHChargeFormOps.submitted && OBHQuantityNameEdtOps.invalid">
                                         Quantity is required !
@@ -3654,7 +3713,8 @@
                                     <input type="number" class="form-control m-input m-input--square"
                                         [disabled]="OBHChargeToEdit.cdno" [(ngModel)]="OBHChargeToEdit.unitPrice"
                                         placeholder="Enter number" required name="OBHUnitPriceNameEdtOps"
-                                        #OBHUnitPriceNameEdtOps="ngModel" (keyup)="calculateTotalEachOBH(true)">
+                                        #OBHUnitPriceNameEdtOps="ngModel" (keyup)="calculateTotalEachOBH(true)"
+                                        (change)="calculateTotalEachOBH(true)">
                                     <div class="form-control-feedback"
                                         *ngIf="editOBHChargeFormOps.submitted &&(OBHUnitPriceNameEdtOps.invalid || (0 >= OBHChargeToEdit.unitPrice))">
                                         Unit Price is required and must be larger than 0 !
@@ -3692,7 +3752,7 @@
                                         [disabled]="OBHChargeToEdit.cdno" #OBHChargeVATNameEdtOps="ngModel"
                                         [(ngModel)]="OBHChargeToEdit.vatrate"
                                         class="form-control m-input m-input--square" placeholder="Enter number"
-                                        (keyup)="calculateTotalEachOBH(true)">
+                                        (keyup)="calculateTotalEachOBH(true)" (change)="calculateTotalEachOBH(true)">
                                     <div class="form-control-feedback"
                                         *ngIf="editOBHChargeFormOps.submitted && (OBHChargeVATNameEdtOps.invalid || OBHChargeToEdit.vatrate > 100)">
                                         VAT is required and must be less than or equal 100
@@ -3730,25 +3790,30 @@
                                         placeholder="Enter text" name="OBHChargeNoteNameEdtOps">
                                 </div>
                             </div>
-                            <!-- <div class="col-lg-4">
+                            <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
                                         Exchange rate date
                                     </label>
                                     <div class="m-input-icon m-input-icon--right down">
                                         <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [autoApply]="true" [disabled]=""
+                                            ngxDaterangepickerMd [autoApply]="true"
+                                            [attr.disabled]="OBHChargeToEdit.cdno"
                                             [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                            [(ngModel)]="selectedDate" [singleDatePicker]="true"
-                                            name="OBHExchangeDateNameEdt" readonly />
+                                            [(ngModel)]="exchangeRateDate" [singleDatePicker]="true"
+                                            name="exchangeRateDate" readonly />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
                                             <span>
                                                 <i class="la la-calendar"></i>
                                             </span>
                                         </span>
                                     </div>
+                                    <div class="form-control-feedback"
+                                        *ngIf="editOBHChargeFormOps.submitted && this.exchangeRateDate.startDate != null && this.exchangeRateDate.startDate != null && (this.exchangeRateDate.startDate < this.exchangeRateDate.startDate)">
+                                        Finish Date must more greater or equal Service Date
+                                    </div>
                                 </div>
-                            </div> -->
+                            </div>
                         </div>
                     </div>
                     <!--end::Form-->
@@ -3976,3 +4041,9 @@
     </div>
 </div>
 <!--end::confirm-cancel-job-modal-->
+
+<app-ops-module-credit-debit-note-detail [CDNoteDetails]="CDNoteDetails" (openEditCDNote)="openEditCDNotePopUp($event)">
+</app-ops-module-credit-debit-note-detail>
+
+<app-ops-module-credit-debit-note-edit [cdNoteDetails]="CDNoteDetails" (isCloseModal)="closeEditModal($event)">
+</app-ops-module-credit-debit-note-edit>

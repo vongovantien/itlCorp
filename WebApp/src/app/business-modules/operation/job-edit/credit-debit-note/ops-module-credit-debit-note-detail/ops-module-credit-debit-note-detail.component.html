@@ -50,13 +50,14 @@
                                     </div>
                                     <div class="m--margin-top-5">
                                         <span class="font-weight-bold"> Package Quantity: </span>
+                                        {{ CDNoteDetails.sumPackages | number: '1.2-2' }}
                                     </div>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div>
                                     <span class="font-weight-bold"> Job ID: </span>
-                                    {{CDNoteDetails.jobId}}
+                                    {{CDNoteDetails.jobNo}}
                                 </div>
                                 <div>
                                     <span class="font-weight-bold"> Master Bill of Lading No: </span>
@@ -68,16 +69,16 @@
                                 </div>
                                 <div>
                                     <span class="font-weight-bold"> Service Date: </span>
-                                    {{'dd/mm/yyyy'}}
+                                    {{CDNoteDetails.serviceDate | date: 'dd/MM/yyyy'}}
                                 </div>
                                 <div class="m--margin-top-10">
                                     <div class="m--margin-top-5">
-                                        <span class="font-weight-bold"> GW: </span>
-                                        {{ CDNoteDetails.pol }}, {{CDNoteDetails.polCountry}}
+                                        <span class="font-weight-bold"> G.W: </span>
+                                        {{ CDNoteDetails.gw | number: '1.2-2' }}
                                     </div>
                                     <div class="m--margin-top-5">
                                         <span class="font-weight-bold">Container Quantity: </span>
-                                        {{ CDNoteDetails.hbConstainers }}
+                                        {{ CDNoteDetails.sumContainers | number: '1.2-2' }}
                                     </div>
                                 </div>
                             </div>
@@ -100,8 +101,8 @@
                                 </div>
                                 <div class="m--margin-top-10">
                                     <div class="m--margin-top-5">
-                                        <span class="font-weight-bold"> CPM: </span>
-                                        -
+                                        <span class="font-weight-bold"> CBM: </span>
+                                        {{ CDNoteDetails.cbm | number: '1.2-2' }}
                                     </div>
                                     <div class="m--margin-top-5">
                                         <span class="font-weight-bold">SOA: </span>

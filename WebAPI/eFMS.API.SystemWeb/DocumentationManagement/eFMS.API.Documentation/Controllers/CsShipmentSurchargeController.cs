@@ -5,6 +5,7 @@ using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
@@ -149,6 +150,18 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Get list charge shipment by conditions
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("ListChargeShipment")]
+        public ChargeShipmentResult ListChargeShipment(ChargeShipmentCriteria criteria)
+        {
+            var data = csShipmentSurchargeService.GetListChargeShipment(criteria);
+            return data;
         }
     }
 }

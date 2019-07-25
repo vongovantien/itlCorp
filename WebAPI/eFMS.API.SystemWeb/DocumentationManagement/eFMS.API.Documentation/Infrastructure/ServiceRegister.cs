@@ -47,6 +47,7 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddTransient<ICsManifestService, CsManifestService>();
             services.AddTransient<ICsShippingInstructionService, CsShippingInstructionService>();
             services.AddTransient<IOpsTransactionService, OpsTransactionService>();
+            services.AddTransient<IAcctSOAService, AcctSOAService>();
         }
         public static IServiceCollection AddAuthorize(this IServiceCollection services, IConfiguration configuration)
         {

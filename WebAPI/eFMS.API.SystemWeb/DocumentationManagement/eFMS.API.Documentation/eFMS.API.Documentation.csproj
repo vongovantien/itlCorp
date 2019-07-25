@@ -42,7 +42,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
     <PackageReference Include="MongoDB.Driver" Version="2.7.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="4.0.1" />
@@ -59,7 +59,10 @@
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Documentation.Service.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.IdentityServer.DL">
-      <HintPath>..\..\IdentityServer\eFMS.IdentityServer.DL\obj\Debug\netcoreapp2.2\eFMS.IdentityServer.DL.dll</HintPath>
+      <HintPath>..\bin\netcoreapp2.2\eFMS.IdentityServer.DL.dll</HintPath>
+    </Reference>
+    <Reference Include="eFMS.IdentityServer.Service">
+      <HintPath>..\bin\netcoreapp2.2\eFMS.IdentityServer.Service.dll</HintPath>
     </Reference>
     <Reference Include="ITL.NetCore.Common">
       <HintPath>..\bin\netcoreapp2.2\ITL.NetCore.Common.dll</HintPath>

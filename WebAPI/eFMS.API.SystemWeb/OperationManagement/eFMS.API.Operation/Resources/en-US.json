@@ -119,11 +119,14 @@
   "MSG_CUSTOM_CLEARANCE_DATE_EMPTY": "Clearance Date is not allow empty",
   "MSG_CUSTOM_CLEARANCE_CUSTOMER_CODE_EMPTY": "Customer Code is not allow empty",
   "MSG_CUSTOM_CLEARANCE_MBL_EMPTY": "MBL is not allow empty",
+  "MSG_CUSTOM_CLEARANCE_HBL_EMPTY": "HBL is not allow empty",
   "MSG_CUSTOM_CLEARANCE_GATEWAY_EMPTY": "Gateway is not allow empty",
   "MSG_CUSTOM_CLEARANCE_CARGO_TYPE_EMPTY": "Cargo Type is not allow empty",
   "MSG_CUSTOM_CLEARANCE_SERVICE_TYPE_EMPTY": "Service Type is not allow empty",
   "MSG_CUSTOM_CLEARANCE_ROUTE_EMPTY": "Route is not allow empty",
   "MSG_DUPLICATE_DATA": "{0} duplacate data",
-  "MSG_INVALID_MAX_LENGTH": "Should be at most {0} symbols"
+  "MSG_INVALID_MAX_LENGTH": "Should be at most {0} symbols",
+  "MSG_INVALID_NEGATIVE": "Not allow negative numbers",
+  "MSG_CUSTOM_INVALID_CHARACTER_SPECIAL": "Not allowed to enter special characters. Except for characters ./_- and space"
   //------------end: Custom Clearance
 }

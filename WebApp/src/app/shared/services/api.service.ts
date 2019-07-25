@@ -11,15 +11,6 @@ export class ApiService {
     ) {
     }
 
-    getApiUrl(apiUrl: string, port: string | number, module: string) {
-        if (apiUrl.includes('localhost')) {
-            apiUrl = `${apiUrl}${port}`;
-        } else {
-            apiUrl = `${apiUrl}/${module}`;
-        }
-        return apiUrl;
-    }
-
     setHeaders(headers: any = {}) {
         this._headers = Object.assign({}, this._headers, headers);
         return this;

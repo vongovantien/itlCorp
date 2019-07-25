@@ -1,4 +1,5 @@
 ﻿using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -14,6 +15,6 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState DeleteCharge(Guid chargeId);
         List<object> GroupChargeByHB(Guid id,string PartnerId,bool IsHouseBillID,bool getAll=false);
         List<CatPartner> GetAllParner(Guid id,bool IsHouseBillID);
-
+        ChargeShipmentResult GetListChargeShipment(ChargeShipmentCriteria criteria);
     }
 }

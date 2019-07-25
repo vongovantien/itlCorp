@@ -179,11 +179,14 @@ export class CustomClearanceComponent implements OnInit {
     }
 
     async convertToJobs() {
-        let clearancesToConvert = this.mapClearancesToJobs();
-        let response = await this.baseServices.postAsync(this.api_menu.Documentation.Operation.convertExistedClearancesToJobs, clearancesToConvert, true, true);
-        if (response.status) {
-            await this.initPager();
-            await this.getListCustomsDeclaration();
+        const clearancesToConvert = this.mapClearancesToJobs();
+        const clearanceNulls = clearancesToConvert.filter(x => x.opsTransaction == null);
+        if (clearanceNulls.length === 0) {
+            const response = await this.baseServices.postAsync(this.api_menu.Documentation.Operation.convertExistedClearancesToJobs, clearancesToConvert, true, true);
+            if (response.status) {
+                await this.initPager();
+                await this.getListCustomsDeclaration();
+            }
         }
     }
     async getListCustomer() {
@@ -199,33 +202,33 @@ export class CustomClearanceComponent implements OnInit {
         this.listUnit = res;
     }
     mapClearancesToJobs() {
-        let clearancesToConvert = [];
+        const clearancesToConvert = [];
         for (let i = 0; i < this.customCheckedArray.length; i++) {
-            let clearance = this.customCheckedArray[i];
+            const clearance = this.customCheckedArray[i];
             let shipment = new OpsTransaction();
-            let index = this.listCustomer.findIndex(x => x.taxCode == clearance.partnerTaxCode);
+            let index = this.listCustomer.findIndex(x => x.taxCode === clearance.partnerTaxCode);
             if (index > -1) {
-                let customer = this.listCustomer[index];
+                const customer = this.listCustomer[index];
                 shipment.customerId = customer.id;
-                shipment.salemanId = customer.salemanId;
-                index = this.listPort.findIndex(x => x.code == clearance.gateway);
+                shipment.salemanId = customer.salePersonId;
+                shipment.serviceMode = clearance.type;
+                index = this.listPort.findIndex(x => x.code === clearance.gateway);
                 if (index > -1) {
-                    if (clearance.type == "Export") {
+                    if (clearance.type === "Export") {
                         shipment.pol = this.listPort[index].id;
                     }
-                    if (clearance.type == "Import") {
+                    if (clearance.type === "Import") {
                         shipment.pod = this.listPort[index].id;
                     }
                 }
-                if (clearance.serviceType == "Sea") {
-                    if (clearance.cargoType == "FCL") {
-                        shipment.productService = "Sea FCL";
+                if (clearance.serviceType === "Sea") {
+                    if (clearance.cargoType === "FCL") {
+                        shipment.productService = "SeaFCL";
                     }
-                    if (clearance.cargoType == "LCL") {
-                        shipment.productService = "Sea LCL";
+                    if (clearance.cargoType === "LCL") {
+                        shipment.productService = "SeaLCL";
                     }
-                }
-                else {
+                } else {
                     shipment.productService = clearance.serviceType;
                 }
                 shipment.shipmentMode = "External";
@@ -235,20 +238,27 @@ export class CustomClearanceComponent implements OnInit {
                 shipment.sumGrossWeight = clearance.grossWeight;
                 shipment.sumNetWeight = clearance.netWeight;
                 shipment.sumCbm = clearance.cbm;
-                let claim = localStorage.getItem('id_token_claims_obj');
-                let currenctUser = JSON.parse(claim)["id"];
+                const claim = localStorage.getItem('id_token_claims_obj');
+                const currenctUser = JSON.parse(claim)["id"];
                 shipment.billingOpsId = currenctUser;
-                index = this.listUnit.findIndex(x => x.code == clearance.unitCode);
+                index = this.listUnit.findIndex(x => x.code === clearance.unitCode);
                 if (index > -1) {
                     shipment.packageTypeID = this.listUnit[index].id;
                 }
+            } else {
+                this.baseServices.errorToast("Không có customer để tạo job mới");
+                shipment = null;
             }
-            else {
-                this.baseServices.errorToast("Không đủ điều kiện để tạo job mới");
+            if (clearance.mblid == null) {
+                this.baseServices.errorToast("Không có MBL/MAWB để tạo job mới");
+                shipment = null;
+            }
+            if (clearance.hblid == null) {
+                this.baseServices.errorToast("Không có HBL/HAWB để tạo job mới");
                 shipment = null;
             }
             if (clearance.clearanceDate == null) {
-                this.baseServices.errorToast("Không đủ điều kiện để tạo job mới");
+                this.baseServices.errorToast("Không có clearance date để tạo job mới");
                 shipment = null;
             }
             clearancesToConvert.push({ opsTransaction: shipment, customsDeclaration: clearance });

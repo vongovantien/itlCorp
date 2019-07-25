@@ -20,5 +20,6 @@ namespace eFMS.API.Documentation.DL.IService
         Crystal PreviewCDNOte(AcctCDNoteDetailsModel model);
         HandleState ConvertClearanceToJob(OpsTransactionClearanceModel model);
         HandleState ConvertExistedClearancesToJobs(List<OpsTransactionClearanceModel> list);
+        HandleState SoftDeleteJob(Guid id);
     }
 }

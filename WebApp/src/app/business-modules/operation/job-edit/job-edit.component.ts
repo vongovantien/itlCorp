@@ -13,10 +13,10 @@ import { NgForm } from '@angular/forms';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
 import filter from 'lodash/filter';
 import cloneDeep from 'lodash/cloneDeep';
-import { SurchargeTypeEnum } from 'src/app/shared/enums/csShipmentSurchargeType-enum';
-import { async } from 'rxjs/internal/scheduler/async';
 import { SortService } from 'src/app/shared/services/sort.service';
-import { BehaviorSubject } from 'rxjs';
+import { OpsModuleCreditDebitNoteDetailComponent } from './credit-debit-note/ops-module-credit-debit-note-detail/ops-module-credit-debit-note-detail.component';
+import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDetails.model';
+import { OpsModuleCreditDebitNoteEditComponent } from './credit-debit-note/ops-module-credit-debit-note-edit/ops-module-credit-debit-note-edit.component';
 declare var $: any;
 
 @Component({
@@ -25,6 +25,9 @@ declare var $: any;
     styleUrls: ['./job-edit.component.scss']
 })
 export class OpsModuleBillingJobEditComponent implements OnInit {
+
+    @ViewChild(OpsModuleCreditDebitNoteDetailComponent, { static: false }) poupDetail: OpsModuleCreditDebitNoteDetailComponent;
+    @ViewChild(OpsModuleCreditDebitNoteEditComponent, { static: false }) popupEdit: OpsModuleCreditDebitNoteEditComponent;
     opsTransaction: OpsTransaction = null;
     productServices: any[] = [];
     serviceDate: any;
@@ -67,8 +70,8 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     OBHChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
 
     isDisplay: boolean = true;
-    BuyingRateChargeToEdit: any = null;
-    SellingRateChargeToEdit: any = null;
+    BuyingRateChargeToEdit: CsShipmentSurcharge = null;
+    SellingRateChargeToEdit: CsShipmentSurcharge = null;
     OBHChargeToEdit: any = null;
 
     totalSellingUSD: number = 0;
@@ -188,6 +191,8 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             || this.opsTransaction.sumGrossWeight === 0
             || this.opsTransaction.sumNetWeight === 0
             || this.opsTransaction.sumCbm === 0
+            || this.opsTransaction.sumPackages === 0
+            || this.opsTransaction.sumContainers === 0
         ) {
             return;
         } else {
@@ -214,7 +219,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
      * Close popup, assign list container to current job & remove last row that is not saved
      */
     closeContainerPopup() {
-        const index = this.lstMasterContainers.findIndex(x => x.isNew == true);
+        const index = this.lstMasterContainers.findIndex(x => x.isNew === true);
         if (index > -1 && this.lstMasterContainers.length > 1) {
             this.lstMasterContainers.splice(index, 1);
         }
@@ -277,6 +282,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     /**
      * change mode of row(editing - not editing)
      */
+    containerToChangeEdit: any = null;
     changeEditMode(index: any) {
         this.getComboboxDataContainer(index);
         if (this.lstMasterContainers[index].allowEdit === false || this.lstMasterContainers[index].allowEdit == undefined) {
@@ -295,6 +301,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         } else {
             this.lstMasterContainers[index].allowEdit = false;
         }
+        this.containerToChangeEdit = Object.assign({}, this.lstMasterContainers[index]);
     }
 
     saveContainerSuccess = false;
@@ -330,7 +337,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             this.saveContainerSuccess = false;
         } else {
             // set row is saved
-            if (this.lstMasterContainers[index].isNew == true) {
+            if (this.lstMasterContainers[index].isNew === true) {
                 this.lstMasterContainers[index].isNew = false;
             } else {
                 this.lstMasterContainers[index].inValidRow = false;
@@ -338,10 +345,25 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
                 this.lstMasterContainers[index].packageTypeActive = this.lstMasterContainers[index].packageTypeId != null ? [{ id: this.lstMasterContainers[index].packageTypeId, text: this.lstMasterContainers[index].packageTypeName }] : [];
                 this.lstMasterContainers[index].unitOfMeasureActive = this.lstMasterContainers[index].unitOfMeasureId != null ? [{ id: this.lstMasterContainers[index].unitOfMeasureId, text: this.lstMasterContainers[index].unitOfMeasureName }] : [];
             }
+            this.roundWeight(index);
             this.saveContainerSuccess = true;
             this.lstMasterContainers[index].allowEdit = false;
         }
         this.lstContainerTemp = Object.assign([], this.lstMasterContainers);
+    }
+    roundWeight(index: number) {
+        if (this.lstMasterContainers[index].gw != null) {
+            this.lstMasterContainers[index].gw = Number(this.lstMasterContainers[index].gw.toFixed(2));
+        }
+        if (this.lstMasterContainers[index].nw != null) {
+            this.lstMasterContainers[index].nw = Number(this.lstMasterContainers[index].nw.toFixed(2));
+        }
+        if (this.lstMasterContainers[index].cbm != null) {
+            this.lstMasterContainers[index].cbm = Number(this.lstMasterContainers[index].cbm.toFixed(2));
+        }
+        if (this.lstMasterContainers[index].chargeAbleWeight != null) {
+            this.lstMasterContainers[index].chargeAbleWeight = Number(this.lstMasterContainers[index].chargeAbleWeight.toFixed(2));
+        }
     }
     /**
      * save list container
@@ -386,12 +408,14 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
      * @param index 
      */
     cancelNewContainer(index: number) {
-        if (this.lstMasterContainers[index].isNew == true) {
+        if (this.lstMasterContainers[index].isNew === true) {
             this.lstMasterContainers.splice(index, 1);
-        }
-        else {
+        } else {
+            this.lstMasterContainers[index] = this.containerToChangeEdit;
             this.lstMasterContainers[index].allowEdit = false;
+            this.containerToChangeEdit = null;
         }
+
     }
 
     /**
@@ -626,51 +650,60 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     }
 
     calculateTotalEachBuying(isEdit: boolean = false) {
+        let total = 0;
         if (isEdit) {
             if (this.BuyingRateChargeToEdit.vatrate >= 0) {
-                this.BuyingRateChargeToEdit.total = this.BuyingRateChargeToEdit.quantity * this.BuyingRateChargeToEdit.unitPrice * (1 + (this.BuyingRateChargeToEdit.vatrate / 100));
+                total = this.BuyingRateChargeToEdit.quantity * this.BuyingRateChargeToEdit.unitPrice * (1 + (this.BuyingRateChargeToEdit.vatrate / 100));
             } else {
-                this.BuyingRateChargeToEdit.total = this.BuyingRateChargeToEdit.quantity * this.BuyingRateChargeToEdit.unitPrice + Math.abs(this.BuyingRateChargeToEdit.vatrate);
+                total = this.BuyingRateChargeToEdit.quantity * this.BuyingRateChargeToEdit.unitPrice + Math.abs(this.BuyingRateChargeToEdit.vatrate);
             }
+            this.BuyingRateChargeToEdit.total = Number(total.toFixed(2));
         } else {
             if (this.BuyingRateChargeToAdd.vatrate >= 0) {
-                this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice * (1 + (this.BuyingRateChargeToAdd.vatrate / 100));
+                total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice * (1 + (this.BuyingRateChargeToAdd.vatrate / 100));
             } else {
-                this.BuyingRateChargeToAdd.total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice + Math.abs(this.BuyingRateChargeToAdd.vatrate);
+                total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice + Math.abs(this.BuyingRateChargeToAdd.vatrate);
             }
+            this.BuyingRateChargeToAdd.total = Number(total.toFixed(2));
         }
     }
 
     calculateTotalEachSelling(isEdit: boolean = false) {
+        let total = 0;
         if (isEdit) {
             if (this.SellingRateChargeToEdit.vatrate >= 0) {
-                this.SellingRateChargeToEdit.total = this.SellingRateChargeToEdit.quantity * this.SellingRateChargeToEdit.unitPrice * (1 + (this.SellingRateChargeToEdit.vatrate / 100));
+                total = this.SellingRateChargeToEdit.quantity * this.SellingRateChargeToEdit.unitPrice * (1 + (this.SellingRateChargeToEdit.vatrate / 100));
             } else {
-                this.SellingRateChargeToEdit.total = this.SellingRateChargeToEdit.quantity * this.SellingRateChargeToEdit.unitPrice + Math.abs(this.SellingRateChargeToEdit.vatrate);
+                total = this.SellingRateChargeToEdit.quantity * this.SellingRateChargeToEdit.unitPrice + Math.abs(this.SellingRateChargeToEdit.vatrate);
             }
+            this.SellingRateChargeToEdit.total = Number(total.toFixed(2));
         } else {
             if (this.SellingRateChargeToAdd.vatrate >= 0) {
-                this.SellingRateChargeToAdd.total = this.SellingRateChargeToAdd.quantity * this.SellingRateChargeToAdd.unitPrice * (1 + (this.SellingRateChargeToAdd.vatrate / 100));
+                total = this.SellingRateChargeToAdd.quantity * this.SellingRateChargeToAdd.unitPrice * (1 + (this.SellingRateChargeToAdd.vatrate / 100));
             } else {
-                this.SellingRateChargeToAdd.total = this.SellingRateChargeToAdd.quantity * this.SellingRateChargeToAdd.unitPrice + Math.abs(this.SellingRateChargeToAdd.vatrate);
+                total = this.SellingRateChargeToAdd.quantity * this.SellingRateChargeToAdd.unitPrice + Math.abs(this.SellingRateChargeToAdd.vatrate);
             }
+            this.SellingRateChargeToAdd.total = Number(total.toFixed(2));
         }
     }
 
 
     calculateTotalEachOBH(isEdit: boolean = false) {
+        let total = 0;
         if (isEdit) {
             if (this.OBHChargeToEdit.vatrate >= 0) {
-                this.OBHChargeToEdit.total = this.OBHChargeToEdit.quantity * this.OBHChargeToEdit.unitPrice * (1 + (this.OBHChargeToEdit.vatrate / 100));
+                total = this.OBHChargeToEdit.quantity * this.OBHChargeToEdit.unitPrice * (1 + (this.OBHChargeToEdit.vatrate / 100));
             } else {
-                this.OBHChargeToEdit.total = this.OBHChargeToEdit.quantity * this.OBHChargeToEdit.unitPrice + Math.abs(this.OBHChargeToEdit.vatrate);
+                total = this.OBHChargeToEdit.quantity * this.OBHChargeToEdit.unitPrice + Math.abs(this.OBHChargeToEdit.vatrate);
             }
+            this.OBHChargeToEdit.total = total;
         } else {
             if (this.OBHChargeToAdd.vatrate >= 0) {
-                this.OBHChargeToAdd.total = this.OBHChargeToAdd.quantity * this.OBHChargeToAdd.unitPrice * (1 + (this.OBHChargeToAdd.vatrate / 100));
+                total = this.OBHChargeToAdd.quantity * this.OBHChargeToAdd.unitPrice * (1 + (this.OBHChargeToAdd.vatrate / 100));
             } else {
-                this.OBHChargeToAdd.total = this.OBHChargeToAdd.quantity * this.OBHChargeToAdd.unitPrice + Math.abs(this.OBHChargeToAdd.vatrate);
+                total = this.OBHChargeToAdd.quantity * this.OBHChargeToAdd.unitPrice + Math.abs(this.OBHChargeToAdd.vatrate);
             }
+            this.OBHChargeToAdd.total = total;
         }
     }
 
@@ -798,16 +831,25 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     prepareEditCharge(type: 'BUY' | 'SELL' | 'OBH', charge: any) {
         if (type === 'BUY') {
             this.BuyingRateChargeToEdit = cloneDeep(charge);
-            this.BuyingRateChargeToEdit.exchangeDate = { startDate: moment(this.BuyingRateChargeToEdit.exchangeDate), endDate: moment(this.BuyingRateChargeToEdit.exchangeDate) };
+            //this.BuyingRateChargeToEdit.exchangeDate = { startDate: moment(this.BuyingRateChargeToEdit.exchangeDate), endDate: moment(this.BuyingRateChargeToEdit.exchangeDate) };
+            if (this.BuyingRateChargeToEdit.exchangeDate != null) {
+                this.exchangeRateDate = { startDate: moment(this.BuyingRateChargeToEdit.exchangeDate), endDate: moment(this.BuyingRateChargeToEdit.exchangeDate) };
+            }
         }
         if (type === 'SELL') {
             this.SellingRateChargeToEdit = cloneDeep(charge);
-            this.SellingRateChargeToEdit.exchangeDate = { startDate: moment(this.SellingRateChargeToEdit.exchangeDate), endDate: moment(this.SellingRateChargeToEdit.exchangeDate) };
-            this.exchangeRateDate = { startDate: moment(this.SellingRateChargeToEdit.exchangeDate), endDate: moment(this.SellingRateChargeToEdit.exchangeDate) };
+            if (this.SellingRateChargeToEdit.exchangeDate != null) {
+                this.exchangeRateDate = { startDate: moment(this.SellingRateChargeToEdit.exchangeDate), endDate: moment(this.SellingRateChargeToEdit.exchangeDate) };
+            }
+            //this.SellingRateChargeToEdit.exchangeDate = { startDate: moment(this.SellingRateChargeToEdit.exchangeDate), endDate: moment(this.SellingRateChargeToEdit.exchangeDate) };
+
         }
         if (type === 'OBH') {
             this.OBHChargeToEdit = cloneDeep(charge);
-            this.OBHChargeToEdit.exchangeDate = { startDate: moment(this.OBHChargeToEdit.exchangeDate), endDate: moment(this.OBHChargeToEdit.exchangeDate) };
+            //this.OBHChargeToEdit.exchangeDate = { startDate: moment(this.OBHChargeToEdit.exchangeDate), endDate: moment(this.OBHChargeToEdit.exchangeDate) };
+            if (this.OBHChargeToEdit.exchangeDate != null) {
+                this.exchangeRateDate = { startDate: moment(this.OBHChargeToEdit.exchangeDate), endDate: moment(this.OBHChargeToEdit.exchangeDate) };
+            }
         }
     }
 
@@ -826,8 +868,53 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         }
     }
 
-    openCreditDebitNote() {
+    CDNoteDetails: AcctCDNoteDetails = null;
+    async openCreditDebitNote(soaNo: string) {
+        this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.opsTransaction.id + "&soaNo=" + soaNo);
+        if (this.CDNoteDetails != null) {
+            if (this.CDNoteDetails.listSurcharges != null) {
+                this.totalCreditDebitCalculate();
+            }
+            this.poupDetail.show({ backdrop: 'static' });
+        }
+    }
 
+    openEditCDNotePopUp(event) {
+        this.CDNoteDetails = null;
+        console.log(event);
+        if (event != null) {
+            this.CDNoteDetails = event;
+            //this.baseServices.setData("CDNoteDetails", event);
+            this.popupEdit.show({ backdrop: 'static' });
+        }
+    }
+    async closeEditModal(event) {
+        console.log(event);
+        this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.opsTransaction.id + "&soaNo=" + this.CDNoteDetails.cdNote.code);
+        if (this.CDNoteDetails != null) {
+            if (this.CDNoteDetails.listSurcharges != null) {
+                this.totalCreditDebitCalculate();
+            }
+            this.poupDetail.show({ backdrop: 'static' });
+        }
+    }
+    totalCreditDebitCalculate() {
+        let totalCredit = 0;
+        let totalDebit = 0;
+        for (let i = 0; i < this.CDNoteDetails.listSurcharges.length; i++) {
+            const c = this.CDNoteDetails.listSurcharges[i];
+            if (c.type === "BUY" || c.type === "LOGISTIC" || (c.type === "OBH" && this.CDNoteDetails.partnerId === c.payerId)) {
+                // calculate total credit
+                totalCredit += (c.total * c.exchangeRate);
+            }
+            if (c.type === "SELL" || (c.type === "OBH" && this.CDNoteDetails.partnerId === c.receiverId)) {
+                // calculate total debit 
+                totalDebit += (c.total * c.exchangeRate);
+            }
+
+        }
+        this.CDNoteDetails.totalCredit = totalCredit;
+        this.CDNoteDetails.totalDebit = totalDebit;
     }
 
 
@@ -860,7 +947,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
 
         return results;
     }
-    
+
     editCharge(id_form: string, form: NgForm, data: CsShipmentSurcharge) {
         setTimeout(async () => {
             if (form.submitted) {

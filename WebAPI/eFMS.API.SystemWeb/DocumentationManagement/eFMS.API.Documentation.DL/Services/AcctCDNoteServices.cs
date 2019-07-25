@@ -288,7 +288,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         public AcctCDNoteDetailsModel GetCDNoteDetails(Guid JobId, string CDNoteCode)
         {
-            
+            AcctCDNoteDetailsModel soaDetails = new AcctCDNoteDetailsModel();
             var cdNote = DataContext.Where(x => x.Code == CDNoteCode).FirstOrDefault();
             var partner = ((eFMSDataContext)DataContext.DC).CatPartner.FirstOrDefault(x => x.Id == cdNote.PartnerId);
 
@@ -343,14 +343,20 @@ namespace eFMS.API.Documentation.DL.Services
             }
             var hbOfLadingNo = string.Empty;
             var mbOfLadingNo = string.Empty;
+
             if (transaction != null)
             {
                 hbOfLadingNo = transaction?.Mawb;
             }
             else
             {
-                hbOfLadingNo = opsTansaction?.Hwbno;
-                mbOfLadingNo = opsTansaction?.Mblno;
+                soaDetails.CBM = opsTansaction.SumCbm;
+                soaDetails.GW = opsTansaction.SumGrossWeight;
+                soaDetails.ServiceDate = opsTansaction.ServiceDate;
+                soaDetails.HbLadingNo = opsTansaction?.Hwbno;
+                soaDetails.MbLadingNo = opsTansaction?.Mblno;
+                soaDetails.SumContainers = opsTansaction.SumContainers;
+                soaDetails.SumPackages = opsTansaction.SumPackages;
             }
             var hbConstainers = string.Empty;
             decimal? volum = 0;
@@ -369,14 +375,11 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             var countries = ((eFMSDataContext)DataContext.DC).CatCountry.ToList();
-            AcctCDNoteDetailsModel soaDetails = new AcctCDNoteDetailsModel();
             soaDetails.PartnerNameEn = partner?.PartnerNameEn;
             soaDetails.PartnerShippingAddress = partner?.AddressShippingEn;
             soaDetails.PartnerTel = partner?.Tel;
             soaDetails.PartnerTaxcode = partner?.TaxCode;
             soaDetails.PartnerId = partner?.Id;
-            soaDetails.HbLadingNo = hbOfLadingNo;
-            soaDetails.MbLadingNo = mbOfLadingNo;
             soaDetails.JobId = transaction != null ? transaction.Id : opsTansaction.Id;
             soaDetails.JobNo = transaction != null ? transaction.JobNo : opsTansaction.JobNo;
             soaDetails.Pol = pol?.NameEn;
@@ -399,8 +402,6 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.CDNote = cdNote;
             soaDetails.ProductService = opsTansaction.ProductService;
             soaDetails.ServiceMode = opsTansaction.ServiceMode;
-
-
 
             return soaDetails;
 

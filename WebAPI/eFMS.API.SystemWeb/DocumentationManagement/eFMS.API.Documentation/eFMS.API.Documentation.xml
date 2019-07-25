@@ -4,6 +4,32 @@
         <name>eFMS.API.Documentation</name>
     </assembly>
     <members>
+        <member name="T:eFMS.API.Documentation.Controllers.AcctSOAController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSOAController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.LanguageSub},eFMS.API.Documentation.DL.IService.IAcctSOAService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+            <summary>
+            constructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="service"></param>
+            <param name="user"></param>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSOAController.Get">
+            <summary>
+            get the list of acctSOA
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSOAController.AddNew(eFMS.API.Documentation.DL.Models.AcctSoaModel)">
+            <summary>
+            add new acctSOA
+            </summary>
+            <param name="model">object to add</param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController">
             <summary>
             A base class for an MVC controller without view support.
@@ -62,6 +88,12 @@
             delete an existed surcharge
             </summary>
             <param name="chargId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.ListChargeShipment(eFMS.API.Documentation.DL.Models.Criteria.ChargeShipmentCriteria)">
+            <summary>
+            Get list charge shipment by conditions
+            </summary>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsTransactionController">

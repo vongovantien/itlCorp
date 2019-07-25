@@ -9,6 +9,7 @@ import * as dataHelper from 'src/helper/data.helper';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { StageConstants } from 'src/constants/stage.const';
+import { JobConstants } from 'src/constants/job.const';
 declare var $: any;
 
 @Component({
@@ -17,14 +18,14 @@ declare var $: any;
     styleUrls: ['./ops-module-billing.component.scss']
 })
 export class OpsModuleBillingComponent implements OnInit {
-    stageConts = {
-        inSchedule: StageConstants.InSchedule,
-        processing: StageConstants.Processing,
-        completed: StageConstants.Completed,
-        overdued: StageConstants.Overdued,
-        pending: StageConstants.Pending,
-        deleted: StageConstants.Deleted,
-        warning: StageConstants.Warning
+    jobStatusConts = {
+        overdued: JobConstants.Overdued,
+        processing: JobConstants.Processing,
+        inSchedule: JobConstants.InSchedule,
+        pending: JobConstants.Pending,
+        finish: JobConstants.Finish,
+        canceled: JobConstants.Canceled,
+        warning: JobConstants.Warning
     }
     productServices: any[] = [];
     serviceModes: any[] = [];
@@ -117,9 +118,9 @@ export class OpsModuleBillingComponent implements OnInit {
         }, 100);
         this.getShipments();
     }
-    async showCustomClearance(jobNo){
+    async showCustomClearance(jobNo) {
         let responses = await this.baseServices.getAsync(this.api_menu.Operation.CustomClearance.getByJob + "?jobNo=" + jobNo, false, true);
-        if(responses){
+        if (responses) {
             this.customClearances = this.sortService.sort(responses, 'clearanceNo', true);;
         }
         else {
