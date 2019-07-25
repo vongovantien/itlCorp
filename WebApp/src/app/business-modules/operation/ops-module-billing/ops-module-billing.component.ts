@@ -60,6 +60,8 @@ export class OpsModuleBillingComponent implements OnInit {
     ngOnInit() {
         this.pager.currentPage = 1;
         this.pager.totalItems = 0;
+        this.criteria.serviceDateFrom = moment().startOf('month');
+        this.criteria.serviceDateTo = moment();
         this.getShipmentCommonData();
         this.getUserInCharges();
         this.getCustomers();
@@ -80,24 +82,23 @@ export class OpsModuleBillingComponent implements OnInit {
     }
     searchShipment() {
         this.pager.totalItems = 0;
+        this.pager.currentPage = 1;
         this.criteria.jobNo = null;
         this.criteria.hwbno = null;
         this.criteria.all = null;
+
         if (this.isFilterTime) {
             this.criteria.serviceDateFrom = this.selectedRange.startDate;
             this.criteria.serviceDateTo = this.selectedRange.endDate;
-        }
-        else {
+        } else {
             this.criteria.serviceDateFrom = null;
             this.criteria.serviceDateTo = null;
         }
         if (this.selectedFilter === 'Job ID') {
             this.criteria.jobNo = this.searchString;
-        }
-        else if (this.selectedFilter === 'HBL') {
+        } else if (this.selectedFilter === 'HBL') {
             this.criteria.hwbno = this.searchString;
-        }
-        else {
+        } else {
             this.criteria.all = this.searchString;
         }
         this.getShipments();
@@ -170,9 +171,17 @@ export class OpsModuleBillingComponent implements OnInit {
         let responses = await this.baseServices.postAsync(this.api_menu.Documentation.Operation.paging + "?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.criteria, true, true);
         if (responses.data != null) {
             this.shipments = responses.data.opsTransactions;
+            this.totalInProcess = responses.data.toTalInProcessing;
+            this.totalOverdued = responses.data.totalOverdued;
+            this.totalComplete = responses.data.totalComplete;
+            this.totalCanceled = responses.data.totalCanceled;
         }
         else {
             this.shipments = [];
+            this.totalInProcess = 0;
+            this.totalOverdued = 0;
+            this.totalComplete = 0;
+            this.totalCanceled = 0;
         }
         console.log(this.shipments);
         this.pager.totalItems = responses.totalItems;

@@ -33,7 +33,7 @@
                                     <label class="form-control-label" for="">
                                         Search text
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square"
+                                    <input type="text" class="form-control m-input m-input--square" autocomplete="nope"
                                         placeholder="Search text" [(ngModel)]="searchString" name="searchString"
                                         (change)="searchString = searchString.trim()">
                                 </div>
@@ -129,7 +129,7 @@
                                                 Service Date From - To
                                             </label>
                                             <input type="text" class="form-control m-input m-input--square"
-                                                ngxDaterangepickerMd
+                                                ngxDaterangepickerMd [autoApply]="true"
                                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
                                                 [(ngModel)]="selectedRange" [ranges]="ranges" [maxDate]="maxDate"
                                                 [alwaysShowCalendars]="true" name="daterange"
