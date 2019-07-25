@@ -59,7 +59,6 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges, After
   }
 
   private setDataSource(data: any[]) {
-
     if (data != undefined && data.length > 0) {
       data = this.sortService.sort(data, this.displayFields[0].field, true);
       this.DataSources = data;
@@ -78,6 +77,8 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges, After
           this.displaySelectedStr = activeItemData.hardValue;
         }
       }
+    } else {
+      this.DataSources = [];
     }
   }
 
