@@ -6,6 +6,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
     {
         public Guid ID { get; set; }
         public string ChargeCode { get; set; }
+        public string ChargeName { get; set; }
         public string JobId { get; set; }
         public string HBL { get; set; }
         public string MBL { get; set; }
@@ -13,6 +14,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string InvoiceNo { get; set; }
         public DateTime ServiceDate { get; set; }
         public string Note { get; set; }
+        public string Currency { get; set; }
         public string CurrencyToLocal { get; set; }
         public string CurrencyToUSD { get; set; }
         public Nullable<decimal> Debit { get; set; }
