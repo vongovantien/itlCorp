@@ -1,12 +1,13 @@
 import { Component, ViewChild } from '@angular/core';
 import { forkJoin } from 'rxjs';
-import { takeUntil, catchError } from 'rxjs/operators';
+import { takeUntil, catchError, finalize } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 import { GlobalState } from 'src/app/global-state';
 import { SystemRepo, AccoutingRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
 import { StatementOfAccountAddChargeComponent } from '../components/poup/add-charge/add-charge.popup';
 import { ToastrService } from 'ngx-toastr';
+import { HttpErrorResponse } from '@angular/common/http';
 
 
 @Component({
@@ -75,7 +76,14 @@ export class StatementOfAccountAddnewComponent extends AppList {
                     this._globalState.notifyDataChanged('currency', dataCurrency);
                     this._globalState.notifyDataChanged('system-user', dataSystemUser);
                 },
-                (err: any) => {
+                (errors: any) => {
+                    let message: string = 'Has Error Please Check Again !';
+                    let title: string = '';
+                    if (errors instanceof HttpErrorResponse) {
+                        message = errors.message;
+                        title = errors.statusText;
+                    }
+                    this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
                 },
                 // complete
                 () => {
@@ -110,7 +118,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
                 currency: this.dataSearch.currency,
                 note: this.dataSearch.note
             };
-            console.log(body);
 
             this._accountRepo.createSOA(body)
                 .pipe(catchError(this.catchError))
@@ -122,11 +129,17 @@ export class StatementOfAccountAddnewComponent extends AppList {
                             this.isCheckAllCharge = false; // ? reset checkbox
 
                         } else {
-                            // TODO: handle error
+                            this._toastService.error(res, '', { positionClass: 'toast-bottom-right' });
                         }
                     },
-                    (errs: any) => {
-
+                    (errors: any) => {
+                        let message: string = 'Has Error Please Check Again !';
+                        let title: string = '';
+                        if (errors instanceof HttpErrorResponse) {
+                            message = errors.message;
+                            title = errors.statusText;
+                        }
+                        this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
                     },
                     () => {
 
@@ -137,9 +150,13 @@ export class StatementOfAccountAddnewComponent extends AppList {
     }
 
     onSearchCharge(dataSearch: any) {
+        this.isLoading = true;
         this.dataSearch = dataSearch;
         this._accountRepo.getListChargeShipment(dataSearch)
-            .pipe(catchError(this.catchError))
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this.isLoading = false; })
+            )
             .subscribe(
                 (res: any) => {
                     this.dataCharge = res;
@@ -148,8 +165,14 @@ export class StatementOfAccountAddnewComponent extends AppList {
                     this.totalShipment = res.totalShipment;
                     console.log(this.charges);
                 },
-                (errs: any) => {
-                    // Todo: handle error
+                (errors: any) => {
+                    let message: string = 'Has Error Please Check Again !';
+                    let title: string = '';
+                    if (errors instanceof HttpErrorResponse) {
+                        message = errors.message;
+                        title = errors.statusText;
+                    }
+                    this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
                 },
                 () => { }
             );

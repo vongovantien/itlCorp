@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from '../services';
 import { environment } from 'src/environments/environment';
+import { catchError, map } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Injectable()
 export class SystemRepo {
@@ -11,8 +13,12 @@ export class SystemRepo {
     }
 
     getListSystemUser() {
-        // return this._api.get(`${environment.HOST.WEB_URL}44360/api/${this.VERSION}/vi/SysUser`);
-        return this._api.get(`${environment.HOST.WEB_URL}/${this.MODULE}/api/${this.VERSION}/vi/SysUser`);
+        return this._api.get(`${environment.HOST.WEB_URL}/${this.MODULE}/api/${this.VERSION}/vi/SysUser`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
     }
 
     getListCurrency(page?: number, size?: number) {
@@ -20,9 +26,19 @@ export class SystemRepo {
             return this._api.post(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatCurrency/paging`, {}, {
                 page: '' + page,
                 size: '' + size
-            });
+            }).pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => {
+                    return data;
+                })
+            );
         } else {
-            return this._api.get(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatCurrency/getAll`);
+            return this._api.get(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatCurrency/getAll`).pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => {
+                    return data;
+                })
+            );
         }
         
     }
@@ -32,9 +48,19 @@ export class SystemRepo {
             return this._api.post(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatPartner/paging`, {}, {
                 page: '' + page,
                 size: '' + size
-            });
+            }).pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => {
+                    return data;
+                })
+            );
         } else {
-            return this._api.post(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatPartner/Query`, data);
+            return this._api.post(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatPartner/Query`, data).pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => {
+                    return data;
+                })
+            );
         }
     }
 
@@ -43,9 +69,19 @@ export class SystemRepo {
             return this._api.post(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatCharge/paging`, {}, {
                 page: '' + page,
                 size: '' + size
-            });
+            }).pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => {
+                    return data;
+                })
+            );
         } else {
-            return this._api.post(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatCharge/Query`, {});
+            return this._api.post(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatCharge/Query`, {}).pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => {
+                    return data;
+                })
+            );
         }
     }
 }

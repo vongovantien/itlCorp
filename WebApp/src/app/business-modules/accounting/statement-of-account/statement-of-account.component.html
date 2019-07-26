@@ -35,7 +35,7 @@
                             <div class="m-portlet">
                                 <div class="m-form">
                                     <div class="m-portlet__body">
-                                        <soa-search-box></soa-search-box>
+                                        <soa-search-box (onSearch)="getSOAs($event)"></soa-search-box>
                                     </div>
                                 </div>
                             </div>
@@ -80,7 +80,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr *ngIf="!SOAs.length">
+                                                <tr *ngIf="!isLoading && !SOAs.length">
                                                     <td colspan="100">
                                                         <div class="no-data">
                                                             <i class="flaticon-coins"></i>
@@ -89,7 +89,7 @@
                                                     </td>
                                                 </tr>
                                                 <tr *ngFor="let soa of SOAs; let i = index; trackBy: trackByFn">
-                                                    <td class="table-actions-col">
+                                                    <td class="table-actions-col" *ngIf="soa.status === 'New' || soa.status === 'Need Revicse'">
                                                         <div class="table-actions">
                                                             <button type="button"
                                                                 class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
@@ -131,6 +131,14 @@
                                                         <span>{{soa.datetimeModified | date: 'dd/MM/yyyy'}}</span>
                                                     </td>
                                                 </tr>
+                                                <tr class="loading-wrapper" *ngIf="isLoading">
+                                                    <td colspan="100">
+                                                        <div class="on-loading">
+                                                            <div class="m-loader m-loader--brand">
+                                                            </div><span>Loading</span>
+                                                        </div>
+                                                    </td>
+                                                </tr>
                                             </tbody>
                                         </table>
                                     </div>
@@ -139,10 +147,12 @@
                                             <div class="col-sm-6">
                                                 <div class="tatable__pager-size">
                                                     <div class="select-box">
-                                                        <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize" (change)="selectPageSize()"
+                                                        <select class="form-control" id="" aria-label=""
+                                                            [(ngModel)]="pageSize" (change)="selectPageSize()"
                                                             name="pagesize">
-                                                            <ng-container *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
-                                                                <option [ngValue]="item" >{{item}} line / screen</option>
+                                                            <ng-container
+                                                                *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
+                                                                <option [ngValue]="item">{{item}} line / screen</option>
                                                             </ng-container>
                                                         </select>
                                                     </div>
@@ -150,7 +160,8 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="float-right">
-                                                    <pagination [boundaryLinks]="true" [totalItems]="totalItems" [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)">
+                                                    <pagination [boundaryLinks]="true" [totalItems]="totalItems"
+                                                        [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)">
                                                     </pagination>
                                                 </div>
                                             </div>
@@ -169,5 +180,4 @@
     </div>
 </div>
 
-<confirm-popup></confirm-popup>
-<info-popup></info-popup>
+<confirm-popup (onSubmit)="deleteSOA()" [body]="messageDelete" [iconConfirm]="'la la-trash'"></confirm-popup>

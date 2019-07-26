@@ -83,7 +83,7 @@
                             </tr>
                         </thead>
                         <tbody class="tbody-group">
-                            <tr *ngIf="!charges.length">
+                            <tr *ngIf="!isLoading && !charges.length">
                                 <td colspan="100">
                                     <div class="no-data">
                                         <i class="flaticon-coins"></i>
@@ -137,6 +137,14 @@
                                 </td>
                                 <td>
                                     <span>{{charge.note}}</span>
+                                </td>
+                            </tr>
+                            <tr class="loading-wrapper" *ngIf="isLoading">
+                                <td colspan="100">
+                                    <div class="on-loading">
+                                        <div class="m-loader m-loader--brand">
+                                        </div><span>Loading</span>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>

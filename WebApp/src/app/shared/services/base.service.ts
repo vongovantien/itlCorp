@@ -387,4 +387,8 @@ export class BaseService implements ErrorHandler {
     return localStorage.getItem('access_token');
   }
 
+  getUserLogin() {
+    return JSON.parse(localStorage.getItem('id_token_claims_obj'));
+  }
+
 }

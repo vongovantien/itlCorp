@@ -5,7 +5,7 @@
                 <label class="form-control-label" for="">
                     Reference No
                 </label>
-                <textarea class="form-control m-input m-input--square" name="" id="" rows="5"></textarea>
+                <textarea class="form-control m-input m-input--square" [(ngModel)]="reference" name="reference" rows="6"></textarea>
             </div>
         </div>
         <div class="col-lg-8">
@@ -15,6 +15,7 @@
                         <label class="form-control-label" for="">
                             Partner
                         </label>
+                        {{!!selectedPartner}}
                         <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPartner"
                             (itemSelected)="onSelectDataFormSearch($event, 'partner')"
                             [selectedDisplayFields]="configPartner.selectedDisplayFields"
@@ -61,7 +62,7 @@
                             Currency
                         </label>
                         <ng-select [items]="currencyList" (selected)="onSelectDataFormSearch($event, 'currency')"
-                            placeholder="Select currency">
+                            placeholder="Select currency" [active]="selectedCurrency">
                         </ng-select>
                     </div>
                 </div>
