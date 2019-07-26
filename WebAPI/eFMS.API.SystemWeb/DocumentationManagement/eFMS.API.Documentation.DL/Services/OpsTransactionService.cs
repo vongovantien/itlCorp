@@ -149,6 +149,13 @@ namespace eFMS.API.Documentation.DL.Services
             var data = GetView().AsQueryable();
             if (data == null)
                 return null;
+            if(criteria.ServiceDateFrom == null && criteria.ServiceDateTo == null)
+            {
+                int year = DateTime.Now.Year -2;
+                DateTime startDay = new DateTime(year, 1, 1);
+                DateTime lastDay = new DateTime(DateTime.Now.Year, 12, 31);
+                data = data.Where(x => x.ServiceDate >= startDay && x.ServiceDate <= lastDay);
+            }
             if (criteria.All == null)
             {
                 data = data.Where(x => (x.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) > -1
@@ -157,6 +164,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 && (x.ServiceMode ?? "").IndexOf(criteria.ServiceMode ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.CustomerID == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
                                 && (x.FieldOpsID == criteria.FieldOps || string.IsNullOrEmpty(criteria.FieldOps))
+                                && (x.ShipmentMode == criteria.ShipmentMode || string.IsNullOrEmpty(criteria.ShipmentMode))
                                 && ((x.ServiceDate ?? null) >= criteria.ServiceDateFrom || criteria.ServiceDateFrom == null)
                                 && ((x.ServiceDate ?? null) <= criteria.ServiceDateTo || criteria.ServiceDateTo == null)
                             ).OrderByDescending(x => x.ModifiedDate);
@@ -169,7 +177,8 @@ namespace eFMS.API.Documentation.DL.Services
                                    || (x.ServiceMode ?? "").IndexOf(criteria.ServiceMode ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.CustomerID == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
                                    || (x.FieldOpsID == criteria.FieldOps || string.IsNullOrEmpty(criteria.FieldOps))
-                                   && ((x.ServiceDate ?? null) >= (criteria.ServiceDateFrom ?? null) && (x.ServiceDate ?? null) <= (criteria.ServiceDateTo ?? null))
+                                   || (x.ShipmentMode == criteria.ShipmentMode || string.IsNullOrEmpty(criteria.ShipmentMode))
+                               && ((x.ServiceDate ?? null) >= (criteria.ServiceDateFrom ?? null) && (x.ServiceDate ?? null) <= (criteria.ServiceDateTo ?? null))
                                ).OrderByDescending(x => x.ModifiedDate);
             }
             List<OpsTransactionModel> results = new List<OpsTransactionModel>();

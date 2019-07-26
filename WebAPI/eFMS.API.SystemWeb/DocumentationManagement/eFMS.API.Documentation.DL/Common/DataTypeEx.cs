@@ -21,7 +21,7 @@ namespace eFMS.API.Documentation.DL.Common
                     result = TermData.Pending;
                     break;
                 case JobStatus.Finish:
-                    result = TermData.Done;
+                    result = TermData.Finish;
                     break;
                 case JobStatus.Overdued:
                     result = TermData.Overdue;

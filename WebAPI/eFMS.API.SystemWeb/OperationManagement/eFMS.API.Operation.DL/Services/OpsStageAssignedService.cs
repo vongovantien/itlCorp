@@ -125,23 +125,24 @@ namespace eFMS.API.Operation.DL.Services
         public HandleState Update(OpsStageAssignedEditModel model)
         {
             var assigned = mapper.Map<OpsStageAssignedModel>(model);
-            assigned.UserModified = "admin"; //currentUser.UserID;
+            assigned.UserModified = currentUser.UserID;
             assigned.ModifiedDate = DateTime.Now;
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var stageAssigneds = DataContext.Get(x => x.JobId == model.JobId);
             var job = dc.OpsTransaction.Find(model.JobId);
-            int hours = 3;
             if (job.CurrentStatus != "Deleted" && job.CurrentStatus != "Completed")
             {
                 if (assigned.Status?.Trim() == DataTypeEx.GetStageStatus(StageEnum.Overdue))
                 {
                     job.CurrentStatus = "Overdued";
                 }
-                if ((assigned.Status?.Trim() == DataTypeEx.GetStageStatus(StageEnum.Done) || assigned.Status.Trim() == DataTypeEx.GetStageStatus(StageEnum.Deleted)) 
-                    && stageAssigneds.All(x => (x.Status == DataTypeEx.GetStageStatus(StageEnum.Done) || x.Status == DataTypeEx.GetStageStatus(StageEnum.Deleted))
-                    && x.Id != model.Id))
-                { 
-                    job.CurrentStatus = "Completed";
+                if (assigned.Status.Contains(DataTypeEx.GetStageStatus(StageEnum.Done)))
+                {
+                    var others = stageAssigneds.Where(x => x.Id != model.Id);
+                    if(others.All(x => x.Status.Contains(Constants.Done)))
+                    {
+                        job.CurrentStatus = "Finish";
+                    }
                 }
                 if(job.CurrentStatus?.Trim() == "InSchedule" && assigned.Status.Trim() == DataTypeEx.GetStageStatus(StageEnum.Processing))
                 {
