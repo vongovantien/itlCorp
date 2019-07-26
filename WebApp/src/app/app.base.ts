@@ -1,5 +1,5 @@
 import { OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit } from "@angular/core";
-import { Observable, Subject } from "rxjs";
+import { Observable, Subject, throwError } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 
 import moment from "moment";
@@ -20,6 +20,8 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
   maxDate: any = moment();
 
   utility: UtilityHelper = new UtilityHelper();
+  isLoading: boolean = false;
+  
   constructor() { 
   }
   ngOnInit(): void { }
@@ -50,7 +52,7 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
   }
 
   catchError(error: HttpErrorResponse): Observable<any> {
-    return Observable.throw(error || 'Có lỗi xảy, Vui lòng kiểm tra lại !');
+    return throwError(error || 'Có lỗi xảy, Vui lòng kiểm tra lại !');
   }
 
   removed(value:any):void {
