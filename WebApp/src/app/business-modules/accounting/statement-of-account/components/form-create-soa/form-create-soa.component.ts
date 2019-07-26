@@ -4,7 +4,8 @@ import { SystemRepo } from 'src/app/shared/repositories';
 import { GlobalState } from 'src/app/global-state';
 import { catchError } from 'rxjs/operators';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import _ from 'lodash';
+import _includes from 'lodash/includes';
+import _uniq from 'lodash/uniq' ;
 import { Charge } from 'src/app/shared/models';
 import moment from 'moment';
 
@@ -318,11 +319,11 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 }
             }
             for (const key of charge.serviceTypeId) {
-                if (_.includes(keys, key)) {
+                if (_includes(keys, key)) {
                     result.push(charge);
                 }
             }
         }
-        return _.uniq(result);
+        return _uniq(result);
     }
 }
