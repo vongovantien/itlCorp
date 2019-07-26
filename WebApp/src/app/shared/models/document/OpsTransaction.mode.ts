@@ -37,7 +37,7 @@ export class OpsTransaction {
         agentName: string = null;
         podName: string = null;
         polName: string = null;
-        packageTypeID: null;
+        packageTypeId: null;
         //sumCont: number = null;
         //packageQuantity: number = null;
         csMawbcontainers: Container[] = null;

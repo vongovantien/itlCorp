@@ -521,9 +521,9 @@
                                                                 <ng-select [allowClear]="false" [items]="packageTypes"
                                                                     [active]="packagesUnitActive" [disabled]="disabled"
                                                                     (data)="refreshValue($event)"
-                                                                    (selected)="selected($event)"
-                                                                    (removed)="removed($event)" (typed)="typed($event)"
-                                                                    placeholder="">
+                                                                    (selected)="opsTransaction.packageTypeId = $event.id"
+                                                                    (removed)="opsTransaction.packageTypeId = null"
+                                                                    (typed)="typed($event)" placeholder="">
                                                                 </ng-select>
                                                             </div>
                                                         </div>

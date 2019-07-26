@@ -11,8 +11,8 @@ export class SystemRepo {
     }
 
     getListSystemUser() {
-        // return this._api.get(`${environment.HOST.WEB_URL}44360/api/${this.VERSION}/vi/SysUser`);
-        return this._api.get(`${environment.HOST.WEB_URL}/${this.MODULE}/api/${this.VERSION}/vi/SysUser`);
+        return this._api.get(`${environment.HOST.WEB_URL}44360/api/${this.VERSION}/vi/SysUser`);
+        // return this._api.get(`${environment.HOST.WEB_URL}/${this.MODULE}/api/${this.VERSION}/vi/SysUser`);
     }
 
     getListCurrency(page?: number, size?: number) {

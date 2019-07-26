@@ -13,16 +13,16 @@ using System.Timers;
 
 namespace eFMSWindowService
 {
-    public partial class Service1 : ServiceBase
+    public partial class UpdateExchangeRate : ServiceBase
     {
-        private static System.Timers.Timer _aTimer;
+        Timer _aTimer;
         DateTime _scheduleTime;
 
-        public Service1()
+        public UpdateExchangeRate()
         {
             InitializeComponent();
             _aTimer = new System.Timers.Timer(30000);
-            _scheduleTime = DateTime.Today.AddDays(0);
+            _scheduleTime = DateTime.Today.AddDays(1);
         }
         public void Start()
         {
@@ -31,7 +31,7 @@ namespace eFMSWindowService
             double tillNextInterval = _scheduleTime.Subtract(DateTime.Now).TotalSeconds * 1000;
             if (tillNextInterval < 0) tillNextInterval += new TimeSpan(24, 0, 0).TotalSeconds * 1000;
             _aTimer.Interval = tillNextInterval;
-            _aTimer.Elapsed += new System.Timers.ElapsedEventHandler(_aTimer_Elapsed);
+            _aTimer.Elapsed += _aTimer_Elapsed;
         }
         //Custom method to Stop the timer
         public new void Stop()

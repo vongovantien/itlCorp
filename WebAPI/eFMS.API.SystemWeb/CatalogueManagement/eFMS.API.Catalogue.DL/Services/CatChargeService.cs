@@ -25,6 +25,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             stringLocalizer = localizer;
             currentUser = user;
+            SetChildren<CsShipmentSurcharge>("Id", "ChargeId");
         }
 
         public HandleState AddCharge(CatChargeAddOrUpdateModel model)
@@ -151,18 +152,19 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public HandleState DeleteCharge(Guid id)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
-            DataContext.Delete(x => x.Id == id);
             try
             {
-                DataContext.Delete(x => x.Id == id);
-                var listChargeDefaultAccount = ((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Where(x => x.ChargeId == id).ToList();
-                foreach(var item in listChargeDefaultAccount)
+                ChangeTrackerHelper.currentUser = currentUser.UserID;
+                var hs = DataContext.Delete(x => x.Id == id, false);
+                if (hs.Success)
                 {
-                    ((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Remove(item);
+                    var listChargeDefaultAccount = ((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Where(x => x.ChargeId == id).ToList();
+                    foreach (var item in listChargeDefaultAccount)
+                    {
+                        ((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Remove(item);
+                    }
+                    ((eFMSDataContext)DataContext.DC).SaveChanges();
                 }
-                ((eFMSDataContext)DataContext.DC).SaveChanges();
-                var hs = new HandleState();
                 return hs;
 
             }

@@ -177,7 +177,7 @@ export class OpsModuleCreditDebitNoteAddnewComponent extends PopupBase implement
                     this.CDNoteWorking.jobId = this.currentJob.id;
                     this.CDNoteWorking.total = this.totalDebit - this.totalCredit;
                     this.CDNoteWorking.currencyId = "USD"; // in the future , this id must be local currency of each country
-                    this.CDNoteWorking.listShipmentSurcharge = filter(this.CDNoteWorking.listShipmentSurcharge, function (o: any) {
+                    this.CDNoteWorking.listShipmentSurcharge = filter(this.listChargeOfPartner[0].listCharges, function (o: any) {
                         return o.isSelected;
                     });
                     if (this.CDNoteWorking.listShipmentSurcharge.length === 0) {

@@ -84,7 +84,7 @@ export class StatementOfAccountSearchComponent extends AppPage {
                 () => { }
             );
     }
-    
+
     getStatus() {
         this.statusSOA = [
             { title: 'New', name: 'New' },
@@ -124,5 +124,23 @@ export class StatementOfAccountSearchComponent extends AppPage {
         } catch (error) {
             console.log(error + '');
         }
+    }
+    search() { }
+    reset() { }
+    value: any;
+    public selected(value: any): void {
+        console.log('Selected value is: ', value);
+    }
+
+    public removed(value: any): void {
+        console.log('Removed value is: ', value);
+    }
+
+    public typed(value: any): void {
+        console.log('New search input: ', value);
+    }
+
+    public refreshValue(value: any): void {
+        this.value = value;
     }
 }
