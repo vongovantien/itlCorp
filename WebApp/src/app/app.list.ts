@@ -2,6 +2,11 @@ import { AppPage } from './app.base';
 
 export abstract class AppList extends AppPage {
 
+  page: number = 1;
+  totalItems: number = 0;
+  numberToShow: number[] = [3, 15, 30,  50];
+  pageSize: number = this.numberToShow[0];
+
   sort: string = null;
   order: any = false;
   keyword: string = '';
@@ -37,4 +42,18 @@ export abstract class AppList extends AppPage {
     }
     return '';
   }
+
+  pageChanged(event: any): void {
+    if (this.page !== event.page || this.pageSize !== event.itemsPerPage) {
+      this.page = event.page;
+      this.pageSize = event.itemsPerPage;
+
+      this.requestList();
+    }
+  }
+
+  selectPageSize() {
+    this.requestList();
+  }
+
 }
