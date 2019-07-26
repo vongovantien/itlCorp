@@ -109,9 +109,9 @@ export class OpsModuleBillingComponent implements OnInit {
         this.criteria = {
         };
         this.searchString = null;
-        // this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
-        // this.criteria.serviceDateFrom = this.selectedRange.startDate;
-        // this.criteria.serviceDateTo = this.selectedRange.endDate;
+        this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
+        this.criteria.serviceDateFrom = this.selectedRange.startDate;
+        this.criteria.serviceDateTo = this.selectedRange.endDate;
         this.isFilterTime = false;
         this.isReset = false;
         setTimeout(() => {

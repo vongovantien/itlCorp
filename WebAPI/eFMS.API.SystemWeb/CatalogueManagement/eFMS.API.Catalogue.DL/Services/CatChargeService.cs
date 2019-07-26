@@ -163,8 +163,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     {
                         ((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Remove(item);
                     }
-                    ((eFMSDataContext)DataContext.DC).SaveChanges();
                 }
+                ((eFMSDataContext)DataContext.DC).SaveChanges();
                 return hs;
 
             }

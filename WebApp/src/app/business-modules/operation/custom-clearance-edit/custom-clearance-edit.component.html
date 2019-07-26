@@ -309,7 +309,8 @@
                                 </label>
                                 <div class="input-group m-input-group m-input-group--square">
                                     <input type="number" class="form-control m-input" aria-label="" autocomplete="nope"
-                                        [(ngModel)]="customDeclaration.pcs" name="pcs" placeholder="Enter number"
+                                        min="0" [(ngModel)]="customDeclaration.pcs" name="pcs"
+                                        placeholder="Enter number"
                                         onkeypress="return (event.charCode > 47 && event.charCode < 58)" #pcs="ngModel">
                                     <div class="input-group-prepend">
                                         <app-combo-grid-virtual-scroll

@@ -134,9 +134,9 @@ namespace eFMS.API.Documentation.DL.Services
         public bool CheckAllowDelete(Guid jobId)
         {
             var query = (from detail in ((eFMSDataContext)DataContext.DC).OpsTransaction
-                         where detail.Id == jobId
+                         where detail.Id == jobId && detail.CurrentStatus != TermData.Canceled
                          join surcharge in ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge on detail.Id equals surcharge.Hblid
-                         where surcharge.Cdno != null || surcharge.Soano != null || surcharge.PaymentRefNo != null
+                         where (surcharge.Cdno != null || surcharge.Soano != null || surcharge.PaymentRefNo != null) && detail.CurrentStatus != TermData.Canceled
                          select detail);
             if (query.Any())
             {
@@ -356,7 +356,7 @@ namespace eFMS.API.Documentation.DL.Services
         public HandleState SoftDeleteJob(Guid id)
         {
             var result = new HandleState();
-            var job = DataContext.First(x => x.Id == id);
+            var job = DataContext.First(x => x.Id == id && x.CurrentStatus != TermData.Canceled);
             if(job == null)
             {
                 result = new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
