@@ -1,12 +1,14 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { AppPage, IComboGirdConfig } from 'src/app/app.base';
 import { SystemRepo } from 'src/app/shared/repositories';
-import { GlobalState } from 'src/app/global-state';
 import { catchError } from 'rxjs/operators';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import _ from 'lodash';
+import _includes from 'lodash/includes';
+import _uniq from 'lodash/uniq';
 import { Charge } from 'src/app/shared/models';
 import moment from 'moment';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'form-create-soa',
@@ -63,7 +65,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
     constructor(
         private _sysRepo: SystemRepo,
-        private _globalState: GlobalState
+        private _toastService: ToastrService
     ) {
 
         super();
@@ -90,9 +92,14 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                     ];
                     this.configPartner.selectedDisplayFields = ['partnerNameEn'];
                 },
-                (errs: any) => {
-                    console.log(errs + '');
-                    // TODO handle errors
+                (errors: any) => {
+                    let message: string = 'Has Error Please Check Again !';
+                    let title: string = '';
+                    if (errors instanceof HttpErrorResponse) {
+                        message = errors.message;
+                        title = errors.statusText;
+                    }
+                    this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
                 },
                 // complete
                 () => { }
@@ -107,9 +114,14 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                     this.currencyList = (dataCurrency).map((item: any) => ({ id: item.id, text: item.id }));
                     this.selectedCurrency = [this.currencyList.filter((curr) => curr.id === "VND")[0]];
                 },
-                (errs: any) => {
-                    console.log(errs + '');
-                    // TODO handle errors
+                (errors: any) => {
+                    let message: string = 'Has Error Please Check Again !';
+                    let title: string = '';
+                    if (errors instanceof HttpErrorResponse) {
+                        message = errors.message;
+                        title = errors.statusText;
+                    }
+                    this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
                 },
                 // complete
                 () => { }
@@ -124,9 +136,14 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                     this.users = (dataUser || []).map((item: any) => ({ id: item.id, text: item.id }));
                     this.selectedUser = [this.users.filter((i: any) => i.id === 'admin')[0]];
                 },
-                (errs: any) => {
-                    console.log(errs + '');
-                    // TODO handle errors
+                (errors: any) => {
+                    let message: string = 'Has Error Please Check Again !';
+                    let title: string = '';
+                    if (errors instanceof HttpErrorResponse) {
+                        message = errors.message;
+                        title = errors.statusText;
+                    }
+                    this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
                 },
                 // complete
                 () => { }
@@ -147,9 +164,14 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 ];
                 this.configCharge.selectedDisplayFields = ['code'];
             },
-                (errs: any) => {
-                    console.log(errs + '');
-                    // TODO handle errors
+                (errors: any) => {
+                    let message: string = 'Has Error Please Check Again !';
+                    let title: string = '';
+                    if (errors instanceof HttpErrorResponse) {
+                        message = errors.message;
+                        title = errors.statusText;
+                    }
+                    this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
                 },
                 // complete
                 () => { }
@@ -292,7 +314,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
             return;
         } else {
             const body = {
-                currencyLocal: 'VND', //todo: get currency local follow location or login info
+                currencyLocal: 'VND', // Todo: get currency local follow location or login info
                 currency: this.selectedCurrency[0].id,
                 customerID: this.selectedPartner.value || '',
                 dateType: this.selectedDateMode[0].id,
@@ -318,11 +340,11 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 }
             }
             for (const key of charge.serviceTypeId) {
-                if (_.includes(keys, key)) {
+                if (_includes(keys, key)) {
                     result.push(charge);
                 }
             }
         }
-        return _.uniq(result);
+        return _uniq(result);
     }
 }

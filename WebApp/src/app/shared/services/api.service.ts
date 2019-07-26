@@ -35,7 +35,7 @@ export class ApiService {
                 params,
                 headers: Object.assign({}, this._headers, headers)
             })
-    };
+    }
 
     put(url: string, data?: any, params?: any, headers?: any) {
         return this._http
@@ -43,9 +43,13 @@ export class ApiService {
                 params,
                 headers: Object.assign({}, this._headers, headers)
             })
-    };
+    }
 
     get(url: string = '', params?: any, headers: any = {}) {
         return this._http.get(this.setUrl(url), { params, headers });
-    };
+    }
+
+    delete(url: string, params?: any, headers?: any) {
+        return this._http.delete(this.setUrl(url), { params, headers });
+    }
 }

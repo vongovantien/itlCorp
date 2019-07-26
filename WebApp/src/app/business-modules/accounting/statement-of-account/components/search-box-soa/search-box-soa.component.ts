@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { forkJoin } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AppPage, IComboGirdConfig } from 'src/app/app.base';
@@ -6,6 +6,8 @@ import { GlobalState } from 'src/app/global-state';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { Currency, Partner, User } from 'src/app/shared/models';
 import { SystemRepo } from 'src/app/shared/repositories';
+import moment from 'moment';
+import { BaseService } from 'src/app/shared/services';
 
 @Component({
     selector: 'soa-search-box',
@@ -13,9 +15,11 @@ import { SystemRepo } from 'src/app/shared/repositories';
     styleUrls: ['./search-box-soa.component.scss']
 })
 export class StatementOfAccountSearchComponent extends AppPage {
+
+    @Output() onSearch: EventEmitter<any> = new EventEmitter<any>();
+
     items: any[];
     selectedRange: any;
-    maxDate: any;
 
     configPartner: IComboGirdConfig = {
         placeholder: 'Please select',
@@ -24,27 +28,37 @@ export class StatementOfAccountSearchComponent extends AppPage {
         selectedDisplayFields: [],
     };
     partners: Partner[] = [];
-    selectedPartner: Partial<Partner> = {};
+    selectedPartner: any = {};
 
     currencyList: Currency[] = [];
-    selectedCurrency: Currency;
+    selectedCurrency: any;
 
     users: User[] = [];
+    userLogged: User;
     currentUser: any;
 
     statusSOA: any[] = [];
     selectedStatus: any = null;
 
+    reference: string = '';
+
     constructor(
         private _sysRepo: SystemRepo,
-        private _globalState: GlobalState) {
+        private _globalState: GlobalState,
+        private _baseService: BaseService,
+    ) {
         super();
     }
 
     ngOnInit(): void {
         this.getBasicData();
         this.getStatus();
+        this.getUserLogged();
 
+    }
+
+    getUserLogged() {
+        this.userLogged = this._baseService.getUserLogin();
     }
 
     getBasicData() {
@@ -56,12 +70,17 @@ export class StatementOfAccountSearchComponent extends AppPage {
             .subscribe(
                 ([dataCurrency, dataSystemUser, dataPartner]: any) => {
                     this.partners = this.mapModel(dataPartner, Partner);
+                    // * add all value into partners data
+                    this.partners.unshift(new Partner({ taxCode: 'All', shortName: 'All', partnerNameEn: 'All' })); 
+                    this.selectedPartner = { field: 'partnerNameEn', value: 'All' };
+
                     this.currencyList = <any>this.utility.prepareNg2SelectData(this.mapModel(dataCurrency, Currency), 'id', 'currencyName');
+                    this.selectedCurrency = [this.currencyList.filter((item: any) => item.id === 'VND')[0]];
 
                     this.users = <any>this.utility.prepareNg2SelectData(this.mapModel(dataSystemUser, User), 'id', 'username');
-                    this.currentUser = [this.users[0]];
+                    this.currentUser = [this.users.filter((user: any) => user.id === this.userLogged.id)[0]];
 
-                    // set config for combogird
+                    // * set config for combogird
                     this.configPartner.dataSource = this.partners;
                     this.configPartner.displayFields = [
                         { field: 'taxCode', label: 'Taxcode' },
@@ -88,23 +107,21 @@ export class StatementOfAccountSearchComponent extends AppPage {
     getStatus() {
         this.statusSOA = [
             { title: 'New', name: 'New' },
-            { title: 'Request Confirmed', name: 'Request Confirmed' },
+            { title: 'Request Confirmed', name: 'RequestConfirmed' },
             { title: 'Confirmed ', name: 'Confirmed ' },
-            { title: 'Need Revise', name: 'Need Revise' },
+            { title: 'Need Revise', name: 'NeedRevise' },
             { title: 'Done', name: 'Done' },
         ];
         this.selectedStatus = this.statusSOA[0];
     }
 
     onSelectDataFormSearch(data: any, key: string) {
-        console.log(data);
         switch (key.toLowerCase()) {
             case 'partner':
-                this.selectedPartner = <any>{ field: 'code', value: data.partnerNameEn };
-                console.log(this.selectedPartner);
+                this.selectedPartner = <any>{ field: data.partnerNameEn, value: data.id };
                 break;
             case 'currency':
-                this.selectedCurrency = new Currency(data);
+                this.selectedCurrency = [data];
                 break;
             case 'user':
                 this.currentUser = [data];
@@ -122,25 +139,34 @@ export class StatementOfAccountSearchComponent extends AppPage {
         try {
             return (data || []).map((item: any) => new Model(item));
         } catch (error) {
+            // Todo handle error.
             console.log(error + '');
         }
     }
-    search() { }
-    reset() { }
-    value: any;
-    public selected(value: any): void {
-        console.log('Selected value is: ', value);
+
+    search() {
+        const body = {
+            strCodes: this.reference.replace(/(?:\r\n|\r|\n|\\n|\\r)/g, ',').split(',').toString().trim(),
+            customerID: (this.selectedPartner.value === 'All' ? '' : this.selectedPartner.value) || '',
+            soaFromDateCreate: moment((!!this.selectedRange ? this.selectedRange.startDate : new Date())).format("YYYY-MM-DD") || '',
+            soaToDateCreate: moment((!!this.selectedRange ? this.selectedRange.endDate : new Date())).format("YYYY-MM-DD") || '',
+            soaStatus: this.selectedStatus.name,
+            soaCurrency: this.selectedCurrency[0].id || 'VND',
+            soaUserCreate: this.currentUser[0].id || '',
+        };
+
+        this.onSearch.emit(body);
     }
 
-    public removed(value: any): void {
-        console.log('Removed value is: ', value);
+    // * reset data in form search
+    reset() {
+        this.reference = '';
+        this.selectedPartner = { field: 'partnerNameEn', value: 'All' };
+        this.selectedStatus = this.statusSOA[0];
+        this.selectedRange = null;
+
+        // ? search again!
+        this.search();
     }
 
-    public typed(value: any): void {
-        console.log('New search input: ', value);
-    }
-
-    public refreshValue(value: any): void {
-        this.value = value;
-    }
 }

@@ -16,7 +16,7 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="m-input-icon m-input-icon--right">
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Search">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Search" [(ngModel)]="keyword" name="keyword">
                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                 <span>
                                     <i class="la la-search"></i>
@@ -83,7 +83,7 @@
                             </tr>
                         </thead>
                         <tbody class="tbody-group">
-                            <tr *ngIf="!charges.length">
+                            <tr *ngIf="!isLoading && !charges.length">
                                 <td colspan="100">
                                     <div class="no-data">
                                         <i class="flaticon-coins"></i>
@@ -91,7 +91,7 @@
                                     </div>
                                 </td>
                             </tr>
-                            <tr *ngFor="let charge of charges; let i = index; trackBy: trackByFn">
+                            <tr *ngFor="let charge of charges | filter: keyword:['chargeCode', 'hbl'] ; let i = index; trackBy: trackByFn">
                                 <td class="table-actions-col">
                                     <div class="table-actions">
                                         <label class="m-checkbox">
@@ -100,7 +100,6 @@
                                                 name="{{charge.code}}">
                                             <span></span>
                                         </label>
-                                        <span>{{i+1}}</span>
                                     </div>
                                 </td>
                                 <td>
@@ -138,6 +137,14 @@
                                 </td>
                                 <td>
                                     <span>{{charge.note}}</span>
+                                </td>
+                            </tr>
+                            <tr class="loading-wrapper" *ngIf="isLoading">
+                                <td colspan="100">
+                                    <div class="on-loading">
+                                        <div class="m-loader m-loader--brand">
+                                        </div><span>Loading</span>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>

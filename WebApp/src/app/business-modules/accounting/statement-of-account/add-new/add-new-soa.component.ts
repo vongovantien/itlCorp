@@ -1,12 +1,13 @@
 import { Component, ViewChild } from '@angular/core';
 import { forkJoin } from 'rxjs';
-import { takeUntil, catchError } from 'rxjs/operators';
+import { takeUntil, catchError, finalize } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 import { GlobalState } from 'src/app/global-state';
 import { SystemRepo, AccoutingRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
 import { StatementOfAccountAddChargeComponent } from '../components/poup/add-charge/add-charge.popup';
 import { ToastrService } from 'ngx-toastr';
+import { HttpErrorResponse } from '@angular/common/http';
 
 
 @Component({
@@ -30,6 +31,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
 
     dataCharge: any = null;
     dataSearch: any = {};
+
     constructor(
         private _sysRepo: SystemRepo,
         private _globalState: GlobalState,
@@ -43,21 +45,19 @@ export class StatementOfAccountAddnewComponent extends AppList {
 
     ngOnInit() {
         this.headers = [
-            { title: 'Charge Code', field: 'code', sortable: true },
-            { title: 'Charge Name', field: 'name', sortable: true },
+            { title: 'Charge Code', field: 'chargeCode', sortable: true },
+            { title: 'Charge Name', field: 'chargeName', sortable: true },
             { title: 'JobID', field: 'jobId', sortable: true },
             { title: 'HBL', field: 'hbl', sortable: true },
             { title: 'MBL', field: 'mbl', sortable: true },
-            { title: 'Custom No', field: 'custom', sortable: true },
+            { title: 'Custom No', field: 'customNo', sortable: true },
             { title: 'Debit', field: 'debit', sortable: true },
             { title: 'Credit', field: 'credit', sortable: true },
             { title: 'Currency', field: 'currency', sortable: true },
-            { title: 'Invoice No', field: 'invoice', sortable: true },
+            { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Services Date', field: 'serviceDate', sortable: true },
-            { title: 'Note', field: 'action', sortable: true },
+            { title: 'Note', field: 'note', sortable: true },
         ];
-        // this.getBasicData();
-        this.getListCharge();
     }
 
     addCharge() {
@@ -76,7 +76,14 @@ export class StatementOfAccountAddnewComponent extends AppList {
                     this._globalState.notifyDataChanged('currency', dataCurrency);
                     this._globalState.notifyDataChanged('system-user', dataSystemUser);
                 },
-                (err: any) => {
+                (errors: any) => {
+                    let message: string = 'Has Error Please Check Again !';
+                    let title: string = '';
+                    if (errors instanceof HttpErrorResponse) {
+                        message = errors.message;
+                        title = errors.statusText;
+                    }
+                    this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
                 },
                 // complete
                 () => {
@@ -84,13 +91,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
             );
     }
 
-    getListCharge() {
-        const results: any[] = [];
-        this.charges = results;
-    }
-
     sortLocal(sortField?: string, order?: boolean) {
-        console.log(this.sort, this.order);
         this.charges = this._sortService.sort(this.charges, sortField, order);
     }
 
@@ -117,7 +118,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
                 currency: this.dataSearch.currency,
                 note: this.dataSearch.note
             };
-            console.log(body);
 
             this._accountRepo.createSOA(body)
                 .pipe(catchError(this.catchError))
@@ -125,19 +125,21 @@ export class StatementOfAccountAddnewComponent extends AppList {
                     (res: any) => {
                         if (res.status) {
                             this._toastService.success(res.message, '', { positionClass: 'toast-bottom-right' });
-
-                            // ? search charge
-                            this.onSearchCharge(this.dataSearch);
-
-                            // ? reset checkbox
-                            this.isCheckAllCharge = false;
+                            this.onSearchCharge(this.dataSearch); // ? search charge again
+                            this.isCheckAllCharge = false; // ? reset checkbox
 
                         } else {
-                            // TODO: handle error
+                            this._toastService.error(res, '', { positionClass: 'toast-bottom-right' });
                         }
                     },
-                    (errs: any) => {
-
+                    (errors: any) => {
+                        let message: string = 'Has Error Please Check Again !';
+                        let title: string = '';
+                        if (errors instanceof HttpErrorResponse) {
+                            message = errors.message;
+                            title = errors.statusText;
+                        }
+                        this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
                     },
                     () => {
 
@@ -148,9 +150,13 @@ export class StatementOfAccountAddnewComponent extends AppList {
     }
 
     onSearchCharge(dataSearch: any) {
+        this.isLoading = true;
         this.dataSearch = dataSearch;
         this._accountRepo.getListChargeShipment(dataSearch)
-            .pipe(catchError(this.catchError))
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this.isLoading = false; })
+            )
             .subscribe(
                 (res: any) => {
                     this.dataCharge = res;
@@ -159,9 +165,14 @@ export class StatementOfAccountAddnewComponent extends AppList {
                     this.totalShipment = res.totalShipment;
                     console.log(this.charges);
                 },
-                (errs: any) => {
-                    console.log(errs);
-                    // Todo: handle error
+                (errors: any) => {
+                    let message: string = 'Has Error Please Check Again !';
+                    let title: string = '';
+                    if (errors instanceof HttpErrorResponse) {
+                        message = errors.message;
+                        title = errors.statusText;
+                    }
+                    this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
                 },
                 () => { }
             );
