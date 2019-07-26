@@ -9,6 +9,7 @@ import { ActivatedRoute } from "@angular/router";
 
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { Stage } from "src/app/shared/models/operation/stage";
+import { SortService } from "src/app/shared/services";
 
 @Component({
     selector: "app-ops-module-stage-management",
@@ -32,7 +33,8 @@ export class OpsModuleStageManagementComponent extends AppPage {
     constructor(
         private _spinner: NgxSpinnerService,
         private _jobRepo: JobRepo,
-        private _activedRouter: ActivatedRoute
+        private _activedRouter: ActivatedRoute,
+        private _sortService: SortService
     ) {
         super();
     }
@@ -70,7 +72,8 @@ export class OpsModuleStageManagementComponent extends AppPage {
             (res: any[]) => {
                 if (res instanceof Error) {
                 } else {
-                    this.stages = res.map((item: any) => new Stage(item));
+                    this.stages = this._sortService.sort(res.map((item: any) => new Stage(item)), 'orderNumberProcessed', true);
+
                     this.currentStages = this.stages;
                 }
             },
