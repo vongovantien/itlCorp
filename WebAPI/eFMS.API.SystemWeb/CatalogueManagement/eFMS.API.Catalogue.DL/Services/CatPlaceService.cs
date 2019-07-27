@@ -43,6 +43,13 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<CsTransaction>("Id", "Pod");
             SetChildren<CsTransactionDetail>("Id", "Pol");
             SetChildren<CsTransactionDetail>("Id", "Pod");
+            SetChildren<OpsTransaction>("Id", "Pol");
+            SetChildren<OpsTransaction>("Id", "Pod");
+            SetChildren<OpsTransaction>("Id", "WarehouseId");
+            SetChildren<CsManifest>("Id", "Pol");
+            SetChildren<CsManifest>("Id", "Pod");
+            SetChildren<CsShippingInstruction>("Id", "Pod");
+            SetChildren<CsShippingInstruction>("Id", "Pol");
         }
 
         #region CRUD

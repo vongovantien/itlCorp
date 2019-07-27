@@ -22,7 +22,7 @@ export class SystemRepo {
     }
 
     getListCurrency(page?: number, size?: number) {
-        if(!!page && !!size) {
+        if (!!page && !!size) {
             return this._api.post(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatCurrency/paging`, {}, {
                 page: '' + page,
                 size: '' + size
@@ -40,7 +40,7 @@ export class SystemRepo {
                 })
             );
         }
-        
+
     }
 
     getListPartner(page?: number, size?: number, data?: any) {

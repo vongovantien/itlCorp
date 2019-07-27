@@ -9,7 +9,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public Guid Hblid { get; set; }
         public string Type { get; set; }
         public Guid ChargeId { get; set; }
-        public int Quantity { get; set; }
+        public decimal Quantity { get; set; }
         public short UnitId { get; set; }
         public decimal? UnitPrice { get; set; }
         public string CurrencyId { get; set; }
@@ -50,8 +50,9 @@ namespace eFMS.API.Catalogue.Service.Models
         public string UnlockedSoadirectorStatus { get; set; }
         public DateTime? UnlockedSoadirectorDate { get; set; }
         public bool? Soaclosed { get; set; }
+        public bool? Cdclosed { get; set; }
+        public string Cdno { get; set; }
         public string Soano { get; set; }
-        public string OtherSoa { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }

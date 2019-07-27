@@ -27,6 +27,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             stringLocalizer = localizer;
             cache = distributedCache;
+            SetChildren<OpsStageAssigned>("Id", "StageId");
         }        
         
         public IQueryable<CatStageModel> GetAll()

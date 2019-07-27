@@ -145,7 +145,7 @@ export class CustomClearanceAddnewComponent implements OnInit {
             shipment.billingOpsId = currenctUser;
             index = this.listUnit.findIndex(x => x.code === this.customDeclaration.unitCode);
             if (index > -1) {
-                shipment.packageTypeID = this.listUnit[index].id;
+                shipment.packageTypeId = this.listUnit[index].id;
             }
         } else {
             this.baseServices.errorToast("Không có customer để tạo job mới");

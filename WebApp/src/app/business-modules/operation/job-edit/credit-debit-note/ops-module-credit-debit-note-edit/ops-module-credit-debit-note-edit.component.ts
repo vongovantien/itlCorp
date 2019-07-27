@@ -106,6 +106,19 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
         this.totalCreditDebitCalculate();
     }
     removeSelectedCharges() {
+        this.checkAllCharge = false;
+        if (this.listChargeOfPartner.length > 0) {
+            if (this.listChargeOfPartner[0].listCharges != null) {
+                this.listChargeOfPartner[0].listCharges.forEach(element => {
+                    element.isSelected = false;
+                    if (element.isRemaining === false) {
+                        element.isRemaining = true;
+                    }
+                });
+                this.totalCredit = 0;
+                this.totalDebit = 0;
+            }
+        }
     }
 
     addChargeToSOA(event) {

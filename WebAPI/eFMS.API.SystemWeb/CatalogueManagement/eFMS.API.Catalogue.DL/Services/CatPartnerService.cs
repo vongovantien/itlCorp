@@ -35,6 +35,15 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
             SetChildren<SysUser>("Id", "PersonIncharge");
+            SetChildren<OpsTransaction>("Id", "CustomerId");
+            SetChildren<OpsTransaction>("Id", "SupplierId");
+            SetChildren<OpsTransaction>("Id", "AgentId");
+            SetChildren<CsShippingInstruction>("Id", "Shipper");
+            SetChildren<CsShippingInstruction>("Id", "Supplier");
+            SetChildren<CsShippingInstruction>("Id", "ConsigneeId");
+            SetChildren<CsShippingInstruction>("Id", "ActualShipperId");
+            SetChildren<CsShippingInstruction>("Id", "ActualConsigneeId");
+            SetChildren<CsManifest>("Id", "Supplier");
         }
 
         public IQueryable<CatPartner> GetPartners()

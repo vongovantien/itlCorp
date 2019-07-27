@@ -11,6 +11,7 @@ import { CatChargeToAddOrUpdate } from 'src/app/shared/models/catalogue/catCharg
 import { CatChargeDefaultAccount } from 'src/app/shared/models/catalogue/catChargeDefaultAccount.model';
 
 import { Router, ActivatedRoute } from '@angular/router';
+import { ChargeConstants } from 'src/constants/charge.const';
 // declare var $: any;
 
 
@@ -50,21 +51,33 @@ export class ChargeDetailsComponent implements OnInit {
   activeServices: any = null;
 
   /**
-   * Need to update ngDataServices by get data from databse after implement documentation module 
+   * Need to update ngDataServices by get data from databse after implement documentation module
    */
   ngDataService = [
-    { text: "Inland Trucking", id: "IT" },
-    { text: "Air Import", id: "AI" },
-    { text: "Air Export", id: "AE" },
-    { text: "Sea Import", id: "SI" },
-    { text: "Sea Export", id: "SE" },
-    { text: "Sea FCL Export", id: "SFE" },
-    { text: "Sea FCL Import", id: "SFI" },
-    { text: "Sea LCL Export", id: "SLE" },
-    { text: "Sea LCL Import", id: "SLI" },
-    { text: "Sea Consol Export", id: "SCE" },
-    { text: "Sea Consol Import", id: "SCI" },
-    { text: "Custom Logistic", id: "CL" }
+    // { text: "Inland Trucking", id: "IT" },
+    // { text: "Air Import", id: "AI" },
+    // { text: "Air Export", id: "AE" },
+    // { text: "Sea Import", id: "SI" },
+    // { text: "Sea Export", id: "SE" },
+    // { text: "Sea FCL Export", id: "SFE" },
+    // { text: "Sea FCL Import", id: "SFI" },
+    // { text: "Sea LCL Export", id: "SLE" },
+    // { text: "Sea LCL Import", id: "SLI" },
+    // { text: "Sea Consol Export", id: "SCE" },
+    // { text: "Sea Consol Import", id: "SCI" },
+    // { text: "Custom Logistic", id: "CL" }
+    { text: ChargeConstants.IT_DES, id: ChargeConstants.IT_CODE },
+    { text: ChargeConstants.AI_DES, id: ChargeConstants.AI_CODE },
+    { text: ChargeConstants.AE_DES, id: ChargeConstants.AE_CODE },
+    { text: ChargeConstants.SI_DES, id: ChargeConstants.SI_CODE },
+    { text: ChargeConstants.SE_DES, id: ChargeConstants.SE_CODE },
+    { text: ChargeConstants.SFE_CODE, id: ChargeConstants.SFE_CODE },
+    { text: ChargeConstants.SFI_DES, id: ChargeConstants.SFE_CODE },
+    { text: ChargeConstants.SLE_DES, id: ChargeConstants.SLE_CODE },
+    { text: ChargeConstants.SLI_DES, id: ChargeConstants.SLI_CODE },
+    { text: ChargeConstants.SCE_DES, id: ChargeConstants.SCE_CODE },
+    { text: ChargeConstants.SCI_DES, id: ChargeConstants.SCI_CODE },
+    { text: ChargeConstants.CL_DES, id: ChargeConstants.CL_CODE }
   ];
 
   async ngOnInit() {
@@ -122,7 +135,7 @@ export class ChargeDetailsComponent implements OnInit {
 
   addNewChargeDedaultAccount() {
     var obj = new CatChargeDefaultAccount();
-    // this.Charge.listChargeDefaultAccount.push(obj);   
+    // this.Charge.listChargeDefaultAccount.push(obj);
 
     if (this.Charge.listChargeDefaultAccount.length == 0) {
       this.Charge.listChargeDefaultAccount.push(obj);

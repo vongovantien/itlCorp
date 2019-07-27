@@ -17,6 +17,7 @@ import { SortService } from 'src/app/shared/services/sort.service';
 import { OpsModuleCreditDebitNoteDetailComponent } from './credit-debit-note/ops-module-credit-debit-note-detail/ops-module-credit-debit-note-detail.component';
 import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDetails.model';
 import { OpsModuleCreditDebitNoteEditComponent } from './credit-debit-note/ops-module-credit-debit-note-edit/ops-module-credit-debit-note-edit.component';
+import { ChargeConstants } from 'src/constants/charge.const';
 declare var $: any;
 
 @Component({
@@ -121,6 +122,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
 
         this.route.params.subscribe(async (params: any) => {
             this.tab = 'job-edit';
+            this.getPackageTypes();
             this.getUnits();
             this.getPartners();
             this.getCurrencies();
@@ -144,9 +146,12 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
                     let index = this.productServices.findIndex(x => x.id === this.opsTransaction.productService);
                     if (index > -1) { this.productServiceActive = [this.productServices[index]]; }
                     index = this.serviceModes.findIndex(x => x.id === this.opsTransaction.serviceMode);
-                    if (index > -1) { this.serviceModeActive = [this.serviceModes[index]] };
+                    if (index > -1) { this.serviceModeActive = [this.serviceModes[index]]; }
                     index = this.shipmentModes.findIndex(x => x.id === this.opsTransaction.shipmentMode);
-                    if (index > -1) { this.shipmentModeActive = [this.shipmentModes[index]] };
+                    if (index > -1) { this.shipmentModeActive = [this.shipmentModes[index]]; }
+                    index = this.packageTypes.findIndex(x => x.id === this.opsTransaction.packageTypeId);
+                    if (index > -1) { this.packagesUnitActive = [this.packageTypes[index]]; }
+                    console.log(this.packagesUnitActive);
                     this.getAllSurCharges();
                     this.getShipmentContainer();
                     this.getCustomClearances();
@@ -378,7 +383,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         if (this.containerMasterForm.valid) {
             let hasItemEdited = false;
             for (let i = 0; i < this.lstMasterContainers.length; i++) {
-                if (this.lstMasterContainers[i].allowEdit == true) {
+                if (this.lstMasterContainers[i].allowEdit === true) {
                     hasItemEdited = true;
                     break;
                 }
@@ -386,12 +391,6 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             if (hasItemEdited === false) {
                 // continue
                 this.numberOfTimeSaveContainer = this.numberOfTimeSaveContainer + 1;
-                this.opsTransaction.sumGrossWeight = 0;
-                this.opsTransaction.sumNetWeight = 0;
-                this.opsTransaction.sumChargeWeight = 0;
-                this.opsTransaction.sumCbm = 0;
-                this.opsTransaction.sumContainers = 0;
-                this.opsTransaction.sumPackages = 0;
                 this.opsTransaction.csMawbcontainers = this.lstMasterContainers;
                 var response = await this.baseServices.putAsync(this.api_menu.Documentation.CsMawbcontainer.update, { csMawbcontainerModels: this.opsTransaction.csMawbcontainers, masterId: this.opsTransaction.id }, true, false);
                 if (response.status) {
@@ -426,7 +425,13 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
      * @param listContainers list of container
      */
     getGoodInfomation(listContainers) {
-        for (var i = 0; i < listContainers.length; i++) {
+        this.opsTransaction.sumGrossWeight = 0;
+        this.opsTransaction.sumNetWeight = 0;
+        this.opsTransaction.sumChargeWeight = 0;
+        this.opsTransaction.sumCbm = 0;
+        this.opsTransaction.sumContainers = 0;
+        this.opsTransaction.sumPackages = 0;
+        for (let i = 0; i < listContainers.length; i++) {
             listContainers[i].isSave = true;
             this.opsTransaction.sumGrossWeight = this.opsTransaction.sumGrossWeight + listContainers[i].gw;
             this.opsTransaction.sumNetWeight = this.opsTransaction.sumNetWeight + listContainers[i].nw;
@@ -500,7 +505,6 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     getContainerData() {
         this.getContainerTypes();
         this.getWeightTypes();
-        this.getPackageTypes();
         this.getComodities();
     }
 
@@ -609,20 +613,20 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     }
 
     public getListBuyingRateCharges() {
-        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'CREDIT', serviceTypeId: 'CL' }).subscribe(res => {
+        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'CREDIT', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
             this.lstBuyingRateChargesComboBox = res['data'];
         });
 
     }
 
     public getListSellingRateCharges() {
-        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'DEBIT', serviceTypeId: 'CL' }).subscribe(res => {
+        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'DEBIT', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
             this.lstSellingRateChargesComboBox = res['data'];
         });
     }
 
     public getListOBHCharges() {
-        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'OBH', serviceTypeId: 'CL' }).subscribe(res => {
+        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'OBH', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
             this.lstOBHChargesComboBox = res['data'];
         });
     }
@@ -699,14 +703,14 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             } else {
                 total = this.OBHChargeToEdit.quantity * this.OBHChargeToEdit.unitPrice + Math.abs(this.OBHChargeToEdit.vatrate);
             }
-            this.OBHChargeToEdit.total = total;
+            this.OBHChargeToEdit.total = Number(total.toFixed(2));
         } else {
             if (this.OBHChargeToAdd.vatrate >= 0) {
                 total = this.OBHChargeToAdd.quantity * this.OBHChargeToAdd.unitPrice * (1 + (this.OBHChargeToAdd.vatrate / 100));
             } else {
                 total = this.OBHChargeToAdd.quantity * this.OBHChargeToAdd.unitPrice + Math.abs(this.OBHChargeToAdd.vatrate);
             }
-            this.OBHChargeToAdd.total = total;
+            this.OBHChargeToAdd.total = Number(total.toFixed(2));
         }
     }
 
@@ -834,7 +838,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
     prepareEditCharge(type: 'BUY' | 'SELL' | 'OBH', charge: any) {
         if (type === 'BUY') {
             this.BuyingRateChargeToEdit = cloneDeep(charge);
-            this.buyingRateChargeActive = [{'text': this.BuyingRateChargeToEdit.currency, 'id': this.BuyingRateChargeToEdit.currencyId}]
+            this.buyingRateChargeActive = [{ 'text': this.BuyingRateChargeToEdit.currency, 'id': this.BuyingRateChargeToEdit.currencyId }]
             //this.BuyingRateChargeToEdit.exchangeDate = { startDate: moment(this.BuyingRateChargeToEdit.exchangeDate), endDate: moment(this.BuyingRateChargeToEdit.exchangeDate) };
             if (this.BuyingRateChargeToEdit.exchangeDate != null) {
                 this.exchangeRateDate = { startDate: moment(this.BuyingRateChargeToEdit.exchangeDate), endDate: moment(this.BuyingRateChargeToEdit.exchangeDate) };
@@ -842,7 +846,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         }
         if (type === 'SELL') {
             this.SellingRateChargeToEdit = cloneDeep(charge);
-            this.sellingRateChargeActive = [{'text': this.SellingRateChargeToEdit.currency,' id': this.SellingRateChargeToEdit.currencyId}];
+            this.sellingRateChargeActive = [{ 'text': this.SellingRateChargeToEdit.currency, ' id': this.SellingRateChargeToEdit.currencyId }];
             if (this.SellingRateChargeToEdit.exchangeDate != null) {
                 this.exchangeRateDate = { startDate: moment(this.SellingRateChargeToEdit.exchangeDate), endDate: moment(this.SellingRateChargeToEdit.exchangeDate) };
             }
@@ -851,7 +855,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         }
         if (type === 'OBH') {
             this.OBHChargeToEdit = cloneDeep(charge);
-            this.obhChargeActive = [{'text': this.OBHChargeToEdit.currency,'id':this.OBHChargeToEdit.currencyId}];
+            this.obhChargeActive = [{ 'text': this.OBHChargeToEdit.currency, 'id': this.OBHChargeToEdit.currencyId }];
             //this.OBHChargeToEdit.exchangeDate = { startDate: moment(this.OBHChargeToEdit.exchangeDate), endDate: moment(this.OBHChargeToEdit.exchangeDate) };
             if (this.OBHChargeToEdit.exchangeDate != null) {
                 this.exchangeRateDate = { startDate: moment(this.OBHChargeToEdit.exchangeDate), endDate: moment(this.OBHChargeToEdit.exchangeDate) };

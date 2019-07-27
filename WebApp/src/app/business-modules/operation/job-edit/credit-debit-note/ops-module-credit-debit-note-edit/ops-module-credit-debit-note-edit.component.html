@@ -145,7 +145,7 @@
                                                 <div class="table-actions">
                                                     <label class="m-checkbox">
                                                         <input type="checkbox" name="" [checked]="charge.isSelected"
-                                                            (change)="charge.isSelected=!charge.isSelected; removeAllChargeSelected();">
+                                                            (change)="charge.isSelected=!charge.isSelected;charge.isRemaining=!charge.isRemaining; removeAllChargeSelected();">
                                                         <span></span>
                                                     </label>
                                                 </div>

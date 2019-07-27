@@ -61,7 +61,7 @@ export class OpsModuleBillingComponent implements OnInit {
         this.pager.currentPage = 1;
         this.pager.totalItems = 0;
         this.criteria.serviceDateFrom = moment().startOf('month');
-        this.criteria.serviceDateTo = moment();
+        this.criteria.serviceDateTo = moment().endOf('month');
         this.getShipmentCommonData();
         this.getUserInCharges();
         this.getCustomers();
@@ -109,9 +109,9 @@ export class OpsModuleBillingComponent implements OnInit {
         this.criteria = {
         };
         this.searchString = null;
-        // this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
-        // this.criteria.serviceDateFrom = this.selectedRange.startDate;
-        // this.criteria.serviceDateTo = this.selectedRange.endDate;
+        this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
+        this.criteria.serviceDateFrom = this.selectedRange.startDate;
+        this.criteria.serviceDateTo = this.selectedRange.endDate;
         this.isFilterTime = false;
         this.isReset = false;
         setTimeout(() => {
@@ -199,7 +199,7 @@ export class OpsModuleBillingComponent implements OnInit {
     selectedRange: any;
     selectedDate: any;
     keepCalendarOpeningWithRange: true;
-    maxDate: moment.Moment = moment();
+    maxDate: moment.Moment = moment().endOf('month');
     ranges: any = {
         Today: [moment(), moment()],
         Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],

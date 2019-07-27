@@ -195,7 +195,7 @@
                                     </label>
                                     <input type="text" (change)="HouseBillWorking.hwbno=HouseBillWorking.hwbno.trim()"
                                         required name="HouseBillLadingNoName" #HouseBillLadingNoName="ngModel"
-                                        [(ngModel)]="HouseBillWorking.hwbno"
+                                        [(ngModel)]="HouseBillWorking.hwbno" autocomplete="nope"
                                         class="form-control m-input m-input--square" placeholder="Enter text">
                                     <div class="form-control-feedback"
                                         *ngIf="addHouseBillForm.submitted && HouseBillLadingNoName.invalid">
@@ -227,7 +227,7 @@
                                     <label class="form-control-label" for="">
                                         Booking no.
                                     </label>
-                                    <input type="text" name="BookingNoName"
+                                    <input type="text" name="BookingNoName" autocomplete="nope"
                                         (change)="HouseBillWorking.customsBookingNo=HouseBillWorking.customsBookingNo.trim()"
                                         [(ngModel)]="HouseBillWorking.customsBookingNo"
                                         class="form-control m-input m-input--square" placeholder="Enter text">
@@ -242,7 +242,7 @@
                                         Local vessel & voy no.
                                     </label>
                                     <input type="text" name="LocalVesselAndVoyNoName" #LocalVesselAndVoyNoName="ngModel"
-                                        [(ngModel)]="HouseBillWorking.localVoyNo"
+                                        [(ngModel)]="HouseBillWorking.localVoyNo" autocomplete="nope"
                                         (change)="HouseBillWorking.localVoyNo=HouseBillWorking.localVoyNo.trim()"
                                         class="form-control m-input m-input--square" placeholder="Enter text">
                                 </div>
@@ -253,7 +253,7 @@
                                     <label class="form-control-label" for="">
                                         Ocean vessel & voy no. <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <input type="text" required name="OceanVesselAndVoyNoName"
+                                    <input type="text" required name="OceanVesselAndVoyNoName" autocomplete="nope"
                                         #OceanVesselAndVoyNoName="ngModel" [(ngModel)]="HouseBillWorking.oceanVoyNo"
                                         (change)="HouseBillWorking.oceanVoyNo=HouseBillWorking.oceanVoyNo.trim()"
                                         class="form-control m-input m-input--square" placeholder="Enter text">
@@ -287,6 +287,7 @@
                                     </label>
 
                                     <input type="text" name="PlaceOfReceipt" [(ngModel)]="HouseBillWorking.pickupPlace"
+                                        autocomplete="nope"
                                         (change)="HouseBillWorking.pickupPlace=HouseBillWorking.pickupPlace.trim()"
                                         class="form-control m-input m-input--square" placeholder="Enter text">
                                 </div>
@@ -340,7 +341,7 @@
                                     <label class="form-control-label" for="">
                                         Place of delivery
                                     </label>
-                                    <input type="text" name="PlaceOfDelivery"
+                                    <input type="text" name="PlaceOfDelivery" autocomplete="nope"
                                         [(ngModel)]="HouseBillWorking.deliveryPlace"
                                         (change)="HouseBillWorking.deliveryPlace=HouseBillWorking.deliveryPlace.trim()"
                                         class="form-control m-input m-input--square" placeholder="Enter text">
@@ -351,7 +352,7 @@
                                     <label class="form-control-label" for="">
                                         Final destination
                                     </label>
-                                    <input type="text" name="FinalDestination"
+                                    <input type="text" name="FinalDestination" autocomplete="nope"
                                         [(ngModel)]="HouseBillWorking.finalDestinationPlace"
                                         (change)="HouseBillWorking.finalDestinationPlace=HouseBillWorking.finalDestinationPlace.trim()"
                                         class="form-control m-input m-input--square" placeholder="Enter text">
@@ -481,7 +482,7 @@
                                             <label class="form-control-label" for="">
                                                 Place and date of issue H-B/L
                                             </label>
-                                            <input type="text" name="ReferenceNo"
+                                            <input type="text" name="ReferenceNo" autocomplete="nope"
                                                 [(ngModel)]="HouseBillWorking.issueHblplaceAndDate"
                                                 (change)="HouseBillWorking.issueHblplaceAndDate=HouseBillWorking.issueHblplaceAndDate.trim()"
                                                 class="form-control m-input m-input--square" placeholder="Enter text">
@@ -494,7 +495,7 @@
                                             <label class="form-control-label" for="">
                                                 Reference no.
                                             </label>
-                                            <input type="text" name="ReferenceNo"
+                                            <input type="text" name="ReferenceNo" autocomplete="nope"
                                                 [(ngModel)]="HouseBillWorking.referenceNo"
                                                 (change)="HouseBillWorking.referenceNo=HouseBillWorking.referenceNo.trim()"
                                                 class="form-control m-input m-input--square" placeholder="Enter text">
@@ -505,7 +506,7 @@
                                             <label class="form-control-label" for="">
                                                 Export reference no.
                                             </label>
-                                            <input type="text" name="ExportReferenceNo"
+                                            <input type="text" name="ExportReferenceNo" autocomplete="nope"
                                                 [(ngModel)]="HouseBillWorking.exportReferenceNo"
                                                 (change)="HouseBillWorking.exportReferenceNo=HouseBillWorking.exportReferenceNo.trim()"
                                                 class="form-control m-input m-input--square" placeholder="Enter text">
@@ -680,7 +681,7 @@
                                         Shipping mark
                                     </label>
                                     <input type="text" name="ShippingMark" [(ngModel)]="HouseBillWorking.shippingMark"
-                                        class="form-control m-input m-input--square"
+                                        class="form-control m-input m-input--square" autocomplete="nope"
                                         (change)="HouseBillWorking.shippingMark=HouseBillWorking.shippingMark.trim()"
                                         placeholder="Enter text">
                                 </div>
@@ -691,6 +692,7 @@
                                         In word
                                     </label>
                                     <input type="text" name="InWord" [(ngModel)]="HouseBillWorking.inWord"
+                                        autocomplete="nope"
                                         (change)="HouseBillWorking.inWord=HouseBillWorking.inWord.trim()"
                                         class="form-control m-input m-input--square" placeholder="Enter text">
                                 </div>
@@ -701,6 +703,7 @@
                                         On board status
                                     </label>
                                     <input type="text" name="OnBoardStatus" [(ngModel)]="HouseBillWorking.onBoardStatus"
+                                        autocomplete="nope"
                                         (change)="HouseBillWorking.onBoardStatus=HouseBillWorking.onBoardStatus.trim()"
                                         class="form-control m-input m-input--square" placeholder="Enter text">
                                 </div>
@@ -720,8 +723,8 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" 
-                    data-toggle="modal" data-target="#confirm-before-leave">
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
+                    data-target="#confirm-before-leave">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
@@ -1219,7 +1222,8 @@
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="closeAlert()">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)="closeAlert()">
                     <span>
                         <i class="la la-save"></i>
                         <span>

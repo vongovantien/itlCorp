@@ -159,12 +159,12 @@ export class OpsModuleBillingJobCreateComponent extends PopupBase implements OnI
                 this._toaster.error(res.message, '', { positionClass: 'toast-bottom-right' });
               } else {
                 this.OpsTransactionToAdd = new OpsTransaction();
-                this.resetDisplay();
-                form.onReset();
-                this._toaster.success(res.message, '', { positionClass: 'toast-bottom-right' });
                 this.router.navigate([
                   "/home/operation/job-edit/", res.data
                 ]);
+                this.resetDisplay();
+                form.onReset();
+                this._toaster.success(res.message, '', { positionClass: 'toast-bottom-right' });
               }
             }
           );

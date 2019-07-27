@@ -105,6 +105,17 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
             if (this.CDNoteDetails.listSurcharges != null) {
                 this.totalCreditDebitCalculate();
             }
+
+            if (this.CDNoteDetails.cdNote.type === 'CREDIT') {
+                this.CDNoteDetails.cdNote.type = 'Credit';
+            }
+            if (this.CDNoteDetails.cdNote.type === 'DEBIT') {
+                this.CDNoteDetails.cdNote.type = 'Debit';
+            }
+            if (this.CDNoteDetails.cdNote.type === 'INVOICE') {
+                this.CDNoteDetails.cdNote.type = 'Invoice';
+            }
+            console.log('sfsfsfsf' + this.CDNoteDetails.cdNote.type);
             this.poupDetail.show({ backdrop: 'static' });
         }
     }
@@ -132,7 +143,7 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
         console.log(event);
         if (event != null) {
             this.CDNoteDetails = event;
-            //this.baseServices.setData("CDNoteDetails", event);
+            // this.baseServices.setData("CDNoteDetails", event);
             this.popupEdit.show({ backdrop: 'static' });
         }
     }

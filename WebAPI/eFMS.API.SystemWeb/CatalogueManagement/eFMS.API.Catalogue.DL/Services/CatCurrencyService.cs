@@ -32,6 +32,9 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<AcctSoa>("Id", "CurrencyId");
             SetChildren<CatCharge>("Id", "CurrencyId");
             SetChildren<CsShipmentSurcharge>("Id", "CurrencyId");
+            SetChildren<AcctCdnote>("Id", "CurrencyId");
+            SetChildren<AcctSoa>("Id", "Currency");
+            SetChildren<CatCharge>("Id", "Currency");
         }
 
         #region CRUD
