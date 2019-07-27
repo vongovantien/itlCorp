@@ -89,7 +89,8 @@
                                                     </td>
                                                 </tr>
                                                 <tr *ngFor="let soa of SOAs; let i = index; trackBy: trackByFn">
-                                                    <td class="table-actions-col" *ngIf="soa.status === 'New' || soa.status === 'Need Revicse'">
+                                                    <td class="table-actions-col"
+                                                        *ngIf="soa.status === 'New' || soa.status === 'Need Revicse'">
                                                         <div class="table-actions">
                                                             <button type="button"
                                                                 class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
@@ -99,8 +100,7 @@
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <a href="javascript:void(0)"
-                                                            [routerLink]="'/home/accounting/statement-of-account/detail'">{{soa.soano}}</a>
+                                                        <a [routerLink]="['/home/accounting/statement-of-account/detail/']" [queryParams]="{no: soa.soano, currency: 'VND'}">{{soa.soano}}</a>
                                                     </td>
                                                     <td>
                                                         <span>{{soa.partnerName}}</span>

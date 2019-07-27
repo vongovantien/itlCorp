@@ -36,7 +36,6 @@ export class StatementOfAccountComponent extends AppList {
     }
 
     onDeleteSOA(soaItem: SOA) {
-        console.log(soaItem);
         this.selectedSOA = new SOA(soaItem);
         this.messageDelete = `Do you want to delete SOA ${soaItem.soano} ? `;
         this.confirmPopup.show();
