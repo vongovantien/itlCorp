@@ -174,7 +174,7 @@ export class StatementOfAccountSearchComponent extends AppPage {
         this.selectedRange = null;
 
         // ? search again!
-        this.search();
+        this.onSearch.emit({});
     }
 
 }
