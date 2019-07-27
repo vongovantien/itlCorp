@@ -11,7 +11,6 @@ import { SharedModule } from '../../shared/shared.module';
   imports: [
     CommonModule,
     ReportRoutingModule,
-    SharedModule
   ],
   declarations: [PerformanceReportComponent, ShipmentOverviewComponent, PLReportComponent]
 })

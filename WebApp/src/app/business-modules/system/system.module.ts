@@ -14,7 +14,7 @@ import { SharedModule } from '../../shared/shared.module';
   imports: [
     CommonModule,
     SystemRoutingModule,
-    SharedModule
+    // SharedModule
   ],
   declarations: [UserManagementComponent, GroupComponent, RoleComponent, PermissionComponent, DepartmentComponent, CompanyInfoComponent]
 })
