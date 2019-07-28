@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
-import { CURRENCYCOLUMNSETTING } from '../currency/currency.columns';
+import { CURRENCYCOLUMNSETTING } from './currency.columns';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { SortService } from 'src/app/shared/services/sort.service';
@@ -13,7 +13,7 @@ import { NgForm } from '@angular/forms';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import * as lodash from 'lodash';
 import { ExcelService } from 'src/app/shared/services/excel.service';
-import {ExportExcel} from 'src/app/shared/models/layout/exportExcel.models';
+import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { SystemConstants } from 'src/constants/system.const';
 import { Currency } from 'src/app/shared/models';
 
@@ -31,7 +31,7 @@ export class CurrencyComponent implements OnInit {
   pager: PagerSetting = PAGINGSETTING;
   criteria: any = {};
   configSearch: any = {
-    settingFields: this.currenciesSettings.filter(x => x.allowSearch == true).map(x=>({"fieldName": x.primaryKey,"displayName": x.header})),
+    settingFields: this.currenciesSettings.filter(x => x.allowSearch == true).map(x => ({ "fieldName": x.primaryKey, "displayName": x.header })),
     typeSearch: TypeSearch.outtab
   };
   keySortDefault = "";
@@ -53,8 +53,8 @@ export class CurrencyComponent implements OnInit {
     typeButton: ButtonType.cancel
   };
   isAddnew: boolean;
-  @ViewChild(PaginationComponent,{static:false}) child;
-  @ViewChild('formAddEdit',{static:false}) form: NgForm;
+  @ViewChild(PaginationComponent, { static: false }) child;
+  @ViewChild('formAddEdit', { static: false }) form: NgForm;
   totalPages: number;
   constructor(private sortService: SortService, private baseService: BaseService,
     private excelService: ExcelService,
@@ -77,7 +77,7 @@ export class CurrencyComponent implements OnInit {
       this.pager.totalItems = response.totalItems;
       console.log(response.totalPages);
       this.totalPages = response.totalPages;
-    },err=>{
+    }, err => {
       this.baseService.spinnerHide();
       this.baseService.handleError(err);
     });
@@ -139,20 +139,20 @@ export class CurrencyComponent implements OnInit {
   }
   async update() {
     let response = await this.baseService.putAsync(this.api_menu.Catalogue.Currency.update, this.currency, true, true);
-    if(response){
+    if (response) {
       this.resetForm();
       this.getCurrencies(this.pager);
     }
   }
   async addNew() {
     let response = await this.baseService.postAsync(this.api_menu.Catalogue.Currency.addNew, this.currency, true, true);
-    if(response.status){
+    if (response.status) {
       this.resetForm();
       this.initPager();
       this.getCurrencies(this.pager);
     }
   }
-  resetForm(){
+  resetForm() {
     this.form.onReset();
     $('#edit-currency-modal').modal('hide');
   }
@@ -189,49 +189,49 @@ export class CurrencyComponent implements OnInit {
   }
 
 
-  async export() {    
-    var currenciesList = await this.baseService.postAsync(this.api_menu.Catalogue.Currency.getAllByQuery, this.criteria);      
-    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.ENGLISH_API){
-      currenciesList = lodash.map(currenciesList, function (currency,index) {
+  async export() {
+    var currenciesList = await this.baseService.postAsync(this.api_menu.Catalogue.Currency.getAllByQuery, this.criteria);
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
+      currenciesList = lodash.map(currenciesList, function (currency, index) {
         return [
-          index+1,
+          index + 1,
           currency['id'],
           currency['currencyName'],
           currency['isDefault'],
-          (currency['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+          (currency['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
         ]
       });
     }
 
-    if(localStorage.getItem(SystemConstants.CURRENT_LANGUAGE)===SystemConstants.LANGUAGES.VIETNAM_API){
-      currenciesList = lodash.map(currenciesList, function (currency,index) {
+    if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
+      currenciesList = lodash.map(currenciesList, function (currency, index) {
         return [
-          index+1,
+          index + 1,
           currency['id'],
           currency['currencyName'],
           currency['isDefault'],
-          (currency['inactive']===true)?SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+          (currency['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
         ]
       });
     }
-    
 
-     /**Set up stylesheet */
-     var exportModel:ExportExcel = new ExportExcel();
-     exportModel.fileName = "Currency Report";    
-     const currrently_user = localStorage.getItem('currently_userName');
-     exportModel.title = "Currency Report ";
-     exportModel.author = currrently_user;
-     exportModel.sheetName = "Sheet 1";
-     exportModel.header = [
-       {name:"No.",width:10},
-       {name:"Code",width:10},
-       {name:"Currency Name",width:20},
-       {name:"Is Default",width:20},
-       {name:"Inactive",width:20}
-     ]
-     exportModel.data = currenciesList;
-     this.excelService.generateExcel(exportModel);
-    
+
+    /**Set up stylesheet */
+    var exportModel: ExportExcel = new ExportExcel();
+    exportModel.fileName = "Currency Report";
+    const currrently_user = localStorage.getItem('currently_userName');
+    exportModel.title = "Currency Report ";
+    exportModel.author = currrently_user;
+    exportModel.sheetName = "Sheet 1";
+    exportModel.header = [
+      { name: "No.", width: 10 },
+      { name: "Code", width: 10 },
+      { name: "Currency Name", width: 20 },
+      { name: "Is Default", width: 20 },
+      { name: "Inactive", width: 20 }
+    ]
+    exportModel.data = currenciesList;
+    this.excelService.generateExcel(exportModel);
+
   }
 }

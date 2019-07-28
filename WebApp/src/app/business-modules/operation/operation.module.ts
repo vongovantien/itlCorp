@@ -30,6 +30,11 @@ import { OpsModuleStageManagementAddStagePopupComponent } from "./job-edit/stage
 import { NotSelectedAlertModalComponent } from './job-edit/credit-debit-note/ops-module-credit-debit-note-addnew/not-selected-alert-modal/not-selected-alert-modal.component';
 import { ChangePartnerConfirmModalComponent } from './job-edit/credit-debit-note/ops-module-credit-debit-note-addnew/change-partner-confirm-modal/change-partner-confirm-modal.component';
 import { NgProgressModule } from "@ngx-progressbar/core";
+import { ContainerListComponent } from "./job-edit/container-list/container-list.component";
+import { CancelCreateJobPopupComponent } from './job-edit/job-confirm-popup/cancel-create-job-popup/cancel-create-job-popup.component';
+import { CanNotDeleteJobPopupComponent } from './job-edit/job-confirm-popup/can-not-delete-job-popup/can-not-delete-job-popup.component';
+import { ConfirmCancelJobPopupComponent } from './job-edit/job-confirm-popup/confirm-cancel-job-popup/confirm-cancel-job-popup.component';
+import { ConfirmDeleteJobPopupComponent } from './job-edit/job-confirm-popup/confirm-delete-job-popup/confirm-delete-job-popup.component';
 
 
 const LIB = [
@@ -76,7 +81,12 @@ const LIB = [
 
         NotSelectedAlertModalComponent,
 
-        ChangePartnerConfirmModalComponent
+        ChangePartnerConfirmModalComponent,
+        ContainerListComponent,
+        CancelCreateJobPopupComponent,
+        CanNotDeleteJobPopupComponent,
+        ConfirmCancelJobPopupComponent,
+        ConfirmDeleteJobPopupComponent
     ]
 })
-export class OperationModule {}
+export class OperationModule { }

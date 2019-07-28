@@ -135,8 +135,8 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var query = (from detail in ((eFMSDataContext)DataContext.DC).OpsTransaction
                          where detail.Id == jobId && detail.CurrentStatus != TermData.Canceled
-                         join surcharge in ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge on detail.Id equals surcharge.Hblid
-                         where (surcharge.Cdno != null || surcharge.Soano != null || surcharge.PaymentRefNo != null) && detail.CurrentStatus != TermData.Canceled
+                         join surcharge in ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge on detail.Hblid equals surcharge.Hblid
+                         where surcharge.Cdno != null || surcharge.Soano != null || surcharge.PaymentRefNo != null
                          select detail);
             if (query.Any())
             {

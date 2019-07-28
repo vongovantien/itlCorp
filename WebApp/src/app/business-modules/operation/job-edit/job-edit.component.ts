@@ -18,6 +18,13 @@ import { OpsModuleCreditDebitNoteDetailComponent } from './credit-debit-note/ops
 import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDetails.model';
 import { OpsModuleCreditDebitNoteEditComponent } from './credit-debit-note/ops-module-credit-debit-note-edit/ops-module-credit-debit-note-edit.component';
 import { ChargeConstants } from 'src/constants/charge.const';
+import { ContainerListComponent } from './container-list/container-list.component';
+import { ContainerRepo, UnitRepo } from 'src/app/shared/repositories';
+import { AppPage } from "src/app/app.base";
+import { catchError, finalize } from 'rxjs/operators';
+import { CancelCreateJobPopupComponent } from './job-confirm-popup/cancel-create-job-popup/cancel-create-job-popup.component';
+import { CanNotDeleteJobPopupComponent } from './job-confirm-popup/can-not-delete-job-popup/can-not-delete-job-popup.component';
+import { ConfirmDeleteJobPopupComponent } from './job-confirm-popup/confirm-delete-job-popup/confirm-delete-job-popup.component';
 declare var $: any;
 
 @Component({
@@ -25,10 +32,14 @@ declare var $: any;
     templateUrl: './job-edit.component.html',
     styleUrls: ['./job-edit.component.scss']
 })
-export class OpsModuleBillingJobEditComponent implements OnInit {
+export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit {
 
     @ViewChild(OpsModuleCreditDebitNoteDetailComponent, { static: false }) poupDetail: OpsModuleCreditDebitNoteDetailComponent;
     @ViewChild(OpsModuleCreditDebitNoteEditComponent, { static: false }) popupEdit: OpsModuleCreditDebitNoteEditComponent;
+    @ViewChild(ContainerListComponent, { static: false }) popupContainerList: ContainerListComponent;
+    @ViewChild(CancelCreateJobPopupComponent, { static: false }) cancelCreateJobPopup: CancelCreateJobPopupComponent;
+    @ViewChild(CanNotDeleteJobPopupComponent, { static: false }) canNotDeleteJobPopup: CanNotDeleteJobPopupComponent;
+    @ViewChild(ConfirmDeleteJobPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmDeleteJobPopupComponent;
     opsTransaction: OpsTransaction = null;
     productServices: any[] = [];
     serviceDate: any;
@@ -92,13 +103,8 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
 
     listContainerType: any[] = [];
 
-    lstContainerTemp: any[];
-    containerTypes: any[];
     listPackageTypes: any[];
-    listWeightMesurement: any[];
-    commodities: any[];
     packageTypes: any[] = [];
-    weightMesurements: any[];
     currentActiveItemDefault: { id: null, text: null }[] = [];
     buyingRateChargeActive = [];
     sellingRateChargeActive = [];
@@ -113,7 +119,9 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         private api_menu: API_MENU,
         private route: ActivatedRoute,
         private router: Router,
-        private sortService: SortService) {
+        private _unitRepo: UnitRepo,
+        private _containerRepo: ContainerRepo) {
+        super();
         this.keepCalendarOpeningWithRange = true;
         // this.selectedDate = Date.now();
         // this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
@@ -122,7 +130,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
 
         this.route.params.subscribe(async (params: any) => {
             this.tab = 'job-edit';
-            this.getPackageTypes();
+            // this.getPackageTypes();
             this.getUnits();
             this.getPartners();
             this.getCurrencies();
@@ -135,11 +143,13 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             this.getAgents();
             this.getBillingOps();
             this.getWarehouses();
-            this.getContainerData();
+            // this.getContainerData();
+            this.getListPackageTypes();
             await this.getShipmentCommonData();
             if (!!params && !!params.id) {
                 this.jobId = params.id;
                 await this.getShipmentDetails(params.id);
+                this.getListContainersOfJob();
                 if (this.opsTransaction != null) {
                     this.serviceDate = (this.opsTransaction.serviceDate !== null) ? { startDate: moment(this.opsTransaction.serviceDate), endDate: moment(this.opsTransaction.serviceDate) } : null;
                     this.finishDate = this.opsTransaction.finishDate != null ? { startDate: moment(this.opsTransaction.finishDate), endDate: moment(this.opsTransaction.finishDate) } : null;
@@ -153,7 +163,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
                     if (index > -1) { this.packagesUnitActive = [this.packageTypes[index]]; }
                     console.log(this.packagesUnitActive);
                     this.getAllSurCharges();
-                    this.getShipmentContainer();
+                    // this.getShipmentContainer();
                     this.getCustomClearances();
                 } else {
                     this.serviceDate = null;
@@ -164,16 +174,35 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
 
     }
 
-    async getShipmentContainer() {
-        const responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, { mblid: this.opsTransaction.id }, false, false);
-        this.opsTransaction.csMawbcontainers = this.lstContainerTemp = this.lstMasterContainers = responses;
+    // async getShipmentContainer() {
+    //     const responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, { mblid: this.opsTransaction.id }, false, false);
+    //     this.opsTransaction.csMawbcontainers = this.lstContainerTemp = this.lstMasterContainers = responses;
+    // }
+    getListContainersOfJob() {
+        this._containerRepo.getListContainersOfJob({ mblid: this.opsTransaction.id })
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this.isLoading = false;
+                })
+            )
+            .subscribe(
+                (res: any) => {
+                    this.lstMasterContainers = res;
+                },
+                (errors: any) => {
+                },
+                () => { }
+            );
     }
     async confirmDelete() {
         const respone = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.checkAllowDelete + this.opsTransaction.id, false, true);
         if (respone === true) {
-            $('#confirm-delete-job-modal').modal('show');
+            // $('#confirm-delete-job-modal').modal('show');
+            this.confirmDeleteJobPopup.show();
         } else {
-            $('#confirm-can-not-delete-job-modal').modal('show');
+            // $('#confirm-can-not-delete-job-modal').modal('show');
+            this.canNotDeleteJobPopup.show();
         }
     }
     async deleteJob() {
@@ -182,6 +211,9 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             $('#confirm-delete-job-modal').modal('hide');
             this.router.navigate(["/home/operation/job-management"]);
         }
+    }
+    cancelCreatJob() {
+        this.cancelCreateJobPopup.show();
     }
     async saveShipment(form: NgForm) {
         console.log(this.opsTransaction);
@@ -216,208 +248,34 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
      * Show popup & init new first row( if container list is null)
      */
     showListContainer() {
-        if (this.lstMasterContainers.length == 0) {
-            this.lstMasterContainers.push(this.initNewContainer());
-        }
-        $('#container-list-of-ops-billing-modal').modal('show');
-        $("#containerSelect").click();
+        this.popupContainerList.show();
     }
-
-    /**
-     * Close popup, assign list container to current job & remove last row that is not saved
-     */
-    closeContainerPopup() {
-        const index = this.lstMasterContainers.findIndex(x => x.isNew === true);
-        if (index > -1 && this.lstMasterContainers.length > 1) {
-            this.lstMasterContainers.splice(index, 1);
-        }
-        $('#container-list-of-ops-billing-modal').modal('hide');
-        this.opsTransaction.csMawbcontainers = this.lstMasterContainers;
-    }
-
-    /**
-     * Add new row
-     * 1. check existed a row that is editing
-     * 2. change editing item to label row & push new row
-     */
-    addNewContainer() {
-        let hasItemEdited = false;
-        let index = -1;
-        // 1.
-        for (let i = 0; i < this.lstMasterContainers.length; i++) {
-            if (this.lstMasterContainers[i].allowEdit == true) {
-                hasItemEdited = true;
-                index = i;
-                break;
-            }
-        }
-        // 2.
-        if (hasItemEdited === false) {
-            this.lstMasterContainers.push(this.initNewContainer());
-        } else {
-            this.saveNewContainer(index);
-            if (this.saveContainerSuccess) {
-                this.lstMasterContainers.push(this.initNewContainer());
-            }
-        }
-    }
-
-    /**
-     * search container in list container
-     * @param keySearch key to search in container list
-     */
-    searchContainer(keySearch: any) {
-        keySearch = keySearch != null ? keySearch.trim().toLowerCase() : "";
-        this.lstMasterContainers = Object.assign([], this.lstContainerTemp).filter(
-            item => (item.containerTypeName.toLowerCase().includes(keySearch)
-                || (item.quantity != null ? item.quantity.toString() : "").includes(keySearch)
-                || (item.containerNo != null ? item.containerNo.toLowerCase() : "").includes(keySearch)
-                || (item.sealNo != null ? item.sealNo.toLowerCase() : "").includes(keySearch)
-                || (item.markNo != null ? item.markNo.toLowerCase() : "").includes(keySearch)
-                || (item.commodityName != null ? item.commodityName.toLowerCase() : "").includes(keySearch)
-                || (item.packageTypeName != null ? item.packageTypeName.toLowerCase() : "").includes(keySearch)
-                || (item.packageQuantity != null ? item.packageQuantity.toString().toLowerCase() : "").includes(keySearch)
-                || (item.description != null ? item.description.toLowerCase() : "").includes(keySearch)
-                || (item.nw != null ? item.nw.toString().toLowerCase() : "").includes(keySearch)
-                || (item.chargeAbleWeight != null ? item.chargeAbleWeight.toString() : "").toLowerCase().includes(keySearch)
-                || (item.gw != null ? item.gw.toString().toLowerCase() : "").includes(keySearch)
-                || (item.unitOfMeasureName != null ? item.unitOfMeasureName.toLowerCase() : "").includes(keySearch)
-                || (item.cbm != null ? item.cbm.toString().toLowerCase() : "").includes(keySearch)
+    getListPackageTypes() {
+        this._unitRepo.getListUnitByType({ unitType: 'package' })
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this.isLoading = false;
+                    if (this.listPackageTypes != null) {
+                        this.packageTypes = dataHelper.prepareNg2SelectData(this.listPackageTypes, 'id', 'unitNameEn');
+                    }
+                })
             )
-        );
+            .subscribe(
+                (res: any) => {
+                    this.listPackageTypes = res;
+                },
+                (errors: any) => {
+                },
+                () => { }
+            );
     }
-
-    /**
-     * change mode of row(editing - not editing)
-     */
-    containerToChangeEdit: any = null;
-    changeEditMode(index: any) {
-        this.getComboboxDataContainer(index);
-        if (this.lstMasterContainers[index].allowEdit === false || this.lstMasterContainers[index].allowEdit == undefined) {
-            this.lstMasterContainers[index].allowEdit = true;
-            this.lstMasterContainers[index].containerTypeActive = this.lstMasterContainers[index].containerTypeId != null ?
-                [{ id: this.lstMasterContainers[index].containerTypeId, text: this.lstMasterContainers[index].containerTypeName }] : [];
-            this.lstMasterContainers[index].packageTypeActive = this.lstMasterContainers[index].packageTypeId != null ?
-                [{ id: this.lstMasterContainers[index].packageTypeId, text: this.lstMasterContainers[index].packageTypeName }] : [];
-            this.lstMasterContainers[index].unitOfMeasureActive = this.lstMasterContainers[index].unitOfMeasureID != null ?
-                [{ id: this.lstMasterContainers[index].unitOfMeasureID, text: this.lstMasterContainers[index].unitOfMeasureName }] : [];
-            for (let i = 0; i < this.lstMasterContainers.length; i++) {
-                if (i !== index) {
-                    this.lstMasterContainers[i].allowEdit = false;
-                }
-            }
-        } else {
-            this.lstMasterContainers[index].allowEdit = false;
-        }
-        this.containerToChangeEdit = Object.assign({}, this.lstMasterContainers[index]);
-    }
-
-    saveContainerSuccess = false;
-    /**
-     * change a row from editing mode in table
-     * @param index index of row in table
-     */
-    async saveNewContainer(index: any) {
-        if (this.lstMasterContainers[index].containerNo.length > 0 || this.lstMasterContainers[index].sealNo.length > 0 || this.lstMasterContainers[index].markNo.length > 0) {
-            this.lstMasterContainers[index].quantity = 1;
-        }
-        this.lstMasterContainers[index].verifying = true;
-        if (this.lstMasterContainers[index].quantity == null
-            || this.lstMasterContainers[index].containerTypeId == null
-            || this.lstMasterContainers[index].gw === 0 || this.lstMasterContainers[index].nw === 0
-            || this.lstMasterContainers[index].chargeAbleWeight === 0
-            || this.lstMasterContainers[index].cbm === 0) {
-            this.saveContainerSuccess = false;
-            return;
-        }
-        // Check duplicate( Cont Type && Cont Q'ty && Container No && Package Type)
-        let existedItems = this.lstMasterContainers.filter(x => x.containerTypeId == this.lstMasterContainers[index].containerTypeId
-            && x.quantity == this.lstMasterContainers[index].quantity);
-        if (this.lstMasterContainers[index].containerNo.length != 0 && this.lstMasterContainers[index].packageTypeId != null) {
-            existedItems = existedItems.filter(x => x.containerNo == this.lstMasterContainers[index].containerNo
-                && x.packageTypeId == this.lstMasterContainers[index].packageTypeId);
-        } else {
-            existedItems = [];
-        }
-        // set row is invalid
-        if (existedItems.length > 1) {
-            this.lstMasterContainers[index].inValidRow = true;
-            this.saveContainerSuccess = false;
-        } else {
-            // set row is saved
-            if (this.lstMasterContainers[index].isNew === true) {
-                this.lstMasterContainers[index].isNew = false;
-            } else {
-                this.lstMasterContainers[index].inValidRow = false;
-                this.lstMasterContainers[index].containerTypeActive = this.lstMasterContainers[index].containerTypeId != null ? [{ id: this.lstMasterContainers[index].containerTypeId, text: this.lstMasterContainers[index].containerTypeName }] : [];
-                this.lstMasterContainers[index].packageTypeActive = this.lstMasterContainers[index].packageTypeId != null ? [{ id: this.lstMasterContainers[index].packageTypeId, text: this.lstMasterContainers[index].packageTypeName }] : [];
-                this.lstMasterContainers[index].unitOfMeasureActive = this.lstMasterContainers[index].unitOfMeasureId != null ? [{ id: this.lstMasterContainers[index].unitOfMeasureId, text: this.lstMasterContainers[index].unitOfMeasureName }] : [];
-            }
-            this.roundWeight(index);
-            this.saveContainerSuccess = true;
-            this.lstMasterContainers[index].allowEdit = false;
-        }
-        this.lstContainerTemp = Object.assign([], this.lstMasterContainers);
-    }
-    roundWeight(index: number) {
-        if (this.lstMasterContainers[index].gw != null) {
-            this.lstMasterContainers[index].gw = Number(this.lstMasterContainers[index].gw.toFixed(2));
-        }
-        if (this.lstMasterContainers[index].nw != null) {
-            this.lstMasterContainers[index].nw = Number(this.lstMasterContainers[index].nw.toFixed(2));
-        }
-        if (this.lstMasterContainers[index].cbm != null) {
-            this.lstMasterContainers[index].cbm = Number(this.lstMasterContainers[index].cbm.toFixed(2));
-        }
-        if (this.lstMasterContainers[index].chargeAbleWeight != null) {
-            this.lstMasterContainers[index].chargeAbleWeight = Number(this.lstMasterContainers[index].chargeAbleWeight.toFixed(2));
-        }
-    }
-    /**
-     * save list container
-     */
-    async onSubmitContainer() {
-        for (let i = 0; i < this.lstMasterContainers.length; i++) {
-            this.lstMasterContainers[i].verifying = true;
-        }
-        if (this.containerMasterForm.valid) {
-            let hasItemEdited = false;
-            for (let i = 0; i < this.lstMasterContainers.length; i++) {
-                if (this.lstMasterContainers[i].allowEdit === true) {
-                    hasItemEdited = true;
-                    break;
-                }
-            }
-            if (hasItemEdited === false) {
-                // continue
-                this.numberOfTimeSaveContainer = this.numberOfTimeSaveContainer + 1;
-                this.opsTransaction.csMawbcontainers = this.lstMasterContainers;
-                var response = await this.baseServices.putAsync(this.api_menu.Documentation.CsMawbcontainer.update, { csMawbcontainerModels: this.opsTransaction.csMawbcontainers, masterId: this.opsTransaction.id }, true, false);
-                if (response.status) {
-                    this.getGoodInfomation(this.lstMasterContainers);
-                    await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.opsTransaction, false, false);
-                    $('#container-list-of-ops-billing-modal').modal('hide');
-                }
-            }
-            else {
-                this.baseServices.errorToast("Current container must be save!!!");
-            }
-        }
-    }
-
-    /**
-     * cancel edit stage of container row
-     * @param index 
-     */
-    cancelNewContainer(index: number) {
-        if (this.lstMasterContainers[index].isNew === true) {
-            this.lstMasterContainers.splice(index, 1);
-        } else {
-            this.lstMasterContainers[index] = this.containerToChangeEdit;
-            this.lstMasterContainers[index].allowEdit = false;
-            this.containerToChangeEdit = null;
-        }
-
+    async saveContainers(event) {
+        console.log(event);
+        this.opsTransaction.csMawbcontainers = event;
+        await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.opsTransaction, false, false);
+        this.getListContainersOfJob();
+        this.getGoodInfomation(this.opsTransaction.csMawbcontainers);
     }
 
     /**
@@ -441,127 +299,6 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
             this.opsTransaction.sumPackages = this.opsTransaction.sumPackages + listContainers[i].packageQuantity;
         }
     }
-    /**
-     * init a new container
-     */
-    initNewContainer() {
-        const container = {
-            mawb: this.opsTransaction.id,
-            containerTypeId: null,
-            containerTypeName: '',
-            containerTypeActive: [],
-            quantity: 1,
-            containerNo: '',
-            sealNo: '',
-            markNo: '',
-            unitOfMeasureId: 37,
-            unitOfMeasureName: 'Kilogam',
-            unitOfMeasureActive: [], ///[{ "id": 37, "text": "Kilogam" }],
-            commodityId: null,
-            commodityName: '',
-            packageTypeId: null,
-            packageTypeName: '',
-            packageTypeActive: [],
-            packageQuantity: null,
-            description: null,
-            gw: null,
-            nw: null,
-            chargeAbleWeight: null,
-            cbm: null,
-            packageContainer: '',
-            allowEdit: true,
-            isNew: true,
-            verifying: false
-        };
-        this.getComboboxDataContainer(this.lstMasterContainers.length);
-        return container;
-    }
-    removeContainer() {
-        this.lstMasterContainers.splice(this.indexItemConDelete, 1);
-        this.opsTransaction.csMawbcontainers = this.lstMasterContainers;
-        $('#confirm-accept-delete-container-modal').modal('hide');
-    }
-    indexItemConDelete: any = null;
-    /**
-     * confirm item to remove out of table
-     * @param index index of row in table
-     */
-    removeAContainer(index: number) {
-        this.indexItemConDelete = index;
-    }
-    /**
-     * get container type data
-     */
-    async getContainerTypes() {
-        let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Container", inactive: false }, false, false);
-        this.listContainerType = responses;
-        if (responses != null) {
-            this.containerTypes = dataHelper.prepareNg2SelectData(responses, 'id', 'unitNameEn');
-        }
-    }
-    /**
-     * get reference container
-     */
-    getContainerData() {
-        this.getContainerTypes();
-        this.getWeightTypes();
-        this.getComodities();
-    }
-
-    /**
-     * get list weight type
-     */
-    async getWeightTypes() {
-        let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Weight Measurement", inactive: false }, false, false);
-        this.listWeightMesurement = responses;
-    }
-
-    /**
-     * get list package type
-     */
-    async getPackageTypes() {
-        let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Package", inactive: false }, false, false);
-        this.listPackageTypes = responses;
-
-        if (this.listPackageTypes) {
-            this.packageTypes = dataHelper.prepareNg2SelectData(this.listPackageTypes, 'id', 'unitNameEn');
-            this.packagesUnitActive = [this.packageTypes[0]];
-        }
-    }
-    /**
-     * get list commodity
-     */
-    async getComodities() {
-        let criteriaSearchCommodity = { inactive: null, all: null };
-        let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, criteriaSearchCommodity, false, false);
-        if (responses != null) {
-            this.commodities = this.sortService.sort(responses, 'commodityNameEn', true);
-        }
-        else {
-            this.commodities = [];
-        }
-    }
-    getComboboxDataContainer(index: number) {
-        if (this.listContainerType != null) {
-            if (this.lstMasterContainers[index] == null) {
-                this.containerTypes = dataHelper.prepareNg2SelectData(this.listContainerType, 'id', 'unitNameEn');
-                this.packageTypes = dataHelper.prepareNg2SelectData(this.listPackageTypes, 'id', 'unitNameEn');
-                this.weightMesurements = dataHelper.prepareNg2SelectData(this.listWeightMesurement, 'id', 'unitNameEn');
-            } else {
-                if (this.lstMasterContainers[index]["id"] != null) {
-                    let conts = this.listContainerType.filter(x => x.inactive === false);
-                    let packs = this.listPackageTypes.filter(x => x.inactive === false);
-                    let weights = this.listWeightMesurement.filter(x => x.inactive === false);
-                    this.containerTypes = dataHelper.prepareNg2SelectData(conts, 'id', 'unitNameEn');
-                    this.packageTypes = dataHelper.prepareNg2SelectData(packs, 'id', 'unitNameEn');
-                    this.weightMesurements = dataHelper.prepareNg2SelectData(weights, 'id', 'unitNameEn');
-                }
-            }
-        }
-        else {
-            this.containerTypes = [];
-        }
-    }
     // -------------    End Container   -------------------//
 
     async getWarehouses() {
@@ -579,11 +316,11 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
         this.serviceModes = dataHelper.prepareNg2SelectData(data.serviceModes, 'value', 'displayName');
         this.shipmentModes = dataHelper.prepareNg2SelectData(data.shipmentModes, 'value', 'displayName');
     }
-    private getListBillingOps() {
-        this.baseServices.get(this.api_menu.System.User_Management.getAll).subscribe((res: any) => {
-            this.billingOps = res;
-        });
-    }
+    // private getListBillingOps() {
+    //     this.baseServices.get(this.api_menu.System.User_Management.getAll).subscribe((res: any) => {
+    //         this.billingOps = res;
+    //     });
+    // }
     private getPorts() {
         this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { placeType: PlaceTypeEnum.Port, inactive: false }).subscribe((res: any) => {
             this.ports = res;
@@ -1029,7 +766,7 @@ export class OpsModuleBillingJobEditComponent implements OnInit {
 
 
     //packagesUnit: Array<string> = ['PKG', 'PCS', 'BOX', 'CNTS'];
-    packagesUnitActive = ['PKG'];
+    packagesUnitActive = [];
 
     private value: any = {};
     private _disabledV: string = '0';

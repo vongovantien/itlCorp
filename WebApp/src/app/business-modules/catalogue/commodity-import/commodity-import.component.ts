@@ -30,9 +30,9 @@ export class CommodityImportComponent implements OnInit {
     private sortService: SortService
   ) { }
 
-  @ViewChild(PaginationComponent,{static:false}) child: any;
-  @ViewChild('form',{static:false}) form: any;
-  @ViewChild(NgProgressComponent,{static:false}) progressBar: NgProgressComponent;
+  @ViewChild(PaginationComponent, { static: false }) child: any;
+  @ViewChild('form', { static: false }) form: any;
+  @ViewChild(NgProgressComponent, { static: false }) progressBar: NgProgressComponent;
   ngOnInit() {
     this.pager.totalItems = 0;
   }
@@ -105,7 +105,7 @@ export class CommodityImportComponent implements OnInit {
     if (this.totalRows - this.totalValidRows > 0) {
       $('#upload-alert-modal').modal('show');
     }
-    else {     
+    else {
       let validItems = this.data.filter(x => x.isValid);
       var response = await this.baseService.postAsync(this.menu_api.Catalogue.Commodity.import, validItems);
       if (response) {
@@ -127,7 +127,7 @@ export class CommodityImportComponent implements OnInit {
 
 
   async downloadSample() {
-    await this.baseService.downloadfile(this.menu_api.Catalogue.Commodity.downloadExcel,'CommodityTemplate.xlsx');
+    await this.baseService.downloadfile(this.menu_api.Catalogue.Commodity.downloadExcel, 'CommodityTemplate.xlsx');
   }
 
 }

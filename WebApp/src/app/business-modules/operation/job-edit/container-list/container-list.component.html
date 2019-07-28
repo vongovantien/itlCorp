@@ -1,0 +1,417 @@
+<div class="modal fade" id="container-list-of-ops-billing-modal" bsModal #popup="bs-modal" role="dialog"
+  (onHide)="onHide($event)" (onShow)="onShow($event)">
+  <div class="modal-dialog c-modal-fullscreen" role="document">
+    <form novalidate #containerMasterForm="ngForm" (ngSubmit)="containerMasterForm.form.valid">
+      <div class="modal-content m-form m-form--state">
+        <div class="modal-header">
+          <h5 class="modal-title">List of container</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closeContainerPopup()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="container-list-table">
+            <!--begin: Search Form -->
+            <div class="m-form m-form--label-align-right m--margin-bottom-10">
+              <div class="row align-items-center">
+                <div class="col-lg-4 order-2 order-lg-1">
+                  <div class="form-group">
+                    <div class="m-input-icon m-input-icon--left">
+                      <input type="text" class="form-control m-input m-input--square" [ngModel]="searchcontainer"
+                        (change)="searchcontainer = searchcontainer.trim()" (ngModelChange)="searchContainer($event)"
+                        placeholder="Search..." autocomplete="nope" name="searchcontainer">
+                      <span class="m-input-icon__icon m-input-icon__icon--left">
+                        <span>
+                          <i class="la la-search"></i>
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
+                  <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                      <i class="la la-download"></i>
+                      <span>
+                        import
+                      </span>
+                    </span>
+                  </button>
+                  <button type="" (click)="addNewRowContainer()"
+                    class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                      <i class="la la-plus"></i>
+                      <span>
+                        add container
+                      </span>
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!--end: Search Form -->
+            <!--begin: Datatable -->
+            <div class="table-wrapper" id="" style="min-height: 300px">
+              <table class="table table-striped table-brand table-editable">
+                <thead class="">
+                  <tr class="">
+                    <th class="fixed-side"></th>
+                    <th class="">
+                      <span>
+                        Cont Type <span class="m--font-danger">(*)</span>
+                      </span>
+                    </th>
+                    <th class="">
+                      <span>
+                        Cont Q'ty <span class="m--font-danger">(*)</span>
+                      </span>
+                    </th>
+                    <th class="">
+                      <span>
+                        Cont No.
+                      </span>
+                    </th>
+                    <th class="">
+                      <span>
+                        Seal No.
+                      </span>
+                    </th>
+                    <th class="">
+                      <span>
+                        Mark No.
+                      </span>
+                    </th>
+                    <th class="">
+                      <span>
+                        Commodity
+                      </span>
+                    </th>
+                    <th class="">
+                      <span>
+                        Package Type
+                      </span>
+                    </th>
+                    <th class="">
+                      <span>
+                        Package Q'ty
+                      </span>
+                    </th>
+                    <th class="">
+                      <span>
+                        Description of Good
+                      </span>
+                    </th>
+                    <th class="">
+                      <span>
+                        G.W
+                      </span>
+                    </th>
+                    <th class="">
+                      <span>
+                        N.W
+                      </span>
+                    </th>
+                    <th class="">
+                      <span>
+                        C.W
+                      </span>
+                    </th>
+                    <th class="">
+                      <span>
+                        Unit
+                      </span>
+                    </th>
+                    <th class="">
+                      <span>
+                        CBM
+                      </span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody *ngIf="lstMasterContainers">
+                  <ng-container *ngFor="let container of lstMasterContainers; let i= index">
+                    <tr class="m-form m-form--state row-editing" *ngIf="container.allowEdit"
+                      [ngClass]="{ 'invalid-row': container.inValidRow }">
+                      <td class="table-actions-col fixed-side">
+                        <div class="table-actions control-editable" style="width: 70px">
+                          <button type="" class="btn btn-primary btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                            title="Save" (click)="saveNewContainer(i)">
+                            <i class="la la-save"></i>
+                          </button>
+                          <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                            title="Cancel" (click)="cancelNewContainer(i)">
+                            <i class="la la-ban"></i>
+                          </button>
+                        </div>
+                      </td>
+                      <td class="">
+                        <div class="control-editable"
+                          [ngClass]="{ 'has-danger': containerMasterForm.submitted && container.containerTypeId == null && container.verifying}">
+                          <ng-select [allowClear]="true" [items]="containerTypes" #containerSelect id="containerSelect"
+                            (data)="refreshValue($event)"
+                            (selected)="container.containerTypeId = $event.id;container.containerTypeName = $event.text"
+                            (removed)="container.containerTypeId = null;container.containerTypeName = null"
+                            (typed)="typed($event)" [active]="container.containerTypeActive"
+                            placeholder="Select filter">
+                          </ng-select>
+                          <div class="form-control-feedback"
+                            *ngIf="containerMasterForm.submitted && container.containerTypeId == null && container.verifying">
+                            Container type is required.
+                          </div>
+                        </div>
+                        <div class="has-danger row-control-feedback" *ngIf="container.inValidRow">
+                          <div class="form-control-feedback">
+                            Duplicate container detail
+                          </div>
+                        </div>
+                      </td>
+                      <td class="">
+                        <div class="control-editable"
+                          [ngClass]="{ 'has-danger': (containerMasterForm.submitted && conQuantity.invalid && container.verifying) || (containerMasterForm.submitted && container.chargeAbleWeight == 0)}">
+                          <input type="number" class="form-control m-input m-input--square" min="1" max="2147483647"
+                            value="1" appIntergerInputCheck placeholder="Enter number" [(ngModel)]="container.quantity"
+                            name="conQuantity" #conQuantity="ngModel" required>
+                          <div class="form-control-feedback"
+                            *ngIf="(containerMasterForm.submitted && conQuantity.invalid && container.verifying) || (containerMasterForm.submitted && container.chargeAbleWeight == 0)">
+                            Cont Q'ty must be a number
+                          </div>
+                        </div>
+                      </td>
+                      <td class="">
+                        <div class="control-editable">
+                          <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                            autocomplete="nope" [(ngModel)]="container.containerNo"
+                            (change)="container.containerNo = container.containerNo.trim()" name="containerNo"
+                            #containerNo="ngModel">
+                        </div>
+                      </td>
+                      <td class="">
+                        <div class="control-editable">
+                          <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                            autocomplete="nope" [(ngModel)]="container.sealNo" name="sealNo"
+                            (change)="container.sealNo = container.sealNo.trim()" #sealNo="ngModel">
+                        </div>
+                      </td>
+                      <td class="">
+                        <div class="control-editable">
+                          <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
+                            autocomplete="nope" [(ngModel)]="container.markNo" name="markNo"
+                            (change)="container.markNo = container.markNo.trim()" #markNo="ngModel">
+                        </div>
+                      </td>
+                      <td class="">
+                        <div class="control-editable">
+
+                          <app-combo-grid-virtual-scroll
+                            [currentActiveItemId]="{field:'id',value:container.commodityId}"
+                            (itemSelected)="container.commodityId=$event.id;container.commodityName=$event.commodityNameEn"
+                            [selectedDisplayFields]="['commodityNameEn']" [dataSources]="listcommodities"
+                            [displayFields]="[{'field':'commodityNameEn','label':'Name EN'},{'field':'commodityNameVn','label':'Name VN'},{'field':'commodityGroupNameEn','label':'Group'}]">
+                          </app-combo-grid-virtual-scroll>
+                        </div>
+                      </td>
+                      <td class="">
+                        <div class="control-editable">
+                          <ng-select [allowClear]="true" [items]="packageTypes" (data)="refreshValue($event)"
+                            (selected)="container.packageTypeId = $event.id; container.packageTypeName = $event.text"
+                            (removed)="container.packageTypeId = null; container.packageTypeName = null"
+                            (typed)="typed($event)" [active]="container.packageTypeActive" placeholder="Select filter">
+                          </ng-select>
+                        </div>
+                      </td>
+                      <td class="">
+                        <div class="control-editable">
+                          <input type="number" class="form-control m-input m-input--square" min="1" max="32767"
+                            [(ngModel)]="container.packageQuantity" name="packageQuantity" #packageQuantity="ngModel"
+                            oninput="validity.valid||(value='');" placeholder="Enter number" autocomplete="nope">
+                        </div>
+                      </td>
+                      <td class="" style="width: 130px">
+                        <div class="control-editable">
+                          <input type="text" class="form-control m-input m-input--square" autocomplete="nope"
+                            [(ngModel)]="container.description" name="descriptionOfGood" #descriptionOfGood="ngModel"
+                            (change)="container.description = container.description.trim()" placeholder="Enter text">
+                        </div>
+                      </td>
+                      <td class="">
+                        <div class="control-editable"
+                          [ngClass]="{ 'has-danger': containerMasterForm.submitted && container.gw == 0}">
+                          <input type="number" class="form-control m-input m-input--square" placeholder="Enter number"
+                            autocomplete="nope" [(ngModel)]="container.gw" name="containerGW" min="0.01"
+                            decimalNumberGreaterThan0 #containerGW="ngModel">
+                          <div class="form-control-feedback" *ngIf="containerMasterForm.submitted && container.gw == 0">
+                            Gross weight must be greater than 0.
+                          </div>
+                        </div>
+                      </td>
+                      <td class="">
+                        <div class="control-editable"
+                          [ngClass]="{ 'has-danger': containerMasterForm.submitted && container.nw == 0}">
+                          <input type="number" class="form-control m-input m-input--square" placeholder="Enter number"
+                            autocomplete="nope" [(ngModel)]="container.nw" name="containerNW" min="0.01"
+                            decimalNumberGreaterThan0 #containerNW="ngModel">
+                          <div class="form-control-feedback" *ngIf="containerMasterForm.submitted && container.nw == 0">
+                            Net weight must be greater than 0.
+                          </div>
+                        </div>
+                      </td>
+                      <td class="">
+                        <div class="control-editable"
+                          [ngClass]="{ 'has-danger': containerMasterForm.submitted && container.chargeAbleWeight == 0}">
+                          <input type="number" class="form-control m-input m-input--square" placeholder="Enter number"
+                            autocomplete="nope" [(ngModel)]="container.chargeAbleWeight"
+                            name="containerchargeAbleWeight" min="0.01" decimalNumberGreaterThan0
+                            #containerchargeAbleWeight="ngModel">
+                          <div class="form-control-feedback"
+                            *ngIf="containerMasterForm.submitted && container.chargeAbleWeight == 0">
+                            Chargeable weight must be greater than 0.
+                          </div>
+                        </div>
+                      </td>
+                      <td class="">
+                        <div class="control-editable">
+                          <ng-select [allowClear]="true" [items]="weightMesurements" (data)="refreshValue($event)"
+                            (selected)="container.unitOfMeasureId = $event.id; container.unitOfMeasureName = $event.text"
+                            (removed)="container.unitOfMeasureId = null; container.unitOfMeasureName = null"
+                            (typed)="typed($event)" [active]="container.unitOfMeasureActive"
+                            placeholder="Select filter">
+                          </ng-select>
+                        </div>
+                      </td>
+                      <td class="">
+                        <div class="control-editable"
+                          [ngClass]="{ 'has-danger': containerMasterForm.submitted && container.cbm == 0}">
+                          <input type="number" class="form-control m-input m-input--square" placeholder="Enter number"
+                            autocomplete="nope" [(ngModel)]="container.cbm" name="containerCBM" min="0.01"
+                            decimalNumberGreaterThan0 #containerCBM="ngModel">
+                          <div class="form-control-feedback"
+                            *ngIf="containerMasterForm.submitted && container.cbm == 0">
+                            CBM must be greater than 0.
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr class="" *ngIf="!container.allowEdit">
+                      <td class="table-actions-col fixed-side">
+                        <div class="table-actions" style="width: 70px">
+                          <button type="button"
+                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit"
+                            (click)="changeEditMode(i)">
+                            <i class="la la-edit"></i>
+                          </button>
+                          <!-- <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                            title="Remove" data-toggle="modal" data-target="#confirm-accept-delete-container-modal"
+                            (click)="removeAContainer(i)">
+                            <i class="la la-trash"></i>
+                          </button> -->
+                          <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                            title="Remove" (click)="removeAContainer(i)">
+                            <i class="la la-trash"></i>
+                          </button>
+                        </div>
+                      </td>
+                      <td class="">
+                        <span class="content-editable">
+                          {{ container.containerTypeName }}
+                        </span>
+                      </td>
+                      <td class="">
+                        <span class="content-editable">
+                          {{ container.quantity }}
+                        </span>
+                      </td>
+                      <td class="">
+                        <span class="content-editable">
+                          {{ container.containerNo }}
+                        </span>
+                      </td>
+                      <td class="">
+                        <span class="content-editable">
+                          {{ container.sealNo }}
+                        </span>
+                      </td>
+                      <td class="">
+                        <span class="content-editable">
+                          {{ container.markNo }}
+                        </span>
+                      </td>
+                      <td class="">
+                        <span class="content-editable">
+                          {{ container.commodityName }}
+                        </span>
+                      </td>
+                      <td class="">
+                        <span class="content-editable">
+                          {{ container.packageTypeName }}
+                        </span>
+                      </td>
+                      <td class="">
+                        <span class="content-editable">
+                          {{ container.packageQuantity }}
+                        </span>
+                      </td>
+                      <td class="" style="width: 130px">
+                        <span class="content-editable">
+                          {{ container.description }}
+                        </span>
+                      </td>
+                      <td class="">
+                        <span class="content-editable">
+                          {{ container.gw | number: '1.2-2' }}
+                        </span>
+                      </td>
+                      <td class="">
+                        <span class="content-editable">
+                          {{ container.nw | number: '1.2-2' }}
+                        </span>
+                      </td>
+                      <td class="">
+                        <span class="content-editable">
+                          {{ container.chargeAbleWeight | number: '1.2-2' }}
+                        </span>
+                      </td>
+                      <td class="">
+                        <span class="content-editable">
+                          {{ container.unitOfMeasureName }}
+                        </span>
+                      </td>
+                      <td class="">
+                        <span class="content-editable">
+                          {{ container.cbm | number: '1.2-2' }}
+                        </span>
+                      </td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </table>
+            </div>
+            <!--end: Datatable -->
+          </div>
+        </div>
+        <div class="modal-footer m--align-center">
+          <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+            (click)="onSubmitContainer(containerMasterForm)">
+            <span>
+              <i class="la la-save"></i>
+              <span>
+                save
+              </span>
+            </span>
+          </button>
+          <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal"
+            (click)="closeContainerPopup()">
+            <span>
+              <i class="la la-ban"></i>
+              <span>
+                cancel
+              </span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<confirm-popup [title]="'Delete Container'" [body]="'Are you sure you want to delete the selected container?'"
+  (onSubmit)="deleteContainer()"></confirm-popup>
