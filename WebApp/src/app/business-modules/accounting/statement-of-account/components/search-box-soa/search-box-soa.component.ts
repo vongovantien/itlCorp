@@ -8,6 +8,8 @@ import { Currency, Partner, User } from 'src/app/shared/models';
 import { SystemRepo } from 'src/app/shared/repositories';
 import moment from 'moment';
 import { BaseService } from 'src/app/shared/services';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'soa-search-box',
@@ -46,6 +48,7 @@ export class StatementOfAccountSearchComponent extends AppPage {
         private _sysRepo: SystemRepo,
         private _globalState: GlobalState,
         private _baseService: BaseService,
+        private _toastService: ToastrService
     ) {
         super();
     }
@@ -95,9 +98,14 @@ export class StatementOfAccountSearchComponent extends AppPage {
                     this._globalState.notifyDataChanged('system-user', dataSystemUser);
 
                 },
-                (errs: any) => {
-                    console.log(errs + '');
-                    // TODO handle errors
+                (errors: any) => {
+                    let message: string = 'Has Error Please Check Again !';
+                    let title: string = '';
+                    if (errors instanceof HttpErrorResponse) {
+                        message = errors.message;
+                        title = errors.statusText;
+                    }
+                    this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
                 },
                 // complete
                 () => { }
@@ -166,7 +174,7 @@ export class StatementOfAccountSearchComponent extends AppPage {
         this.selectedRange = null;
 
         // ? search again!
-        this.search();
+        this.onSearch.emit({});
     }
 
 }

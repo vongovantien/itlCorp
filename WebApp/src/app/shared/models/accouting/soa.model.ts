@@ -12,16 +12,24 @@ export class SOA {
     soaformDate: string = '';
     soano: string = '';
     soatoDate: string = '';
-    status: string= '';
+    status: string = '';
     surchargeIds: string = '';
     userCreated: string = '';
     userModified: string = '';
 
+    amountBalanceUSD: number = 0;
+    amountCreditLocal: number = 0;
+    amountCreditUSD: number = 0;
+    amountDebitLocal: number = 0;
+    amountDebitUSD: number = 0;
+    chargeShipments: any[] = [];
+    amountBalanceLocal: number = 0;
+    
     constructor(data?: any) {
         const self = this;
         for (const key in data) {
             if (self.hasOwnProperty(key)) {
-               self[key] = data[key];
+                self[key] = data[key];
             }
         }
     }

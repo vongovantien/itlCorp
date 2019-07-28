@@ -67,7 +67,7 @@ const COMPONENTS = [
         ...COMPONENTS
     ],
     imports: [
-        CommonModule,
+        // CommonModule,
         RouterModule.forChild(routing),
         SharedModule,
         FormsModule,

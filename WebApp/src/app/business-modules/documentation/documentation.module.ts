@@ -44,7 +44,7 @@ import { SeaLclExportShippingInstructionComponent } from './sea-lcl-export-creat
 
 @NgModule({
   imports: [
-    CommonModule,
+    // CommonModule,
     DocumentationRoutingModule,
     ReactiveFormsModule.withConfig({warnOnNgModelWithFormControl: 'never'}),
     SharedModule,

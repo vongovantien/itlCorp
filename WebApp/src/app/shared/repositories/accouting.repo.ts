@@ -57,4 +57,14 @@ export class AccoutingRepo {
                 })
             );
     }
+
+    getDetaiLSOA(soaNO: string, currency: string) {
+        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSOA/GetBySoaNo/${soaNO}&${currency}`)
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => {
+                    return data;
+                })
+            );
+    }
 }

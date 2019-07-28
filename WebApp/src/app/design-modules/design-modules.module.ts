@@ -15,7 +15,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
 };
 @NgModule({
   imports: [
-    CommonModule,
+    // CommonModule,
     DesignModulesRoutingModule,
     SharedModule,
     NgxDaterangepickerMd,
