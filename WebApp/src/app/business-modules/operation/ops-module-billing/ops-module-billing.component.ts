@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import moment from 'moment/moment';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
@@ -10,6 +10,8 @@ import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { StageConstants } from 'src/constants/stage.const';
 import { JobConstants } from 'src/constants/job.const';
+import { ConfirmDeleteJobPopupComponent } from '../job-edit/job-confirm-popup/confirm-delete-job-popup/confirm-delete-job-popup.component';
+import { CanNotDeleteJobPopupComponent } from '../job-edit/job-confirm-popup/can-not-delete-job-popup/can-not-delete-job-popup.component';
 declare var $: any;
 
 @Component({
@@ -49,6 +51,8 @@ export class OpsModuleBillingComponent implements OnInit {
     customClearances: any[] = [];
     itemToDelete: any = null;
 
+    @ViewChild(ConfirmDeleteJobPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmDeleteJobPopupComponent;
+    @ViewChild(CanNotDeleteJobPopupComponent, { static: false }) canNotDeleteJobPopup: CanNotDeleteJobPopupComponent;
     constructor(private baseServices: BaseService,
         private sortService: SortService,
         private api_menu: API_MENU) {
@@ -131,18 +135,20 @@ export class OpsModuleBillingComponent implements OnInit {
     }
     async confirmDelete(item: { id: string; }) {
         this.itemToDelete = item;
-        let respone = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.checkAllowDelete + item.id, false, true);
-        if (respone == true) {
-            $('#confirm-delete-job-modal').modal('show');
-        }
-        else {
-            $('#confirm-can-not-delete-job-modal').modal('show');
+        const respone = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.checkAllowDelete + item.id, false, true);
+        if (respone === true) {
+            // $('#confirm-delete-job-modal').modal('show');
+            this.confirmDeleteJobPopup.show();
+        } else {
+            this.canNotDeleteJobPopup.show();
+            // $('#confirm-can-not-delete-job-modal').modal('show');
         }
     }
     async deleteJob() {
-        let respone = await this.baseServices.deleteAsync(this.api_menu.Documentation.Operation.delete + this.itemToDelete.id, true, true);
+        const respone = await this.baseServices.deleteAsync(this.api_menu.Documentation.Operation.delete + this.itemToDelete.id, true, true);
         if (respone.status) {
-            $('#confirm-delete-job-modal').modal('hide');
+            // $('#confirm-delete-job-modal').modal('hide');
+            this.confirmDeleteJobPopup.hide();
             this.getShipments();
         }
     }
@@ -173,7 +179,7 @@ export class OpsModuleBillingComponent implements OnInit {
             this.shipments = responses.data.opsTransactions;
             this.totalInProcess = responses.data.toTalInProcessing;
             this.totalOverdued = responses.data.totalOverdued;
-            this.totalComplete = responses.data.totalComplete;
+            this.totalComplete = responses.data.totalfinish;
             this.totalCanceled = responses.data.totalCanceled;
         }
         else {

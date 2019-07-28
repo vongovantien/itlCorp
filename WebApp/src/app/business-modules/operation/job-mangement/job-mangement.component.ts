@@ -44,8 +44,8 @@ export class JobMangementComponent implements OnInit {
   pager: PagerSetting = {
     currentPage: 1,
     pageSize: 15,
-    numberToShow: [3,5,10,15, 30, 50],
-    totalPageBtn:7
+    numberToShow: [3, 5, 10, 15, 30, 50],
+    totalPageBtn: 7
   };
 
 
@@ -54,8 +54,8 @@ export class JobMangementComponent implements OnInit {
     private toastr: ToastrService) { }
 
   async ngOnInit() {
-    this.toastr.success("mess","title", {
-      timeOut:2000
+    this.toastr.success("mess", "title", {
+      timeOut: 2000
     });
 
     this.route.params.subscribe(prams => {
@@ -64,7 +64,7 @@ export class JobMangementComponent implements OnInit {
         this.router.navigate(['/home/operation/job-management']);
       }
     });
-   // this.getJobs();
+    // this.getJobs();
     await this.setPage(this.pager);
     this.getStages();
     this.ready = true;
@@ -233,12 +233,12 @@ export class JobMangementComponent implements OnInit {
     vessel_flight: "",
     port_of_delivery: "",
     m_b_l: "",
-    cs_ic: "",
+    cs_ic: " ",
     customer: "",
     stage_list: null,
     house_bill_list: null,
     container_list: null,
-    service:""
+    service: ""
   }
 
 
@@ -362,7 +362,7 @@ export class JobMangementComponent implements OnInit {
   edit_stage_detail(index_job, index_stage, action) {
     console.log(index_job + "  |  " + index_stage)
     if (action == "confirm") {
-      this.job_index = index_job==-1?this.index_opening_job:index_job; 
+      this.job_index = index_job == -1 ? this.index_opening_job : index_job;
       this.stage_index = index_stage;
       console.log(this.Jobs_List[this.job_index].stage_list[this.stage_index]);
     } else {
@@ -383,8 +383,8 @@ export class JobMangementComponent implements OnInit {
     this.Jobs_List = await this.getJobs(pager);
   }
 
-  selectedDate(event){
-    
+  selectedDate(event) {
+
   }
 
 
