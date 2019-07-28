@@ -174,12 +174,13 @@ export class OpsModuleBillingComponent implements OnInit {
         }
     }
     async getShipments() {
-        let responses = await this.baseServices.postAsync(this.api_menu.Documentation.Operation.paging + "?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.criteria, true, true);
+        const responses = await this.baseServices.postAsync(this.api_menu.Documentation.Operation.paging + "?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.criteria, true, true);
         if (responses.data != null) {
+            console.log(responses.data);
             this.shipments = responses.data.opsTransactions;
             this.totalInProcess = responses.data.toTalInProcessing;
             this.totalOverdued = responses.data.totalOverdued;
-            this.totalComplete = responses.data.totalfinish;
+            this.totalComplete = responses.data.toTalFinish;
             this.totalCanceled = responses.data.totalCanceled;
         }
         else {
