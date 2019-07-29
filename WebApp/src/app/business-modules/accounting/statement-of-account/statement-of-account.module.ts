@@ -1,21 +1,23 @@
-import { NgModule } from 'node_modules/@angular/core';
-import { CommonModule } from 'node_modules/@angular/common';
+import { NgModule, LOCALE_ID } from '@angular/core';
+import { CommonModule, registerLocaleData } from '@angular/common';
 import { StatementOfAccountComponent } from './statement-of-account.component';
 import { AccountReceivePayableComponent } from './account-receive-payable/account-receive-payable.component';
 import { StatementOfAccountDetailComponent } from './detail/detail-soa.component';
 import { StatementOfAccountEditComponent } from './edit/edit-soa.component';
 import { StatementOfAccountAddnewComponent } from './add-new/add-new-soa.component';
-import { Routes, RouterModule } from 'node_modules/@angular/router';
-import { FormsModule } from 'node_modules/@angular/forms';
-import { SelectModule } from 'node_modules/ng2-select';
-import { TabsModule, ModalModule, CollapseModule, PaginationModule, AccordionModule } from 'node_modules/ngx-bootstrap';
-import { NgxDaterangepickerMd } from 'node_modules/ngx-daterangepicker-material';
+import { Routes, RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { SelectModule } from 'ng2-select';
+import { TabsModule, ModalModule, CollapseModule, PaginationModule, AccordionModule } from 'ngx-bootstrap';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { StatementOfAccountSearchComponent } from './components/search-box-soa/search-box-soa.component';
 import { StatementOfAccountAddChargeComponent } from './components/poup/add-charge/add-charge.popup';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { StatementOfAccountFormCreateComponent } from './components/form-create-soa/form-create-soa.component';
-import { PerfectScrollbarModule } from 'node_modules/ngx-perfect-scrollbar';
+import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
+import localeVi from '@angular/common/locales/vi';
 
+registerLocaleData(localeVi, 'vi');
 const routing: Routes = [
     {
         path: "", component: StatementOfAccountComponent,
@@ -81,10 +83,14 @@ const COMPONENTS = [
         AccordionModule.forRoot(),
     ],
     exports: [],
-    providers: [],
+    providers: [
+        { provide: LOCALE_ID, useValue: 'vi' },
+
+    ],
     bootstrap: [
         StatementOfAccountComponent
-    ]
+    ],
+
 })
 export class StatementOfAccountModule {
     static routing = routing;

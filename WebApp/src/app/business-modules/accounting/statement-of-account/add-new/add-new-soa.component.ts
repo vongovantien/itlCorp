@@ -1,4 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
@@ -7,7 +9,7 @@ import { SystemRepo, AccoutingRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
 import { StatementOfAccountAddChargeComponent } from '../components/poup/add-charge/add-charge.popup';
 import { ToastrService } from 'ngx-toastr';
-import { HttpErrorResponse } from '@angular/common/http';
+
 
 
 @Component({
@@ -37,7 +39,8 @@ export class StatementOfAccountAddnewComponent extends AppList {
         private _globalState: GlobalState,
         private _sortService: SortService,
         private _accountRepo: AccoutingRepo,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _router: Router
     ) {
         super();
         this.requestList = this.sortLocal;
@@ -62,7 +65,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
 
     addCharge() {
         this.addChargePopup.show();
-        this._globalState.notifyDataChanged('system-user', []);
     }
 
     getBasicData() {
@@ -77,13 +79,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
                     this._globalState.notifyDataChanged('system-user', dataSystemUser);
                 },
                 (errors: any) => {
-                    let message: string = 'Has Error Please Check Again !';
-                    let title: string = '';
-                    if (errors instanceof HttpErrorResponse) {
-                        message = errors.message;
-                        title = errors.statusText;
-                    }
-                    this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
+                    this.handleError(errors);
                 },
                 // complete
                 () => {
@@ -125,21 +121,18 @@ export class StatementOfAccountAddnewComponent extends AppList {
                     (res: any) => {
                         if (res.status) {
                             this._toastService.success(res.message, '', { positionClass: 'toast-bottom-right' });
-                            this.onSearchCharge(this.dataSearch); // ? search charge again
-                            this.isCheckAllCharge = false; // ? reset checkbox
+                            this.onSearchCharge(this.dataSearch); // ? Charge search again to remove charge was created by current SOA
+                            this.isCheckAllCharge = false; // ? reset checkbox all
+
+                            //  * go to detail page
+                            this._router.navigate(['home/accounting/statement-of-account/detail'], { queryParams: { no: res.data.soano, currency: 'VND' } });
 
                         } else {
                             this._toastService.error(res, '', { positionClass: 'toast-bottom-right' });
                         }
                     },
                     (errors: any) => {
-                        let message: string = 'Has Error Please Check Again !';
-                        let title: string = '';
-                        if (errors instanceof HttpErrorResponse) {
-                            message = errors.message;
-                            title = errors.statusText;
-                        }
-                        this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
+                        this.handleError(errors);
                     },
                     () => {
 
@@ -163,7 +156,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
                     this.charges = res.chargeShipments || [];
                     this.totalCharge = res.totalCharge;
                     this.totalShipment = res.totalShipment;
-                    console.log(this.charges);
                 },
                 (errors: any) => {
                     let message: string = 'Has Error Please Check Again !';
@@ -176,6 +168,16 @@ export class StatementOfAccountAddnewComponent extends AppList {
                 },
                 () => { }
             );
+    }
+
+    handleError(errors: any) {
+        let message: string = 'Has Error Please Check Again !';
+        let title: string = '';
+        if (errors instanceof HttpErrorResponse) {
+            message = errors.message;
+            title = errors.statusText;
+        }
+        this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
     }
 
 }

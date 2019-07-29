@@ -1,15 +1,17 @@
 import { Component, EventEmitter, Output } from '@angular/core';
+import { formatDate } from '@angular/common';
+
 import { forkJoin } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AppPage, IComboGirdConfig } from 'src/app/app.base';
-import { GlobalState } from 'src/app/global-state';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { Currency, Partner, User } from 'src/app/shared/models';
 import { SystemRepo } from 'src/app/shared/repositories';
-import moment from 'moment';
-import { BaseService } from 'src/app/shared/services';
+import { BaseService, SortService } from 'src/app/shared/services';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
+
+
 
 @Component({
     selector: 'soa-search-box',
@@ -46,9 +48,9 @@ export class StatementOfAccountSearchComponent extends AppPage {
 
     constructor(
         private _sysRepo: SystemRepo,
-        private _globalState: GlobalState,
         private _baseService: BaseService,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _sortService: SortService
     ) {
         super();
     }
@@ -74,10 +76,11 @@ export class StatementOfAccountSearchComponent extends AppPage {
                 ([dataCurrency, dataSystemUser, dataPartner]: any) => {
                     this.partners = this.mapModel(dataPartner, Partner);
                     // * add all value into partners data
-                    this.partners.unshift(new Partner({ taxCode: 'All', shortName: 'All', partnerNameEn: 'All' })); 
+                    this.partners.push(new Partner({ taxCode: 'All', shortName: 'All', partnerNameEn: 'All' }));
                     this.selectedPartner = { field: 'partnerNameEn', value: 'All' };
 
-                    this.currencyList = <any>this.utility.prepareNg2SelectData(this.mapModel(dataCurrency, Currency), 'id', 'currencyName');
+                    this.partners = this._sortService.sort(this.partners, 'shortName', true);
+                    this.currencyList = <any>this.utility.prepareNg2SelectData(this.mapModel(dataCurrency, Currency), 'id', 'id');
                     this.selectedCurrency = [this.currencyList.filter((item: any) => item.id === 'VND')[0]];
 
                     this.users = <any>this.utility.prepareNg2SelectData(this.mapModel(dataSystemUser, User), 'id', 'username');
@@ -91,21 +94,9 @@ export class StatementOfAccountSearchComponent extends AppPage {
                         { field: 'partnerNameEn', label: 'Customer Name [EN]' },
                     ];
                     this.configPartner.selectedDisplayFields = ['partnerNameEn'];
-
-                    // * Share data for another components/Pages
-                    this._globalState.notifyDataChanged('partner', this.partners);
-                    this._globalState.notifyDataChanged('currency', dataCurrency);
-                    this._globalState.notifyDataChanged('system-user', dataSystemUser);
-
                 },
                 (errors: any) => {
-                    let message: string = 'Has Error Please Check Again !';
-                    let title: string = '';
-                    if (errors instanceof HttpErrorResponse) {
-                        message = errors.message;
-                        title = errors.statusText;
-                    }
-                    this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
+                    this.handleError(errors);
                 },
                 // complete
                 () => { }
@@ -156,13 +147,12 @@ export class StatementOfAccountSearchComponent extends AppPage {
         const body = {
             strCodes: this.reference.replace(/(?:\r\n|\r|\n|\\n|\\r)/g, ',').split(',').toString().trim(),
             customerID: (this.selectedPartner.value === 'All' ? '' : this.selectedPartner.value) || '',
-            soaFromDateCreate: moment((!!this.selectedRange ? this.selectedRange.startDate : new Date())).format("YYYY-MM-DD") || '',
-            soaToDateCreate: moment((!!this.selectedRange ? this.selectedRange.endDate : new Date())).format("YYYY-MM-DD") || '',
-            soaStatus: this.selectedStatus.name,
-            soaCurrency: this.selectedCurrency[0].id || 'VND',
+            soaFromDateCreate: !!this.selectedRange.startDate ? formatDate(this.selectedRange.startDate, 'yyyy-MM-dd', 'en') : null,
+            soaToDateCreate: !!this.selectedRange.endDate ? formatDate(this.selectedRange.endDate, 'yyyy-MM-dd', 'en') : null,
+            soaStatus: this.selectedStatus.name || null,
+            soaCurrency: this.selectedCurrency[0].id || null,
             soaUserCreate: this.currentUser[0].id || '',
         };
-
         this.onSearch.emit(body);
     }
 
@@ -175,6 +165,16 @@ export class StatementOfAccountSearchComponent extends AppPage {
 
         // ? search again!
         this.onSearch.emit({});
+    }
+
+    handleError(errors: any) {
+        let message: string = 'Has Error Please Check Again !';
+        let title: string = '';
+        if (errors instanceof HttpErrorResponse) {
+            message = errors.message;
+            title = errors.statusText;
+        }
+        this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
     }
 
 }

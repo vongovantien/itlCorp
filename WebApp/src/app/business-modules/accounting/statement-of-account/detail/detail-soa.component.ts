@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AccoutingRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { NgxSpinnerService } from 'ngx-spinner';
@@ -27,10 +27,11 @@ export class StatementOfAccountDetailComponent extends AppList {
         private _accoutingRepo: AccoutingRepo,
         private _spinner: NgxSpinnerService,
         private _toastService: ToastrService,
-        private _sortService: SortService
+        private _sortService: SortService,
+        private _router: Router
     ) {
         super();
-        this.requestList = this.sortChargeList
+        this.requestList = this.sortChargeList;
     }
 
     ngOnInit() {
@@ -52,7 +53,6 @@ export class StatementOfAccountDetailComponent extends AppList {
             if (!!params.no && params.currency) {
                 this.soaNO = params.no;
                 this.currencyLocal = params.currency;
-                // tslint:disable-next-line: semicolon
                 this.getDetailSOA(this.soaNO, this.currencyLocal)
             }
         });
@@ -72,13 +72,7 @@ export class StatementOfAccountDetailComponent extends AppList {
                     console.log(this.soa);
                 },
                 (errors: any) => {
-                    let message: string = 'Has Error Please Check Again !';
-                    let title: string = '';
-                    if (errors instanceof HttpErrorResponse) {
-                        message = errors.message;
-                        title = errors.statusText;
-                    }
-                    this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
+                    this.handleError(errors);
                 },
                 () => { }
             );
@@ -86,6 +80,20 @@ export class StatementOfAccountDetailComponent extends AppList {
 
     sortChargeList(sortField?: string, order?: boolean) {
         this.soa.chargeShipments = this._sortService.sort(this.soa.chargeShipments, sortField, order);
+    }
+
+    handleError(errors: any) {
+        let message: string = 'Has Error Please Check Again !';
+        let title: string = '';
+        if (errors instanceof HttpErrorResponse) {
+            message = errors.message;
+            title = errors.statusText;
+        }
+        this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
+    }
+
+    back() {
+        this._router.navigate(['home/accounting/statement-of-account']);
     }
 
 }

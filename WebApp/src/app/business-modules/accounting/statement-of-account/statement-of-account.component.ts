@@ -53,13 +53,7 @@ export class StatementOfAccountComponent extends AppList {
                 this.getSOAs();
             },
             (errors: any) => {
-                let message: string = 'Has Error Please Check Again !';
-                let title: string = '';
-                if (errors instanceof HttpErrorResponse) {
-                    message = errors.message;
-                    title = errors.statusText;
-                }
-                this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
+                this.handleError(errors);
             },
             () => { }
         );
@@ -75,12 +69,23 @@ export class StatementOfAccountComponent extends AppList {
                 (res: any) => {
                     this.SOAs = (res.data || []).map((item: SOA) => new SOA(item));
                     this.totalItems = res.totalItems || 0;
-                    console.log(this.SOAs, this.totalItems);
                 },
-                (errors: any) => { },
+                (errors: any) => {
+                    this.handleError(errors);
+                 },
                 () => { }
 
             );
+    }
+
+    handleError(errors: any) {
+        let message: string = 'Has Error Please Check Again !';
+        let title: string = '';
+        if (errors instanceof HttpErrorResponse) {
+            message = errors.message;
+            title = errors.statusText;
+        }
+        this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
     }
 
 }

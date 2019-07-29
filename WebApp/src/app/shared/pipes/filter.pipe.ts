@@ -7,10 +7,14 @@ export class FilterPipe implements PipeTransform {
         if (!!sources.length) {
             return sources.filter((item: any) => {
                 for (const key of keys) {
-                    if (item.hasOwnProperty(key) && item[key].search(searchText) === -1) {
-                        continue;
+                    if (item.hasOwnProperty(key) && !!item[key] ) {
+                        if (item[key].search(searchText) === -1) {
+                            continue;
+                        }
+                        return item[key].search(searchText) !== -1;
+                    } else {
+                        return item;
                     }
-                    return item[key].search(searchText) !== -1;
                 }
             });
         } return sources;

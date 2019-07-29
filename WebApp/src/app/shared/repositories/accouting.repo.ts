@@ -14,18 +14,14 @@ export class AccoutingRepo {
     getListChargeShipment(data: any = {}) {
         return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/CsShipmentSurcharge/ListChargeShipment`, data).pipe(
             catchError((error) => throwError(error)),
-            map((data: any) => {
-                return data;
-            })
+            map((data: any) => data)
         );
     }
 
     createSOA(data: any = {}) {
         return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/AcctSOA/Add`, data).pipe(
             catchError((error) => throwError(error)),
-            map((data: any) => {
-                return data;
-            })
+            map((data: any) => data)
         );
     }
 
@@ -41,9 +37,7 @@ export class AccoutingRepo {
         } else {
             return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSOA`).pipe(
                 catchError((error) => throwError(error)),
-                map((data: any) => {
-                    return data;
-                })
+                map((data: any) => data)
             );
         }
     }
@@ -52,9 +46,7 @@ export class AccoutingRepo {
         return this._api.delete(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSOA/delete`, { soaNo: soaNO })
             .pipe(
                 catchError((error) => throwError(error)),
-                map((data: any) => {
-                    return data;
-                })
+                map((data: any) => data)
             );
     }
 
@@ -62,9 +54,7 @@ export class AccoutingRepo {
         return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSOA/GetBySoaNo/${soaNO}&${currency}`)
             .pipe(
                 catchError((error) => throwError(error)),
-                map((data: any) => {
-                    return data;
-                })
+                map((data: any) => data)
             );
     }
 }

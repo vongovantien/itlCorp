@@ -6,9 +6,9 @@ import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import _includes from 'lodash/includes';
 import _uniq from 'lodash/uniq';
 import { Charge } from 'src/app/shared/models';
-import moment from 'moment';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
+import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'form-create-soa',
@@ -93,13 +93,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                     this.configPartner.selectedDisplayFields = ['partnerNameEn'];
                 },
                 (errors: any) => {
-                    let message: string = 'Has Error Please Check Again !';
-                    let title: string = '';
-                    if (errors instanceof HttpErrorResponse) {
-                        message = errors.message;
-                        title = errors.statusText;
-                    }
-                    this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
+                    this.handleError(errors);
                 },
                 // complete
                 () => { }
@@ -115,13 +109,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                     this.selectedCurrency = [this.currencyList.filter((curr) => curr.id === "VND")[0]];
                 },
                 (errors: any) => {
-                    let message: string = 'Has Error Please Check Again !';
-                    let title: string = '';
-                    if (errors instanceof HttpErrorResponse) {
-                        message = errors.message;
-                        title = errors.statusText;
-                    }
-                    this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
+                    this.handleError(errors);
                 },
                 // complete
                 () => { }
@@ -137,13 +125,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                     this.selectedUser = [this.users.filter((i: any) => i.id === 'admin')[0]];
                 },
                 (errors: any) => {
-                    let message: string = 'Has Error Please Check Again !';
-                    let title: string = '';
-                    if (errors instanceof HttpErrorResponse) {
-                        message = errors.message;
-                        title = errors.statusText;
-                    }
-                    this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
+                    this.handleError(errors);
                 },
                 // complete
                 () => { }
@@ -165,13 +147,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 this.configCharge.selectedDisplayFields = ['code'];
             },
                 (errors: any) => {
-                    let message: string = 'Has Error Please Check Again !';
-                    let title: string = '';
-                    if (errors instanceof HttpErrorResponse) {
-                        message = errors.message;
-                        title = errors.statusText;
-                    }
-                    this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
+                    this.handleError(errors);
                 },
                 // complete
                 () => { }
@@ -318,8 +294,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 currency: this.selectedCurrency[0].id,
                 customerID: this.selectedPartner.value || '',
                 dateType: this.selectedDateMode[0].id,
-                fromDate: moment(this.selectedRangeDate.startDate).format("YYYY-MM-DD"),
-                toDate: moment(this.selectedRangeDate.endDate).format("YYYY-MM-DD"),
+                fromDate: formatDate(this.selectedRangeDate.startDate, 'yyyy-MM-dd', 'vi'),
+                toDate: formatDate(this.selectedRangeDate.endDate, 'yyyy-MM-dd', 'vi'),
                 type: this.selectedType[0].text,
                 isOBH: this.selectedObh[0].id === 1 ? true : false,
                 strCreators: this.selectedUser.map((item: any) => item.id).toString(),
@@ -346,5 +322,15 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
             }
         }
         return _uniq(result);
+    }
+
+    handleError(errors: any) {
+        let message: string = 'Has Error Please Check Again !';
+        let title: string = '';
+        if (errors instanceof HttpErrorResponse) {
+            message = errors.message;
+            title = errors.statusText;
+        }
+        this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
     }
 }
