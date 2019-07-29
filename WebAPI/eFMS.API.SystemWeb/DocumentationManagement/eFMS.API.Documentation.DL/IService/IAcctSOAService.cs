@@ -16,5 +16,9 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState UpdateSOASurCharge(string soaNo);
 
         AcctSOADetailResult GetBySoaNoAndCurrencyLocal(string soaNo, string currencyLocal);
+
+        object GetListServices();
+
+        object GetListStatusSoa();
     }
 }

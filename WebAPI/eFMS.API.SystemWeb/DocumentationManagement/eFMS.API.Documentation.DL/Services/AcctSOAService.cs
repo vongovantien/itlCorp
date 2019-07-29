@@ -32,9 +32,9 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var soa = mapper.Map<AcctSoa>(model);
-                soa.Soano = CreateSoaNo(dc);
+                soa.Soano = model.Soano = CreateSoaNo(dc);
                 var hs = dc.AcctSoa.Add(soa);
-
+                
                 var surcharge = dc.CsShipmentSurcharge.Where(x => model.SurchargeIds != null
                                                                && model.SurchargeIds.Contains(x.Id)
                                                                && (x.Soano == null || x.Soano == "")).ToList();
@@ -50,8 +50,8 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                     );
                 }
-
-                dc.SaveChanges();
+                
+                dc.SaveChanges();               
                 return new HandleState();
             }
             catch (Exception ex)
@@ -178,6 +178,16 @@ namespace eFMS.API.Documentation.DL.Services
                 SqlParam.GetParameter("soaNo", soaNo)
             };
             return ((eFMSDataContext)DataContext.DC).ExecuteProcedure<spc_GetListChargeShipmentMasterBySOANo>(parameters);
+        }
+
+        public object GetListServices()
+        {
+            return CustomData.Services;
+        }
+
+        public object GetListStatusSoa()
+        {
+            return CustomData.StatusSoa;
         }
     }
 }
