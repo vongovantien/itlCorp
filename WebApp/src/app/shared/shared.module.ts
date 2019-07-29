@@ -9,7 +9,7 @@ import { ModalModule } from "ngx-bootstrap/modal";
 import { API_MENU } from "../../constants/api-menu.const";
 import { RepositoryModule } from "./repositories/repository.module";
 import { ServiceModule } from "./services/service.module";
-import { SearchStage, FilterPipe } from "./pipes";
+import { SearchStage, FilterPipe, NegativeNumberePipe } from "./pipes";
 
 import { InfoPopupComponent, ConfirmPopupComponent } from "./common/popup";
 import { DecimalNumberGreaterThan0Directive, StyleCellDirective, AutofocusDirective, TwoDigitDecimaNumberDirective, ThreeDigitDecimaNumberDirective, IntergerInputDirective, SpecialCharacterDirective, EcusSpecicalCharacterAllowSpaceDirective, EcusSpecicalCharacterNoSpaceDirective } from "./directives";
@@ -24,7 +24,8 @@ const Libary = [
 
 const APP_PIPES = [
   SearchStage,
-  FilterPipe
+  FilterPipe,
+  NegativeNumberePipe
 ];
 
 const APP_POPUP = [
