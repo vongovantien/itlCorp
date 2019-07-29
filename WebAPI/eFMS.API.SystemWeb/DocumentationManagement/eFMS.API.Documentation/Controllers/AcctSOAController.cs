@@ -72,7 +72,7 @@ namespace eFMS.API.Documentation.Controllers
             var hs = acctSOAService.AddSOA(model);
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
             {
                 return BadRequest(result);
@@ -130,5 +130,28 @@ namespace eFMS.API.Documentation.Controllers
             var results = acctSOAService.GetBySoaNoAndCurrencyLocal(soaNo, currencyLocal);
             return Ok(results);
         }
+
+        /// <summary>
+        /// get list services
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetListServices")]
+        public IActionResult GetListServices()
+        {
+            var results = acctSOAService.GetListServices();
+            return Ok(results);
+        }
+
+        /// <summary>
+        /// get list status of soa
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetListStatusSoa")]
+        public IActionResult GetListStatusSoa()
+        {
+            var results = acctSOAService.GetListStatusSoa();
+            return Ok(results);
+        }
+
     }
 }

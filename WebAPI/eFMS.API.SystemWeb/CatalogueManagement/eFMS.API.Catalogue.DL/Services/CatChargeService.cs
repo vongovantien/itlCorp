@@ -293,9 +293,5 @@ namespace eFMS.API.Catalogue.DL.Services
             }
         }
 
-        public object GetServicesData()
-        {
-            return CustomData.Services;
-        }
     }
 }
