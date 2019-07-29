@@ -65,7 +65,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
 
     addCharge() {
         this.addChargePopup.show();
-        this._globalState.notifyDataChanged('system-user', []);
     }
 
     getBasicData() {
@@ -126,7 +125,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
                             this.isCheckAllCharge = false; // ? reset checkbox all
 
                             //  * go to detail page
-                            this._router.navigate(['home/accounting/statement-of-account/detail'], { queryParams: { no: '1900004', currency: 'VND' } });
+                            this._router.navigate(['home/accounting/statement-of-account/detail'], { queryParams: { no: res.data.soano, currency: 'VND' } });
 
                         } else {
                             this._toastService.error(res, '', { positionClass: 'toast-bottom-right' });
@@ -157,7 +156,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
                     this.charges = res.chargeShipments || [];
                     this.totalCharge = res.totalCharge;
                     this.totalShipment = res.totalShipment;
-                    console.log(this.charges);
                 },
                 (errors: any) => {
                     let message: string = 'Has Error Please Check Again !';

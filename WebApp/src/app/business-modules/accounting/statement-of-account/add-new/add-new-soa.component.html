@@ -16,7 +16,8 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="m-input-icon m-input-icon--right">
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Search" [(ngModel)]="keyword" name="keyword">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Search"
+                                [(ngModel)]="keyword" name="keyword">
                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                 <span>
                                     <i class="la la-search"></i>
@@ -91,7 +92,8 @@
                                     </div>
                                 </td>
                             </tr>
-                            <tr *ngFor="let charge of charges | filter: keyword:['chargeCode', 'hbl'] ; let i = index; trackBy: trackByFn">
+                            <tr
+                                *ngFor="let charge of charges | filter: keyword:[ 'jobId', 'chargeCode', 'hbl', 'chargeName', 'hbl',  'mbl', 'currency'] ; let i = index; trackBy: trackByFn">
                                 <td class="table-actions-col">
                                     <div class="table-actions">
                                         <label class="m-checkbox">

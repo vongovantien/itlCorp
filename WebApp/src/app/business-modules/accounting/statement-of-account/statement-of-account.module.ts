@@ -1,5 +1,5 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgModule, LOCALE_ID } from '@angular/core';
+import { CommonModule, registerLocaleData } from '@angular/common';
 import { StatementOfAccountComponent } from './statement-of-account.component';
 import { AccountReceivePayableComponent } from './account-receive-payable/account-receive-payable.component';
 import { StatementOfAccountDetailComponent } from './detail/detail-soa.component';
@@ -15,7 +15,9 @@ import { StatementOfAccountAddChargeComponent } from './components/poup/add-char
 import { SharedModule } from 'src/app/shared/shared.module';
 import { StatementOfAccountFormCreateComponent } from './components/form-create-soa/form-create-soa.component';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
+import localeVi from '@angular/common/locales/vi';
 
+registerLocaleData(localeVi, 'vi');
 const routing: Routes = [
     {
         path: "", component: StatementOfAccountComponent,
@@ -81,10 +83,14 @@ const COMPONENTS = [
         AccordionModule.forRoot(),
     ],
     exports: [],
-    providers: [],
+    providers: [
+        { provide: LOCALE_ID, useValue: 'vi' },
+
+    ],
     bootstrap: [
         StatementOfAccountComponent
-    ]
+    ],
+
 })
 export class StatementOfAccountModule {
     static routing = routing;

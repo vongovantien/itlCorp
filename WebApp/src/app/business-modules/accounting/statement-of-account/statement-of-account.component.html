@@ -109,7 +109,7 @@
                                                         <span>{{soa.shipment}}</span>
                                                     </td>
                                                     <td>
-                                                        <span>{{soa.creditAmount | number: '.0-2'}} {{soa.currency}}</span>
+                                                        <span>{{soa.creditAmount | number :'.0-2'}} {{soa.currency}}</span>
                                                     </td>
                                                     <td>
                                                         <span>{{soa.debitAmount | number: '.0-2'}} {{soa.currency}}</span>
@@ -122,7 +122,7 @@
                                                             [ngClass]="soa.status === 'Done' ? 'm--font-success' : 'm--font-danger'">{{soa.status}}</span>
                                                     </td>
                                                     <td>
-                                                        <span>{{soa.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}</span>
+                                                        <span>{{soa.datetimeCreated | date :'dd/MM/yyyy HH:mm'}}</span>
                                                     </td>
                                                     <td>
                                                         <span>{{soa.userCreated}}</span>

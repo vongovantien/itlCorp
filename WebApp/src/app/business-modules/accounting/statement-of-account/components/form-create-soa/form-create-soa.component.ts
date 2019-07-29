@@ -6,9 +6,9 @@ import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import _includes from 'lodash/includes';
 import _uniq from 'lodash/uniq';
 import { Charge } from 'src/app/shared/models';
-import moment from 'moment';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
+import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'form-create-soa',
@@ -294,8 +294,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 currency: this.selectedCurrency[0].id,
                 customerID: this.selectedPartner.value || '',
                 dateType: this.selectedDateMode[0].id,
-                fromDate: moment(this.selectedRangeDate.startDate).format("YYYY-MM-DD"),
-                toDate: moment(this.selectedRangeDate.endDate).format("YYYY-MM-DD"),
+                fromDate: formatDate(this.selectedRangeDate.startDate, 'yyyy-MM-dd', 'vi'),
+                toDate: formatDate(this.selectedRangeDate.endDate, 'yyyy-MM-dd', 'vi'),
                 type: this.selectedType[0].text,
                 isOBH: this.selectedObh[0].id === 1 ? true : false,
                 strCreators: this.selectedUser.map((item: any) => item.id).toString(),

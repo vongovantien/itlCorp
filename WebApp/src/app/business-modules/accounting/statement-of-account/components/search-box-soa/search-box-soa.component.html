@@ -15,7 +15,6 @@
                         <label class="form-control-label" for="">
                             Partner
                         </label>
-                        {{!!selectedPartner}}
                         <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPartner"
                             (itemSelected)="onSelectDataFormSearch($event, 'partner')"
                             [selectedDisplayFields]="configPartner.selectedDisplayFields"

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AccoutingRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { NgxSpinnerService } from 'ngx-spinner';
@@ -27,10 +27,11 @@ export class StatementOfAccountDetailComponent extends AppList {
         private _accoutingRepo: AccoutingRepo,
         private _spinner: NgxSpinnerService,
         private _toastService: ToastrService,
-        private _sortService: SortService
+        private _sortService: SortService,
+        private _router: Router
     ) {
         super();
-        this.requestList = this.sortChargeList
+        this.requestList = this.sortChargeList;
     }
 
     ngOnInit() {
@@ -89,6 +90,10 @@ export class StatementOfAccountDetailComponent extends AppList {
             title = errors.statusText;
         }
         this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
+    }
+
+    back() {
+        this._router.navigate(['home/accounting/statement-of-account']);
     }
 
 }

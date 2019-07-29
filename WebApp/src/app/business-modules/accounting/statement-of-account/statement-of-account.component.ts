@@ -69,7 +69,6 @@ export class StatementOfAccountComponent extends AppList {
                 (res: any) => {
                     this.SOAs = (res.data || []).map((item: SOA) => new SOA(item));
                     this.totalItems = res.totalItems || 0;
-                    console.log(this.SOAs, this.totalItems);
                 },
                 (errors: any) => {
                     this.handleError(errors);
