@@ -165,7 +165,8 @@
                 <div class="row">
                     <div class="col-lg-12 c-button-actions">
                         <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                            id="btnDeleteCustomClearance" data-toggle="modal" data-target="#confirm-delete-modal" (click)="confirmDelete()">
+                            id="btnDeleteCustomClearance" data-toggle="modal" data-target="#confirm-delete-modal"
+                            (click)="confirmDelete()">
                             <span>
                                 <i class="la la-trash"></i>
                                 <span>
@@ -173,8 +174,8 @@
                                 </span>
                             </span>
                         </button>
-                        <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase" (click)="confirmConvert()"
-                            data-toggle="" data-target="">
+                        <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase"
+                            (click)="confirmConvert()" data-toggle="" data-target="">
                             <span>
                                 <i class="la la-exchange"></i>
                                 <span>
@@ -182,7 +183,8 @@
                                 </span>
                             </span>
                         </button>
-                        <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" (click)="getDataFromEcus()">
+                        <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                            (click)="getDataFromEcus()">
                             <span>
                                 <i class="la la-refresh"></i>
                                 <span>
@@ -258,7 +260,7 @@
                                 </div>
                             </td>
                             <td>
-                                <a href="javascript:void(0)"
+                                <a [routerLink]="['/home/operation/custom-clearance-edit', { id: custom.id }]"
                                     (click)="gotoEditPage(custom.id)">{{custom.clearanceNo}}</a>
                             </td>
                             <td>
@@ -396,7 +398,8 @@
 <!--end::confirm-convert-modal-->
 
 <!--begin::delete-alert-modal-->
-<div class="modal fade" id="delete-alert-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<div class="modal fade" id="delete-alert-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -407,7 +410,8 @@
             </div>
             <div class="modal-body">
                 <div class="confirm-text-block">
-                    <span>You haven't selected any custom clearance yet. Please select one or more custom no to delete !</span>
+                    <span>You haven't selected any custom clearance yet. Please select one or more custom no to delete
+                        !</span>
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
@@ -422,5 +426,5 @@
             </div>
         </div>
     </div>
-  </div>
-  <!--end::delete-alert-modal-->
+</div>
+<!--end::delete-alert-modal-->

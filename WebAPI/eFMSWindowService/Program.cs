@@ -34,9 +34,9 @@ namespace eFMSWindowService
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
-                //new Service1()
-                new UpdateCurrentStatusOfJobService(),
-                new UpdateExchangeRate()
+                //new Service1(),
+                new UpdateExchangeRate(),
+                new UpdateCurrentStatusOfJobService()
             };
             ServiceBase.Run(ServicesToRun);
 //#endif
