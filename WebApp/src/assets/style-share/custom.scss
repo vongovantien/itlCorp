@@ -78,6 +78,7 @@ body {
 
 body {
     overflow-y: scroll;
+    font-size:15px;
     // &.body-fixed {
     //     width: 100%;
     //     position: fixed;
@@ -307,7 +308,7 @@ a {
 }
 
 .table {
-    font-size: 12px;
+    font-size: 13px;
     margin-bottom: 0;
     * {
         white-space: pre-wrap; // to fix trim white-space
