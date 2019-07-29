@@ -99,7 +99,7 @@
                                                             </button>
                                                         </div>
                                                     </td>
-                                                    <td>
+                                                    <td class="text-underline">
                                                         <a [routerLink]="['/home/accounting/statement-of-account/detail/']" [queryParams]="{no: soa.soano, currency: 'VND'}">{{soa.soano}}</a>
                                                     </td>
                                                     <td>
@@ -109,26 +109,26 @@
                                                         <span>{{soa.shipment}}</span>
                                                     </td>
                                                     <td>
-                                                        <span>{{soa.creditAmount | number: '.0-2'}}</span>
+                                                        <span>{{soa.creditAmount | number: '.0-2'}} {{soa.currency}}</span>
                                                     </td>
                                                     <td>
-                                                        <span>{{soa.debitAmount | number: '.0-2'}}</span>
+                                                        <span>{{soa.debitAmount | number: '.0-2'}} {{soa.currency}}</span>
                                                     </td>
                                                     <td>
-                                                        <span>{{soa.totalAmount | number: '.0-2'}}</span>
+                                                        <span>{{soa.totalAmount | number: '.0-2'}} {{soa.currency}}</span>
                                                     </td>
                                                     <td>
                                                         <span
                                                             [ngClass]="soa.status === 'Done' ? 'm--font-success' : 'm--font-danger'">{{soa.status}}</span>
                                                     </td>
                                                     <td>
-                                                        <span>{{soa.datetimeCreated | date: 'dd/MM/yyyy'}}</span>
+                                                        <span>{{soa.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}</span>
                                                     </td>
                                                     <td>
                                                         <span>{{soa.userCreated}}</span>
                                                     </td>
                                                     <td>
-                                                        <span>{{soa.datetimeModified | date: 'dd/MM/yyyy'}}</span>
+                                                        <span>{{soa.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}</span>
                                                     </td>
                                                 </tr>
                                                 <tr class="loading-wrapper" *ngIf="isLoading">

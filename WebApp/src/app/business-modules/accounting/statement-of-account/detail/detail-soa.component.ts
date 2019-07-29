@@ -52,7 +52,6 @@ export class StatementOfAccountDetailComponent extends AppList {
             if (!!params.no && params.currency) {
                 this.soaNO = params.no;
                 this.currencyLocal = params.currency;
-                // tslint:disable-next-line: semicolon
                 this.getDetailSOA(this.soaNO, this.currencyLocal)
             }
         });
@@ -72,13 +71,7 @@ export class StatementOfAccountDetailComponent extends AppList {
                     console.log(this.soa);
                 },
                 (errors: any) => {
-                    let message: string = 'Has Error Please Check Again !';
-                    let title: string = '';
-                    if (errors instanceof HttpErrorResponse) {
-                        message = errors.message;
-                        title = errors.statusText;
-                    }
-                    this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
+                    this.handleError(errors);
                 },
                 () => { }
             );
@@ -86,6 +79,16 @@ export class StatementOfAccountDetailComponent extends AppList {
 
     sortChargeList(sortField?: string, order?: boolean) {
         this.soa.chargeShipments = this._sortService.sort(this.soa.chargeShipments, sortField, order);
+    }
+
+    handleError(errors: any) {
+        let message: string = 'Has Error Please Check Again !';
+        let title: string = '';
+        if (errors instanceof HttpErrorResponse) {
+            message = errors.message;
+            title = errors.statusText;
+        }
+        this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
     }
 
 }

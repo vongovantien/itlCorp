@@ -77,7 +77,7 @@ export class StatementOfAccountSearchComponent extends AppPage {
                     this.partners.unshift(new Partner({ taxCode: 'All', shortName: 'All', partnerNameEn: 'All' })); 
                     this.selectedPartner = { field: 'partnerNameEn', value: 'All' };
 
-                    this.currencyList = <any>this.utility.prepareNg2SelectData(this.mapModel(dataCurrency, Currency), 'id', 'currencyName');
+                    this.currencyList = <any>this.utility.prepareNg2SelectData(this.mapModel(dataCurrency, Currency), 'id', 'id');
                     this.selectedCurrency = [this.currencyList.filter((item: any) => item.id === 'VND')[0]];
 
                     this.users = <any>this.utility.prepareNg2SelectData(this.mapModel(dataSystemUser, User), 'id', 'username');
@@ -99,13 +99,7 @@ export class StatementOfAccountSearchComponent extends AppPage {
 
                 },
                 (errors: any) => {
-                    let message: string = 'Has Error Please Check Again !';
-                    let title: string = '';
-                    if (errors instanceof HttpErrorResponse) {
-                        message = errors.message;
-                        title = errors.statusText;
-                    }
-                    this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
+                    this.handleError(errors);
                 },
                 // complete
                 () => { }
@@ -156,10 +150,10 @@ export class StatementOfAccountSearchComponent extends AppPage {
         const body = {
             strCodes: this.reference.replace(/(?:\r\n|\r|\n|\\n|\\r)/g, ',').split(',').toString().trim(),
             customerID: (this.selectedPartner.value === 'All' ? '' : this.selectedPartner.value) || '',
-            soaFromDateCreate: moment((!!this.selectedRange ? this.selectedRange.startDate : new Date())).format("YYYY-MM-DD") || '',
-            soaToDateCreate: moment((!!this.selectedRange ? this.selectedRange.endDate : new Date())).format("YYYY-MM-DD") || '',
-            soaStatus: this.selectedStatus.name,
-            soaCurrency: this.selectedCurrency[0].id || 'VND',
+            soaFromDateCreate: !!this.selectedRange.startDate ? moment(this.selectedRange.startDate).format("YYYY-MM-DD") : null,
+            soaToDateCreate: !!this.selectedRange.endDate ? moment(this.selectedRange.endDate).format("YYYY-MM-DD") : null,
+            soaStatus: this.selectedStatus.name || null,
+            soaCurrency: this.selectedCurrency[0].id || null,
             soaUserCreate: this.currentUser[0].id || '',
         };
 
@@ -175,6 +169,16 @@ export class StatementOfAccountSearchComponent extends AppPage {
 
         // ? search again!
         this.onSearch.emit({});
+    }
+
+    handleError(errors: any) {
+        let message: string = 'Has Error Please Check Again !';
+        let title: string = '';
+        if (errors instanceof HttpErrorResponse) {
+            message = errors.message;
+            title = errors.statusText;
+        }
+        this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
     }
 
 }
