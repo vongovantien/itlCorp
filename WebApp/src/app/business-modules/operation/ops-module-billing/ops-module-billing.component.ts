@@ -8,7 +8,6 @@ import * as shipmentHelper from 'src/helper/shipment.helper';
 import * as dataHelper from 'src/helper/data.helper';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { SortService } from 'src/app/shared/services/sort.service';
-import { StageConstants } from 'src/constants/stage.const';
 import { JobConstants } from 'src/constants/job.const';
 import { ConfirmDeleteJobPopupComponent } from '../job-edit/job-confirm-popup/confirm-delete-job-popup/confirm-delete-job-popup.component';
 import { CanNotDeleteJobPopupComponent } from '../job-edit/job-confirm-popup/can-not-delete-job-popup/can-not-delete-job-popup.component';

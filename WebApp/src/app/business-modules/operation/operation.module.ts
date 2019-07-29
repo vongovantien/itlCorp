@@ -35,6 +35,7 @@ import { CancelCreateJobPopupComponent } from './job-edit/job-confirm-popup/canc
 import { CanNotDeleteJobPopupComponent } from './job-edit/job-confirm-popup/can-not-delete-job-popup/can-not-delete-job-popup.component';
 import { ConfirmCancelJobPopupComponent } from './job-edit/job-confirm-popup/confirm-cancel-job-popup/confirm-cancel-job-popup.component';
 import { ConfirmDeleteJobPopupComponent } from './job-edit/job-confirm-popup/confirm-delete-job-popup/confirm-delete-job-popup.component';
+import { ChargeListComponent } from './job-edit/charge-list/charge-list.component';
 
 
 const LIB = [
@@ -86,7 +87,8 @@ const LIB = [
         CancelCreateJobPopupComponent,
         CanNotDeleteJobPopupComponent,
         ConfirmCancelJobPopupComponent,
-        ConfirmDeleteJobPopupComponent
+        ConfirmDeleteJobPopupComponent,
+        ChargeListComponent
     ]
 })
 export class OperationModule { }

@@ -9,9 +9,11 @@ namespace eFMS.API.Shipment.Infrastructure.Common
     {
         public static string GetMessage(HandleState hs, Crud crud)
         {
-          
             string message = LanguageSub.MSG_DATA_NOT_FOUND;
-
+            if (hs.Exception != null)
+            {
+                message = hs.Exception.Message;
+            }
 
             switch (hs.Code)
             {

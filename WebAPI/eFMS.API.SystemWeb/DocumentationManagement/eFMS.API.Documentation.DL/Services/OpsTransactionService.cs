@@ -107,10 +107,17 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var data = Query(criteria);
             rowsCount = data.Count();
-            var totalProcessing = data.Count(x => x.CurrentStatus == DataTypeEx.GetJobStatus(JobStatus.Processing));
-            var totalfinish = data.Count(x => x.CurrentStatus == DataTypeEx.GetJobStatus(JobStatus.Finish));
-            var totalOverdued = data.Count(x => x.CurrentStatus == DataTypeEx.GetJobStatus(JobStatus.Overdued));
-            var totalCanceled = DataContext.Count(x => x.CurrentStatus == TermData.Canceled); //data.Count(x => x.CurrentStatus == DataTypeEx.GetJobStatus(JobStatus.Canceled));
+            var totalProcessing = data.Count(x => x.CurrentStatus == TermData.Processing);
+            var totalfinish = data.Count(x => x.CurrentStatus == TermData.Finish);
+            var totalOverdued = data.Count(x => x.CurrentStatus == TermData.Overdue);
+            int totalCanceled = 0;
+            if (criteria.ServiceDateFrom == null && criteria.ServiceDateTo == null)
+            {
+                int year = DateTime.Now.Year - 2;
+                criteria.ServiceDateFrom = new DateTime(year, 1, 1);
+                criteria.ServiceDateTo = new DateTime(DateTime.Now.Year, 12, 31);
+            }
+            totalCanceled = DataContext.Count(x => x.CurrentStatus == TermData.Canceled && x.ServiceDate >= criteria.ServiceDateFrom && x.ServiceDate <= criteria.ServiceDateTo); //data.Count(x => x.CurrentStatus == DataTypeEx.GetJobStatus(JobStatus.Canceled));
             if (rowsCount == 0) return null;
             if (size > 1)
             {
@@ -243,7 +250,12 @@ namespace eFMS.API.Documentation.DL.Services
             var result = new HandleState();
             try
             {
-                if(CheckExist(model.CustomsDeclaration, model.CustomsDeclaration.Id))
+                var existedMessage = CheckExist(model.OpsTransaction);
+                if (existedMessage != null)
+                {
+                    return new HandleState(existedMessage);
+                }
+                if (CheckExistClearance(model.CustomsDeclaration, model.CustomsDeclaration.Id))
                 {
                     result = new HandleState(stringLocalizer[LanguageSub.MSG_CLEARANCENO_EXISTED, model.CustomsDeclaration.ClearanceNo].Value);
                     return result;
@@ -296,7 +308,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return result;
         }
-        private bool CheckExist(CustomsDeclarationModel model, decimal id)
+        private bool CheckExistClearance(CustomsDeclarationModel model, decimal id)
         {
             if (id == 0)
             {
@@ -323,6 +335,11 @@ namespace eFMS.API.Documentation.DL.Services
                 int i = 0;
                 foreach (var item in list)
                 {
+                    var existedMessage = CheckExist(item.OpsTransaction);
+                    if (existedMessage != null)
+                    {
+                        return new HandleState(existedMessage);
+                    }
                     if (item.CustomsDeclaration.JobNo == null)
                     {
                         item.OpsTransaction.Id = Guid.NewGuid();
@@ -374,8 +391,35 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 job.CurrentStatus = TermData.Canceled;
                 result = DataContext.Update(job, x => x.Id == id);
+                if (result.Success)
+                {
+                    var clearances = ((eFMSDataContext)DataContext.DC).CustomsDeclaration.Where(x => x.JobNo == job.JobNo);
+                    if (clearances != null)
+                    {
+                        foreach(var item in clearances)
+                        {
+                            item.JobNo = null;
+                            ((eFMSDataContext)DataContext.DC).CustomsDeclaration.Update(item);
+                        }
+                    }
+                    ((eFMSDataContext)DataContext.DC).SaveChanges();
+                }
             }
             return result;
+        }
+        public string CheckExist(OpsTransactionModel model)
+        {
+            var existedHBL = DataContext.Any(x => x.Id != model.Id && x.Hwbno == model.Hwbno && x.CurrentStatus != TermData.Canceled);
+            var existedMBL = DataContext.Any(x => x.Id != model.Id && x.Mblno == model.Mblno && x.CurrentStatus != TermData.Canceled);
+            if (existedHBL)
+            {
+                return stringLocalizer[LanguageSub.MSG_HBNO_EXISTED, model.Hwbno].Value;
+            }
+            if (existedMBL)
+            {
+                return stringLocalizer[LanguageSub.MSG_MAWB_EXISTED, model.Mblno].Value;
+            }
+            return null;
         }
     }
 }

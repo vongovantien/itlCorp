@@ -94,7 +94,7 @@ namespace eFMS.API.Documentation.Controllers
         [Route("Add")]
         public IActionResult Add(OpsTransactionModel model)
         {
-            var existedMessage = CheckExist(model);
+            var existedMessage = transactionService.CheckExist(model);
             if (existedMessage != null)
             {
                 return Ok(new ResultHandle { Status = false, Message = existedMessage });
@@ -120,7 +120,7 @@ namespace eFMS.API.Documentation.Controllers
         [Route("Update")]       
         public IActionResult Update(OpsTransactionModel model)
         {
-            var existedMessage = CheckExist(model);
+            var existedMessage = transactionService.CheckExist(model);
             if (existedMessage != null)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
@@ -185,7 +185,7 @@ namespace eFMS.API.Documentation.Controllers
         {
             var hs = transactionService.ConvertClearanceToJob(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[LanguageSub.MSG_CLEARANCE_CONVERT_TO_JOB].Value };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = message };
             if (!hs.Success)
             {
                 return BadRequest(result);
@@ -204,7 +204,7 @@ namespace eFMS.API.Documentation.Controllers
         {
             HandleState hs = transactionService.ConvertExistedClearancesToJobs(list);
             var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[LanguageSub.MSG_LIST_CLEARANCE_CONVERT_TO_JOB].Value };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = message };
             if (!hs.Success)
             {
                 return BadRequest(result);
@@ -212,19 +212,19 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
-        private string CheckExist(OpsTransactionModel model)
-        {
-            var existedHBL = transactionService.Any(x => x.Id != model.Id && x.Hwbno == model.Hwbno && x.CurrentStatus != TermData.Canceled);
-            var existedMBL = transactionService.Any(x => x.Id != model.Id && x.Mblno == model.Mblno && x.CurrentStatus != TermData.Canceled);
-            if (existedHBL)
-            {
-                return "HBL no is existed !";
-            }
-            if (existedMBL)
-            {
-                return "MBL no is existed !";
-            }
-            return null;
-        }
+        //private string CheckExist(OpsTransactionModel model)
+        //{
+        //    var existedHBL = transactionService.Any(x => x.Id != model.Id && x.Hwbno == model.Hwbno && x.CurrentStatus != TermData.Canceled);
+        //    var existedMBL = transactionService.Any(x => x.Id != model.Id && x.Mblno == model.Mblno && x.CurrentStatus != TermData.Canceled);
+        //    if (existedHBL)
+        //    {
+        //        return "HBL no is existed !";
+        //    }
+        //    if (existedMBL)
+        //    {
+        //        return "MBL no is existed !";
+        //    }
+        //    return null;
+        //}
     }
 }
