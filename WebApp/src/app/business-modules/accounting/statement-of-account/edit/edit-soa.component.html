@@ -1,4 +1,3 @@
-<!--begin:: subheader-->
 <div class="m-subheader">
     <div class="d-flex align-items-center">
         <div class="mr-auto">
@@ -6,45 +5,53 @@
         </div>
     </div>
 </div>
-<!--end:: subheader-->
 
-<!--begin:: m-content -->
 <div class="m-content">
-    <!--begin:: m-portlet-->
     <div class="m-portlet">
-        <!--begin::Form-->
         <div class="m-form m-form--state">
             <div class="m-portlet__body">
                 <div class="row">
                     <div class="col-lg-4 m--margin-bottom-10">
                         <span class="m--font-bolder">SOA no:</span>
-                        <span class="m--font-brand m--margin-left-5">0123456</span>
+                        <span class="m--font-brand m--margin-left-5">{{soa.soano}}</span>
                     </div>
                     <div class="col-lg-4  m--margin-bottom-10">
                         <span class="m--font-bolder">Partner Name:</span>
-                        <span class="m--font-brand m--margin-left-5">ITL corp</span>
+                        <span class="m--font-brand m--margin-left-5">{{soa.partnerName}}</span>
                     </div>
                     <div class="col-lg-4 m--margin-bottom-10">
                         <span class="m--font-bolder">Status:</span>
-                        <span class="m--font-danger m--margin-left-5">New</span>
+                        <span class="m--font-danger m--margin-left-5">{{soa.status}}</span>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-lg-4 m--margin-bottom-10">
                         <span class="m--font-bolder">Total Amount:</span>
-                        <span class="m--font-brand m--margin-left-5">40000</span>
+                        <span class="m--font-brand m--margin-left-5">{{soa.totalAmount | negativeNumber}}</span>
                     </div>
                     <div class="col-lg-4  m--margin-bottom-10">
                         <span class="m--font-bolder">Total Shipment:</span>
-                        <span class="m--font-brand m--margin-left-5">ITL corp</span>
+                        <span class="m--font-brand m--margin-left-5">{{soa.shipment}}</span>
                     </div>
                     <div class="col-lg-4 m--margin-bottom-10">
                         <span class="m--font-bolder">Service Logistic:</span>
-                        <span class="m--font-brand m--margin-left-5"></span>
+                        <span class="m--font-brand m--margin-left-5">{{soa.servicesNameSoa}}</span>
                     </div>
                 </div>
                 <hr />
                 <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Currency
+                            </label>
+                            <select [(ngModel)]="selectedCurrency" class="form-control" name="currency">
+                                <option *ngFor="let currency of currencyList" [ngValue]="currency">{{currency.id}}
+                                </option>
+                            </select>
+
+                        </div>
+                    </div>
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
@@ -53,7 +60,7 @@
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [(ngModel)]="selectedRange"
-                                    [ranges]="ranges" [maxDate]="maxDate" [alwaysShowCalendars]="true" name="daterange"
+                                    [ranges]="ranges" [alwaysShowCalendars]="true" name="daterange"
                                     placeholder="From date - to date" readonly />
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
@@ -63,75 +70,39 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Currency
-                            </label>
-                            <ng-select [allowClear]="true" [items]="currencyList" (data)="refreshValue($event)"
-                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                placeholder="Select filter">
-                            </ng-select>
-                        </div>
-                    </div>
+
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
                                 Note
                             </label>
-                            <textarea class="form-control m-input m-input--square" name="" id="" rows="1"></textarea>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-actions">
-                    <div class="row">
-                        <div class="col-lg-6"></div>
-                        <div class="col-lg-6 m--align-right">
-                            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                                <span>
-                                    <i class="la la-download"></i>
-                                    <span>
-                                        Apply
-                                    </span>
-                                </span>
-                            </button>
+                            <textarea class="form-control m-input m-input--square" name="note" rows="1"
+                                [(ngModel)]="soa.note"></textarea>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!--end::Form-->
     </div>
-    <!--end:: m-portlets-->
 
-    <!--begin:: m-portlet-->
     <div class="m-portlet">
         <div class="m-portlet__body">
-            <!--begin:: search-form-->
             <div class="m-form m--margin-bottom-10">
                 <div class="row">
                     <div class="col-lg-6">
                         <div class="m-input-icon m-input-icon--right">
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Search">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Search"
+                                [(ngModel)]="keyword" name="keyword">
                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                 <span>
                                     <i class="la la-search"></i>
                                 </span>
                             </span>
                         </div>
-                        <div class="row m--margin-top-15">
-                            <div class="col-md-6">
-                                <span class="m--font-bolder">Total shipment:</span><span
-                                    class="m--font-brand m--margin-left-5">0</span>
-                            </div>
-                            <div class="col-md-6">
-                                <span class="m--font-bolder">Total Charge:</span><span
-                                    class="m--font-brand m--margin-left-5">0</span>
-                            </div>
-                        </div>
+
                     </div>
                     <div class="col-lg-6 m--align-right">
-                        <button type="reset" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                        <button type="reset" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="removeAllCharge()">
                             <span>
                                 <i class="la la-trash"></i>
                                 <span>
@@ -140,8 +111,7 @@
                             </span>
                         </button>
                         <button type="button"
-                            class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-left-10"
-                            (click)="addCharge()">
+                            class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-left-10">
                             <span>
                                 <i class="la la-plus"></i>
                                 <span>
@@ -152,142 +122,97 @@
                     </div>
                 </div>
             </div>
-            <!--end::search-form-->
-            <!--begin: Datatable-->
-            <div class="table-wrapper  table-scrollable fit-height-div">
+            <div class="table-wrapper">
                 <table class="table table-striped table-brand dataTable">
                     <thead>
                         <tr>
-                            <th class="table-actions-col no-sorting">
+                            <th>
                                 <label class="m-checkbox">
-                                    <input type="checkbox" name="" class="all-charges-select">
+                                    <input type="checkbox" [(ngModel)]="isCheckAllCharge"
+                                        (change)="checkUncheckAllCharge()">
                                     <span></span>
                                 </label>
                             </th>
-                            <th class="sorting">
-                                <span>Charge Code</span>
-                            </th>
-                            <th class="sorting">
-                                <span>Charge Name</span>
-                            </th>
-                            <th class="sorting">
-                                <span>JobID</span>
-                            </th>
-                            <th class="sorting">
-                                <span>HBL</span>
-                            </th>
-                            <th class="sorting">
-                                <span>MBL</span>
-                            </th>
-                            <th class="sorting">
-                                <span>Custom No</span>
-                            </th>
-                            <th class="sorting">
-                                <span>Debit</span>
-                            </th>
-                            <th class="sorting">
-                                <span>Credit</span>
-                            </th>
-                            <th class="sorting">
-                                <span>Currency</span>
-                            </th>
-                            <th class="sorting">
-                                <span>Invoice No</span>
-                            </th>
-                            <th class="sorting">
-                                <span>Services Date</span>
-                            </th>
-                            <th class="sorting">
-                                <span>Note</span>
+                            <th *ngFor="let header of headers; let i = index; trackBy: trackByFn"
+                                [class]="sortClass(header.sortable ? header.field : '')"
+                                (click)="sortBy(header.sortable ? header.field : '')">
+                                <span>{{header.title}}</span>
+                                <span class="sort-indicator"></span>
                             </th>
                         </tr>
                     </thead>
                     <tbody class="tbody-group">
-                        <tr>
+                        <tr *ngIf="!isLoading && !soa.chargeShipments.length">
+                            <td colspan="100">
+                                <div class="no-data">
+                                    <i class="flaticon-coins"></i>
+                                    <span class="no-data-text">No records found</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr
+                            *ngFor="let charge of soa.chargeShipments | filter: keyword: ['chargeCode', 'hbl', 'currency' , 'mbl' , 'jobId' , 'chargeName'] ; let i = index; trackBy: trackByFn">
                             <td class="table-actions-col">
                                 <div class="table-actions">
                                     <label class="m-checkbox">
-                                        <input type="checkbox" name="" class="single-charges-select">
+                                        <input type="checkbox" (change)="onChangeCheckBoxCharge($event)"
+                                            value="{{charge}}" [(ngModel)]="charge.isSelected" name="{{charge.code}}">
                                         <span></span>
                                     </label>
                                 </div>
                             </td>
                             <td>
-                                <span>Text</span>
+                                <span>{{charge.chargeCode}}</span>
                             </td>
                             <td>
-                                <span>Text</span>
+                                <span>{{charge.chargeName}}</span>
                             </td>
                             <td>
-                                <span>Text</span>
+                                <span>{{charge.jobId}}</span>
                             </td>
                             <td>
-                                <span>Text</span>
+                                <span>{{charge.hbl}}</span>
                             </td>
                             <td>
-                                <span>Text</span>
+                                <span>{{charge.mbl}}</span>
                             </td>
                             <td>
-                                <span>Text</span>
+                                <span>{{charge.customNo}}</span>
                             </td>
                             <td>
-                                <span>Text</span>
+                                <span>{{charge.debit}}</span>
                             </td>
                             <td>
-                                <span>Text</span>
+                                <span>{{charge.credit}}</span>
                             </td>
                             <td>
-                                <span>Text</span>
+                                <span>{{charge.currency}}</span>
                             </td>
                             <td>
-                                <span>Text</span>
+                                <span>{{charge.invoiceNo}}</span>
                             </td>
                             <td>
-                                <span>Text</span>
+                                <span>{{charge.serviceDate | date: 'dd/MM/yyyy'}}</span>
                             </td>
                             <td>
-                                <span>Text</span>
+                                <span>{{charge.note}}</span>
+                            </td>
+                        </tr>
+                        <tr class="loading-wrapper" *ngIf="isLoading">
+                            <td colspan="100">
+                                <div class="on-loading">
+                                    <div class="m-loader m-loader--brand">
+                                    </div><span>Loading</span>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <!--end: Datatable-->
-            <!--begin::pagination-->
-            <div class="pagination-nav">
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="tatable__pager-size" style="max-width: 190px">
-                            <div class="select-box">
-                                <select class="form-control m-input m-input--square" id="" aria-label="">
-                                    <option value="1">15 line/screen</option>
-                                    <option value="2">30 line/screen</option>
-                                    <option value="3">50 line/screen</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <nav aria-label="">
-                            <ul class="pagination justify-content-end">
-                                <li class="page-item"><a class="page-link" href="javascript:void(0)">First</a></li>
-                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Back</a></li>
-                                <li class="page-item active"><a class="page-link" href="javascript:void(0)">1</a></li>
-                                <li class="page-item"><a class="page-link" href="javascript:void(0)">2</a></li>
-                                <li class="page-item"><a class="page-link" href="javascript:void(0)">3</a></li>
-                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Next</a></li>
-                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Last</a></li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-            <!--end::pagination-->
+
         </div>
     </div>
-    <!--end::  m-portlet-->
 
-    <!--begin:: m-portlet-->
     <div class="m-portlet">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
@@ -300,7 +225,6 @@
         </div>
         <div class="m-portlet__body">
             <div class="collapse show" id="soa-summary">
-                <!--begin: table -->
                 <div class="table-wrapper" id="">
                     <table class="table table-striped table-brand">
                         <thead>
@@ -320,16 +244,16 @@
                         <tbody>
                             <tr>
                                 <td>
-                                    <span>Local (VNĐ)</span>
+                                    <span>VNĐ</span>
                                 </td>
                                 <td>
-                                    <span></span>
+                                    <span>{{soa.amountDebitLocal | number: '.0-2'}}</span>
                                 </td>
                                 <td>
-                                    <span></span>
+                                    <span>{{soa.amountCreditLocal | number: '.0-2'}}</span>
                                 </td>
                                 <td>
-                                    <span></span>
+                                    <span>{{soa.amountBalanceLocal | number: '.0-2'}}</span>
                                 </td>
                             </tr>
                             <tr>
@@ -337,26 +261,24 @@
                                     <span>USD</span>
                                 </td>
                                 <td>
-                                    <span></span>
+                                    <span>{{soa.amountDebitUSD | number: '.0-2'}}</span>
                                 </td>
                                 <td>
-                                    <span></span>
+                                    <span>{{soa.amountCreditUSD | number: '.0-2'}}</span>
                                 </td>
                                 <td>
-                                    <span></span>
+                                    <span>{{soa.amountBalanceUSD | number: '.0-2'}}</span>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <!--end: table -->
             </div>
         </div>
     </div>
-    <!--end:: m-portlet-->
 
-    <div class="form-actions m--align-right">
-        <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+    <div class="form-actions m--align-center">
+        <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="updateSOA()">
             <span>
                 <i class="la la-save"></i>
                 <span>
@@ -364,7 +286,7 @@
                 </span>
             </span>
         </button>
-        <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase">
+        <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" (click)="back()">
             <span>
                 <i class="la la-ban"></i>
                 <span>
@@ -374,7 +296,6 @@
         </button>
     </div>
 </div>
-<!--end:: m-content-->
 
 
 <soa-add-charge-popup></soa-add-charge-popup>

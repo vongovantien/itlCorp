@@ -17,7 +17,13 @@ import { ToastrService } from "ngx-toastr";
 import { Subscription } from "rxjs";
 @Component({
   selector: "app-ops-module-billing-job-create",
-  templateUrl: "./ops-module-billing-job-create.component.html"
+  templateUrl: "./ops-module-billing-job-create.component.html",
+  styles:
+  [`
+  .form-add-job {
+    margin-left: 15px;
+  }
+  `]
 })
 export class OpsModuleBillingJobCreateComponent extends PopupBase implements OnInit, OnDestroy {
   DataStorage: Object = null;

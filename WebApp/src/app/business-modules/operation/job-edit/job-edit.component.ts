@@ -25,6 +25,9 @@ import { catchError, finalize } from 'rxjs/operators';
 import { CancelCreateJobPopupComponent } from './job-confirm-popup/cancel-create-job-popup/cancel-create-job-popup.component';
 import { CanNotDeleteJobPopupComponent } from './job-confirm-popup/can-not-delete-job-popup/can-not-delete-job-popup.component';
 import { ConfirmDeleteJobPopupComponent } from './job-confirm-popup/confirm-delete-job-popup/confirm-delete-job-popup.component';
+import { AddBuyingRatePopupComponent } from './charge-list/add-buying-rate-popup/add-buying-rate-popup.component';
+import { AddSellingRatePopupComponent } from './charge-list/add-selling-rate-popup/add-selling-rate-popup.component';
+import { AddObhRatePopupComponent } from './charge-list/add-obh-rate-popup/add-obh-rate-popup.component';
 declare var $: any;
 
 @Component({
@@ -40,6 +43,9 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     @ViewChild(CancelCreateJobPopupComponent, { static: false }) cancelCreateJobPopup: CancelCreateJobPopupComponent;
     @ViewChild(CanNotDeleteJobPopupComponent, { static: false }) canNotDeleteJobPopup: CanNotDeleteJobPopupComponent;
     @ViewChild(ConfirmDeleteJobPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmDeleteJobPopupComponent;
+    @ViewChild(AddBuyingRatePopupComponent, { static: false }) addBuyingRatePopup: AddBuyingRatePopupComponent;
+    @ViewChild(AddSellingRatePopupComponent, { static: false }) addSellingRatePopup: AddSellingRatePopupComponent;
+    @ViewChild(AddObhRatePopupComponent, { static: false }) addOHBRatePopup: AddObhRatePopupComponent;
     opsTransaction: OpsTransaction = null;
     productServices: any[] = [];
     serviceDate: any;
@@ -208,7 +214,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     async deleteJob() {
         const respone = await this.baseServices.deleteAsync(this.api_menu.Documentation.Operation.delete + this.opsTransaction.id, true, true);
         if (respone.status) {
-            $('#confirm-delete-job-modal').modal('hide');
+            // $('#confirm-delete-job-modal').modal('hide');
+            this.confirmDeleteJobPopup.hide();
             this.router.navigate(["/home/operation/job-management"]);
         }
     }
@@ -247,8 +254,11 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     /**
      * Show popup & init new first row( if container list is null)
      */
-    showListContainer() { 
-        this.popupContainerList.show();
+    showListContainer() {
+        if (this.lstMasterContainers.length === 0) {
+            this.lstMasterContainers.push(this.popupContainerList.initNewContainer());
+        }
+        this.popupContainerList.show({ backdrop: 'static' });
     }
     getListPackageTypes() {
         this._unitRepo.getListUnitByType({ unitType: 'package' })
@@ -457,7 +467,24 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             this.isDisplay = true;
         }, 50);
     }
-
+    onSaveNewBuyingRate(event) {
+        if (event === true) {
+            console.log('add buying charge thành công');
+            this.getSurCharges('BUY');
+        }
+    }
+    onSaveNewSellingRate(event) {
+        if (event === true) {
+            console.log('add selling charge thành công');
+            this.getSurCharges('SELL');
+        }
+    }
+    onSaveNewOBHRate(event) {
+        if (event === true) {
+            console.log('add OHB charge thành công');
+            this.getSurCharges('OBH');
+        }
+    }
     saveNewCharge(id_form: string, form: NgForm, data: CsShipmentSurcharge, isContinue: boolean) {
         setTimeout(async () => {
             const error = $('#' + id_form).find('div.has-danger');
@@ -483,8 +510,15 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             }
         }, 300);
     }
-
-
+    openAddNewBuyingRatePopup() {
+        this.addBuyingRatePopup.show({ backdrop: 'static' });
+    }
+    openAddNewSellingRatePopup() {
+        this.addSellingRatePopup.show({ backdrop: 'static' });
+    }
+    openAddNewOBHRatePopup() {
+        this.addOHBRatePopup.show({ backdrop: 'static' });
+    }
 
     private totalProfit() {
         this.totalProfitUSD = this.totalSellingUSD - this.totalBuyingUSD - this.totalLogisticChargeUSD;
@@ -582,7 +616,11 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             }
         }
         if (type === 'SELL') {
+            console.log('data selling');
+            console.log(this.lstSellingRateChargesComboBox);
             this.SellingRateChargeToEdit = cloneDeep(charge);
+            console.log(this.SellingRateChargeToEdit);
+            console.log(this.lstCurrencies);
             this.sellingRateChargeActive = [{ 'text': this.SellingRateChargeToEdit.currency, ' id': this.SellingRateChargeToEdit.currencyId }];
             if (this.SellingRateChargeToEdit.exchangeDate != null) {
                 this.exchangeRateDate = { startDate: moment(this.SellingRateChargeToEdit.exchangeDate), endDate: moment(this.SellingRateChargeToEdit.exchangeDate) };

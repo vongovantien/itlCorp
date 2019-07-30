@@ -10,284 +10,288 @@
 </div>
 <!--end:: subheader-->
 
-<!--begin:: m-content -->
-<form novalidate #addOpsForm="ngForm" name="addOpsForm" (ngSubmit)="addOpsForm.form.valid">
-    <div class="m-content">
-        <!--begin::Form-->
-        <div class="m-form m-form--state">
-            <!--begin::m-portlet -->
-            <div class="m-portlet">
-                <div class="m-portlet__body" id="add-new-ops-job-form" *ngIf="isDisplay">
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsHbl.invalid}">
-                                <label class="form-control-label" for="">
-                                    HBL No <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" (change)="OpsTransactionToAdd.hwbno=OpsTransactionToAdd.hwbno.trim()"
-                                    autocomplete="nope" required class="form-control m-input m-input--square"
-                                    [(ngModel)]="OpsTransactionToAdd.hwbno" placeholder="Enter text" #opsHbl="ngModel"
-                                    name="opsHbl" autoFocus>
-                                <div class="form-control-feedback" *ngIf="addOpsForm.submitted && opsHbl.invalid">
-                                    HBL No is required!
+<div class="row h-100vh">
+    <div class="col-12 form-add-job">
+        <form novalidate #addOpsForm="ngForm" name="addOpsForm" (ngSubmit)="addOpsForm.form.valid">
+            <div class="m-content">
+                <!--begin::Form-->
+                <div class="m-form m-form--state">
+                    <!--begin::m-portlet -->
+                    <div class="m-portlet">
+                        <div class="m-portlet__body" id="add-new-ops-job-form" *ngIf="isDisplay">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsHbl.invalid}">
+                                        <label class="form-control-label" for="">
+                                            HBL No <span class="m--font-danger">(*)</span>
+                                        </label>
+                                        <input type="text" (change)="OpsTransactionToAdd.hwbno=OpsTransactionToAdd.hwbno.trim()"
+                                            autocomplete="nope" required class="form-control m-input m-input--square"
+                                            [(ngModel)]="OpsTransactionToAdd.hwbno" placeholder="Enter text" #opsHbl="ngModel"
+                                            name="opsHbl" autoFocus>
+                                        <div class="form-control-feedback" *ngIf="addOpsForm.submitted && opsHbl.invalid">
+                                            HBL No is required!
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsMbl.invalid}">
+                                        <label class="form-control-label" for="">
+                                            MBL No <span class="m--font-danger">(*)</span>
+                                        </label>
+                                        <input [(ngModel)]="OpsTransactionToAdd.mblno" type="text" required autocomplete="nope"
+                                            class="form-control m-input m-input--square" placeholder="Enter text" name="opsMbl"
+                                            #opsMbl="ngModel">
+                                        <div class="form-control-feedback" *ngIf="addOpsForm.submitted && opsMbl.invalid">
+                                            MBL No is required!
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group"
+                                        [ngClass]="{ 'has-danger': addOpsForm.submitted && selectedDate.startDate == null }">
+                                        <label class="form-control-label" for="">
+                                            Service Date <span class="m--font-danger">(*)</span>
+                                        </label>
+                                        <div class="m-input-icon m-input-icon--right down">
+                                            <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                                [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                                [(ngModel)]="selectedDate" [singleDatePicker]="true" name="singledater"
+                                                readonly />
+                                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                <span>
+                                                    <i class="la la-calendar"></i>
+                                                </span>
+                                            </span>
+                                        </div>
+                                        <div class="form-control-feedback"
+                                            *ngIf="addOpsForm.submitted && selectedDate.startDate == null">
+                                            Service Date is required!
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && opsMbl.invalid}">
-                                <label class="form-control-label" for="">
-                                    MBL No <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input [(ngModel)]="OpsTransactionToAdd.mblno" type="text" required autocomplete="nope"
-                                    class="form-control m-input m-input--square" placeholder="Enter text" name="opsMbl"
-                                    #opsMbl="ngModel">
-                                <div class="form-control-feedback" *ngIf="addOpsForm.submitted && opsMbl.invalid">
-                                    MBL No is required!
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && OpsTransactionToAdd.productService === null}">
+                                        <label class="form-control-label" for="">
+                                            Product Service <span class="m--font-danger">(*)</span>
+                                        </label>
+                                        <ng-select [allowClear]="true" [items]="productServices" (data)="refreshValue($event)"
+                                            (selected)="OpsTransactionToAdd.productService=$event.id"
+                                            (removed)="OpsTransactionToAdd.productService=null" (typed)="typed($event)"
+                                            placeholder="Please Select">
+                                        </ng-select>
+                                        <div class="form-control-feedback"
+                                            *ngIf="addOpsForm.submitted && OpsTransactionToAdd.productService === null">
+                                            Product Service is required!
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && OpsTransactionToAdd.serviceMode === null}">
+                                        <label class="form-control-label" for="">
+                                            Service Mode <span class="m--font-danger">(*)</span>
+                                        </label>
+                                        <ng-select [allowClear]="true" [items]="serviceModes" (data)="refreshValue($event)"
+                                            (selected)="OpsTransactionToAdd.serviceMode=$event.id"
+                                            (removed)="OpsTransactionToAdd.serviceMode=null" (typed)="typed($event)"
+                                            placeholder="Please Select">
+                                        </ng-select>
+                                        <div class="form-control-feedback"
+                                            *ngIf="addOpsForm.submitted && OpsTransactionToAdd.serviceMode ===null">
+                                            Service Mode is required!
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && OpsTransactionToAdd.shipmentMode === null}">
+                                        <label class="form-control-label" for="">
+                                            Shipment Mode <span class="m--font-danger">(*)</span>
+                                        </label>
+                                        <ng-select [allowClear]="true" [items]="shipmentModes" (data)="refreshValue($event)"
+                                            (selected)="OpsTransactionToAdd.shipmentMode=$event.id"
+                                            (removed)="OpsTransactionToAdd.shipmentMode=null" (typed)="typed($event)"
+                                            placeholder="Please Select">
+                                        </ng-select>
+                                        <div class="form-control-feedback"
+                                            *ngIf="addOpsForm.submitted && OpsTransactionToAdd.shipmentMode === null">
+                                            Shipment Mode is required!
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group"
-                                [ngClass]="{ 'has-danger': addOpsForm.submitted && selectedDate.startDate == null }">
-                                <label class="form-control-label" for="">
-                                    Service Date <span class="m--font-danger">(*)</span>
-                                </label>
-                                <div class="m-input-icon m-input-icon--right down">
-                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                        [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                        [(ngModel)]="selectedDate" [singleDatePicker]="true" name="singledater"
-                                        readonly />
-                                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                                        <span>
-                                            <i class="la la-calendar"></i>
-                                        </span>
-                                    </span>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && OpsTransactionToAdd.customerId === null}">
+                                        <label class="form-control-label" for="">
+                                            Customer <span class="m--font-danger">(*)</span>
+                                        </label>
+                                        <app-combo-grid-virtual-scroll
+                                            [currentActiveItemId]="{field:'id',value:OpsTransactionToAdd.customerId}"
+                                            (itemSelected)="OpsTransactionToAdd.customerId = $event.id"
+                                            [selectedDisplayFields]="['partnerNameEn']" [dataSources]="listCustomers"
+                                            [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                        </app-combo-grid-virtual-scroll>
+
+                                        <div class="form-control-feedback"
+                                            *ngIf="addOpsForm.submitted && OpsTransactionToAdd.customerId===null">
+                                            Customer is required!
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="form-control-feedback"
-                                    *ngIf="addOpsForm.submitted && selectedDate.startDate == null">
-                                    Service Date is required!
+                                <div class="col-lg-4">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && (OpsTransactionToAdd.pol === OpsTransactionToAdd.pod) && (OpsTransactionToAdd.pol!==null)}">
+                                        <label class="form-control-label" for="">
+                                            Port of Loading
+                                        </label>
+                                        <app-combo-grid-virtual-scroll
+                                            [currentActiveItemId]="{field:'id',value:OpsTransactionToAdd.pol}"
+                                            (itemSelected)="OpsTransactionToAdd.pol=$event.id"
+                                            [selectedDisplayFields]="['nameEn']" [dataSources]="listPort"
+                                            [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                                        </app-combo-grid-virtual-scroll>
+
+                                        <div class="form-control-feedback"
+                                            *ngIf="addOpsForm.submitted && (OpsTransactionToAdd.pol === OpsTransactionToAdd.pod) && (OpsTransactionToAdd.pol!==null)">
+                                            Port of loading is must be different with port of discharge
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && (OpsTransactionToAdd.pol === OpsTransactionToAdd.pod) && (OpsTransactionToAdd.pol!==null)}">
+                                        <label class="form-control-label" for="">
+                                            Port of Discharge
+                                        </label>
+                                        <app-combo-grid-virtual-scroll
+                                            [currentActiveItemId]="{field:'id',value:OpsTransactionToAdd.pod}"
+                                            (itemSelected)="OpsTransactionToAdd.pod=$event.id"
+                                            [selectedDisplayFields]="['nameEn']" [dataSources]="listPort"
+                                            [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                                        </app-combo-grid-virtual-scroll>
+
+                                        <div class="form-control-feedback"
+                                            *ngIf="addOpsForm.submitted && (OpsTransactionToAdd.pol === OpsTransactionToAdd.pod) && (OpsTransactionToAdd.pol!==null)">
+                                            Port of discharge must be different with port of loading
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Supplier
+                                        </label>
+
+                                        <app-combo-grid-virtual-scroll
+                                            [currentActiveItemId]="{field:'id',value:OpsTransactionToAdd.supplierId}"
+                                            (itemSelected)="OpsTransactionToAdd.supplierId = $event.id"
+                                            [selectedDisplayFields]="['partnerNameEn']" [dataSources]="listSuppliers"
+                                            [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                        </app-combo-grid-virtual-scroll>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Vessel/Flight
+                                        </label>
+                                        <input type="text" [(ngModel)]="OpsTransactionToAdd.flightVessel" autocomplete="nope"
+                                            class="form-control m-input m-input--square" placeholder="Enter text"
+                                            name="opsVessel">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Agent
+                                        </label>
+                                        <app-combo-grid-virtual-scroll
+                                            [currentActiveItemId]="{field:'id',value:OpsTransactionToAdd.agentId}"
+                                            (itemSelected)="OpsTransactionToAdd.agentId = $event.id"
+                                            [selectedDisplayFields]="['partnerNameEn']" [dataSources]="listAgents"
+                                            [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                        </app-combo-grid-virtual-scroll>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="">
+                                            Purchase Order No
+                                        </label>
+                                        <input type="text" [(ngModel)]="OpsTransactionToAdd.purchaseOrderNo" autocomplete="nope"
+                                            class="form-control m-input m-input--square" placeholder="Enter text"
+                                            name="opsPurchaseNo">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && OpsTransactionToAdd.billingOpsId===null}">
+                                        <label class="form-control-label" for="">
+                                            Billing OPS <span class="m--font-danger">(*)</span>
+                                        </label>
+                                        <app-combo-grid-virtual-scroll
+                                            [currentActiveItemId]="{field:'id',value:OpsTransactionToAdd.billingOpsId}"
+                                            (itemSelected)="OpsTransactionToAdd.billingOpsId = $event.id"
+                                            [selectedDisplayFields]="['employeeNameEn']" [dataSources]="listBillingOps"
+                                            [displayFields]="[{'field':'username','label':'User Name'},{'field':'employeeNameEn','label':'Full Name'},{'field':'','label':'Role'}]">
+                                        </app-combo-grid-virtual-scroll>
+                                        <div class="form-control-feedback"
+                                            *ngIf="addOpsForm.submitted && OpsTransactionToAdd.billingOpsId===null">
+                                            Billing OPS is required!
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && OpsTransactionToAdd.productService === null}">
-                                <label class="form-control-label" for="">
-                                    Product Service <span class="m--font-danger">(*)</span>
-                                </label>
-                                <ng-select [allowClear]="true" [items]="productServices" (data)="refreshValue($event)"
-                                    (selected)="OpsTransactionToAdd.productService=$event.id"
-                                    (removed)="OpsTransactionToAdd.productService=null" (typed)="typed($event)"
-                                    placeholder="Please Select">
-                                </ng-select>
-                                <div class="form-control-feedback"
-                                    *ngIf="addOpsForm.submitted && OpsTransactionToAdd.productService === null">
-                                    Product Service is required!
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && OpsTransactionToAdd.serviceMode === null}">
-                                <label class="form-control-label" for="">
-                                    Service Mode <span class="m--font-danger">(*)</span>
-                                </label>
-                                <ng-select [allowClear]="true" [items]="serviceModes" (data)="refreshValue($event)"
-                                    (selected)="OpsTransactionToAdd.serviceMode=$event.id"
-                                    (removed)="OpsTransactionToAdd.serviceMode=null" (typed)="typed($event)"
-                                    placeholder="Please Select">
-                                </ng-select>
-                                <div class="form-control-feedback"
-                                    *ngIf="addOpsForm.submitted && OpsTransactionToAdd.serviceMode ===null">
-                                    Service Mode is required!
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && OpsTransactionToAdd.shipmentMode === null}">
-                                <label class="form-control-label" for="">
-                                    Shipment Mode <span class="m--font-danger">(*)</span>
-                                </label>
-                                <ng-select [allowClear]="true" [items]="shipmentModes" (data)="refreshValue($event)"
-                                    (selected)="OpsTransactionToAdd.shipmentMode=$event.id"
-                                    (removed)="OpsTransactionToAdd.shipmentMode=null" (typed)="typed($event)"
-                                    placeholder="Please Select">
-                                </ng-select>
-                                <div class="form-control-feedback"
-                                    *ngIf="addOpsForm.submitted && OpsTransactionToAdd.shipmentMode === null">
-                                    Shipment Mode is required!
-                                </div>
-                            </div>
-                        </div>
+                    <!--end::m-portlet -->
+                    <!--begin:: form-actions-->
+
+                    <!-- routerLink="/home/operation/job-edit" -->
+                    <div class="form-actions m--align-right">
+                        <button (click)="submitNewOps(addOpsForm)" type="submit"
+                            class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                            <span>
+                                <i class="la la la-save"></i>
+                                <span>
+                                    save
+                                </span>
+                            </span>
+                        </button>
+                        <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
+                            data-toggle="modal" data-target="#cancel-create-ops-job-modal">
+                            <span>
+                                <i class="la la-ban"></i>
+                                <span>
+                                    cancel
+                                </span>
+                            </span>
+                        </button>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && OpsTransactionToAdd.customerId === null}">
-                                <label class="form-control-label" for="">
-                                    Customer <span class="m--font-danger">(*)</span>
-                                </label>
-                                <app-combo-grid-virtual-scroll
-                                    [currentActiveItemId]="{field:'id',value:OpsTransactionToAdd.customerId}"
-                                    (itemSelected)="OpsTransactionToAdd.customerId = $event.id"
-                                    [selectedDisplayFields]="['partnerNameEn']" [dataSources]="listCustomers"
-                                    [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
-                                </app-combo-grid-virtual-scroll>
-
-                                <div class="form-control-feedback"
-                                    *ngIf="addOpsForm.submitted && OpsTransactionToAdd.customerId===null">
-                                    Customer is required!
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && (OpsTransactionToAdd.pol === OpsTransactionToAdd.pod) && (OpsTransactionToAdd.pol!==null)}">
-                                <label class="form-control-label" for="">
-                                    Port of Loading
-                                </label>
-                                <app-combo-grid-virtual-scroll
-                                    [currentActiveItemId]="{field:'id',value:OpsTransactionToAdd.pol}"
-                                    (itemSelected)="OpsTransactionToAdd.pol=$event.id"
-                                    [selectedDisplayFields]="['nameEn']" [dataSources]="listPort"
-                                    [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
-                                </app-combo-grid-virtual-scroll>
-
-                                <div class="form-control-feedback"
-                                    *ngIf="addOpsForm.submitted && (OpsTransactionToAdd.pol === OpsTransactionToAdd.pod) && (OpsTransactionToAdd.pol!==null)">
-                                    Port of loading is must be different with port of discharge
-                                </div>
-
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && (OpsTransactionToAdd.pol === OpsTransactionToAdd.pod) && (OpsTransactionToAdd.pol!==null)}">
-                                <label class="form-control-label" for="">
-                                    Port of Discharge
-                                </label>
-                                <app-combo-grid-virtual-scroll
-                                    [currentActiveItemId]="{field:'id',value:OpsTransactionToAdd.pod}"
-                                    (itemSelected)="OpsTransactionToAdd.pod=$event.id"
-                                    [selectedDisplayFields]="['nameEn']" [dataSources]="listPort"
-                                    [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
-                                </app-combo-grid-virtual-scroll>
-
-                                <div class="form-control-feedback"
-                                    *ngIf="addOpsForm.submitted && (OpsTransactionToAdd.pol === OpsTransactionToAdd.pod) && (OpsTransactionToAdd.pol!==null)">
-                                    Port of discharge must be different with port of loading
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Supplier
-                                </label>
-
-                                <app-combo-grid-virtual-scroll
-                                    [currentActiveItemId]="{field:'id',value:OpsTransactionToAdd.supplierId}"
-                                    (itemSelected)="OpsTransactionToAdd.supplierId = $event.id"
-                                    [selectedDisplayFields]="['partnerNameEn']" [dataSources]="listSuppliers"
-                                    [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
-                                </app-combo-grid-virtual-scroll>
-
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Vessel/Flight
-                                </label>
-                                <input type="text" [(ngModel)]="OpsTransactionToAdd.flightVessel" autocomplete="nope"
-                                    class="form-control m-input m-input--square" placeholder="Enter text"
-                                    name="opsVessel">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Agent
-                                </label>
-                                <app-combo-grid-virtual-scroll
-                                    [currentActiveItemId]="{field:'id',value:OpsTransactionToAdd.agentId}"
-                                    (itemSelected)="OpsTransactionToAdd.agentId = $event.id"
-                                    [selectedDisplayFields]="['partnerNameEn']" [dataSources]="listAgents"
-                                    [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
-                                </app-combo-grid-virtual-scroll>
-
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Purchase Order No
-                                </label>
-                                <input type="text" [(ngModel)]="OpsTransactionToAdd.purchaseOrderNo" autocomplete="nope"
-                                    class="form-control m-input m-input--square" placeholder="Enter text"
-                                    name="opsPurchaseNo">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger':addOpsForm.submitted && OpsTransactionToAdd.billingOpsId===null}">
-                                <label class="form-control-label" for="">
-                                    Billing OPS <span class="m--font-danger">(*)</span>
-                                </label>
-                                <app-combo-grid-virtual-scroll
-                                    [currentActiveItemId]="{field:'id',value:OpsTransactionToAdd.billingOpsId}"
-                                    (itemSelected)="OpsTransactionToAdd.billingOpsId = $event.id"
-                                    [selectedDisplayFields]="['employeeNameEn']" [dataSources]="listBillingOps"
-                                    [displayFields]="[{'field':'username','label':'User Name'},{'field':'employeeNameEn','label':'Full Name'},{'field':'','label':'Role'}]">
-                                </app-combo-grid-virtual-scroll>
-                                <div class="form-control-feedback"
-                                    *ngIf="addOpsForm.submitted && OpsTransactionToAdd.billingOpsId===null">
-                                    Billing OPS is required!
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <!--end:: form-actions-->
                 </div>
+                <!--end::Form-->
             </div>
-            <!--end::m-portlet -->
-            <!--begin:: form-actions-->
-
-            <!-- routerLink="/home/operation/job-edit" -->
-            <div class="form-actions m--align-right">
-                <button (click)="submitNewOps(addOpsForm)" type="submit"
-                    class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                    <span>
-                        <i class="la la la-save"></i>
-                        <span>
-                            save
-                        </span>
-                    </span>
-                </button>
-                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                    data-toggle="modal" data-target="#cancel-create-ops-job-modal">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            cancel
-                        </span>
-                    </span>
-                </button>
-            </div>
-            <!--end:: form-actions-->
-        </div>
-        <!--end::Form-->
+        </form>
     </div>
-</form>
+</div>
+
 
 <!--end:: m-content-->
 

@@ -74,7 +74,7 @@
                                 data-target="#id-cd-001">
                                 <i class="la la-minus-square"></i>
                             </label>
-                            <span class="tgroup-title m--margin-right-10">No-1</span>&nbsp;<span
+                            <span class="tgroup-title m--margin-right-10">No-{{(i+1)}}</span>&nbsp;<span
                                 class="tgroup-title">Partner name:</span>&nbsp;<span
                                 class="tgroup-title">{{item.partnerNameEn}}</span>
                         </td>
@@ -103,7 +103,8 @@
                                                 <span>{{s.cdNote.type}}</span>
                                             </td>
                                             <td>
-                                                <a (click)="openEdit(s.cdNote.code)">{{s.cdNote.code}}</a>
+                                                <a href="javascript:void(0)"
+                                                    (click)="openDetails(s.cdNote.code)">{{s.cdNote.code}}</a>
                                             </td>
                                             <td>
                                                 <span>{{s.total_charge}}</span>

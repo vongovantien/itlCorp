@@ -7,4 +7,4 @@ export const environment = {
         CD_NOTE: "staging.api-efms.itlvn.com",
         INDENTITY_SERVER_URL:"http://staging.api-efms.itlvn.com/identityserver"
     },
-  };   
+};   

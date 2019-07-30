@@ -21,8 +21,8 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
 
   utility: UtilityHelper = new UtilityHelper();
   isLoading: boolean = false;
-  
-  constructor() { 
+
+  constructor() {
   }
   ngOnInit(): void { }
 
@@ -55,17 +55,13 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
     return throwError(error || 'Có lỗi xảy, Vui lòng kiểm tra lại !');
   }
 
-  removed(value:any):void {
+  removed(value: any): void {
   }
- 
-  refreshValue(value:any):void {
+
+  refreshValue(value: any): void {
   }
 }
 
   // config for <app-combo-grid-virtual-scroll>
-export interface IComboGirdConfig {
-  placeholder: string;
-  displayFields: any[];
-  dataSource: any[];
-  selectedDisplayFields: any[];
-}
+
+

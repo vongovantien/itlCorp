@@ -1,5 +1,4 @@
 import { Component, Output, EventEmitter } from '@angular/core';
-import { AppPage, IComboGirdConfig } from 'src/app/app.base';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { catchError } from 'rxjs/operators';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
@@ -9,6 +8,7 @@ import { Charge } from 'src/app/shared/models';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
+import { AppPage } from 'src/app/app.base';
 
 @Component({
     selector: 'form-create-soa',
@@ -19,7 +19,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
     @Output() onApply: EventEmitter<any> = new EventEmitter<any>();
 
-    configPartner: IComboGirdConfig = {
+    configPartner: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
         displayFields: [],
         dataSource: [],
@@ -27,7 +27,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     };
 
     charges: Charge[] = [];
-    configCharge: IComboGirdConfig = {
+    configCharge: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
         displayFields: [],
         dataSource: [],
@@ -62,6 +62,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     items: any[] = [];
 
     isSubmited: boolean = false;
+
+    dataSearch: Partial<ISOASearchCharge> = {};
 
     constructor(
         private _sysRepo: SystemRepo,
@@ -289,7 +291,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         if (this.isSubmited && !this.selectedRangeDate.startDate || !this.selectedPartner.value) {
             return;
         } else {
-            const body = {
+            this.dataSearch = {
                 currencyLocal: 'VND', // Todo: get currency local follow location or login info
                 currency: this.selectedCurrency[0].id,
                 customerID: this.selectedPartner.value || '',
@@ -302,9 +304,12 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 strCharges: this.selectedCharges.map((item: any) => item.code).toString(),
                 note: this.note
             };
-            this.onApply.emit(body);
+            this.onApply.emit(this.dataSearch);
         }
+    }
 
+    onChangeNote(note: string) {
+        this.dataSearch.note = note;
     }
 
     filterChargeWithService(charges: any[], keys: any[]) {
@@ -333,4 +338,18 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         }
         this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
     }
+}
+
+interface ISOASearchCharge {
+    currencyLocal: string;
+    currency: string;
+    customerID: string;
+    dateType: string;
+    fromDate: string;
+    toDate: string;
+    type: string;
+    isOBH: boolean;
+    strCreators: string;
+    strCharges: string;
+    note: string;
 }
