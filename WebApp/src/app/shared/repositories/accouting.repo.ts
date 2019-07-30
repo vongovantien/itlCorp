@@ -57,4 +57,12 @@ export class AccoutingRepo {
                 map((data: any) => data)
             );
     }
+
+    updateSOA(data: any = {}) {
+        return this._api.put(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSOA/update`, data)
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => data)
+            );
+    }
 }

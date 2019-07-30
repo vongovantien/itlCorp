@@ -78,7 +78,7 @@ body {
 
 body {
     overflow-y: scroll;
-    font-size:15px;
+    // font-size:15px;
     // &.body-fixed {
     //     width: 100%;
     //     position: fixed;
@@ -1077,4 +1077,8 @@ table.dataTable {
 }
 .text-underline{
     text-decoration: underline;
+}
+
+.h-100vh {
+    height: 100vh;
 }

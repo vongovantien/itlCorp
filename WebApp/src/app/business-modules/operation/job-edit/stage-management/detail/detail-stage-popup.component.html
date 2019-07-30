@@ -29,11 +29,15 @@
                     </div>
                     <div class="row">
                         <div class="col-lg-6">
-                            <div class="form-group">
+                            <div class="form-group"  [ngClass]="{'m-form__group has-danger': isSummited && processTime.value === 0}">
                                 <label class="form-control-label">
                                     Process time (h)
                                 </label>
                                 <input appTwoDigitDecimaNumber type="text" class="form-control m-input m-input--square" [formControl]="processTime" formControlName="processTime">
+                                <div class="form-control-feedback"
+                                    *ngIf="isSummited && processTime.value === 0">
+                                    Process time must greater than 0 !
+                                </div>
                             </div>
                         </div>
                         <div class="col-lg-6">

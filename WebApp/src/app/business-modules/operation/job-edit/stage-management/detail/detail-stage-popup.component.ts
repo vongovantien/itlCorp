@@ -184,9 +184,10 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
 
     onSubmit(form: FormGroup) {
         this.isSummited = true;
-
-        // validate before submit
-        if ((this.statusStageActive[0].id === 'Peding' || this.statusStageActive[0].id === "Deleted") && !form.value.comment) {
+        if (form.invalid) {
+            return;
+        }
+        if ((this.statusStageActive[0].id === 'Pending' || this.statusStageActive[0].id === "Deleted") && !form.value.comment) {
             return;
         }
         if (!this.selectedMainPersonInCharge.value || this.selectedMainPersonInCharge.value === this.selectedRealPersonInCharge.value) {
@@ -241,7 +242,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
                 if (!res) {
                 } else {
                     this.systemUsers = res.map((item: any) => new User(item));
-                    Object.assign(this.configComboGrid, {source: this.systemUsers});
+                    Object.assign(this.configComboGrid, { source: this.systemUsers });
                 }
             },
             // error

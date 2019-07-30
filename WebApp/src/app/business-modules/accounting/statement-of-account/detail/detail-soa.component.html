@@ -5,7 +5,8 @@
         </div>
         <div class="c-button-actions">
             <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                [routerLink]="'/home/accounting/statement-of-account/edit'">
+                [routerLink]="'/home/accounting/statement-of-account/edit'"
+                [queryParams]="{ no: soa.soano, currency: 'VND' }">
                 <span>
                     <i class="la la-edit"></i>
                     <span>

@@ -124,7 +124,7 @@
                         <label class="form-control-label">
                             Note
                         </label>
-                        <textarea class="form-control m-input m-input--square" rows="4" [(ngModel)]="note" name="note"></textarea>
+                        <textarea class="form-control m-input m-input--square" rows="4" [(ngModel)]="note" name="note" (ngModelChange)="onChangeNote($event)"></textarea>
                     </div>
                 </div>
             </div>
