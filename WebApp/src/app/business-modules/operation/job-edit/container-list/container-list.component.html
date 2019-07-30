@@ -17,9 +17,9 @@
                 <div class="col-lg-4 order-2 order-lg-1">
                   <div class="form-group">
                     <div class="m-input-icon m-input-icon--left">
-                      <input type="text" class="form-control m-input m-input--square" [ngModel]="searchcontainer"
-                        (change)="searchcontainer = searchcontainer.trim()" (ngModelChange)="searchContainer($event)"
-                        placeholder="Search..." autocomplete="nope" name="searchcontainer">
+                      <input type="text" class="form-control m-input m-input--square" [(ngModel)]="keySearch"
+                        (ngModelChange)="searchContainer($event)" placeholder="Search..." autocomplete="nope"
+                        name="keySearch">
                       <span class="m-input-icon__icon m-input-icon__icon--left">
                         <span>
                           <i class="la la-search"></i>

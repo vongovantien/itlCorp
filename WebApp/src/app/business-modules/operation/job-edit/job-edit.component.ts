@@ -58,7 +58,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     serviceModeActive: any[] = [];
     shipmentModeActive: any[] = [];
     searchcontainer: string = '';
-    lstMasterContainers: any[] = [];
+    lstMasterContainers: any[];
 
     lstBuyingRateChargesComboBox: any[] = [];
     lstSellingRateChargesComboBox: any[] = [];
@@ -247,7 +247,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     /**
      * Show popup & init new first row( if container list is null)
      */
-    showListContainer() {
+    showListContainer() { 
         this.popupContainerList.show();
     }
     getListPackageTypes() {

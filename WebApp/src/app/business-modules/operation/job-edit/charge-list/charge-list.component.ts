@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-charge-list',
-  templateUrl: './charge-list.component.html',
-  styleUrls: ['./charge-list.component.scss']
+  templateUrl: './charge-list.component.html'
 })
 export class ChargeListComponent implements OnInit {
 

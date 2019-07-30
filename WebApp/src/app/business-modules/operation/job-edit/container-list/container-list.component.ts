@@ -1,11 +1,11 @@
 import { Component, OnInit, Input, EventEmitter, Output, ViewChild } from '@angular/core';
-import { ContainerRepo } from 'src/app/shared/repositories/container.repo';      
+import { ContainerRepo } from 'src/app/shared/repositories/container.repo';
 import { catchError, finalize } from 'rxjs/operators';
 import * as dataHelper from 'src/helper/data.helper';
-import { BaseService, SortService } from 'src/app/shared/services';        
+import { BaseService, SortService } from 'src/app/shared/services';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PopupBase } from 'src/app/popup.base';
-import { NgForm } from '@angular/forms';   
+import { NgForm } from '@angular/forms';
 import { UnitRepo } from 'src/app/shared/repositories';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
@@ -48,8 +48,9 @@ export class ContainerListComponent extends PopupBase implements OnInit {
     this.getUnits();
     // this.getListContainersOfJob();
     if (this.lstMasterContainers.length === 0) {
-      this.lstContainerTemp = this.lstMasterContainers;
       this.lstMasterContainers.push(this.initNewContainer());
+    } else {
+      this.lstContainerTemp = this.lstMasterContainers;
     }
   }
 
@@ -309,7 +310,9 @@ export class ContainerListComponent extends PopupBase implements OnInit {
     this.lstMasterContainers.splice(this.indexItemConDelete, 1);
     this.popupConfirmDelete.hide();
   }
+  keySearch = '';
   searchContainer(keySearch: any) {
+    console.log(keySearch);
     keySearch = keySearch != null ? keySearch.trim().toLowerCase() : "";
     this.lstMasterContainers = Object.assign([], this.lstContainerTemp).filter(
       item => (item.containerTypeName.toLowerCase().includes(keySearch)

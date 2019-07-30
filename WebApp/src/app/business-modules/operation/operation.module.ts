@@ -36,6 +36,12 @@ import { CanNotDeleteJobPopupComponent } from './job-edit/job-confirm-popup/can-
 import { ConfirmCancelJobPopupComponent } from './job-edit/job-confirm-popup/confirm-cancel-job-popup/confirm-cancel-job-popup.component';
 import { ConfirmDeleteJobPopupComponent } from './job-edit/job-confirm-popup/confirm-delete-job-popup/confirm-delete-job-popup.component';
 import { ChargeListComponent } from './job-edit/charge-list/charge-list.component';
+import { AddBuyingRatePopupComponent } from './job-edit/charge-list/add-buying-rate-popup/add-buying-rate-popup.component';
+import { EditBuyingRatePopupComponent } from './job-edit/charge-list/edit-buying-rate-popup/edit-buying-rate-popup.component';
+import { AddSellingRatePopupComponent } from './job-edit/charge-list/add-selling-rate-popup/add-selling-rate-popup.component';
+import { EditSellingRatePopupComponent } from './job-edit/charge-list/edit-selling-rate-popup/edit-selling-rate-popup.component';
+import { AddObhRatePopupComponent } from './job-edit/charge-list/add-obh-rate-popup/add-obh-rate-popup.component';
+import { EditObhRatePopupComponent } from './job-edit/charge-list/edit-obh-rate-popup/edit-obh-rate-popup.component';
 
 
 const LIB = [
@@ -88,7 +94,13 @@ const LIB = [
         CanNotDeleteJobPopupComponent,
         ConfirmCancelJobPopupComponent,
         ConfirmDeleteJobPopupComponent,
-        ChargeListComponent
+        ChargeListComponent,
+        AddBuyingRatePopupComponent,
+        EditBuyingRatePopupComponent,
+        AddSellingRatePopupComponent,
+        EditSellingRatePopupComponent,
+        AddObhRatePopupComponent,
+        EditObhRatePopupComponent
     ]
 })
 export class OperationModule { }

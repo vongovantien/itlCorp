@@ -765,8 +765,8 @@
                                                         </td>
                                                         <td>
                                                             <!-- <span>
-                                                    {{charge.nameEn}}
-                                                </span> -->
+				{{charge.nameEn}}
+			</span> -->
                                                             <a href="javascript:void()"
                                                                 (click)="prepareEditCharge('BUY',charge)"
                                                                 data-toggle="modal"
@@ -820,10 +820,10 @@
                                                         </td>
                                                         <td>
                                                             <!-- <a href="javascript:void(0)" data-toggle="modal"
-                                                                data-target="#detail-credit-debit-note-modal"
-                                                                (click)="openCreditDebitNote(charge.cdno)">
-                                                                {{ charge.cdno }}
-                                                            </a> -->
+							data-target="#detail-credit-debit-note-modal"
+							(click)="openCreditDebitNote(charge.cdno)">
+							{{ charge.cdno }}
+						</a> -->
                                                             <a href="javascript:void(0)"
                                                                 (click)="openCreditDebitNote(charge.cdno)">
                                                                 {{ charge.cdno }}
@@ -1594,7 +1594,7 @@
 
 <!--begin::container-list-of-ops-billing-modal-->
 <app-container-list [jobId]="jobId" [lstMasterContainers]='lstMasterContainers'
-    (outputContainers)="saveContainers($event)" *ngIf="jobId"></app-container-list>
+    (outputContainers)="saveContainers($event)" *ngIf="jobId && lstMasterContainers"></app-container-list>
 <!--end::container-list-of-ops-billing-modal-->
 
 <!--begin:: add-buying-rate-modal-->
