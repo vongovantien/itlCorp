@@ -33,25 +33,28 @@ namespace eFMS.API.Documentation.DL.Services
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var soa = mapper.Map<AcctSoa>(model);
                 soa.Soano = model.Soano = CreateSoaNo(dc);
-                var hs = dc.AcctSoa.Add(soa);
-                
-                var surcharge = dc.CsShipmentSurcharge.Where(x => model.SurchargeIds != null
-                                                               && model.SurchargeIds.Contains(x.Id)
-                                                               && (x.Soano == null || x.Soano == "")).ToList();
+                //var hs = dc.AcctSoa.Add(soa);
+                var hs = DataContext.Add(soa);
 
-                if (surcharge.Count() > 0)
+                if (hs.Success)
                 {
-                    //Update SOANo to CsShipmentSurcharge
-                    surcharge.ForEach(a =>
-                        {
-                            a.Soano = soa.Soano;
-                            a.UserModified = currentUser.UserID;
-                            a.DatetimeModified = DateTime.Now;
-                        }
-                    );
+                    var surcharge = dc.CsShipmentSurcharge.Where(x => model.SurchargeIds != null
+                                                                   && model.SurchargeIds.Contains(x.Id)
+                                                                   && (x.Soano == null || x.Soano == "")).ToList();
+
+                    if (surcharge.Count() > 0)
+                    {
+                        //Update SOANo to CsShipmentSurcharge
+                        surcharge.ForEach(a =>
+                            {
+                                a.Soano = soa.Soano;
+                                a.UserModified = currentUser.UserID;
+                                a.DatetimeModified = DateTime.Now;
+                            }
+                        );
+                    }
                 }
-                
-                dc.SaveChanges();               
+                dc.SaveChanges();
                 return new HandleState();
             }
             catch (Exception ex)
@@ -167,6 +170,10 @@ namespace eFMS.API.Documentation.DL.Services
             dataMapSOA.AmountDebitUSD = chargeShipmentList.Sum(x => x.AmountDebitUSD);
             dataMapSOA.AmountCreditUSD = chargeShipmentList.Sum(x => x.AmountCreditUSD);
 
+            //Thông tin các Service Name của SOA
+            dataMapSOA.ServicesIdSoa = GetInfoServiceOfSoa(soaNo).FirstOrDefault().Key?.ToString();
+            dataMapSOA.ServicesNameSoa = GetInfoServiceOfSoa(soaNo).FirstOrDefault().Value?.ToString();
+
             return dataMapSOA;
         }
 
@@ -189,5 +196,95 @@ namespace eFMS.API.Documentation.DL.Services
         {
             return CustomData.StatusSoa;
         }
+
+        /// <summary>
+        /// Lấy thông tin các ServiceName & ServiceId của SOA
+        /// </summary>
+        /// <param name="soaNo">SOANo</param>
+        /// <returns></returns>
+        public Dictionary<string,string> GetInfoServiceOfSoa(string soaNo)
+        {
+            var listServiceTypeId = (
+                                from sur in ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge
+                                join charge in ((eFMSDataContext)DataContext.DC).CatCharge
+                                on sur.ChargeId equals charge.Id
+                                where sur.Soano == soaNo
+                                select charge.ServiceTypeId
+                               );
+            string strServiceTypeId = "";
+            foreach (var serviceTypeId in listServiceTypeId)
+            {
+                //Nối các chuỗi serviceTypeId
+                strServiceTypeId += serviceTypeId;
+            }
+
+            //Tách chuỗi servicetype thành mảng
+            string[] arrayStrServiceTypeId = strServiceTypeId.Split(';').Where(x => x.ToString() != "").ToArray();
+
+            //Xóa các serviceTypeId trùng
+            string[] arrayGrpServiceTypeId = arrayStrServiceTypeId.Distinct<string>().ToArray();
+
+            var serviceName = "";
+            var serviceId = "";
+            foreach (var item in arrayGrpServiceTypeId)
+            {
+                //Lấy ra DisplayName của serviceTypeId
+                serviceName += CustomData.Services.Where(x => x.Value == item).FirstOrDefault() != null ?
+                            CustomData.Services.Where(x => x.Value == item).FirstOrDefault().DisplayName.Trim() + ";"
+                            : "";
+                serviceId += item + ";";
+            }
+            serviceName = (serviceName + ")").Replace(";)", "");
+            serviceId = (serviceId + ")").Replace(";)", "");
+            var dic = new Dictionary<string, string>();
+            dic.Add(serviceId, serviceName);
+            return dic;
+        }
+
+        public HandleState UpdateSOA(AcctSoaModel model)
+        {
+            try
+            {
+                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+
+                //Gỡ bỏ các charge có SOANo = model.Soano
+                UpdateSOASurCharge(model.Soano);
+
+                var soa = mapper.Map<AcctSoa>(model);
+                //Update các thông tin của SOA
+                //var hs = dc.AcctSoa.Update(soa);
+                var hs = DataContext.Update(soa, x => x.Id == soa.Id);
+
+                if (hs.Success)
+                {
+                    //Duyệt qua các charge được tick chọn. Chỉ lấy ra các charge chưa có gán SOA 
+                    var surcharge = dc.CsShipmentSurcharge.Where(x => model.SurchargeIds != null
+                                                                   && model.SurchargeIds.Contains(x.Id)
+                                                                   && (x.Soano == null || x.Soano == "")).ToList();
+
+                    if (surcharge.Count() > 0)
+                    {
+                        //Update SOANo to CsShipmentSurcharge
+                        surcharge.ForEach(a =>
+                            {
+                                a.Soano = model.Soano;
+                                a.UserModified = currentUser.UserID;
+                                a.DatetimeModified = DateTime.Now;
+                            }
+                        );
+
+                    }
+                }
+                dc.SaveChanges();
+
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                var hs = new HandleState(ex.Message);
+                return hs;
+            }
+        }
+
     }
 }

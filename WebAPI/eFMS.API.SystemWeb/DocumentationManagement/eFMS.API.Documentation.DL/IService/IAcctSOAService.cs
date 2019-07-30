@@ -20,5 +20,10 @@ namespace eFMS.API.Documentation.DL.IService
         object GetListServices();
 
         object GetListStatusSoa();
+
+        Dictionary<string, string> GetInfoServiceOfSoa(string soaNo);
+
+        HandleState UpdateSOA(AcctSoaModel model);
+
     }
 }

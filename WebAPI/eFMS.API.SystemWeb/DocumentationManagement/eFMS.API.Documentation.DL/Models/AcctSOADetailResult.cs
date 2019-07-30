@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace eFMS.API.Documentation.DL.Models
 {
@@ -13,5 +11,7 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal AmountDebitUSD { get; set; }
         public decimal AmountCreditUSD { get; set; }
         public decimal AmountBalanceUSD { get { return this.AmountDebitUSD - this.AmountCreditUSD; } }
+        public string ServicesIdSoa { get; set; }
+        public string ServicesNameSoa { get; set; }
     }
 }
