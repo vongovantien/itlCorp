@@ -153,5 +153,31 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(results);
         }
 
+        /// <summary>
+        /// Update SOA
+        /// </summary>
+        /// <param name="model">object to update</param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("Update")]
+        [Authorize]
+        public IActionResult UpdateSOA(AcctSoaModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            model.DatetimeModified = DateTime.Now;
+            model.UserModified = currentUser.UserID;
+
+            var hs = acctSOAService.UpdateSOA(model);
+
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+        
     }
 }
