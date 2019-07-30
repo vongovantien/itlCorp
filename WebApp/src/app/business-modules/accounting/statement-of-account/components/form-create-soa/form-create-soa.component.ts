@@ -1,5 +1,4 @@
 import { Component, Output, EventEmitter } from '@angular/core';
-import { AppPage, IComboGirdConfig } from 'src/app/app.base';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { catchError } from 'rxjs/operators';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
@@ -9,6 +8,7 @@ import { Charge } from 'src/app/shared/models';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
+import { AppPage } from 'src/app/app.base';
 
 @Component({
     selector: 'form-create-soa',
@@ -19,7 +19,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
     @Output() onApply: EventEmitter<any> = new EventEmitter<any>();
 
-    configPartner: IComboGirdConfig = {
+    configPartner: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
         displayFields: [],
         dataSource: [],
@@ -27,7 +27,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     };
 
     charges: Charge[] = [];
-    configCharge: IComboGirdConfig = {
+    configCharge: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
         displayFields: [],
         dataSource: [],

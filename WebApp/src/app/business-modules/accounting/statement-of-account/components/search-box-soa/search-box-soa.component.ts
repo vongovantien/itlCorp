@@ -3,7 +3,7 @@ import { formatDate } from '@angular/common';
 
 import { forkJoin } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { AppPage, IComboGirdConfig } from 'src/app/app.base';
+import { AppPage } from 'src/app/app.base';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { Currency, Partner, User } from 'src/app/shared/models';
 import { SystemRepo } from 'src/app/shared/repositories';
@@ -25,7 +25,7 @@ export class StatementOfAccountSearchComponent extends AppPage {
     items: any[];
     selectedRange: any;
 
-    configPartner: IComboGirdConfig = {
+    configPartner: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
         displayFields: [],
         dataSource: [],
