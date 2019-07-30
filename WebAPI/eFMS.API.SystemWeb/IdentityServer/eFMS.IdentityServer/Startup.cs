@@ -19,6 +19,8 @@ using eFMS.IdentityServer;
 using Microsoft.IdentityModel.Logging;
 using System.Security.Cryptography.X509Certificates;
 using System.IO;
+using eTMS.IdentityServer.Configuration;
+using AutoMapper.Configuration;
 
 namespace AuthServer
 {
@@ -26,27 +28,20 @@ namespace AuthServer
     {
 
         IHostingEnvironment _environment;
-        public Startup(IHostingEnvironment environment)
+        IAppConfig _appConfig;
+
+        public Startup(IHostingEnvironment environment, IAppConfig appConfig)
         {
             _environment = environment;
+            _appConfig = appConfig;
         }
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
 
         public void ConfigureServices(IServiceCollection services)
-        {
-          
+        {          
             services.AddAutoMapper();
-            var cert = new X509Certificate2(Path.Combine(_environment.ContentRootPath, "certs", "IdentityServer4Auth.pfx"));
-            services.AddIdentityServer()
-                //.AddDeveloperSigningCredential()
-                .AddInMemoryApiResources(Config.GetApiResources())
-                .AddInMemoryIdentityResources(Config.GetIdentityResources())
-                .AddInMemoryClients(Config.GetClients(null, 14400, 12600))
-                .AddInMemoryPersistedGrants()
-            .AddSigningCredential(cert)
-                .AddValidationKey(cert);
-
+            services.AddCustomAuthentication(_environment, _appConfig);
             services.AddTransient<IAuthenUserService, AuthenticateService>();
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
 
@@ -70,13 +65,42 @@ namespace AuthServer
             app.UseIdentityServer();
             app.Run(async (context) =>
             {
-                await context.Response.WriteAsync("Identity Server is running ...");
+                string url = string.Concat(
+                       context.Request.Scheme,
+                       "://",
+                       context.Request.Host.ToUriComponent(),
+                       context.Request.PathBase.ToUriComponent(),
+                      context.Request.Path.HasValue && context.Request.Path.ToUriComponent().EndsWith('/')
+                      ? "" : @"/");
+                await
+                context.Response.WriteAsync("Identity Server is running ..."
+                     + Environment.NewLine
+                     + "Check working: " + url
+                     + @".well-known/openid-configuration");
             });
             app.UseCors(builder => builder
             .AllowAnyOrigin()
             .AllowAnyHeader()
             .AllowCredentials()
             .AllowAnyMethod());
+        }
+    }
+    static class CustomExtensionsMethods
+    {
+        public static IServiceCollection AddCustomAuthentication(this IServiceCollection services, IHostingEnvironment environment, IAppConfig appConfig)
+        {
+            var cert = new X509Certificate2(Path.Combine(environment.ContentRootPath, "certs", "IdentityServer4Auth.pfx"));
+            services.AddIdentityServer()
+                //.AddDeveloperSigningCredential()
+                .AddInMemoryApiResources(Config.GetApiResources())
+                .AddInMemoryIdentityResources(Config.GetIdentityResources())
+                //.AddInMemoryClients(Config.GetClients(null, 14400, 12600))
+                .AddInMemoryClients(Config.GetClients(appConfig.AuthConfig.RedirectUris, appConfig.AuthConfig.AccessTokenLifetime, appConfig.AuthConfig.SlidingRefreshTokenLifetime))
+                .AddInMemoryPersistedGrants()
+                .AddSigningCredential(cert)
+                .AddValidationKey(cert);
+
+            return services;
         }
     }
 }
