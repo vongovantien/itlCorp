@@ -46,34 +46,8 @@ export class ContainerListComponent extends PopupBase implements OnInit {
   ngOnInit() {
     this.getComodities();
     this.getUnits();
-    // this.getListContainersOfJob();
-    if (this.lstMasterContainers.length === 0) {
-      this.lstMasterContainers.push(this.initNewContainer());
-    } else {
-      this.lstContainerTemp = this.lstMasterContainers;
-    }
+    this.lstContainerTemp = this.lstMasterContainers;
   }
-
-  // getListContainersOfJob() {
-  //   this._containerRepo.getListContainersOfJob({ mblid: this.jobId })
-  //     .pipe(
-  //       catchError(this.catchError),
-  //       finalize(() => {
-  //         this.isLoading = false;
-  //         if (this.lstMasterContainers.length === 0) {
-  //           this.lstMasterContainers.push(this.initNewContainer());
-  //         }
-  //       })
-  //     )
-  //     .subscribe(
-  //       (res: any) => {
-  //         this.lstMasterContainers = this.lstContainerTemp = res;
-  //       },
-  //       (errors: any) => {
-  //       },
-  //       () => { }
-  //     );
-  // }
 
   async onSubmitContainer(form: NgForm) {
     for (let i = 0; i < this.lstMasterContainers.length; i++) {

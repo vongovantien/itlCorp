@@ -1,3 +1,257 @@
-<p>
-  add-obh-rate-popup works!
-</p>
+<form novalidate name="addOBHChargeFormOps" #addOBHChargeFormOps="ngForm" (ngSubmit)="addOBHChargeFormOps.form.valid">
+  <div class="modal fade" id="ops-add-obh-charge-modal" bsModal #popup="bs-modal" role="dialog"
+    (onHide)="onHide($event)" (onShow)="onShow($event)">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add OBH charge</h5>
+          <button type="button" class="close" aria-label="Close" (click)="close(addOBHChargeFormOps)">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" *ngIf="isDisplay">
+          <!--begin::Form-->
+          <div class="m-form m-form--state">
+            <div class="row">
+              <div class="col-lg-4">
+                <div class="form-group"
+                  [ngClass]="{ 'm-form__group has-danger': addOBHChargeFormOps.submitted && obhChargeToAdd.chargeId==null}">
+                  <label class="form-control-label" for="" #selectedOBHChargeCode>
+                    Charge <span class="m--font-danger">(*)</span>
+                    <small
+                      class="m--margin-left-5 m--font-primary">{{selectedOBHChargeCode.value==null?'':selectedOBHChargeCode.value}}&nbsp;</small>
+                  </label>
+
+                  <app-combo-grid-virtual-scroll
+                    [currentActiveItemId]="{field:'charge.id',value:obhChargeToAdd.chargeId}" (itemSelected)="obhChargeToAdd.chargeId=$event.charge.id;
+                                              obhChargeToAdd.unitId=$event.charge.unitId;
+                                              obhChargeToAdd.unitPrice=$event.charge.unitPrice;
+                                              obhChargeToAdd.vatrate = $event.charge.vatrate;
+                                              selectedOBHChargeCode.value=$event.charge.code;
+                                              obhChargeToAdd.currencyId=$event.currency;
+                                              currentActiveItemDefault=[{ id: $event.currency, text: $event.currency }];
+                                              calculateTotalEachOBH()"
+                    [selectedDisplayFields]="['charge.chargeNameEn']" [dataSources]="lstOBHChargesComboBox"
+                    [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
+                  </app-combo-grid-virtual-scroll>
+
+                  <div class="form-control-feedback"
+                    *ngIf="addOBHChargeFormOps.submitted && obhChargeToAdd.chargeId==null">
+                    Charge is required
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="col-lg-4">
+                <div class="form-group"
+                  [ngClass]="{ 'm-form__group has-danger': addOBHChargeFormOps.submitted && (obhChargeToAdd.receiverId==null || obhChargeToAdd.receiverId==obhChargeToAdd.payerId)}">
+                  <label class="form-control-label" for="">
+                    Receiver <span class="m--font-danger">(*)</span>
+                  </label>
+
+                  <app-combo-grid-virtual-scroll [currentActiveItemId]="{field:'id',value:obhChargeToAdd.receiverId}"
+                    (itemSelected)="obhChargeToAdd.receiverId = $event.id" [selectedDisplayFields]="['shortName']"
+                    [dataSources]="lstPartners"
+                    [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                  </app-combo-grid-virtual-scroll>
+
+                  <div class="form-control-feedback"
+                    *ngIf="addOBHChargeFormOps.submitted && (obhChargeToAdd.receiverId==null || obhChargeToAdd.receiverId==obhChargeToAdd.payerId)">
+                    Receiver name is required and do not same with payer!
+                  </div>
+
+
+                </div>
+              </div>
+
+
+              <div class="col-lg-4">
+                <div class="form-group"
+                  [ngClass]="{ 'm-form__group has-danger': addOBHChargeFormOps.submitted && (obhChargeToAdd.payerId==null || obhChargeToAdd.receiverId==obhChargeToAdd.payerId)}">
+                  <label class="form-control-label" for="">
+                    Payer <span class="m--font-danger">(*)</span>
+                  </label>
+
+                  <app-combo-grid-virtual-scroll [currentActiveItemId]="{field:'id',value:obhChargeToAdd.payerId}"
+                    (itemSelected)="obhChargeToAdd.payerId  = $event.id" [selectedDisplayFields]="['shortName']"
+                    [dataSources]="lstPartners"
+                    [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                  </app-combo-grid-virtual-scroll>
+
+                  <div class="form-control-feedback"
+                    *ngIf="addOBHChargeFormOps.submitted && (obhChargeToAdd.payerId==null || obhChargeToAdd.receiverId==obhChargeToAdd.payerId)">
+                    Payer name is required and do not same with receiver!
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+            <div class="row">
+              <div class="col-lg-4">
+                <div class="form-group"
+                  [ngClass]="{ 'm-form__group has-danger': addOBHChargeFormOps.submitted && (OBHQuantityNameOps.invalid || obhChargeToAdd.quantity == 0) }">
+                  <label class="form-control-label" for="">
+                    Quantity <span class="m--font-danger">(*)</span>
+                  </label>
+                  <input type="number" class="form-control m-input m-input--square" min="0" decimalNumberGreaterThan0
+                    placeholder="Enter number" #OBHQuantityNameOps="ngModel" [(ngModel)]="obhChargeToAdd.quantity"
+                    required (keyup)="calculateTotalEachOBH()" (change)="calculateTotalEachOBH()" autocomplete="nope"
+                    name="OBHQuantityNameOps">
+                  <div class="form-control-feedback"
+                    *ngIf="addOBHChargeFormOps.submitted && OBHQuantityNameOps.invalid">
+                    Quantity is required !
+                  </div>
+                  <div class="form-control-feedback"
+                    *ngIf="addOBHChargeFormOps.submitted && obhChargeToAdd.quantity == 0">
+                    Quantity must be greater than 0 !
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="col-lg-4">
+                <div class="form-group"
+                  [ngClass]="{ 'm-form__group has-danger': addOBHChargeFormOps.submitted && obhChargeToAdd.unitId==null}">
+
+                  <label class="form-control-label" for="">
+                    Unit <span class="m--font-danger">(*)</span>
+                  </label>
+
+                  <app-combo-grid-virtual-scroll [currentActiveItemId]="{field:'id',value:obhChargeToAdd.unitId}"
+                    (itemSelected)="obhChargeToAdd.unitId=$event.id" [selectedDisplayFields]="['unitNameEn']"
+                    [dataSources]="lstUnits"
+                    [displayFields]="[{'field':'unitNameEn','label':'Name EN'},{'field':'unitType','label':'Unit type'}]">
+                  </app-combo-grid-virtual-scroll>
+
+                  <div class="form-control-feedback"
+                    *ngIf="addOBHChargeFormOps.submitted && obhChargeToAdd.chargeId==null">
+                    Unit is required
+                  </div>
+
+                </div>
+              </div>
+
+
+              <div class="col-lg-4">
+                <div class="form-group"
+                  [ngClass]="{ 'm-form__group has-danger': addOBHChargeFormOps.submitted &&(OBHUnitPriceNameOps.invalid || (0 >= obhChargeToAdd.unitPrice)) }">
+                  <label class="form-control-label" for="">
+                    Unit price <span class="m--font-danger">(*)</span>
+                  </label>
+                  <input type="number" class="form-control m-input m-input--square" autocomplete="nope"
+                    [(ngModel)]="obhChargeToAdd.unitPrice" placeholder="Enter number" required
+                    name="OBHUnitPriceNameOps" #OBHUnitPriceNameOps="ngModel" (keyup)="calculateTotalEachOBH()"
+                    (change)="calculateTotalEachOBH()">
+                  <div class="form-control-feedback"
+                    *ngIf="addOBHChargeFormOps.submitted &&(OBHUnitPriceNameOps.invalid || (0 >= obhChargeToAdd.unitPrice))">
+                    Unit Price is required and must be larger than 0 !
+                  </div>
+                </div>
+              </div>
+
+
+            </div>
+            <div class="row">
+              <div class="col-lg-4">
+                <div class="form-group"
+                  [ngClass]="{ 'm-form__group has-danger': addOBHChargeFormOps.submitted && obhChargeToAdd.currencyId===null }">
+                  <label class="form-control-label" for="">
+                    Currency <span class="m--font-danger">(*)</span>
+                  </label>
+
+                  <ng-select [allowClear]="true" [items]="lstCurrencies" [disabled]="disabled"
+                    [active]="currentActiveItemDefault" (data)="refreshValue($event)"
+                    (selected)="obhChargeToAdd.currencyId=$event.id" (removed)="obhChargeToAdd.currencyId=null"
+                    placeholder="Select filter">
+                  </ng-select>
+
+                  <div class="form-control-feedback"
+                    *ngIf="addOBHChargeFormOps.submitted && obhChargeToAdd.currencyId===null">
+                    Currency is required
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="form-group"
+                  [ngClass]="{ 'm-form__group has-danger': addOBHChargeFormOps.submitted && (OBHRateChargeVATNameOps.invalid || obhChargeToAdd.vatrate > 100) }">
+                  <label class="form-control-label" for="">
+                    VAT <span class="m--font-danger">(*)</span>
+                  </label>
+                  <input type="number" max="100" name="OBHRateChargeVATNameOps" required autocomplete="nope"
+                    #OBHRateChargeVATNameOps="ngModel" [(ngModel)]="obhChargeToAdd.vatrate"
+                    class="form-control m-input m-input--square" placeholder="Enter number"
+                    (keyup)="calculateTotalEachOBH()" (change)="calculateTotalEachOBH()">
+                  <div class="form-control-feedback"
+                    *ngIf="addOBHChargeFormOps.submitted && (OBHRateChargeVATNameOps.invalid || obhChargeToAdd.vatrate > 100)">
+                    VAT is required and must be less than or equal 100
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="form-group">
+                  <label class="form-control-label" for="">
+                    Total
+                  </label>
+                  <input type="text" class="form-control m-input m-input--square" disabled name="OBHChargeTotalNameOps"
+                    [(ngModel)]="obhChargeToAdd.total">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-4">
+                <div class="form-group">
+                  <label class="form-control-label" for="">
+                    Doc no
+                  </label>
+                  <input type="text" [(ngModel)]="obhChargeToAdd.docNo" autocomplete="nope"
+                    class="form-control m-input m-input--square" placeholder="Enter text" name="OBHChargeDocNameOps">
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="form-group">
+                  <label class="form-control-label" for="">
+                    Note
+                  </label>
+                  <input type="text" [(ngModel)]="obhChargeToAdd.notes" autocomplete="nope"
+                    class="form-control m-input m-input--square" placeholder="Enter text" name="OBHChargeNoteNameOps">
+                </div>
+              </div>
+            </div>
+          </div>
+          <!--end::Form-->
+        </div>
+        <div class="modal-footer m--align-center">
+          <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+            (click)="obhChargeToAdd.type='OBH';saveNewCharge('ops-add-obh-charge-modal',addOBHChargeFormOps,true)">
+            <span>
+              <i class="la la-plus"></i>
+              <span>
+                save & continue
+              </span>
+            </span>
+          </button>
+          <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+            (click)="obhChargeToAdd.type='OBH';saveNewCharge('ops-add-obh-charge-modal',addOBHChargeFormOps,false)">
+            <span>
+              <i class="la la-save"></i>
+              <span>
+                save
+              </span>
+            </span>
+          </button>
+          <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
+            (click)="close(addOBHChargeFormOps)">
+            <span>
+              <i class="la la-ban"></i>
+              <span>
+                cancel
+              </span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
