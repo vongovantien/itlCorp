@@ -24,7 +24,8 @@ export class SOA {
     amountDebitUSD: number = 0;
     chargeShipments: any[] = [];
     amountBalanceLocal: number = 0;
-    
+    servicesNameSoa: any[] = [];
+
     constructor(data?: any) {
         const self = this;
         for (const key in data) {
