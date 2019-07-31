@@ -41,7 +41,8 @@ namespace AuthServer
         public void ConfigureServices(IServiceCollection services)
         {          
             services.AddAutoMapper();
-            services.AddCustomAuthentication(_environment, _appConfig);
+            services.AddCustomMvc(_appConfig)
+                .AddCustomAuthentication(_environment, _appConfig);
             services.AddTransient<IAuthenUserService, AuthenticateService>();
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
 
@@ -78,11 +79,7 @@ namespace AuthServer
                      + "Check working: " + url
                      + @".well-known/openid-configuration");
             });
-            app.UseCors(builder => builder
-            .AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowCredentials()
-            .AllowAnyMethod());
+            app.UseCors("AllowAllOrigins");
         }
     }
     static class CustomExtensionsMethods
@@ -100,6 +97,24 @@ namespace AuthServer
                 .AddSigningCredential(cert)
                 .AddValidationKey(cert);
 
+            return services;
+        }
+        public static IServiceCollection AddCustomMvc(this IServiceCollection services, IAppConfig appConfig)
+        {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    builder =>
+                    {
+                        builder
+                            //.AllowAnyOrigin()
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowCredentials()
+                            .WithOrigins(appConfig.CrosConfig.Urls);
+                    });
+            });
+            services.AddMvc();
             return services;
         }
     }
