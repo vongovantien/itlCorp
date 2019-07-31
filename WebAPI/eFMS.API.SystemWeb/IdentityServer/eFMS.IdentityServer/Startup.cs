@@ -92,7 +92,7 @@ namespace AuthServer
                 .AddInMemoryApiResources(Config.GetApiResources())
                 .AddInMemoryIdentityResources(Config.GetIdentityResources())
                 //.AddInMemoryClients(Config.GetClients(null, 14400, 12600))
-                .AddInMemoryClients(Config.GetClients(appConfig.AuthConfig.RedirectUris, appConfig.CrosConfig.Urls, appConfig.AuthConfig.AccessTokenLifetime, appConfig.AuthConfig.SlidingRefreshTokenLifetime))
+                .AddInMemoryClients(Config.GetClients(appConfig.CrosConfig.Urls, appConfig.AuthConfig.RedirectUris, appConfig.AuthConfig.AccessTokenLifetime, appConfig.AuthConfig.SlidingRefreshTokenLifetime))
                 .AddInMemoryPersistedGrants()
                 .AddSigningCredential(cert)
                 .AddValidationKey(cert);
