@@ -524,10 +524,17 @@ namespace eFMS.API.Catalogue.DL.Services
                 item.Code = stringLocalizer[LanguageSub.MSG_PLACE_CODE_EMPTY];
                 item.IsValid = false;
             }
-            else if (newList.Count(x => (x.Code ?? "").ToLower() == item.Code.ToLower()) > 1)
+            else if (newList.Count(x => (x.Code ?? "").ToLower() == item.Code.ToLower()) > 0)
             {
-                item.Code = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_CODE_DUPLICATE], item.Code);
-                item.IsValid = false;
+                var existedItemDuplicate = newList.FirstOrDefault(x => (x.Code ?? "").ToLower() == item.Code.ToLower());
+                if(existedItemDuplicate != null)
+                {
+                    existedItemDuplicate.Code = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_CODE_DUPLICATE], item.Code);
+                    existedItemDuplicate.IsValid = false;
+                    newList[newList.FindIndex(x => x.Id == existedItemDuplicate.Id)] = existedItemDuplicate;
+                    item.Code = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_CODE_DUPLICATE], item.Code);
+                    item.IsValid = false;
+                }
             }
             else
             {
