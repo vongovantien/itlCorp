@@ -9,7 +9,7 @@ namespace AuthServer
 {
     public class Config
     {
-        public static IEnumerable<Client> GetClients(string[] redirectUris, int tokenLifetime, int slientRefreshToken)
+        public static IEnumerable<Client> GetClients(string[] redirectUris, string[] allowedCorsOrigins,  int tokenLifetime, int slientRefreshToken)
         {
             return new List<Client>
             {
@@ -31,6 +31,12 @@ namespace AuthServer
                     SlidingRefreshTokenLifetime = slientRefreshToken,
                     RedirectUris = redirectUris,
                     AlwaysIncludeUserClaimsInIdToken = true,
+                    AllowedCorsOrigins = new List<string> {
+                        "http://localhost:4200",
+                        "http://test.efms.itlvn.com",
+                        "http://test.api-efms.itlvn.com",
+                        "http://staging.efms.itlvn.com",
+                        "http://staging.api-efms.itlvn.com" },
                     AllowedScopes =
                     {
                         "openid", "profile", "offline_access", "efms_scope", "dnt_api"
