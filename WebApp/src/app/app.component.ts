@@ -1,7 +1,7 @@
 
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BaseService } from 'src/app/shared/services/base.service';
-import { Router} from '@angular/router';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -10,16 +10,15 @@ import { Router} from '@angular/router';
 })
 export class AppComponent implements OnInit {
 
-  ngOnInit(): void {   
+  ngOnInit(): void {
     document.body.style.zoom = "100%"
-    if(!this.baseService.checkLoginSession()){
+    if (!this.baseService.checkLoginSession()) {
       this.router.navigateByUrl('/login');
     }
   }
 
-  public BreadcrumbStack:{path:string,name:string,level:number}[]=[];
 
-  constructor(private baseService:BaseService, private router:Router) {
+  constructor(private baseService: BaseService, private router: Router) {
   }
 
 
