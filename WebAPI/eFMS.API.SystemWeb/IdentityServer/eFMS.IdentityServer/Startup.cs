@@ -19,7 +19,7 @@ using eFMS.IdentityServer;
 using Microsoft.IdentityModel.Logging;
 using System.Security.Cryptography.X509Certificates;
 using System.IO;
-using eTMS.IdentityServer.Configuration;
+using eFMS.IdentityServer.Configuration;
 using AutoMapper.Configuration;
 
 namespace AuthServer
