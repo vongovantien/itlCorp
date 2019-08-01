@@ -6,11 +6,11 @@
         background-color: #fff;
         -webkit-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .16), 0 2px 8px 0 rgba(0, 0, 0, .12);
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .16), 0 2px 8px 0 rgba(0, 0, 0, .12);
-        transform: none !important;
-        -webkit-transform: none !important;
-        -moz-transform: none !important;
-        -ms-transform: none !important;
-        -o-transform: none !important;
+        transform: translateX(0) !important;
+        -webkit-transform: translateX(0) !important;
+        -moz-transform: translateX(0) !important;
+        -ms-transform: translateX(0) !important;
+        -o-transform: translateX(0) !important;
 }
 
     .table {

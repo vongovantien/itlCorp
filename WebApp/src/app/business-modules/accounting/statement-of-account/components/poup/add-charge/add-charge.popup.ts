@@ -20,6 +20,8 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
     headers: CommonInterface.IHeaderTable[];
     sort: string = null;
     order: any = false;
+
+    isCheckAllCharge: boolean  = false;
     constructor() {
         super();
     }
@@ -88,7 +90,9 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
     }
 
     checkUncheckAllCharge() {
-        
+
     }
+
+    onChangeCheckBoxCharge(data) {}
 
 }
