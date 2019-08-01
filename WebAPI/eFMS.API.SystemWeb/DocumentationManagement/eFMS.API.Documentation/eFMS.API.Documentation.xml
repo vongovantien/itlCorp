@@ -73,6 +73,27 @@
             <param name="model">object to update</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSOAController.GetShipmentsAndCDdNotesNotExistInResultFilter(eFMS.API.Documentation.DL.Models.Criteria.MoreChargeShipmentCriteria)">
+            <summary>
+            Get list shipment(JobId, HBL, MBL) and list CDNotes(CreditDebitNo) not exist in result filter
+            </summary>
+            <param name="criteria">search conditions</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSOAController.GetListMoreChargeByCondition(eFMS.API.Documentation.DL.Models.Criteria.MoreChargeShipmentCriteria)">
+            <summary>
+            get list more charge not exists in list charge on form Info
+            </summary>
+            <param name="criteria">search conditions</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSOAController.AddMoreCharge(eFMS.API.Documentation.DL.Models.Criteria.AddMoreChargeCriteria)">
+            <summary>
+            add more charge
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController">
             <summary>
             A base class for an MVC controller without view support.

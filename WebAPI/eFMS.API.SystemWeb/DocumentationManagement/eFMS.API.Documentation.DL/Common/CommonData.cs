@@ -35,4 +35,16 @@ namespace eFMS.API.Documentation.DL.Common
             new CommonData { Value = "Done", DisplayName = "Done" }
         };
     }
+
+    public class Shipments
+    {
+        public string JobId { get; set; }
+        public string HBL { get; set; }
+        public string MBL { get; set; }
+    }
+
+    public class CreditDebitNote : Shipments
+    {
+        public string CreditDebitNo { get; set; }
+    }
 }
