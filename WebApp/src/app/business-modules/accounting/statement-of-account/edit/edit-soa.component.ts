@@ -12,7 +12,6 @@ import { SortService } from 'src/app/shared/services';
 import { forkJoin } from 'rxjs';
 import { formatDate } from '@angular/common';
 import moment from 'moment';
-
 @Component({
     selector: 'app-statement-of-account-edit',
     templateUrl: './edit-soa.component.html',
@@ -75,7 +74,6 @@ export class StatementOfAccountEditComponent extends AppList {
     }
 
     getDetailSOA(soaNO: string, currency: string) {
-        this._spinner.show();
         forkJoin([
             this._accoutingRepo.getDetaiLSOA(soaNO, currency),
             this._sysRepo.getListCurrency()
@@ -112,7 +110,6 @@ export class StatementOfAccountEditComponent extends AppList {
             .subscribe(
                 (dataCurrency: any) => {
                     this.currencyList = dataCurrency;
-                    console.log(this.currencyList);
                 },
                 (errors: any) => {
                     this.handleError(errors);
@@ -161,7 +158,7 @@ export class StatementOfAccountEditComponent extends AppList {
         /*
         * endDate must greater or equal soaToDate
                     * and 
-        * fromDate must lower or equal soaFromDate
+        * fromDate must less or equal soaFromDate
         */
         if (!(moment(this.soa.soaformDate).isSameOrAfter(moment(this.selectedRange.startDate), 'day') && moment(this.selectedRange.endDate).isSameOrAfter(moment(this.soa.soatoDate), 'day'))) {
             this._toastService.warning(`Range date invalid `, '', { positionClass: 'toast-bottom-right' });
@@ -183,17 +180,21 @@ export class StatementOfAccountEditComponent extends AppList {
                 userCreated: this.soa.userCreated,
                 userModified: this.soa.userModified,
                 datetimeCreated: this.soa.datetimeCreated,
-                datetimeModified: this.soa.datetimeModified
+                datetimeModified: this.soa.datetimeModified,
+                serviceTypeId: this.soa.serviceTypeId,
+                dateType: this.soa.dateType
             };
-            console.log(body);
+            this._spinner.show();
 
             this._accoutingRepo.updateSOA(body)
-                .pipe(catchError(this.catchError))
+                .pipe(
+                    catchError(this.catchError),
+                    finalize(() => { this._spinner.hide(); })
+                )
                 .subscribe(
                     (res: CommonInterface.IResult) => {
-                        console.log(res);
                         if (res.status) {
-                            this._toastService.success(res.message, '', { positionClass: 'toast-bottom-right' });
+                            this._toastService.success(`SOA ${res.data.soano} is successfull`, 'Update Success', { positionClass: 'toast-bottom-right' });
 
                             // * get detail again
                             this.getDetailSOA(this.soaNO, this.currencyLocal);

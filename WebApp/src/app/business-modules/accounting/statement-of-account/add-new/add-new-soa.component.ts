@@ -10,8 +10,6 @@ import { SortService } from 'src/app/shared/services';
 import { StatementOfAccountAddChargeComponent } from '../components/poup/add-charge/add-charge.popup';
 import { ToastrService } from 'ngx-toastr';
 
-
-
 @Component({
     selector: 'app-statement-of-account-new',
     templateUrl: './add-new-soa.component.html',
@@ -22,7 +20,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
     @ViewChild(StatementOfAccountAddChargeComponent, { static: false }) addChargePopup: StatementOfAccountAddChargeComponent;
 
     charges: any[] = [];
-    headers: any = null;
+    headers: CommonInterface.IHeaderTable[];
 
     totalShipment: number = 0;
     totalCharge: number = 0;
@@ -112,7 +110,10 @@ export class StatementOfAccountAddnewComponent extends AppList {
                 soaformDate: this.dataSearch.fromDate,
                 soatoDate: this.dataSearch.toDate,
                 currency: this.dataSearch.currency,
-                note: this.dataSearch.note
+                note: this.dataSearch.note,
+                dateType: this.dataSearch.dateType,
+                serviceTypeId: this.dataSearch.serviceTypeId,
+                customerID: this.dataSearch.customerID
             };
 
             this._accountRepo.createSOA(body)
@@ -121,8 +122,8 @@ export class StatementOfAccountAddnewComponent extends AppList {
                     (res: any) => {
                         if (res.status) {
                             this._toastService.success(res.message, '', { positionClass: 'toast-bottom-right' });
-                            this.onSearchCharge(this.dataSearch); // ? Charge search again to remove charge was created by current SOA
-                            this.isCheckAllCharge = false; // ? reset checkbox all
+                            // this.onSearchCharge(this.dataSearch); // ? Charge search again to remove charge was created by current SOA
+                            // this.isCheckAllCharge = false; // ? reset checkbox all
 
                             //  * go to detail page
                             this._router.navigate(['home/accounting/statement-of-account/detail'], { queryParams: { no: res.data.soano, currency: 'VND' } });
@@ -158,13 +159,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
                     this.totalShipment = res.totalShipment;
                 },
                 (errors: any) => {
-                    let message: string = 'Has Error Please Check Again !';
-                    let title: string = '';
-                    if (errors instanceof HttpErrorResponse) {
-                        message = errors.message;
-                        title = errors.statusText;
-                    }
-                    this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
+                    this.handleError(errors);
                 },
                 () => { }
             );

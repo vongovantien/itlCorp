@@ -20,7 +20,7 @@ export class StatementOfAccountDetailComponent extends AppList {
     currencyLocal: string = 'VND';
 
     soa: SOA = new SOA();
-    headers: any[] = [];
+    headers: CommonInterface.IHeaderTable[] = [];
 
     constructor(
         private _activedRoute: ActivatedRoute,
@@ -69,7 +69,6 @@ export class StatementOfAccountDetailComponent extends AppList {
                 (res: any) => {
                     this.soa = new SOA(res);
                     this.totalItems = this.soa.chargeShipments.length;
-                    console.log(this.soa);
                 },
                 (errors: any) => {
                     this.handleError(errors);
