@@ -11,5 +11,7 @@ export * from './report-preview/report-preview.component';
 export * from './search-options/search-options.component';
 export * from './table-detail/table-detail.component';
 export * from './table-layout/table-layout.component';
+export * from './select-multiple/select-multiple.component';
+
 
 

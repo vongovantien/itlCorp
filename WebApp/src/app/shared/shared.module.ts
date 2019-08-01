@@ -12,9 +12,9 @@ import { ServiceModule } from "./services/service.module";
 import { SearchStage, FilterPipe, NegativeNumberePipe } from "./pipes";
 
 import { InfoPopupComponent, ConfirmPopupComponent } from "./common/popup";
-import { DecimalNumberGreaterThan0Directive, StyleCellDirective, AutofocusDirective, TwoDigitDecimaNumberDirective, ThreeDigitDecimaNumberDirective, IntergerInputDirective, SpecialCharacterDirective, EcusSpecicalCharacterAllowSpaceDirective, EcusSpecicalCharacterNoSpaceDirective } from "./directives";
+import { DecimalNumberGreaterThan0Directive, StyleCellDirective, AutofocusDirective, TwoDigitDecimaNumberDirective, ThreeDigitDecimaNumberDirective, IntergerInputDirective, SpecialCharacterDirective, EcusSpecicalCharacterAllowSpaceDirective, EcusSpecicalCharacterNoSpaceDirective, ClickOutSideDirective } from "./directives";
 
-import { PaginationComponent, TableLayoutComponent, InputTableLayoutComponent, BreadcrumbComponent, DefaultButtonComponent, DeleteConfirmModalComponent, SearchOptionsComponent, InputFormComponent, TableDetailComponent, CloseModalButtonComponent, ReportPreviewComponent, ComboGridVirtualScrollComponent, CfBeforeLeaveModalComponent } from "./common";
+import { PaginationComponent, TableLayoutComponent, InputTableLayoutComponent, BreadcrumbComponent, DefaultButtonComponent, DeleteConfirmModalComponent, SearchOptionsComponent, InputFormComponent, TableDetailComponent, CloseModalButtonComponent, ReportPreviewComponent, ComboGridVirtualScrollComponent, CfBeforeLeaveModalComponent, AppMultipleSelectComponent } from "./common";
 
 const Libary = [
   ModalModule,
@@ -47,6 +47,7 @@ const APP_COMPONENTS = [
   ReportPreviewComponent,
   ComboGridVirtualScrollComponent,
   CfBeforeLeaveModalComponent,
+  AppMultipleSelectComponent,
   ...APP_POPUP
 ];
 
@@ -60,6 +61,7 @@ const APP_DIRECTIVES = [
   EcusSpecicalCharacterAllowSpaceDirective,
   EcusSpecicalCharacterNoSpaceDirective,
   DecimalNumberGreaterThan0Directive,
+  ClickOutSideDirective
 ];
 @NgModule({
   imports: [
