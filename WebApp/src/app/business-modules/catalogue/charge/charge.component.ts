@@ -111,7 +111,7 @@ export class ChargeComponent implements OnInit {
   }
 
   gotoEditPage(id) {
-    this.router.navigate(["/home/catalogue/charge-edit", { id: id }]);
+    this.router.navigate(["/home/catalogue/charge/edit", { id: id }]);
   }
 
   isDesc = true;
