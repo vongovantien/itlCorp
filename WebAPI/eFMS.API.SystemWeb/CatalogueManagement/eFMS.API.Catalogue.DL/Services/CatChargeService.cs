@@ -192,18 +192,36 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.ChargeNameVn = stringLocalizer[LanguageSub.MSG_CHARGE_NAME_LOCAL_EMPTY];
                     item.IsValid = false;
                 }
-                if (item.UnitId<=0)
+                //if (item.UnitId<=0)
+                //{
+                //    item.UnitId = -1;
+                //    item.IsValid = false;
+                //}
+                //if (item.UnitId > 0)
+                //{
+                //    var unit = dc.CatUnit.FirstOrDefault(x => x.Id == item.UnitId);
+                //    if (unit == null)
+                //    {
+                //        item.UnitId = -1;
+                //        item.IsValid = false;
+                //    }
+                //}
+                if (string.IsNullOrEmpty(item.UnitCode))
                 {
-                    item.UnitId = -1;
+                    item.UnitCode = stringLocalizer[LanguageSub.MSG_CHARGE_UNIT_EMPTY];
                     item.IsValid = false;
                 }
-                if (item.UnitId > 0)
+                else
                 {
-                    var unit = dc.CatUnit.FirstOrDefault(x => x.Id == item.UnitId);
-                    if (unit == null)
+                    var unit = dc.CatUnit.FirstOrDefault(x => x.Code.ToLower() == item.UnitCode.ToLower());
+                    if(unit == null)
                     {
-                        item.UnitId = -1;
+                        item.UnitCode = stringLocalizer[LanguageSub.MSG_CHARGE_UNIT_NOT_FOUND];
                         item.IsValid = false;
+                    }
+                    else
+                    {
+                        item.UnitId = unit.Id;
                     }
                 }
                 if (item.UnitPrice < 0)

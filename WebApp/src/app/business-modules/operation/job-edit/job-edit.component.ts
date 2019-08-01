@@ -28,6 +28,11 @@ import { ConfirmDeleteJobPopupComponent } from './job-confirm-popup/confirm-dele
 import { AddBuyingRatePopupComponent } from './charge-list/add-buying-rate-popup/add-buying-rate-popup.component';
 import { AddSellingRatePopupComponent } from './charge-list/add-selling-rate-popup/add-selling-rate-popup.component';
 import { AddObhRatePopupComponent } from './charge-list/add-obh-rate-popup/add-obh-rate-popup.component';
+import { DataService } from 'src/app/shared/services';
+import { EditBuyingRatePopupComponent } from './charge-list/edit-buying-rate-popup/edit-buying-rate-popup.component';
+import { EditSellingRatePopupComponent } from './charge-list/edit-selling-rate-popup/edit-selling-rate-popup.component';
+import { EditObhRatePopupComponent } from './charge-list/edit-obh-rate-popup/edit-obh-rate-popup.component';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 declare var $: any;
 
 @Component({
@@ -46,6 +51,11 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     @ViewChild(AddBuyingRatePopupComponent, { static: false }) addBuyingRatePopup: AddBuyingRatePopupComponent;
     @ViewChild(AddSellingRatePopupComponent, { static: false }) addSellingRatePopup: AddSellingRatePopupComponent;
     @ViewChild(AddObhRatePopupComponent, { static: false }) addOHBRatePopup: AddObhRatePopupComponent;
+    @ViewChild(EditBuyingRatePopupComponent, { static: false }) editBuyingRatePopup: EditBuyingRatePopupComponent;
+    @ViewChild(EditSellingRatePopupComponent, { static: false }) editSellingRatePopup: EditSellingRatePopupComponent;
+    @ViewChild(EditObhRatePopupComponent, { static: false }) editOHBRatePopup: EditObhRatePopupComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteCharge: ConfirmPopupComponent;
+
     opsTransaction: OpsTransaction = null;
     productServices: any[] = [];
     serviceDate: any;
@@ -83,11 +93,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     ListOBHCharges: any[] = [];
     ConstListOBHCharges: any[] = [];
 
-    BuyingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
-    SellingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
-    OBHChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
-
-    isDisplay: boolean = true;
     BuyingRateChargeToEdit: CsShipmentSurcharge = null;
     SellingRateChargeToEdit: CsShipmentSurcharge = null;
     OBHChargeToEdit: any = null;
@@ -111,12 +116,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
     listPackageTypes: any[];
     packageTypes: any[] = [];
-    currentActiveItemDefault: { id: null, text: null }[] = [];
-    buyingRateChargeActive = [];
-    sellingRateChargeActive = [];
-    obhChargeActive = [];
-    @ViewChild('containerMasterForm', { static: true }) containerMasterForm: NgForm;
-    // @ViewChild('containerSelect',{static:true}) containerSelect: ElementRef;
 
     tab: string = '';
     jobId: string = '';
@@ -126,7 +125,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         private route: ActivatedRoute,
         private router: Router,
         private _unitRepo: UnitRepo,
-        private _containerRepo: ContainerRepo) {
+        private _containerRepo: ContainerRepo,
+        private _data: DataService) {
         super();
         this.keepCalendarOpeningWithRange = true;
         // this.selectedDate = Date.now();
@@ -139,6 +139,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             // this.getPackageTypes();
             this.getUnits();
             this.getPartners();
+            this.getListCurrencies();
             this.getCurrencies();
             this.getListBuyingRateCharges();
             this.getListSellingRateCharges();
@@ -180,10 +181,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
     }
 
-    // async getShipmentContainer() {
-    //     const responses = await this.baseServices.postAsync(this.api_menu.Documentation.CsMawbcontainer.query, { mblid: this.opsTransaction.id }, false, false);
-    //     this.opsTransaction.csMawbcontainers = this.lstContainerTemp = this.lstMasterContainers = responses;
-    // }
     getListContainersOfJob() {
         this._containerRepo.getListContainersOfJob({ mblid: this.opsTransaction.id })
             .pipe(
@@ -326,11 +323,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this.serviceModes = dataHelper.prepareNg2SelectData(data.serviceModes, 'value', 'displayName');
         this.shipmentModes = dataHelper.prepareNg2SelectData(data.shipmentModes, 'value', 'displayName');
     }
-    // private getListBillingOps() {
-    //     this.baseServices.get(this.api_menu.System.User_Management.getAll).subscribe((res: any) => {
-    //         this.billingOps = res;
-    //     });
-    // }
     private getPorts() {
         this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { placeType: PlaceTypeEnum.Port, inactive: false }).subscribe((res: any) => {
             this.ports = res;
@@ -362,6 +354,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     public getListBuyingRateCharges() {
         this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'CREDIT', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
             this.lstBuyingRateChargesComboBox = res['data'];
+            this._data.setData('buyingCharges', this.lstBuyingRateChargesComboBox);
         });
 
     }
@@ -369,18 +362,21 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     public getListSellingRateCharges() {
         this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'DEBIT', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
             this.lstSellingRateChargesComboBox = res['data'];
+            this._data.setData('sellingCharges', this.lstSellingRateChargesComboBox);
         });
     }
 
     public getListOBHCharges() {
         this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'OBH', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
             this.lstOBHChargesComboBox = res['data'];
+            this._data.setData('obhCharges', this.lstOBHChargesComboBox);
         });
     }
 
     public getPartners() {
         this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.ALL, inactive: false }).subscribe((res: any) => {
             this.lstPartners = res;
+            this._data.setData('lstPartners', this.lstPartners);
             console.log({ PARTNERS: this.lstPartners });
         });
     }
@@ -388,9 +384,15 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     public getUnits() {
         this.baseServices.post(this.api_menu.Catalogue.Unit.getAllByQuery, { inactive: false }).subscribe((data: any) => {
             this.lstUnits = data;
+            this._data.setData('lstUnits', this.lstUnits);
         });
     }
 
+    public getListCurrencies() {
+        this.baseServices.post(this.api_menu.Catalogue.Currency.getAllByQuery, { inactive: false }).subscribe((res: any) => {
+            this._data.setData('lstCurrencies', res);
+        });
+    }
     public getCurrencies(isAddNew = true) {
         if (isAddNew === true) {
             this.baseServices.post(this.api_menu.Catalogue.Currency.getAllByQuery, { inactive: false }).subscribe((res: any) => {
@@ -403,70 +405,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         }
     }
 
-    calculateTotalEachBuying(isEdit: boolean = false) {
-        let total = 0;
-        if (isEdit) {
-            if (this.BuyingRateChargeToEdit.vatrate >= 0) {
-                total = this.BuyingRateChargeToEdit.quantity * this.BuyingRateChargeToEdit.unitPrice * (1 + (this.BuyingRateChargeToEdit.vatrate / 100));
-            } else {
-                total = this.BuyingRateChargeToEdit.quantity * this.BuyingRateChargeToEdit.unitPrice + Math.abs(this.BuyingRateChargeToEdit.vatrate);
-            }
-            this.BuyingRateChargeToEdit.total = Number(total.toFixed(2));
-        } else {
-            if (this.BuyingRateChargeToAdd.vatrate >= 0) {
-                total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice * (1 + (this.BuyingRateChargeToAdd.vatrate / 100));
-            } else {
-                total = this.BuyingRateChargeToAdd.quantity * this.BuyingRateChargeToAdd.unitPrice + Math.abs(this.BuyingRateChargeToAdd.vatrate);
-            }
-            this.BuyingRateChargeToAdd.total = Number(total.toFixed(2));
-        }
-    }
-
-    calculateTotalEachSelling(isEdit: boolean = false) {
-        let total = 0;
-        if (isEdit) {
-            if (this.SellingRateChargeToEdit.vatrate >= 0) {
-                total = this.SellingRateChargeToEdit.quantity * this.SellingRateChargeToEdit.unitPrice * (1 + (this.SellingRateChargeToEdit.vatrate / 100));
-            } else {
-                total = this.SellingRateChargeToEdit.quantity * this.SellingRateChargeToEdit.unitPrice + Math.abs(this.SellingRateChargeToEdit.vatrate);
-            }
-            this.SellingRateChargeToEdit.total = Number(total.toFixed(2));
-        } else {
-            if (this.SellingRateChargeToAdd.vatrate >= 0) {
-                total = this.SellingRateChargeToAdd.quantity * this.SellingRateChargeToAdd.unitPrice * (1 + (this.SellingRateChargeToAdd.vatrate / 100));
-            } else {
-                total = this.SellingRateChargeToAdd.quantity * this.SellingRateChargeToAdd.unitPrice + Math.abs(this.SellingRateChargeToAdd.vatrate);
-            }
-            this.SellingRateChargeToAdd.total = Number(total.toFixed(2));
-        }
-    }
-
-
-    calculateTotalEachOBH(isEdit: boolean = false) {
-        let total = 0;
-        if (isEdit) {
-            if (this.OBHChargeToEdit.vatrate >= 0) {
-                total = this.OBHChargeToEdit.quantity * this.OBHChargeToEdit.unitPrice * (1 + (this.OBHChargeToEdit.vatrate / 100));
-            } else {
-                total = this.OBHChargeToEdit.quantity * this.OBHChargeToEdit.unitPrice + Math.abs(this.OBHChargeToEdit.vatrate);
-            }
-            this.OBHChargeToEdit.total = Number(total.toFixed(2));
-        } else {
-            if (this.OBHChargeToAdd.vatrate >= 0) {
-                total = this.OBHChargeToAdd.quantity * this.OBHChargeToAdd.unitPrice * (1 + (this.OBHChargeToAdd.vatrate / 100));
-            } else {
-                total = this.OBHChargeToAdd.quantity * this.OBHChargeToAdd.unitPrice + Math.abs(this.OBHChargeToAdd.vatrate);
-            }
-            this.OBHChargeToAdd.total = Number(total.toFixed(2));
-        }
-    }
-
-    resetDisplay() {
-        this.isDisplay = false;
-        setTimeout(() => {
-            this.isDisplay = true;
-        }, 50);
-    }
     onSaveNewBuyingRate(event) {
         if (event === true) {
             console.log('add buying charge thành công');
@@ -485,30 +423,23 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             this.getSurCharges('OBH');
         }
     }
-    saveNewCharge(id_form: string, form: NgForm, data: CsShipmentSurcharge, isContinue: boolean) {
-        setTimeout(async () => {
-            const error = $('#' + id_form).find('div.has-danger');
-            if (error.length === 0) {
-                data.hblid = this.opsTransaction.hblid;
-                if (data.quantity != null) {
-                    data.quantity = Number(data.quantity.toFixed(2));
-                }
-                const res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, data);
-                if (res.status) {
-                    form.onReset();
-                    this.resetDisplay();
-                    this.getAllSurCharges();
-                    this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
-                    this.SellingRateChargeToAdd = new CsShipmentSurcharge();
-                    this.OBHChargeToAdd = new CsShipmentSurcharge();
-                    this.baseServices.setData("CurrentOpsTransaction", this.opsTransaction);
-                    this.baseServices.setData("ShipmentAdded", true);
-                    if (!isContinue) {
-                        $('#' + id_form).modal('hide');
-                    }
-                }
-            }
-        }, 300);
+    onSaveBuyingRate(event) {
+        if (event === true) {
+            console.log('edit buying charge thành công');
+            this.getSurCharges('BUY');
+        }
+    }
+    onSaveSellingRate(event) {
+        if (event === true) {
+            console.log('edit selling charge thành công');
+            this.getSurCharges('SELL');
+        }
+    }
+    onSaveOHBRate(event) {
+        if (event === true) {
+            console.log('edit obh charge thành công');
+            this.getSurCharges('OBH');
+        }
     }
     openAddNewBuyingRatePopup() {
         this.addBuyingRatePopup.show({ backdrop: 'static' });
@@ -609,48 +540,41 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     prepareEditCharge(type: 'BUY' | 'SELL' | 'OBH', charge: any) {
         if (type === 'BUY') {
             this.BuyingRateChargeToEdit = cloneDeep(charge);
-            this.buyingRateChargeActive = [{ 'text': this.BuyingRateChargeToEdit.currency, 'id': this.BuyingRateChargeToEdit.currencyId }]
-            //this.BuyingRateChargeToEdit.exchangeDate = { startDate: moment(this.BuyingRateChargeToEdit.exchangeDate), endDate: moment(this.BuyingRateChargeToEdit.exchangeDate) };
-            if (this.BuyingRateChargeToEdit.exchangeDate != null) {
-                this.exchangeRateDate = { startDate: moment(this.BuyingRateChargeToEdit.exchangeDate), endDate: moment(this.BuyingRateChargeToEdit.exchangeDate) };
+            if (this.BuyingRateChargeToEdit) {
+                setTimeout(() => {
+                    this.editBuyingRatePopup.show({ backdrop: 'static' });
+                }, 100);
             }
         }
         if (type === 'SELL') {
-            console.log('data selling');
-            console.log(this.lstSellingRateChargesComboBox);
             this.SellingRateChargeToEdit = cloneDeep(charge);
-            console.log(this.SellingRateChargeToEdit);
-            console.log(this.lstCurrencies);
-            this.sellingRateChargeActive = [{ 'text': this.SellingRateChargeToEdit.currency, ' id': this.SellingRateChargeToEdit.currencyId }];
-            if (this.SellingRateChargeToEdit.exchangeDate != null) {
-                this.exchangeRateDate = { startDate: moment(this.SellingRateChargeToEdit.exchangeDate), endDate: moment(this.SellingRateChargeToEdit.exchangeDate) };
+            if (this.SellingRateChargeToEdit) {
+                setTimeout(() => {
+                    this.editSellingRatePopup.show({ backdrop: 'static' });
+                }, 100);
             }
-            //this.SellingRateChargeToEdit.exchangeDate = { startDate: moment(this.SellingRateChargeToEdit.exchangeDate), endDate: moment(this.SellingRateChargeToEdit.exchangeDate) };
-
         }
         if (type === 'OBH') {
             this.OBHChargeToEdit = cloneDeep(charge);
-            this.obhChargeActive = [{ 'text': this.OBHChargeToEdit.currency, 'id': this.OBHChargeToEdit.currencyId }];
-            //this.OBHChargeToEdit.exchangeDate = { startDate: moment(this.OBHChargeToEdit.exchangeDate), endDate: moment(this.OBHChargeToEdit.exchangeDate) };
-            if (this.OBHChargeToEdit.exchangeDate != null) {
-                this.exchangeRateDate = { startDate: moment(this.OBHChargeToEdit.exchangeDate), endDate: moment(this.OBHChargeToEdit.exchangeDate) };
+            if (this.OBHChargeToEdit) {
+                setTimeout(() => {
+                    this.editOHBRatePopup.show({ backdrop: 'static' });
+                }, 100);
             }
         }
     }
 
     chargeIdToDelete: string = null;
-    async DeleteCharge(stt: string, chargeId: string = null) {
-        if (stt == "confirm") {
-            console.log(chargeId);
-            this.chargeIdToDelete = chargeId;
+    showConfirmDeleteCharge(chargeId: string = null) {
+        this.chargeIdToDelete = chargeId;
+        this.confirmDeleteCharge.show();
+    }
+    async deleteCharge() {
+        const res = await this.baseServices.deleteAsync(this.api_menu.Documentation.CsShipmentSurcharge.delete + "?chargId=" + this.chargeIdToDelete);
+        if (res.status) {
+            this.getAllSurCharges();
         }
-        if (stt == "ok") {
-            var res = await this.baseServices.deleteAsync(this.api_menu.Documentation.CsShipmentSurcharge.delete + "?chargId=" + this.chargeIdToDelete);
-            if (res.status) {
-                this.getAllSurCharges();
-            }
-
-        }
+        this.confirmDeleteCharge.hide();
     }
 
     CDNoteDetails: AcctCDNoteDetails = null;
@@ -680,11 +604,10 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         console.log(event);
         if (event != null) {
             this.CDNoteDetails = event;
-            //this.baseServices.setData("CDNoteDetails", event);
             this.popupEdit.show({ backdrop: 'static' });
         }
     }
-    async closeEditModal(event) {
+    async closeEditCDNoteModal(event) {
         console.log(event);
         this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.opsTransaction.id + "&soaNo=" + this.CDNoteDetails.cdNote.code);
         if (this.CDNoteDetails != null) {
@@ -716,7 +639,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
     searchCharge(key: string, type: 'BUY' | 'SELL' | 'OBH') {
         const search_key = key.toString().trim().toLowerCase();
-        var referenceData: any[] = [];
+        let referenceData: any[] = [];
         if (type === 'BUY') {
             referenceData = this.ConstListBuyingRateCharges;
         }
@@ -726,7 +649,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         if (type === 'OBH') {
             referenceData = this.ConstListOBHCharges;
         }
-        var results = filter(referenceData, function (x: any) {
+        const results = filter(referenceData, function (x: any) {
             return (
                 ((x.partnerName == null ? "" : x.partnerName.toLowerCase().includes(search_key)) ||
                     (x.nameEn == null ? "" : x.nameEn.toLowerCase().includes(search_key)) ||
@@ -742,46 +665,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         });
 
         return results;
-    }
-
-    editCharge(id_form: string, form: NgForm, data: CsShipmentSurcharge) {
-        setTimeout(async () => {
-            if (form.submitted) {
-                const error = $('#' + id_form).find('div.has-danger');
-                if (error.length === 0) {
-                    if (data.quantity != null) {
-                        data.quantity = Number(data.quantity.toFixed(2));
-                    }
-                    if (this.exchangeRateDate != null) {
-                        data.exchangeDate = this.exchangeRateDate.startDate != null ? dataHelper.dateTimeToUTC(this.exchangeRateDate.startDate) : null;
-                    }
-                    const res = await this.baseServices.putAsync(this.api_menu.Documentation.CsShipmentSurcharge.update, data);
-                    if (res.status) {
-                        $('#' + id_form).modal('hide');
-                        this.getAllSurCharges();
-                        this.baseServices.setData("CurrentOpsTransaction", this.opsTransaction);
-                        this.baseServices.setData("ShipmentUpdated", true);
-                    }
-                }
-            }
-        }, 300);
-    }
-
-
-    closeChargeForm(formId: string, form: NgForm) {
-        form.onReset();
-        this.resetDisplay();
-        $('#' + formId).modal("hide");
-
-        this.currentActiveItemDefault = [];
-        this.BuyingRateChargeToAdd = new CsShipmentSurcharge();
-        this.SellingRateChargeToAdd = new CsShipmentSurcharge();
-        this.OBHChargeToAdd = new CsShipmentSurcharge();
-
-        this.BuyingRateChargeToEdit = null;
-        this.SellingRateChargeToEdit = null;
-        this.OBHChargeToEdit = null;
-
     }
 
     /**

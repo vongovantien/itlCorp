@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSurcharge';
 import { NgForm } from '@angular/forms';
@@ -8,12 +8,14 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
+import { DataService } from 'src/app/shared/services';
+import cloneDeep from 'lodash/cloneDeep';
 
 @Component({
   selector: 'app-add-buying-rate-popup',
   templateUrl: './add-buying-rate-popup.component.html'
 })
-export class AddBuyingRatePopupComponent extends PopupBase implements OnInit {
+export class AddBuyingRatePopupComponent extends PopupBase implements OnInit, OnDestroy {
   @Input() opsTransaction: OpsTransaction = null;
   @Output() outputAddBuying = new EventEmitter<any>();
   buyingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
@@ -25,15 +27,42 @@ export class AddBuyingRatePopupComponent extends PopupBase implements OnInit {
   currentActiveItemDefault: { id: null, text: null }[] = [];
 
   constructor(private baseServices: BaseService,
-    private api_menu: API_MENU) {
+    private api_menu: API_MENU,
+    private _data: DataService) {
     super();
   }
 
   ngOnInit() {
-    this.getListBuyingRateCharges();
-    this.getPartners();
-    this.getUnits();
-    this.getCurrencies();
+    this._data.currentMessage.subscribe(message => {
+      if (message['buyingCharges'] != null) {
+        this.lstBuyingRateChargesComboBox = cloneDeep(message['buyingCharges']);
+        console.log('charge buying nè');
+        console.log(this.lstBuyingRateChargesComboBox);
+      } else {
+        this.getListBuyingRateCharges();
+      }
+      if (message['lstUnits'] != null) {
+        this.lstUnits = cloneDeep(message['lstUnits']);
+        console.log('list unit nè');
+        console.log(this.lstUnits);
+      } else {
+        this.getUnits();
+      }
+      if (message['lstPartners'] != null) {
+        this.lstPartners = cloneDeep(message['lstPartners']);
+        console.log('list partner nè');
+        console.log(this.lstPartners);
+      } else {
+        this.getPartners();
+      }
+      if (message['lstCurrencies'] != null) {
+        this.lstCurrencies = prepareNg2SelectData(cloneDeep(message['lstCurrencies']), "id", "id");
+        console.log('list currency nè');
+        console.log(this.lstCurrencies);
+      } else {
+        this.getCurrencies();
+      }
+    });
   }
   close(form: NgForm) {
     form.onReset();

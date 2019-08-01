@@ -45,7 +45,8 @@
                     </div>
                 </div>
                 <div class="form-actions m--margin-top-5 m--align-right">
-                    <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="hideInvalid()">
+                    <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="hideInvalid()">
                         <span>
                             <span *ngIf="isShowInvalid">
                                 Show invalid rows
@@ -55,7 +56,8 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="import()">
+                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="import()">
                         <span>
                             <i class="la la-save"></i>
                             <span>
@@ -63,7 +65,8 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" routerLink="/home/catalogue/charge">
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase"
+                        routerLink="/home/catalogue/charge">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -133,19 +136,21 @@
                                         item.code.split('|')[0] }}</span>
                                 </td>
                                 <td class="">
-                                    <span *ngIf="item.chargeNameEn.split('|').length == 1">{{ item.chargeNameEn }}</span>
+                                    <span
+                                        *ngIf="item.chargeNameEn.split('|').length == 1">{{ item.chargeNameEn }}</span>
                                     <span class="m--font-danger" *ngIf="item.chargeNameEn.split('|').length > 1">{{
                                         item.chargeNameEn.split('|')[0] }}</span>
                                 </td>
                                 <td class="">
-                                    <span *ngIf="item.chargeNameVn.split('|').length == 1">{{ item.chargeNameVn }}</span>
+                                    <span
+                                        *ngIf="item.chargeNameVn.split('|').length == 1">{{ item.chargeNameVn }}</span>
                                     <span class="m--font-danger" *ngIf="item.chargeNameVn.split('|').length > 1">{{
                                         item.chargeNameVn.split('|')[0] }}</span>
                                 </td>
                                 <td class="">
-                                    <span *ngIf="item.unitId != -1">{{ item.unitId }}</span>
-                                    <span class="m--font-danger" *ngIf="item.unitId== -1">Unit is not allow to null and
-                                        must be number </span>
+                                    <span *ngIf="item.unitCode.split('|').length == 1">{{ item.unitCode }}</span>
+                                    <span class="m--font-danger" *ngIf="item.unitCode.split('|').length > 1">{{
+                                        item.unitCode.split('|')[0] }} </span>
                                 </td>
                                 <td class="">
                                     <span *ngIf="item.unitPrice != -1">{{ item.unitPrice }}</span>
@@ -168,7 +173,8 @@
                                         item.type.split('|')[0] }}</span>
                                 </td>
                                 <td class="">
-                                    <span *ngIf="item.serviceTypeId.split('|').length == 1">{{ item.serviceTypeId }}</span>
+                                    <span
+                                        *ngIf="item.serviceTypeId.split('|').length == 1">{{ item.serviceTypeId }}</span>
                                     <span class="m--font-danger" *ngIf="item.serviceTypeId.split('|').length > 1">{{
                                         item.serviceTypeId.split('|')[0] }}</span>
                                 </td>
@@ -183,7 +189,8 @@
             <!--end: Datatable -->
 
             <!--begin::pagination-->
-            <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)"></app-pagination>
+            <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)">
+            </app-pagination>
             <!--end::pagination-->
         </div>
     </div>
@@ -191,7 +198,8 @@
 </div>
 <!--end::m-content-->
 <!--begin::modal-->
-<div class="modal fade" id="upload-alert-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<div class="modal fade" id="upload-alert-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header">
