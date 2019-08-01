@@ -53,7 +53,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     selectedCurrency: any = null;
 
     users: any = [];
-    selectedUser: any = null;
+    selectedUser: any = [];
 
     services: any[] = [];
     selectedService: any[] = [];
@@ -79,6 +79,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         this.getCurrency();
         this.getUser();
         this.getCharge();
+        this.getService();
     }
 
     getPartner() {
@@ -98,6 +99,28 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                     this.handleError(errors);
                 },
                 // complete
+                () => { }
+            );
+    }
+
+    getService() {
+        this._sysRepo.getListService()
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+
+                        this.services = this.utility.prepareNg2SelectData(res, 'value', 'displayName');
+                        this.services.unshift({ id: 'All', text: 'All' });
+
+                        this.selectedService = [this.services[0]];
+                    } else {
+                        this.handleError();
+                    }
+                },
+                (errors: any) => {
+                    this.handleError(errors);
+                },
                 () => { }
             );
     }
@@ -177,23 +200,6 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
             { text: 'No', id: 2 }
         ];
         this.selectedObh = [this.obhs[1]];
-
-        this.services = [
-            { text: 'All', id: 'All' },
-            { text: 'Logistic (operation)', id: 'LGO' },
-            { text: "Air Import", id: "AI" },
-            { text: "Air Export", id: "AE" },
-            { text: "Sea Import", id: "SI" },
-            { text: "Sea Export", id: "SE" },
-            { text: "Sea FCL Export", id: "SFE" },
-            { text: "Sea FCL Import", id: "SFI" },
-            { text: "Sea LCL Export", id: "SLE" },
-            { text: "Sea LCL Import", id: "SLI" },
-            { text: "Sea Consol Export", id: "SCE" },
-            { text: "Sea Consol Import", id: "SCI" },
-            { text: "Inland Trucking", id: "IT" },
-        ];
-        this.selectedService = [this.services[0]];
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -235,7 +241,9 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 }
                 break;
             case 'user':
-                this.selectedUser.push(data);
+                this.selectedUser = [];
+                this.selectedUser.push(...data);
+
                 break;
             case 'charge':
                 if (data.id === 'All') {
@@ -291,6 +299,13 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         if (this.isSubmited && !this.selectedRangeDate.startDate || !this.selectedPartner.value) {
             return;
         } else {
+            let serviceTypeId = '';
+            if (this.selectedService[0].id === 'All') {
+                this.services.shift(); // * remove item with value 'All'
+                serviceTypeId = this.services.map((item: any) => item.id).toString().replace(',', ';');
+            } else {
+                serviceTypeId = this.selectedService.map((item: any) => item.id).toString().replace(',', ';');
+            }
             this.dataSearch = {
                 currencyLocal: 'VND', // Todo: get currency local follow location or login info
                 currency: this.selectedCurrency[0].id,
@@ -302,8 +317,10 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 isOBH: this.selectedObh[0].id === 1 ? true : false,
                 strCreators: this.selectedUser.map((item: any) => item.id).toString(),
                 strCharges: this.selectedCharges.map((item: any) => item.code).toString(),
-                note: this.note
+                note: this.note,
+                serviceTypeId: serviceTypeId
             };
+
             this.onApply.emit(this.dataSearch);
         }
     }
@@ -329,8 +346,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         return _uniq(result);
     }
 
-    handleError(errors: any) {
-        let message: string = 'Has Error Please Check Again !';
+    handleError(errors?: any) {
+        let message: string = 'Something getting error Please Check Again !';
         let title: string = '';
         if (errors instanceof HttpErrorResponse) {
             message = errors.message;
@@ -352,4 +369,5 @@ interface ISOASearchCharge {
     strCreators: string;
     strCharges: string;
     note: string;
+    serviceTypeId: string;
 }

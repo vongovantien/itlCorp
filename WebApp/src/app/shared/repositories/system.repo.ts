@@ -84,4 +84,12 @@ export class SystemRepo {
             );
         }
     }
+
+    getListService() {
+        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSOA/GetListServices`)
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => data)
+            );
+    }
 }
