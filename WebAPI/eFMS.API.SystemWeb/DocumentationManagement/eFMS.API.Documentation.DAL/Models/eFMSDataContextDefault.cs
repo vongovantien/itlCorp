@@ -1495,16 +1495,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.ContainerType)
-                    .WithMany(p => p.CsMawbcontainerContainerType)
-                    .HasForeignKey(d => d.ContainerTypeId)
-                    .HasConstraintName("FK_csMAWBContainer_catUnit1");
-
-                entity.HasOne(d => d.UnitOfMeasure)
-                    .WithMany(p => p.CsMawbcontainerUnitOfMeasure)
-                    .HasForeignKey(d => d.UnitOfMeasureId)
-                    .HasConstraintName("FK_csMAWBContainer_catUnit");
             });
 
             modelBuilder.Entity<CsShipmentHawbdetail>(entity =>
@@ -2307,12 +2297,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.Job)
-                    .WithMany(p => p.CsTransactionDetail)
-                    .HasForeignKey(d => d.JobId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_csTransactionDetail_csTransaction");
             });
 
             modelBuilder.Entity<CustomsDeclaration>(entity =>
