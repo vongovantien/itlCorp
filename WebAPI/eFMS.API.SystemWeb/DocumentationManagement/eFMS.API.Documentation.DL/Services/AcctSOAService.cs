@@ -171,8 +171,7 @@ namespace eFMS.API.Documentation.DL.Services
             dataMapSOA.AmountCreditUSD = chargeShipmentList.Sum(x => x.AmountCreditUSD);
 
             //Thông tin các Service Name của SOA
-            dataMapSOA.ServicesIdSoa = GetInfoServiceOfSoa(soaNo).FirstOrDefault().Key?.ToString();
-            dataMapSOA.ServicesNameSoa = GetInfoServiceOfSoa(soaNo).FirstOrDefault().Value?.ToString();
+            dataMapSOA.ServicesNameSoa = GetInfoServiceOfSoa(soaNo).ToString();
 
             return dataMapSOA;
         }
@@ -198,47 +197,36 @@ namespace eFMS.API.Documentation.DL.Services
         }
 
         /// <summary>
-        /// Lấy thông tin các ServiceName & ServiceId của SOA
+        /// Lấy thông tin các ServiceName của SOA
         /// </summary>
         /// <param name="soaNo">SOANo</param>
         /// <returns></returns>
-        public Dictionary<string,string> GetInfoServiceOfSoa(string soaNo)
+        public string GetInfoServiceOfSoa(string soaNo)
         {
-            var listServiceTypeId = (
-                                from sur in ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge
-                                join charge in ((eFMSDataContext)DataContext.DC).CatCharge
-                                on sur.ChargeId equals charge.Id
-                                where sur.Soano == soaNo
-                                select charge.ServiceTypeId
-                               );
-            string strServiceTypeId = "";
-            foreach (var serviceTypeId in listServiceTypeId)
-            {
-                //Nối các chuỗi serviceTypeId
-                strServiceTypeId += serviceTypeId;
-            }
-
-            //Tách chuỗi servicetype thành mảng
-            string[] arrayStrServiceTypeId = strServiceTypeId.Split(';').Where(x => x.ToString() != "").ToArray();
-
-            //Xóa các serviceTypeId trùng
-            string[] arrayGrpServiceTypeId = arrayStrServiceTypeId.Distinct<string>().ToArray();
+            var serviceTypeId = ((eFMSDataContext)DataContext.DC).AcctSoa.Where(x => x.Soano == soaNo).FirstOrDefault()?.ServiceTypeId;
 
             var serviceName = "";
-            var serviceId = "";
-            foreach (var item in arrayGrpServiceTypeId)
+
+            if (serviceTypeId != null)
             {
-                //Lấy ra DisplayName của serviceTypeId
-                serviceName += CustomData.Services.Where(x => x.Value == item).FirstOrDefault() != null ?
-                            CustomData.Services.Where(x => x.Value == item).FirstOrDefault().DisplayName.Trim() + ";"
-                            : "";
-                serviceId += item + ";";
+                //Tách chuỗi servicetype thành mảng
+                string[] arrayStrServiceTypeId = serviceTypeId.Split(';').Where(x => x.ToString() != "").ToArray();
+
+                //Xóa các serviceTypeId trùng
+                string[] arrayGrpServiceTypeId = arrayStrServiceTypeId.Distinct<string>().ToArray();
+
+                var serviceId = "";
+                foreach (var item in arrayGrpServiceTypeId)
+                {
+                    //Lấy ra DisplayName của serviceTypeId
+                    serviceName += CustomData.Services.Where(x => x.Value == item).FirstOrDefault() != null ?
+                                CustomData.Services.Where(x => x.Value == item).FirstOrDefault().DisplayName.Trim() + ";"
+                                : "";
+                    serviceId += item + ";";
+                }
+                serviceName = (serviceName + ")").Replace(";)", "");                
             }
-            serviceName = (serviceName + ")").Replace(";)", "");
-            serviceId = (serviceId + ")").Replace(";)", "");
-            var dic = new Dictionary<string, string>();
-            dic.Add(serviceId, serviceName);
-            return dic;
+            return serviceName;
         }
 
         public HandleState UpdateSOA(AcctSoaModel model)
@@ -284,6 +272,73 @@ namespace eFMS.API.Documentation.DL.Services
                 var hs = new HandleState(ex.Message);
                 return hs;
             }
+        }
+
+        public List<ChargeShipmentModel> GetListMoreChargeByCondition(MoreChargeShipmentCriteria criteria)
+        {
+            var moreChargeShipmentList = GetSpcMoreChargeShipmentByCondition(criteria);
+
+            List<Guid> SurchargeIds = new List<Guid>();
+            if (criteria.ChargeShipments != null)
+            {
+                foreach (var item in criteria.ChargeShipments)
+                {
+                    SurchargeIds.Add(item.ID);
+                }
+            }
+
+            //Lấy ra các charge chưa tồn tại trong list criteria.SurchargeIds(Các Id của charge đã có trong kết quả search ở form info)
+            var charges = moreChargeShipmentList.Where(x=> SurchargeIds != null 
+                                                        && !SurchargeIds.Contains(x.ID)).ToList();
+
+            var dataMapMoreChargeShipment = mapper.Map<List<spc_GetListMoreChargeMasterByCondition>, List<ChargeShipmentModel>>(charges);
+
+            return dataMapMoreChargeShipment;
+        }
+
+        private List<spc_GetListMoreChargeMasterByCondition> GetSpcMoreChargeShipmentByCondition(MoreChargeShipmentCriteria criteria)
+        {
+            DbParameter[] parameters =
+            {
+                SqlParam.GetParameter("CurrencyLocal", criteria.CurrencyLocal),
+                SqlParam.GetParameter("CustomerID", criteria.CustomerID),
+                SqlParam.GetParameter("DateType", criteria.DateType),
+                SqlParam.GetParameter("FromDate", criteria.FromDate),
+                SqlParam.GetParameter("ToDate", criteria.ToDate),
+                SqlParam.GetParameter("Type", criteria.Type),
+                SqlParam.GetParameter("IsOBH", criteria.IsOBH),
+                SqlParam.GetParameter("StrCreators", criteria.StrCreators),
+                SqlParam.GetParameter("StrCharges", criteria.StrCharges),
+                SqlParam.GetParameter("inSOA", criteria.InSoa),
+                SqlParam.GetParameter("jobId", criteria.JobId),
+                SqlParam.GetParameter("hbl", criteria.Hbl),
+                SqlParam.GetParameter("mbl", criteria.Mbl),
+                SqlParam.GetParameter("cdNote", criteria.CDNote)
+            };
+            return ((eFMSDataContext)DataContext.DC).ExecuteProcedure<spc_GetListMoreChargeMasterByCondition>(parameters);
+        }
+
+        public AcctSOADetailResult AddMoreCharge(AddMoreChargeCriteria criteria)
+        {
+            var data = new AcctSOADetailResult();
+            if(criteria!= null)
+            {
+                if(criteria.ChargeShipmentsCurrent != null && criteria.ChargeShipmentsAddMore != null)
+                {
+                    foreach(var item in criteria.ChargeShipmentsAddMore)
+                    {
+                        criteria.ChargeShipmentsCurrent.Add(item);
+                    }
+                }
+            }
+
+            data.ChargeShipments = criteria.ChargeShipmentsCurrent;
+            data.AmountDebitLocal = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountDebitLocal);
+            data.AmountCreditLocal = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountCreditLocal);
+            data.AmountDebitUSD = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountDebitUSD);
+            data.AmountCreditUSD = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountCreditUSD);
+            
+            return data;
         }
 
     }

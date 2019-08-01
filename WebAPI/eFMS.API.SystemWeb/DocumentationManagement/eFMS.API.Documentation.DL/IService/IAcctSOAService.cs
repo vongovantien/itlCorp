@@ -21,9 +21,12 @@ namespace eFMS.API.Documentation.DL.IService
 
         object GetListStatusSoa();
 
-        Dictionary<string, string> GetInfoServiceOfSoa(string soaNo);
+        string GetInfoServiceOfSoa(string soaNo);
 
         HandleState UpdateSOA(AcctSoaModel model);
 
+        List<ChargeShipmentModel> GetListMoreChargeByCondition(MoreChargeShipmentCriteria criteria);
+
+        AcctSOADetailResult AddMoreCharge(AddMoreChargeCriteria criteria);
     }
 }

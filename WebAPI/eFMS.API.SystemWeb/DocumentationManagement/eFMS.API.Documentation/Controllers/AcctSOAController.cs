@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;
+using System.Linq;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 namespace eFMS.API.Documentation.Controllers
@@ -178,6 +179,68 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
-        
+
+        /// <summary>
+        /// Get list shipment(JobId, HBL, MBL) and list CDNotes(CreditDebitNo) not exist in result filter
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("GetShipmentsAndCDdNotesNotExistInResultFilter")]
+        public ActionResult GetShipmentsAndCDdNotesNotExistInResultFilter(MoreChargeShipmentCriteria criteria)
+        {
+            var data = acctSOAService.GetListMoreChargeByCondition(criteria);
+            
+            //Danh sách shipment
+            var listShipment = data
+                .GroupBy(x => new { x.JobId, x.HBL, x.MBL })
+                .Select(x => new Shipments
+                {
+                    JobId = x.Key.JobId,
+                    HBL = x.Key.HBL,
+                    MBL = x.Key.MBL
+                }).ToList();
+            
+            //Danh sách CreditDebitNote
+            var listCdNote = data
+                .Where(x=>x.CreditDebitNo != null)
+                .GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.CreditDebitNo })
+                .Select(x => new CreditDebitNote
+                {
+                    JobId = x.Key.JobId,
+                    HBL = x.Key.HBL,
+                    MBL = x.Key.MBL,
+                    CreditDebitNo = x.Key.CreditDebitNo
+                }).ToList();
+
+            var result = new { listShipment, listCdNote };
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// get list more charge not exists in list charge on form Info
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("GetListMoreChargeByCondition")]
+        public IActionResult GetListMoreChargeByCondition(MoreChargeShipmentCriteria criteria)
+        {
+            var data = acctSOAService.GetListMoreChargeByCondition(criteria);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// add more charge
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("AddMoreCharge")]
+        public IActionResult AddMoreCharge(AddMoreChargeCriteria criteria)
+        {
+            var data = acctSOAService.AddMoreCharge(criteria);
+            return Ok(data);
+        }
     }
 }

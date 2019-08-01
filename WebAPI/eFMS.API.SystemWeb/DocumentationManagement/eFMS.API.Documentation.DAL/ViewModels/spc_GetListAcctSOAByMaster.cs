@@ -19,5 +19,11 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string Note { get; set; }
         public DateTime? SoaformDate { get; set; }
         public DateTime? SoatoDate { get; set; }
+        public string Type { get; set; }
+        public bool? Obh { get; set; }
+        public string ServiceTypeId { get; set; }
+        public string Customer { get; set; }
+        public string DateType { get; set; }
+        public string CreatorShipment { get; set; }
     }
 }
