@@ -79,6 +79,8 @@
   "MSG_CHARGE_CODE_EMPTY": "Type is not allow to empty!|wrong",
   "MSG_CHARGE_CODE_EXISTED": "Code {0} has been existed!|wrong",
   "MSG_CHARGE_CODE_DUPLICATED": "Code {0} has been duplicated!|wrong",
+  "MSG_CHARGE_UNIT_EMPTY": "Unit is not allow empty!|wrong",
+  "MSG_CHARGE_UNIT_NOT_FOUND": "Unit not found!|wrong",
   //------------end  : Charge
 
 

@@ -250,16 +250,17 @@ namespace eFMS.API.Catalogue.Controllers
                     var charge = new CatChargeImportModel
                     {
                         IsValid = true,
-                        Code = worksheet.Cells[row, 1].Value?.ToString(),
-                        ChargeNameEn = worksheet.Cells[row, 2].Value?.ToString(),
-                        ChargeNameVn = worksheet.Cells[row, 3].Value?.ToString(),
-                        UnitId = worksheet.Cells[row, 4].Value == null ? (short)(-1) : Convert.ToInt16(worksheet.Cells[row, 4].Value),
+                        Code = worksheet.Cells[row, 1].Value?.ToString().Trim(),
+                        ChargeNameEn = worksheet.Cells[row, 2].Value?.ToString().Trim(),
+                        ChargeNameVn = worksheet.Cells[row, 3].Value?.ToString().Trim(),
+                        UnitCode = worksheet.Cells[row, 4].Value?.ToString().Trim(),
+                        // UnitId = worksheet.Cells[row, 4].Value == null ? (short)(-1) : Convert.ToInt16(worksheet.Cells[row, 4].Value),
                         UnitPrice = worksheet.Cells[row,5].Value == null? -1: Convert.ToDecimal(worksheet.Cells[row, 5].Value),
-                        CurrencyId = worksheet.Cells[row,6].Value?.ToString(),
+                        CurrencyId = worksheet.Cells[row,6].Value?.ToString().Trim(),
                         Vatrate = worksheet.Cells[row,7].Value == null ? -1 : Convert.ToDecimal(worksheet.Cells[row, 7].Value),
-                        Type = worksheet.Cells[row, 8].Value?.ToString(),
-                        ServiceTypeId = worksheet.Cells[row, 9].Value?.ToString(),
-                        Status = worksheet.Cells[row, 10].Value?.ToString(),
+                        Type = worksheet.Cells[row, 8].Value?.ToString().Trim(),
+                        ServiceTypeId = worksheet.Cells[row, 9].Value?.ToString().Trim(),
+                        Status = worksheet.Cells[row, 10].Value?.ToString().Trim(),
                     };
                     list.Add(charge);
                 }

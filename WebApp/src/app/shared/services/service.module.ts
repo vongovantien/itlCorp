@@ -5,6 +5,7 @@ import { ApiService } from './api.service';
 import { PagingService } from './paging-service';
 import { BaseService } from './base.service';
 import { AuthGuardService } from './auth-guard.service';
+import { DataService } from './data.service';
 
 @NgModule({
     declarations: [],
@@ -16,7 +17,8 @@ import { AuthGuardService } from './auth-guard.service';
         ApiService,
         PagingService,
         BaseService,
-        AuthGuardService
+        AuthGuardService,
+        DataService
     ],
 })
-export class ServiceModule {}
+export class ServiceModule { }

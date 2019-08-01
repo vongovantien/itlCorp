@@ -96,6 +96,8 @@ namespace eFMS.API.Catalogue.DL.Common
         public static readonly string MSG_CHARGE_CODE_EMPTY = "MSG_CHARGE_CODE_EMPTY";
         public static readonly string MSG_CHARGE_CODE_EXISTED = "MSG_CHARGE_CODE_EXISTED";
         public static readonly string MSG_CHARGE_CODE_DUPLICATED= "MSG_CHARGE_CODE_DUPLICATED";
+        public static readonly string MSG_CHARGE_UNIT_EMPTY = "MSG_CHARGE_UNIT_EMPTY";
+        public static readonly string MSG_CHARGE_UNIT_NOT_FOUND = "MSG_CHARGE_UNIT_NOT_FOUND";
         #endregion
 
         #region commodity group
