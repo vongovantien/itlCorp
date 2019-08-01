@@ -87,4 +87,8 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
         }
     }
 
+    checkUncheckAllCharge() {
+        
+    }
+
 }

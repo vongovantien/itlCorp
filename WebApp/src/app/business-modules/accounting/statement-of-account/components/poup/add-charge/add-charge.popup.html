@@ -15,7 +15,7 @@
                                 <label class="form-control-label" for="">
                                     Shipment
                                 </label>
-                                <select [(ngModel)]="selectedShipment" class="form-control">
+                                <select  class="form-control">
                                     <option *ngFor="let item of []" [ngValue]="item">{{item}}</option>
                                 </select>
                             </div>
@@ -25,7 +25,7 @@
                                 <label class="form-control-label" for="">
                                     Debit/Credit Note
                                 </label>
-                                <select [(ngModel)]="selectedCDNote" class="form-control">
+                                <select class="form-control">
                                     <option *ngFor="let item of []" [ngValue]="item">{{item}}</option>
                                 </select>
                             </div>
@@ -50,7 +50,7 @@
                                             OBH
                                         </label>
                                         <select [(ngModel)]="selectedOBH" class="form-control">
-                                            <option *ngFor="let item of  obhs" [ngValue]="item">{{item.text}}</option>
+                                            <option *ngFor="let item of obhs" [ngValue]="item">{{item.text}}</option>
                                         </select>
                                     </div>
                                 </div>
@@ -145,7 +145,8 @@
                                     <td class="table-actions-col">
                                         <div class="table-actions">
                                             <label class="m-checkbox">
-                                                <input type="checkbox" (change)="onChangeCheckBoxCharge($event)" name="">
+                                                <input type="checkbox" (change)="onChangeCheckBoxCharge($event)"
+                                                    name="">
                                                 <span></span>
                                             </label>
                                         </div>
