@@ -1,5 +1,4 @@
 import { ModalOptions, ModalDirective } from "ngx-bootstrap";
-import * as _ from "lodash";
 import { AppPage } from "src/app/app.base";
 import { ViewChild } from "@angular/core";
 
@@ -11,70 +10,40 @@ export abstract class PopupBase extends AppPage {
         keyboard: true
     };
 
-    reset: any = null;
-
     constructor() {
         super();
     }
 
-    // fn set options
-    setOptions(options?: any) {
-        let self = this;
-        if (_.isObject(options) || _.isArray(options)) {
-            _.each(options, function(val, key) {
+    // * fn set options
+    setOptions(options?: ModalOptions) {
+        const self = this;
+        if (typeof options === 'object') {
+            for (const key in options) {
                 if (self.hasOwnProperty(key)) {
-                    self[key] = val;
+                    self[key] = options[key];
                 }
-            });
+            }
         }
     }
 
-    // fn set config to handle
-    setSettings(options?: any): any {
-        let self = this;
-        if (_.isObject(options) || _.isArray(options)) {
-            _.each(options, function(val, key) {
-                if (self.hasOwnProperty(key)) {
-                    self[key] = val;
-                }
-            });
-        }
-
-        return this;
-    }
-
-    // show poup
-    show(options?: any): void {
+    // * show poup
+    show(options?: ModalOptions): void {
         this.setOptions(Object.assign(this.options, options));
         if (!this.popup.isShown) {
-            if (typeof this.reset === "function") {
-                this.reset();
-            }
-
             this.popup.config = this.options;
             this.popup.show();
         }
     }
 
-    // fn open popup
-    open = (settings?: any, options?: any): any => {
-        this.setSettings(settings || {}).setOptions(options || {});
-
-        if (!this.popup.isShown) {
-            this.popup.show();
-        }
-
-        return this;
-    }
-
-    // close popup
-    hide(): void {
+    hide() {
         this.popup.hide();
     }
 
+    // event fire when hide popup
     onHide($event: any) {
     }
 
+    // event fire when show popup
     onShow($event: any) {
     }
 }
