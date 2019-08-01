@@ -236,10 +236,12 @@
                                 (click)="sort('jobNo')">
                                 <span>JOBID</span>
                             </th>
-                            <th>
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceDate'), 'sorting_desc': (!isDesc && sortKey == 'clearanceDate') }"
+                                (click)="sort('clearanceDate')">
                                 <span>Clearance Date</span>
                             </th>
-                            <th>
+                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'jobNo'), 'sorting_desc': (!isDesc && sortKey == 'jobNo') }"
+                                (click)="sort('jobNo')">
                                 <span>Status</span>
                             </th>
                         </tr>

@@ -30,6 +30,8 @@ export class CustomClearanceComponent implements OnInit {
     listCustomer: any = [];
     listPort: any = [];
     listUnit: any = [];
+    isDesc = true;
+    sortKey: string = "";
 
     constructor(
         private excelService: ExcelService,
@@ -40,7 +42,6 @@ export class CustomClearanceComponent implements OnInit {
         private toastr: ToastrService) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
-        //this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
         this.selectedRange = { startDate: moment().subtract(30, 'days'), endDate: moment() };
     }
 
@@ -63,7 +64,6 @@ export class CustomClearanceComponent implements OnInit {
 
     async getListCustomsDeclaration() {
         const res = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.paging + "?pageNumber=" + this.pager.currentPage + "&pageSize=" + this.pager.pageSize, this.searchObject, true, true);
-        console.log(res);
         this.listCustomDeclaration = res.data;
         this.pager.totalItems = res.totalItems;
 
@@ -107,7 +107,6 @@ export class CustomClearanceComponent implements OnInit {
         }
 
         this.searchObject.PersonHandle = this.currentUser[0].toString();
-        console.log(this.searchObject);
         this.getListCustomsDeclaration();
     }
 
@@ -123,8 +122,7 @@ export class CustomClearanceComponent implements OnInit {
         this.getListCustomsDeclaration();
     }
 
-    isDesc = true;
-    sortKey: string = "";
+   
     sort(property) {
         this.isDesc = !this.isDesc;
         this.sortKey = property;
