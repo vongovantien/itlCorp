@@ -146,8 +146,13 @@
                         }
 
                         &.sort-asc .sort-indicator:before,
-                        &.sort-desc .sort-indicator:before {
+                        &.sort-desc .sort-indicator:after {
                             visibility: hidden;
+                        }
+
+                        &.sort-asc .sort-indicator:after,
+                        &.sort-desc .sort-indicator:before {
+                            border-color: #000 transparent;
                         }
 
                         &.sort-desc .sort-indicator:after {
