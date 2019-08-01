@@ -9,7 +9,7 @@ namespace AuthServer
 {
     public class Config
     {
-        public static IEnumerable<Client> GetClients(string[] redirectUris, int tokenLifetime, int slientRefreshToken)
+        public static IEnumerable<Client> GetClients(string[] originUris, string[] redirectUris, int tokenLifetime, int slientRefreshToken)
         {
             return new List<Client>
             {
@@ -22,7 +22,6 @@ namespace AuthServer
                     RequireClientSecret = false,
                     RequireConsent = false,
                     AlwaysSendClientClaims = true,
-
                     AllowAccessTokensViaBrowser = true,
                     AccessTokenType = AccessTokenType.Jwt,
                     AllowOfflineAccess = true,
@@ -30,6 +29,7 @@ namespace AuthServer
                     RefreshTokenExpiration = TokenExpiration.Sliding,
                     SlidingRefreshTokenLifetime = slientRefreshToken,
                     RedirectUris = redirectUris,
+                    AllowedCorsOrigins= originUris,
                     AlwaysIncludeUserClaimsInIdToken = true,
                     AllowedScopes =
                     {
