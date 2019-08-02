@@ -65,4 +65,12 @@ export class AccoutingRepo {
                 map((data: any) => data)
             );
     }
+
+    getListShipmentAndCDNote(data: any = {}) {
+        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSOA/GetShipmentsAndCDdNotesNotExistInResultFilter`, data)
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => data)
+            );
+    }
 }
