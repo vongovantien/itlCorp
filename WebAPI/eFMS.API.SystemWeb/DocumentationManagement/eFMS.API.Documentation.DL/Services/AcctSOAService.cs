@@ -323,21 +323,22 @@ namespace eFMS.API.Documentation.DL.Services
             var data = new AcctSOADetailResult();
             if(criteria!= null)
             {
-                if(criteria.ChargeShipmentsCurrent != null && criteria.ChargeShipmentsAddMore != null)
+                if(criteria.ChargeShipmentsCurrent != null)
                 {
-                    foreach(var item in criteria.ChargeShipmentsAddMore)
+                    if (criteria.ChargeShipmentsAddMore != null)
                     {
-                        criteria.ChargeShipmentsCurrent.Add(item);
+                        foreach (var item in criteria.ChargeShipmentsAddMore)
+                        {
+                            criteria.ChargeShipmentsCurrent.Add(item);
+                        }
                     }
+                    data.ChargeShipments = criteria.ChargeShipmentsCurrent;
+                    data.AmountDebitLocal = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountDebitLocal);
+                    data.AmountCreditLocal = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountCreditLocal);
+                    data.AmountDebitUSD = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountDebitUSD);
+                    data.AmountCreditUSD = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountCreditUSD);
                 }
-            }
-
-            data.ChargeShipments = criteria.ChargeShipmentsCurrent;
-            data.AmountDebitLocal = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountDebitLocal);
-            data.AmountCreditLocal = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountCreditLocal);
-            data.AmountDebitUSD = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountDebitUSD);
-            data.AmountCreditUSD = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountCreditUSD);
-            
+            }            
             return data;
         }
 

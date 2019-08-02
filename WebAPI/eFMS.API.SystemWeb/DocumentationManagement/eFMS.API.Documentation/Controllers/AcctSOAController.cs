@@ -203,7 +203,7 @@ namespace eFMS.API.Documentation.Controllers
             
             //Danh sách CreditDebitNote
             var listCdNote = data
-                .Where(x=>x.CreditDebitNo != null)
+                .Where(x => x.CreditDebitNo != null)
                 .GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.CreditDebitNo })
                 .Select(x => new CreditDebitNote
                 {
