@@ -148,7 +148,7 @@
                                                 <div class="tatable__pager-size">
                                                     <div class="select-box">
                                                         <select class="form-control" id="" aria-label=""
-                                                            [(ngModel)]="pageSize" (change)="selectPageSize()"
+                                                            [(ngModel)]="pageSize" (change)="selectPageSize(pageSize)"
                                                             name="pagesize">
                                                             <ng-container
                                                                 *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
