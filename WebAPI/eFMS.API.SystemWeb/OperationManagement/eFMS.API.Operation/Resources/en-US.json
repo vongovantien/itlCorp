@@ -127,6 +127,9 @@
   "MSG_DUPLICATE_DATA": "{0} duplacate data",
   "MSG_INVALID_MAX_LENGTH": "Should be at most {0} symbols",
   "MSG_INVALID_NEGATIVE": "Not allow negative numbers",
-  "MSG_CUSTOM_INVALID_CHARACTER_SPECIAL": "Not allowed to enter special characters. Except for characters ./_- and space"
+  "MSG_CUSTOM_INVALID_CHARACTER_SPECIAL": "Not allowed to enter special characters. Except for characters ./_- and space",
   //------------end: Custom Clearance
+
+  "ECUS_CONVERT_SUCCESS": " have been convert from ecus system"
+
 }

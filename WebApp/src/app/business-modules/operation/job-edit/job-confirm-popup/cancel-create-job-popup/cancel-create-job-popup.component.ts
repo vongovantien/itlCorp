@@ -13,5 +13,7 @@ export class CancelCreateJobPopupComponent extends PopupBase implements OnInit {
 
   ngOnInit() {
   }
-
+  close() {
+    this.hide();
+  }
 }

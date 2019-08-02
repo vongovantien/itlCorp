@@ -57,6 +57,6 @@ namespace eFMS.API.Operation.Service.Models
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
 
-        public virtual CsTransaction Job { get; set; }
+        //public virtual CsTransaction Job { get; set; }
     }
 }

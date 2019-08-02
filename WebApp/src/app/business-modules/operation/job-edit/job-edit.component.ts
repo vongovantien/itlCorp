@@ -33,6 +33,7 @@ import { EditBuyingRatePopupComponent } from './charge-list/edit-buying-rate-pop
 import { EditSellingRatePopupComponent } from './charge-list/edit-selling-rate-popup/edit-selling-rate-popup.component';
 import { EditObhRatePopupComponent } from './charge-list/edit-obh-rate-popup/edit-obh-rate-popup.component';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { ConfirmCancelJobPopupComponent } from './job-confirm-popup/confirm-cancel-job-popup/confirm-cancel-job-popup.component';
 declare var $: any;
 
 @Component({
@@ -55,6 +56,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     @ViewChild(EditSellingRatePopupComponent, { static: false }) editSellingRatePopup: EditSellingRatePopupComponent;
     @ViewChild(EditObhRatePopupComponent, { static: false }) editOHBRatePopup: EditObhRatePopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteCharge: ConfirmPopupComponent;
+    @ViewChild(ConfirmCancelJobPopupComponent, { static: false }) confirmCancelJobPopup: ConfirmCancelJobPopupComponent;
 
     opsTransaction: OpsTransaction = null;
     productServices: any[] = [];
@@ -218,6 +220,9 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
     cancelCreatJob() {
         this.cancelCreateJobPopup.show();
+    }
+    confirmCancelJob(){
+        this.confirmCancelJobPopup.show();
     }
     async saveShipment(form: NgForm) {
         console.log(this.opsTransaction);

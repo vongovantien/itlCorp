@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Operation.DL.Helper;
 using eFMS.API.Operation.DL.IService;
 using eFMS.API.Operation.DL.Models;
 using eFMS.API.Operation.DL.Models.Criteria;
 using eFMS.API.Operation.DL.Models.Ecus;
+using eFMS.API.Operation.Service.Contexts;
 using eFMS.API.Operation.Service.Models;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
@@ -50,7 +50,7 @@ namespace eFMS.API.Operation.DL.Services
         {
             List<SetEcusConnectionModel> returnList = new List<SetEcusConnectionModel>();
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var cons = dc.SetEcusconnection.ToList();
+            var cons = DataContext.Get().ToList();
             var query = (from con in cons
                          join user in dc.SysUser on con.UserId equals user.Id into users
                          from u in users

@@ -28,7 +28,7 @@ namespace eFMS.API.Operation.Service.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;");
+                optionsBuilder.UseSqlServer("Server=192.168.7.31;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;");
             }
         }
 
@@ -216,7 +216,7 @@ namespace eFMS.API.Operation.Service.Models
 
                 entity.Property(e => e.StageId).HasColumnName("StageID");
 
-                entity.Property(e => e.Status).HasMaxLength(10);
+                entity.Property(e => e.Status).HasMaxLength(20);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
@@ -247,7 +247,9 @@ namespace eFMS.API.Operation.Service.Models
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.CurrentStatus).HasMaxLength(10);
+                entity.Property(e => e.CurrentStatus)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.CustomerId)
                     .HasColumnName("CustomerID")
@@ -354,7 +356,6 @@ namespace eFMS.API.Operation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Dbpassword)
-                    .IsRequired()
                     .HasColumnName("DBPassword")
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -373,7 +374,7 @@ namespace eFMS.API.Operation.Service.Models
                     .IsRequired()
                     .HasMaxLength(50);
 
-                entity.Property(e => e.Note).HasMaxLength(10);
+                entity.Property(e => e.Note).HasMaxLength(100);
 
                 entity.Property(e => e.ServerName)
                     .IsRequired()

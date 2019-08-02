@@ -134,10 +134,10 @@ namespace eFMS.API.Catalogue.DL.Services
                         InactiveOn = item.Status != null? DateTime.Now: inactive
                     };
                     dc.CatCountry.Add(country);
-                    cache.Remove(Templates.CatCountry.NameCaching.ListName);
                 }
                 dc.SaveChanges();
-               
+                cache.Remove(Templates.CatCountry.NameCaching.ListName);
+
                 return new HandleState();
             }
             catch (Exception ex)
@@ -175,7 +175,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.Code = string.Format(stringLocalizer[LanguageSub.MSG_COUNTRY_EXISTED], item.Code);
                         item.IsValid = false;
                     }
-                    if (list.Count(x => (x.Code ?? "").IndexOf(item.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0) > 1)
+                    if (list.Count(x => x.Code.ToLower() == item.Code.ToLower()) > 1)
                     {
                         item.Code = string.Format(stringLocalizer[LanguageSub.MSG_COUNTRY_CODE_DUPLICATE], item.Code);
                         item.IsValid = false;

@@ -9,7 +9,7 @@ namespace eFMS.API.Catalogue.Infrastructure.Common
     {
         public static string GetMessage(HandleState hs, Crud crud)
         {
-            string message = LanguageSub.MSG_DATA_NOT_FOUND;
+            string message = hs.Exception.Message;
             switch (hs.Code)
             {
                 case 200:
