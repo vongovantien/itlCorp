@@ -182,7 +182,11 @@ export class StatementOfAccountEditComponent extends AppList {
                 datetimeCreated: this.soa.datetimeCreated,
                 datetimeModified: this.soa.datetimeModified,
                 serviceTypeId: this.soa.serviceTypeId,
-                dateType: this.soa.dateType
+                dateType: this.soa.dateType,
+                type: this.soa.type,
+                obh: this.soa.obh,
+                creatorShipment: this.soa.creatorShipment,
+                customer: this.soa.customer
             };
             this._spinner.show();
 

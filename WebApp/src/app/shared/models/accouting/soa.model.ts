@@ -27,7 +27,10 @@ export class SOA {
     servicesNameSoa: any[] = [];
     serviceTypeId: string = '';
     dateType: string = '';
-    
+    type: string = '';
+    creatorShipment: string = '';
+    obh: boolean = false;
+    customer: string = '';
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

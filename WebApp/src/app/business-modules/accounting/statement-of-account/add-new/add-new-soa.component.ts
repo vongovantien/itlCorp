@@ -113,7 +113,10 @@ export class StatementOfAccountAddnewComponent extends AppList {
                 note: this.dataSearch.note,
                 dateType: this.dataSearch.dateType,
                 serviceTypeId: this.dataSearch.serviceTypeId,
-                customerID: this.dataSearch.customerID
+                customer: this.dataSearch.customerID,
+                type: this.dataSearch.type,
+                obh: this.dataSearch.isOBH,
+                creatorShipment: this.dataSearch.strCreators
             };
 
             this._accountRepo.createSOA(body)

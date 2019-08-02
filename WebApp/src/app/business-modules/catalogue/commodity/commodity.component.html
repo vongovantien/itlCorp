@@ -45,7 +45,7 @@
                                 </button> -->
                                 <app-default-button [buttonSetting]="addCommodityButtonSetting" [dataTarget]="addCommodityButtonSetting.dataTarget"
                                     (click)="showAdd(tabName.commodity)"></app-default-button>
-                                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" [routerLink]="['/home/catalogue/commodity-import']">
+                                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" [routerLink]="['/home/catalogue/commodity/commodity-import']">
                                     <span>
                                         <i class="la la-download"></i>
                                         <span>
@@ -84,7 +84,7 @@
                             <div class="c-button-actions m--align-right">
                                 <app-default-button [buttonSetting]="addGroupButtonSetting" [dataTarget]="addGroupButtonSetting.dataTarget"
                                     (click)="showAdd(tabName.commodityGroup)"></app-default-button>
-                                <app-default-button [buttonSetting]="importButtonSetting" [routerLink]="['/home/catalogue/commodity-group-import']"></app-default-button>
+                                <app-default-button [buttonSetting]="importButtonSetting" [routerLink]="['/home/catalogue/commodity/commodity-group-import']"></app-default-button>
                                 <app-default-button [buttonSetting]="exportButtonSetting" (click)="exportComGroup()"></app-default-button>
                             </div>
                         </div>

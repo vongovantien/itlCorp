@@ -174,7 +174,7 @@ export class PartnerComponent implements OnInit {
   }
   showDetail(event) {
     this.partner = event;
-    this.router.navigate(["/home/catalogue/partner-data-detail/", { id: this.partner.id }]);
+    this.router.navigate(["/home/catalogue/partner-data/detail", { id: this.partner.id }]);
   }
   async onDelete(event) {
     if (event) {
@@ -229,7 +229,7 @@ export class PartnerComponent implements OnInit {
   }
 
   addPartner() {
-    this.router.navigate(["/home/catalogue/partner-data-addnew", { partnerType: this.criteria.partnerGroup }]);
+    this.router.navigate(["/home/catalogue/partner-data/addnew", { partnerType: this.criteria.partnerGroup }]);
   }
   setPage(pager: PagerSetting) {
     this.pager.currentPage = pager.currentPage;
