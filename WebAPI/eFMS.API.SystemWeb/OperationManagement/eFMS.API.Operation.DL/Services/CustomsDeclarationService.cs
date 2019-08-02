@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using eFMS.API.Catalogue.Service.Contexts;
+using eFMS.API.Operation.Service.Contexts;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Operation.DL.Common;
@@ -80,7 +80,7 @@ namespace eFMS.API.Operation.DL.Services
             foreach (var item in connections)
             {
                 var clearanceEcus = ecusCconnectionService.GetDataEcusByUser(item.UserId, item.ServerName, item.Dbusername, item.Dbpassword, item.Dbname);
-                if (clearanceEcus == null)
+               if (clearanceEcus == null)
                 {
                     continue;
                 }
@@ -108,6 +108,11 @@ namespace eFMS.API.Operation.DL.Services
                 {
                     dc.CustomsDeclaration.AddRange(lists);
                     dc.SaveChanges();
+                    result = new HandleState(true, lists.Count + " have been convert from ecus system");
+                }
+                else
+                {
+                    result = new HandleState(true, "There is no data converted from ecus system");
                 }
                 return result;
             }

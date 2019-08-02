@@ -214,6 +214,22 @@ namespace eFMS.API.Catalogue.Controllers
                 int rowCount = worksheet.Dimension.Rows;
                 int ColCount = worksheet.Dimension.Columns;
                 if (rowCount < 2) return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.NOT_FOUND_DATA_EXCEL].Value });
+                if (worksheet.Cells[1, 1].Value?.ToString() != "Country Code")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Country Code' " });
+                }
+                if (worksheet.Cells[1, 2].Value?.ToString() != "English Name")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'English Name' " });
+                }
+                if (worksheet.Cells[1, 3].Value?.ToString() != "Local Name")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Local Name' " });
+                }
+                if (worksheet.Cells[1, 4].Value?.ToString() != "Inactive")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Inactive' " });
+                }
                 List<CatCountryImportModel> list = new List<CatCountryImportModel>();
                 for (int row = 2; row <= rowCount; row++)
                 {
@@ -246,15 +262,14 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Import([FromBody]List<CatCountryImportModel> data)
         {
-            var result = catCountryService.Import(data);
-            if (result != null)
+            var hs = catCountryService.Import(data);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
             {
-                return Ok(result);
+                return BadRequest(result);
             }
-            else
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
-            }
+            return Ok(result);
         }
         private string CheckExist(int id, CatCountryModel model)
         {

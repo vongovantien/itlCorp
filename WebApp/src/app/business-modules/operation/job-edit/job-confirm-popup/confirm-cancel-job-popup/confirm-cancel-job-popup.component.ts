@@ -13,5 +13,7 @@ export class ConfirmCancelJobPopupComponent extends PopupBase implements OnInit 
 
   ngOnInit() {
   }
-
+  close() {
+    this.hide();
+  }
 }

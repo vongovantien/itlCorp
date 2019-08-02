@@ -22,6 +22,15 @@
   <ItemGroup>
     <Compile Remove="Helpers\ChangeTrackerHelper.cs" />
     <Compile Remove="Helpers\MongoDbHelper.cs" />
+    <Compile Remove="Models\CatStage.cs" />
+    <Compile Remove="Models\CatTransportationMode.cs" />
+    <Compile Remove="Models\CatUnit.cs" />
+    <Compile Remove="Models\CsManifest.cs" />
+    <Compile Remove="Models\CsMawbcontainer.cs" />
+    <Compile Remove="Models\CsShipmentSurcharge.cs" />
+    <Compile Remove="Models\CsShippingInstruction.cs" />
+    <Compile Remove="Models\CsTransaction.cs" />
+    <Compile Remove="Models\CsTransactionDetail.cs" />
   </ItemGroup>
 
   <ItemGroup>

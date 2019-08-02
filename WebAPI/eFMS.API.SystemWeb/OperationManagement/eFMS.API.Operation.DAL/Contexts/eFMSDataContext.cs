@@ -2,7 +2,7 @@
 using eFMS.API.Operation.Service.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace eFMS.API.Catalogue.Service.Contexts
+namespace eFMS.API.Operation.Service.Contexts
 {
     public class eFMSDataContext: eFMSDataContextDefault
     {

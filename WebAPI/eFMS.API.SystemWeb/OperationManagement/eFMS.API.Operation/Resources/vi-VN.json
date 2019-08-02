@@ -129,6 +129,7 @@
   "MSG_DUPLICATE_DATA": "{0} duplacate data",
   "MSG_INVALID_MAX_LENGTH": "Chỉ được nhập tối đa {0} ký tự",
   "MSG_INVALID_NEGATIVE": "Không cho phép số âm",
-  "MSG_CUSTOM_INVALID_CHARACTER_SPECIAL": "không được phép nhập các ký tự đặc biệt. Ngoại trừ các ký tự ./_- và khoảng trắng"
+  "MSG_CUSTOM_INVALID_CHARACTER_SPECIAL": "không được phép nhập các ký tự đặc biệt. Ngoại trừ các ký tự ./_- và khoảng trắng",
   //------------end: Custom Clearance
+  "ECUS_CONVERT_SUCCESS": " have been convert from ecus system"
 }
