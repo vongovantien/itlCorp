@@ -7,11 +7,181 @@
 </div>
 
 <div class="m-content add-new-soa-wp">
-    <form-create-soa (onApply)="onSearchCharge($event)"></form-create-soa>
+    <!-- <form-create-soa (onApply)="onSearchCharge($event)"></form-create-soa> -->
+    <div class="m-portlet">
+        <div class="m-form m-form--state">
+            <div class="m-portlet__body">
+                <div class="row">
+                    <div class="col-lg-4" *ngIf="!!configPartner">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': isApplied && !selectedPartner.value}">
+                            <label class="form-control-label">
+                                Partner
+                                <span class="text-danger">*</span>
+                            </label>
+                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPartner"
+                                (itemSelected)="onSelectDataFormInfo($event, 'partner')"
+                                [selectedDisplayFields]="configPartner.selectedDisplayFields"
+                                [dataSources]="configPartner.dataSource" [displayFields]="configPartner.displayFields">
+                            </app-combo-grid-virtual-scroll>
+                            <div class="form-control-feedback" *ngIf="isApplied && !selectedPartner.value">
+                                Partner is required!
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': isApplied && !selectedRangeDate.startDate}">
+                            <label class="form-control-label">
+                                Date
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                    [(ngModel)]="selectedRangeDate" [showCustomRangeLabel]="true"
+                                    [keepCalendarOpeningWithRange]="true" [alwaysShowCalendars]="true" [ranges]="ranges"
+                                    placeholder="From date - to date" [showClearButton]="false" [maxDate]="maxDate"
+                                    [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [showCancel]="true"
+                                    readonly (datesUpdated)="onChangeRangeDate($event)"/>
+                                <span class=" m-input-icon__icon m-input-icon__icon--right">
+                                    <span>
+                                        <i class="la la-calendar"></i>
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="form-control-feedback" *ngIf="isApplied && !selectedRangeDate.startDate">
+                                Date is required!
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label">
+                                Date Mode
+                            </label>
+                            <ng-select [items]="dateModes" (selected)="onSelectDataFormInfo($event, 'date-mode')"
+                                [active]="selectedDateMode" placeholder="Select Date Mode">
+                            </ng-select>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label">
+                                Type
+                            </label>
+                            <ng-select [items]="types" (selected)="onSelectDataFormInfo($event, 'type')"
+                                [active]="selectedType">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label">
+                                OBH
+                            </label>
+
+                            <select [(ngModel)]="selectedObh" class="form-control" (ngModelChange)="onSelectDataFormInfo($event , 'obh')">
+                                <option *ngFor="let item of obhs" [ngValue]="item">{{item.text}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label">
+                                Currency
+                            </label>
+                            <ng-select [active]="selectedCurrency" [items]="currencyList"
+                                (selected)="onSelectDataFormInfo($event, 'currency')">
+                            </ng-select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Services
+                            </label>
+                            <ng-select [multiple]="true" (removed)="onRemoveService($event)" [active]="selectedService"
+                                [items]="services" (selected)="onSelectDataFormInfo($event, 'service')">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label">
+                                Creator
+                            </label>
+                            <app-multiple-select [source]="users" [active]="selectedUser"
+                                (onChange)="onSelectDataFormInfo($event,'user')" [placeHolder]="'Select user'">
+                            </app-multiple-select>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label">
+                                Note
+                            </label>
+                            <textarea class="form-control m-input m-input--square" rows="4" [(ngModel)]="note"
+                                name="note" (ngModelChange)="onChangeNote($event)"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="row form-charge">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Charge
+                            </label>
+                            <div class="charge-list-selected" *ngIf="!!selectedCharges.length">
+                                <ul class="list-unstyled list">
+                                    <li class="charge-list-item d-flex justify-content-between align-items-center"
+                                        *ngFor="let chargeItem of selectedCharges; let i = index; trackBy: trackByFn">
+
+                                        <div *ngIf="chargeItem.id !== 'All' else all">{{chargeItem.code}} -
+                                            {{chargeItem.chargeNameEn}}
+                                        </div>
+                                        <ng-template #all>All</ng-template>
+                                        <a title="Delete" (click)="onRemoveCharge(i)">
+                                            <i class="la la-close"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCharge"
+                                (itemSelected)="onSelectDataFormInfo($event, 'charge')"
+                                [dataSources]="configCharge.dataSource" [displayFields]="configCharge.displayFields ">
+                            </app-combo-grid-virtual-scroll>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="form-actions">
+                    <div class="row">
+                        <div class="col-lg-6"></div>
+                        <div class="col-lg-6 m--align-right">
+                            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                                (click)="onApplySearchCharge()">
+                                <span>
+                                    <i class="la la-download"></i>
+                                    <span>
+                                        Apply
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /form search info -->
 
     <div class="m-portlet">
         <div class="m-portlet__body">
-            <!--begin:: search-form-->
             <div class="m-form m--margin-bottom-10">
                 <div class="row">
                     <div class="col-lg-4">
@@ -41,7 +211,7 @@
                         </div>
                     </div>
                     <div class="col-lg-5 m--align-right">
-                        <button type="reset" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                        <button type="reset" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="removeAllCharge()">
                             <span>
                                 <i class="la la-trash"></i>
                                 <span>
@@ -51,7 +221,7 @@
                         </button>
                         <button type="button"
                             class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-left-10"
-                            (click)="addCharge()">
+                            (click)="addMoreCharge()">
                             <span>
                                 <i class="la la-plus"></i>
                                 <span>
@@ -63,8 +233,7 @@
                 </div>
             </div>
             <perfect-scrollbar style="max-height: 900px">
-
-                <div class="table-wrapper" [ngClass]="charges.length > 20 ? 'table-30-row' : ''">
+                <div class="table-wrapper" [ngClass]="listCharges.length > 20 ? 'table-30-row' : ''">
                     <table class="table table-striped table-brand dataTable" row>
                         <thead>
                             <tr>
@@ -84,7 +253,7 @@
                             </tr>
                         </thead>
                         <tbody class="tbody-group">
-                            <tr *ngIf="!isLoading && !charges.length">
+                            <tr *ngIf="!isLoading && !listCharges.length">
                                 <td colspan="100">
                                     <div class="no-data">
                                         <i class="flaticon-coins"></i>
@@ -93,7 +262,7 @@
                                 </td>
                             </tr>
                             <tr
-                                *ngFor="let charge of charges | filter: keyword:[ 'jobId', 'chargeCode', 'hbl', 'chargeName', 'hbl',  'mbl', 'currency'] ; let i = index; trackBy: trackByFn">
+                                *ngFor="let charge of listCharges | filter: keyword:[ 'jobId', 'chargeCode', 'hbl', 'chargeName', 'hbl',  'mbl', 'currency'] ; let i = index; trackBy: trackByFn">
                                 <td class="table-actions-col">
                                     <div class="table-actions">
                                         <label class="m-checkbox">
@@ -157,6 +326,7 @@
 
         </div>
     </div>
+    <!-- /list charge -->
 
     <div class="m-portlet summary-wp mb-0">
         <accordion [isAnimated]="true">
@@ -225,7 +395,7 @@
             </accordion-group>
         </accordion>
     </div>
-
+    <!-- /summary -->
 
     <div class="form-actions m--align-center">
         <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onCreateSOA()">
@@ -247,4 +417,4 @@
     </div>
 </div>
 
-<soa-add-charge-popup></soa-add-charge-popup>
+<soa-add-charge-popup  [searchInfo]="dataSearch" (onChange)="onUpdateMoreSOA($event)"></soa-add-charge-popup>
