@@ -73,4 +73,20 @@ export class AccoutingRepo {
                 map((data: any) => data)
             );
     }
+
+    getListMoreCharge(dataSearch: any = {}) {
+        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSOA/GetListMoreChargeByCondition`, dataSearch)
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => data)
+            );
+    }
+
+    addMoreCharge(data: any = {}) {
+        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSOA/AddMoreCharge`, data)
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => data)
+            );
+    }
 }
