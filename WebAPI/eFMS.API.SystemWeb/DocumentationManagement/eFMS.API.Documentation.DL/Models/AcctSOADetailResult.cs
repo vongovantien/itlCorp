@@ -5,6 +5,7 @@ namespace eFMS.API.Documentation.DL.Models
     public class AcctSOADetailResult : AcctSOAResult
     {
         public List<ChargeShipmentModel> ChargeShipments { get; set; }
+        public int TotalCharge { get; set; }
         public decimal AmountDebitLocal { get; set; }
         public decimal AmountCreditLocal { get; set; }
         public decimal AmountBalanceLocal { get { return this.AmountDebitLocal - this.AmountCreditLocal; } }

@@ -28,5 +28,7 @@ namespace eFMS.API.Documentation.DL.IService
         List<ChargeShipmentModel> GetListMoreChargeByCondition(MoreChargeShipmentCriteria criteria);
 
         AcctSOADetailResult AddMoreCharge(AddMoreChargeCriteria criteria);
+
+        ExportSOADetailResult GetDataExportSOABySOANo(string soaNo);
     }
 }

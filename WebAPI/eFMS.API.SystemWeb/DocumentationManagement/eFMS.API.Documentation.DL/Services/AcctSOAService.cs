@@ -332,6 +332,8 @@ namespace eFMS.API.Documentation.DL.Services
                             criteria.ChargeShipmentsCurrent.Add(item);
                         }
                     }
+                    data.Shipment = criteria.ChargeShipmentsCurrent.Where(x => x.HBL != null).GroupBy(x => x.HBL).Count();
+                    data.TotalCharge = criteria.ChargeShipmentsCurrent.Count();
                     data.ChargeShipments = criteria.ChargeShipmentsCurrent;
                     data.AmountDebitLocal = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountDebitLocal);
                     data.AmountCreditLocal = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountCreditLocal);
@@ -342,5 +344,26 @@ namespace eFMS.API.Documentation.DL.Services
             return data;
         }
 
+        public ExportSOADetailResult GetDataExportSOABySOANo(string soaNo)
+        {
+            var data = GetSpcDataExportSOABySOANo(soaNo);
+            var dataMap = mapper.Map<List<spc_GetDataExportSOABySOANo>, List<ExportSOAModel>>(data);
+            var result = new ExportSOADetailResult
+            {
+                ListCharges = dataMap,
+                TotalDebitExchange = dataMap.Where(x => x.DebitExchange != null).Sum(x => x.DebitExchange),
+                TotalCreditExchange = dataMap.Where(x => x.CreditExchange != null).Sum(x => x.CreditExchange)
+            };
+            return result;
+        }
+
+        private List<spc_GetDataExportSOABySOANo> GetSpcDataExportSOABySOANo(string soaNo)
+        {
+            DbParameter[] parameters =
+            {
+                SqlParam.GetParameter("soaNo", soaNo)
+            };
+            return ((eFMSDataContext)DataContext.DC).ExecuteProcedure<spc_GetDataExportSOABySOANo>(parameters);
+        }
     }
 }

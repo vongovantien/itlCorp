@@ -242,5 +242,17 @@ namespace eFMS.API.Documentation.Controllers
             var data = acctSOAService.AddMoreCharge(criteria);
             return Ok(data);
         }
+
+        /// <summary>
+        /// Export SOA detail by SOANo
+        /// </summary>
+        /// <param name="soaNo">soaNo that want to retrieve SOA</param>
+        /// <returns></returns>
+        [HttpGet("GetDataExportSOABySOANo")]
+        public IActionResult GetDataExportSOABySOANo(string soaNo)
+        {
+            var data = acctSOAService.GetDataExportSOABySOANo(soaNo);
+            return Ok(data);
+        }
     }
 }

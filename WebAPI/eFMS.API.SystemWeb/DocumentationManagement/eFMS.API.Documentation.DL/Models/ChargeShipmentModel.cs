@@ -24,7 +24,7 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal AmountDebitUSD { get; set; }
         public decimal AmountCreditUSD { get; set; }
 
-
+        public string SOANo { get; set; }
         public decimal Quantity { get; set; }
         public string Unit { get; set; }
         public decimal UnitPrice { get; set; }
