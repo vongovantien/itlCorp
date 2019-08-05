@@ -93,9 +93,9 @@
                             <label class="form-control-label">
                                 Currency
                             </label>
-                            <ng-select [active]="selectedCurrency" [items]="currencyList"
-                                (selected)="onSelectDataFormInfo($event, 'currency')">
-                            </ng-select>
+                            <select [(ngModel)]="selectedCurrency" class="form-control" (ngModelChange)="onSelectDataFormInfo($event , 'currency')">
+                                <option *ngFor="let currency of currencyList" [ngValue]="currency">{{currency.id}}</option>
+                            </select>
                         </div>
                     </div>
                 </div>

@@ -120,9 +120,9 @@ export class StatementOfAccountAddnewComponent extends AppList {
             this.addChargePopup.getListShipmentAndCDNote(this.dataSearch);
 
             this.addChargePopup.charges = this.charges;
-            this.addChargePopup.configCharge =  this.configCharge;
+            this.addChargePopup.configCharge = this.configCharge;
 
-            this.addChargePopup.show({backdrop: 'static'});
+            this.addChargePopup.show({ backdrop: 'static' });
         }
     }
 
@@ -175,9 +175,10 @@ export class StatementOfAccountAddnewComponent extends AppList {
             .subscribe(
                 (dataCurrency: any) => {
                     this.currencyList = (dataCurrency).map((item: any) => ({ id: item.id, text: item.id }));
-                    this.selectedCurrency = [this.currencyList.filter((curr) => curr.id === "VND")[0]];
-
+                    this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0];
+                    this.updateDataSearch('currency', this.selectedCurrency.id);
                     this.updateDataSearch('currencyLocal', 'VND');
+
                 },
                 (errors: any) => {
                     this.handleError(errors);
@@ -275,7 +276,8 @@ export class StatementOfAccountAddnewComponent extends AppList {
                 this.updateDataSearch('isOBH', this.selectedObh.id);
                 break;
             case 'currency':
-                this.selectedCurrency = [data];
+                this.selectedCurrency = data;
+                this.updateDataSearch('currency', this.selectedCurrency.id);
                 break;
             case 'service':
                 // * reset selected charges & dataSource.
@@ -369,7 +371,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
             }
             const body = {
                 currencyLocal: 'VND', // Todo: get currency local follow location or login info
-                currency: this.selectedCurrency[0].id,
+                currency: this.selectedCurrency.id,
                 customerID: this.selectedPartner.value || '',
                 dateType: this.selectedDateMode[0].id,
                 fromDate: formatDate(this.selectedRangeDate.startDate, 'yyyy-MM-dd', 'vi'),
@@ -442,7 +444,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
                 obh: this.dataSearch.isOBH,
                 creatorShipment: this.dataSearch.strCreators
             };
-
             this._accountRepo.createSOA(body)
                 .pipe(catchError(this.catchError))
                 .subscribe(
@@ -523,5 +524,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
         this.totalShipment = data.shipment;
     }
 }
+
+
 
 

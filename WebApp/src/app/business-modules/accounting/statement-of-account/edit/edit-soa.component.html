@@ -111,7 +111,7 @@
                             </span>
                         </button>
                         <button type="button"
-                            class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-left-10">
+                            class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-left-10" (click)="addMoreCharge()">
                             <span>
                                 <i class="la la-plus"></i>
                                 <span>
@@ -298,4 +298,4 @@
 </div>
 
 
-<soa-add-charge-popup></soa-add-charge-popup>
+<soa-add-charge-popup [searchInfo]="dataSearch" (onChange)="onUpdateMoreSOA($event)"></soa-add-charge-popup>

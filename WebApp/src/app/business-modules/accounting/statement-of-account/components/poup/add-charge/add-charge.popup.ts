@@ -20,7 +20,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
     @Input() searchInfo: SOASearchCharge = null;
 
     selectedShipment: Partial<CommonInterface.IComboGridData> = {};
-    selectedShipmentData: any;
+    selectedShipmentData: IShipment;
 
     configShipment: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
@@ -40,6 +40,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
     selectedCharges: any[] = []; // for multiple select
 
     cdNotes: ICDNote[];
+    initCDNotes: ICDNote[];
     selectedCDNote: ICDNote;
 
     obhs: any[] = [];
@@ -151,7 +152,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
         try {
             const res: IResultShipmentCDNote = await this._accoutingRepo.getListShipmentAndCDNote(data).toPromise();
             this.configShipment.dataSource = res.listShipment;
-            this.cdNotes = res.listCdNote;
+            this.cdNotes = this.initCDNotes = res.listCdNote;
 
             // * update config combogrid.
             this.configShipment.displayFields = [
@@ -184,6 +185,13 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
             case 'shipment':
                 this.selectedShipment = { field: data.jobId, value: data.hbl };
                 this.selectedShipmentData = data;
+                
+                this.cdNotes = [];
+                this.selectedCDNote = null;
+                this.cdNotes = this.filterCDNoteByShipment(this.selectedShipmentData);
+                if (this.cdNotes.length === 1) {
+                    this.selectedCDNote = this.cdNotes[0];
+                }
                 break;
             case 'charge':
                 if (data.id === 'All') {
@@ -224,6 +232,12 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
             }
         }
         return _uniq(result);
+    }
+
+    filterCDNoteByShipment(shipment: IShipment): ICDNote[] {
+        return this.initCDNotes.filter((item: ICDNote) => {
+            return (item.hbl === shipment.hbl && item.mbl === shipment.mbl && item.jobId === shipment.jobId);
+        });
     }
 
     onRemoveCharge(index: number = 0) {

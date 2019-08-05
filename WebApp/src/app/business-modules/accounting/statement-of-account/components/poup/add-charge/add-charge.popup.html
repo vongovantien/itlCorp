@@ -12,7 +12,7 @@
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label class="form-control-label" for="">
+                                <label class="form-control-label">
                                     Shipment
                                 </label>
                                 <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedShipment"
@@ -23,7 +23,7 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label class="form-control-label" for="">
+                                <label class="form-control-label">
                                     Debit/Credit Note
                                 </label>
                                 <select class="form-control" [(ngModel)]="selectedCDNote" name="selectedCDNote" placeholder="Select">
@@ -33,7 +33,7 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label class="form-control-label" for="">
+                                <label class="form-control-label">
                                     Type
                                 </label>
                                 <select [(ngModel)]="selectedType" name="selectedType" class="form-control">
@@ -47,7 +47,7 @@
                             <div class="row">
                                 <div class="col-6">
                                     <div class="form-group">
-                                        <label class="form-control-label" for="">
+                                        <label class="form-control-label">
                                             OBH
                                         </label>
                                         <select [(ngModel)]="selectedOBH" name="selectedOBH" class="form-control">
@@ -57,7 +57,7 @@
                                 </div>
                                 <div class="col-6">
                                     <div class="form-group">
-                                        <label class="form-control-label" for="">
+                                        <label class="form-control-label">
                                             In SOA
                                         </label>
                                         <select [(ngModel)]="selectedInSOA" name="selectedInSOA" class="form-control">
@@ -69,7 +69,7 @@
                         </div>
                         <div class="col-lg-8">
                         <div class="form-group form-charge">
-                            <label class="form-control-label" for="">
+                            <label class="form-control-label">
                                 Charge
                             </label>
                             <div class="charge-list-selected" *ngIf="!!selectedCharges.length">
