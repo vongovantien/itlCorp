@@ -12,6 +12,11 @@ namespace CommonInterface {
         selectedDisplayFields: any[];
     }
 
+    export interface IComboGridData {
+        field: string;
+        value: string;
+    }
+
     export interface IResult {
         data: any;
         message: string;

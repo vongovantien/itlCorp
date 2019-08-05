@@ -13,7 +13,6 @@ import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { StatementOfAccountSearchComponent } from './components/search-box-soa/search-box-soa.component';
 import { StatementOfAccountAddChargeComponent } from './components/poup/add-charge/add-charge.popup';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { StatementOfAccountFormCreateComponent } from './components/form-create-soa/form-create-soa.component';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import localeVi from '@angular/common/locales/vi';
 
@@ -56,7 +55,6 @@ const routing: Routes = [
 const COMPONENTS = [
     StatementOfAccountSearchComponent,
     StatementOfAccountAddChargeComponent,
-    StatementOfAccountFormCreateComponent
 ];
 
 @NgModule({

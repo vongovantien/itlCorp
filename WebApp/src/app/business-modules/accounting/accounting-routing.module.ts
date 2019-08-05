@@ -3,11 +3,10 @@ import { AccountReceivablePayableComponent } from './account-receivable-payable/
 import { AdvancePaymentComponent } from './advance-payment/advance-payment.component';
 import { SettlementPaymentComponent } from './settlement-payment/settlement-payment.component';
 import { ModuleWithProviders } from '@angular/compiler/src/core';
-import { AccoutingComponent } from './accouting.component';
 
 const routes: Routes = [
   {
-    path: '', component: AccoutingComponent
+    path: '', redirectTo: 'statement-of-account'
   },
   {
     path: 'statement-of-account', loadChildren: () => import('./statement-of-account/statement-of-account.module').then(m => m.StatementOfAccountModule),

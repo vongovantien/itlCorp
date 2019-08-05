@@ -12,9 +12,7 @@ export class FilterPipe implements PipeTransform {
                             continue;
                         }
                         return item[key].search(searchText) !== -1;
-                    } else {
-                        return item;
-                    }
+                    } 
                 }
             });
         } return sources;

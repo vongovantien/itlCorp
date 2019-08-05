@@ -5,10 +5,8 @@ import { routing } from './accounting-routing.module';
 import { AdvancePaymentComponent } from './advance-payment/advance-payment.component';
 import { SettlementPaymentComponent } from './settlement-payment/settlement-payment.component';
 import { AccountReceivablePayableComponent } from './account-receivable-payable/account-receivable-payable.component';
-import { AccoutingComponent } from './accouting.component';
 
 const PAGES = [
-  AccoutingComponent,
   AdvancePaymentComponent,
   SettlementPaymentComponent,
   AccountReceivablePayableComponent,
@@ -22,6 +20,6 @@ const PAGES = [
   declarations: [
     ...PAGES
   ],
-  bootstrap: [AccoutingComponent]
+  bootstrap: []
 })
 export class AccountingModule { }

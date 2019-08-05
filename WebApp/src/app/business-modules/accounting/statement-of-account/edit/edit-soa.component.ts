@@ -3,7 +3,7 @@ import { StatementOfAccountAddChargeComponent } from '../components/poup/add-cha
 import { NgxSpinnerService } from 'ngx-spinner';
 import { AccoutingRepo, SystemRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
-import { SOA } from 'src/app/shared/models';
+import { SOA, SOASearchCharge, Charge } from 'src/app/shared/models';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -31,6 +31,17 @@ export class StatementOfAccountEditComponent extends AppList {
 
     headers: CommonInterface.IHeaderTable[] = [];
     isCheckAllCharge: boolean = true;
+
+    dataSearch: SOASearchCharge;
+
+    charges: Charge[] = [];
+    configCharge: CommonInterface.IComboGirdConfig = {
+        placeholder: 'Please select',
+        displayFields: [],
+        dataSource: [],
+        selectedDisplayFields: [],
+    };
+
     constructor(
         private _spinner: NgxSpinnerService,
         private _accoutingRepo: AccoutingRepo,
@@ -63,7 +74,8 @@ export class StatementOfAccountEditComponent extends AppList {
             if (!!params.no && !!params.currency) {
                 this.soaNO = params.no;
                 this.currencyLocal = params.currency;
-                this.getCurrency();
+                // this.getCurrency();
+                // this.getListCharge()
                 this.getDetailSOA(this.soaNO, this.currencyLocal);
             }
         });
@@ -74,14 +86,17 @@ export class StatementOfAccountEditComponent extends AppList {
     }
 
     getDetailSOA(soaNO: string, currency: string) {
+        this._spinner.show();
         forkJoin([
             this._accoutingRepo.getDetaiLSOA(soaNO, currency),
-            this._sysRepo.getListCurrency()
+            this._sysRepo.getListCurrency(),
+            this._sysRepo.getListCharge()
+
         ]).pipe(
             catchError(this.catchError),
             finalize(() => { this._spinner.hide(); })
         ).subscribe(
-            ([dataSoa, dataCurrency]: any[]) => {
+            ([dataSoa, dataCurrency, datCharge]: any[]) => {
                 this.soa = new SOA(dataSoa);
                 this.currencyList = dataCurrency;
 
@@ -95,6 +110,37 @@ export class StatementOfAccountEditComponent extends AppList {
 
                 // * update range Date
                 this.selectedRange = { startDate: new Date(this.soa.soaformDate), endDate: new Date(this.soa.soatoDate) };
+
+                // * Update charge 
+                this.charges = datCharge;
+                this.charges.push(new Charge({ code: 'All', id: 'All', chargeNameEn: 'All' }));
+
+                this.configCharge.dataSource = datCharge || [];
+                this.configCharge.displayFields = [
+                    { field: 'code', label: 'Charge Code' },
+                    { field: 'chargeNameEn', label: 'Charge Name EN ' },
+                ];
+                this.configCharge.selectedDisplayFields = ['code'];
+
+                // * Update dataSearch for Add More Charge.
+                const datSearchMoreCharge: SOASearchCharge = {
+                    currency: this.soa.currency,
+                    currencyLocal: 'VND', // TODO get currency local from user,
+                    customerID: this.soa.customer,
+                    dateType: this.soa.dateType,
+                    toDate: this.soa.soatoDate,
+                    fromDate: this.soa.soaformDate,
+                    type: this.soa.type,
+                    isOBH: this.soa.obh,
+                    inSoa: false,
+                    strCharges: this.soa.surchargeIds,
+                    strCreators: this.soa.creatorShipment,
+                    serviceTypeId: this.soa.serviceTypeId,
+                    chargeShipments: this.soa.chargeShipments,
+                    note: this.soa.note
+                };
+                this.dataSearch = new SOASearchCharge(datSearchMoreCharge);
+
             },
             (errors: any) => {
                 this.handleError(errors);
@@ -111,6 +157,28 @@ export class StatementOfAccountEditComponent extends AppList {
                 (dataCurrency: any) => {
                     this.currencyList = dataCurrency;
                 },
+                (errors: any) => {
+                    this.handleError(errors);
+                },
+                // complete
+                () => { }
+            );
+    }
+    
+    getListCharge() {
+        this._sysRepo.getListCharge()
+            .pipe(catchError(this.catchError))
+            .subscribe((data) => {
+                this.charges = data;
+                this.charges.push(new Charge({ code: 'All', id: 'All', chargeNameEn: 'All' }));
+
+                this.configCharge.dataSource = data || [];
+                this.configCharge.displayFields = [
+                    { field: 'code', label: 'Charge Code' },
+                    { field: 'chargeNameEn', label: 'Charge Name EN ' },
+                ];
+                this.configCharge.selectedDisplayFields = ['code'];
+            },
                 (errors: any) => {
                     this.handleError(errors);
                 },
@@ -151,6 +219,12 @@ export class StatementOfAccountEditComponent extends AppList {
 
     back() {
         this._router.navigate(['home/accounting/statement-of-account']);
+    }
+
+    onUpdateMoreSOA(data: any) {
+        this.soa.chargeShipments = data.chargeShipments;
+        this.isCheckAllCharge = false;
+        console.log(this.soa.chargeShipments);
     }
 
     updateSOA() {
@@ -213,5 +287,17 @@ export class StatementOfAccountEditComponent extends AppList {
                     () => { }
                 );
         }
+    }
+
+  
+
+    addMoreCharge() {
+        this.addChargePopup.searchInfo = this.dataSearch;
+        this.addChargePopup.getListShipmentAndCDNote(this.dataSearch);
+
+        this.addChargePopup.charges = this.charges;
+        this.addChargePopup.configCharge = this.configCharge;
+
+        this.addChargePopup.show({ backdrop: 'static' });
     }
 }
