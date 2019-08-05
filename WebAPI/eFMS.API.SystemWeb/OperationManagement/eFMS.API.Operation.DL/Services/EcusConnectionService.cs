@@ -92,19 +92,21 @@ namespace eFMS.API.Operation.DL.Services
             List<SetEcusConnectionModel> list = GetConnections();
             if (criteria.All == null)
             {
-                list = list.Where(x => ((x.Username ?? "").Contains(criteria.Username ?? "")
-                && ((x.Name ?? "").Contains(criteria.Name ?? "")
-                && ((x.ServerName ?? "").Contains(criteria.ServerName ?? ""))
-                && ((x.Dbname ?? "").Contains(criteria.Dbname ?? "")))
-                )).ToList();
+                list = list.Where(x => (x.Username ?? "").IndexOf(criteria.Username ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                && (x.Name ?? "").IndexOf(criteria.Name ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                && (x.ServerName ?? "").IndexOf(criteria.ServerName ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                && (x.Dbname ?? "").IndexOf(criteria.Dbname ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                && (x.Fullname ?? "").IndexOf(criteria.Fullname ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                ).ToList();
             }
             else
             {
-                list = list.Where(x => ((x.Username ?? "").Contains(criteria.All ?? "")
-                 || ((x.Name ?? "").Contains(criteria.All ?? "")
-                 || ((x.ServerName ?? "").Contains(criteria.All ?? ""))
-                 || ((x.Dbname ?? "").Contains(criteria.All ?? "")))
-               )).ToList();
+                list = list.Where(x => (x.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                 || (x.Name ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                 || (x.ServerName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                 || (x.Dbname ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                 || (x.Fullname ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+               ).ToList();
             }
 
             return list;

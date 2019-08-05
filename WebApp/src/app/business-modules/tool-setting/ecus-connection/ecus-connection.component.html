@@ -233,35 +233,54 @@
                         </div>
                         <div class="row">
                             <div class="col-lg-6">
-                                <div class="form-group">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': addEcusConnectForm.submitted && EcusConnectionAdd.serverName===null}">
                                     <label class="form-control-label" for="">
-                                        server name
+                                        server name <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <input [(ngModel)]="EcusConnectionAdd.serverName" type="text"
-                                        class="form-control m-input m-input--square" autocomplete="nope"
+                                    <input [(ngModel)]="EcusConnectionAdd.serverName" type="text" maxlength="250"
+                                        (change)="EcusConnectionAdd.serverName=EcusConnectionAdd.serverName.trim()"
+                                        required class="form-control m-input m-input--square" autocomplete="nope"
                                         name="ecusServerName" placeholder="">
+                                    <div class="form-control-feedback"
+                                        *ngIf="addEcusConnectForm.submitted && EcusConnectionAdd.serverName===null">
+                                        Server is required
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-lg-6">
-                                <div class="form-group">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': addEcusConnectForm.submitted && EcusConnectionAdd.dbname===null}">
                                     <label class="form-control-label" for="">
-                                        database name
+                                        database name <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <input [(ngModel)]="EcusConnectionAdd.dbname" type="text"
+                                    <input [(ngModel)]="EcusConnectionAdd.dbname" type="text" required maxlength="250"
+                                        (change)="EcusConnectionAdd.dbname=EcusConnectionAdd.dbname.trim()"
                                         class="form-control m-input m-input--square" autocomplete="nope"
                                         name="ecusDBName" placeholder="">
+                                    <div class="form-control-feedback"
+                                        *ngIf="addEcusConnectForm.submitted && EcusConnectionAdd.dbname===null">
+                                        Database name is required
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-lg-6">
-                                <div class="form-group">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': addEcusConnectForm.submitted && EcusConnectionAdd.dbusername===null}">
                                     <label class="form-control-label" for="">
-                                        database user name
+                                        database user name <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <input [(ngModel)]="EcusConnectionAdd.dbusername" type="text"
+                                    <input [(ngModel)]="EcusConnectionAdd.dbusername" type="text" required
+                                        maxlength="100"
+                                        (change)="EcusConnectionAdd.dbusername=EcusConnectionAdd.dbusername.trim()"
                                         class="form-control m-input m-input--square" autocomplete="nope"
                                         name="ecusDBUserName" placeholder="">
+                                    <div class="form-control-feedback"
+                                        *ngIf="addEcusConnectForm.submitted && EcusConnectionAdd.dbusername===null">
+                                        Database user name is required
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-lg-6">
@@ -269,7 +288,7 @@
                                     <label class="form-control-label" for="">
                                         database password
                                     </label>
-                                    <input [(ngModel)]="EcusConnectionAdd.dbpassword" type="text"
+                                    <input [(ngModel)]="EcusConnectionAdd.dbpassword" type="text" maxlength="100"
                                         (change)="EcusConnectionAdd.dbpassword=EcusConnectionAdd.dbpassword.trim()"
                                         class="form-control m-input m-input--square" autocomplete="nope"
                                         name="ecusDBPass" placeholder="">
@@ -355,11 +374,10 @@
                                     <label class="form-control-label" for="">
                                         name <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <input ecusSpecicalCharacterAllowSpace type="text"
-                                        (change)="EcusConnectionEdit.name=EcusConnectionEdit.name.trim()" required
-                                        class="form-control m-input m-input--square" #edtEcusName="ngModel"
-                                        [(ngModel)]="EcusConnectionEdit.name" autocomplete="nope" name="edtEcusName"
-                                        placeholder="">
+                                    <input type="text" (change)="EcusConnectionEdit.name=EcusConnectionEdit.name.trim()"
+                                        maxlength="250" required class="form-control m-input m-input--square"
+                                        #edtEcusName="ngModel" [(ngModel)]="EcusConnectionEdit.name" autocomplete="nope"
+                                        name="edtEcusName" placeholder="">
                                     <div class="form-control-feedback"
                                         *ngIf="editEcusConnectForm.submitted && edtEcusName.invalid">
                                         Name is required
@@ -387,35 +405,54 @@
                         </div>
                         <div class="row">
                             <div class="col-lg-6">
-                                <div class="form-group">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': editEcusConnectForm.submitted && edtEcusServerName.invalid}">
                                     <label class="form-control-label" for="">
-                                        server name
+                                        server name <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <input ecusSpecicalCharacterNoSpace [(ngModel)]="EcusConnectionEdit.serverName"
-                                        type="text" class="form-control m-input m-input--square" autocomplete="nope"
-                                        name="edtEcusServerName" placeholder="">
+                                    <input [(ngModel)]="EcusConnectionEdit.serverName" type="text" maxlength="250"
+                                        (change)="EcusConnectionEdit.serverName=EcusConnectionEdit.serverName.trim()"
+                                        required class="form-control m-input m-input--square" autocomplete="nope"
+                                        name="edtEcusServerName" #edtEcusServerName="ngModel" placeholder="Enter text">
+                                    <div class="form-control-feedback"
+                                        *ngIf="editEcusConnectForm.submitted && edtEcusServerName.invalid">
+                                        Server name is required
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-lg-6">
-                                <div class="form-group">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': editEcusConnectForm.submitted && edtEcusDBName.invalid}">
                                     <label class="form-control-label" for="">
-                                        database name
+                                        database name <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <input ecusSpecicalCharacterNoSpace [(ngModel)]="EcusConnectionEdit.dbname"
-                                        type="text" class="form-control m-input m-input--square" autocomplete="nope"
-                                        name="edtEcusDBName" placeholder="">
+                                    <input [(ngModel)]="EcusConnectionEdit.dbname" type="text" required maxlength="250"
+                                        (change)="EcusConnectionEdit.dbname=EcusConnectionEdit.dbname.trim()"
+                                        class="form-control m-input m-input--square" autocomplete="nope"
+                                        #edtEcusDBName="ngModel" name="edtEcusDBName" placeholder="">
+                                    <div class="form-control-feedback"
+                                        *ngIf="editEcusConnectForm.submitted && edtEcusDBName.invalid">
+                                        Database name is required
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-lg-6">
-                                <div class="form-group">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': editEcusConnectForm.submitted && edtEcusDBUserName.invalid}">
                                     <label class="form-control-label" for="">
-                                        database user name
+                                        database user name <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <input ecusSpecicalCharacterNoSpace [(ngModel)]="EcusConnectionEdit.dbusername"
-                                        type="text" class="form-control m-input m-input--square" autocomplete="nope"
-                                        name="edtEcusDBUserName" placeholder="">
+                                    <input [(ngModel)]="EcusConnectionEdit.dbusername" type="text" required
+                                        maxlength="100"
+                                        (change)="EcusConnectionEdit.dbusername=EcusConnectionEdit.dbusername.trim()"
+                                        class="form-control m-input m-input--square" autocomplete="nope"
+                                        name="edtEcusDBUserName" #edtEcusDBUserName="ngModel" placeholder="">
+                                    <div class="form-control-feedback"
+                                        *ngIf="editEcusConnectForm.submitted && edtEcusDBUserName.invalid">
+                                        Database user name is required
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-lg-6">
@@ -423,7 +460,7 @@
                                     <label class="form-control-label" for="">
                                         database password
                                     </label>
-                                    <input [(ngModel)]="EcusConnectionEdit.dbpassword"
+                                    <input [(ngModel)]="EcusConnectionEdit.dbpassword" maxlength="100"
                                         (change)="EcusConnectionEdit.dbpassword=EcusConnectionEdit.dbpassword.trim()"
                                         type="text" class="form-control m-input m-input--square" autocomplete="nope"
                                         name="edtEcusDBPass" placeholder="">

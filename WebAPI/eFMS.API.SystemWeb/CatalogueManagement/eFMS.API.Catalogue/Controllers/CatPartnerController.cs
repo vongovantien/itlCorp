@@ -121,6 +121,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Add")]
+        [Authorize]
         public IActionResult Post(CatPartnerEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -148,6 +149,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="model">object to update</param>
         /// <returns></returns>
         [HttpPut("{id}")]
+        [Authorize]
         public IActionResult Put(string id, CatPartnerEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -174,6 +176,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="id">id of data that need to delete</param>
         /// <returns></returns>
         [HttpDelete("{id}")]
+        [Authorize]
         public IActionResult Delete(string id)
         {
             var hs = catPartnerService.Delete(id);
