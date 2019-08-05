@@ -1,6 +1,6 @@
 @echo off
 cd C:\Windows\Microsoft.NET\Framework\v4.0.30319
-installutil.exe "D:\Workspace\efms\src\WebAPI\eFMSWindowService\bin\Debug\eFMSWindowService.exe"
+installutil.exe -u "D:\Workspace\efms\src\WebAPI\eFMSWindowService\bin\Debug\eFMSWindowService.exe"
 
 if ERRORLEVEL 1 goto error
 exit

@@ -13,13 +13,13 @@
           <Property Name="CurrencyFromID" Type="varchar" MaxLength="30" />
           <Property Name="CurrencyToID" Type="varchar" MaxLength="30" />
           <Property Name="Rate" Type="decimal" Precision="18" Scale="4" Nullable="false" />
-          <Property Name="EffectiveOn" Type="smalldatetime" />
+          <Property Name="EffectiveOn" Type="datetime" />
           <Property Name="UserCreated" Type="varchar" MaxLength="50" />
-          <Property Name="DatetimeCreated" Type="smalldatetime" />
+          <Property Name="DatetimeCreated" Type="datetime" />
           <Property Name="UserModified" Type="varchar" MaxLength="50" />
-          <Property Name="DatetimeModified" Type="smalldatetime" />
+          <Property Name="DatetimeModified" Type="datetime" />
           <Property Name="Inactive" Type="bit" />
-          <Property Name="InactiveOn" Type="smalldatetime" />
+          <Property Name="InactiveOn" Type="datetime" />
         </EntityType>
         <!--Errors Found During Generation:
 warning 6002: The table/view 'eFMSTest.dbo.vw_catCurrencyExchangeNewest' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
@@ -58,13 +58,13 @@ warning 6002: The table/view 'eFMSTest.dbo.vw_catCurrencyExchangeNewest' does no
           <Property Name="CurrencyFromID" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
           <Property Name="CurrencyToID" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
           <Property Name="Rate" Type="Decimal" Precision="18" Scale="4" Nullable="false" />
-          <Property Name="EffectiveOn" Type="DateTime" Precision="0" />
+          <Property Name="EffectiveOn" Type="DateTime" Precision="3" />
           <Property Name="UserCreated" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="DatetimeCreated" Type="DateTime" Precision="0" />
+          <Property Name="DatetimeCreated" Type="DateTime" Precision="3" />
           <Property Name="UserModified" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="DatetimeModified" Type="DateTime" Precision="0" />
+          <Property Name="DatetimeModified" Type="DateTime" Precision="3" />
           <Property Name="Inactive" Type="Boolean" />
-          <Property Name="InactiveOn" Type="DateTime" Precision="0" />
+          <Property Name="InactiveOn" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityContainer Name="eFMSTestEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="catCurrencyExchanges" EntityType="Self.catCurrencyExchange" />
