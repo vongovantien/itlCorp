@@ -75,7 +75,7 @@ namespace eFMS.API.Catalogue.DL.Services
             partner.DatetimeModified = DateTime.Now;
             partner.UserCreated = partner.UserModified = currentUser.UserID;
             partner.Inactive = false;
-            var hs = DataContext.Add(entity);
+            var hs = DataContext.Add(partner);
             if (hs.Success)
             {
                 cache.Remove(Templates.CatPartner.NameCaching.ListName);
