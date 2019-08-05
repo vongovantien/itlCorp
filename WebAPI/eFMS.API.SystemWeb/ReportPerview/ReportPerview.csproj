@@ -285,8 +285,8 @@
     <Content Include="Reports\SeaShippingInstructionNew.ttx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Reports\LogisticsDebitNewDNTT.rpt" />
     <Content Include="Reports\LogisticsDebitNewDNTT.ttx" />
+    <Content Include="Reports\LogisticsDebitNewDNTT.rpt" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

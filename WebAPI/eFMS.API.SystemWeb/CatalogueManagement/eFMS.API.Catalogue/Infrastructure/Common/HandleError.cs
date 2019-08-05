@@ -9,7 +9,11 @@ namespace eFMS.API.Catalogue.Infrastructure.Common
     {
         public static string GetMessage(HandleState hs, Crud crud)
         {
-            string message = hs.Exception.Message;
+            string message = string.Empty;
+            if (hs.Exception != null)
+            {
+                message = hs.Exception.Message;
+            }
             switch (hs.Code)
             {
                 case 200:

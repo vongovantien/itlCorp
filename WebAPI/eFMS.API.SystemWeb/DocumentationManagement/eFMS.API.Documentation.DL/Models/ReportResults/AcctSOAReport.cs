@@ -30,7 +30,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public DateTime? Delivery { get; set; }
         public string HWBNO { get; set; }
         public string Description { get; set;}
-        public decimal? Quanity { get; set; }
+        public decimal? Quantity { get; set; }
         public string QUnit { get; set;}
         public decimal? UnitPrice { get; set; }
         public string Unit { get; set; }
