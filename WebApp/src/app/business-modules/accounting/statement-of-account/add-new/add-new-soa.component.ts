@@ -365,7 +365,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
             let serviceTypeId = '';
             if (this.selectedService[0].id === 'All') {
                 this.services.shift(); // * remove item with value 'All'
-                serviceTypeId = this.services.map((item: any) => item.id).toString().replace(',', ';');
+                serviceTypeId = this.services.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
             } else {
                 serviceTypeId = this.selectedService.map((item: any) => item.id).toString().replace(',', ';');
             }
