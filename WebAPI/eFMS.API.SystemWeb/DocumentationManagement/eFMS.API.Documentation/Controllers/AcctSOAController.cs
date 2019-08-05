@@ -203,7 +203,7 @@ namespace eFMS.API.Documentation.Controllers
             
             //Danh sách CreditDebitNote
             var listCdNote = data
-                .Where(x=>x.CreditDebitNo != null)
+                .Where(x => x.CreditDebitNo != null)
                 .GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.CreditDebitNo })
                 .Select(x => new CreditDebitNote
                 {
@@ -240,6 +240,18 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult AddMoreCharge(AddMoreChargeCriteria criteria)
         {
             var data = acctSOAService.AddMoreCharge(criteria);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Export SOA detail by SOANo
+        /// </summary>
+        /// <param name="soaNo">soaNo that want to retrieve SOA</param>
+        /// <returns></returns>
+        [HttpGet("GetDataExportSOABySOANo")]
+        public IActionResult GetDataExportSOABySOANo(string soaNo)
+        {
+            var data = acctSOAService.GetDataExportSOABySOANo(soaNo);
             return Ok(data);
         }
     }

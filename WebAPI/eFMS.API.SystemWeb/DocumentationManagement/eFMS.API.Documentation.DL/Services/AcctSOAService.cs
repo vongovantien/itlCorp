@@ -323,23 +323,47 @@ namespace eFMS.API.Documentation.DL.Services
             var data = new AcctSOADetailResult();
             if(criteria!= null)
             {
-                if(criteria.ChargeShipmentsCurrent != null && criteria.ChargeShipmentsAddMore != null)
+                if(criteria.ChargeShipmentsCurrent != null)
                 {
-                    foreach(var item in criteria.ChargeShipmentsAddMore)
+                    if (criteria.ChargeShipmentsAddMore != null)
                     {
-                        criteria.ChargeShipmentsCurrent.Add(item);
+                        foreach (var item in criteria.ChargeShipmentsAddMore)
+                        {
+                            criteria.ChargeShipmentsCurrent.Add(item);
+                        }
                     }
+                    data.Shipment = criteria.ChargeShipmentsCurrent.Where(x => x.HBL != null).GroupBy(x => x.HBL).Count();
+                    data.TotalCharge = criteria.ChargeShipmentsCurrent.Count();
+                    data.ChargeShipments = criteria.ChargeShipmentsCurrent;
+                    data.AmountDebitLocal = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountDebitLocal);
+                    data.AmountCreditLocal = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountCreditLocal);
+                    data.AmountDebitUSD = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountDebitUSD);
+                    data.AmountCreditUSD = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountCreditUSD);
                 }
-            }
-
-            data.ChargeShipments = criteria.ChargeShipmentsCurrent;
-            data.AmountDebitLocal = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountDebitLocal);
-            data.AmountCreditLocal = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountCreditLocal);
-            data.AmountDebitUSD = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountDebitUSD);
-            data.AmountCreditUSD = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountCreditUSD);
-            
+            }            
             return data;
         }
 
+        public ExportSOADetailResult GetDataExportSOABySOANo(string soaNo)
+        {
+            var data = GetSpcDataExportSOABySOANo(soaNo);
+            var dataMap = mapper.Map<List<spc_GetDataExportSOABySOANo>, List<ExportSOAModel>>(data);
+            var result = new ExportSOADetailResult
+            {
+                ListCharges = dataMap,
+                TotalDebitExchange = dataMap.Where(x => x.DebitExchange != null).Sum(x => x.DebitExchange),
+                TotalCreditExchange = dataMap.Where(x => x.CreditExchange != null).Sum(x => x.CreditExchange)
+            };
+            return result;
+        }
+
+        private List<spc_GetDataExportSOABySOANo> GetSpcDataExportSOABySOANo(string soaNo)
+        {
+            DbParameter[] parameters =
+            {
+                SqlParam.GetParameter("soaNo", soaNo)
+            };
+            return ((eFMSDataContext)DataContext.DC).ExecuteProcedure<spc_GetDataExportSOABySOANo>(parameters);
+        }
     }
 }
