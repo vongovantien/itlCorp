@@ -478,13 +478,19 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>01/28/2016 14:22:24</publishTime>
     </File>
     <File Include="bin/ReportPerview.dll">
-      <publishTime>08/04/2019 16:20:57</publishTime>
+      <publishTime>08/05/2019 09:53:32</publishTime>
     </File>
     <File Include="bin/ReportPerview.pdb">
-      <publishTime>08/04/2019 16:20:57</publishTime>
+      <publishTime>08/05/2019 09:53:32</publishTime>
     </File>
     <File Include="bin/Reports/FreightManifest.ttx">
       <publishTime>07/11/2019 17:00:18</publishTime>
+    </File>
+    <File Include="bin/Reports/LogisticsDebitNewDNTT.rpt">
+      <publishTime>08/05/2019 09:07:21</publishTime>
+    </File>
+    <File Include="bin/Reports/LogisticsDebitNewDNTT.ttx">
+      <publishTime>07/25/2019 10:16:24</publishTime>
     </File>
     <File Include="bin/Reports/rptLCLQuotation-En.rpt">
       <publishTime>02/26/2019 13:58:56</publishTime>
@@ -508,7 +514,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>08/20/2018 09:43:43</publishTime>
     </File>
     <File Include="bin/Reports/SeaCargoManifest.rpt">
-      <publishTime>07/11/2019 17:00:18</publishTime>
+      <publishTime>08/05/2019 09:07:21</publishTime>
     </File>
     <File Include="bin/Reports/SeaCargoManifest.ttx">
       <publishTime>07/11/2019 17:00:18</publishTime>
@@ -535,7 +541,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>07/11/2019 17:00:18</publishTime>
     </File>
     <File Include="Reports/LogisticsDebitNewDNTT.rpt">
-      <publishTime>07/25/2019 15:48:01</publishTime>
+      <publishTime>08/05/2019 09:07:21</publishTime>
     </File>
     <File Include="Reports/LogisticsDebitNewDNTT.ttx">
       <publishTime>07/25/2019 10:16:24</publishTime>
@@ -583,7 +589,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>07/11/2019 17:00:18</publishTime>
     </File>
     <File Include="Reports/SeaCargoManifest.rpt">
-      <publishTime>07/11/2019 17:00:18</publishTime>
+      <publishTime>08/05/2019 09:07:21</publishTime>
     </File>
     <File Include="Reports/SeaCargoManifest.ttx">
       <publishTime>07/11/2019 17:00:18</publishTime>
@@ -601,7 +607,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>07/11/2019 17:00:18</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>08/04/2019 16:20:58</publishTime>
+      <publishTime>04/08/2019 16:20:58</publishTime>
     </File>
   </ItemGroup>
 </Project>

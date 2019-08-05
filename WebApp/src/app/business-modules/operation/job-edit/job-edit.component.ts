@@ -219,7 +219,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         }
     }
     cancelCreatJob() {
-        this.cancelCreateJobPopup.show();
+        this.cancelCreateJobPopup.hide();
     }
     confirmCancelJob(){
         this.confirmCancelJobPopup.show();
