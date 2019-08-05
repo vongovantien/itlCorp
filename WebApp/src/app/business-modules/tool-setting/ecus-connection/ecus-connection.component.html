@@ -204,7 +204,7 @@
                                     <input (change)="EcusConnectionAdd.name=EcusConnectionAdd.name.trim()" required
                                         [(ngModel)]="EcusConnectionAdd.name" type="text" #ecusName="ngModel"
                                         class="form-control m-input m-input--square" autocomplete="nope" name="ecusName"
-                                        maxlength="250" placeholder="">
+                                        maxlength="250" placeholder="Enter text">
                                     <div class="form-control-feedback"
                                         *ngIf="addEcusConnectForm.submitted && ecusName.invalid">
                                         Name is required
@@ -234,16 +234,16 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': addEcusConnectForm.submitted && EcusConnectionAdd.serverName===null}">
+                                    [ngClass]="{ 'm-form__group has-danger': addEcusConnectForm.submitted && ecusServerName.invalid}">
                                     <label class="form-control-label" for="">
                                         server name <span class="m--font-danger">(*)</span>
                                     </label>
                                     <input [(ngModel)]="EcusConnectionAdd.serverName" type="text" maxlength="250"
                                         (change)="EcusConnectionAdd.serverName=EcusConnectionAdd.serverName.trim()"
                                         required class="form-control m-input m-input--square" autocomplete="nope"
-                                        name="ecusServerName" placeholder="">
+                                        #ecusServerName="ngModel" name="ecusServerName" placeholder="enter text">
                                     <div class="form-control-feedback"
-                                        *ngIf="addEcusConnectForm.submitted && EcusConnectionAdd.serverName===null">
+                                        *ngIf="addEcusConnectForm.submitted && ecusServerName.invalid">
                                         Server is required
                                     </div>
                                 </div>
@@ -257,7 +257,7 @@
                                     <input [(ngModel)]="EcusConnectionAdd.dbname" type="text" required maxlength="250"
                                         (change)="EcusConnectionAdd.dbname=EcusConnectionAdd.dbname.trim()"
                                         class="form-control m-input m-input--square" autocomplete="nope"
-                                        name="ecusDBName" placeholder="">
+                                        name="ecusDBName" #ecusDBName="ngModel" placeholder="Enter text">
                                     <div class="form-control-feedback"
                                         *ngIf="addEcusConnectForm.submitted && EcusConnectionAdd.dbname===null">
                                         Database name is required
@@ -276,7 +276,7 @@
                                         maxlength="100"
                                         (change)="EcusConnectionAdd.dbusername=EcusConnectionAdd.dbusername.trim()"
                                         class="form-control m-input m-input--square" autocomplete="nope"
-                                        name="ecusDBUserName" placeholder="">
+                                        name="ecusDBUserName" #ecusDBUserName="ngModel" placeholder="enter text">
                                     <div class="form-control-feedback"
                                         *ngIf="addEcusConnectForm.submitted && EcusConnectionAdd.dbusername===null">
                                         Database user name is required
@@ -291,7 +291,8 @@
                                     <input [(ngModel)]="EcusConnectionAdd.dbpassword" type="text" maxlength="100"
                                         (change)="EcusConnectionAdd.dbpassword=EcusConnectionAdd.dbpassword.trim()"
                                         class="form-control m-input m-input--square" autocomplete="nope"
-                                        name="ecusDBPass" placeholder="">
+                                        name="ecusDBPass" #ecusDBPass="ngModel" placeholder="Enter text"
+                                        onkeypress="return event.charCode == 46 || event.charCode > 32">
                                 </div>
                             </div>
                         </div>
@@ -320,7 +321,7 @@
                                     <input [(ngModel)]="EcusConnectionAdd.note"
                                         (change)="EcusConnectionAdd.note=EcusConnectionAdd.note.trim()" type="text"
                                         class="form-control m-input m-input--square" autocomplete="nope" name="ecusNote"
-                                        placeholder="">
+                                        placeholder="Enter text">
                                 </div>
                             </div>
                         </div>
@@ -377,7 +378,7 @@
                                     <input type="text" (change)="EcusConnectionEdit.name=EcusConnectionEdit.name.trim()"
                                         maxlength="250" required class="form-control m-input m-input--square"
                                         #edtEcusName="ngModel" [(ngModel)]="EcusConnectionEdit.name" autocomplete="nope"
-                                        name="edtEcusName" placeholder="">
+                                        name="edtEcusName" placeholder="Enter text">
                                     <div class="form-control-feedback"
                                         *ngIf="editEcusConnectForm.submitted && edtEcusName.invalid">
                                         Name is required
@@ -429,7 +430,7 @@
                                     <input [(ngModel)]="EcusConnectionEdit.dbname" type="text" required maxlength="250"
                                         (change)="EcusConnectionEdit.dbname=EcusConnectionEdit.dbname.trim()"
                                         class="form-control m-input m-input--square" autocomplete="nope"
-                                        #edtEcusDBName="ngModel" name="edtEcusDBName" placeholder="">
+                                        #edtEcusDBName="ngModel" name="edtEcusDBName" placeholder="Enter text">
                                     <div class="form-control-feedback"
                                         *ngIf="editEcusConnectForm.submitted && edtEcusDBName.invalid">
                                         Database name is required
@@ -448,7 +449,7 @@
                                         maxlength="100"
                                         (change)="EcusConnectionEdit.dbusername=EcusConnectionEdit.dbusername.trim()"
                                         class="form-control m-input m-input--square" autocomplete="nope"
-                                        name="edtEcusDBUserName" #edtEcusDBUserName="ngModel" placeholder="">
+                                        name="edtEcusDBUserName" #edtEcusDBUserName="ngModel" placeholder="Enter text">
                                     <div class="form-control-feedback"
                                         *ngIf="editEcusConnectForm.submitted && edtEcusDBUserName.invalid">
                                         Database user name is required
@@ -463,7 +464,8 @@
                                     <input [(ngModel)]="EcusConnectionEdit.dbpassword" maxlength="100"
                                         (change)="EcusConnectionEdit.dbpassword=EcusConnectionEdit.dbpassword.trim()"
                                         type="text" class="form-control m-input m-input--square" autocomplete="nope"
-                                        name="edtEcusDBPass" placeholder="">
+                                        name="edtEcusDBPass" placeholder="Enter text"
+                                        onkeypress="return event.charCode == 46 || event.charCode > 32">
                                 </div>
                             </div>
                         </div>
@@ -492,7 +494,7 @@
                                     <input [(ngModel)]="EcusConnectionEdit.note"
                                         (change)="EcusConnectionEdit.note=EcusConnectionEdit.note.trim()" type="text"
                                         class="form-control m-input m-input--square" autocomplete="nope"
-                                        name="edtEcusNote" placeholder="">
+                                        name="edtEcusNote" placeholder="Enter text">
                                 </div>
                             </div>
                         </div>

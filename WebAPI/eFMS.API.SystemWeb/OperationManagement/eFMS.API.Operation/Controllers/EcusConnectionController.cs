@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.NoSql;
 using eFMS.API.Operation.DL.IService;
 using eFMS.API.Operation.DL.Models;
 using eFMS.API.Operation.DL.Models.Criteria;
 using eFMS.API.Operation.Infrastructure.Common;
 using eFMS.API.Operation.Infrastructure.Middlewares;
+using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 
@@ -23,16 +26,18 @@ namespace eFMS.API.Operation.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly IEcusConnectionService ecusConnectionService;
+        private readonly ICurrentUser currentUser;
 
         /// <summary>
         /// constructor
         /// </summary>
         /// <param name="localizer">inject interface IStringLocalizer</param>
         /// <param name="service">inject interface IEcusConnectionService</param>
-        public EcusConnectionController(IStringLocalizer<Resources.LanguageSub> localizer, IEcusConnectionService service)
+        public EcusConnectionController(IStringLocalizer<Resources.LanguageSub> localizer, IEcusConnectionService service, ICurrentUser user)
         {
             stringLocalizer = localizer;
             ecusConnectionService = service;
+            currentUser = user;
         }
 
         /// <summary>
@@ -42,6 +47,7 @@ namespace eFMS.API.Operation.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Add")]
+        [Authorize]
         public IActionResult AddNew(SetEcusConnectionModel model)
         {
             var existedMessage = CheckExist(model);
@@ -50,7 +56,7 @@ namespace eFMS.API.Operation.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
             model.DatetimeCreated = DateTime.Now;
-            model.UserCreated = "admin";
+            model.UserCreated = currentUser.UserID;
             var hs = ecusConnectionService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -68,6 +74,7 @@ namespace eFMS.API.Operation.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("Update")]
+        [Authorize]
         public IActionResult Update(SetEcusConnectionModel model)
         {
             var existedMessage = CheckExist(model);
@@ -76,7 +83,7 @@ namespace eFMS.API.Operation.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
             model.DatetimeModified = DateTime.Now;
-            model.UserModified = "admin";
+            model.UserModified = currentUser.UserID;
             var hs = ecusConnectionService.Update(model, x => x.Id == model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -96,6 +103,7 @@ namespace eFMS.API.Operation.Controllers
         [Route("Delete")]
         public IActionResult Delete(int id)
         {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = ecusConnectionService.Delete(x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

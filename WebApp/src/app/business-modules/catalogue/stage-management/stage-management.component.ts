@@ -130,24 +130,27 @@ export class StageManagementComponent implements OnInit {
     }
 
     async add_stage(form: NgForm, action: string) {
-        if (action == "yes") {
+        if (action === "yes") {
             delete this.StageToAdd.id;
-            if (form.form.status != "INVALID") {
-                await this.baseServices.postAsync(this.api_menu.Catalogue.Stage_Management.addNew, this.StageToAdd, true, true);
-                this.StageToAdd = new StageModel();
-                this.pager.currentPage = 1;
-                this.pager.totalItems = 0;
-                this.child.setPage(this.pager.currentPage);
+            if (form.form.status !== "INVALID") {
+                const response = await this.baseServices.postAsync(this.api_menu.Catalogue.Stage_Management.addNew, this.StageToAdd, true, true);
+                if (response) {
+                    $('#add-stage-management-modal').modal('hide');
+                    this.StageToAdd = new StageModel();
+                    this.pager.currentPage = 1;
+                    this.pager.totalItems = 0;
+                    this.ListStages = await this.getStages(this.pager);
+                    // this.child.setPage(this.pager.currentPage);
+
+                    this.resetNgSelect();
+                    form.onReset();
+                }
                 //await this.getStages(this.pager);
                 // this.child.setPage(this.pager.currentPage);
                 // if (this.pager.currentPage < this.pager.totalPages) {
                 //     this.pager.currentPage = this.pager.totalPages;
                 //     this.child.setPage(this.pager.currentPage);
                 // }
-
-                this.resetNgSelect();
-                form.onReset();
-                $('#add-stage-management-modal').modal('hide');
             }
         } else {
             this.resetNgSelect();
@@ -310,14 +313,14 @@ export class StageManagementComponent implements OnInit {
             stages = lodash.map(stages, function (stg, index) {
                 return [
                     index + 1,
-                    stg['stage']['id'],
+                    stg['id'],
                     stg['deptName'],
-                    stg['stage']['code'],
-                    stg['stage']['stageNameVn'],
-                    stg['stage']['stageNameEn'],
-                    stg['stage']['descriptionVn'],
-                    stg['stage']['descriptionEn'],
-                    (stg['stage']['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+                    stg['code'],
+                    stg['stageNameVn'],
+                    stg['stageNameEn'],
+                    stg['descriptionVn'],
+                    stg['descriptionEn'],
+                    (stg['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
                 ]
             });
         }
@@ -326,14 +329,14 @@ export class StageManagementComponent implements OnInit {
             stages = lodash.map(stages, function (stg, index) {
                 return [
                     index + 1,
-                    stg['stage']['id'],
+                    stg['id'],
                     stg['deptName'],
-                    stg['stage']['code'],
-                    stg['stage']['stageNameVn'],
-                    stg['stage']['stageNameEn'],
-                    stg['stage']['descriptionVn'],
-                    stg['stage']['descriptionEn'],
-                    (stg['stage']['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+                    stg['code'],
+                    stg['stageNameVn'],
+                    stg['stageNameEn'],
+                    stg['descriptionVn'],
+                    stg['descriptionEn'],
+                    (stg['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
                 ]
             });
         }
