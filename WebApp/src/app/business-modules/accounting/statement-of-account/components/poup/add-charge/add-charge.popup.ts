@@ -288,7 +288,6 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: any) => {
-                        console.log(res);
                         this.onChange.emit(res);
                         this.hide();
                     },
