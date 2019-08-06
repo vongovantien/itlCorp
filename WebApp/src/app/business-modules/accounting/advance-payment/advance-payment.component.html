@@ -1,3 +1,45 @@
-<p>
-  advance-payment works!
-</p>
+<div class="advance-payment-page">
+    <div class="m-subheader">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <app-breadcrumb></app-breadcrumb>
+            </div>
+            <div class="c-button-actions">
+                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                    [routerLink]="'/home/accounting/advance-payment/new'">
+                    <span>
+                        <i class="la la-plus"></i>
+                        <span>
+                            add new
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-upload"></i>
+                        <span>
+                            export
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="m-content">
+        <div class="m-portlet">
+            <div class="m-form">
+                <div class="m-portlet__body">
+                    form-search-component
+                </div>
+            </div>
+        </div>
+
+        <div class="m-portlet">
+            <div class="m-form">
+                <div class="m-portlet__body">
+                    List Advance Payment
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
