@@ -48,6 +48,7 @@ export class ChargeComponent implements OnInit {
   @ViewChild(PaginationComponent, { static: false }) child: any;
 
   async ngOnInit() {
+    this.pager.totalItems = 0;
     this.searchCharge();
   }
 
