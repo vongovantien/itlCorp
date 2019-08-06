@@ -60,6 +60,29 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
 
   refreshValue(value: any): void {
   }
+
+  saveAs(blob: Blob, filename: string) {
+    const anchorElem = document.createElement("a");
+    anchorElem.id = "down";
+
+    if (window.navigator.msSaveBlob) {
+      window.navigator.msSaveOrOpenBlob(blob, filename);
+    } else {
+      const url = window.URL.createObjectURL(blob);
+      // const el = document.getElementById('down');
+      const el = document.getElementById(anchorElem.id);
+
+      anchorElem.setAttribute('href', url);
+      anchorElem.setAttribute('download', filename);
+      anchorElem.style.display = 'none';
+      anchorElem.click();
+
+      setTimeout(function () {
+        document.body.removeChild(anchorElem);
+        window.URL.revokeObjectURL(url);
+      }, 500);
+    }
+  };
 }
 
   // config for <app-combo-grid-virtual-scroll>
