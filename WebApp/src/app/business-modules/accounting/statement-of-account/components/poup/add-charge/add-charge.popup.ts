@@ -247,9 +247,9 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
     onApplySearchCharge() {
         const body: ISearchMoreCharge = {
             inSoa: this.selectedInSOA.id,
-            jobId: this.selectedShipmentData.jobId,
-            hbl: this.selectedShipmentData.hbl,
-            mbl: this.selectedShipmentData.mbl,
+            jobId: !!this.selectedShipmentData ? this.selectedShipmentData.jobId : '',
+            hbl: !!this.selectedShipmentData ? this.selectedShipmentData.hbl : '',
+            mbl: !!this.selectedShipmentData ? this.selectedShipmentData.mbl : '',
             cdNote: !!this.selectedCDNote ? this.selectedCDNote.creditDebitNo : '',
             currencyLocal: "VND",
             customerID: this.searchInfo.customerID,
