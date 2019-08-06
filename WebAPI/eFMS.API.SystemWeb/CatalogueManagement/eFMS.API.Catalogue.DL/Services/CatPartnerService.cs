@@ -305,7 +305,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                     else
                     {
-                        var groups = item.PartnerGroup.Split(";");
+                        var groups = item.PartnerGroup.Split(";").Select(x => x.Trim());
                         var group = partnerGroups.Intersect(groups);
                         if (group == null)
                         {
@@ -314,7 +314,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         }
                         else
                         {
-                            item.PartnerGroup = String.Join(";", group);
+                            item.PartnerGroup = String.Join(";", groups);
                             if (item.PartnerGroup.Contains(DataEnums.CustomerPartner))
                             {
                                 if (string.IsNullOrEmpty(item.SaleManName))
@@ -425,6 +425,10 @@ namespace eFMS.API.Catalogue.DL.Services
                             item.CityBilling = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_PROVINCE_BILLING_NOT_FOUND], item.CityBilling);
                             item.IsValid = false;
                         }
+                        else
+                        {
+                            item.ProvinceId = province.Id;
+                        }
                     }
                     var countryShipping = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryShipping.ToLower());
                     if (countryShipping == null)
@@ -434,13 +438,21 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                     else
                     {
-                        item.CountryId = countryShipping.Id;
+                        item.CountryShippingId = countryShipping.Id;
                         var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.CityShipping.ToLower() && i.CountryId == item.CountryId);
                         if (province == null)
                         {
                             item.CityShipping = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_PROVINCE_SHIPPING_NOT_FOUND], item.CityShipping);
                             item.IsValid = false;
                         }
+                        else
+                        {
+                            item.ProvinceShippingId = province.Id;
+                        }
+                    }
+                    if(item.DepartmentId == null)
+                    {
+                        item.DepartmentId = "Head Office";
                     }
                 }
             });
