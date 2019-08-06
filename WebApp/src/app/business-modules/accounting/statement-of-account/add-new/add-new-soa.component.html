@@ -323,78 +323,11 @@
                     </table>
                 </div>
             </perfect-scrollbar>
-
         </div>
     </div>
     <!-- /list charge -->
 
-    <div class="m-portlet summary-wp mb-0">
-        <accordion [isAnimated]="true">
-            <accordion-group>
-                <div class="m-portlet__head" accordion-heading>
-                    <div class="m-portlet__head-caption">
-                        <div class="m-portlet__head-title">
-                            <h3 class="m-portlet__head-text">
-                                <i class="la la-angle-up m--margin-right-5 hide"></i>
-                                <i class="la la-angle-down m--margin-right-5 show"></i>
-                                Summary
-                            </h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="m-portlet__body">
-                    <div class="table-wrapper" id="">
-                        <table class="table table-bordered table-brand">
-                            <thead>
-                                <tr class="text-center">
-                                    <th></th>
-                                    <th>
-                                        <span>Total Debit</span>
-                                    </th>
-                                    <th>
-                                        <span>Total Credit</span>
-                                    </th>
-                                    <th>
-                                        <span>Balance</span>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody *ngIf="!!dataCharge">
-                                <tr class="text-center">
-                                    <td>
-                                        <span>VNĐ</span>
-                                    </td>
-                                    <td>
-                                        <span>{{dataCharge.amountCreditLocal | number: '.0-2'}}</span>
-                                    </td>
-                                    <td>
-                                        <span>{{dataCharge.amountDebitLocal | number: '.0-2'}}</span>
-                                    </td>
-                                    <td>
-                                        <span>{{dataCharge.amountBalanceLocal | number: '.0-2'}}</span>
-                                    </td>
-                                </tr>
-                                <tr class="text-center">
-                                    <td>
-                                        <span>USD</span>
-                                    </td>
-                                    <td>
-                                        <span>{{dataCharge.amountCreditUSD | number: '.0-2'}}</span>
-                                    </td>
-                                    <td>
-                                        <span>{{dataCharge.amountDebitUSD | number: '.0-2'}}</span>
-                                    </td>
-                                    <td>
-                                        <span>{{dataCharge.amountBalanceUSD | number: '.0-2'}}</span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </accordion-group>
-        </accordion>
-    </div>
+    <soa-summary [data]="dataCharge"></soa-summary>
     <!-- /summary -->
 
     <div class="form-actions m--align-center">
