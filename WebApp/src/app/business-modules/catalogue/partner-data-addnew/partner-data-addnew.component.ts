@@ -65,6 +65,8 @@ export class PartnerDataAddnewComponent implements OnInit {
     this.getWorkPlaces();
     this.getparentCustomers();
     this.getDepartments();
+    console.log(this.partner.salePersonId);
+    console.log(this.isRequiredSaleman);
   }
   departmentActive: any[] = [];
   getDepartments(): any {
@@ -150,6 +152,7 @@ export class PartnerDataAddnewComponent implements OnInit {
     }
     if (partnerGroup == PartnerGroupEnum.CUSTOMER) {
       this.partnerGroupActives.push(this.partnerGroups.find(x => x.id == "CUSTOMER"));
+      this.isRequiredSaleman = true;
     }
     if (partnerGroup == PartnerGroupEnum.SHIPPER) {
       this.partnerGroupActives.push(this.partnerGroups.find(x => x.id == "SHIPPER"));
@@ -163,6 +166,7 @@ export class PartnerDataAddnewComponent implements OnInit {
     this.partner.partnerGroup = '';
     if (this.partnerGroupActives.find(x => x.id == "ALL")) {
       this.partner.partnerGroup = 'AGENT;AIRSHIPSUP;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
+      this.isRequiredSaleman = true;
     }
     else {
       this.partnerGroupActives.forEach(element => {
@@ -172,7 +176,7 @@ export class PartnerDataAddnewComponent implements OnInit {
         this.partner.partnerGroup.substring(0, (this.partner.partnerGroup.length - 1));
       }
     }
-    this.isRequiredSaleman = this.checkRequireSaleman(this.partner.partnerGroup);
+    // this.isRequiredSaleman = this.checkRequireSaleman(this.partner.partnerGroup);
     console.log(this.partner.partnerGroup);
     this.activeNg = false;
     setTimeout(() => {
@@ -294,11 +298,9 @@ export class PartnerDataAddnewComponent implements OnInit {
   checkRequireSaleman(partnerGroup: string): boolean {
     if (partnerGroup == null) {
       return false;
-    }
-    else if (partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')) {
+    } else if (partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }

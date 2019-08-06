@@ -88,9 +88,13 @@
   "MSG_COMMOIDITY_NAME_EN_EMPTY": "Name En is not allow empty!|wrong",
   "MSG_COMMOIDITY_NAME_LOCAL_EMPTY": "Name Local is not allow empty!|wrong",
   "MSG_COMMOIDITY_CODE_EMPTY": "Code is not allow empty!|wrong",
-  "MSG_COMMOIDITY_CODE_EXISTED": "Code has been existed!|wrong",
-  "MSG_COMMOIDITY_CODE_DUPLICATED": "Code has been duplicated!|wrong",
+  "MSG_COMMOIDITY_CODE_EXISTED": "Code '{0}' has been existed!|wrong",
+  "MSG_COMMOIDITY_CODE_DUPLICATED": "Code '{0}' has been duplicated!|wrong",
   "MSG_COMMOIDITY_STATUS_EMPTY": "Status is not allow empty!|wrong",
+  "EF_COMMOIDITY_DISPLAYNAME_CODE": "Code",
+  "EF_COMMOIDITY_DISPLAYNAME_NAMEVN": "Name VN",
+  "EF_COMMOIDITY_DISPLAYNAME_NAMEEN": "Name EN",
+  "EF_COMMOIDITY_DISPLAYNAME_GROUP": "Group",
   //------------end  : Commodity
 
   //------------start: COUNTRY

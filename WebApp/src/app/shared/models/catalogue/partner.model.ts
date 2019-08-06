@@ -22,7 +22,7 @@ export class Partner {
     bankAccountName: string = '';
     bankAccountAddress: string = '';
     note: string = '';
-    salePersonId: string = '';
+    salePersonId: string = null;
     public: boolean = false;
     creditAmount: 0;
     debitAmount: 0;

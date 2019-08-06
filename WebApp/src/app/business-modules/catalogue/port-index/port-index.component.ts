@@ -320,8 +320,8 @@ export class PortIndexComponent implements OnInit {
         return [
           index + 1,
           pi['code'],
-          pi['name_EN'],
-          pi['name_VN'],
+          pi['nameEn'],
+          pi['nameVn'],
           pi['countryNameEN'],
           pi['areaNameEN'],
           pi['modeOfTransport'],
@@ -335,8 +335,8 @@ export class PortIndexComponent implements OnInit {
         return [
           index + 1,
           pi['code'],
-          pi['name_EN'],
-          pi['name_VN'],
+          pi['nameEn'],
+          pi['nameVn'],
           pi['countryNameVN'],
           pi['areaNameVN'],
           pi['modeOfTransport'],
