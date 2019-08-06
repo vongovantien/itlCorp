@@ -362,13 +362,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
         if (this.isApplied && !this.selectedRangeDate.startDate || !this.selectedPartner.value) {
             return;
         } else {
-            let serviceTypeId = '';
-            if (this.selectedService[0].id === 'All') {
-                this.services.shift(); // * remove item with value 'All'
-                serviceTypeId = this.services.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
-            } else {
-                serviceTypeId = this.selectedService.map((item: any) => item.id).toString().replace(',', ';');
-            }
             const body = {
                 currencyLocal: 'VND', // Todo: get currency local follow location or login info
                 currency: this.selectedCurrency.id,
@@ -381,10 +374,9 @@ export class StatementOfAccountAddnewComponent extends AppList {
                 strCreators: this.selectedUser.map((item: any) => item.id).toString(),
                 strCharges: this.selectedCharges.map((item: any) => item.code).toString(),
                 note: this.note,
-                serviceTypeId: serviceTypeId,
+                serviceTypeId: !!this.selectedService.length ? this.mapServiceId(this.selectedService[0].id) : this.mapServiceId('All'),
             };
             this.dataSearch = new SOASearchCharge(body);
-
             this.searchChargeWithDataSearch(this.dataSearch);
         }
     }
@@ -431,6 +423,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
             this._toastService.warning(`SOA Don't have any charges in this period, Please check it again! `, '', { positionClass: 'toast-bottom-right' });
             return;
         } else {
+
             const body = {
                 surchargeIds: chargeChecked.map((item: any) => item.id),
                 soaformDate: this.dataSearch.fromDate,
@@ -438,7 +431,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
                 currency: this.dataSearch.currency,
                 note: this.dataSearch.note,
                 dateType: this.dataSearch.dateType,
-                serviceTypeId: this.dataSearch.serviceTypeId,
+                serviceTypeId: !!this.selectedService.length ? this.mapServiceId(this.selectedService[0].id) : this.mapServiceId('All'),
                 customer: this.dataSearch.customerID,
                 type: this.dataSearch.type,
                 obh: this.dataSearch.isOBH,
@@ -460,9 +453,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
                     (errors: any) => {
                         this.handleError(errors);
                     },
-                    () => {
-
-                    }
+                    () => { }
                 );
         }
 
@@ -522,6 +513,23 @@ export class StatementOfAccountAddnewComponent extends AppList {
 
         this.totalCharge = data.totalCharge;
         this.totalShipment = data.shipment;
+    }
+
+    mapServiceId(service: any = 'All') {
+        let serviceTypeId = '';
+        if (!!service) {
+            if (service === 'All') {
+                this.services.shift(); // * remove item with value 'All'
+                serviceTypeId = this.services.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
+            } else {
+                serviceTypeId = this.selectedService.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
+            }
+        } else {
+            this.services.shift(); // * remove item with value 'All'
+            serviceTypeId = this.services.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
+        }
+
+        return serviceTypeId;
     }
 }
 
