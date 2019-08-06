@@ -375,7 +375,7 @@ export class CommodityComponent implements OnInit {
           com['code'],
           com['commodityNameEn'],
           com['commodityNameVn'],
-          com['commonityGroupNameEn'],
+          com['commodityGroupNameEn'],
           (com['inactive'] === true) ? "Inactive" : "Active"
         ]
       });
@@ -388,7 +388,7 @@ export class CommodityComponent implements OnInit {
           com['code'],
           com['commodityNameEn'],
           com['commodityNameVn'],
-          com['commonityGroupNameVn'],
+          com['commodityGroupNameVn'],
           (com['inactive'] === true) ? "Ngưng Hoạt Động" : "Đang Hoạt Động"
         ]
       });

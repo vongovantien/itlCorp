@@ -59,41 +59,42 @@ export class PartnerDataDetailComponent implements OnInit {
     });
     await this.getComboboxData();
     await this.getParnerDetails();
+    console.log(this.partner);
   }
   async getParnerDetails() {
     this.partner = await this.baseService.getAsync(this.api_menu.Catalogue.PartnerData.getById + this.partner.id, false, true);
     this.getReferenceData();
   }
   getReferenceData(): any {
-    if (this.partner.partnerGroup.includes('CUSTOMER')) {
+    if (this.partner.partnerGroup.includes('CUSTOMER') || this.partner.partnerGroup.includes('ALL')) {
       this.isRequiredSaleman = true;
     }
-    let index = this.saleMans.findIndex(x => x.id == this.partner.salePersonId)
-    if (index > -1) this.salemanActive = [this.saleMans.find(x => x.id == this.partner.salePersonId)];
+    let index = this.saleMans.findIndex(x => x.id === this.partner.salePersonId)
+    if (index > -1) { this.salemanActive = [this.saleMans.find(x => x.id === this.partner.salePersonId)]; }
     if (this.partner.partnerGroup.includes('CUSTOMER')) {
       this.isRequiredSaleman = true;
     }
     console.log(this.isRequiredSaleman);
     console.log(this.partner.salePersonId);
     this.getPartnerGroupActives(this.partner.partnerGroup.split(';'));
-    index = this.departments.findIndex(x => x.id == this.partner.departmentId);
-    if (index > -1) this.departmentActive = [this.departments[index].id];
-    index = this.parentCustomers.findIndex(x => x.id == this.partner.parentId);
-    if (index > -1) this.parentCustomerActive = [this.parentCustomers[index]];
-    index = this.workPlaces.findIndex(x => x.id == this.partner.workPlaceId);
-    if (index > -1) this.workPlaceActive = [this.workPlaces[index]];
-    index = this.countries.findIndex(x => x.id == this.partner.countryId);
+    index = this.departments.findIndex(x => x.id === this.partner.departmentId);
+    if (index > -1) { this.departmentActive = [this.departments[index].id]; }
+    index = this.parentCustomers.findIndex(x => x.id === this.partner.parentId);
+    if (index > -1) { this.parentCustomerActive = [this.parentCustomers[index]]; }
+    index = this.workPlaces.findIndex(x => x.id === this.partner.workPlaceId);
+    if (index > -1) { this.workPlaceActive = [this.workPlaces[index]]; }
+    index = this.countries.findIndex(x => x.id === this.partner.countryId);
     if (index > - 1) {
       this.billingCountryActive = [this.countries[index]];
       this.getProvincesByCountry(this.countries[index].id, true);
     }
-    index = this.countries.findIndex(x => x.id == this.partner.countryShippingId);
+    index = this.countries.findIndex(x => x.id === this.partner.countryShippingId);
     if (index > -1) {
       this.shippingCountryActive = [this.countries[index]];
       this.getProvincesByCountry(this.countries[index].id, false);
     }
     if (this.partner.salePersonId) {
-      let user = this.users.find(x => x.id == this.partner.salePersonId);
+      const user = this.users.find(x => x.id === this.partner.salePersonId);
       if (user) {
         this.getEmployee(user.employeeId);
       }
@@ -248,23 +249,23 @@ export class PartnerDataDetailComponent implements OnInit {
 
   public selected(value: any, selectName): void {
     console.log('Selected value is: ', value);
-    if (selectName == 'billingCountry') {
+    if (selectName === 'billingCountry') {
       this.partner.countryId = value.id;
       this.getProvincesByCountry(this.partner.countryId, true);
     }
-    if (selectName == 'shippingCountry') {
+    if (selectName === 'shippingCountry') {
       this.partner.countryShippingId = value.id;
       this.getProvincesByCountry(this.partner.countryShippingId, false);
     }
-    if (selectName == 'billingProvince') {
+    if (selectName === 'billingProvince') {
       this.partner.provinceId = value.id;
     }
-    if (selectName == 'shippingProvince') {
+    if (selectName === 'shippingProvince') {
       this.partner.provinceShippingId = value.id;
     }
-    if (selectName == 'saleman') {
-      //this.partner.salePersonId = value.id;
-      let user = this.users.find(x => x.id == value.id);
+    if (selectName === 'saleman') {
+      // this.partner.salePersonId = value.id;
+      const user = this.users.find(x => x.id === value.id);
       if (user) {
         this.getEmployee(user.employeeId);
       }
@@ -272,12 +273,11 @@ export class PartnerDataDetailComponent implements OnInit {
         this.isRequiredSaleman = true;
       }
     }
-    if (selectName == 'category') {
+    if (selectName === 'category') {
       this.partner.partnerGroup = '';
-      if (value.id == "ALL") {
+      if (value.id === "ALL") {
         this.partner.partnerGroup = 'AGENT;AIRSHIPSUP;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
-      }
-      else {
+      } else {
         this.partnerGroupActives.push({ id: value.id, text: value.text });
         this.partnerGroupActives.forEach(element => {
           this.partner.partnerGroup = element.text + ';' + this.partner.partnerGroup;
@@ -292,11 +292,9 @@ export class PartnerDataDetailComponent implements OnInit {
   checkRequireSaleman(partnerGroup: string): boolean {
     if (partnerGroup == null) {
       return false;
-    }
-    else if (partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')) {
+    } else if (partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }

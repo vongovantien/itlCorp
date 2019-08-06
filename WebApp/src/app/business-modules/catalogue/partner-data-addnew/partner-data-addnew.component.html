@@ -104,7 +104,7 @@
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square"
                                     placeholder="please enter Name Abreviation" name="nameAbreviation"
-                                    autocomplete="nope" minlength="3" maxlength="10" [(ngModel)]="partner.shortName"
+                                    autocomplete="nope" minlength="3" maxlength="100" [(ngModel)]="partner.shortName"
                                     #nameAbreviation="ngModel" (change)="partner.shortName = partner.shortName.trim()"
                                     [ngClass]="{ 'm-input--square': formAddEdit.submitted && nameAbreviation.invalid }"
                                     required>

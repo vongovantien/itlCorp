@@ -105,7 +105,7 @@
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square"
                                     placeholder="please enter Name Abreviation" name="nameAbreviation"
-                                    autocomplete="nope" minlength="3" maxlength="10" [(ngModel)]="partner.shortName"
+                                    autocomplete="nope" minlength="3" maxlength="100" [(ngModel)]="partner.shortName"
                                     #nameAbreviation="ngModel" (change)="partner.shortName = partner.shortName.trim()"
                                     [ngClass]="{ 'm-input--square': formAddEdit.submitted && nameAbreviation.invalid }"
                                     ecusSpecicalCharacterNoSpace required>
@@ -393,8 +393,10 @@
                                     </label>
                                     <ng-select #chooseSaleman [allowClear]="true" [items]="saleMans"
                                         (data)="refreshValue($event)" name="partnerSaleman"
-                                        (selected)="partner.salePersonId = $event.id" [active]="salemanActive"
-                                        (removed)="partner.salePersonId = null" (typed)="typed($event)" placeholder="">
+                                        (selected)="partner.salePersonId = $event.id; selected($event, 'saleman')"
+                                        [active]="salemanActive"
+                                        (removed)="partner.salePersonId = null; removed($event,'saleman')"
+                                        (typed)="typed($event)" placeholder="">
                                     </ng-select>
                                     <div class="form-control-feedback"
                                         *ngIf="(partner.salePersonId == null && isRequiredSaleman)">

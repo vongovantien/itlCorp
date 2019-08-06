@@ -19,8 +19,8 @@
         <div class="row">
           <div class="col-lg-4">
             <form #form>
-              <input type="file" id="inputFile" class="form-control m-input m-input--square" placeholder="" (change)="chooseFile($event)"
-                onclick="this.value=null;" accept=".xlsx">
+              <input type="file" id="inputFile" class="form-control m-input m-input--square" placeholder=""
+                (change)="chooseFile($event)" onclick="this.value=null;" accept=".xlsx">
             </form>
             <span class="m-form__help">
               <a class="btn-link" href="javascript:void(0)" (click)="downloadSample()">Download sample</a>
@@ -47,7 +47,8 @@
           </div>
         </div>
         <div class="form-actions m--margin-top-5 m--align-right">
-          <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="hideInvalid()">
+          <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+            (click)="hideInvalid()">
             <span>
               <span *ngIf="isShowInvalid">
                 Show invalid rows
@@ -65,7 +66,8 @@
               </span>
             </span>
           </button>
-          <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" routerLink="/home/catalogue/commodity">
+          <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase"
+            routerLink="/home/catalogue/commodity">
             <span>
               <i class="la la-ban"></i>
               <span>
@@ -154,10 +156,11 @@
                     item.commodityNameVn.split('|')[0] }}</span>
                 </td>
                 <td>
-                  <span *ngIf="item.commodityGroupId !== -1">{{ item.commodityGroupId }}</span>
+                  <span *ngIf="item.commodityGroupId >0">{{ item.commodityGroupId }}</span>
                   <span class="m--font-danger" *ngIf="item.commodityGroupId === -1">CommodityGroup ID not allow null
                     and must be
                     number</span>
+                  <span class="m--font-danger" *ngIf="item.commodityGroupId === -2">CommodityGroup ID not found</span>
                 </td>
 
                 <td>
@@ -207,7 +210,8 @@
 </div>
 <!--end::m-content-->
 <!--begin::modal-->
-<div class="modal fade" id="upload-alert-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<div class="modal fade" id="upload-alert-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+  aria-hidden="true">
   <div class="modal-dialog modal-sm" role="document">
     <div class="modal-content">
       <div class="modal-header">

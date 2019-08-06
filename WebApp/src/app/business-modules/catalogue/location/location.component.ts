@@ -1071,8 +1071,8 @@ export class LocationComponent implements OnInit, AfterViewInit {
         return [
           index + 1,
           province['code'],
-          province['name_EN'],
-          province['name_VN'],
+          province['nameEn'],
+          province['nameVn'],
           province['countryNameEN'],
           (province['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
         ]
@@ -1084,8 +1084,8 @@ export class LocationComponent implements OnInit, AfterViewInit {
         return [
           index + 1,
           province['code'],
-          province['name_EN'],
-          province['name_VN'],
+          province['nameEn'],
+          province['nameVn'],
           province['countryNameVN'],
           (province['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
         ]
@@ -1120,8 +1120,8 @@ export class LocationComponent implements OnInit, AfterViewInit {
         return [
           index + 1,
           dist['code'],
-          dist['name_EN'],
-          dist['name_VN'],
+          dist['nameEn'],
+          dist['nameVn'],
           dist['provinceNameEN'],
           dist['countryNameEN'],
           (dist['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
@@ -1134,8 +1134,8 @@ export class LocationComponent implements OnInit, AfterViewInit {
         return [
           index + 1,
           dist['code'],
-          dist['name_EN'],
-          dist['name_VN'],
+          dist['nameEn'],
+          dist['nameVn'],
           dist['provinceNameVN'],
           dist['countryNameVN'],
           (dist['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
@@ -1173,8 +1173,8 @@ export class LocationComponent implements OnInit, AfterViewInit {
         return [
           index + 1,
           ward['code'],
-          ward['name_EN'],
-          ward['name_VN'],
+          ward['nameEn'],
+          ward['nameVn'],
           ward['districtNameEN'],
           ward['provinceNameEN'],
           ward['countryNameEN'],
@@ -1188,8 +1188,8 @@ export class LocationComponent implements OnInit, AfterViewInit {
         return [
           index + 1,
           ward['code'],
-          ward['name_EN'],
-          ward['name_VN'],
+          ward['nameEn'],
+          ward['nameVn'],
           ward['districtNameVN'],
           ward['provinceNameVN'],
           ward['countryNameVN'],

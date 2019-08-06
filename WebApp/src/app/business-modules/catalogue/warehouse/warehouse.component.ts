@@ -388,8 +388,8 @@ export class WarehouseComponent implements OnInit {
         return [
           index + 1,
           item['code'],
-          item['name_EN'],
-          item['name_VN'],
+          item['nameEn'],
+          item['nameVn'],
           item['address'],
           item['districtNameEN'],
           item['provinceNameEN'],
@@ -403,8 +403,8 @@ export class WarehouseComponent implements OnInit {
         return [
           index + 1,
           item['code'],
-          item['name_EN'],
-          item['name_VN'],
+          item['nameEn'],
+          item['nameVn'],
           item['address'],
           item['districtNameVN'],
           item['provinceNameVN'],

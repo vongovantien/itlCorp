@@ -40,6 +40,7 @@ export class PortIndexImportComponent implements OnInit {
     this.pager.totalItems = 0;
   }
   chooseFile(file: Event) {
+    this.pager.totalItems = 0;
     if (file.target['files'] == null) return;
     this.progressBar.start();
     this.baseService.uploadfile(this.api_menu.Catalogue.CatPlace.uploadExel + "?type=" + PlaceTypeEnum.Port, file.target['files'], "uploadedFile")
