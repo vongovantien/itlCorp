@@ -16,7 +16,6 @@ import { formatDate } from '@angular/common';
 @Component({
     selector: 'app-statement-of-account-detail',
     templateUrl: './detail-soa.component.html',
-    styleUrls: ['./detail-soa.component.scss']
 })
 export class StatementOfAccountDetailComponent extends AppList {
 

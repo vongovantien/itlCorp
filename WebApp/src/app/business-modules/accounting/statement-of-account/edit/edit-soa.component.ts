@@ -15,7 +15,6 @@ import moment from 'moment';
 @Component({
     selector: 'app-statement-of-account-edit',
     templateUrl: './edit-soa.component.html',
-    styleUrls: ['./edit-soa.component.scss']
 })
 export class StatementOfAccountEditComponent extends AppList {
     @ViewChild(StatementOfAccountAddChargeComponent, { static: false }) addChargePopup: StatementOfAccountAddChargeComponent;

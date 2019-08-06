@@ -22,6 +22,11 @@ namespace CommonInterface {
         message: string;
         status: boolean;
     }
+
+    export interface ICommonTitleValue {
+        title: string;
+        value: string;
+    }
 }
 
 

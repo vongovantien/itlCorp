@@ -10,15 +10,21 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
   ngUnsubscribe: Subject<any> = new Subject();
   keyword: string = '';
   ranges: any = {
-    Today: [moment(), moment()],
-    Yesterday: [moment().subtract(1, "days"), moment().subtract(1, "days")],
-    "Last 7 Days": [moment().subtract(6, "days"), moment()],
-    "Last 30 Days": [moment().subtract(29, "days"), moment()],
-    "This Month": [moment().startOf("month"), moment().endOf("month")],
-    "Last Month": [moment().subtract(1, "month").startOf("month"), moment().subtract(1, "month").endOf("month")]
+    // "Today": [moment(), moment()],
+    // Yesterday: [moment().subtract(1, "days"), moment().subtract(1, "days")],
+    // "Last 7 Days": [moment().subtract(6, "days"), moment()],
+    // "Last 30 Days": [moment().subtract(29, "days"), moment()],
+    // "This Month": [moment().startOf("month"), moment().endOf("month")],
+    // "Last Month": [moment().subtract(1, "month").startOf("month"), moment().subtract(1, "month").endOf("month")]
+    "Today": [new Date(), new Date()],
+    "Yesterday": [new Date(new Date().setDate(new Date().getDate() - 1)), new Date(new Date().setDate(new Date().getDate() - 1))],
+    "Last 7 Days": [new Date(new Date().setDate(new Date().getDate() - 6)), new Date()],
+    "Last 30 Days": [new Date(new Date().setDate(new Date().getDate() - 29)), new Date()],
+    "This Month": [new Date(new Date().getFullYear(), new Date().getMonth(), 1), new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)],
+    "Last Month": [new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1), new Date(new Date().getFullYear(), new Date().getMonth(), 0)]
   };
   maxDate: any = moment();
-
+  minDate: any = moment();
   utility: UtilityHelper = new UtilityHelper();
   isLoading: boolean = false;
 
