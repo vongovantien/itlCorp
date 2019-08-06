@@ -10,6 +10,7 @@ import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { ModalModule, PaginationModule, } from 'ngx-bootstrap';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { AdvancePaymentAddNewComponent } from './add/add-new-advance-payment.component';
+import { AdvancePaymentFormCreateComponent } from './components/form-create-advance-payment/form-create-advance-payment.component';
 
 registerLocaleData(localeVi, 'vi');
 const routing: Routes = [
@@ -25,6 +26,7 @@ const routing: Routes = [
 ];
 
 const COMPONENTS = [
+    AdvancePaymentFormCreateComponent
 ];
 
 @NgModule({
