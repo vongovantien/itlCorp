@@ -27,8 +27,9 @@
                                 </label>
                                 <input type="text" [(ngModel)]="customDeclaration.clearanceNo" placeholder="Enter text"
                                     (change)="customDeclaration.clearanceNo=customDeclaration.clearanceNo.trim()"
-                                    autocomplete="nope" maxlength="50" class="form-control m-input m-input--square"
+                                    autocomplete="nope" maxlength="100" class="form-control m-input m-input--square"
                                     #clearance_no="ngModel"
+                                    onpaste="return true;"
                                     onkeypress="return event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)"
                                     name="clearance_no" required placeholder="" autoFocus>
                                 <div class="form-control-feedback" *ngIf="addForm.submitted && clearance_no.invalid">
@@ -89,9 +90,9 @@
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
                                     autocomplete="nope" [(ngModel)]="customDeclaration.hblid" name="hblid"
-                                    #hblib="ngModel" maxlength="50"
+                                    #hblib="ngModel" maxlength="250"
                                     (change)="customDeclaration.hblid=customDeclaration.hblid.trim()"
-                                    onpaste="return false;"
+                                    onpaste="return true;"
                                     onkeypress="return event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)">
                                 <div class="form-control-feedback"
                                     *ngIf="addForm.submitted && (customDeclaration.hblid == null || customDeclaration.hblid == '') && isConvertJob">
@@ -108,7 +109,7 @@
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
                                     autocomplete="nope" [(ngModel)]="customDeclaration.mblid" name="mblid"
-                                    onpaste="return false;" #mblib="ngModel" maxlength="50"
+                                    onpaste="return true;" #mblib="ngModel" maxlength="250"
                                     (change)="customDeclaration.mblid=customDeclaration.mblid.trim()"
                                     onkeypress="return event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)">
                                 <div class="form-control-feedback"

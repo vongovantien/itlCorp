@@ -387,9 +387,18 @@ namespace eFMS.API.Operation.DL.Services
                 else
                 {
                     //Check valid maxlength for Clearance No
-                    if (_clearanceNo.Length > 50)
+                    if (_clearanceNo.Length > 100)
                     {
                         item.ClearanceNo = string.Format(stringLocalizer[LanguageSub.MSG_INVALID_MAX_LENGTH], 50);
+                        item.IsValid = false;
+                        item.ClearanceNoValid = false;
+                    }
+
+                    //Check input character special, number
+                    Regex pattern = new Regex(@"^[a-zA-Z0-9 ./_-]*$");
+                    if (!pattern.IsMatch(_clearanceNo))
+                    {
+                        item.ClearanceNo = stringLocalizer[LanguageSub.MSG_CUSTOM_INVALID_CHARACTER_SPECIAL];
                         item.IsValid = false;
                         item.ClearanceNoValid = false;
                     }
@@ -474,7 +483,7 @@ namespace eFMS.API.Operation.DL.Services
                 else
                 {
                     //Check valid maxlength for MblId
-                    if (_mbl.Length > 50)
+                    if (_mbl.Length > 250)
                     {
                         item.Mblid = string.Format(stringLocalizer[LanguageSub.MSG_INVALID_MAX_LENGTH], 50);
                         item.IsValid = false;
@@ -503,7 +512,7 @@ namespace eFMS.API.Operation.DL.Services
                 else
                 {
                     //Check valid maxlength for HblId
-                    if (_hbl.Length > 50)
+                    if (_hbl.Length > 250)
                     {
                         item.Hblid = string.Format(stringLocalizer[LanguageSub.MSG_INVALID_MAX_LENGTH], 50);
                         item.IsValid = false;

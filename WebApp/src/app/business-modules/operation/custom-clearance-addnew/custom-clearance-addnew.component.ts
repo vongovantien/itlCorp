@@ -9,6 +9,7 @@ import { Location } from '@angular/common';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-custom-clearance-addnew',
@@ -28,7 +29,8 @@ export class CustomClearanceAddnewComponent implements OnInit {
         private api_menu: API_MENU,
         private route: ActivatedRoute,
         private _location: Location,
-        private cdr: ChangeDetectorRef) {
+        private cdr: ChangeDetectorRef,
+        private toastr: ToastrService) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
@@ -47,6 +49,24 @@ export class CustomClearanceAddnewComponent implements OnInit {
         if (this.serviceTypeCurrent[0] != 'Air' && this.serviceTypeCurrent[0] != 'Express') {
             if (this.cargoTypeCurrent.length == 0) return;
         }
+
+        var pattern = /^[a-zA-Z0-9./_-\s]*$/;
+
+        if(!this.customDeclaration.clearanceNo.match(pattern)){
+            this.toastr.warning("Clearance No - Not allowed to enter special characters. Except for characters ./_- and space",'',{ positionClass: 'toast-bottom-right', closeButton: true, timeOut: 5000 });
+            return;
+        }
+
+        if(this.customDeclaration.hblid != null && !this.customDeclaration.hblid.toString().match(pattern)){
+            this.toastr.warning("HBL - Not allowed to enter special characters. Except for characters ./_- and space",'',{ positionClass: 'toast-bottom-right', closeButton: true, timeOut: 5000 });
+            return;
+        }
+
+        if(this.customDeclaration.mblid != null && !this.customDeclaration.mblid.toString().match(pattern)){
+            this.toastr.warning("MBL - Not allowed to enter special characters. Except for characters ./_- and space",'',{ positionClass: 'toast-bottom-right', closeButton: true, timeOut: 5000 });
+            return;
+        }
+
         if (formAdd.form.status != "INVALID" && this.customDeclaration.clearanceDate.endDate != null) {
             this.cdr.detach();
             this.customDeclaration.partnerTaxCode = this.strCustomerCurrent;
@@ -194,6 +214,8 @@ export class CustomClearanceAddnewComponent implements OnInit {
         //unitType = Package
         const res = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: 'Package' }, true, true);
         this.listUnit = res;
+        this.strUnitCurrent = this.listUnit != null ? this.listUnit[0].code : '';
+        console.log(this.strUnitCurrent)
     }
 
     /**
