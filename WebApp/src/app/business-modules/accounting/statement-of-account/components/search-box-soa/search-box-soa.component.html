@@ -5,7 +5,8 @@
                 <label class="form-control-label" for="">
                     Reference No
                 </label>
-                <textarea class="form-control m-input m-input--square" [(ngModel)]="reference" name="reference" rows="6"></textarea>
+                <textarea class="form-control m-input m-input--square" [(ngModel)]="reference" name="reference"
+                    rows="6"></textarea>
             </div>
         </div>
         <div class="col-lg-8">
@@ -45,12 +46,10 @@
                         <label class="form-control-label" for="">
                             Status
                         </label>
-                        <div class="form-group">
-                            <select class="form-control" [(ngModel)]="selectedStatus" name="status"
-                                (ngModelChange)="onSelectDataFormSearch($event, 'status')">
-                                <option *ngFor="let status of statusSOA" [ngValue]="status">{{status.title}}</option>
-                            </select>
-                        </div>
+                        <select class="form-control" [(ngModel)]="selectedStatus" name="status"
+                            (ngModelChange)="onSelectDataFormSearch($event, 'status')">
+                            <option *ngFor="let status of statusSOA" [ngValue]="status">{{status.title}}</option>
+                        </select>
                     </div>
                 </div>
             </div>

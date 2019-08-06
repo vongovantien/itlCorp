@@ -8,6 +8,7 @@ import _uniq from 'lodash/uniq';
 import { catchError } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
     selector: 'soa-add-charge-popup',
@@ -291,7 +292,9 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
                         this.onChange.emit(res);
                         this.hide();
                     },
-                    (errors: any) => { },
+                    (errors: any) => { 
+                        this.handleError(errors);
+                    },
                     () => { }
                 );
         }
@@ -306,6 +309,16 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
         this.selectedOBH = this.obhs[1];
         this.selectedInSOA = this.inSOAs[1];
 
+    }
+
+    handleError(errors?: any) {
+        let message: string = 'Has Error Please Check Again !';
+        let title: string = '';
+        if (errors instanceof HttpErrorResponse) {
+            message = errors.message;
+            title = errors.statusText;
+        }
+        this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
     }
 
     hide() {
