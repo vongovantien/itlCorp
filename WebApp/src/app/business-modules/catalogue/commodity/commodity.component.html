@@ -19,7 +19,8 @@
                     </a>
                 </li>
                 <li class="nav-item m-tabs__item">
-                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#commodity-group-tab" role="tab" (click)="tabSelect(tabName.commodityGroup)">
+                    <a class="nav-link m-tabs__link" data-toggle="tab" href="#commodity-group-tab" role="tab"
+                        (click)="tabSelect(tabName.commodityGroup)">
                         Commodity group
                     </a>
                 </li>
@@ -43,9 +44,11 @@
                                         </span>
                                     </span>
                                 </button> -->
-                                <app-default-button [buttonSetting]="addCommodityButtonSetting" [dataTarget]="addCommodityButtonSetting.dataTarget"
+                                <app-default-button [buttonSetting]="addCommodityButtonSetting"
+                                    [dataTarget]="addCommodityButtonSetting.dataTarget"
                                     (click)="showAdd(tabName.commodity)"></app-default-button>
-                                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" [routerLink]="['/home/catalogue/commodity/commodity-import']">
+                                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                                    [routerLink]="['/home/catalogue/commodity/commodity-import']">
                                     <span>
                                         <i class="la la-download"></i>
                                         <span>
@@ -65,13 +68,15 @@
                             </div>
                         </div>
                         <div class="bg-secondary m--padding-10">
-                            <app-search-options [configSearch]="configSearchCommonity" (search)="onSearch($event, tabName.commodity)"
+                            <app-search-options [configSearch]="configSearchCommonity"
+                                (search)="onSearch($event, tabName.commodity)"
                                 (reset_search)="resetSearch($event, tabName.commodity)"></app-search-options>
                         </div>
                     </div>
                     <!--end:: Search-form-->
-                    <app-table-layout [records]="commodities" [settings]="commoditySettings" (sortChange)="onSortChange($event)"
-                        [nameEditModal]="'edit-commodity-modal'" (edit)="showDetail($event, tabName.commodity)"
+                    <app-table-layout [records]="commodities" [settings]="commoditySettings"
+                        (sortChange)="onSortChange($event)" [nameEditModal]="'edit-commodity-modal'"
+                        (edit)="showDetail($event, tabName.commodity)"
                         (delete)="showConfirmDelete($event, tabName.commodity)">
                     </app-table-layout>
                     <!--end: Datatable -->
@@ -82,28 +87,35 @@
                     <div class="m-form m--margin-bottom-15">
                         <div class="clearfix m--margin-bottom-15">
                             <div class="c-button-actions m--align-right">
-                                <app-default-button [buttonSetting]="addGroupButtonSetting" [dataTarget]="addGroupButtonSetting.dataTarget"
+                                <app-default-button [buttonSetting]="addGroupButtonSetting"
+                                    [dataTarget]="addGroupButtonSetting.dataTarget"
                                     (click)="showAdd(tabName.commodityGroup)"></app-default-button>
-                                <app-default-button [buttonSetting]="importButtonSetting" [routerLink]="['/home/catalogue/commodity/commodity-group-import']"></app-default-button>
-                                <app-default-button [buttonSetting]="exportButtonSetting" (click)="exportComGroup()"></app-default-button>
+                                <app-default-button [buttonSetting]="importButtonSetting"
+                                    [routerLink]="['/home/catalogue/commodity/commodity-group-import']">
+                                </app-default-button>
+                                <app-default-button [buttonSetting]="exportButtonSetting" (click)="exportComGroup()">
+                                </app-default-button>
                             </div>
                         </div>
                         <div class="bg-secondary m--padding-10">
-                            <app-search-options [configSearch]="configSearchGroup" (search)="onSearch($event, tabName.commodityGroup)"
+                            <app-search-options [configSearch]="configSearchGroup"
+                                (search)="onSearch($event, tabName.commodityGroup)"
                                 (reset_search)="resetSearch($event, tabName.commodityGroup)"></app-search-options>
                         </div>
                     </div>
                     <!--end:: Search-form-->
                     <!--begin: Datatable-->
-                    <app-table-layout [records]="commodityGroups" [settings]="commodityGroupSettings" (sortChange)="onSortChange($event)"
-                        [nameEditModal]="'edit-commodity-group-modal'" (edit)="showDetail($event, tabName.commodityGroup)"
+                    <app-table-layout [records]="commodityGroups" [settings]="commodityGroupSettings"
+                        (sortChange)="onSortChange($event)" [nameEditModal]="'edit-commodity-group-modal'"
+                        (edit)="showDetail($event, tabName.commodityGroup)"
                         (delete)="showConfirmDelete($event, tabName.commodityGroup)">
                     </app-table-layout>
                     <!--end: Datatable-->
                 </div>
 
                 <!--begin::pagination-->
-                <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)"></app-pagination>
+                <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)">
+                </app-pagination>
                 <!--end::pagination-->
             </div>
         </div>
@@ -131,56 +143,71 @@
                 <div class="modal-body">
                     <!--begin::add-commodity-form-->
                     <div class="m-form m-form--state">
-                            <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': formCommodity.submitted && commodityCode.invalid }">
-                                    <label class="col-lg-4 col-form-label form-control-label">
-                                        Code: <span class="m--font-danger">(*)</span>
-                                    </label>
-                                    <div class="col-lg-8">
-                                        <input type="text" [(ngModel)]="commodity.code" (change)="commodity.code = commodity.code.trim()"
-                                            class="form-control m-input m-input-group--square" #commodityCode="ngModel" name="commodityCode"
-                                            required placeholder="Please enter group name" maxlength="25" [attr.disabled]="commodity.id ? '' : null">
-                                        <div class="form-control-feedback" *ngIf="formCommodity.submitted && commodityCode.invalid">
-                                            Code is required
-                                        </div>
-                                    </div>
+                        <div class="form-group row"
+                            [ngClass]="{ 'm-form__group has-danger': formCommodity.submitted && commodityCode.invalid }">
+                            <label class="col-lg-4 col-form-label form-control-label">
+                                Code: <span class="m--font-danger">(*)</span>
+                            </label>
+                            <div class="col-lg-8">
+                                <input type="text" [(ngModel)]="commodity.code"
+                                    (change)="commodity.code = commodity.code.trim()"
+                                    class="form-control m-input m-input-group--square" #commodityCode="ngModel"
+                                    name="commodityCode" required placeholder="Please enter group name" maxlength="25"
+                                    [attr.disabled]="commodity.id ? '' : null">
+                                <div class="form-control-feedback"
+                                    *ngIf="formCommodity.submitted && commodityCode.invalid">
+                                    Code is required
                                 </div>
+                            </div>
+                        </div>
 
-                        <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': formCommodity.submitted && commodityNameEn.invalid }">
+                        <div class="form-group row"
+                            [ngClass]="{ 'm-form__group has-danger': formCommodity.submitted && commodityNameEn.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
                                 Name (EN): <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
-                                <input type="text" [(ngModel)]="commodity.commodityNameEn" (change)="commodity.commodityNameEn = commodity.commodityNameEn.trim()"
-                                    class="form-control m-input m-input-group--square" #commodityNameEn="ngModel" name="commodityNameEn"
-                                    required placeholder="Please enter group name" maxlength="100">
-                                <div class="form-control-feedback" *ngIf="formCommodity.submitted && commodityNameEn.invalid">
+                                <input type="text" [(ngModel)]="commodity.commodityNameEn"
+                                    (change)="commodity.commodityNameEn = commodity.commodityNameEn.trim()"
+                                    class="form-control m-input m-input-group--square" #commodityNameEn="ngModel"
+                                    name="commodityNameEn" required placeholder="Please enter group name"
+                                    maxlength="100">
+                                <div class="form-control-feedback"
+                                    *ngIf="formCommodity.submitted && commodityNameEn.invalid">
                                     Name(EN) is required
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': formCommodity.submitted && commodityNameVn.invalid }">
+                        <div class="form-group row"
+                            [ngClass]="{ 'm-form__group has-danger': formCommodity.submitted && commodityNameVn.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
                                 Name (Local): <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
-                                <input type="text" [(ngModel)]="commodity.commodityNameVn" (change)="commodity.commodityNameVn = commodity.commodityNameVn.trim()"
-                                    class="form-control m-input m-input-group--square" #commodityNameVn="ngModel" name="commodityNameVn"
-                                    required placeholder="Please enter group name" maxlength="100">
-                                <div class="form-control-feedback" *ngIf="formCommodity.submitted && commodityNameVn.invalid">
+                                <input type="text" [(ngModel)]="commodity.commodityNameVn"
+                                    (change)="commodity.commodityNameVn = commodity.commodityNameVn.trim()"
+                                    class="form-control m-input m-input-group--square" #commodityNameVn="ngModel"
+                                    name="commodityNameVn" required placeholder="Please enter group name"
+                                    maxlength="100">
+                                <div class="form-control-feedback"
+                                    *ngIf="formCommodity.submitted && commodityNameVn.invalid">
                                     Name (Local) is required
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': formCommodity.submitted && commodity.commodityGroupId == null }">
+                        <div class="form-group row"
+                            [ngClass]="{ 'm-form__group has-danger': formCommodity.submitted && commodity.commodityGroupId == null }">
                             <label class="col-lg-4 col-form-label form-control-label">
                                 Group: <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <ng-select #chooseGroup [allowClear]="true" [items]="groups"
-                                    (data)="refreshValue($event)" (selected)="commodity.commodityGroupId = $event.id" (removed)="commodity.commodityGroupId = null"
-                                    (typed)="typed($event)" [active]="groupActive" placeholder="Select group commdity">
+                                    (data)="refreshValue($event)" (selected)="commodity.commodityGroupId = $event.id"
+                                    (removed)="commodity.commodityGroupId = null" (typed)="typed($event)"
+                                    [active]="groupActive" placeholder="Select group commdity">
                                 </ng-select>
-                                <div class="form-control-feedback" *ngIf="formCommodity.submitted && commodity.commodityGroupId == null">
+                                <div class="form-control-feedback"
+                                    *ngIf="formCommodity.submitted && commodity.commodityGroupId == null">
                                     Group commdity is required
                                 </div>
                             </div>
@@ -190,7 +217,8 @@
                                 Inactive
                             </label>
                             <div class="col-lg-8">
-                                <label class="m-checkbox"><input [checked]="commodity.inactive" (change)="commodity.inactive=!commodity.inactive"
+                                <label class="m-checkbox"><input [checked]="commodity.inactive"
+                                        (change)="commodity.inactive=!commodity.inactive"
                                         type="checkbox"><span></span></label>
                             </div>
                         </div>
@@ -199,7 +227,8 @@
                 </div>
                 <div class="modal-footer m--align-center c-button-actions">
                     <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button>
-                    <app-default-button [buttonSetting]="cancelButtonSetting" (click)="onCancel(tabName.commodity)"></app-default-button>
+                    <app-default-button [buttonSetting]="cancelButtonSetting" (click)="onCancel(tabName.commodity)">
+                    </app-default-button>
                 </div>
             </form>
         </div>
@@ -212,7 +241,8 @@
     aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form name="formGroupCommodity" #formGroupCommodity="ngForm" novalidate (ngSubmit)="formGroupCommodity.form.valid">
+            <form name="formGroupCommodity" #formGroupCommodity="ngForm" novalidate
+                (ngSubmit)="formGroupCommodity.form.valid">
                 <div class="modal-header">
                     <h5 class="modal-title" *ngIf="commodityGroup.id == null">Add New Commodity Group</h5>
                     <h5 class="modal-title" *ngIf="commodityGroup.id">Edit Commodity Group</h5>
@@ -224,30 +254,36 @@
                 <div class="modal-body">
                     <!--begin::add-commodity-group-form-->
                     <div class="m-form">
-                        <div class="m-form m-form--state">                     
-                            <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': formGroupCommodity.submitted && groupNameEN.invalid }">
+                        <div class="m-form m-form--state">
+                            <div class="form-group row"
+                                [ngClass]="{ 'm-form__group has-danger': formGroupCommodity.submitted && groupNameEN.invalid }">
                                 <label class="col-lg-4 col-form-label form-control-label">
                                     Group Name(EN): <span class="m--font-danger">(*)</span>
                                 </label>
                                 <div class="col-lg-8">
-                                    <input type="text" [(ngModel)]="commodityGroup.groupNameEn" (change)="commodityGroup.groupNameEn = commodityGroup.groupNameEn.trim()"
-                                        class="form-control m-input m-input-group--square" #groupNameEN="ngModel" name="groupNameEN"
-                                        required placeholder="Please enter group name">
-                                    <div class="form-control-feedback" *ngIf="formGroupCommodity.submitted && groupNameEN.invalid">
+                                    <input type="text" [(ngModel)]="commodityGroup.groupNameEn"
+                                        (change)="commodityGroup.groupNameEn = commodityGroup.groupNameEn.trim()"
+                                        class="form-control m-input m-input-group--square" #groupNameEN="ngModel"
+                                        name="groupNameEN" required placeholder="Please enter group name">
+                                    <div class="form-control-feedback"
+                                        *ngIf="formGroupCommodity.submitted && groupNameEN.invalid">
                                         Group Name(EN) is required
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': formGroupCommodity.submitted && groupNameVN.invalid }">
+                            <div class="form-group row"
+                                [ngClass]="{ 'm-form__group has-danger': formGroupCommodity.submitted && groupNameVN.invalid }">
                                 <label class="col-lg-4 col-form-label form-control-label">Group Name(Local): <span
                                         class="m--font-danger">(*)</span></label>
                                 <div class="col-lg-8">
-                                    <input type="input" class="form-control m-input m-input-group--square" placeholder="Enter group name (VN)"
-                                        name="groupNameVN" [(ngModel)]="commodityGroup.groupNameVn" #groupNameVN="ngModel"
+                                    <input type="input" class="form-control m-input m-input-group--square"
+                                        placeholder="Enter group name (VN)" name="groupNameVN"
+                                        [(ngModel)]="commodityGroup.groupNameVn" #groupNameVN="ngModel"
                                         (change)="commodityGroup.groupNameVn = commodityGroup.groupNameVn.trim()"
                                         [ngClass]="{ 'm-input--square': formGroupCommodity.submitted && groupNameVN.invalid }"
                                         minlength="3" required>
-                                    <div class="form-control-feedback" *ngIf="formGroupCommodity.submitted && groupNameEN.invalid">
+                                    <div class="form-control-feedback"
+                                        *ngIf="formGroupCommodity.submitted && groupNameEN.invalid">
                                         Group Name(Local) is required
                                     </div>
                                 </div>
@@ -257,7 +293,8 @@
                                     Inactive
                                 </label>
                                 <div class="col-lg-8">
-                                    <label class="m-checkbox"><input [checked]="commodityGroup.inactive" (change)="commodityGroup.inactive=!commodityGroup.inactive"
+                                    <label class="m-checkbox"><input [checked]="commodityGroup.inactive"
+                                            (change)="commodityGroup.inactive=!commodityGroup.inactive"
                                             type="checkbox"><span></span></label>
                                 </div>
                             </div>
@@ -267,11 +304,13 @@
                 </div>
                 <div class="modal-footer m--align-center c-button-actions">
                     <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSubmit()"></app-default-button>
-                    <app-default-button [buttonSetting]="cancelButtonSetting" (click)="onCancel(tabName.commodityGroup)"></app-default-button>
+                    <app-default-button [buttonSetting]="cancelButtonSetting"
+                        (click)="onCancel(tabName.commodityGroup)"></app-default-button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-<app-delete-confirm-modal (delete)="onDelete($event)" [title]="'You want to delete this Commodity Group'"></app-delete-confirm-modal>
+<app-delete-confirm-modal (delete)="onDelete($event)" [title]="'You want to delete this Commodity Group'">
+</app-delete-confirm-modal>
 <!--end::confirm-delete-modal-->

@@ -119,6 +119,7 @@ export class CommodityComponent implements OnInit {
     this.activeTab = tabName;
     this.pager.currentPage = 1;
     this.pager.pageSize = 15;
+    this.pager.totalItems = 0;
     this.resetSearch({ field: "All", fieldDisplayName: "All" }, tabName);
   }
   async getCommodities(pager: PagerSetting) {

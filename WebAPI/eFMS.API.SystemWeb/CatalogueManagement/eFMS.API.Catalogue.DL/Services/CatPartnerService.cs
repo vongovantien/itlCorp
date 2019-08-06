@@ -75,7 +75,7 @@ namespace eFMS.API.Catalogue.DL.Services
             partner.DatetimeModified = DateTime.Now;
             partner.UserCreated = partner.UserModified = currentUser.UserID;
             partner.Inactive = false;
-            var hs = DataContext.Add(entity);
+            var hs = DataContext.Add(partner);
             if (hs.Success)
             {
                 cache.Remove(Templates.CatPartner.NameCaching.ListName);
@@ -271,17 +271,17 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    bool isNumeric = int.TryParse(item.TaxCode, out int n);
+                    //bool isNumeric = int.TryParse(item.TaxCode, out int n);
                     if (list.Count(x => x.TaxCode.ToLower() == item.TaxCode.ToLower()) > 1)
                     {
                         item.TaxCode = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_TAXCODE_DUPLICATED]);
                         item.IsValid = false;
                     }
-                    if (isNumeric == false || n <0)
-                    {
-                        item.TaxCode = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_TAXCODE_NOT_NUMBER]);
-                        item.IsValid = false;
-                    }
+                    //if (isNumeric == false || n <0)
+                    //{
+                    //    item.TaxCode = string.Format(stringLocalizer[LanguageSub.MSG_PARTNER_TAXCODE_NOT_NUMBER]);
+                    //    item.IsValid = false;
+                    //}
                     else
                     {
                         if (partners.Any(x => x.TaxCode.ToLower() == item.TaxCode.ToLower()))

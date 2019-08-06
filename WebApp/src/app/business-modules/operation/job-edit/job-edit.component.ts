@@ -219,9 +219,9 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         }
     }
     cancelCreatJob() {
-        this.cancelCreateJobPopup.hide();
+        this.cancelCreateJobPopup.show();
     }
-    confirmCancelJob(){
+    confirmCancelJob() {
         this.confirmCancelJobPopup.show();
     }
     async saveShipment(form: NgForm) {

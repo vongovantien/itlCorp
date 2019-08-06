@@ -48,7 +48,7 @@ export class ChargeComponent implements OnInit {
   @ViewChild(PaginationComponent, { static: false }) child: any;
 
   async ngOnInit() {
-    await this.getCharges();
+    this.searchCharge();
   }
 
   async searchCharge() {

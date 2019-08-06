@@ -206,13 +206,19 @@ export class BillingCustomDeclarationComponent implements OnInit {
     this.pagerMaster = this.pagerService.getPager(this.dataImportedSearch.length, pager.currentPage, this.pagerMaster.pageSize, this.pagerMaster.totalPageBtn);
     this.pagerMaster.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
     this.pagerMaster.numberToShow = SystemConstants.ITEMS_PER_PAGE;
-    this.customClearances = this.dataImportedSearch.slice(this.pagerMaster.startIndex, this.pagerMaster.endIndex + 1);
+    if (this.dataImportedSearch != null) {
+      this.dataImportedSearch = this.sortService.sort(this.dataImportedSearch, 'clearanceNo', true);
+      this.customClearances = this.dataImportedSearch.slice(this.pagerMaster.startIndex, this.pagerMaster.endIndex + 1);
+    }
   }
   setPage(pager: PagerSetting) {
     this.pager = this.pagerService.getPager(this.dataNotImportedSearch.length, pager.currentPage, this.pager.pageSize, this.pager.totalPageBtn);
     this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
     this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
-    this.notImportedCustomClearances = this.dataNotImportedSearch.slice(this.pager.startIndex, this.pager.endIndex + 1);
+    if (this.dataNotImportedSearch != null) {
+      this.dataNotImportedSearch = this.sortService.sort(this.dataNotImportedSearch, 'clearanceNo', true);
+      this.notImportedCustomClearances = this.dataNotImportedSearch.slice(this.pager.startIndex, this.pager.endIndex + 1);
+    }
   }
   searchClearanceNotImported(event) {
     this.pager.totalItems = 0;
