@@ -97,4 +97,14 @@ export class AccoutingRepo {
                 map((data: any) => data)
             );
     }
+
+    getListCustomsDeclaration() {
+        return this._api.get(`${environment.HOST.WEB_URL}/operation/api/${this.VERSION}/en-US/CustomsDeclaration`)
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => data)
+            );
+    }
+
+
 }

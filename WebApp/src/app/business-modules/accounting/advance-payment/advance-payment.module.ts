@@ -4,13 +4,15 @@ import { registerLocaleData, CommonModule } from '@angular/common';
 import localeVi from '@angular/common/locales/vi';
 import { Routes, RouterModule } from '@angular/router';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { ModalModule, PaginationModule, } from 'ngx-bootstrap';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { AdvancePaymentAddNewComponent } from './add/add-new-advance-payment.component';
 import { AdvancePaymentFormCreateComponent } from './components/form-create-advance-payment/form-create-advance-payment.component';
+import { AdvancePaymentListRequestComponent } from './components/list-advance-payment-request/list-advance-payment-request.component';
+import { AdvancePaymentAddPopupComponent } from './components/popup/add-advance-payment/add-advance-payment.popup';
 
 registerLocaleData(localeVi, 'vi');
 const routing: Routes = [
@@ -26,7 +28,9 @@ const routing: Routes = [
 ];
 
 const COMPONENTS = [
-    AdvancePaymentFormCreateComponent
+    AdvancePaymentFormCreateComponent,
+    AdvancePaymentListRequestComponent,
+    AdvancePaymentAddPopupComponent
 ];
 
 @NgModule({
@@ -39,7 +43,8 @@ const COMPONENTS = [
         ModalModule.forRoot(),
         PaginationModule.forRoot(),
         PerfectScrollbarModule,
-        RouterModule.forChild(routing)
+        RouterModule.forChild(routing),
+        ReactiveFormsModule
     ],
     declarations: [
         AdvancePaymentComponent,

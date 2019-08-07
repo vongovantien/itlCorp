@@ -147,6 +147,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
         for (const charge of this.listCharges) {
             charge.isSelected = this.isCheckAllCharge;
         }
+        console.log(this.listCharges);
     }
 
     async getListShipmentAndCDNote(data: SOASearchCharge) {
@@ -279,7 +280,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
     addMoreCharge() {
         const body = {
             chargeShipmentsCurrent: this.searchInfo.chargeShipments,
-            chargeShipmentsAddMore: this.listCharges.filter((i: any) => i.isSelected)
+            chargeShipmentsAddMore: this.listCharges.filter((i: any) => !i.soaNo && i.isSelected)
         };
         if (!body.chargeShipmentsAddMore.length) {
             this._toastService.warning(`SOA Don't have any charges in this period, Please check it again! `, '', { positionClass: 'toast-bottom-right' });
@@ -309,6 +310,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
         this.selectedOBH = this.obhs[1];
         this.selectedInSOA = this.inSOAs[1];
 
+        this.isCheckAllCharge = false;
     }
 
     handleError(errors?: any) {

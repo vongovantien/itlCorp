@@ -17,8 +17,78 @@
     <div class="m-portlet">
         <div class="m-form">
             <div class="m-portlet__body">
-                List Advance Payment
+                <div class="row">
+                    <div class="col-lg-12 m--align-left">
+                        <button type="button"
+                            class="btn btn-success  m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                            (click)="openPopupAdd()">
+                            <span>
+                                <i class="la la-plus"></i>
+                                <span>
+                                    Add
+                                </span>
+                            </span>
+                        </button>
+                        <button type="button" class="btn btn-danger  m-btn--square m-btn--icon m-btn--uppercase"
+                           >
+                            <span>
+                                <i class="la la-trash"></i>
+                                <span>
+                                    Delete
+                                </span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
+                <adv-payment-list-request></adv-payment-list-request>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="m--align-center m--margin-top-20">
+                            <button
+                                class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                                title="Save">
+                                <span>
+                                    <i class="la la-save"></i>
+                                    <span>
+                                        Save
+                                    </span>
+                                </span>
+                            </button>
+                            <button
+                                class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                                title="Save & Send Request">
+                                <span>
+                                    <i class="la la-download"></i>
+                                    <span>
+                                        Save & Send Request
+                                    </span>
+                                </span>
+                            </button>
+                            <button class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                                title="Preview">
+                                <span>
+                                    <i class="la la-print"></i>
+                                    <span>
+                                        Preview
+                                    </span>
+                                </span>
+                            </button>
+                            <button class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" title="Cancel">
+                                <span>
+                                    <i class="la la-ban"></i>
+                                    <span>
+                                        Cancel
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<adv-payment-add-popup></adv-payment-add-popup>

@@ -1,0 +1,80 @@
+<div class="list-request-advance-payment m--margin-top-20">
+    <div class="row">
+        <perfect-scrollbar style="max-height: 900px">
+            <div class="table-wrapper">
+                <table class="table table-brand table-hover dataTable">
+                    <thead >
+                        <tr class="text-center">
+                            <th class="m--w-50">
+                                <!-- <label class="m-checkbox">
+                                    <input type="checkbox" [(ngModel)]="isCheckAllCharge" (change)="checkUncheckAllCharge()">
+                                    <span></span>
+                                </label> -->
+                            </th>
+                            <th *ngFor="let header of headers; let i = index; trackBy: trackByFn"
+                                [class]="sortClass(header.sortable ? header.field : '')"
+                                (click)="sortBy(header.sortable ? header.field : '')">
+                                <span>{{header.title}}</span>
+                                <span class="sort-indicator"></span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="tbody-group">
+                        <tr *ngIf="!isLoading && !requests.length">
+                            <td colspan="100">
+                                <div class="no-data">
+                                    <i class="flaticon-coins"></i>
+                                    <span class="no-data-text">No records found</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr *ngFor="let request of requests; trackBy: trackByFn" class="text-center">
+                            <td>
+                                <div class="m-checkbox-list">
+                                    <label class="m-checkbox">
+                                        <input type="checkbox"> 
+                                        <i class="la la-copy"></i>
+                                        <span></span>
+                                    </label>
+                                </div>
+                            </td>
+                            <td class="text-underline text-primary pointer">{{request.description}}</td>
+                            <td>{{request.customNo}}</td>
+                            <td>{{request.jobId}}</td>
+                            <td>{{request.hbl}}</td>
+                            <td>{{request.amount | number : '.0-2'}}</td>
+                            <td>{{request.currency}}</td>
+                            <td>{{request.type}}</td>
+                            <td>{{request.note}}</td>
+                        </tr>
+                        <tr class="loading-wrapper" *ngIf="isLoading">
+                            <td colspan="100">
+                                <div class="on-loading">
+                                    <div class="m-loader m-loader--brand">
+                                    </div><span>Loading</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="text-center">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>
+                                <h5 class="font-weight-bold m--margin-top-10">Total Amount:</h5>
+                            </td>
+                            <td>
+                                <span class="total-amount-content">600</span>
+                            </td>
+                            <td>
+                                <span class="total-amount-content">VND</span>
+                            </td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </perfect-scrollbar>
+    </div>
+</div>

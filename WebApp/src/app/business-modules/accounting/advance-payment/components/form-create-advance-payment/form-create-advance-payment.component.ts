@@ -64,7 +64,6 @@ export class AdvancePaymentFormCreateComponent extends AppPage {
                 (res: any) => {
                     this.currencyList = res || [];
                     this.selectedCurrency = this.currencyList.filter((item: Currency) => item.id === 'VND')[0];
-                    console.log(this.selectedCurrency);
                 },
                 (errors: any) => { },
                 () => { }
