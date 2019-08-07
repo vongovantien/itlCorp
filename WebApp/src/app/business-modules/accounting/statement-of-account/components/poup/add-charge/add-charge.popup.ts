@@ -309,6 +309,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
         this.selectedOBH = this.obhs[1];
         this.selectedInSOA = this.inSOAs[1];
 
+        this.isCheckAllCharge = false;
     }
 
     handleError(errors?: any) {

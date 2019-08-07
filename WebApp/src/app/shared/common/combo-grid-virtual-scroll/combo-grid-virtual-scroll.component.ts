@@ -31,7 +31,7 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges, After
   @Input() selectedDisplayFields: any[];
   @Input() currentActiveItemId: any;
   @Input() disabled: boolean;
-
+  @Input() height: number = 100;
 
   ngOnChanges(changes: SimpleChanges): void {
     const _dataSources: SimpleChange = changes.dataSources;
