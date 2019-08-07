@@ -162,7 +162,7 @@
                                     *ngFor="let charge of listCharges | filter: keyword:[ 'jobId', 'chargeCode', 'hbl', 'chargeName', 'hbl',  'mbl', 'currency'] ; let i = index; trackBy: trackByFn">
                                     <td class="table-actions-col">
                                         <div class="table-actions">
-                                            <label class="m-checkbox">
+                                            <label class="m-checkbox"  *ngIf="!charge.soaNo">
                                                 <input type="checkbox" (change)="onChangeCheckBoxCharge($event)" value="{{charge}}"
                                                     [(ngModel)]="charge.isSelected" name="{{charge.code}}">
                                                 <span></span>
