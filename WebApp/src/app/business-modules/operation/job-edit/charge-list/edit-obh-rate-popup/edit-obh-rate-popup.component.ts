@@ -141,4 +141,7 @@ export class EditObhRatePopupComponent extends PopupBase implements OnInit, OnCh
       this.lstPartners = res;
     });
   }
+  public typed(value: any): void {
+    console.log('New search input: ', value);
+  }
 }

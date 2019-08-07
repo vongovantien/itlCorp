@@ -34,7 +34,6 @@ import { EditSellingRatePopupComponent } from './charge-list/edit-selling-rate-p
 import { EditObhRatePopupComponent } from './charge-list/edit-obh-rate-popup/edit-obh-rate-popup.component';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ConfirmCancelJobPopupComponent } from './job-confirm-popup/confirm-cancel-job-popup/confirm-cancel-job-popup.component';
-declare var $: any;
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
@@ -361,7 +360,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             this.lstBuyingRateChargesComboBox = res['data'];
             this._data.setData('buyingCharges', this.lstBuyingRateChargesComboBox);
         });
-
     }
 
     public getListSellingRateCharges() {
@@ -376,6 +374,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             this.lstOBHChargesComboBox = res['data'];
             this._data.setData('obhCharges', this.lstOBHChargesComboBox);
         });
+
     }
 
     public getPartners() {
@@ -470,9 +469,9 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         if (this.ListBuyingRateCharges.length > 0) {
 
             this.ListBuyingRateCharges.forEach(element => {
-
-                this.totalBuyingLocal += element.total * element.exchangeRate;
-                this.totalBuyingUSD += this.totalBuyingLocal / element.exchangeRateUSDToVND;
+                const currentLocalBuying = element.total * element.exchangeRate;
+                this.totalBuyingLocal += currentLocalBuying;
+                this.totalBuyingUSD += currentLocalBuying / element.exchangeRateUSDToVND;
                 this.totalProfit();
             });
         }
@@ -487,8 +486,9 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         if (this.ListSellingRateCharges.length > 0) {
 
             this.ListSellingRateCharges.forEach(element => {
-                this.totalSellingLocal += element.total * element.exchangeRate;
-                this.totalSellingUSD += this.totalSellingLocal / element.exchangeRateUSDToVND;
+                const currentLocalSelling = element.total * element.exchangeRate;
+                this.totalSellingLocal += currentLocalSelling;
+                this.totalSellingUSD += currentLocalSelling / element.exchangeRateUSDToVND;
                 this.totalProfit();
 
             });
@@ -505,9 +505,9 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         if (this.ListOBHCharges.length > 0) {
 
             this.ListOBHCharges.forEach(element => {
-
-                this.totalOBHLocal += element.total * element.exchangeRate;
-                this.totalOBHUSD += this.totalOBHLocal / element.exchangeRateUSDToVND;
+                const currentOBHCharge = element.total * element.exchangeRate;
+                this.totalOBHLocal += currentOBHCharge;
+                this.totalOBHUSD += currentOBHCharge / element.exchangeRateUSDToVND;
                 this.totalProfit();
             });
 

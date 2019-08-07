@@ -12,17 +12,17 @@ export class ContainerRepo {
     }
 
     getListContainersOfJob(data: any = {}) {
-        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/CsMawbcontainer/Query`, data).pipe(
-            catchError((error) => throwError(error)),
-            map((res: any) => {
-                return res;
-            })
-        );
-        // return this._api.post(`${environment.HOST.WEB_URL}44366/api/${this.VERSION}/vi/CsMawbcontainer/Query`, data).pipe(
+        // return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/CsMawbcontainer/Query`, data).pipe(
         //     catchError((error) => throwError(error)),
         //     map((res: any) => {
         //         return res;
         //     })
         // );
+        return this._api.post(`${environment.HOST.WEB_URL}44366/api/${this.VERSION}/vi/CsMawbcontainer/Query`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
     }
 }

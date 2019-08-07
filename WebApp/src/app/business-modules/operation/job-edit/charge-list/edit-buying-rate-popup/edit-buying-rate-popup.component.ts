@@ -124,10 +124,10 @@ export class EditBuyingRatePopupComponent extends PopupBase implements OnInit, O
     }, 300);
   }
   public getListBuyingRateCharges() {
-    this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { type: 'CREDIT', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
+    this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'CREDIT', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
       this.lstBuyingRateChargesComboBox = res['data'];
+      this._data.setData('buyingCharges', this.lstBuyingRateChargesComboBox);
     });
-
   }
   public getUnits() {
     this.baseServices.post(this.api_menu.Catalogue.Unit.getAllByQuery, {}).subscribe((data: any) => {
@@ -145,4 +145,7 @@ export class EditBuyingRatePopupComponent extends PopupBase implements OnInit, O
       this.lstCurrencies = prepareNg2SelectData(res, "id", "id");
     });
   }
+  public typed(value: any): void {
+    console.log('New search input: ', value);
+}
 }

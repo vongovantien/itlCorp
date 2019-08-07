@@ -42,7 +42,6 @@
                     [selectedDisplayFields]="['charge.chargeNameEn']" [dataSources]="lstBuyingRateChargesComboBox"
                     [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
                   </app-combo-grid-virtual-scroll>
-
                   <div class="form-control-feedback"
                     *ngIf="addBuyingRateChargeFormOps.submitted && buyingRateChargeToAdd.chargeId==null">
                     Charge is required

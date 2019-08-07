@@ -55,7 +55,7 @@ export class PartnerComponent implements OnInit {
   };
   activeTab: string = this.tabName.allTab;
   @ViewChild(PaginationComponent, { static: false }) child: any;
-  //partnerType: any;
+  // partnerType: any;
 
   @ViewChild(AgentComponent, { static: false }) agentComponent: any;
   @ViewChild(AllPartnerComponent, { static: true }) allPartnerComponent: any;
@@ -70,67 +70,68 @@ export class PartnerComponent implements OnInit {
     private router: Router) { }
 
   ngOnInit() {
-    this.pager.totalItems = 0;
-    this.pager.totalItems = 1;
-    this.baseService.spinnerShow();
+    this.resetPager();
     this.tabSelect(this.activeTab);
   }
   resetSearch(event) {
     this.onSearch(event);
   }
-  onSearch(event) {
+  resetPager() {
     this.pager.totalItems = 0;
-    this.pager.totalItems = 1;
-    if (event.field == "All") {
+    this.pager.currentPage = 1;
+  }
+  onSearch(event) {
+    this.resetPager();
+    console.log(event);
+    if (event.field === "All") {
       this.criteria.all = event.searchString;
-    }
-    else {
-      //this.criteria.all = null;
-      let currentTab = this.criteria.partnerGroup;
+    } else {
+      const currentTab = this.criteria.partnerGroup;
       this.criteria = {};
       this.criteria.partnerGroup = currentTab;
-      if (event.field == "id") {
+      if (event.field === "id") {
         this.criteria.id = event.searchString;
       }
-      if (event.field == "shortName") {
+      if (event.field === "shortName") {
         this.criteria.shortName = event.searchString;
       }
-      if (event.field == "addressVn") {
+      if (event.field === "addressVn") {
         this.criteria.addressVn = event.searchString;
       }
-      if (event.field == "taxCode") {
+      if (event.field === "taxCode") {
         this.criteria.taxCode = event.searchString;
       }
-      if (event.field == "tel") {
+      if (event.field === "tel") {
         this.criteria.tel = event.searchString;
       }
-      if (event.field == "fax") {
+      if (event.field === "fax") {
         this.criteria.fax = event.searchString;
       }
-      if (event.field == "userCreatedName") {
+      if (event.field === "userCreatedName") {
         this.criteria.userCreated = event.searchString;
       }
     }
-    if (this.criteria.partnerGroup == PartnerGroupEnum.CUSTOMER) {
+    if (this.criteria.partnerGroup === PartnerGroupEnum.CUSTOMER) {
       this.customerComponent.getPartnerData(this.pager, this.criteria);
     }
-    if (this.criteria.partnerGroup == PartnerGroupEnum.AGENT) {
+    if (this.criteria.partnerGroup === PartnerGroupEnum.AGENT) {
       this.agentComponent.getPartnerData(this.pager, this.criteria);
     }
-    if (this.criteria.partnerGroup == PartnerGroupEnum.CARRIER) {
+    if (this.criteria.partnerGroup === PartnerGroupEnum.CARRIER) {
       this.carrierComponent.getPartnerData(this.pager, this.criteria);
     }
-    if (this.criteria.partnerGroup == PartnerGroupEnum.CONSIGNEE) {
+    if (this.criteria.partnerGroup === PartnerGroupEnum.CONSIGNEE) {
       this.consigneeComponent.getPartnerData(this.pager, this.criteria);
     }
-    if (this.criteria.partnerGroup == PartnerGroupEnum.AIRSHIPSUP) {
+    if (this.criteria.partnerGroup === PartnerGroupEnum.AIRSHIPSUP) {
       this.airShipSupComponent.getPartnerData(this.pager, this.criteria);
     }
-    if (this.criteria.partnerGroup == PartnerGroupEnum.SHIPPER) {
+    if (this.criteria.partnerGroup === PartnerGroupEnum.SHIPPER) {
       this.shipperComponent.getPartnerData(this.pager, this.criteria);
     }
-    if (this.criteria.partnerGroup == PartnerGroupEnum.ALL) {
+    if (this.criteria.partnerGroup === PartnerGroupEnum.ALL) {
       this.allPartnerComponent.getPartnerData(this.pager, this.criteria);
+      console.log(this.pager);
     }
   }
   tabSelect(tabName) {
@@ -138,31 +139,31 @@ export class PartnerComponent implements OnInit {
     this.pager.pageSize = SystemConstants.OPTIONS_PAGE_SIZE;
     this.activeTab = tabName;
 
-    if (tabName == this.tabName.customerTab) {
+    if (tabName === this.tabName.customerTab) {
       this.criteria.partnerGroup = PartnerGroupEnum.CUSTOMER;
       this.pager.totalItems = this.customerComponent.getPartnerData(this.pager, this.criteria);
     }
-    if (tabName == this.tabName.agentTab) {
+    if (tabName === this.tabName.agentTab) {
       this.criteria.partnerGroup = PartnerGroupEnum.AGENT;
       this.pager.totalItems = this.agentComponent.getPartnerData(this.pager, this.criteria);
     }
-    if (tabName == this.tabName.carrierTab) {
+    if (tabName === this.tabName.carrierTab) {
       this.criteria.partnerGroup = PartnerGroupEnum.CARRIER;
       this.pager.totalItems = this.carrierComponent.getPartnerData(this.pager, this.criteria);
     }
-    if (tabName == this.tabName.consigneeTab) {
+    if (tabName === this.tabName.consigneeTab) {
       this.criteria.partnerGroup = PartnerGroupEnum.CONSIGNEE;
       this.pager.totalItems = this.consigneeComponent.getPartnerData(this.pager, this.criteria);
     }
-    if (tabName == this.tabName.airshipsupTab) {
+    if (tabName === this.tabName.airshipsupTab) {
       this.criteria.partnerGroup = PartnerGroupEnum.AIRSHIPSUP;
       this.pager.totalItems = this.airShipSupComponent.getPartnerData(this.pager, this.criteria);
     }
-    if (tabName == this.tabName.shipperTab) {
+    if (tabName === this.tabName.shipperTab) {
       this.criteria.partnerGroup = PartnerGroupEnum.SHIPPER;
       this.pager.totalItems = this.shipperComponent.getPartnerData(this.pager, this.criteria);
     }
-    if (tabName == this.tabName.allTab) {
+    if (tabName === this.tabName.allTab) {
       this.criteria.partnerGroup = PartnerGroupEnum.ALL;
       this.pager.totalItems = this.allPartnerComponent.getPartnerData(this.pager, this.criteria);
     }
@@ -190,7 +191,7 @@ export class PartnerComponent implements OnInit {
   }
   setPageAfterDelete() {
     this.pager.totalItems = this.pager.totalItems - 1;
-    let totalPages = Math.ceil(this.pager.totalItems / this.pager.pageSize);
+    const totalPages = Math.ceil(this.pager.totalItems / this.pager.pageSize);
     if (totalPages < this.pager.totalPages) {
       this.pager.currentPage = totalPages;
     }
@@ -198,31 +199,31 @@ export class PartnerComponent implements OnInit {
   }
 
   RefreshData(): any {
-    if (this.criteria.partnerGroup == PartnerGroupEnum.CUSTOMER) {
+    if (this.criteria.partnerGroup === PartnerGroupEnum.CUSTOMER) {
       this.pager.totalItems = this.customerComponent.getPartnerData(this.pager, this.criteria);
       this.setPageAfterDelete();
     }
-    if (this.criteria.partnerGroup == PartnerGroupEnum.AGENT) {
+    if (this.criteria.partnerGroup === PartnerGroupEnum.AGENT) {
       this.pager.totalItems = this.agentComponent.getPartnerData(this.pager, this.criteria);
       this.setPageAfterDelete();
     }
-    if (this.criteria.partnerGroup == PartnerGroupEnum.CARRIER) {
+    if (this.criteria.partnerGroup === PartnerGroupEnum.CARRIER) {
       this.pager.totalItems = this.carrierComponent.getPartnerData(this.pager, this.criteria);
       this.setPageAfterDelete();
     }
-    if (this.criteria.partnerGroup == PartnerGroupEnum.CONSIGNEE) {
+    if (this.criteria.partnerGroup === PartnerGroupEnum.CONSIGNEE) {
       this.pager.totalItems = this.consigneeComponent.getPartnerData(this.pager, this.criteria);
       this.setPageAfterDelete();
     }
-    if (this.criteria.partnerGroup == PartnerGroupEnum.AIRSHIPSUP) {
+    if (this.criteria.partnerGroup === PartnerGroupEnum.AIRSHIPSUP) {
       this.pager.totalItems = this.airShipSupComponent.getPartnerData(this.pager, this.criteria);
       this.setPageAfterDelete();
     }
-    if (this.criteria.partnerGroup == PartnerGroupEnum.SHIPPER) {
+    if (this.criteria.partnerGroup === PartnerGroupEnum.SHIPPER) {
       this.pager.totalItems = this.shipperComponent.getPartnerData(this.pager, this.criteria);
       this.setPageAfterDelete();
     }
-    if (this.criteria.partnerGroup == PartnerGroupEnum.ALL) {
+    if (this.criteria.partnerGroup === PartnerGroupEnum.ALL) {
       this.pager.totalItems = this.allPartnerComponent.getPartnerData(this.pager, this.criteria);
       this.setPageAfterDelete();
     }
@@ -235,35 +236,35 @@ export class PartnerComponent implements OnInit {
     this.pager.currentPage = pager.currentPage;
     this.pager.pageSize = pager.pageSize;
     this.pager.totalPages = pager.totalPages;
-    if (this.activeTab == this.tabName.customerTab) {
+    if (this.activeTab === this.tabName.customerTab) {
       this.criteria.partnerGroup = PartnerGroupEnum.CUSTOMER;
       this.customerComponent.getPartnerData(pager, this.criteria);
     }
-    if (this.activeTab == this.tabName.agentTab) {
+    if (this.activeTab === this.tabName.agentTab) {
       this.criteria.partnerGroup = PartnerGroupEnum.AGENT;
       this.agentComponent.getPartnerData(pager, this.criteria);
     }
-    if (this.activeTab == this.tabName.carrierTab) {
+    if (this.activeTab === this.tabName.carrierTab) {
       this.criteria.partnerGroup = PartnerGroupEnum.CARRIER;
       this.carrierComponent.getPartnerData(pager, this.criteria);
     }
-    if (this.activeTab == this.tabName.consigneeTab) {
+    if (this.activeTab === this.tabName.consigneeTab) {
       this.criteria.partnerGroup = PartnerGroupEnum.CONSIGNEE;
       this.consigneeComponent.getPartnerData(pager, this.criteria);
     }
-    if (this.activeTab == this.tabName.airshipsupTab) {
+    if (this.activeTab === this.tabName.airshipsupTab) {
       this.criteria.partnerGroup = PartnerGroupEnum.AIRSHIPSUP;
       this.airShipSupComponent.getPartnerData(pager, this.criteria);
     }
-    if (this.activeTab == this.tabName.shipperTab) {
+    if (this.activeTab === this.tabName.shipperTab) {
       this.criteria.partnerGroup = PartnerGroupEnum.SHIPPER;
       this.shipperComponent.getPartnerData(pager, this.criteria);
     }
-    if (this.activeTab == this.tabName.allTab) {
+    if (this.activeTab === this.tabName.allTab) {
       this.criteria.partnerGroup = PartnerGroupEnum.ALL;
       this.allPartnerComponent.getPartnerData(pager, this.criteria);
     }
-    //this.pager.currentPage = pager.currentPage;
+    // this.pager.currentPage = pager.currentPage;
   }
 
   async export() {
