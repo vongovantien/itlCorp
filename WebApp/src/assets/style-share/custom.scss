@@ -974,7 +974,7 @@ table.dataTable {
 .daterange-rtl {
     .md-drppicker {
         left: auto !important;
-        right: 0 !important;
+        // right: 0 !important;
         margin-top: 0;
     }
 }
@@ -1081,4 +1081,8 @@ table.dataTable {
 
 .h-100vh {
     height: 100vh;
+}
+
+.m--w-50 {
+    width: 50px;
 }
