@@ -165,10 +165,10 @@ namespace eFMS.API.Documentation.DL.Services
             var dataMapChargeShipment = mapper.Map<List<spc_GetListChargeShipmentMasterBySOANo>, List<ChargeShipmentModel>>(chargeShipmentList);
 
             dataMapSOA.ChargeShipments = dataMapChargeShipment;
-            dataMapSOA.AmountDebitLocal = chargeShipmentList.Sum(x => x.AmountDebitLocal);
-            dataMapSOA.AmountCreditLocal = chargeShipmentList.Sum(x => x.AmountCreditLocal);
-            dataMapSOA.AmountDebitUSD = chargeShipmentList.Sum(x => x.AmountDebitUSD);
-            dataMapSOA.AmountCreditUSD = chargeShipmentList.Sum(x => x.AmountCreditUSD);
+            dataMapSOA.AmountDebitLocal = Math.Round(chargeShipmentList.Sum(x => x.AmountDebitLocal),3);
+            dataMapSOA.AmountCreditLocal = Math.Round(chargeShipmentList.Sum(x => x.AmountCreditLocal),3);
+            dataMapSOA.AmountDebitUSD = Math.Round(chargeShipmentList.Sum(x => x.AmountDebitUSD),3);
+            dataMapSOA.AmountCreditUSD = Math.Round(chargeShipmentList.Sum(x => x.AmountCreditUSD),3);
 
             //Thông tin các Service Name của SOA
             dataMapSOA.ServicesNameSoa = GetInfoServiceOfSoa(soaNo).ToString();
