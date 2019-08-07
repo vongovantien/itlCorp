@@ -58,7 +58,7 @@
                     (data)="refreshValue($event)" [disabled]="sellingRateChargeToEdit.cdno"
                     (selected)="sellingRateChargeToEdit.objectBePaid=$event.id;
                                         sellingRateChargeToEdit.objectBePaid==='AGENT'? sellingRateChargeToEdit.paymentObjectId=opsTransaction.agentId:null;
-                                        sellingRateChargeToEdit.objectBePaid==='CUSTOMER'? sellingRateChargeToEdit.paymentObjectId=opsTransaction.supplierId:null;
+                                        sellingRateChargeToEdit.objectBePaid==='CUSTOMER'? sellingRateChargeToEdit.paymentObjectId=opsTransaction.customerId:null;
                                         sellingRateChargeToEdit.objectBePaid==='OTHER'? sellingRateChargeToEdit.paymentObjectId=null:null;"
                     (removed)="sellingRateChargeToEdit.objectBePaid=null;sellingRateChargeToEdit.paymentObjectId=null;"
                     (typed)="typed($event)" placeholder="Select filter">
