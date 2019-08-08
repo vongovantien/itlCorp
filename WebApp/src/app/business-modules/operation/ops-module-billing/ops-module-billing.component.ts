@@ -11,6 +11,7 @@ import { SortService } from 'src/app/shared/services/sort.service';
 import { JobConstants } from 'src/constants/job.const';
 import { ConfirmDeleteJobPopupComponent } from '../job-edit/job-confirm-popup/confirm-delete-job-popup/confirm-delete-job-popup.component';
 import { CanNotDeleteJobPopupComponent } from '../job-edit/job-confirm-popup/can-not-delete-job-popup/can-not-delete-job-popup.component';
+import { DataService } from 'src/app/shared/services';
 declare var $: any;
 
 @Component({
@@ -54,7 +55,9 @@ export class OpsModuleBillingComponent implements OnInit {
     @ViewChild(CanNotDeleteJobPopupComponent, { static: false }) canNotDeleteJobPopup: CanNotDeleteJobPopupComponent;
     constructor(private baseServices: BaseService,
         private sortService: SortService,
-        private api_menu: API_MENU) {
+        private api_menu: API_MENU,
+        private _dataService: DataService 
+        ) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
@@ -169,7 +172,7 @@ export class OpsModuleBillingComponent implements OnInit {
         const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, criteriaSearchColoader, false, false);
         if (partners != null) {
             this.customers = partners;
-            console.log(this.customers);
+            this._dataService.setData('lstPartners', this.customers);
         }
     }
     async getShipments() {

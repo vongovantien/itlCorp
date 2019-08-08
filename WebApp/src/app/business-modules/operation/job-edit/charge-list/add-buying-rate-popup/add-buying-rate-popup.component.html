@@ -42,7 +42,6 @@
                     [selectedDisplayFields]="['charge.chargeNameEn']" [dataSources]="lstBuyingRateChargesComboBox"
                     [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
                   </app-combo-grid-virtual-scroll>
-
                   <div class="form-control-feedback"
                     *ngIf="addBuyingRateChargeFormOps.submitted && buyingRateChargeToAdd.chargeId==null">
                     Charge is required
@@ -261,7 +260,7 @@
           <!--end::Form-->
         </div>
         <div class="modal-footer m--align-center">
-          <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" type="button"
+          <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" type=""
             (click)="buyingRateChargeToAdd.type='BUY';saveNewCharge('ops-add-buying-rate-modal',addBuyingRateChargeFormOps,true)">
             <span>
               <i class="la la-plus"></i>
@@ -270,7 +269,7 @@
               </span>
             </span>
           </button>
-          <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" type="button"
+          <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" type=""
             (click)="buyingRateChargeToAdd.type='BUY';saveNewCharge('ops-add-buying-rate-modal',addBuyingRateChargeFormOps,false)">
             <span>
               <i class="la la-save"></i>

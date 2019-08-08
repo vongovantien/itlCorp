@@ -102,4 +102,7 @@ export class AddObhRatePopupComponent extends PopupBase implements OnInit {
       this.lstCurrencies = prepareNg2SelectData(res, "id", "id");
     });
   }
+  public typed(value: any): void {
+    console.log('New search input: ', value);
+  }
 }

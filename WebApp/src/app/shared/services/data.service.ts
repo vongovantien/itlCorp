@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class DataService {
@@ -9,11 +10,20 @@ export class DataService {
 
     constructor() { }
 
-    // changeMessage(message: string) {
-    //     this.messageSource.next(message);
-    // }
     setData(key: string, value: any) {
         this.messageSource.next({ ...this.messageSource.value, [key]: value });
+    }
+
+    getData(): Observable<any> {
+        return this.messageSource.pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getDataByKey(key: string): Observable<any> {
+        return this.messageSource.pipe(
+            map((data: any) => data[key] || null)
+        );
     }
 
 }
