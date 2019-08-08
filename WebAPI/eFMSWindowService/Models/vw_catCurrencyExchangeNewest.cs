@@ -16,8 +16,8 @@ namespace eFMSWindowService.Models
     {
         public int ID { get; set; }
         public string CurrencyFromID { get; set; }
+        public string CurrencyToID { get; set; }
         public decimal Rate { get; set; }
         public Nullable<System.DateTime> DatetimeCreated { get; set; }
-        public string CurrencyToID { get; set; }
     }
 }

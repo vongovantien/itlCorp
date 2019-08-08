@@ -34,6 +34,7 @@ warning 6002: The table/view 'eFMSTest.dbo.vw_catCurrencyExchangeNewest' does no
           <Property Name="Rate" Type="decimal" Precision="18" Scale="4" Nullable="false" />
           <Property Name="DatetimeCreated" Type="smalldatetime" />
         </EntityType>
+        <Function Name="sp_QueryAndUpdateCurrentStatusOfJob" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <EntityContainer Name="eFMSTestModelStoreContainer">
           <EntitySet Name="catCurrencyExchange" EntityType="Self.catCurrencyExchange" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="vw_catCurrencyExchangeNewest" EntityType="Self.vw_catCurrencyExchangeNewest" store:Type="Views" store:Schema="dbo">
@@ -50,6 +51,11 @@ warning 6002: The table/view 'eFMSTest.dbo.vw_catCurrencyExchangeNewest' does no
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="eFMSTestModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="eFMSTestEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="catCurrencyExchanges" EntityType="eFMSTestModel.catCurrencyExchange" />
+          <FunctionImport Name="sp_QueryAndUpdateCurrentStatusOfJob" ReturnType="Collection(Int32)" />
+          <EntitySet Name="vw_catCurrencyExchangeNewest" EntityType="eFMSTestModel.vw_catCurrencyExchangeNewest" />
+        </EntityContainer>
         <EntityType Name="catCurrencyExchange">
           <Key>
             <PropertyRef Name="ID" />
@@ -57,7 +63,7 @@ warning 6002: The table/view 'eFMSTest.dbo.vw_catCurrencyExchangeNewest' does no
           <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="CurrencyFromID" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
           <Property Name="CurrencyToID" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="Rate" Type="Decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="Rate" Type="Decimal" Nullable="false" Precision="18" Scale="4" />
           <Property Name="EffectiveOn" Type="DateTime" Precision="3" />
           <Property Name="UserCreated" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="DatetimeCreated" Type="DateTime" Precision="3" />
@@ -66,10 +72,6 @@ warning 6002: The table/view 'eFMSTest.dbo.vw_catCurrencyExchangeNewest' does no
           <Property Name="Inactive" Type="Boolean" />
           <Property Name="InactiveOn" Type="DateTime" Precision="3" />
         </EntityType>
-        <EntityContainer Name="eFMSTestEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="catCurrencyExchanges" EntityType="Self.catCurrencyExchange" />
-          <EntitySet Name="vw_catCurrencyExchangeNewest" EntityType="eFMSTestModel.vw_catCurrencyExchangeNewest" />
-        </EntityContainer>
         <EntityType Name="vw_catCurrencyExchangeNewest">
           <Key>
             <PropertyRef Name="ID" />
@@ -77,9 +79,9 @@ warning 6002: The table/view 'eFMSTest.dbo.vw_catCurrencyExchangeNewest' does no
           </Key>
           <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="CurrencyFromID" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="CurrencyToID" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
           <Property Name="Rate" Type="Decimal" Nullable="false" Precision="18" Scale="4" />
           <Property Name="DatetimeCreated" Type="DateTime" Precision="0" />
-          <Property Name="CurrencyToID" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -90,26 +92,27 @@ warning 6002: The table/view 'eFMSTest.dbo.vw_catCurrencyExchangeNewest' does no
           <EntitySetMapping Name="catCurrencyExchanges">
             <EntityTypeMapping TypeName="eFMSTestModel.catCurrencyExchange">
               <MappingFragment StoreEntitySet="catCurrencyExchange">
-                <ScalarProperty Name="ID" ColumnName="ID" />
-                <ScalarProperty Name="CurrencyFromID" ColumnName="CurrencyFromID" />
-                <ScalarProperty Name="CurrencyToID" ColumnName="CurrencyToID" />
-                <ScalarProperty Name="Rate" ColumnName="Rate" />
-                <ScalarProperty Name="EffectiveOn" ColumnName="EffectiveOn" />
-                <ScalarProperty Name="UserCreated" ColumnName="UserCreated" />
-                <ScalarProperty Name="DatetimeCreated" ColumnName="DatetimeCreated" />
-                <ScalarProperty Name="UserModified" ColumnName="UserModified" />
-                <ScalarProperty Name="DatetimeModified" ColumnName="DatetimeModified" />
-                <ScalarProperty Name="Inactive" ColumnName="Inactive" />
                 <ScalarProperty Name="InactiveOn" ColumnName="InactiveOn" />
+                <ScalarProperty Name="Inactive" ColumnName="Inactive" />
+                <ScalarProperty Name="DatetimeModified" ColumnName="DatetimeModified" />
+                <ScalarProperty Name="UserModified" ColumnName="UserModified" />
+                <ScalarProperty Name="DatetimeCreated" ColumnName="DatetimeCreated" />
+                <ScalarProperty Name="UserCreated" ColumnName="UserCreated" />
+                <ScalarProperty Name="EffectiveOn" ColumnName="EffectiveOn" />
+                <ScalarProperty Name="Rate" ColumnName="Rate" />
+                <ScalarProperty Name="CurrencyToID" ColumnName="CurrencyToID" />
+                <ScalarProperty Name="CurrencyFromID" ColumnName="CurrencyFromID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="sp_QueryAndUpdateCurrentStatusOfJob" FunctionName="eFMSTestModel.Store.sp_QueryAndUpdateCurrentStatusOfJob" />
           <EntitySetMapping Name="vw_catCurrencyExchangeNewest">
             <EntityTypeMapping TypeName="eFMSTestModel.vw_catCurrencyExchangeNewest">
               <MappingFragment StoreEntitySet="vw_catCurrencyExchangeNewest">
-                <ScalarProperty Name="CurrencyToID" ColumnName="CurrencyToID" />
                 <ScalarProperty Name="DatetimeCreated" ColumnName="DatetimeCreated" />
                 <ScalarProperty Name="Rate" ColumnName="Rate" />
+                <ScalarProperty Name="CurrencyToID" ColumnName="CurrencyToID" />
                 <ScalarProperty Name="CurrencyFromID" ColumnName="CurrencyFromID" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
