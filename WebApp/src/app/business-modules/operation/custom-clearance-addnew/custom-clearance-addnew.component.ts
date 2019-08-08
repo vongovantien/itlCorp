@@ -10,6 +10,7 @@ import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mo
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { ToastrService } from 'ngx-toastr';
+import { SortService } from 'src/app/shared/services/sort.service';
 
 @Component({
     selector: 'app-custom-clearance-addnew',
@@ -30,6 +31,7 @@ export class CustomClearanceAddnewComponent implements OnInit {
         private route: ActivatedRoute,
         private _location: Location,
         private cdr: ChangeDetectorRef,
+        private sortService: SortService,
         private toastr: ToastrService) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
@@ -214,8 +216,10 @@ export class CustomClearanceAddnewComponent implements OnInit {
         //unitType = Package
         const res = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: 'Package' }, true, true);
         this.listUnit = res;
-        this.strUnitCurrent = this.listUnit != null ? this.listUnit[0].code : '';
-        console.log(this.strUnitCurrent)
+        var datasort = this.sortService.sort(res, res[0].code, true);
+        console.log(datasort)
+        this.strUnitCurrent = datasort != null ? datasort[0].code : '';
+        console.log(this.strUnitCurrent);
     }
 
     /**
