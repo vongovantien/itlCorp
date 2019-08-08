@@ -127,7 +127,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         private router: Router,
         private _unitRepo: UnitRepo,
         private _containerRepo: ContainerRepo,
-        private _data: DataService) {
+        private _data: DataService,
+        private sortService: SortService) {
         super();
         this.keepCalendarOpeningWithRange = true;
         // this.selectedDate = Date.now();
@@ -745,5 +746,23 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this.tab = tabName;
         this.getAllSurCharges();
         // this.router.navigate([`home/operation/job-edit/${this.jobId}`], {queryParams: {tab: this.tab}});
+    }
+
+    isDesc = true;
+    sortKey: string = '';
+    sortBuyingRateCharges(property) {
+        this.isDesc = !this.isDesc;
+        this.sortKey = property;
+        this.ListBuyingRateCharges = this.sortService.sort(this.ListBuyingRateCharges, property, this.isDesc);
+    }
+    sortSellingRateCharges(property) {
+        this.isDesc = !this.isDesc;
+        this.sortKey = property;
+        this.ListSellingRateCharges = this.sortService.sort(this.ListSellingRateCharges, property, this.isDesc);
+    }
+    sortOBHRateCharges(property) {
+        this.isDesc = !this.isDesc;
+        this.sortKey = property;
+        this.ListOBHCharges = this.sortService.sort(this.ListOBHCharges, property, this.isDesc);
     }
 }

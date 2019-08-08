@@ -681,73 +681,101 @@
                                                 <thead class="">
                                                     <tr class="">
                                                         <th class=""></th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'partnerName'), 'sorting_desc': (!isDesc && sortKey == 'partnerName') }"
+                                                            (click)="sortBuyingRateCharges('partnerName')">
                                                             <span>
                                                                 Partner
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameEn'), 'sorting_desc': (!isDesc && sortKey == 'nameEn') }"
+                                                            (click)="sortBuyingRateCharges('nameEn')">
                                                             <span>
                                                                 Name EN
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'quantity'), 'sorting_desc': (!isDesc && sortKey == 'quantity') }"
+                                                            (click)="sortBuyingRateCharges('quantity')">
                                                             <span>
                                                                 Quantity
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'unit'), 'sorting_desc': (!isDesc && sortKey == 'unit') }"
+                                                            (click)="sortBuyingRateCharges('unit')">
                                                             <span>
                                                                 Unit
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'unitPrice'), 'sorting_desc': (!isDesc && sortKey == 'unitPrice') }"
+                                                            (click)="sortBuyingRateCharges('unitPrice')">
                                                             <span>
                                                                 Unit price
                                                             </span>
                                                         </th>
 
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'currency'), 'sorting_desc': (!isDesc && sortKey == 'currency') }"
+                                                            (click)="sortBuyingRateCharges('currency')">
                                                             <span>
                                                                 Currency
                                                             </span>
                                                         </th>
-                                                        <th class="">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'vatrate'), 'sorting_desc': (!isDesc && sortKey == 'vatrate') }"
+                                                            (click)="sortBuyingRateCharges('vatrate')">
                                                             <span>
                                                                 VAT
                                                             </span>
                                                         </th>
-                                                        <th class="">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'total'), 'sorting_desc': (!isDesc && sortKey == 'total') }"
+                                                            (click)="sortBuyingRateCharges('total')">
                                                             <span>
                                                                 Total
                                                             </span>
                                                         </th>
-                                                        <th class="">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'notes'), 'sorting_desc': (!isDesc && sortKey == 'notes') }"
+                                                            (click)="sortBuyingRateCharges('notes')">
                                                             <span>
                                                                 Note
                                                             </span>
                                                         </th>
-                                                        <th class="">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'docNo'), 'sorting_desc': (!isDesc && sortKey == 'docNo') }"
+                                                            (click)="sortBuyingRateCharges('docNo')">
                                                             <span>
                                                                 Docs
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'soano'), 'sorting_desc': (!isDesc && sortKey == 'soano') }"
+                                                            (click)="sortBuyingRateCharges('soano')">
                                                             <span>
                                                                 SOA
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'cdno'), 'sorting_desc': (!isDesc && sortKey == 'cdno') }"
+                                                            (click)="sortBuyingRateCharges('cdno')">
                                                             <span>
                                                                 Credit/ Debit note
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'settlementCode'), 'sorting_desc': (!isDesc && sortKey == 'settlementCode') }"
+                                                            (click)="sortBuyingRateCharges('settlementCode')">
                                                             <span>
                                                                 Settle payment
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'exchangeDate'), 'sorting_desc': (!isDesc && sortKey == 'exchangeDate') }"
+                                                            (click)="sortBuyingRateCharges('exchangeDate')">
                                                             <span>
                                                                 Exchange rate date
                                                             </span>
@@ -863,6 +891,7 @@
                                                         <td>
                                                             <span>
                                                                 <!-- Settle payment -->
+                                                                {{ charge.settlementCode }}
                                                             </span>
                                                         </td>
                                                         <td>
@@ -930,72 +959,100 @@
                                                 <thead class="">
                                                     <tr class="">
                                                         <th class=""></th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'partnerName'), 'sorting_desc': (!isDesc && sortKey == 'partnerName') }"
+                                                            (click)="sortSellingRateCharges('partnerName')">
                                                             <span>
                                                                 Partner
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameEn'), 'sorting_desc': (!isDesc && sortKey == 'nameEn') }"
+                                                            (click)="sortSellingRateCharges('nameEn')">
                                                             <span>
                                                                 Name EN
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'quantity'), 'sorting_desc': (!isDesc && sortKey == 'quantity') }"
+                                                            (click)="sortSellingRateCharges('quantity')">
                                                             <span>
                                                                 Quantity
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'unit'), 'sorting_desc': (!isDesc && sortKey == 'unit') }"
+                                                            (click)="sortSellingRateCharges('unit')">
                                                             <span>
                                                                 Unit
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'unitPrice'), 'sorting_desc': (!isDesc && sortKey == 'unitPrice') }"
+                                                            (click)="sortSellingRateCharges('unitPrice')">
                                                             <span>
                                                                 Unit Price
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'currency'), 'sorting_desc': (!isDesc && sortKey == 'currency') }"
+                                                            (click)="sortSellingRateCharges('currency')">
                                                             <span>
                                                                 Currency
                                                             </span>
                                                         </th>
-                                                        <th class="">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'vatrate'), 'sorting_desc': (!isDesc && sortKey == 'vatrate') }"
+                                                            (click)="sortSellingRateCharges('vatrate')">
                                                             <span>
                                                                 VAT
                                                             </span>
                                                         </th>
-                                                        <th class="">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'total'), 'sorting_desc': (!isDesc && sortKey == 'total') }"
+                                                            (click)="sortSellingRateCharges('total')">
                                                             <span>
                                                                 Total
                                                             </span>
                                                         </th>
-                                                        <th class="">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'notes'), 'sorting_desc': (!isDesc && sortKey == 'notes') }"
+                                                            (click)="sortSellingRateCharges('notes')">
                                                             <span>
                                                                 Note
                                                             </span>
                                                         </th>
-                                                        <th class="">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'docNo'), 'sorting_desc': (!isDesc && sortKey == 'docNo') }"
+                                                            (click)="sortSellingRateCharges('docNo')">
                                                             <span>
                                                                 Docs
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'soano'), 'sorting_desc': (!isDesc && sortKey == 'soano') }"
+                                                            (click)="sortSellingRateCharges('soano')">
                                                             <span>
                                                                 SOA
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'cdno'), 'sorting_desc': (!isDesc && sortKey == 'cdno') }"
+                                                            (click)="sortSellingRateCharges('cdno')">
                                                             <span>
                                                                 Credit/ Debit note
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'settlementCode'), 'sorting_desc': (!isDesc && sortKey == 'settlementCode') }"
+                                                            (click)="sortSellingRateCharges('settlementCode')">
                                                             <span>
                                                                 Settle payment
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'exchangeDate'), 'sorting_desc': (!isDesc && sortKey == 'exchangeDate') }"
+                                                            (click)="sortSellingRateCharges('exchangeDate')">
                                                             <span>
                                                                 Exchange rate date
                                                             </span>
@@ -1108,6 +1165,7 @@
                                                         <td>
                                                             <span>
                                                                 <!-- Settle payment -->
+                                                                {{ charge.settlementCode }}
                                                             </span>
                                                         </td>
                                                         <td>
@@ -1175,77 +1233,107 @@
                                                 <thead class="">
                                                     <tr class="">
                                                         <th class=""></th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'receiverName'), 'sorting_desc': (!isDesc && sortKey == 'receiverName') }"
+                                                            (click)="sortOBHRateCharges('receiverName')">
                                                             <span>
                                                                 Receiver
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'payerName'), 'sorting_desc': (!isDesc && sortKey == 'payerName') }"
+                                                            (click)="sortOBHRateCharges('payerName')">
                                                             <span>
                                                                 Payer
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nameEn'), 'sorting_desc': (!isDesc && sortKey == 'nameEn') }"
+                                                            (click)="sortOBHRateCharges('nameEn')">
                                                             <span>
                                                                 Name EN
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'quantity'), 'sorting_desc': (!isDesc && sortKey == 'quantity') }"
+                                                            (click)="sortOBHRateCharges('quantity')">
                                                             <span>
                                                                 Quantity
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'unit'), 'sorting_desc': (!isDesc && sortKey == 'unit') }"
+                                                            (click)="sortOBHRateCharges('unit')">
                                                             <span>
                                                                 Unit
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'unitPrice'), 'sorting_desc': (!isDesc && sortKey == 'unitPrice') }"
+                                                            (click)="sortOBHRateCharges('unitPrice')">
                                                             <span>
                                                                 Unit price
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'currency'), 'sorting_desc': (!isDesc && sortKey == 'currency') }"
+                                                            (click)="sortOBHRateCharges('currency')">
                                                             <span>
                                                                 Currency
                                                             </span>
                                                         </th>
-                                                        <th class="">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'vatrate'), 'sorting_desc': (!isDesc && sortKey == 'vatrate') }"
+                                                            (click)="sortOBHRateCharges('vatrate')">
                                                             <span>
                                                                 VAT
                                                             </span>
                                                         </th>
-                                                        <th class="">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'total'), 'sorting_desc': (!isDesc && sortKey == 'total') }"
+                                                            (click)="sortOBHRateCharges('total')">
                                                             <span>
                                                                 Total
                                                             </span>
                                                         </th>
-                                                        <th class="">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'notes'), 'sorting_desc': (!isDesc && sortKey == 'notes') }"
+                                                            (click)="sortOBHRateCharges('notes')">
                                                             <span>
                                                                 Note
                                                             </span>
                                                         </th>
-                                                        <th class="">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'docNo'), 'sorting_desc': (!isDesc && sortKey == 'docNo') }"
+                                                            (click)="sortOBHRateCharges('docNo')">
                                                             <span>
                                                                 Docs
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'soano'), 'sorting_desc': (!isDesc && sortKey == 'soano') }"
+                                                            (click)="sortOBHRateCharges('soano')">
                                                             <span>
                                                                 SOA
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'cdno'), 'sorting_desc': (!isDesc && sortKey == 'cdno') }"
+                                                            (click)="sortOBHRateCharges('cdno')">
                                                             <span>
                                                                 Credit/ Debit note
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'settlementCode'), 'sorting_desc': (!isDesc && sortKey == 'settlementCode') }"
+                                                            (click)="sortOBHRateCharges('settlementCode')">
                                                             <span>
                                                                 Settle payment
                                                             </span>
                                                         </th>
-                                                        <th class="sorting">
+                                                        <th class="sorting"
+                                                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'exchangeDate'), 'sorting_desc': (!isDesc && sortKey == 'exchangeDate') }"
+                                                            (click)="sortOBHRateCharges('exchangeDate')">
                                                             <span>
                                                                 Exchange rate date
                                                             </span>
@@ -1354,6 +1442,7 @@
                                                         <td>
                                                             <span>
                                                                 <!-- Settle payment -->
+                                                                {{ charge.settlementCode }}
                                                             </span>
                                                         </td>
                                                         <td>
