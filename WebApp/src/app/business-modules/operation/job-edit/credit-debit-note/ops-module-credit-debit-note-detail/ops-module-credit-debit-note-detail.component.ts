@@ -5,6 +5,7 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDetails.model';
 import { Subject } from 'rxjs';
 import { PopupBase } from 'src/app/popup.base';
+import { OpsModuleCreditDebitNoteEditComponent } from '../ops-module-credit-debit-note-edit/ops-module-credit-debit-note-edit.component';
 declare var $: any;
 
 @Component({
@@ -12,6 +13,9 @@ declare var $: any;
   templateUrl: './ops-module-credit-debit-note-detail.component.html'
 })
 export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
+
+  @ViewChild(OpsModuleCreditDebitNoteEditComponent, { static: false }) popupEdit: OpsModuleCreditDebitNoteEditComponent;
+
   constructor(
     private baseServices: BaseService,
     private api_menu: API_MENU,
@@ -19,12 +23,13 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
   ) {
     super();
   }
-  @Output() openEditCDNote = new EventEmitter<AcctCDNoteDetails>();
+  @Output() openEditCDNote = new EventEmitter<any>();
+  @Output() isCloseModal = new EventEmitter<any>();
   @Input() CDNoteDetails: AcctCDNoteDetails = null;
 
   STORAGE_DATA: any = null;
   currentSOANo: string = null;
-  currentJobID: string = null;
+  // currentJobID: string = null;
 
   previewModalId = "preview-modal";
   dataReport: any;
@@ -36,13 +41,14 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
   ngOnInit() {
   }
 
-  editCDNote() {
-    // $('#ops-credit-debit-note-detail-modal').modal('hide');
-    // $('#ops-credit-debit-note-edit-modal').modal('show');
+  async editCDNote() {
+    const currentCDNoteDetail = this.CDNoteDetails;
+    // this.CDNoteDetails = null;
     this.hide();
-    //this.popupEditCreditDebit.show();
+    this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + currentCDNoteDetail.jobId + "&soaNo=" + currentCDNoteDetail.cdNote.code);
     this.baseServices.setData("CDNoteDetails", this.CDNoteDetails);
-    this.openEditCDNote.emit(this.CDNoteDetails);
+    this.popupEdit.StateChecking();
+    this.popupEdit.show();
   }
 
   ngOnDestroy(): void {
@@ -51,10 +57,13 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
 
     this.subscribe.unsubscribe();
   }
-  Close() {
-    $('#ops-credit-debit-note-detail-modal').modal('hide');
+  close() {
+    this.isCloseModal.emit(true);
+    this.hide();
   }
-
+  closeEditModal(event) {
+    this.show();
+  }
   async Preview() {
     this.dataReport = null;
     if (this.CDNoteDetails.listSurcharges.length === 0) {

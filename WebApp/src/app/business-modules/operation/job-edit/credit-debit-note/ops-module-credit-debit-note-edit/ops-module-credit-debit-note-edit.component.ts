@@ -16,7 +16,7 @@ declare var $: any;
     selector: 'app-ops-module-credit-debit-note-edit',
     templateUrl: './ops-module-credit-debit-note-edit.component.html'
 })
-export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements OnInit, OnDestroy, AfterViewInit {
+export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements OnInit, OnDestroy {
     @ViewChild(OpsModuleCreditDebitNoteRemainingChargeComponent, { static: false }) popupAddCharge: OpsModuleCreditDebitNoteRemainingChargeComponent;
     listChargeOfPartner: any[] = [];
     listRemainingCharges: any[] = [];
@@ -40,11 +40,6 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
     }
 
     ngOnInit() {
-        this.StateChecking();
-
-    }
-    ngAfterViewInit() {
-        console.log(this.cdNoteDetails);
     }
 
     async getListCharges(partnerId: String) {
@@ -218,11 +213,16 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
                 this.EditingCDNote.listShipmentSurcharge = this.STORAGE_DATA.CDNoteDetails.listSurcharges;
                 this.getListCharges(this.EditingCDNote.partnerId);
             }
-            if (this.STORAGE_DATA.listChargeOfPartner !== undefined) {
-                this.listChargeOfPartner = cloneDeep(this.STORAGE_DATA.listChargeOfPartner);
-                this.constListChargeOfPartner = cloneDeep(this.STORAGE_DATA.listChargeOfPartner);
-            }
+            // if (this.STORAGE_DATA.listChargeOfPartner !== undefined) {
+            //     this.listChargeOfPartner = cloneDeep(this.STORAGE_DATA.listChargeOfPartner);
+            //     this.constListChargeOfPartner = cloneDeep(this.STORAGE_DATA.listChargeOfPartner);
+            // }
+            this.getListChargeOfPartner();
         });
+    }
+    async getListChargeOfPartner() {
+        this.listChargeOfPartner = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getChargesByPartner + "?Id=" + this.currentHbID + "&partnerID=" + this.EditingCDNote.partnerId + "&IsHouseBillId=true");
+        console.log(this.listChargeOfPartner);
     }
 
     ngOnDestroy(): void {

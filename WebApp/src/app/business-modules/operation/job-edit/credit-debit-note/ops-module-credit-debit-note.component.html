@@ -132,11 +132,13 @@
 
 <app-ops-module-credit-debit-note-addnew [currentJob]="currentJob"></app-ops-module-credit-debit-note-addnew>
 
-<app-ops-module-credit-debit-note-detail [CDNoteDetails]="CDNoteDetails" (openEditCDNote)="openEditCDNotePopUp($event)">
+<app-ops-module-credit-debit-note-detail [CDNoteDetails]="CDNoteDetails" (openEditCDNote)="openEditCDNotePopUp($event)"
+    (isCloseModal)="closeDetailModal($event)">
 </app-ops-module-credit-debit-note-detail>
 
-<app-ops-module-credit-debit-note-edit [cdNoteDetails]="CDNoteDetails" (isCloseModal)="closeEditModal($event)">
-</app-ops-module-credit-debit-note-edit>
+<!-- <app-ops-module-credit-debit-note-edit [cdNoteDetails]="CDNoteDetails" (isCloseModal)="closeEditModal($event)"
+    *ngIf="!!CDNoteDetails">
+</app-ops-module-credit-debit-note-edit> -->
 
 <!-- <app-ops-module-credit-debit-note-remaining-charge></app-ops-module-credit-debit-note-remaining-charge> -->
 

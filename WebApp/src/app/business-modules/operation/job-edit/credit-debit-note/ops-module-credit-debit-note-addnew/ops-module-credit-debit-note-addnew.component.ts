@@ -63,7 +63,13 @@ export class OpsModuleCreditDebitNoteAddnewComponent extends PopupBase implement
     }
     confirmYes(partnerId: string) {
         this.partnerIdNewChange = partnerId;
-        this.popupConfirmChangePartner.show();
+        const index = this.listChargeOfPartner.findIndex(x => x.partnerId === partnerId);
+        if (this.listChargeOfPartner.length > 0) {
+            this.popupConfirmChangePartner.show();
+        } else {
+            this.CDNoteWorking.partnerId = this.partnerIdNewChange;
+            this.getListCharges(this.partnerIdNewChange);
+        }
     }
     async getListCharges(partnerId: String) {
         if (this.currentHbID !== null && partnerId != null) {
