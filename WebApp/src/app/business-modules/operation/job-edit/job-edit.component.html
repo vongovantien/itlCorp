@@ -5,6 +5,16 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10" (click)="onOpePLPrint()">
+                <span>
+                    <i class="la la-print"></i>
+                    <span>
+                        P/L Sheet
+                    </span>
+                </span>
+            </button>
+        </div>
+        <div class="c-button-actions">
             <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
                 (click)="confirmDelete()">
                 <span>
@@ -15,14 +25,6 @@
                 </span>
             </button>
         </div>
-        <!-- <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
-            data-target="#confirm-cancel-job-modal">
-            <span>
-                <i class="la la-ban"></i>
-                <span>
-                    cancel
-                </span>
-            </span> -->
         <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="confirmCancelJob()">
             <span>
                 <i class="la la-ban"></i>
@@ -1730,3 +1732,5 @@
 
 <app-ops-module-credit-debit-note-edit [cdNoteDetails]="CDNoteDetails" (isCloseModal)="closeEditCDNoteModal($event)">
 </app-ops-module-credit-debit-note-edit>
+
+<pl-sheet-popup></pl-sheet-popup>

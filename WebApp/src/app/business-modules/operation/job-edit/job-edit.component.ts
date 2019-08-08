@@ -34,6 +34,7 @@ import { EditSellingRatePopupComponent } from './charge-list/edit-selling-rate-p
 import { EditObhRatePopupComponent } from './charge-list/edit-obh-rate-popup/edit-obh-rate-popup.component';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ConfirmCancelJobPopupComponent } from './job-confirm-popup/confirm-cancel-job-popup/confirm-cancel-job-popup.component';
+import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
 declare var $: any;
 
 @Component({
@@ -57,6 +58,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     @ViewChild(EditObhRatePopupComponent, { static: false }) editOHBRatePopup: EditObhRatePopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteCharge: ConfirmPopupComponent;
     @ViewChild(ConfirmCancelJobPopupComponent, { static: false }) confirmCancelJobPopup: ConfirmCancelJobPopupComponent;
+    @ViewChild(PlSheetPopupComponent, { static: false }) plSheetPopup: PlSheetPopupComponent;
 
     opsTransaction: OpsTransaction = null;
     productServices: any[] = [];
@@ -379,11 +381,17 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     public getPartners() {
-        this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.ALL, inactive: false }).subscribe((res: any) => {
-            this.lstPartners = res;
-            this._data.setData('lstPartners', this.lstPartners);
-            console.log({ PARTNERS: this.lstPartners });
-        });
+        this._data.getDataByKey('lstPartners')
+        .subscribe(
+            (data: any) => {
+                this.lstPartners = data;
+            }
+        );
+
+        // this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.ALL, inactive: false }).subscribe((res: any) => {
+        //     this.lstPartners = res;
+        //     this._data.setData('lstPartners', this.lstPartners);
+        // });
     }
 
     public getUnits() {
@@ -398,6 +406,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             this._data.setData('lstCurrencies', res);
         });
     }
+
     public getCurrencies(isAddNew = true) {
         if (isAddNew === true) {
             this.baseServices.post(this.api_menu.Catalogue.Currency.getAllByQuery, { inactive: false }).subscribe((res: any) => {
@@ -745,5 +754,9 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this.tab = tabName;
         this.getAllSurCharges();
         // this.router.navigate([`home/operation/job-edit/${this.jobId}`], {queryParams: {tab: this.tab}});
+    }
+
+    onOpePLPrint() {
+        this.plSheetPopup.show({ backdrop: 'static' });
     }
 }
