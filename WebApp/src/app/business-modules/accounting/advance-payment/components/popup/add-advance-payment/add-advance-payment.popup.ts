@@ -15,10 +15,23 @@ export class AdvancePaymentAddPopupComponent extends PopupBase {
 
     @ViewChild(ConfirmPopupComponent, {static: false}) confirmPopup: ConfirmPopupComponent;
 
+    configShipment: CommonInterface.IComboGirdConfig = {
+        placeholder: 'Please select',
+        displayFields: [],
+        dataSource: [],
+        selectedDisplayFields: [],
+    };
+
+    selectedShipment: any = {};
+    selectedShipmentData: OperationInteface.IShipment;
+
     types: CommonInterface.ICommonTitleValue[];
     selectedType: CommonInterface.ICommonTitleValue;
 
     customDeclarations: CustomDeclaration[];
+    initCD: CustomDeclaration[];
+    shipments: OperationInteface.IShipment[];
+ 
     form: FormGroup;
     description: AbstractControl;
     amount: AbstractControl;
@@ -27,7 +40,6 @@ export class AdvancePaymentAddPopupComponent extends PopupBase {
     note: AbstractControl;
     shipment: AbstractControl;
     customNo: AbstractControl;
-
 
     constructor(
         private _fb: FormBuilder,
@@ -39,6 +51,7 @@ export class AdvancePaymentAddPopupComponent extends PopupBase {
     ngOnInit() {
         this.initForm();
         this.initBasicData();
+        this.getListShipment();
         this.getCustomNo();
     }
 
@@ -77,6 +90,26 @@ export class AdvancePaymentAddPopupComponent extends PopupBase {
         console.log(this.form.value);
     }
 
+    getListShipment() {
+        this._accoutingRepo.getListShipmentDocumentOperation()
+        .pipe(catchError(this.catchError))
+        .subscribe(
+            (res: OperationInteface.IShipment) => {
+                this.configShipment.dataSource = <any>res || [];
+
+                // * update config combogrid.
+                this.configShipment.displayFields = [
+                    { field: 'jobId', label: 'Job No' },
+                    { field: 'mbl', label: 'MBL' },
+                    { field: 'hbl', label: 'HBL' },
+                ];
+                this.configShipment.selectedDisplayFields = ['jobId', `mbl`, 'hbl'];
+            },
+            (errors: any) => {},
+            () => {}
+        );
+    }
+
     getCustomNo() {
         this._accoutingRepo.getListCustomsDeclaration()
             .pipe(
@@ -85,12 +118,38 @@ export class AdvancePaymentAddPopupComponent extends PopupBase {
             )
             .subscribe(
                 (res: any) => {
-                    this.customDeclarations = res || [];
-                    console.log(this.customDeclarations);
+                    this.customDeclarations = this.initCD =  res || [];
                 },
                 (errors: any) => { },
                 () => { },
             );
+    }
+
+    onSelectDataFormInfo(data: any , key: string) {
+        switch (key) {
+            case 'shipment':
+                this.selectedShipment = { field: data.jobId, value: data.hbl };
+                this.selectedShipmentData = data;
+
+                this.customDeclarations = [];
+                this.customNo.setValue(null);
+                
+                this.customDeclarations = this.filterCDByShipment(this.selectedShipmentData);
+                if (this.customDeclarations.length === 1) {
+                    this.customNo.setValue(this.customDeclarations[0]);
+                }
+                break;
+        
+            default:
+                break;
+        }
+
+    }
+
+    filterCDByShipment(shipment: OperationInteface.IShipment): CustomDeclaration[] {
+        return this.initCD.filter((item: CustomDeclaration) => {
+            return (item.hblid === shipment.hbl && item.mblid === shipment.mbl && item.jobNo === shipment.jobId);
+        });
     }
 
     onCancel() {

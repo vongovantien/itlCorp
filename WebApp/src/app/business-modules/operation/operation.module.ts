@@ -42,6 +42,7 @@ import { AddSellingRatePopupComponent } from './job-edit/charge-list/add-selling
 import { EditSellingRatePopupComponent } from './job-edit/charge-list/edit-selling-rate-popup/edit-selling-rate-popup.component';
 import { AddObhRatePopupComponent } from './job-edit/charge-list/add-obh-rate-popup/add-obh-rate-popup.component';
 import { EditObhRatePopupComponent } from './job-edit/charge-list/edit-obh-rate-popup/edit-obh-rate-popup.component';
+import { PlSheetPopupComponent } from "./job-edit/pl-sheet-popup/pl-sheet.popup";
 
 
 const LIB = [
@@ -100,7 +101,8 @@ const LIB = [
         AddSellingRatePopupComponent,
         EditSellingRatePopupComponent,
         AddObhRatePopupComponent,
-        EditObhRatePopupComponent
+        EditObhRatePopupComponent,
+        PlSheetPopupComponent
     ]
 })
 export class OperationModule { }

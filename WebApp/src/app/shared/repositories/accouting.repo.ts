@@ -106,5 +106,13 @@ export class AccoutingRepo {
             );
     }
 
+    getListShipmentDocumentOperation() {
+        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctAdvancePayment/GetShipments`)
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => data)
+            );
+    }
+
 
 }

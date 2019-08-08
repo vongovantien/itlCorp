@@ -21,7 +21,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
     @Input() searchInfo: SOASearchCharge = null;
 
     selectedShipment: Partial<CommonInterface.IComboGridData> = {};
-    selectedShipmentData: IShipment;
+    selectedShipmentData: OperationInteface.IShipment;
 
     configShipment: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
@@ -236,7 +236,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
         return _uniq(result);
     }
 
-    filterCDNoteByShipment(shipment: IShipment): ICDNote[] {
+    filterCDNoteByShipment(shipment: OperationInteface.IShipment): ICDNote[] {
         return this.initCDNotes.filter((item: ICDNote) => {
             return (item.hbl === shipment.hbl && item.mbl === shipment.mbl && item.jobId === shipment.jobId);
         });
@@ -333,13 +333,9 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
 
 interface IResultShipmentCDNote {
     listCdNote: ICDNote[];
-    listShipment: IShipment[];
+    listShipment: OperationInteface.IShipment[];
 }
-interface IShipment {
-    jobId: string;
-    hbl: string;
-    mbl: string;
-}
+
 interface ICDNote {
     creditDebitNo: string;
     hbl: string;
