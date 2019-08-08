@@ -116,6 +116,7 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
                 this.CDNoteDetails.cdNote.type = 'Invoice';
             }
             console.log('sfsfsfsf' + this.CDNoteDetails.cdNote.type);
+            this.poupDetail.currentJob = this.currentJob;
             this.poupDetail.show({ backdrop: 'static' });
         }
     }
@@ -146,7 +147,7 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
             // this.baseServices.setData("CDNoteDetails", event);
             // this.popupEdit.cdNoteDetails = this.CDNoteDetails;
             if (!!this.CDNoteDetails) {
-                this.popupEdit.cdNoteDetails = this.CDNoteDetails;
+                // this.popupEdit.cdNoteDetails = this.CDNoteDetails;
                 this.popupEdit.show({ backdrop: 'static' });
             }
         }

@@ -6,6 +6,7 @@ import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDeta
 import { Subject } from 'rxjs';
 import { PopupBase } from 'src/app/popup.base';
 import { OpsModuleCreditDebitNoteEditComponent } from '../ops-module-credit-debit-note-edit/ops-module-credit-debit-note-edit.component';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
 declare var $: any;
 
 @Component({
@@ -26,9 +27,10 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
   @Output() openEditCDNote = new EventEmitter<any>();
   @Output() isCloseModal = new EventEmitter<any>();
   @Input() CDNoteDetails: AcctCDNoteDetails = null;
+  currentJob: OpsTransaction;
 
   STORAGE_DATA: any = null;
-  currentSOANo: string = null;
+  currentCDNo: string = null;
   // currentJobID: string = null;
 
   previewModalId = "preview-modal";
@@ -46,8 +48,13 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
     // this.CDNoteDetails = null;
     this.hide();
     this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + currentCDNoteDetail.jobId + "&soaNo=" + currentCDNoteDetail.cdNote.code);
-    this.baseServices.setData("CDNoteDetails", this.CDNoteDetails);
-    this.popupEdit.StateChecking();
+    // this.baseServices.setData("CDNoteDetails", this.CDNoteDetails);
+    this.popupEdit.currentCDNo = currentCDNoteDetail.cdNote.code;
+    this.popupEdit.currentJob = this.currentJob;
+    this.popupEdit.EditingCDNote.code = this.popupEdit.currentCDNo;
+    this.popupEdit.EditingCDNote.partnerName = this.CDNoteDetails.partnerNameEn;
+    this.popupEdit.EditingCDNote.type = this.CDNoteDetails.cdNote.type;
+    this.popupEdit.getListCharges(this.CDNoteDetails.partnerId);
     this.popupEdit.show();
   }
 
