@@ -13,27 +13,21 @@ import { FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
 
 export class AdvancePaymentFormCreateComponent extends AppForm {
 
-    methods: CommonInterface.ICommonTitleValue[] = [];
-    selectedMethod: CommonInterface.ICommonTitleValue;
-
-    currencyList: Currency[] = [];
-    selectedCurrency: any;
-
+    methods: CommonInterface.ICommonTitleValue[];
+    currencyList: Currency[];
     userLogged: User;
 
-    selectedRequestDate: Date = new Date();
-    // ? { Startdate, EndDate }  must be initialized to custom Date.
-    selectedDeadLineDate: any = {
-        startDate: new Date(new Date().setDate(this.selectedRequestDate.getDate() + 7)), 
-        endDate: new Date(new Date().setDate(this.selectedRequestDate.getDate() + 7)), 
-    };
+    formCreate: FormGroup;
+    advanceNo: AbstractControl;
+    requester: AbstractControl;
+    requestDate: AbstractControl;
+    paymentMethod: AbstractControl;
+    department: AbstractControl;
+    deadLine: AbstractControl;
+    note: AbstractControl;
+    currency: AbstractControl;
 
 
-    // formCreate: FormGroup;
-    // advanceNo: AbstractControl;
-    // requester: AbstractControl;
-    
-    
     constructor(
         private _fb: FormBuilder,
         private _baseService: BaseService,
@@ -44,18 +38,41 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     }
 
     ngOnInit() {
+        this.initForm();
         this.initBasicData();
         this.getUserLogged();
         this.getCurrency();
     }
 
     initForm() {
-        
+        this.formCreate = this._fb.group({
+            advanceNo: [],
+            requester: [],
+            department: [],
+            requestDate: [new Date()],
+            deadLine: [{
+                startDate: new Date(new Date().setDate(new Date().getDate() + 7)),
+                endDate: new Date(new Date().setDate(new Date().getDate() + 7)),
+            }],
+            paymentMethod: [],
+            note: [],
+            currency: []
+        });
+
+        this.advanceNo = this.formCreate.controls['advanceNo'];
+        this.requester = this.formCreate.controls['requester'];
+        this.requestDate = this.formCreate.controls['requestDate'];
+        this.deadLine = this.formCreate.controls['deadLine'];
+        this.currency = this.formCreate.controls['currency'];
+        this.note = this.formCreate.controls['note'];
+        this.department = this.formCreate.controls['department'];
+        this.paymentMethod = this.formCreate.controls['paymentMethod'];
     }
 
     initBasicData() {
         this.methods = this.getMethod();
-        this.selectedMethod = this.methods[0];
+        this.paymentMethod.setValue(this.methods[0]);
+
     }
 
     getMethod(): CommonInterface.ICommonTitleValue[] {
@@ -67,6 +84,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
 
     getUserLogged() {
         this.userLogged = this._baseService.getUserLogin() || 'admin';
+        this.requester.setValue(this.userLogged.id);
     }
 
     getCurrency() {
@@ -75,7 +93,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
             .subscribe(
                 (res: any) => {
                     this.currencyList = res || [];
-                    this.selectedCurrency = this.currencyList.filter((item: Currency) => item.id === 'VND')[0];
+                    this.currency.setValue(this.currencyList.filter((item: Currency) => item.id === 'VND')[0]);
                 },
                 (errors: any) => { },
                 () => { }

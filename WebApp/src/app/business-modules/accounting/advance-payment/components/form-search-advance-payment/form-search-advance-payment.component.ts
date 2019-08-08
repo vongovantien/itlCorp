@@ -92,4 +92,12 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
             { title: 'Bank Transer', value: 'Bank' },
         ];
     }
+
+    search() {
+
+    }
+    
+    reset() {
+
+    }
 }

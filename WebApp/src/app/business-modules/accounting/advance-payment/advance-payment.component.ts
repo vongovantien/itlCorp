@@ -6,7 +6,6 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./advance-payment.component.sass']
 })
 export class AdvancePaymentComponent implements OnInit {
-
   constructor() { }
 
   ngOnInit() {

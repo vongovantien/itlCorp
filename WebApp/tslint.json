@@ -59,6 +59,7 @@
         "no-duplicate-super": true,
         "no-empty": false,
         "no-empty-interface": true,
+        "interface-name": true,
         "no-eval": true,
         "no-inferrable-types": [
             false,
@@ -85,6 +86,8 @@
             "check-whitespace"
         ],
         "prefer-const": true,
+        "prefer-while": true,
+        "prefer-template": true,
         "quotemark": [
             false,
             "single"
@@ -127,6 +130,11 @@
         "use-life-cycle-interface": false,
         "use-pipe-transform-interface": true,
         "component-class-suffix": true,
-        "directive-class-suffix": true
+        "directive-class-suffix": true,
+        "file-name-casing": [
+            true,
+            "kebab-case"
+        ],
+        "unnecessary-constructor": true
     }
 }

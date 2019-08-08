@@ -147,7 +147,6 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
         for (const charge of this.listCharges) {
             charge.isSelected = this.isCheckAllCharge;
         }
-        console.log(this.listCharges);
     }
 
     async getListShipmentAndCDNote(data: SOASearchCharge) {
@@ -201,6 +200,8 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
                     this.selectedCharges.push({ id: 'All', code: 'All', chargeNameEn: 'All' });
                 } else {
                     this.selectedCharges.push(data);
+                    this.selectedCharges = [...new Set(this.selectedCharges)];
+
                     this.detectChargeWithAllOption(data);
                 }
                 break;

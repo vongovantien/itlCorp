@@ -314,6 +314,8 @@ export class StatementOfAccountAddnewComponent extends AppList {
                     this.selectedCharges.push({ id: 'All', code: 'All', chargeNameEn: 'All' });
                 } else {
                     this.selectedCharges.push(data);
+                    this.selectedCharges = [...new Set(this.selectedCharges)];
+
                     this.detectChargeWithAllOption(data);
                 }
                 break;
@@ -418,14 +420,13 @@ export class StatementOfAccountAddnewComponent extends AppList {
     }
 
     onCreateSOA() {
-        const chargeChecked = this.listCharges.filter((charge: any) => !charge.isSelected);
-        if (!chargeChecked.length) {
+        if (!this.listCharges.length) {
             this._toastService.warning(`SOA Don't have any charges in this period, Please check it again! `, '', { positionClass: 'toast-bottom-right' });
             return;
         } else {
 
             const body = {
-                surchargeIds: chargeChecked.map((item: any) => item.id),
+                surchargeIds: this.listCharges.map((item: any) => item.id),
                 soaformDate: this.dataSearch.fromDate,
                 soatoDate: this.dataSearch.toDate,
                 currency: this.dataSearch.currency,

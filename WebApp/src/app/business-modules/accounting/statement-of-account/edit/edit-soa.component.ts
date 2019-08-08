@@ -222,11 +222,9 @@ export class StatementOfAccountEditComponent extends AppList {
     onUpdateMoreSOA(data: any) {
         this.soa.chargeShipments = data.chargeShipments;
         this.isCheckAllCharge = false;
-        console.log(this.soa.chargeShipments);
     }
 
     updateSOA() {
-        const chargeChecked = this.soa.chargeShipments.filter((charge: any) => !charge.isSelected);
         /*
         * endDate must greater or equal soaToDate
                     * and 
@@ -236,12 +234,12 @@ export class StatementOfAccountEditComponent extends AppList {
             this._toastService.warning(`Range date invalid `, '', { positionClass: 'toast-bottom-right' });
             return;
         }
-        if (!chargeChecked.length) {
+        if (!this.soa.chargeShipments.length) {
             this._toastService.warning(`SOA Don't have any charges in this period, Please check it again! `, '', { positionClass: 'toast-bottom-right' });
             return;
         } else {
             const body = {
-                surchargeIds: chargeChecked.map((item: any) => item.id),
+                surchargeIds: this.soa.chargeShipments.map((item: any) => item.id),
                 id: this.soa.id,
                 soano: this.soaNO,
                 soaformDate: !!this.selectedRange.startDate ? formatDate(this.selectedRange.startDate, 'yyyy-MM-dd', 'en') : null,
