@@ -1,16 +1,17 @@
 import { Component } from '@angular/core';
-import { AppPage } from 'src/app/app.base';
 import { User, Currency } from 'src/app/shared/models';
 import { BaseService } from 'src/app/shared/services';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { catchError } from 'rxjs/operators';
+import { AppForm } from 'src/app/app.form';
+import { FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
 
 @Component({
     selector: 'adv-payment-form-create',
     templateUrl: './form-create-advance-payment.component.html'
 })
 
-export class AdvancePaymentFormCreateComponent extends AppPage {
+export class AdvancePaymentFormCreateComponent extends AppForm {
 
     methods: CommonInterface.ICommonTitleValue[] = [];
     selectedMethod: CommonInterface.ICommonTitleValue;
@@ -27,7 +28,14 @@ export class AdvancePaymentFormCreateComponent extends AppPage {
         endDate: new Date(new Date().setDate(this.selectedRequestDate.getDate() + 7)), 
     };
 
+
+    // formCreate: FormGroup;
+    // advanceNo: AbstractControl;
+    // requester: AbstractControl;
+    
+    
     constructor(
+        private _fb: FormBuilder,
         private _baseService: BaseService,
         private _sysRepo: SystemRepo
     ) {
@@ -39,6 +47,10 @@ export class AdvancePaymentFormCreateComponent extends AppPage {
         this.initBasicData();
         this.getUserLogged();
         this.getCurrency();
+    }
+
+    initForm() {
+        
     }
 
     initBasicData() {
@@ -69,6 +81,8 @@ export class AdvancePaymentFormCreateComponent extends AppPage {
                 () => { }
             );
     }
+
+
 
 
 

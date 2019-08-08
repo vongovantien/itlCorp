@@ -13,6 +13,7 @@ import { AdvancePaymentAddNewComponent } from './add/add-new-advance-payment.com
 import { AdvancePaymentFormCreateComponent } from './components/form-create-advance-payment/form-create-advance-payment.component';
 import { AdvancePaymentListRequestComponent } from './components/list-advance-payment-request/list-advance-payment-request.component';
 import { AdvancePaymentAddPopupComponent } from './components/popup/add-advance-payment/add-advance-payment.popup';
+import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
 
 registerLocaleData(localeVi, 'vi');
 const routing: Routes = [
@@ -30,7 +31,8 @@ const routing: Routes = [
 const COMPONENTS = [
     AdvancePaymentFormCreateComponent,
     AdvancePaymentListRequestComponent,
-    AdvancePaymentAddPopupComponent
+    AdvancePaymentAddPopupComponent,
+    AdvancePaymentFormsearchComponent
 ];
 
 @NgModule({
