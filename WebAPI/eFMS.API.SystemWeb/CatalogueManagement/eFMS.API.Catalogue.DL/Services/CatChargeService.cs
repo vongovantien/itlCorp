@@ -137,7 +137,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 && ((x.ChargeNameVn ?? "").IndexOf(criteria.ChargeNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                 && ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                 && ((x.Type??"").IndexOf(criteria.Type??"",StringComparison.OrdinalIgnoreCase)>=0)
-                && ((x.ServiceTypeId??"").IndexOf(criteria.ServiceTypeId+";"??"",StringComparison.OrdinalIgnoreCase)>=0));
+                && ((x.ServiceTypeId??"").IndexOf(criteria.ServiceTypeId ??"",StringComparison.OrdinalIgnoreCase)>=0));
             }
             else
             {
@@ -145,9 +145,9 @@ namespace eFMS.API.Catalogue.DL.Services
                || ((x.ChargeNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                || ((x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                || ((x.Type ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-               || ((x.ServiceTypeId ?? "").IndexOf(criteria.All + ";" ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
+               || ((x.ServiceTypeId ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
             }
-            return list.ToList(); ;
+            return list.ToList();
         }
 
         public HandleState DeleteCharge(Guid id)

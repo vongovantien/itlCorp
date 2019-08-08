@@ -116,8 +116,8 @@ export class EditSellingRatePopupComponent extends PopupBase implements OnInit, 
     this.sellingRateChargeToEdit = null;
   }
   public getListSellingRateCharges() {
-    this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { type: 'DEBIT', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
-      this.lstSellingRateChargesComboBox = res['data'];
+    this.baseServices.post(this.api_menu.Catalogue.Charge.query, { type: 'DEBIT', serviceTypeId: ChargeConstants.CL_CODE }).subscribe((res: any) => {
+      this.lstSellingRateChargesComboBox = res;
     });
   }
 
@@ -137,4 +137,7 @@ export class EditSellingRatePopupComponent extends PopupBase implements OnInit, 
       this.lstCurrencies = prepareNg2SelectData(res, "id", "id");
     });
   }
+  public typed(value: any): void {
+    console.log('New search input: ', value);
+}
 }

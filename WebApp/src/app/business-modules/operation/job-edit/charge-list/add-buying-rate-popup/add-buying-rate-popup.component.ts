@@ -35,8 +35,8 @@ export class AddBuyingRatePopupComponent extends PopupBase implements OnInit, On
   ngOnInit() {
     this._data.currentMessage.subscribe(message => {
       if (message['buyingCharges'] != null) {
-        this.lstBuyingRateChargesComboBox = cloneDeep(message['buyingCharges']);
         console.log('charge buying nè');
+        this.lstBuyingRateChargesComboBox = cloneDeep(message['buyingCharges']);
         console.log(this.lstBuyingRateChargesComboBox);
       } else {
         this.getListBuyingRateCharges();
@@ -115,8 +115,8 @@ export class AddBuyingRatePopupComponent extends PopupBase implements OnInit, On
   public getListBuyingRateCharges() {
     this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'CREDIT', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
       this.lstBuyingRateChargesComboBox = res['data'];
+      this._data.setData('buyingCharges', this.lstBuyingRateChargesComboBox);
     });
-
   }
   public getPartners() {
     this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.ALL, inactive: false }).subscribe((res: any) => {
@@ -133,5 +133,8 @@ export class AddBuyingRatePopupComponent extends PopupBase implements OnInit, On
     this.baseServices.post(this.api_menu.Catalogue.Currency.getAllByQuery, { inactive: false }).subscribe((res: any) => {
       this.lstCurrencies = prepareNg2SelectData(res, "id", "id");
     });
+  }
+  public typed(value: any): void {
+    console.log('New search input: ', value);
   }
 }

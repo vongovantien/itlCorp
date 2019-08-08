@@ -36,6 +36,7 @@
                     [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
                   </app-combo-grid-virtual-scroll>
 
+
                   <div class="form-control-feedback"
                     *ngIf="addSellingRateChargeFormOps.submitted && sellingRateChargeToAdd.chargeId==null">
                     Charge is required
@@ -57,7 +58,7 @@
                     (data)="refreshValue($event)"
                     (selected)="sellingRateChargeToAdd.objectBePaid=$event.id;
                                         sellingRateChargeToAdd.objectBePaid==='AGENT'? sellingRateChargeToAdd.paymentObjectId=opsTransaction.agentId:null;
-                                        sellingRateChargeToAdd.objectBePaid==='CUSTOMER'? sellingRateChargeToAdd.paymentObjectId=opsTransaction.supplierId:null;
+                                        sellingRateChargeToAdd.objectBePaid==='CUSTOMER'? sellingRateChargeToAdd.paymentObjectId=opsTransaction.customerId:null;
                                         sellingRateChargeToAdd.objectBePaid==='OTHER'? sellingRateChargeToAdd.paymentObjectId=null:null;"
                     (removed)="sellingRateChargeToAdd.objectBePaid=null;sellingRateChargeToAdd.paymentObjectId=null;"
                     (typed)="typed($event)" placeholder="Select filter">
