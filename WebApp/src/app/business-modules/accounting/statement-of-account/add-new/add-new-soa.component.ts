@@ -418,7 +418,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
     }
 
     onCreateSOA() {
-        const chargeChecked = this.listCharges.filter((charge: any) => charge.isSelected);
+        const chargeChecked = this.listCharges.filter((charge: any) => !charge.isSelected);
         if (!chargeChecked.length) {
             this._toastService.warning(`SOA Don't have any charges in this period, Please check it again! `, '', { positionClass: 'toast-bottom-right' });
             return;
@@ -492,9 +492,8 @@ export class StatementOfAccountAddnewComponent extends AppList {
         }
     }
 
-    removeAllCharge() {
-        this.isCheckAllCharge = false;
-        this.checkUncheckAllCharge();
+    removeCharge() {
+        this.listCharges = this.listCharges.filter((charge: any) => !charge.isSelected);
     }
 
     handleError(errors?: any) {

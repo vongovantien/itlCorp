@@ -29,7 +29,7 @@ export class StatementOfAccountEditComponent extends AppList {
     currencyLocal: string = '';
 
     headers: CommonInterface.IHeaderTable[] = [];
-    isCheckAllCharge: boolean = true;
+    isCheckAllCharge: boolean = false;
 
     dataSearch: SOASearchCharge;
 
@@ -211,9 +211,8 @@ export class StatementOfAccountEditComponent extends AppList {
         }
     }
 
-    removeAllCharge() {
-        this.isCheckAllCharge = false;
-        this.checkUncheckAllCharge();
+    removeCharge() {
+        this.soa.chargeShipments  = this.soa.chargeShipments.filter ( (item: any) => !item.isSelected);
     }
 
     back() {
@@ -227,7 +226,7 @@ export class StatementOfAccountEditComponent extends AppList {
     }
 
     updateSOA() {
-        const chargeChecked = this.soa.chargeShipments.filter((charge: any) => charge.isSelected);
+        const chargeChecked = this.soa.chargeShipments.filter((charge: any) => !charge.isSelected);
         /*
         * endDate must greater or equal soaToDate
                     * and 
@@ -277,7 +276,7 @@ export class StatementOfAccountEditComponent extends AppList {
                             this.getDetailSOA(this.soaNO, this.currencyLocal);
 
                             // * init checkbox all
-                            this.isCheckAllCharge = true;
+                            this.isCheckAllCharge = false;
                         }
                     },
                     (errors: any) => {
