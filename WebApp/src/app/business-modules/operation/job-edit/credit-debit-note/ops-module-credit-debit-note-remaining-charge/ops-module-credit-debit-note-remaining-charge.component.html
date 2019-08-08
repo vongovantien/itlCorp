@@ -4,7 +4,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Add charge</h5>
-                <button type="button" class="close" aria-label="Close" data-dismiss="modal">
+                <button type="button" class="close" aria-label="Close" (click)="close()">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -19,7 +19,8 @@
                                 <div class="form-group">
                                     <div class="m-input-icon m-input-icon--left">
                                         <input type="text" class="form-control m-input m-input--square"
-                                            placeholder="Search...">
+                                            placeholder="Search..." (keyup)="searchCharge($event.target.value)">
+
                                         <span class="m-input-icon__icon m-input-icon__icon--left">
                                             <span>
                                                 <i class="la la-search"></i>
@@ -136,8 +137,7 @@
                 <!--end::Form-->
             </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="addCharges()"
-                    data-dismiss="modal">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="addCharges()">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -145,7 +145,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="close()">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
@@ -157,3 +157,4 @@
         </div>
     </div>
 </div>
+<app-not-selected-alert-modal></app-not-selected-alert-modal>

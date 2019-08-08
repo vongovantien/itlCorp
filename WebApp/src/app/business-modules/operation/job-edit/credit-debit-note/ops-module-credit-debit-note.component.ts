@@ -1,6 +1,6 @@
-import { Component, OnInit, Output, EventEmitter, OnDestroy, Input, ViewChild } from '@angular/core';      
-import { BaseService } from 'src/app/shared/services/base.service';          
-import { API_MENU } from 'src/constants/api-menu.const';          
+import { Component, OnInit, Output, EventEmitter, OnDestroy, Input, ViewChild } from '@angular/core';
+import { BaseService } from 'src/app/shared/services/base.service';
+import { API_MENU } from 'src/constants/api-menu.const';
 import cloneDeep from 'lodash/cloneDeep';
 import filter from 'lodash/filter';
 import moment from 'moment/moment';
@@ -116,6 +116,7 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
                 this.CDNoteDetails.cdNote.type = 'Invoice';
             }
             console.log('sfsfsfsf' + this.CDNoteDetails.cdNote.type);
+            this.poupDetail.currentJob = this.currentJob;
             this.poupDetail.show({ backdrop: 'static' });
         }
     }
@@ -138,13 +139,17 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
         this.CDNoteDetails.totalCredit = totalCredit;
         this.CDNoteDetails.totalDebit = totalDebit;
     }
-    openEditCDNotePopUp(event) {
+    async openEditCDNotePopUp(event) {
         this.CDNoteDetails = null;
         console.log(event);
         if (event != null) {
-            this.CDNoteDetails = event;
+            this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.currentJob.id + "&soaNo=" + event);
             // this.baseServices.setData("CDNoteDetails", event);
-            this.popupEdit.show({ backdrop: 'static' });
+            // this.popupEdit.cdNoteDetails = this.CDNoteDetails;
+            if (!!this.CDNoteDetails) {
+                // this.popupEdit.cdNoteDetails = this.CDNoteDetails;
+                this.popupEdit.show({ backdrop: 'static' });
+            }
         }
     }
     async closeEditModal(event) {
@@ -155,6 +160,13 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
                 this.totalCreditDebitCalculate();
             }
             this.poupDetail.show({ backdrop: 'static' });
+        }
+    }
+    async closeDetailModal(event) {
+        this.poupDetail.show();
+        console.log("Mở popup detail");
+        if (event) {
+            this.getAllCDNote();
         }
     }
     SearchCDNotes(search_key: string) {

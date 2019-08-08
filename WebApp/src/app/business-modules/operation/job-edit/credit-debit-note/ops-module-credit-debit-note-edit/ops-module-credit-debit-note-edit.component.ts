@@ -10,28 +10,26 @@ import { NgForm } from '@angular/forms';
 import { Subject } from 'rxjs/internal/Subject';
 import { PopupBase } from 'src/app/popup.base';
 import { OpsModuleCreditDebitNoteRemainingChargeComponent } from '../ops-module-credit-debit-note-remaining-charge/ops-module-credit-debit-note-remaining-charge.component';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
 declare var $: any;
 
 @Component({
     selector: 'app-ops-module-credit-debit-note-edit',
     templateUrl: './ops-module-credit-debit-note-edit.component.html'
 })
-export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements OnInit, OnDestroy, AfterViewInit {
+export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements OnInit, OnDestroy {
     @ViewChild(OpsModuleCreditDebitNoteRemainingChargeComponent, { static: false }) popupAddCharge: OpsModuleCreditDebitNoteRemainingChargeComponent;
     listChargeOfPartner: any[] = [];
-    listRemainingCharges: any[] = [];
     constListChargeOfPartner: any[] = [];
     isDisplay: boolean = true;
     EditingCDNote: AcctCDNote = new AcctCDNote();
-    STORAGE_DATA: any = null;
-    currentHbID: string = null;
     checkAllCharge: boolean = false;
+    currentCDNo: String = '';
+    currentJob: OpsTransaction;
 
     totalCredit: number = 0;
     totalDebit: number = 0;
-    @Input() cdNoteDetails: any = null;
     @Output() isCloseModal = new EventEmitter<any>();
-    subscribe: Subject<any> = new Subject();
     constructor(
         private baseServices: BaseService,
         private api_menu: API_MENU
@@ -40,23 +38,21 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
     }
 
     ngOnInit() {
-        this.StateChecking();
-
-    }
-    ngAfterViewInit() {
-        console.log(this.cdNoteDetails);
     }
 
     async getListCharges(partnerId: String) {
         const listCharges = [];
-        this.listChargeOfPartner = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getChargesByPartner + "?Id=" + this.currentHbID + "&partnerID=" + partnerId + "&IsHouseBillId=true");
+        const cdNo = this.currentCDNo;
+        this.listChargeOfPartner = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getChargesByPartner + "?Id=" + this.currentJob.hblid + "&partnerID=" + partnerId + "&IsHouseBillId=true");
         this.listChargeOfPartner = map(this.listChargeOfPartner, function (o) {
             for (let i = 0; i < o.listCharges.length; i++) {
-                if (o.listCharges[i].cdno != null) {
-                    o.listCharges[i].isSelected = true;
-                    o.listCharges[i].isRemaining = false;
-                } else {
+                if (o.listCharges[i].cdno === null) {
                     o.listCharges[i].isRemaining = true;
+                } else {
+                    if (o.listCharges[i].cdno === cdNo) {
+                        o.listCharges[i].isSelected = true;
+                        o.listCharges[i].isRemaining = false;
+                    }
                 }
                 listCharges.push(o.listCharges[i]);
             }
@@ -121,8 +117,12 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
         }
     }
 
-    addChargeToSOA(event) {
-        console.log(event);
+    addChargeToCDNote(event) {
+        this.totalCreditDebitCalculate();
+    }
+    addMoreChargeToCDNote() {
+        this.popupAddCharge.listChargeOfPartner = this.popupAddCharge.constListChargeOfPartner = this.listChargeOfPartner;
+        this.popupAddCharge.show({ backdrop: 'static' });
     }
     setChargesForCDNote() {
         this.EditingCDNote.listShipmentSurcharge = [];
@@ -134,6 +134,7 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
     async UpdateCDNote(form: NgForm) {
         this.setChargesForCDNote();
         this.EditingCDNote.total = this.totalDebit - this.totalCredit;
+        this.EditingCDNote.jobId = this.currentJob.id;
         this.EditingCDNote.currencyId = "USD"; // in the future , this id must be local currency of each country
         this.EditingCDNote.listShipmentSurcharge = filter(this.EditingCDNote.listShipmentSurcharge, function (o: any) {
             return !o.isRemaining && o.isSelected;
@@ -199,36 +200,6 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
         console.log(this.listChargeOfPartner);
 
     }
-
-    viewDetailCDNote() {
-        // $('#ops-credit-debit-note-edit-modal').modal('hide');
-        //$('#ops-credit-debit-note-detail-modal').modal('show');
-        this.hide();
-    }
-    StateChecking() {
-        this.subscribe = <any>this.baseServices.dataStorage.subscribe(data => {
-
-            this.STORAGE_DATA = data;
-            if (this.STORAGE_DATA.CurrentOpsTransaction !== undefined) {
-                this.currentHbID = this.STORAGE_DATA.CurrentOpsTransaction.hblid;
-            }
-            if (this.STORAGE_DATA.CDNoteDetails != null) {
-                this.EditingCDNote = this.STORAGE_DATA.CDNoteDetails.cdNote;
-                this.EditingCDNote.partnerName = this.STORAGE_DATA.CDNoteDetails.partnerNameEn;
-                this.EditingCDNote.listShipmentSurcharge = this.STORAGE_DATA.CDNoteDetails.listSurcharges;
-                this.getListCharges(this.EditingCDNote.partnerId);
-            }
-            if (this.STORAGE_DATA.listChargeOfPartner !== undefined) {
-                this.listChargeOfPartner = cloneDeep(this.STORAGE_DATA.listChargeOfPartner);
-                this.constListChargeOfPartner = cloneDeep(this.STORAGE_DATA.listChargeOfPartner);
-            }
-        });
-    }
-
-    ngOnDestroy(): void {
-        this.subscribe.unsubscribe();
-    }
-
     closeModal() {
         this.isCloseModal.emit(true);
         this.hide();
