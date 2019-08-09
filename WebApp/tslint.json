@@ -87,7 +87,7 @@
         ],
         "prefer-const": true,
         "prefer-while": true,
-        "prefer-template": true,
+        "prefer-template": false,
         "quotemark": [
             false,
             "single"

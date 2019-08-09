@@ -95,7 +95,7 @@ export class StatementOfAccountDetailComponent extends AppList {
     async getDetailSOAExport(soaNO: string) {
         this._spinner.show();
         try {
-            const res: any = await (this._accoutingRepo.getDetailSOAToExport(soaNO).toPromise());
+            const res: any = await (this._accoutingRepo.getDetailSOAToExport(soaNO, 'VND').toPromise());
             if (!!res) {
                 return res;
             }

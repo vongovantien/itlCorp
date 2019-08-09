@@ -90,8 +90,8 @@ export class AccoutingRepo {
             );
     }
 
-    getDetailSOAToExport(soaNO: string) {
-        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSOA/GetDataExportSOABySOANo`, { soaNo: soaNO })
+    getDetailSOAToExport(soaNO: string, currency: string) {
+        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSOA/GetDataExportSOABySOANo`, { soaNo: soaNO, currencyLocal: currency })
             .pipe(
                 catchError((error) => throwError(error)),
                 map((data: any) => data)

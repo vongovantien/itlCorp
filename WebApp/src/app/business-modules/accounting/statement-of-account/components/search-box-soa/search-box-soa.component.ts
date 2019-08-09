@@ -7,9 +7,10 @@ import { AppPage } from 'src/app/app.base';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { Currency, Partner, User } from 'src/app/shared/models';
 import { SystemRepo } from 'src/app/shared/repositories';
-import { BaseService, SortService } from 'src/app/shared/services';
+import { BaseService, SortService, DataService } from 'src/app/shared/services';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
+import { SystemConstants } from 'src/constants/system.const';
 
 
 
@@ -49,7 +50,8 @@ export class StatementOfAccountSearchComponent extends AppPage {
         private _sysRepo: SystemRepo,
         private _baseService: BaseService,
         private _toastService: ToastrService,
-        private _sortService: SortService
+        private _sortService: SortService,
+        private _dataService: DataService
     ) {
         super();
     }
@@ -93,6 +95,10 @@ export class StatementOfAccountSearchComponent extends AppPage {
                         { field: 'partnerNameEn', label: 'Customer Name [EN]' },
                     ];
                     this.configPartner.selectedDisplayFields = ['partnerNameEn'];
+
+                    this._dataService.setData(SystemConstants.CSTORAGE.CURRENCY, dataCurrency);
+                    this._dataService.setData(SystemConstants.CSTORAGE.PARTNER, dataPartner);
+                    this._dataService.setData(SystemConstants.CSTORAGE.SYSTEM_USER, dataSystemUser);
                 },
                 (errors: any) => {
                     this.handleError(errors);
