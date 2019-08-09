@@ -135,6 +135,17 @@
             true,
             "kebab-case"
         ],
-        "unnecessary-constructor": true
+        "unnecessary-constructor": true,
+        "no-for-in-array": true,
+        "no-duplicate-variable": [
+            true,
+            "check-parameters"
+        ],
+        "no-duplicate-switch-case": true,
+        "no-async-without-await":true,
+        "function-constructor": true,
+        "await-promise": true,
+        "prefer-for-of": true,
+        "no-var-requires": true
     }
 }
