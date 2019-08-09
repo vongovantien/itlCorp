@@ -7,6 +7,7 @@ import { Subject } from 'rxjs';
 import { PopupBase } from 'src/app/popup.base';
 import { OpsModuleCreditDebitNoteEditComponent } from '../ops-module-credit-debit-note-edit/ops-module-credit-debit-note-edit.component';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
+import { SortService } from 'src/app/shared/services';
 declare var $: any;
 
 @Component({
@@ -20,7 +21,8 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
   constructor(
     private baseServices: BaseService,
     private api_menu: API_MENU,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private sortService: SortService
   ) {
     super();
   }
@@ -30,7 +32,7 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
   currentJob: OpsTransaction;
 
   STORAGE_DATA: any = null;
-  currentCDNo: string = null;
+  currentCDNo: String = null;
   // currentJobID: string = null;
 
   previewModalId = "preview-modal";
@@ -51,6 +53,8 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
     // this.baseServices.setData("CDNoteDetails", this.CDNoteDetails);
     this.popupEdit.currentCDNo = currentCDNoteDetail.cdNote.code;
     this.popupEdit.currentJob = this.currentJob;
+    this.popupEdit.EditingCDNote.id = this.CDNoteDetails.cdNote.id;
+    this.popupEdit.EditingCDNote.partnerId = this.CDNoteDetails.partnerId;
     this.popupEdit.EditingCDNote.code = this.popupEdit.currentCDNo;
     this.popupEdit.EditingCDNote.partnerName = this.CDNoteDetails.partnerNameEn;
     this.popupEdit.EditingCDNote.type = this.CDNoteDetails.cdNote.type;
@@ -68,7 +72,9 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
     this.isCloseModal.emit(true);
     this.hide();
   }
-  closeEditModal(event) {
+  async closeEditModal(event) {
+    this.currentCDNo = this.CDNoteDetails.cdNote.code;
+    this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.currentJob.id + "&soaNo=" + this.currentCDNo);
     this.show();
   }
   async Preview() {
@@ -89,6 +95,12 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
       }, 100);
     }
   }
-
+  isDesc = true;
+  sortKey: string = '';
+  sort(property) {
+    this.isDesc = !this.isDesc;
+    this.sortKey = property;
+    this.CDNoteDetails.listSurcharges = this.sortService.sort(this.CDNoteDetails.listSurcharges, property, this.isDesc);
+  }
 
 }

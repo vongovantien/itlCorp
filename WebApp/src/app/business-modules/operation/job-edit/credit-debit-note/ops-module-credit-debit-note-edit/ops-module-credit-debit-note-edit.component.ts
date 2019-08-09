@@ -11,6 +11,7 @@ import { Subject } from 'rxjs/internal/Subject';
 import { PopupBase } from 'src/app/popup.base';
 import { OpsModuleCreditDebitNoteRemainingChargeComponent } from '../ops-module-credit-debit-note-remaining-charge/ops-module-credit-debit-note-remaining-charge.component';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
+import { SortService } from 'src/app/shared/services';
 declare var $: any;
 
 @Component({
@@ -32,7 +33,8 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
     @Output() isCloseModal = new EventEmitter<any>();
     constructor(
         private baseServices: BaseService,
-        private api_menu: API_MENU
+        private api_menu: API_MENU,
+        private sortService: SortService
     ) {
         super();
     }
@@ -203,5 +205,12 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
     closeModal() {
         this.isCloseModal.emit(true);
         this.hide();
+    }
+    isDesc = true;
+    sortKey: string = '';
+    sort(property) {
+        this.isDesc = !this.isDesc;
+        this.sortKey = property;
+        this.listChargeOfPartner[0].listCharges = this.sortService.sort(this.listChargeOfPartner[0].listCharges, property, this.isDesc);
     }
 }

@@ -5,6 +5,7 @@ import { PopupBase } from 'src/app/popup.base';
 import { NotSelectedAlertModalComponent } from '../ops-module-credit-debit-note-addnew/not-selected-alert-modal/not-selected-alert-modal.component';
 declare var $: any;
 import cloneDeep from 'lodash/cloneDeep';
+import { SortService } from 'src/app/shared/services';
 
 @Component({
   selector: 'app-ops-module-credit-debit-note-remaining-charge',
@@ -21,6 +22,7 @@ export class OpsModuleCreditDebitNoteRemainingChargeComponent extends PopupBase 
   partnerId: string = null;
   checkAllCharge: boolean = false;
   constructor(
+    private sortService: SortService
   ) {
     super();
   }
@@ -92,5 +94,12 @@ export class OpsModuleCreditDebitNoteRemainingChargeComponent extends PopupBase 
   }
   close() {
     this.hide();
+  }
+  isDesc = true;
+  sortKey: string = '';
+  sort(property) {
+    this.isDesc = !this.isDesc;
+    this.sortKey = property;
+    this.listChargeOfPartner[0].listCharges = this.sortService.sort(this.listChargeOfPartner[0].listCharges, property, this.isDesc);
   }
 }

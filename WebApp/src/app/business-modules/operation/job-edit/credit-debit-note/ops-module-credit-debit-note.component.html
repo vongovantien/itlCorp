@@ -47,22 +47,34 @@
                         <th class="table-actions-col no-sorting">
                             <span>Action</span>
                         </th>
-                        <th class="sorting">
+                        <th class="sorting"
+                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'type'), 'sorting_desc': (!isDesc && sortKey == 'type') }"
+                            (click)="sort('type')">
                             <span>Type</span>
                         </th>
-                        <th class="sorting">
+                        <th class="sorting"
+                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'code'), 'sorting_desc': (!isDesc && sortKey == 'code') }"
+                            (click)="sort('code')">
                             <span>Note No</span>
                         </th>
-                        <th class="sorting">
+                        <th class="sorting"
+                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'total_charge'), 'sorting_desc': (!isDesc && sortKey == 'total_charge') }"
+                            (click)="sort('total_charge')">
                             <span>Charges Count</span>
                         </th>
-                        <th class="sorting">
+                        <th class="sorting"
+                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'total'), 'sorting_desc': (!isDesc && sortKey == 'total') }"
+                            (click)="sort('total')">
                             <span>Balance Amount</span>
                         </th>
-                        <th class="sorting">
+                        <th class="sorting"
+                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'userCreated'), 'sorting_desc': (!isDesc && sortKey == 'userCreated') }"
+                            (click)="sort('userCreated')">
                             <span>Creator</span>
                         </th>
-                        <th class="sorting">
+                        <th class="sorting"
+                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'datetimeCreated'), 'sorting_desc': (!isDesc && sortKey == 'datetimeCreated') }"
+                            (click)="sort('datetimeCreated')">
                             <span>Create Date</span>
                         </th>
                     </tr>
@@ -100,23 +112,23 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <span>{{s.cdNote.type}}</span>
+                                                <span>{{s.type}}</span>
                                             </td>
                                             <td>
                                                 <a href="javascript:void(0)"
-                                                    (click)="openDetails(s.cdNote.code)">{{s.cdNote.code}}</a>
+                                                    (click)="openDetails(s.cdNote.code)">{{s.code}}</a>
                                             </td>
                                             <td>
                                                 <span>{{s.total_charge}}</span>
                                             </td>
                                             <td>
-                                                <span>{{s.cdNote.total}}</span>
+                                                <span>{{s.total}}</span>
                                             </td>
                                             <td>
-                                                <span>{{s.cdNote.userCreated}}</span>
+                                                <span>{{s.userCreated}}</span>
                                             </td>
                                             <td>
-                                                <span>{{s.cdNote.datetimeCreated | date:'dd/MM/yyyy'}}</span>
+                                                <span>{{s.datetimeCreated | date:'dd/MM/yyyy'}}</span>
                                             </td>
                                         </tr>
                                     </tbody>
