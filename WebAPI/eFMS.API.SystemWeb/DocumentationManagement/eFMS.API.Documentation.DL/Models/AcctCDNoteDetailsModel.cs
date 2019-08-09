@@ -11,6 +11,8 @@ namespace eFMS.API.Documentation.DL.Models
         public string PartnerShippingAddress { get; set; }
         public string PartnerTel { get; set; }
         public string PartnerTaxcode { get; set; }
+        public string PartnerFax { get; set; }
+        public string PartnerPersonalContact { get; set; }
         public string PartnerId { get; set; }
         public string HbLadingNo { get; set; }
         public string MbLadingNo { get; set; }
@@ -39,5 +41,7 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal? GW { get; set; }
         public decimal? SumContainers { get; set; }
         public decimal? SumPackages { get; set; }
+        public string WarehouseName { get; set; }
+        public string CreatedDate { get; set; }
     }
 }
