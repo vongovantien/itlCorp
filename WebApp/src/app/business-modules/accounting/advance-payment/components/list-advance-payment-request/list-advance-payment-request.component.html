@@ -20,7 +20,7 @@
                         </tr>
                     </thead>
                     <tbody class="tbody-group">
-                        <tr *ngIf="!isLoading && !requests.length">
+                        <tr *ngIf="!isLoading && !listRequestAdvancePayment.length">
                             <td colspan="100">
                                 <div class="no-data">
                                     <i class="flaticon-coins"></i>
@@ -28,7 +28,7 @@
                                 </div>
                             </td>
                         </tr>
-                        <tr *ngFor="let request of requests; trackBy: trackByFn" class="text-center">
+                        <tr *ngFor="let request of listRequestAdvancePayment; let i = index; trackBy: trackByFn" class="text-center">
                             <td>
                                 <div class="m-checkbox-list">
                                     <label class="m-checkbox">
@@ -42,20 +42,12 @@
                             <td>{{request.customNo}}</td>
                             <td>{{request.jobId}}</td>
                             <td>{{request.hbl}}</td>
-                            <td>{{request.amount | number : '.0-2'}}</td>
-                            <td>{{request.currency}}</td>
-                            <td>{{request.type}}</td>
-                            <td>{{request.note}}</td>
+                            <td>{{request.amount | number : '.0-3'}}</td>
+                            <td>{{request.requestCurrency}}</td>
+                            <td>{{request.advanceType}}</td>
+                            <td>{{request.requestNote}}</td>
                         </tr>
-                        <tr class="loading-wrapper" *ngIf="isLoading">
-                            <td colspan="100">
-                                <div class="on-loading">
-                                    <div class="m-loader m-loader--brand">
-                                    </div><span>Loading</span>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="text-center">
+                        <tr class="text-center" *ngIf="!!listRequestAdvancePayment.length">
                             <td></td>
                             <td></td>
                             <td></td>
@@ -64,10 +56,10 @@
                                 <h5 class="font-weight-bold m--margin-top-10">Total Amount:</h5>
                             </td>
                             <td>
-                                <span class="total-amount-content">600</span>
+                                <span class="total-amount-content">{{totalAmount | number: '.0-3'}}</span>
                             </td>
                             <td>
-                                <span class="total-amount-content">VND</span>
+                                <span class="total-amount-content">{{currency | uppercase}}</span>
                             </td>
                             <td></td>
                             <td></td>

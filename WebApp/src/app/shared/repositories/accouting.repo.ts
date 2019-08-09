@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { ApiService } from "../services";
 import { environment } from "src/environments/environment";
 import { catchError, map } from "rxjs/operators";
-import { throwError } from "rxjs";
+import { throwError, Observable } from "rxjs";
 
 @Injectable()
 export class AccoutingRepo {
@@ -113,6 +113,24 @@ export class AccoutingRepo {
                 map((data: any) => data)
             );
     }
+
+    // add new advance payment with payment request
+    addNewAdvancePayment(body: any = {}): Observable<any> {
+        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctAdvancePayment/Add`, body)
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => data)
+            );
+    }
+
+    checkShipmentsExistInAdvancePament(body: any) {
+        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctAdvancePayment/CheckShipmentsExistInAdvancePament`, body)
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => data)
+            );
+    }
+    
 
 
 }

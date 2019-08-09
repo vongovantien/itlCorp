@@ -93,7 +93,7 @@
                     <label class="form-control-label" for="">
                         Currency:
                     </label>
-                    <select class="form-control" formControlName="currency" name="currency">
+                    <select class="form-control" formControlName="currency" name="currency" (ngModelChange)="changeCurrency($event)">
                         <option *ngFor="let currency of currencyList" [ngValue]="currency">{{currency.id}}</option>
                     </select>
                 </div>

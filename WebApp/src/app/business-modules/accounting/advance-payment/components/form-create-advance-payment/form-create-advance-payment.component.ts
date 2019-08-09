@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { User, Currency } from 'src/app/shared/models';
-import { BaseService } from 'src/app/shared/services';
+import { BaseService, DataService } from 'src/app/shared/services';
 import { SystemRepo } from 'src/app/shared/repositories';
-import { catchError } from 'rxjs/operators';
+import { catchError, takeUntil } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
 import { FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'adv-payment-form-create',
@@ -12,6 +13,8 @@ import { FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
 })
 
 export class AdvancePaymentFormCreateComponent extends AppForm {
+
+    @Output() onChangeCurrency: EventEmitter<any> = new EventEmitter<any>()
 
     methods: CommonInterface.ICommonTitleValue[];
     currencyList: Currency[];
@@ -31,7 +34,8 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     constructor(
         private _fb: FormBuilder,
         private _baseService: BaseService,
-        private _sysRepo: SystemRepo
+        private _sysRepo: SystemRepo,
+        private _dataService: DataService
     ) {
         super();
 
@@ -88,20 +92,35 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     }
 
     getCurrency() {
-        this._sysRepo.getListCurrency()
-            .pipe(catchError(this.catchError))
+        this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
             .subscribe(
                 (res: any) => {
-                    this.currencyList = res || [];
-                    this.currency.setValue(this.currencyList.filter((item: Currency) => item.id === 'VND')[0]);
-                },
-                (errors: any) => { },
-                () => { }
+                    if (!!res) {
+                        this.currencyList = res || [];
+                        this.currency.setValue(this.currencyList.filter((item: Currency) => item.id === 'VND')[0]);
+                    } else {
+                        this._sysRepo.getListCurrency()
+                            .pipe(catchError(this.catchError))
+                            .subscribe(
+                                (data: any) => {
+                                    this.currencyList = data || [];
+                                    this.currency.setValue(this.currencyList.filter((item: Currency) => item.id === 'VND')[0]);
+                                },
+                                (errors: any) => { },
+                                () => { }
+                            );
+                    }
+                }
             );
     }
 
-
-
-
+    changeCurrency(currency: Currency) {
+        if (!!currency) {
+            this.onChangeCurrency.emit(currency);
+        }
+    }
 
 }
