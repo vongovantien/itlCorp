@@ -6,6 +6,7 @@ namespace eFMS.API.Documentation.Service.Models
     public partial class AcctAdvanceRequest
     {
         public Guid Id { get; set; }
+        public string Description { get; set; }
         public string CustomNo { get; set; }
         public string JobId { get; set; }
         public string Hbl { get; set; }

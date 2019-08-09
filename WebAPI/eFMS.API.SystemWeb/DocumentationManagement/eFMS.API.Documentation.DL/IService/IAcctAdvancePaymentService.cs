@@ -13,6 +13,7 @@ namespace eFMS.API.Documentation.DL.IService
     public interface IAcctAdvancePaymentService : IRepositoryBase<AcctAdvancePayment, AcctAdvancePaymentModel>
     {
         //List<AcctAdvanceRequestResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount);
+        List<AcctAdvanceRequestResult> Paging(AcctAdvancePaymentCriteria criteria);
 
         List<Shipments> GetShipments();
 

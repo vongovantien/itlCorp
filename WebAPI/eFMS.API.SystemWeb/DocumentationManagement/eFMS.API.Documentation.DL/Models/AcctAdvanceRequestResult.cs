@@ -8,6 +8,7 @@ namespace eFMS.API.Documentation.DL.Models
     public class AcctAdvanceRequestResult : AcctAdvanceRequest
     {
         public string Requester { get; set; }
+        public string RequesterName { get; set; }
         public string Department { get; set; }
         public string PaymentMethod { get; set; }
         public string AdvanceCurrency { get; set; }

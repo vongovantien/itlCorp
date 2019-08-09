@@ -17,6 +17,12 @@
             <param name="service"></param>
             <param name="user"></param>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctAdvancePaymentController.GetAll(eFMS.API.Documentation.DL.Models.Criteria.AcctAdvancePaymentCriteria)">
+            <summary>
+            Get All
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.AcctAdvancePaymentController.GetShipments">
             <summary>
             Get shipments (JobId, HBL, MBL) from shipment documentation and shipment operation

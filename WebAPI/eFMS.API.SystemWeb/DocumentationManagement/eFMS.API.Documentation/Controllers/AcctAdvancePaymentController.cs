@@ -45,6 +45,18 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
+        /// Get All
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("GetAll")]
+        public IActionResult GetAll(AcctAdvancePaymentCriteria criteria)
+        {
+            var data = acctAdvancePaymentService.Paging(criteria);
+            return Ok(data);
+        }
+
+        /// <summary>
         /// Get shipments (JobId, HBL, MBL) from shipment documentation and shipment operation
         /// </summary>
         /// <returns></returns>

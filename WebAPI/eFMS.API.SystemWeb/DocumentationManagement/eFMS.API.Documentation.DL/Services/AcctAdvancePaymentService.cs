@@ -24,21 +24,96 @@ namespace eFMS.API.Documentation.DL.Services
             currentUser = user;
         }
 
-        public List<AcctAdvanceRequestResult> Page()
+        public List<AcctAdvanceRequestResult> Paging(AcctAdvancePaymentCriteria criteria)
         {
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var advance = dc.AcctAdvancePayment;
             var request = dc.AcctAdvanceRequest;
+            var user = dc.SysUser;
             var data = from re in request
-                       join ad in request on re.AdvanceNo equals ad.AdvanceNo
+                       join ad in advance on re.AdvanceNo equals ad.AdvanceNo
+                       join u in user on ad.Requester equals u.Id into u2
+                       from u3 in u2.DefaultIfEmpty()
+                       where
+                        criteria.ReferenceNos.Count > 0 ?
+                        (
+                                criteria.ReferenceNos.Contains(re.AdvanceNo)
+                             || criteria.ReferenceNos.Contains(re.Hbl) 
+                             || criteria.ReferenceNos.Contains(re.Mbl) 
+                             || criteria.ReferenceNos.Contains(re.CustomNo)
+                             || criteria.ReferenceNos.Contains(re.JobId)
+                         ) 
+                         : 
+                         (
+                               !string.IsNullOrEmpty(re.AdvanceNo) 
+                            || !string.IsNullOrEmpty(re.Hbl)
+                            || !string.IsNullOrEmpty(re.Mbl)
+                            || !string.IsNullOrEmpty(re.CustomNo)
+                            || !string.IsNullOrEmpty(re.JobId)
+                         )
+                         && 
+                         (
+                            string.IsNullOrEmpty(ad.Requester) ? 
+                                ad.Requester == ad.Requester 
+                            : 
+                                ad.Requester.Equals(criteria.Requester)
+                         )
+                         &&
+                         (
+                            (criteria.RequestDateFrom != null && criteria.RequestDateTo != null ? 
+                                ad.RequestDate >= criteria.RequestDateFrom && ad.RequestDate <= criteria.RequestDateTo 
+                            : 
+                                ad.RequestDate == ad.RequestDate)
+                         )
+                         &&
+                         (
+                            string.IsNullOrEmpty(criteria.StatusApproval) || criteria.StatusApproval.Equals("All") ? 
+                                ad.StatusApproval == ad.StatusApproval 
+                            : 
+                                ad.StatusApproval.Equals(criteria.StatusApproval)
+                         )
+                         &&
+                         (
+                            (criteria.AdvanceModifiedDateFrom != null && criteria.AdvanceModifiedDateTo != null ?
+                                ad.DatetimeModified >= criteria.AdvanceModifiedDateFrom && ad.DatetimeModified <= criteria.AdvanceModifiedDateTo
+                            : 
+                                ad.DatetimeModified == ad.DatetimeModified)
+                         )
+                         &&
+                         (
+                           string.IsNullOrEmpty(criteria.StatusPayment) || criteria.StatusPayment.Equals("All") ? 
+                                re.StatusPayment == re.StatusPayment 
+                           : 
+                                re.StatusPayment.Equals(criteria.StatusPayment)
+                         )
+                         &&
+                         (
+                           string.IsNullOrEmpty(criteria.PaymentMethod) || criteria.PaymentMethod.Equals("All") ? 
+                                ad.PaymentMethod == ad.PaymentMethod 
+                           : 
+                                ad.PaymentMethod.Equals(criteria.PaymentMethod)
+                          )
                        select new AcctAdvanceRequestResult
                        {
                            Id = re.Id,
                            AdvanceNo = re.AdvanceNo,
                            CustomNo = re.CustomNo,
                            JobId = re.JobId,
-                           Hbl = re.Hbl                           
+                           Hbl = re.Hbl,
+                           Description = re.Description,
+                           Amount = re.Amount,
+                           RequestCurrency = re.RequestCurrency,
+                           Requester = ad.Requester,
+                           RequesterName = u3.Username,
+                           RequestDate = ad.RequestDate,
+                           DeadlinePayment = ad.DeadlinePayment,
+                           AdvanceDatetimeModified = ad.DatetimeModified,
+                           StatusApproval = ad.StatusApproval,
+                           StatusPayment = re.StatusPayment,
+                           PaymentMethod = ad.PaymentMethod
                        };
+            
+
             return data.ToList();
         }
 
@@ -72,16 +147,16 @@ namespace eFMS.API.Documentation.DL.Services
         }
 
         private string CreateAdvanceNo(eFMSDataContext dc)
-        {           
+        {
             string year = (DateTime.Now.Year.ToString()).Substring(2, 2);
-            string month = DateTime.Now.ToString("DDMMYYYY").Substring(2,2);
+            string month = DateTime.Now.ToString("DDMMYYYY").Substring(2, 2);
             string prefix = "AD" + year + month + "/";
             string stt;
 
             //Lấy ra dòng cuối cùng của table acctAdvancePayment
             var rowlast = dc.AcctAdvancePayment.LastOrDefault();
 
-            if(rowlast == null)
+            if (rowlast == null)
             {
                 stt = "0001";
             }
@@ -103,7 +178,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             return prefix + stt;
         }
-        
+
         public HandleState AddAdvancePayment(AcctAdvancePaymentModel model)
         {
             try
@@ -156,21 +231,22 @@ namespace eFMS.API.Documentation.DL.Services
                 //Check trường hợp Add new advance payment
                 if (string.IsNullOrEmpty(criteria.AdvanceNo))
                 {
-                    result  = dc.AcctAdvanceRequest.Any(x =>
-                       x.JobId == criteria.JobId
-                    && x.Hbl == criteria.HBL
-                    && x.Mbl == criteria.MBL);
+                    result = dc.AcctAdvanceRequest.Any(x =>
+                      x.JobId == criteria.JobId
+                   && x.Hbl == criteria.HBL
+                   && x.Mbl == criteria.MBL);
                 }
                 else //Check trường hợp Update advance payment
                 {
-                    result  = dc.AcctAdvanceRequest.Any(x =>
-                       x.JobId == criteria.JobId
-                    && x.Hbl == criteria.HBL
-                    && x.Mbl == criteria.MBL
-                    && x.AdvanceNo != criteria.AdvanceNo);
+                    result = dc.AcctAdvanceRequest.Any(x =>
+                      x.JobId == criteria.JobId
+                   && x.Hbl == criteria.HBL
+                   && x.Mbl == criteria.MBL
+                   && x.AdvanceNo != criteria.AdvanceNo);
                 }
                 return result;
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return false;
             }
