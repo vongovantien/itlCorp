@@ -94,9 +94,7 @@ namespace eFMS.API.Documentation.Service.Models
             {
                 entity.ToTable("acctAdvancePayment");
 
-                entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.Id).HasColumnName("ID");
 
                 entity.Property(e => e.AdvanceCurrency).HasMaxLength(10);
 

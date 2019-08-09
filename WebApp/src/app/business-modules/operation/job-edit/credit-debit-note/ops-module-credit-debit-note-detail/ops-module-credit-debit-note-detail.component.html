@@ -5,7 +5,7 @@
                 <h5 class="modal-title">Detail<span class="m--margin-left-5">{{ CDNoteDetails.cdNote.type }}
                         Note</span>&nbsp;<span
                         class="m--font-danger m--margin-left-5">{{CDNoteDetails.cdNote.code}}</span></h5>
-                <button type="button" class="close" (click)="hide()">
+                <button type="button" class="close" (click)="close()">
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <div class="modal-actions c-button-actions">
@@ -238,7 +238,7 @@
                     </span>
                 </button>
                 <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="hide()">
+                    (click)="close()">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
@@ -250,7 +250,8 @@
         </div>
     </div>
 </div>
-
+<app-ops-module-credit-debit-note-edit *ngIf="!!CDNoteDetails" (isCloseModal)="closeEditModal($event)">
+</app-ops-module-credit-debit-note-edit>
 <app-report-preview [data]="dataReport" *ngIf="dataReport" [modalId]="previewModalId"></app-report-preview>
 
 <!-- <app-ops-module-credit-debit-note-edit></app-ops-module-credit-debit-note-edit> -->

@@ -5,7 +5,7 @@ namespace eFMS.API.Documentation.Service.Models
 {
     public partial class AcctAdvancePayment
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public string AdvanceNo { get; set; }
         public string Requester { get; set; }
         public string Department { get; set; }

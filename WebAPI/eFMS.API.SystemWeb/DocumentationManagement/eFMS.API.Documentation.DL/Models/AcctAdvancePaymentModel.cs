@@ -7,6 +7,6 @@ namespace eFMS.API.Documentation.DL.Models
 {
     public class AcctAdvancePaymentModel : AcctAdvancePayment
     {
-        List<AcctAdvanceRequestModel> AdvanceRequests { get; set; }
+        public List<AcctAdvanceRequestModel> AdvanceRequests { get; set; }
     }
 }
