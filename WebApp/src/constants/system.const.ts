@@ -52,7 +52,8 @@ export class SystemConstants {
     public static readonly CSTORAGE = {
         PARTNER: 'efms:partner',
         CURRENCY: 'efms:currency',
-        SYSTEM_USER: 'efms:system-user'
+        SYSTEM_USER: 'efms:system-user',
+        CHARGE: 'efms:charge'
     };
 
 }

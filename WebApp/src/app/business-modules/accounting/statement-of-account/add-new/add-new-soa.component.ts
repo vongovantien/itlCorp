@@ -1,10 +1,10 @@
 import { Component, ViewChild } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 import { SystemRepo, AccoutingRepo } from 'src/app/shared/repositories';
-import { SortService } from 'src/app/shared/services';
+import { SortService, DataService } from 'src/app/shared/services';
 import { StatementOfAccountAddChargeComponent } from '../components/poup/add-charge/add-charge.popup';
 import { ToastrService } from 'ngx-toastr';
 import { Charge, SOASearchCharge } from 'src/app/shared/models';
@@ -12,6 +12,7 @@ import { formatDate } from '@angular/common';
 import _includes from 'lodash/includes';
 import _uniq from 'lodash/uniq';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'app-statement-of-account-new',
@@ -82,7 +83,8 @@ export class StatementOfAccountAddnewComponent extends AppList {
         private _sortService: SortService,
         private _accountRepo: AccoutingRepo,
         private _toastService: ToastrService,
-        private _router: Router
+        private _router: Router,
+        private _dataService: DataService
     ) {
         super();
         this.requestList = this.sortLocal;
@@ -127,24 +129,55 @@ export class StatementOfAccountAddnewComponent extends AppList {
     }
 
     getPartner() {
-        this._sysRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, inactive: false })
-            .pipe(catchError(this.catchError))
+        this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER)
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                catchError(this.catchError)
+            )
             .subscribe(
-                (dataPartner: any) => {
-                    this.configPartner.dataSource = dataPartner;
-                    this.configPartner.displayFields = [
-                        { field: 'taxCode', label: 'Taxcode' },
-                        { field: 'partnerNameEn', label: 'Name' },
-                        { field: 'partnerNameVn', label: 'Customer Name' },
-                    ];
-                    this.configPartner.selectedDisplayFields = ['partnerNameEn'];
-                },
-                (errors: any) => {
-                    this.handleError(errors);
-                },
-                // complete
-                () => { }
+                (data: any) => {
+                    if (!data) {
+                        this._sysRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, inactive: false })
+                            .pipe(catchError(this.catchError))
+                            .subscribe(
+                                (dataPartner: any) => {
+                                    this.getPartnerData(dataPartner)
+                                },
+                                (errors: any) => {
+                                    this.handleError(errors);
+                                },
+                                // complete
+                                () => { }
+                            );
+                    } else {
+                        this.getPartnerData(data);
+                    }
+                }
             );
+    }
+
+    getPartnerData(data: any) {
+        this.configPartner.dataSource = data;
+        this.configPartner.displayFields = [
+            { field: 'taxCode', label: 'Taxcode' },
+            { field: 'partnerNameEn', label: 'Name' },
+            { field: 'partnerNameVn', label: 'Customer Name' },
+        ];
+        this.configPartner.selectedDisplayFields = ['partnerNameEn'];
+    }
+
+    getCurrencyData(data: any) {
+        this.currencyList = (data).map((item: any) => ({ id: item.id, text: item.id }));
+        this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0];
+        this.updateDataSearch('currency', this.selectedCurrency.id);
+        this.updateDataSearch('currencyLocal', 'VND');
+    }
+
+    getCurrencyUser(data: any) {
+        this.users = (data || []).map((item: any) => ({ id: item.id, text: item.id }));
+        this.selectedUser = [this.users.filter((i: any) => i.id === 'admin')[0]];
+
+        this.updateDataSearch('strCreators', this.selectedUser.map((item: any) => item.id).toString());
     }
 
     getService() {
@@ -170,40 +203,60 @@ export class StatementOfAccountAddnewComponent extends AppList {
     }
 
     getCurrency() {
-        this._sysRepo.getListCurrency()
-            .pipe(catchError(this.catchError))
+        this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                catchError(this.catchError)
+            )
             .subscribe(
-                (dataCurrency: any) => {
-                    this.currencyList = (dataCurrency).map((item: any) => ({ id: item.id, text: item.id }));
-                    this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0];
-                    this.updateDataSearch('currency', this.selectedCurrency.id);
-                    this.updateDataSearch('currencyLocal', 'VND');
-
-                },
-                (errors: any) => {
-                    this.handleError(errors);
-                },
-                // complete
-                () => { }
+                (data: any) => {
+                    if (!!data) {
+                        this.getCurrencyData(data);
+                    } else {
+                        this._sysRepo.getListCurrency()
+                            .pipe(catchError(this.catchError))
+                            .subscribe(
+                                (dataCurrency: any) => {
+                                    this.getCurrencyData(dataCurrency)
+                                },
+                                (errors: any) => {
+                                    this.handleError(errors);
+                                },
+                                // complete
+                                () => { }
+                            );
+                    }
+                }
             );
     }
 
     getUser() {
-        this._sysRepo.getListSystemUser()
-            .pipe(catchError(this.catchError))
+        this._dataService.getDataByKey(SystemConstants.CSTORAGE.SYSTEM_USER)
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                catchError(this.catchError)
+            )
             .subscribe(
-                (dataUser: any) => {
-                    this.users = (dataUser || []).map((item: any) => ({ id: item.id, text: item.id }));
-                    this.selectedUser = [this.users.filter((i: any) => i.id === 'admin')[0]];
-
-                    this.updateDataSearch('strCreators', this.selectedUser.map((item: any) => item.id).toString());
-                },
-                (errors: any) => {
-                    this.handleError(errors);
-                },
-                // complete
-                () => { }
-            );
+                (data: any) => {
+                    if (!!data) {
+                        this.getCurrencyUser(data);
+                    } else {
+                        this._sysRepo.getListSystemUser()
+                            .pipe(catchError(this.catchError))
+                            .subscribe(
+                                (dataUser: any) => {
+                                    this.getCurrencyUser(dataUser);
+                                },
+                                (errors: any) => {
+                                    this.handleError(errors);
+                                },
+                                // complete
+                                () => { }
+                            );
+                    }
+                }
+            )
+        
     }
 
     getCharge() {
@@ -219,6 +272,8 @@ export class StatementOfAccountAddnewComponent extends AppList {
                     { field: 'chargeNameEn', label: 'Charge Name EN ' },
                 ];
                 this.configCharge.selectedDisplayFields = ['code'];
+
+                this._dataService.setData(SystemConstants.CSTORAGE.CHARGE, data || []);
             },
                 (errors: any) => {
                     this.handleError(errors);

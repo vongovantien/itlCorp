@@ -60,7 +60,6 @@ export class StatementOfAccountSearchComponent extends AppPage {
         this.getBasicData();
         this.getStatus();
         this.getUserLogged();
-
     }
 
     getUserLogged() {

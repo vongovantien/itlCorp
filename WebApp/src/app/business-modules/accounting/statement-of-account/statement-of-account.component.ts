@@ -61,7 +61,7 @@ export class StatementOfAccountComponent extends AppList {
 
     getSOAs(data: any = {}) {
         this.isLoading = true;
-        this._accoutingRepo.getListSOA(this.page, this.pageSize, data)
+        this._accoutingRepo.getListSOA(this.page, this.pageSize, Object.assign(data, { CurrencyLocal: 'VND' }))
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this.isLoading = false; })
@@ -72,7 +72,7 @@ export class StatementOfAccountComponent extends AppList {
                 },
                 (errors: any) => {
                     this.handleError(errors);
-                 },
+                },
                 () => { }
 
             );
