@@ -15,6 +15,7 @@ import { OpsModuleCreditDebitNoteDetailComponent } from './ops-module-credit-deb
 import { OpsModuleCreditDebitNoteEditComponent } from './ops-module-credit-debit-note-edit/ops-module-credit-debit-note-edit.component';
 import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDetails.model';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { SortService } from 'src/app/shared/services';
 
 
 declare var $: any;
@@ -42,7 +43,8 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
         private baseServices: BaseService,
         private api_menu: API_MENU,
         private _spinner: NgxSpinnerService,
-        private _cdNoteRepo: CDNoteRepo
+        private _cdNoteRepo: CDNoteRepo,
+        private sortService: SortService
     ) {
         super();
     }
@@ -86,6 +88,17 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
             (res: any[]) => {
                 if (res instanceof Error) {
                 } else {
+                    if (res != null) {
+                        res.forEach(o => {
+                            o.listCDNote.forEach(element => {
+                                element.type = element.cdNote.type;
+                                element.code = element.cdNote.code;
+                                element.total = element.cdNote.total;
+                                element.userCreated = element.cdNote.userCreated;
+                                element.datetimeCreated = element.cdNote.datetimeCreated;
+                            });
+                        });
+                    }
                     this.listCDNotes = cloneDeep(res);
                     this.constListCDNotes = cloneDeep(res);
                 }
@@ -224,6 +237,14 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
             this.confirmDeletePopup.hide();
         }
     }
-
+    isDesc = true;
+    sortKey: string = '';
+    sort(property) {
+        this.isDesc = !this.isDesc;
+        this.sortKey = property;
+        this.listCDNotes.forEach(element => {
+            element.listCDNote = this.sortService.sort(element.listCDNote, property, this.isDesc);
+        });
+    }
 
 }

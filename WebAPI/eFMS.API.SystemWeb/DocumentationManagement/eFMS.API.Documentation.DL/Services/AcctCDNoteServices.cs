@@ -7,6 +7,7 @@ using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Documentation.Service.ViewModels;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
@@ -21,9 +22,10 @@ namespace eFMS.API.Documentation.DL.Services
 {
     public class AcctCDNoteServices : RepositoryBase<AcctCdnote, AcctCdnoteModel>, IAcctCDNoteServices
     {
-        public AcctCDNoteServices(IContextBase<AcctCdnote> repository,IMapper mapper) : base(repository, mapper)
+        private readonly ICurrentUser currentUser;
+        public AcctCDNoteServices(IContextBase<AcctCdnote> repository,IMapper mapper, ICurrentUser user) : base(repository, mapper)
         {
-
+            currentUser = user;
         }
 
         private string RandomCode()
@@ -65,7 +67,7 @@ namespace eFMS.API.Documentation.DL.Services
                             charge.Cdno = cdNote.Code;
                             charge.Soaclosed = true;
                             charge.DatetimeModified = DateTime.Now;
-                            charge.UserModified = "admin";
+                            charge.UserModified = currentUser.UserID;
                         }
                         ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Update(charge);
                     }
@@ -122,7 +124,7 @@ namespace eFMS.API.Documentation.DL.Services
                             charge.Cdno = cdNote.Code;
                             charge.Cdclosed = true;
                             charge.DatetimeModified = DateTime.Now;
-                            charge.UserModified = "admin"; // need update in the future 
+                            charge.UserModified = currentUser.UserID; // need update in the future 
                             ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Update(charge);
                         }
                     }
@@ -510,12 +512,17 @@ namespace eFMS.API.Documentation.DL.Services
                IssuedDate = DateTime.Now.ToString(),
                OtherRef = "N/A"
             };
+            string trans = string.Empty;
+            if(model.ServiceMode == "Export")
+            {
+                trans = "X";
+            }
             var listSOA = new List<AcctSOAReport>();
             if (model.ListSurcharges.Count > 0)
             {
                 foreach(var item in model.ListSurcharges)
                 {
-                    var acctsoa = new AcctSOAReport
+                    var acctCDNo = new AcctSOAReport
                     {
                         SortIndex = null,
                         Subject = "ON BEHALF",
@@ -526,7 +533,7 @@ namespace eFMS.API.Documentation.DL.Services
                         Taxcode = model.PartnerTaxcode,
                         Workphone = model.PartnerTel,
                         Fax =  "N/A",
-                        TransID = "N/A",
+                        TransID = trans,
                         LoadingDate = null,
                         Commodity = "N/A",
                         PortofLading = model.PolName,
@@ -549,8 +556,8 @@ namespace eFMS.API.Documentation.DL.Services
                         InputData = "N/A",
                         PONo = "N/A",
                         TransNotes = "N/A",
-                        Shipper = "N/A",
-                        Consignee = "N/A",
+                        Shipper = model.PartnerNameEn,
+                        Consignee = model.PartnerNameEn,
                         ContQty = model.HbConstainers,
                         ContSealNo = "N/A",
                         Deposit = null,
@@ -568,11 +575,10 @@ namespace eFMS.API.Documentation.DL.Services
                         Cuakhau = "N/A",
                         DeliveryPlace = null,
                         TransDate = null,
-                        Unit = "USD",
-                        UnitPieaces = "N/A"                                                             
-
+                        Unit = item.CurrencyId,
+                        UnitPieaces = "N/A"              
                     };
-                    listSOA.Add(acctsoa);
+                    listSOA.Add(acctCDNo);
                 }
             }
             else
