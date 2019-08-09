@@ -177,6 +177,10 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.RequestCurrency).HasMaxLength(10);
 
+                entity.Property(e => e.StatusPayment)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
                     .IsUnicode(false);

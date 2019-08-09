@@ -63,13 +63,38 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Add")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Add(AcctAdvancePaymentModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+
             if(model.AdvanceRequests.Count > 0)
             {
-                var totalAmount = model.AdvanceRequests;
+                //Nếu sum(Amount) > 100.000.000 & Payment Method là Cash thì báo lỗi
+                if (model.PaymentMethod.Equals("Cash"))
+                {
+                    var totalAmount = model.AdvanceRequests.Sum(x => x.Amount);
+                    if (totalAmount > 100000000)
+                    {
+                        return BadRequest();
+                    }
+                }
+
+                //Kiểm tra tồn tại shipment trong 1 Advance Payment khác. Nếu đã tồn tại thì báo lỗi
+                foreach(var item in model.AdvanceRequests)
+                {
+                    var shipment = new ShipmentAdvancePaymentCriteria
+                    {
+                        JobId = item.JobId,
+                        HBL = item.Hbl,
+                        MBL = item.Mbl,
+                        AdvanceNo = item.AdvanceNo
+                    };
+                    if (acctAdvancePaymentService.CheckShipmentsExistInAdvancePayment(shipment))
+                    {
+                        return BadRequest();
+                    }
+                }
             }
 
             var hs = acctAdvancePaymentService.AddAdvancePayment(model);
@@ -92,8 +117,10 @@ namespace eFMS.API.Documentation.Controllers
         [Route("CheckShipmentsExistInAdvancePament")]
         public IActionResult CheckShipmentsExistInAdvancePayment(ShipmentAdvancePaymentCriteria criteria)
         {
-            var result = acctAdvancePaymentService.CheckShipmentsExistInAdvancePayment(criteria);
+            var data = acctAdvancePaymentService.CheckShipmentsExistInAdvancePayment(criteria);
+            ResultHandle result = new ResultHandle { Status = data, Message = data ? "Exists" : "Not exists" };
             return Ok(result);
         }
+
     }
 }

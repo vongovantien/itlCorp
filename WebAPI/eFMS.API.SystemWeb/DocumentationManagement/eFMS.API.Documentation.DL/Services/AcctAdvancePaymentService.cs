@@ -24,6 +24,24 @@ namespace eFMS.API.Documentation.DL.Services
             currentUser = user;
         }
 
+        public List<AcctAdvanceRequestResult> Page()
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var advance = dc.AcctAdvancePayment;
+            var request = dc.AcctAdvanceRequest;
+            var data = from re in request
+                       join ad in request on re.AdvanceNo equals ad.AdvanceNo
+                       select new AcctAdvanceRequestResult
+                       {
+                           Id = re.Id,
+                           AdvanceNo = re.AdvanceNo,
+                           CustomNo = re.CustomNo,
+                           JobId = re.JobId,
+                           Hbl = re.Hbl                           
+                       };
+            return data.ToList();
+        }
+
         /// <summary>
         /// Get shipments (JobId, HBL, MBL) from shipment documentation and shipment operation
         /// </summary>
@@ -96,7 +114,7 @@ namespace eFMS.API.Documentation.DL.Services
                 advance.StatusApproval = model.StatusApproval = "New";
 
                 advance.DatetimeCreated = advance.DatetimeModified = DateTime.Now;
-                advance.UserCreated = advance.UserModified = "admin";//currentUser.UserID;
+                advance.UserCreated = advance.UserModified = currentUser.UserID;
 
                 var hs = DataContext.Add(advance);
                 if (hs.Success)
@@ -107,7 +125,8 @@ namespace eFMS.API.Documentation.DL.Services
                         req.Id = Guid.NewGuid();
                         req.AdvanceNo = advance.AdvanceNo;
                         req.DatetimeCreated = req.DatetimeModified = DateTime.Now;
-                        req.UserCreated = req.UserModified = "admin";//currentUser.UserID;
+                        req.UserCreated = req.UserModified = currentUser.UserID;
+                        req.StatusPayment = "NotSettled";
                     });
                     dc.AcctAdvanceRequest.AddRange(request);
                 }
@@ -156,5 +175,7 @@ namespace eFMS.API.Documentation.DL.Services
                 return false;
             }
         }
+
+
     }
 }

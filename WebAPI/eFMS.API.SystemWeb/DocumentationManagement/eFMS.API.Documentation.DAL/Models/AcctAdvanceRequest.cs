@@ -14,6 +14,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string RequestCurrency { get; set; }
         public string AdvanceType { get; set; }
         public string RequestNote { get; set; }
+        public string StatusPayment { get; set; }
         public string AdvanceNo { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
