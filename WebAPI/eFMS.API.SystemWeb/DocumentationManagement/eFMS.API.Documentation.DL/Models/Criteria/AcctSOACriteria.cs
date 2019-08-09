@@ -11,5 +11,6 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public string SoaStatus { get; set; }
         public string SoaCurrency { get; set; }
         public string SoaUserCreate { get; set; }
+        public string CurrencyLocal { get; set; }
     }
 }

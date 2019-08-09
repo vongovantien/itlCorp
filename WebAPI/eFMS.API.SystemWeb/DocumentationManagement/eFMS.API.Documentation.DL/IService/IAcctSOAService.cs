@@ -29,6 +29,6 @@ namespace eFMS.API.Documentation.DL.IService
 
         AcctSOADetailResult AddMoreCharge(AddMoreChargeCriteria criteria);
 
-        ExportSOADetailResult GetDataExportSOABySOANo(string soaNo);
+        ExportSOADetailResult GetDataExportSOABySOANo(string soaNo, string currencyLocal);
     }
 }

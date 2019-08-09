@@ -119,7 +119,8 @@ namespace eFMS.API.Documentation.DL.Services
                 SqlParam.GetParameter("soaToDateCreate", criteria.SoaToDateCreate),
                 SqlParam.GetParameter("soaStatus", criteria.SoaStatus),
                 SqlParam.GetParameter("soaCurrency", criteria.SoaCurrency),
-                SqlParam.GetParameter("soaUserCreate", criteria.SoaUserCreate)
+                SqlParam.GetParameter("soaUserCreate", criteria.SoaUserCreate),
+                SqlParam.GetParameter("currencyLocal", criteria.CurrencyLocal)
             };
             return ((eFMSDataContext)DataContext.DC).ExecuteProcedure<spc_GetListAcctSOAByMaster>(parameters);
         }
@@ -156,7 +157,8 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var criteria = new AcctSOACriteria
             {
-                StrCodes = soaNo
+                StrCodes = soaNo,
+                CurrencyLocal = currencyLocal
             };
             var dataSOA = GetListAcctSOA(criteria).AsQueryable();
             var dataMapSOA = mapper.Map<spc_GetListAcctSOAByMaster, AcctSOADetailResult>(dataSOA.FirstOrDefault());
@@ -344,9 +346,9 @@ namespace eFMS.API.Documentation.DL.Services
             return data;
         }
 
-        public ExportSOADetailResult GetDataExportSOABySOANo(string soaNo)
+        public ExportSOADetailResult GetDataExportSOABySOANo(string soaNo, string currencyLocal)
         {
-            var data = GetSpcDataExportSOABySOANo(soaNo);
+            var data = GetSpcDataExportSOABySOANo(soaNo, currencyLocal);
             var dataMap = mapper.Map<List<spc_GetDataExportSOABySOANo>, List<ExportSOAModel>>(data);
             var result = new ExportSOADetailResult
             {
@@ -357,11 +359,12 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        private List<spc_GetDataExportSOABySOANo> GetSpcDataExportSOABySOANo(string soaNo)
+        private List<spc_GetDataExportSOABySOANo> GetSpcDataExportSOABySOANo(string soaNo, string currencyLocal)
         {
             DbParameter[] parameters =
             {
-                SqlParam.GetParameter("soaNo", soaNo)
+                SqlParam.GetParameter("soaNo", soaNo),
+                SqlParam.GetParameter("currencyLocal", currencyLocal)
             };
             return ((eFMSDataContext)DataContext.DC).ExecuteProcedure<spc_GetDataExportSOABySOANo>(parameters);
         }

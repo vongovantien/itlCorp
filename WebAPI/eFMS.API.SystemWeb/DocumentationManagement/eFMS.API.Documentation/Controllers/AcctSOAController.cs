@@ -128,6 +128,8 @@ namespace eFMS.API.Documentation.Controllers
         [HttpGet("GetBySoaNo/{soaNo}&{currencyLocal}")]
         public IActionResult GetBySoaNoAndCurrencyLocal(string soaNo, string currencyLocal)
         {
+            if (string.IsNullOrEmpty(currencyLocal))
+                currencyLocal = "VND";
             var results = acctSOAService.GetBySoaNoAndCurrencyLocal(soaNo, currencyLocal);
             return Ok(results);
         }
@@ -247,11 +249,14 @@ namespace eFMS.API.Documentation.Controllers
         /// Export SOA detail by SOANo
         /// </summary>
         /// <param name="soaNo">soaNo that want to retrieve SOA</param>
+        /// <param name="currencyLocal">currencyLocal that want to retrieve SOA</param>
         /// <returns></returns>
         [HttpGet("GetDataExportSOABySOANo")]
-        public IActionResult GetDataExportSOABySOANo(string soaNo)
+        public IActionResult GetDataExportSOABySOANo(string soaNo, string currencyLocal)
         {
-            var data = acctSOAService.GetDataExportSOABySOANo(soaNo);
+            if(string.IsNullOrEmpty(currencyLocal))
+                currencyLocal = "VND";
+            var data = acctSOAService.GetDataExportSOABySOANo(soaNo, currencyLocal);
             return Ok(data);
         }
     }
