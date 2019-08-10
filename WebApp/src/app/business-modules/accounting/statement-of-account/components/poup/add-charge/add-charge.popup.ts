@@ -42,7 +42,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
 
     cdNotes: ICDNote[];
     initCDNotes: ICDNote[];
-    selectedCDNote: ICDNote;
+    selectedCDNote: ICDNote = null;
 
     obhs: any[] = [];
     selectedOBH: any = null;
@@ -190,9 +190,11 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
                 this.cdNotes = [];
                 this.selectedCDNote = null;
                 this.cdNotes = this.filterCDNoteByShipment(this.selectedShipmentData);
-                if (this.cdNotes.length === 1) {
-                    this.selectedCDNote = this.cdNotes[0];
-                }
+
+                // if (this.cdNotes.length === 1) {
+                //     this.selectedCDNote = this.cdNotes[0];
+                // }
+                
                 break;
             case 'charge':
                 if (data.id === 'All') {
@@ -312,6 +314,8 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
         this.selectedInSOA = this.inSOAs[1];
 
         this.isCheckAllCharge = false;
+
+        this.selectedShipmentData = null;
     }
 
     handleError(errors?: any) {

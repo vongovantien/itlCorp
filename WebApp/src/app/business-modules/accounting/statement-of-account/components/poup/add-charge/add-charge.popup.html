@@ -28,6 +28,7 @@
                                     Debit/Credit Note
                                 </label>
                                 <select class="form-control" [(ngModel)]="selectedCDNote" name="selectedCDNote" placeholder="Select">
+                                    <option [value]="null" disabled>Choose Debit/Credit Note</option>
                                     <option *ngFor="let cdNote of cdNotes; let i = index" [ngValue]="cdNote">{{cdNote.creditDebitNo}}</option>
                                 </select>
                             </div>

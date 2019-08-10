@@ -125,6 +125,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
             this.addChargePopup.configCharge = this.configCharge;
 
             this.addChargePopup.show({ backdrop: 'static' });
+            
         }
     }
 

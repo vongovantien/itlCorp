@@ -122,7 +122,7 @@ export class StatementOfAccountDetailComponent extends AppList {
                 { name: "Customs No.", width: 15 },
                 { name: "Code Fee", width: 10 },
                 { name: "Description", width: 20 },
-                { name: "INVOCE NO", width: 10 },
+                { name: "Invoice No", width: 10 },
                 { name: "Revenue", width: 10 },
                 { name: "Cost", width: 10 },
                 { name: "Currency", width: 10 },
@@ -132,19 +132,19 @@ export class StatementOfAccountDetailComponent extends AppList {
             sheetName: `SOA ${soaData.soaNo}`,
             data: soaData.listCharges.map((item: any) => {
                 return [
-                    formatDate(item['serviceDate'], 'dd/MM/yyyy', 'vi'),
-                    item['jobId'],
-                    item['mbl'],
-                    item['hbl'],
-                    item['customNo'],
-                    item['chargeCode'],
-                    item['chargeName'],
-                    item['creditDebitNo'],
-                    item['debit'],
-                    item['credit'],
-                    item['currencySOA'],
-                    item['creditExchange'],
-                    item['debitExchange'],
+                    !!item['serviceDate'] ? formatDate(item['serviceDate'], 'dd/MM/yyyy', 'vi') : '-',
+                    !!item['jobId'] ? item['jobId'] : '-',
+                    !!item['mbl'] ? item['mbl'] : '-',
+                    !!item['hbl'] ? item['hbl'] : '-',
+                    !!item['customNo'] ? item['customNo'] : '-',
+                    !!item['chargeCode'] ? item['chargeCode'] : '-',
+                    !!item['chargeName'] ? item['chargeName'] : '-',
+                    !!item['creditDebitNo'] ? item['creditDebitNo'] : '-',
+                    !!item['debit'] ? item['debit'] : 0,
+                    !!item['credit'] ? item['credit'] : 0,
+                    !!item['currencySOA'] ? item['currencySOA'] : '-',
+                    !!item['debitExchange'] ? item['debitExchange'] : 0,
+                    !!item['creditExchange'] ? item['creditExchange'] : 0
                 ];
             })
         };
@@ -156,7 +156,7 @@ export class StatementOfAccountDetailComponent extends AppList {
             headersName.push(header.name);
             headersWidth.push(header.width);
         });
-        const numRowData = exportModel.data.length || 0;
+        const numRowData = exportModel.data.length || 0;  // * total num row of table
 
         // * Init WorkSheet
         const workbook: Workbook = new Workbook();
@@ -173,40 +173,38 @@ export class StatementOfAccountDetailComponent extends AppList {
         };
 
         for (let index = 3; index <= 7; index++) {
-            worksheet.getCell(`G${index}`).alignment = { horizontal: 'center', vertical: 'middle' };
-            worksheet.getCell(`G${index}`).font = {
+            worksheet.getCell(`F${index}`).alignment = { horizontal: 'center', vertical: 'middle' };
+            worksheet.getCell(`F${index}`).font = {
                 bold: true,
-                size: 12
+                size: 11
             };
         }
-        worksheet.getCell("G3").value = "SOA No";
-        worksheet.getCell("G4").value = "Customer";
-        worksheet.getCell("G5").value = "Taxcode";
-        worksheet.getCell("G6").value = "Address";
-        worksheet.getCell("G7").value = "Currency";
+        worksheet.getCell("F3").value = "SOA No";
+        worksheet.getCell("F4").value = "Customer";
+        worksheet.getCell("F5").value = "Taxcode";
+        worksheet.getCell("F6").value = "Address";
+        worksheet.getCell("F7").value = "Currency";
 
         for (let index = 3; index <= 7; index++) {
-            worksheet.mergeCells(`H${index}`, `M${index}`);
-            worksheet.getCell(`H${index}`).font = {
+            worksheet.mergeCells(`G${index}`, `M${index}`);
+            worksheet.getCell(`G${index}`).font = {
                 bold: false,
-                size: 12
+                size: 11
             };
         }
-
-        worksheet.getCell("H3").value = '' + soaData.soaNo + '';  // ? soaNo
-        worksheet.getCell("H4)").value = soaData.customerName;  // ? Customer
-        worksheet.getCell("H5").value = '' + soaData.taxCode + '';  // ? TaxCode
-        worksheet.getCell("H6").value = soaData.customerAddress; // ? Address
-        worksheet.getCell("H7").value = soaData.currencySOA;   // ? Currency
+        worksheet.getCell("G3").value = soaData.soaNo;  // ? soaNo
+        worksheet.getCell("G4)").value = soaData.customerName;  // ? Customer
+        worksheet.getCell("G5").value = '' + soaData.taxCode + '';  // ? TaxCode
+        worksheet.getCell("G6").value = soaData.customerAddress; // ? Address
+        worksheet.getCell("G7").value = soaData.currencySOA;   // ? Currency
 
         // * Handle header.
         const headerRow: Row = worksheet.addRow(headersName);
-        worksheet.addRow([]);
         headerRow.eachCell((cell: Cell, number: any) => {
             cell.alignment = { horizontal: 'center', vertical: 'middle' };
             cell.font = {
                 bold: true,
-                size: 10
+                size: 11
             };
 
             if (cell.address !== "I8" && cell.address !== "J8" && cell.address !== "L8" && cell.address !== "M8") {
@@ -231,7 +229,7 @@ export class StatementOfAccountDetailComponent extends AppList {
             worksheet.getCell(key).alignment = { horizontal: 'center', vertical: 'middle' };
             worksheet.getCell(key).font = {
                 bold: true,
-                size: 10
+                size: 11
             };
             worksheet.getCell(key).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
         });
@@ -247,27 +245,31 @@ export class StatementOfAccountDetailComponent extends AppList {
         // * Handle Data (A9)
         exportModel.data.forEach((d: any, index: number) => {
             const row = worksheet.addRow(d);
-            row.eachCell((cell: any, number: any) => {
+            row.eachCell((cell: Cell, number: any) => {
                 cell.alignment = { horizontal: 'center', vertical: 'middle' };
                 cell.font = {
                     bold: false,
-                    size: 10
+                    size: 11
                 };
+                cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                cell.numFmt = '#,##0.00';
             });
         });
 
         worksheet.addRows([]);  // * total Cell.
-        worksheet.mergeCells(`A${indexPositionData + numRowData}`, `G${indexPositionData + numRowData}`);
-
-        const totalCell: Cell = worksheet.getCell(`A${indexPositionData + numRowData}`);
+        worksheet.mergeCells(`J${indexPositionData + numRowData}`, `K${indexPositionData + numRowData}`);
+        const totalCell: Cell = worksheet.getCell(`J${indexPositionData + numRowData}`);
         totalCell.alignment = { horizontal: 'center', vertical: 'middle' };
         totalCell.value = "Total";
+        totalCell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
 
         const creditTotalExchange: Cell = worksheet.getCell(`L${indexPositionData + numRowData}`);
         const debitTotalExchange: Cell = worksheet.getCell(`M${indexPositionData + numRowData}`);
-        creditTotalExchange.value = '' + soaData.totalCreditExchange;
-        debitTotalExchange.value = '' + soaData.totalDebitExchange;
-
+        creditTotalExchange.value = soaData.totalCreditExchange;
+        debitTotalExchange.value = soaData.totalDebitExchange;
+        creditTotalExchange.numFmt = '#,##0.00'; // * format with negative number
+        debitTotalExchange.numFmt = '#,##0.00'; // * format with negative number
+        // * balance Total cell
         const balanceTotalCell: Cell = worksheet.getCell(`J${indexPositionData + numRowData + 1}`);
         worksheet.mergeCells(balanceTotalCell.address, `K${indexPositionData + numRowData + 1}`);
         balanceTotalCell.value = "Balance";
@@ -275,15 +277,16 @@ export class StatementOfAccountDetailComponent extends AppList {
         const balanceTotalExchange: Cell = worksheet.getCell(`L${indexPositionData + numRowData + 1}`);
         worksheet.mergeCells(balanceTotalExchange.address, `M${indexPositionData + numRowData + 1}`);
         balanceTotalExchange.value = soaData.totalBalanceExchange;
+        balanceTotalExchange.numFmt = '#,##0.00; (#,##0.00)'; // * format with negative number
 
         [totalCell.address, creditTotalExchange.address, debitTotalExchange.address, balanceTotalCell.address, balanceTotalExchange.address].map((key: string) => {
             worksheet.getCell(key).alignment = { horizontal: 'center', vertical: 'middle' };
             worksheet.getCell(key).font = {
                 bold: true,
-                size: 10
+                size: 11
             };
 
-            // worksheet.getCell(key).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+            worksheet.getCell(key).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
         });
 
         // * save file
