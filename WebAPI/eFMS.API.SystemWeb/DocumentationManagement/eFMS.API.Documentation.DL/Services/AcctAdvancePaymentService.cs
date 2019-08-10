@@ -24,75 +24,85 @@ namespace eFMS.API.Documentation.DL.Services
             currentUser = user;
         }
 
-        public List<AcctAdvanceRequestResult> Paging(AcctAdvancePaymentCriteria criteria)
+        public List<AcctAdvanceRequestResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount)
         {
+            var datefrom = criteria.AdvanceModifiedDateFrom.HasValue;
+            var dateto = criteria.AdvanceModifiedDateTo.HasValue;
+
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var advance = dc.AcctAdvancePayment;
             var request = dc.AcctAdvanceRequest;
             var user = dc.SysUser;
+            
             var data = from re in request
                        join ad in advance on re.AdvanceNo equals ad.AdvanceNo
                        join u in user on ad.Requester equals u.Id into u2
                        from u3 in u2.DefaultIfEmpty()
                        where
-                        criteria.ReferenceNos.Count > 0 ?
                         (
-                                criteria.ReferenceNos.Contains(re.AdvanceNo)
-                             || criteria.ReferenceNos.Contains(re.Hbl) 
-                             || criteria.ReferenceNos.Contains(re.Mbl) 
-                             || criteria.ReferenceNos.Contains(re.CustomNo)
-                             || criteria.ReferenceNos.Contains(re.JobId)
-                         ) 
-                         : 
-                         (
-                               !string.IsNullOrEmpty(re.AdvanceNo) 
-                            || !string.IsNullOrEmpty(re.Hbl)
-                            || !string.IsNullOrEmpty(re.Mbl)
-                            || !string.IsNullOrEmpty(re.CustomNo)
-                            || !string.IsNullOrEmpty(re.JobId)
+                            criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ?
+                            (
+                                (
+                                       criteria.ReferenceNos.Contains(re.AdvanceNo)
+                                    || criteria.ReferenceNos.Contains(re.Hbl)
+                                    || criteria.ReferenceNos.Contains(re.Mbl)
+                                    || criteria.ReferenceNos.Contains(re.CustomNo)
+                                    || criteria.ReferenceNos.Contains(re.JobId)
+                                )
+                            )
+                            :
+                            (
+                                1 == 1
+                            )
                          )
-                         && 
+
+                         &&
+
                          (
-                            string.IsNullOrEmpty(ad.Requester) ? 
-                                ad.Requester == ad.Requester 
-                            : 
+                            !string.IsNullOrEmpty(criteria.Requester) ?
                                 ad.Requester.Equals(criteria.Requester)
+                            :
+                                1 == 1
                          )
                          &&
                          (
-                            (criteria.RequestDateFrom != null && criteria.RequestDateTo != null ? 
-                                ad.RequestDate >= criteria.RequestDateFrom && ad.RequestDate <= criteria.RequestDateTo 
-                            : 
-                                ad.RequestDate == ad.RequestDate)
+                            criteria.RequestDateFrom.HasValue && criteria.RequestDateTo.HasValue ?
+                                ad.RequestDate >= criteria.RequestDateFrom
+                                && ad.RequestDate <= criteria.RequestDateTo
+                            :
+                                1 == 1
                          )
                          &&
                          (
-                            string.IsNullOrEmpty(criteria.StatusApproval) || criteria.StatusApproval.Equals("All") ? 
-                                ad.StatusApproval == ad.StatusApproval 
-                            : 
+                            !string.IsNullOrEmpty(criteria.StatusApproval) && !criteria.StatusApproval.Equals("All") ?
                                 ad.StatusApproval.Equals(criteria.StatusApproval)
+                            :
+                                1 == 1
                          )
                          &&
                          (
-                            (criteria.AdvanceModifiedDateFrom != null && criteria.AdvanceModifiedDateTo != null ?
-                                ad.DatetimeModified >= criteria.AdvanceModifiedDateFrom && ad.DatetimeModified <= criteria.AdvanceModifiedDateTo
-                            : 
-                                ad.DatetimeModified == ad.DatetimeModified)
+                            criteria.AdvanceModifiedDateFrom.HasValue && criteria.AdvanceModifiedDateTo.HasValue ?
+                                //Convert DatetimeModified về date nếu DatetimeModified có value
+                                ad.DatetimeModified.Value.Date >= (criteria.AdvanceModifiedDateFrom.HasValue ? criteria.AdvanceModifiedDateFrom.Value.Date : criteria.AdvanceModifiedDateFrom)
+                                && ad.DatetimeModified.Value.Date <= (criteria.AdvanceModifiedDateTo.HasValue ? criteria.AdvanceModifiedDateTo.Value.Date : criteria.AdvanceModifiedDateTo)
+                            :
+                                1 == 1
                          )
                          &&
                          (
-                           string.IsNullOrEmpty(criteria.StatusPayment) || criteria.StatusPayment.Equals("All") ? 
-                                re.StatusPayment == re.StatusPayment 
-                           : 
+                           !string.IsNullOrEmpty(criteria.StatusPayment) && !criteria.StatusPayment.Equals("All") ?
                                 re.StatusPayment.Equals(criteria.StatusPayment)
+                           :
+                                1 == 1
                          )
                          &&
                          (
-                           string.IsNullOrEmpty(criteria.PaymentMethod) || criteria.PaymentMethod.Equals("All") ? 
-                                ad.PaymentMethod == ad.PaymentMethod 
-                           : 
+                           !string.IsNullOrEmpty(criteria.PaymentMethod) && !criteria.PaymentMethod.Equals("All") ?
                                 ad.PaymentMethod.Equals(criteria.PaymentMethod)
+                           :
+                                1 == 1
                           )
+
                        select new AcctAdvanceRequestResult
                        {
                            Id = re.Id,
@@ -112,7 +122,20 @@ namespace eFMS.API.Documentation.DL.Services
                            StatusPayment = re.StatusPayment,
                            PaymentMethod = ad.PaymentMethod
                        };
-            
+
+            //Sắp xếp giảm dần theo Advance DatetimeModified
+            data = data.OrderByDescending(x => x.AdvanceDatetimeModified);
+
+            //Phân trang
+            rowsCount = (data.Count() > 0) ? data.Count() : 0;
+            if (size > 0)
+            {
+                if (page < 1)
+                {
+                    page = 1;
+                }
+                data = data.Skip((page - 1) * size).Take(size);
+            }
 
             return data.ToList();
         }

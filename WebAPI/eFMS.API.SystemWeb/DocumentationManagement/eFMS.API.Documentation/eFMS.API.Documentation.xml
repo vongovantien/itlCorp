@@ -17,10 +17,13 @@
             <param name="service"></param>
             <param name="user"></param>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.AcctAdvancePaymentController.GetAll(eFMS.API.Documentation.DL.Models.Criteria.AcctAdvancePaymentCriteria)">
+        <member name="M:eFMS.API.Documentation.Controllers.AcctAdvancePaymentController.Paging(eFMS.API.Documentation.DL.Models.Criteria.AcctAdvancePaymentCriteria,System.Int32,System.Int32)">
             <summary>
-            Get All
+            get and paging the list of Advance Payment by conditions
             </summary>
+            <param name="criteria">search conditions</param>
+            <param name="pageNumber">page to retrieve data</param>
+            <param name="pageSize">number items per page</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.AcctAdvancePaymentController.GetShipments">

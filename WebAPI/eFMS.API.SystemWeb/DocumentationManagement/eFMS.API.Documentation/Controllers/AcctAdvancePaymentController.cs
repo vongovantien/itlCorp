@@ -45,15 +45,19 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
-        /// Get All
+        /// get and paging the list of Advance Payment by conditions
         /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <param name="pageNumber">page to retrieve data</param>
+        /// <param name="pageSize">number items per page</param>
         /// <returns></returns>
         [HttpPost]
-        [Route("GetAll")]
-        public IActionResult GetAll(AcctAdvancePaymentCriteria criteria)
+        [Route("Paging")]
+        public IActionResult Paging(AcctAdvancePaymentCriteria criteria, int pageNumber, int pageSize)
         {
-            var data = acctAdvancePaymentService.Paging(criteria);
-            return Ok(data);
+            var data = acctAdvancePaymentService.Paging(criteria, pageNumber, pageSize, out int totalItems);
+            var result = new { data, totalItems, pageNumber, pageSize };
+            return Ok(result);
         }
 
         /// <summary>
