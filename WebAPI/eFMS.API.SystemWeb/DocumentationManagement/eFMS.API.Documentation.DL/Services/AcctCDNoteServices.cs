@@ -7,6 +7,7 @@ using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Documentation.Service.ViewModels;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
@@ -21,9 +22,10 @@ namespace eFMS.API.Documentation.DL.Services
 {
     public class AcctCDNoteServices : RepositoryBase<AcctCdnote, AcctCdnoteModel>, IAcctCDNoteServices
     {
-        public AcctCDNoteServices(IContextBase<AcctCdnote> repository,IMapper mapper) : base(repository, mapper)
+        private readonly ICurrentUser currentUser;
+        public AcctCDNoteServices(IContextBase<AcctCdnote> repository,IMapper mapper, ICurrentUser user) : base(repository, mapper)
         {
-
+            currentUser = user;
         }
 
         private string RandomCode()
@@ -65,7 +67,7 @@ namespace eFMS.API.Documentation.DL.Services
                             charge.Cdno = cdNote.Code;
                             charge.Soaclosed = true;
                             charge.DatetimeModified = DateTime.Now;
-                            charge.UserModified = "admin";
+                            charge.UserModified = currentUser.UserID;
                         }
                         ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Update(charge);
                     }
@@ -122,7 +124,7 @@ namespace eFMS.API.Documentation.DL.Services
                             charge.Cdno = cdNote.Code;
                             charge.Cdclosed = true;
                             charge.DatetimeModified = DateTime.Now;
-                            charge.UserModified = "admin"; // need update in the future 
+                            charge.UserModified = currentUser.UserID; // need update in the future 
                             ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Update(charge);
                         }
                     }
@@ -297,19 +299,20 @@ namespace eFMS.API.Documentation.DL.Services
 
             var transaction = ((eFMSDataContext)DataContext.DC).CsTransaction.FirstOrDefault(x => x.Id == JobId);
             var opsTansaction = ((eFMSDataContext)DataContext.DC).OpsTransaction.FirstOrDefault(x => x.Id == JobId);
+            string warehouseId = null;
 
-            if(transaction != null)
+            if (transaction != null)
             {
                 pol = ((eFMSDataContext)DataContext.DC).CatPlace.FirstOrDefault(x => x.Id == transaction.Pol);
                 pod = ((eFMSDataContext)DataContext.DC).CatPlace.FirstOrDefault(x => x.Id == transaction.Pod);
+                warehouseId = transaction.WareHouseId ?? null;
             }
             else
             {
                 pol = ((eFMSDataContext)DataContext.DC).CatPlace.FirstOrDefault(x => x.Id == opsTansaction.Pol);
                 pod = ((eFMSDataContext)DataContext.DC).CatPlace.FirstOrDefault(x => x.Id == opsTansaction.Pod);
+                warehouseId = opsTansaction.WarehouseId?.ToString();
             }
-
-            
 
             if ((transaction == null && opsTansaction == null) || cdNote == null || partner==null)
             {
@@ -320,7 +323,12 @@ namespace eFMS.API.Documentation.DL.Services
 
             List<CsTransactionDetail> HBList = new List<CsTransactionDetail>();
             List<CsShipmentSurchargeDetailsModel> listSurcharges = new List<CsShipmentSurchargeDetailsModel>();
-            foreach(var item in charges)
+            if(warehouseId != null)
+            {
+                soaDetails.WarehouseName = ((eFMSDataContext)DataContext.DC).CatPlace.FirstOrDefault(x => x.Id == new Guid(warehouseId))?.NameEn;
+            }
+            soaDetails.CreatedDate = ((DateTime)cdNote.DatetimeCreated).ToString("dd'/'MM'/'yyyy");
+            foreach (var item in charges)
             {
                 var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item);               
                 var hb = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.FirstOrDefault(x => x.Id == item.Hblid);
@@ -380,6 +388,8 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.PartnerTel = partner?.Tel;
             soaDetails.PartnerTaxcode = partner?.TaxCode;
             soaDetails.PartnerId = partner?.Id;
+            soaDetails.PartnerFax = partner?.Fax;
+            soaDetails.PartnerPersonalContact = partner.ContactPerson;
             soaDetails.JobId = transaction != null ? transaction.Id : opsTansaction.Id;
             soaDetails.JobNo = transaction != null ? transaction.JobNo : opsTansaction.JobNo;
             soaDetails.Pol = pol?.NameEn;
@@ -483,8 +493,8 @@ namespace eFMS.API.Documentation.DL.Services
             {
                DBTitle = "N/A",
                DebitNo = model.CDNote.Code,
-               TotalDebit = model.TotalDebit==null? "N/A": model.TotalDebit.ToString(),
-               TotalCredit = model.TotalCredit == null ? "N/A" : model.TotalCredit.ToString(),
+               TotalDebit = model.TotalDebit==null? string.Empty: model.TotalDebit.ToString(),
+               TotalCredit = model.TotalCredit == null ? string.Empty: model.TotalCredit.ToString(),
                DueToTitle = "N/A",
                DueTo = "N/A",
                DueToCredit = "N/A",
@@ -507,26 +517,42 @@ namespace eFMS.API.Documentation.DL.Services
                IssueInv = "N/A",
                InvoiceInfo = "N/A",
                Contact = "N/A",
-               IssuedDate = DateTime.Now.ToString(),
+               IssuedDate = model.CreatedDate,
                OtherRef = "N/A"
             };
+            string trans = string.Empty;
+            string port = string.Empty;
+            if (model.ServiceMode == "Export")
+            {
+                trans = "X";
+                port = model.Pol;
+            }
+            else
+            {
+                port = model.Pod;
+            }
             var listSOA = new List<AcctSOAReport>();
             if (model.ListSurcharges.Count > 0)
             {
                 foreach(var item in model.ListSurcharges)
                 {
-                    var acctsoa = new AcctSOAReport
+                    string subject = string.Empty;
+                    if(item.Type == "OBH")
+                    {
+                        subject = "ON BEHALF";
+                    }
+                    var acctCDNo = new AcctSOAReport
                     {
                         SortIndex = null,
-                        Subject = "ON BEHALF",
+                        Subject = subject,
                         PartnerID = model.PartnerId,
                         PartnerName = model.PartnerNameEn,
-                        PersonalContact = "N/A",
+                        PersonalContact = model.PartnerPersonalContact,
                         Address = model.PartnerShippingAddress,
                         Taxcode = model.PartnerTaxcode,
                         Workphone = model.PartnerTel,
-                        Fax =  "N/A",
-                        TransID = "N/A",
+                        Fax =  model.PartnerFax,
+                        TransID = trans,
                         LoadingDate = null,
                         Commodity = "N/A",
                         PortofLading = model.PolName,
@@ -547,10 +573,10 @@ namespace eFMS.API.Documentation.DL.Services
                         Credit = model.TotalCredit,
                         Notes = item.Notes,
                         InputData = "N/A",
-                        PONo = "N/A",
+                        PONo = string.Empty,
                         TransNotes = "N/A",
-                        Shipper = "N/A",
-                        Consignee = "N/A",
+                        Shipper = model.PartnerNameEn,
+                        Consignee = model.PartnerNameEn,
                         ContQty = model.HbConstainers,
                         ContSealNo = "N/A",
                         Deposit = null,
@@ -565,14 +591,13 @@ namespace eFMS.API.Documentation.DL.Services
                         SeaCBM = null,
                         SOTK = "N/A",
                         NgayDK = null,
-                        Cuakhau = "N/A",
-                        DeliveryPlace = null,
+                        Cuakhau = port,
+                        DeliveryPlace = model.WarehouseName,
                         TransDate = null,
-                        Unit = "USD",
-                        UnitPieaces = "N/A"                                                             
-
+                        Unit = item.CurrencyId,
+                        UnitPieaces = "N/A"              
                     };
-                    listSOA.Add(acctsoa);
+                    listSOA.Add(acctCDNo);
                 }
             }
             else

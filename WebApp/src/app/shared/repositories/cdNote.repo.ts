@@ -11,7 +11,7 @@ export class CDNoteRepo {
     }
 
     getListCDNoteByHouseBill(houseBillId: string) {
-        // return this._api.get(`${environment.HOST.WEB_URL}44366/api/${this.VERSION}/vi/AcctCDNote/Get`, { Id: houseBillId, IsHouseBillID: true });
-        return this._api.get(`${environment.HOST.WEB_URL}/${this.MODULE}/api/${this.VERSION}/vi/AcctCDNote/Get`, { Id: houseBillId, IsHouseBillID: true });
+        return this._api.get(`${environment.HOST.WEB_URL}44366/api/${this.VERSION}/vi/AcctCDNote/Get`, { Id: houseBillId, IsHouseBillID: true });
+        // return this._api.get(`${environment.HOST.WEB_URL}/${this.MODULE}/api/${this.VERSION}/vi/AcctCDNote/Get`, { Id: houseBillId, IsHouseBillID: true });
     }
 }
