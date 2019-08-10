@@ -24,6 +24,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="eFMS.API.Documentation.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="eFMS.API.Documentation.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Models\" />
     <Folder Include="ViewModels\" />
   </ItemGroup>
@@ -95,9 +105,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Update="eFMS.API.Documentation.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="Resources\Files\CountryImportTemplate.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

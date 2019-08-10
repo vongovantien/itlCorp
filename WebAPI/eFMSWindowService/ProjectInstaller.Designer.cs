@@ -42,6 +42,7 @@
             this.serviceInstaller1.Description = "eFMSWindowService";
             this.serviceInstaller1.DisplayName = "eFMSWindowService.UpdateSystem";
             this.serviceInstaller1.ServiceName = "UpdateSystemService";
+            this.serviceInstaller1.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
             // 
             // ProjectInstaller
             // 

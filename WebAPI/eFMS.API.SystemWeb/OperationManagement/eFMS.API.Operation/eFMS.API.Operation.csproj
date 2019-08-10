@@ -24,6 +24,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="eFMS.API.Operation.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="eFMS.API.Operation.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Resources\Files\" />
     <Folder Include="ViewModels\" />
   </ItemGroup>
@@ -97,10 +107,5 @@
     <Content Update="Resources\vi-VN.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="eFMS.API.Operation.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 </Project>
