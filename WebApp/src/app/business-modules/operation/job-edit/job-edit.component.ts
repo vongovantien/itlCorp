@@ -21,7 +21,7 @@ import { ChargeConstants } from 'src/constants/charge.const';
 import { ContainerListComponent } from './container-list/container-list.component';
 import { ContainerRepo, UnitRepo } from 'src/app/shared/repositories';
 import { AppPage } from "src/app/app.base";
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { CancelCreateJobPopupComponent } from './job-confirm-popup/cancel-create-job-popup/cancel-create-job-popup.component';
 import { CanNotDeleteJobPopupComponent } from './job-confirm-popup/can-not-delete-job-popup/can-not-delete-job-popup.component';
 import { ConfirmDeleteJobPopupComponent } from './job-confirm-popup/confirm-delete-job-popup/confirm-delete-job-popup.component';
@@ -383,6 +383,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
     public getPartners() {
         this._data.getDataByKey('lstPartners')
+        .pipe(takeUntil(this.ngUnsubscribe))
         .subscribe(
             (data: any) => {
                 this.lstPartners = data;

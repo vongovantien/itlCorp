@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Observer } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Injectable()
@@ -25,5 +25,7 @@ export class DataService {
             map((data: any) => data[key] || null)
         );
     }
+
+
 
 }

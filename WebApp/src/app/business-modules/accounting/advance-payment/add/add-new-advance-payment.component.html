@@ -9,7 +9,7 @@
     <div class="m-portlet">
         <div class="m-form">
             <div class="m-portlet__body">
-                <adv-payment-form-create></adv-payment-form-create>
+                <adv-payment-form-create (onChangeCurrency)="onChangeCurrency($event)"></adv-payment-form-create>
             </div>
         </div>
     </div>
@@ -29,8 +29,7 @@
                                 </span>
                             </span>
                         </button>
-                        <button type="button" class="btn btn-danger  m-btn--square m-btn--icon m-btn--uppercase"
-                           >
+                        <button type="button" class="btn btn-danger  m-btn--square m-btn--icon m-btn--uppercase">
                             <span>
                                 <i class="la la-trash"></i>
                                 <span>
@@ -42,13 +41,13 @@
                 </div>
 
                 <adv-payment-list-request></adv-payment-list-request>
-                
+
                 <div class="row">
                     <div class="col-12">
                         <div class="m--align-center m--margin-top-20">
                             <button
                                 class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                title="Save">
+                                title="Save" (click)="saveAdvancePayment()">
                                 <span>
                                     <i class="la la-save"></i>
                                     <span>
@@ -91,4 +90,4 @@
     </div>
 </div>
 
-<adv-payment-add-popup></adv-payment-add-popup>
+<adv-payment-add-popup (onRequest)="onCreateRequestAdvancePayment($event)"></adv-payment-add-popup>

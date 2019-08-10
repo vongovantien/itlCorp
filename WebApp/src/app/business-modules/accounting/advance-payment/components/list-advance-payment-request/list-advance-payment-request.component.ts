@@ -1,5 +1,9 @@
 import { Component } from '@angular/core';
 import { AppList } from 'src/app/app.list';
+import { AdvancePaymentRequest } from 'src/app/shared/models';
+import { Subject } from 'rxjs';
+import { takeUntil, catchError } from 'rxjs/operators';
+import { SortService } from 'src/app/shared/services';
 
 @Component({
     selector: 'adv-payment-list-request',
@@ -10,11 +14,18 @@ import { AppList } from 'src/app/app.list';
 export class AdvancePaymentListRequestComponent extends AppList {
 
     headers: CommonInterface.IHeaderTable[];
-    requests: any[] = [];
+    $listRequestAdvancePayment: Subject<AdvancePaymentRequest[]> = new Subject<AdvancePaymentRequest[]>();
 
-    constructor() {
+    listRequestAdvancePayment: AdvancePaymentRequest[] = [];
+
+    totalAmount: number = 0;
+    currency: string = 'VND';
+
+    constructor(
+        private _sortService: SortService
+    ) {
         super();
-        this.requestList = this.getRequestAdvancePayment;
+        this.requestList = this.sortRequestAdvancePament;
     }
 
     ngOnInit() {
@@ -32,16 +43,27 @@ export class AdvancePaymentListRequestComponent extends AppList {
     }
 
     getRequestAdvancePayment() {
-        this.requests = [
-            { description: 'AAAAAAA', customNo: 'Custom No', jobId: 'XXXX', hbl: 'XXXX', amount: 23452011.3, currency: 'VND', type: 'Approve', note: 'XXXXX' },
-            { description: 'AAAAAAA', customNo: 'Custom No', jobId: 'XXXX', hbl: 'XXXX', amount: 2345000, currency: 'VND', type: 'Approve', note: 'XXXXX' },
-            { description: 'AAAAAAA', customNo: 'Custom No', jobId: 'XXXX', hbl: 'XXXX', amount: 2345000, currency: 'VND', type: 'Approve', note: 'XXXXX' },
-            { description: 'AAAAAAA', customNo: 'Custom No', jobId: 'XXXX', hbl: 'XXXX', amount: 2345000, currency: 'VND', type: 'Approve', note: 'XXXXX' },
-            { description: 'AAAAAAA', customNo: 'Custom No', jobId: 'XXXX', hbl: 'XXXX', amount: 2345000, currency: 'VND', type: 'Approve', note: 'XXXXX' },
-            { description: 'AAAAAAA', customNo: 'Custom No', jobId: 'XXXX', hbl: 'XXXX', amount: 2345000, currency: 'VND', type: 'Approve', note: 'XXXXX' },
-            { description: 'AAAAAAA', customNo: 'Custom No', jobId: 'XXXX', hbl: 'XXXX', amount: 2345000, currency: 'VND', type: 'Approve', note: 'XXXXX' },
-            { description: 'AAAAAAA', customNo: 'Custom No', jobId: 'XXXX', hbl: 'XXXX', amount: 2345000, currency: 'VND', type: 'Approve', note: 'XXXXX' },
-        ];
+        this.$listRequestAdvancePayment
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                catchError(this.catchError),
+            )
+            .subscribe(
+                (data: AdvancePaymentRequest) => {
+                    this.listRequestAdvancePayment.push(data);
 
+                    // * update total amount, Currency.
+                    this.totalAmount = this.listRequestAdvancePayment.reduce((acc, curr) => acc + curr.amount, 0);
+                    this.currency = data.requestCurrency;
+
+                    for (const request of this.listRequestAdvancePayment) {
+                        request.requestCurrency = data.requestCurrency;
+                    }
+                }
+            );
+    }
+
+    sortRequestAdvancePament() {
+        this.listRequestAdvancePayment = this._sortService.sort(this.listRequestAdvancePayment, this.sort, this.order);
     }
 }

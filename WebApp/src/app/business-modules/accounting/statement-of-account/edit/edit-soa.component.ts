@@ -2,16 +2,16 @@ import { Component, ViewChild } from '@angular/core';
 import { StatementOfAccountAddChargeComponent } from '../components/poup/add-charge/add-charge.popup';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { AccoutingRepo, SystemRepo } from 'src/app/shared/repositories';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { SOA, SOASearchCharge, Charge } from 'src/app/shared/models';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppList } from 'src/app/app.list';
-import { SortService } from 'src/app/shared/services';
-import { forkJoin } from 'rxjs';
+import { SortService, DataService } from 'src/app/shared/services';
 import { formatDate } from '@angular/common';
 import moment from 'moment';
+import { SystemConstants } from 'src/constants/system.const';
 @Component({
     selector: 'app-statement-of-account-edit',
     templateUrl: './edit-soa.component.html',
@@ -48,7 +48,8 @@ export class StatementOfAccountEditComponent extends AppList {
         private _activedRoute: ActivatedRoute,
         private _sysRepo: SystemRepo,
         private _sortService: SortService,
-        private _router: Router
+        private _router: Router,
+        private _dataService: DataService
     ) {
         super();
         this.requestList = this.sortChargeList;
@@ -73,8 +74,8 @@ export class StatementOfAccountEditComponent extends AppList {
             if (!!params.no && !!params.currency) {
                 this.soaNO = params.no;
                 this.currencyLocal = params.currency;
-                // this.getCurrency();
-                // this.getListCharge()
+                this.getCurrency();
+                this.getListCharge();
                 this.getDetailSOA(this.soaNO, this.currencyLocal);
             }
         });
@@ -86,104 +87,117 @@ export class StatementOfAccountEditComponent extends AppList {
 
     getDetailSOA(soaNO: string, currency: string) {
         this._spinner.show();
-        forkJoin([
-            this._accoutingRepo.getDetaiLSOA(soaNO, currency),
-            this._sysRepo.getListCurrency(),
-            this._sysRepo.getListCharge()
+        this._accoutingRepo.getDetaiLSOA(soaNO, currency)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._spinner.hide(); })
+            ).subscribe(
+                (dataSoa: any) => {
+                    this.soa = new SOA(dataSoa);
 
-        ]).pipe(
-            catchError(this.catchError),
-            finalize(() => { this._spinner.hide(); })
-        ).subscribe(
-            ([dataSoa, dataCurrency, datCharge]: any[]) => {
-                this.soa = new SOA(dataSoa);
-                this.currencyList = dataCurrency;
+                    // * make all chargeshipment was selected
+                    for (const item of this.soa.chargeShipments) {
+                        item.isSelected = this.isCheckAllCharge;
+                    }
 
-                // * make all chargeshipment was selected
-                for (const item of this.soa.chargeShipments) {
-                    item.isSelected = this.isCheckAllCharge;
-                }
+                    // * update currency
+                    this.selectedCurrency = !!this.soa.currency ? this.currencyList.filter((currencyItem: any) => currencyItem.id === this.soa.currency.trim())[0] : this.currencyList[0];
 
-                // * update currency
-                this.selectedCurrency = !!this.soa.currency ? this.currencyList.filter((currencyItem: any) => currencyItem.id === this.soa.currency.trim())[0] : this.currencyList[0];
+                    // * update range Date
+                    this.selectedRange = { startDate: new Date(this.soa.soaformDate), endDate: new Date(this.soa.soatoDate) };
 
-                // * update range Date
-                this.selectedRange = { startDate: new Date(this.soa.soaformDate), endDate: new Date(this.soa.soatoDate) };
+                    // * Update dataSearch for Add More Charge.
+                    const datSearchMoreCharge: SOASearchCharge = {
+                        currency: this.soa.currency,
+                        currencyLocal: 'VND', // TODO get currency local from user,
+                        customerID: this.soa.customer,
+                        dateType: this.soa.dateType,
+                        toDate: this.soa.soatoDate,
+                        fromDate: this.soa.soaformDate,
+                        type: this.soa.type,
+                        isOBH: this.soa.obh,
+                        inSoa: false,
+                        strCharges: this.soa.surchargeIds,
+                        strCreators: this.soa.creatorShipment,
+                        serviceTypeId: this.soa.serviceTypeId,
+                        chargeShipments: this.soa.chargeShipments,
+                        note: this.soa.note
+                    };
+                    this.dataSearch = new SOASearchCharge(datSearchMoreCharge);
 
-                // * Update charge 
-                this.charges = datCharge;
-                this.charges.push(new Charge({ code: 'All', id: 'All', chargeNameEn: 'All' }));
-
-                this.configCharge.dataSource = datCharge || [];
-                this.configCharge.displayFields = [
-                    { field: 'code', label: 'Charge Code' },
-                    { field: 'chargeNameEn', label: 'Charge Name EN ' },
-                ];
-                this.configCharge.selectedDisplayFields = ['code'];
-
-                // * Update dataSearch for Add More Charge.
-                const datSearchMoreCharge: SOASearchCharge = {
-                    currency: this.soa.currency,
-                    currencyLocal: 'VND', // TODO get currency local from user,
-                    customerID: this.soa.customer,
-                    dateType: this.soa.dateType,
-                    toDate: this.soa.soatoDate,
-                    fromDate: this.soa.soaformDate,
-                    type: this.soa.type,
-                    isOBH: this.soa.obh,
-                    inSoa: false,
-                    strCharges: this.soa.surchargeIds,
-                    strCreators: this.soa.creatorShipment,
-                    serviceTypeId: this.soa.serviceTypeId,
-                    chargeShipments: this.soa.chargeShipments,
-                    note: this.soa.note
-                };
-                this.dataSearch = new SOASearchCharge(datSearchMoreCharge);
-
-            },
-            (errors: any) => {
-                this.handleError(errors);
-            },
-            () => { }
-        );
+                },
+                (errors: any) => {
+                    this.handleError(errors);
+                },
+                () => { }
+            );
     }
-
 
     getCurrency() {
-        this._sysRepo.getListCurrency()
-            .pipe(catchError(this.catchError))
+        this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                catchError(this.catchError)
+            )
             .subscribe(
-                (dataCurrency: any) => {
-                    this.currencyList = dataCurrency;
-                },
-                (errors: any) => {
-                    this.handleError(errors);
-                },
-                // complete
-                () => { }
+                (data: any) => {
+                    if (!!data) {
+                        this.currencyList = data;
+                    } else {
+                        this._sysRepo.getListCurrency()
+                            .pipe(catchError(this.catchError))
+                            .subscribe(
+                                (dataCurrency: any) => {
+                                    this.currencyList = dataCurrency;
+                                },
+                                (errors: any) => {
+                                    this.handleError(errors);
+                                },
+                                // complete
+                                () => { }
+                            );
+                    }
+                }
             );
     }
-    
-    getListCharge() {
-        this._sysRepo.getListCharge()
-            .pipe(catchError(this.catchError))
-            .subscribe((data) => {
-                this.charges = data;
-                this.charges.push(new Charge({ code: 'All', id: 'All', chargeNameEn: 'All' }));
 
-                this.configCharge.dataSource = data || [];
-                this.configCharge.displayFields = [
-                    { field: 'code', label: 'Charge Code' },
-                    { field: 'chargeNameEn', label: 'Charge Name EN ' },
-                ];
-                this.configCharge.selectedDisplayFields = ['code'];
-            },
-                (errors: any) => {
-                    this.handleError(errors);
-                },
-                // complete
-                () => { }
+    getListCharge() {
+        this._dataService.getDataByKey(SystemConstants.CSTORAGE.CHARGE)
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (data: any) => {
+                    if (!!data) {
+                        this.getDataCharge(data);
+                    } else {
+                        this._sysRepo.getListCharge()
+                            .pipe(catchError(this.catchError))
+                            .subscribe((dataCharge: any) => {
+                                this.getDataCharge(dataCharge);
+                            },
+                                (errors: any) => {
+                                    this.handleError(errors);
+                                },
+                                // complete
+                                () => { }
+                            );
+                    }
+                }
             );
+    }
+
+    getDataCharge(data: any) {
+        this.charges = data;
+        this.charges.push(new Charge({ code: 'All', id: 'All', chargeNameEn: 'All' }));
+
+        this.configCharge.dataSource = data || [];
+        this.configCharge.displayFields = [
+            { field: 'code', label: 'Charge Code' },
+            { field: 'chargeNameEn', label: 'Charge Name EN ' },
+        ];
+        this.configCharge.selectedDisplayFields = ['code'];
     }
 
     handleError(errors: any) {
@@ -212,7 +226,7 @@ export class StatementOfAccountEditComponent extends AppList {
     }
 
     removeCharge() {
-        this.soa.chargeShipments  = this.soa.chargeShipments.filter ( (item: any) => !item.isSelected);
+        this.soa.chargeShipments = this.soa.chargeShipments.filter((item: any) => !item.isSelected);
     }
 
     back() {
@@ -284,8 +298,6 @@ export class StatementOfAccountEditComponent extends AppList {
                 );
         }
     }
-
-  
 
     addMoreCharge() {
         this.addChargePopup.searchInfo = this.dataSearch;

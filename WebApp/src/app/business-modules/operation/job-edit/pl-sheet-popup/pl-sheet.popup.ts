@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { DataService } from 'src/app/shared/services';
 import { Currency } from 'src/app/shared/models';
-import { map } from 'rxjs/operators';
+import { map, takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'pl-sheet-popup',
@@ -26,6 +26,7 @@ export class PlSheetPopupComponent extends PopupBase {
 
     getCurrency() {
         this._dataService.getDataByKey('lstCurrencies').pipe(
+            takeUntil(this.ngUnsubscribe),
             map((data: any) => {
                 if (!!data) {
                     return data.map((item: any) => new Currency(item))

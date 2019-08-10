@@ -1,0 +1,26 @@
+export class AdvancePaymentRequest {
+    id?: string;
+    description: string = '';
+    customNo: string = '';
+    jobId: string = '';
+    hbl: string = '';
+    mbl: string = '';
+    amount: number = 0;
+    requestCurrency: string = '';
+    advanceType: string = '';
+    advanceNo: string = '';
+    requestNote: string = '';
+    userCreated: string = '';
+    datetimeCreated: string = '';
+    userModified: string = '';
+    datetimeModified: string = '';
+    
+    constructor(object?: any) {
+        const self = this;
+        for (const key in object) {
+            if (self.hasOwnProperty(key.toString())) {
+                self[key] = object[key];
+            }
+        }
+    }
+}
