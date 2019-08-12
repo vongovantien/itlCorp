@@ -14,8 +14,6 @@ export class AdvancePaymentRequest {
     datetimeCreated: string = '';
     userModified: string = '';
     datetimeModified: string = '';
-    uuid: number = 0;
-
     requester: string = '';
     requesterName: string = '';
     department: string = '';
@@ -27,6 +25,9 @@ export class AdvancePaymentRequest {
     advanceNote: string = '';
     advanceDatetimeModified: string = '';
     statusPayment: string = '';
+
+    isSelected?: boolean;
+    
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

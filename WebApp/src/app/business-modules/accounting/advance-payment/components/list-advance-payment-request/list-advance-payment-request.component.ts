@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
-import { AdvancePaymentRequest } from 'src/app/shared/models';
+import { AdvancePaymentRequest, Currency } from 'src/app/shared/models';
 import { Subject, Observable } from 'rxjs';
 import { takeUntil, catchError } from 'rxjs/operators';
 import { SortService } from 'src/app/shared/services';
@@ -58,7 +58,7 @@ export class AdvancePaymentListRequestComponent extends AppList {
             .subscribe(
                 (data: any) => {
                     this.listRequestAdvancePayment.push(data);
-                    // * update total amount, Currency.
+
                     this.totalAmount = this.updateTotalAmount(this.listRequestAdvancePayment);
                     this.updateCurrencyForRequest(data);
                 }
@@ -70,24 +70,27 @@ export class AdvancePaymentListRequestComponent extends AppList {
     }
 
     copyRequestPayment(request: AdvancePaymentRequest) {
-
-        this.selectedRequestAdvancePayment = request;
-        this.selectedRequestAdvancePayment.uuid = Math.random();
-        this.addNewRequestPaymentPopup.requestId = this.selectedRequestAdvancePayment.uuid;
-
+        this.selectedRequestAdvancePayment = new AdvancePaymentRequest(request);
         this.addNewRequestPaymentPopup.action = 'update';
+        this.addNewRequestPaymentPopup.selectedRequest = request; 
+        
         this.addNewRequestPaymentPopup.initFormUpdate(this.selectedRequestAdvancePayment);
         this.addNewRequestPaymentPopup.show({ backdrop: 'static' });
-
     }
 
-    onUpdateRequestAdvancePayment(dataRequest: AdvancePaymentRequest) {
-        const index: number = this.listRequestAdvancePayment.findIndex((item: AdvancePaymentRequest) => item.uuid === dataRequest.uuid);
-        if (index !== -1) {
-            this.listRequestAdvancePayment[index] = dataRequest;
-            this.totalAmount = this.updateTotalAmount(this.listRequestAdvancePayment);
-            this.updateCurrencyForRequest(dataRequest);
-        }
+    onRequestAdvancePaymentChange(dataRequest: AdvancePaymentRequest) {
+        this.$dataRequest.next(dataRequest);
+        this.totalAmount = this.updateTotalAmount(this.listRequestAdvancePayment);
+        this.updateCurrencyForRequest(dataRequest);
+    }
+
+    openPopupAdd() {
+        this.addNewRequestPaymentPopup.action = 'create';
+        this.addNewRequestPaymentPopup.show({ backdrop: 'static' });
+    }
+
+    changeCurrency(currency: Currency) {
+        this.addNewRequestPaymentPopup.currency.setValue(currency.id);
     }
 
     updateCurrencyForRequest(request: AdvancePaymentRequest) {
@@ -103,6 +106,21 @@ export class AdvancePaymentListRequestComponent extends AppList {
         } catch (error) {
             this._toastService.error(error + '', 'Không lấy được amount');
         }
+    }
+
+    checkUncheckAllRequest() {
+        for (const request of this.listRequestAdvancePayment) {
+            request.isSelected = this.isCheckAll;
+        }
+    }
+
+    onChangeCheckBoxRequestAdvancePayent($event: Event) {
+        this.isCheckAll = this.listRequestAdvancePayment.every((item: any) => item.isSelected);
+    }
+
+    deleteItemRequestAdvancePayment() {
+        this.listRequestAdvancePayment = this.listRequestAdvancePayment.filter((item: AdvancePaymentRequest) => !item.isSelected);
+        this.isCheckAll = false;
     }
 }
 

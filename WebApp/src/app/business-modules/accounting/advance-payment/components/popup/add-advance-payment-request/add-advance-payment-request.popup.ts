@@ -44,6 +44,11 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     note: AbstractControl;
     customNo: AbstractControl;
 
+    bodyConfirm: string = 'Do you want to exit ?';
+
+    selectedRequest: AdvancePaymentRequest; // TODO detect form was changed when dupplicate
+    isDupplicate: boolean = false;
+
     constructor(
         private _fb: FormBuilder,
         private _accoutingRepo: AccoutingRepo,
@@ -92,6 +97,9 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
         this.customNo = this.form.controls['customNo'];
         this.type = this.form.controls['type'];
         this.currency = this.form.controls['currency'];
+
+
+
     }
 
     initFormUpdate(data: AdvancePaymentRequest) {
@@ -114,7 +122,6 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
         if (this.customDeclarations.length === 1) {
             this.customNo.setValue(this.customDeclarations[0]);
         }
-
     }
 
     onSubmit(form: FormGroup) {
@@ -130,23 +137,36 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             description: form.value.description,
             uuid: this.requestId
         });
-        this._accoutingRepo.checkShipmentsExistInAdvancePament(this.selectedShipmentData)
-            .pipe(
-                catchError(this.catchError)
-            )
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (!res.status) {
-                        this.onRequest.emit(body);
-                        this.hide();
-                        this.resetForm();
-                    } else {
-                        this._toastService.warning('Shipment is existed, Please try again !', 'Warning', { positionClass: 'toast-bottom-right' });
-                    }
-                },
-                (errors: any) => { },
-                () => { }
-            );
+        if (this.action === 'create') {
+            this._accoutingRepo.checkShipmentsExistInAdvancePament(this.selectedShipmentData)
+                .pipe(
+                    catchError(this.catchError)
+                )
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (!res.status) {
+                            this.onRequest.emit(body);
+                            this.hide();
+                            this.resetForm();
+                        } else {
+                            this._toastService.warning('Add New Advance Request Failed, please recheck !', 'Warning', { positionClass: 'toast-bottom-right' });
+                        }
+                    },
+                    (errors: any) => { },
+                    () => { }
+                );
+        } else {
+            console.log(this.detectRequestChange(this.selectedRequest, body));
+            if (this.detectRequestChange(this.selectedRequest, body)) {
+                this.isDupplicate = true;
+                this.bodyConfirm = 'Data already exists, do you want to save or not ?';
+                this.confirmPopup.show();
+            } else {
+                this.isDupplicate = false;
+                this.onRequest.emit(body);
+                this.hide();
+            }
+        }
     }
 
     getListShipment() {
@@ -212,6 +232,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     }
 
     onCancel() {
+        this.bodyConfirm = 'Do you want to exit ?';
         this.confirmPopup.show();
     }
 
@@ -229,10 +250,40 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
         this.selectedShipmentData = null;
     }
 
+    onComfirmSaveDupplicateRequestAdvancePayment(form: FormGroup) {
+        console.log("Add data in dupplicating");
+        const body: AdvancePaymentRequest = new AdvancePaymentRequest({
+            customNo: !!form.value.customNo ? form.value.customNo.clearanceNo : '',
+            amount: form.value.amount,
+            requestNote: form.value.note,
+            hbl: this.selectedShipmentData.hbl,
+            mbl: this.selectedShipmentData.mbl,
+            jobId: this.selectedShipmentData.jobId,
+            advanceType: form.value.type.value,
+            requestCurrency: form.value.currency,
+            description: form.value.description,
+            uuid: this.requestId
+        });
+        this.onRequest.emit(body);
+    }
+
     onSubmitExitPopup() {
         this.confirmPopup.hide();
         this.hide();
+        if (this.isDupplicate) {
+            this.onComfirmSaveDupplicateRequestAdvancePayment(this.form);
+        }
         this.resetForm();
+    }
 
+    detectRequestChange(requestInit: AdvancePaymentRequest, data: AdvancePaymentRequest): boolean {
+        return (
+            requestInit.description === data.description
+            && requestInit.amount === data.amount
+            && requestInit.requestNote === data.requestNote
+            && requestInit.jobId === data.jobId
+            && requestInit.advanceType === data.advanceType
+            && requestInit.customNo === data.customNo
+        );
     }
 }

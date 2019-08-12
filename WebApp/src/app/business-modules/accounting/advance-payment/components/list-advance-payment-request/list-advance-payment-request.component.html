@@ -1,15 +1,38 @@
 <div class="list-request-advance-payment m--margin-top-20">
     <div class="row">
+        <div class="col-lg-12 m--align-left">
+            <button type="button" class="btn btn-success  m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                (click)="openPopupAdd()">
+                <span>
+                    <i class="la la-plus"></i>
+                    <span>
+                        Add
+                    </span>
+                </span>
+            </button>
+            <button type="button" class="btn btn-danger  m-btn--square m-btn--icon m-btn--uppercase"
+                (click)="deleteItemRequestAdvancePayment()">
+                <span>
+                    <i class="la la-trash"></i>
+                    <span>
+                        Delete
+                    </span>
+                </span>
+            </button>
+        </div>
+    </div>
+
+    <div class="row m--margin-top-20">
         <perfect-scrollbar style="max-height: 900px">
             <div class="table-wrapper">
                 <table class="table table-brand table-hover dataTable">
                     <thead>
                         <tr class="text-center">
                             <th class="m--w-50">
-                                <!-- <label class="m-checkbox">
-                                    <input type="checkbox" [(ngModel)]="isCheckAllCharge" (change)="checkUncheckAllCharge()">
+                                <label class="m-checkbox">
+                                    <input type="checkbox" [(ngModel)]="isCheckAll" (change)="checkUncheckAllRequest()">
                                     <span></span>
-                                </label> -->
+                                </label>
                             </th>
                             <th *ngFor="let header of headers; let i = index; trackBy: trackByFn"
                                 [class]="sortClass(header.sortable ? header.field : '')"
@@ -31,13 +54,15 @@
                         <tr *ngFor="let request of listRequestAdvancePayment; let i = index; trackBy: trackByFn"
                             class="text-center">
                             <td>
-                                <div class="m-checkbox-list d-flex" >
+                                <div class="m-checkbox-list d-flex">
                                     <label class="m-checkbox">
-                                        <input type="checkbox">
+                                        <input type="checkbox" (change)="onChangeCheckBoxRequestAdvancePayent($event)"
+                                            [(ngModel)]="request.isSelected">
                                         <span></span>
                                     </label>
                                     <span>
-                                        <a (click)="copyRequestPayment(request)" title="Copy request advance" class="pointer">
+                                        <a (click)="copyRequestPayment(request)" title="Copy request advance"
+                                            class="pointer">
                                             <i class="la la-copy"></i>
                                         </a>
                                     </span>
@@ -77,4 +102,4 @@
 </div>
 
 
-<adv-payment-add-popup (onRequest)="onUpdateRequestAdvancePayment($event)"></adv-payment-add-popup>
+<adv-payment-add-popup (onRequest)="onRequestAdvancePaymentChange($event)"></adv-payment-add-popup>

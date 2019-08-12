@@ -1,8 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
-import { AdvancePaymentAddRequestPopupComponent } from '../components/popup/add-advance-payment-request/add-advance-payment-request.popup';
 import { AdvancePaymentListRequestComponent } from '../components/list-advance-payment-request/list-advance-payment-request.component';
-import { Currency, AdvancePaymentRequest } from 'src/app/shared/models';
+import { Currency } from 'src/app/shared/models';
 import { AdvancePaymentFormCreateComponent } from '../components/form-create-advance-payment/form-create-advance-payment.component';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
@@ -16,7 +15,6 @@ import { catchError } from 'rxjs/operators';
 
 export class AdvancePaymentAddNewComponent extends AppPage {
 
-    @ViewChild(AdvancePaymentAddRequestPopupComponent, { static: true }) addNewRequestPaymentPopup: AdvancePaymentAddRequestPopupComponent;
     @ViewChild(AdvancePaymentListRequestComponent, { static: true }) listRequestAdvancePaymentComponent: AdvancePaymentListRequestComponent;
     @ViewChild(AdvancePaymentFormCreateComponent, { static: true }) formCreateComponent: AdvancePaymentFormCreateComponent;
 
@@ -29,22 +27,11 @@ export class AdvancePaymentAddNewComponent extends AppPage {
 
     ngOnInit() { }
 
-    openPopupAdd() {
-        this.addNewRequestPaymentPopup.currency.setValue(this.formCreateComponent.currency.value.id);
-        this.addNewRequestPaymentPopup.show({ backdrop: 'static' });
-    }
-
-    onCreateRequestAdvancePayment(dataRequest: AdvancePaymentRequest) {
-        this.listRequestAdvancePaymentComponent.$dataRequest.next(dataRequest);
-    }
-
     onChangeCurrency(currency: Currency) {
-        this.addNewRequestPaymentPopup.currency.setValue(currency.id);
+        this.listRequestAdvancePaymentComponent.changeCurrency(currency);
     }
 
     saveAdvancePayment() {
-        this.addNewRequestPaymentPopup.currency.setValue(this.formCreateComponent.currency.value.id);
-        this.addNewRequestPaymentPopup.show({ backdrop: 'static' });
         if (this.listRequestAdvancePaymentComponent.totalAmount > 100000000 && this.formCreateComponent.paymentMethod.value.value === 'Cash') {
             this._toastService.warning(`Total Advance Amount by cash is not exceed 100.000.000 VND `, '', { positionClass: 'toast-bottom-right' });
             return;
@@ -78,6 +65,8 @@ export class AdvancePaymentAddNewComponent extends AppPage {
                 );
         }
     }
+
+
 }
 
 

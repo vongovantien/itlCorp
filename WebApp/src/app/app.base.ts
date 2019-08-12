@@ -25,11 +25,12 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
   };
   maxDate: any = moment();
   minDate: any = moment();
-  utility: UtilityHelper = new UtilityHelper();
-  isLoading: boolean = false;
 
-  constructor() {
-  }
+  utility: UtilityHelper = new UtilityHelper();
+
+  isLoading: boolean = false;
+  isCheckAll: boolean = false;
+
   ngOnInit(): void { }
 
   ngOnDestroy(): void {
@@ -88,9 +89,6 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
         window.URL.revokeObjectURL(url);
       }, 500);
     }
-  };
+  }
 }
-
-  // config for <app-combo-grid-virtual-scroll>
-
 
