@@ -24,21 +24,119 @@ namespace eFMS.API.Documentation.DL.Services
             currentUser = user;
         }
 
-        public List<AcctAdvanceRequestResult> Page()
+        public List<AcctAdvanceRequestResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount)
         {
+            var datefrom = criteria.AdvanceModifiedDateFrom.HasValue;
+            var dateto = criteria.AdvanceModifiedDateTo.HasValue;
+
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var advance = dc.AcctAdvancePayment;
             var request = dc.AcctAdvanceRequest;
+            var user = dc.SysUser;
+            
             var data = from re in request
-                       join ad in request on re.AdvanceNo equals ad.AdvanceNo
+                       join ad in advance on re.AdvanceNo equals ad.AdvanceNo
+                       join u in user on ad.Requester equals u.Id into u2
+                       from u3 in u2.DefaultIfEmpty()
+                       where
+                        (
+                            criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ?
+                            (
+                                (
+                                       criteria.ReferenceNos.Contains(re.AdvanceNo)
+                                    || criteria.ReferenceNos.Contains(re.Hbl)
+                                    || criteria.ReferenceNos.Contains(re.Mbl)
+                                    || criteria.ReferenceNos.Contains(re.CustomNo)
+                                    || criteria.ReferenceNos.Contains(re.JobId)
+                                )
+                            )
+                            :
+                            (
+                                1 == 1
+                            )
+                         )
+
+                         &&
+
+                         (
+                            !string.IsNullOrEmpty(criteria.Requester) ?
+                                ad.Requester.Equals(criteria.Requester)
+                            :
+                                1 == 1
+                         )
+                         &&
+                         (
+                            criteria.RequestDateFrom.HasValue && criteria.RequestDateTo.HasValue ?
+                                ad.RequestDate >= criteria.RequestDateFrom
+                                && ad.RequestDate <= criteria.RequestDateTo
+                            :
+                                1 == 1
+                         )
+                         &&
+                         (
+                            !string.IsNullOrEmpty(criteria.StatusApproval) && !criteria.StatusApproval.Equals("All") ?
+                                ad.StatusApproval.Equals(criteria.StatusApproval)
+                            :
+                                1 == 1
+                         )
+                         &&
+                         (
+                            criteria.AdvanceModifiedDateFrom.HasValue && criteria.AdvanceModifiedDateTo.HasValue ?
+                                //Convert DatetimeModified về date nếu DatetimeModified có value
+                                ad.DatetimeModified.Value.Date >= (criteria.AdvanceModifiedDateFrom.HasValue ? criteria.AdvanceModifiedDateFrom.Value.Date : criteria.AdvanceModifiedDateFrom)
+                                && ad.DatetimeModified.Value.Date <= (criteria.AdvanceModifiedDateTo.HasValue ? criteria.AdvanceModifiedDateTo.Value.Date : criteria.AdvanceModifiedDateTo)
+                            :
+                                1 == 1
+                         )
+                         &&
+                         (
+                           !string.IsNullOrEmpty(criteria.StatusPayment) && !criteria.StatusPayment.Equals("All") ?
+                                re.StatusPayment.Equals(criteria.StatusPayment)
+                           :
+                                1 == 1
+                         )
+                         &&
+                         (
+                           !string.IsNullOrEmpty(criteria.PaymentMethod) && !criteria.PaymentMethod.Equals("All") ?
+                                ad.PaymentMethod.Equals(criteria.PaymentMethod)
+                           :
+                                1 == 1
+                          )
+
                        select new AcctAdvanceRequestResult
                        {
                            Id = re.Id,
                            AdvanceNo = re.AdvanceNo,
                            CustomNo = re.CustomNo,
                            JobId = re.JobId,
-                           Hbl = re.Hbl                           
+                           Hbl = re.Hbl,
+                           Description = re.Description,
+                           Amount = re.Amount,
+                           RequestCurrency = re.RequestCurrency,
+                           Requester = ad.Requester,
+                           RequesterName = u3.Username,
+                           RequestDate = ad.RequestDate,
+                           DeadlinePayment = ad.DeadlinePayment,
+                           AdvanceDatetimeModified = ad.DatetimeModified,
+                           StatusApproval = ad.StatusApproval,
+                           StatusPayment = re.StatusPayment,
+                           PaymentMethod = ad.PaymentMethod
                        };
+
+            //Sắp xếp giảm dần theo Advance DatetimeModified
+            data = data.OrderByDescending(x => x.AdvanceDatetimeModified);
+
+            //Phân trang
+            rowsCount = (data.Count() > 0) ? data.Count() : 0;
+            if (size > 0)
+            {
+                if (page < 1)
+                {
+                    page = 1;
+                }
+                data = data.Skip((page - 1) * size).Take(size);
+            }
+
             return data.ToList();
         }
 
@@ -72,16 +170,16 @@ namespace eFMS.API.Documentation.DL.Services
         }
 
         private string CreateAdvanceNo(eFMSDataContext dc)
-        {           
+        {
             string year = (DateTime.Now.Year.ToString()).Substring(2, 2);
-            string month = DateTime.Now.ToString("DDMMYYYY").Substring(2,2);
+            string month = DateTime.Now.ToString("DDMMYYYY").Substring(2, 2);
             string prefix = "AD" + year + month + "/";
             string stt;
 
             //Lấy ra dòng cuối cùng của table acctAdvancePayment
             var rowlast = dc.AcctAdvancePayment.LastOrDefault();
 
-            if(rowlast == null)
+            if (rowlast == null)
             {
                 stt = "0001";
             }
@@ -103,7 +201,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             return prefix + stt;
         }
-        
+
         public HandleState AddAdvancePayment(AcctAdvancePaymentModel model)
         {
             try
@@ -156,21 +254,22 @@ namespace eFMS.API.Documentation.DL.Services
                 //Check trường hợp Add new advance payment
                 if (string.IsNullOrEmpty(criteria.AdvanceNo))
                 {
-                    result  = dc.AcctAdvanceRequest.Any(x =>
-                       x.JobId == criteria.JobId
-                    && x.Hbl == criteria.HBL
-                    && x.Mbl == criteria.MBL);
+                    result = dc.AcctAdvanceRequest.Any(x =>
+                      x.JobId == criteria.JobId
+                   && x.Hbl == criteria.HBL
+                   && x.Mbl == criteria.MBL);
                 }
                 else //Check trường hợp Update advance payment
                 {
-                    result  = dc.AcctAdvanceRequest.Any(x =>
-                       x.JobId == criteria.JobId
-                    && x.Hbl == criteria.HBL
-                    && x.Mbl == criteria.MBL
-                    && x.AdvanceNo != criteria.AdvanceNo);
+                    result = dc.AcctAdvanceRequest.Any(x =>
+                      x.JobId == criteria.JobId
+                   && x.Hbl == criteria.HBL
+                   && x.Mbl == criteria.MBL
+                   && x.AdvanceNo != criteria.AdvanceNo);
                 }
                 return result;
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return false;
             }
