@@ -14,7 +14,19 @@ export class AdvancePaymentRequest {
     datetimeCreated: string = '';
     userModified: string = '';
     datetimeModified: string = '';
-    
+    uuid: number = 0;
+
+    requester: string = '';
+    requesterName: string = '';
+    department: string = '';
+    paymentMethod: string = ''
+    advanceCurrency: string = '';
+    requestDate: string = '';
+    deadlinePayment: string = '';
+    statusApproval: string = '';
+    advanceNote: string = '';
+    advanceDatetimeModified: string = '';
+    statusPayment: string = '';
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

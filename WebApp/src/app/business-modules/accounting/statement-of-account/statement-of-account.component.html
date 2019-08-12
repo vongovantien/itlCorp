@@ -47,35 +47,10 @@
                                             <thead>
                                                 <tr>
                                                     <th class="table-actions-col"></th>
-                                                    <th>
-                                                        <span>SOA No</span>
-                                                    </th>
-                                                    <th>
-                                                        <span>Partner</span>
-                                                    </th>
-                                                    <th>
-                                                        <span>Shipment</span>
-                                                    </th>
-                                                    <th>
-                                                        <span>Credit Amount</span>
-                                                    </th>
-                                                    <th>
-                                                        <span>Debit Amount</span>
-                                                    </th>
-                                                    <th>
-                                                        <span>Total Amount</span>
-                                                    </th>
-                                                    <th>
-                                                        <span>Status</span>
-                                                    </th>
-                                                    <th>
-                                                        <span>Issue Date</span>
-                                                    </th>
-                                                    <th>
-                                                        <span>Issue Person</span>
-                                                    </th>
-                                                    <th>
-                                                        <span>Modified Date</span>
+                                                    <th *ngFor="let header of headers; let i = index; trackBy: trackByFn"
+                                                        [class]="sortClass(header.sortable ? header.field : '')" (click)="sortBy(header.sortable ? header.field : '')">
+                                                        <span>{{header.title}}</span>
+                                                        <span class="sort-indicator"></span>
                                                     </th>
                                                 </tr>
                                             </thead>
@@ -158,10 +133,10 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-sm-6">
+                                            <div class="col-sm-6" *ngIf="totalItems > pageSize">
                                                 <div class="float-right">
                                                     <pagination [boundaryLinks]="true" [totalItems]="totalItems"
-                                                        [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)">
+                                                        [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)" [(ngModel)]="page">
                                                     </pagination>
                                                 </div>
                                             </div>

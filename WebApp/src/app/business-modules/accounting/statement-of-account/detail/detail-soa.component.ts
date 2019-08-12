@@ -142,7 +142,7 @@ export class StatementOfAccountDetailComponent extends AppList {
                     !!item['creditDebitNo'] ? item['creditDebitNo'] : '-',
                     !!item['debit'] ? item['debit'] : 0,
                     !!item['credit'] ? item['credit'] : 0,
-                    !!item['currencySOA'] ? item['currencySOA'] : '-',
+                    !!item['currencyCharge'] ? item['currencyCharge'] : '-',
                     !!item['debitExchange'] ? item['debitExchange'] : 0,
                     !!item['creditExchange'] ? item['creditExchange'] : 0
                 ];

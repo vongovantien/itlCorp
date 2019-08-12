@@ -26,11 +26,117 @@
         </div>
     </div>
     <div class="m-content">
-        <adv-payment-form-search></adv-payment-form-search>
+        <adv-payment-form-search (onSearch)="getListAdvancePayment($event)"></adv-payment-form-search>
         <div class="m-portlet">
             <div class="m-form">
                 <div class="m-portlet__body">
-                   <adv-payment-list-request></adv-payment-list-request>
+                    <perfect-scrollbar style="max-height: 900px">
+                        <div class="table-wrapper">
+                            <table class="table table-brand table-hover dataTable">
+                                <thead>
+                                    <tr class="text-center">
+                                        <th class="m--w-50">
+                                        </th>
+                                        <th *ngFor="let header of headers; let i = index; trackBy: trackByFn"
+                                            [class]="sortClass(header.sortable ? header.field : '')"
+                                            (click)="sortBy(header.sortable ? header.field : '')">
+                                            <span>{{header.title}}</span>
+                                            <span class="sort-indicator"></span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="tbody-group">
+                                    <tr *ngIf="!isLoading && !advancePayments.length">
+                                        <td colspan="100">
+                                            <div class="no-data">
+                                                <i class="flaticon-coins"></i>
+                                                <span class="no-data-text">No records found</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr *ngFor="let advancePayment of advancePayments; let i = index; trackBy: trackByFn"
+                                        class="text-center">
+                                        <td>
+                                            <div class="m-checkbox-list d-flex">
+                                                <span>
+                                                    <a (click)="deleteAdvancePayment(advancePayment)" title="Delete advance payment" class="pointer">
+                                                        <i class="la la-trash"></i>
+                                                    </a>
+                                                </span>
+                                                <span>
+                                                    <a (click)="copyAdvancePayment(advancePayment)"
+                                                        title="Copy advance payment" class="pointer">
+                                                        <i class="la la-copy"></i>
+                                                    </a>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td class="text-underline text-primary pointer">{{advancePayment.advanceNo}}
+                                        </td>
+                                        <td>{{advancePayment.customNo}}</td>
+                                        <td>{{advancePayment.jobId}}</td>
+                                        <td>{{advancePayment.hbl}}</td>
+                                        <td>{{advancePayment.description}}</td>
+                                        <td>{{advancePayment.amount | number : '.0-3'}}</td>
+                                        <td>{{advancePayment.requestCurrency}}</td>
+                                        <td>{{advancePayment.requestDate | date: 'dd/MM/yyyy'}}</td>
+                                        <td>{{advancePayment.deadlinePayment | date: 'dd/MM/yyyy'}}</td>
+                                        <td>{{advancePayment.advanceDatetimeModified | date: 'dd/MM/yyyy'}}</td>
+                                        <td [ngSwitch]="advancePayment.statusApproval">
+                                            <div *ngSwitchCase="'New'" class="text-danger">
+                                                {{advancePayment.statusApproval}}</div>
+                                            <div *ngSwitchCase="'Done'" class="text-success">
+                                                {{advancePayment.statusApproval}}</div>
+                                            <div *ngSwitchCase="'Denied'" class="text-danger">
+                                                {{advancePayment.statusApproval}}</div>
+                                            <div *ngSwitchDefault class="text-primary">{{advancePayment.statusApproval}}
+                                            </div>
+                                        </td>
+                                        <td [ngSwitch]="advancePayment.statusPayment">
+                                            <div class="text-success" *ngSwitchCase="'Settled'">
+                                                {{advancePayment.statusPayment}}
+                                            </div>
+                                            <div class="text-danger" *ngSwitchCase="'NotSettled'">
+                                                Not Settled
+                                            </div>
+                                        </td>
+                                        <td>{{advancePayment.paymentMethod}}</td>
+                                    </tr>
+                                    <tr class="loading-wrapper" *ngIf="isLoading">
+                                        <td colspan="100">
+                                            <div class="on-loading">
+                                                <div class="m-loader m-loader--brand">
+                                                </div><span>Loading</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </perfect-scrollbar>
+                    <div class="pagination-nav">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="tatable__pager-size">
+                                    <div class="select-box">
+                                        <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
+                                            (change)="selectPageSize(pageSize)" name="pagesize">
+                                            <ng-container *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
+                                                <option [ngValue]="item">{{item}} line / screen</option>
+                                            </ng-container>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6" *ngIf="totalItems > pageSize">
+                                <div class="float-right">
+                                    <pagination [boundaryLinks]="true" [totalItems]="totalItems" [itemsPerPage]="pageSize"
+                                        (pageChanged)="pageChanged($event)" [(ngModel)]="page">
+                                    </pagination>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

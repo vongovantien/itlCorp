@@ -14,8 +14,11 @@ import { ToastrService } from 'ngx-toastr';
 
 export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
 
-    @Output() onRequest: EventEmitter<AdvancePaymentRequest> = new EventEmitter<AdvancePaymentRequest>();
+    @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
+
+    action: string = 'create';
+    requestId: number;
 
     configShipment: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
@@ -32,7 +35,6 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
 
     customDeclarations: CustomDeclaration[];
     initCD: CustomDeclaration[];
-    shipments: OperationInteface.IShipment[];
 
     form: FormGroup;
     description: AbstractControl;
@@ -81,7 +83,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             'note': [],
             'customNo': [],
             'type': [],
-            'currency': ['VND'],
+            'currency': [],
         });
 
         this.description = this.form.controls['description'];
@@ -92,9 +94,32 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
         this.currency = this.form.controls['currency'];
     }
 
+    initFormUpdate(data: AdvancePaymentRequest) {
+        this.form.setValue({
+            description: data.description,
+            amount: data.amount,
+            note: data.requestNote,
+            customNo: !!data.customNo ? this.initCD.filter((item: CustomDeclaration) => item.clearanceNo === data.customNo)[0] : null,
+            type: this.types.filter((type: any) => type.value === data.advanceType)[0],
+            currency: data.requestCurrency
+        });
+
+        this.selectedShipmentData = <OperationInteface.IShipment>{ hbl: data.hbl, jobId: data.jobId, mbl: data.mbl };
+        this.selectedShipment = { field: 'jobId', value: data.jobId };
+
+        this.customDeclarations = [];
+        this.customNo.setValue(null);
+
+        this.customDeclarations = this.filterCDByShipment(this.selectedShipmentData);
+        if (this.customDeclarations.length === 1) {
+            this.customNo.setValue(this.customDeclarations[0]);
+        }
+
+    }
+
     onSubmit(form: FormGroup) {
         const body: AdvancePaymentRequest = new AdvancePaymentRequest({
-            customNo: form.value.customNo,
+            customNo: !!form.value.customNo ? form.value.customNo.clearanceNo : '',
             amount: form.value.amount,
             requestNote: form.value.note,
             hbl: this.selectedShipmentData.hbl,
@@ -103,8 +128,8 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             advanceType: form.value.type.value,
             requestCurrency: form.value.currency,
             description: form.value.description,
+            uuid: this.requestId
         });
-
         this._accoutingRepo.checkShipmentsExistInAdvancePament(this.selectedShipmentData)
             .pipe(
                 catchError(this.catchError)
@@ -162,7 +187,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     onSelectDataFormInfo(data: any, key: string) {
         switch (key) {
             case 'shipment':
-                this.selectedShipment = { field: data.jobId, value: data.hbl };
+                this.selectedShipment = { field: 'jobId', value: data.hbl };
                 this.selectedShipmentData = data;
 
                 this.customDeclarations = [];

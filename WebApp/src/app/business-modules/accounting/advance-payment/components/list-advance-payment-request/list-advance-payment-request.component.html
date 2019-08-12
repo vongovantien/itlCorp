@@ -3,7 +3,7 @@
         <perfect-scrollbar style="max-height: 900px">
             <div class="table-wrapper">
                 <table class="table table-brand table-hover dataTable">
-                    <thead >
+                    <thead>
                         <tr class="text-center">
                             <th class="m--w-50">
                                 <!-- <label class="m-checkbox">
@@ -28,14 +28,19 @@
                                 </div>
                             </td>
                         </tr>
-                        <tr *ngFor="let request of listRequestAdvancePayment; let i = index; trackBy: trackByFn" class="text-center">
+                        <tr *ngFor="let request of listRequestAdvancePayment; let i = index; trackBy: trackByFn"
+                            class="text-center">
                             <td>
-                                <div class="m-checkbox-list">
+                                <div class="m-checkbox-list d-flex" >
                                     <label class="m-checkbox">
-                                        <input type="checkbox"> 
-                                        <i class="la la-copy"></i>
+                                        <input type="checkbox">
                                         <span></span>
                                     </label>
+                                    <span>
+                                        <a (click)="copyRequestPayment(request)" title="Copy request advance" class="pointer">
+                                            <i class="la la-copy"></i>
+                                        </a>
+                                    </span>
                                 </div>
                             </td>
                             <td class="text-underline text-primary pointer">{{request.description}}</td>
@@ -70,3 +75,6 @@
         </perfect-scrollbar>
     </div>
 </div>
+
+
+<adv-payment-add-popup (onRequest)="onUpdateRequestAdvancePayment($event)"></adv-payment-add-popup>

@@ -6,6 +6,7 @@ import { AppList } from "src/app/app.list";
 import { SOA } from "src/app/shared/models";
 import { ToastrService } from "ngx-toastr";
 import { HttpErrorResponse } from "@angular/common/http";
+import { SortService } from "src/app/shared/services";
 
 
 @Component({
@@ -18,13 +19,16 @@ export class StatementOfAccountComponent extends AppList {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
 
+    headers: CommonInterface.IHeaderTable[];
+
     SOAs: SOA[] = [];
     selectedSOA: SOA = null;
     messageDelete: string = '';
 
     constructor(
         private _accoutingRepo: AccoutingRepo,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _sortService: SortService
     ) {
         super();
 
@@ -32,6 +36,18 @@ export class StatementOfAccountComponent extends AppList {
     }
 
     ngOnInit() {
+        this.headers = [
+            { title: 'SOA No', field: 'soano', sortable: true },
+            { title: 'Partner', field: 'partnerName', sortable: true },
+            { title: 'Shipment', field: 'shipment', sortable: true },
+            { title: 'Credit Amount', field: 'creditAmount', sortable: true },
+            { title: 'Debit Amount', field: 'debitAmount', sortable: true },
+            { title: 'Total Amount', field: 'totalAmount', sortable: true },
+            { title: 'Status', field: 'status', sortable: true },
+            { title: 'Issue Date', field: 'datetimeCreated', sortable: true },
+            { title: 'Issue Person', field: 'userCreated', sortable: true },
+            { title: 'Modified Date', field: 'datetimeModified', sortable: true },
+        ]
         this.getSOAs();
     }
 
@@ -76,6 +92,32 @@ export class StatementOfAccountComponent extends AppList {
                 () => { }
 
             );
+    }
+
+    setSortBy(sort?: string, order?: boolean): void {
+        this.sort = sort ? sort : 'code';
+        this.order = order;
+    }
+
+    sortClass(sort: string): string {
+        if (!!sort) {
+            let classes = 'sortable ';
+            if (this.sort === sort) {
+                classes += ('sort-' + (this.order ? 'asc' : 'desc') + ' ');
+            }
+
+            return classes;
+        }
+        return '';
+    }
+
+    sortBy(sort: string): void {
+        if (!!sort) {
+            this.setSortBy(sort, this.sort !== sort ? true : !this.order);
+            if (!!this.SOAs.length) {
+                this.SOAs = this._sortService.sort(this.SOAs, sort, this.order);
+            }
+        }
     }
 
     handleError(errors: any) {

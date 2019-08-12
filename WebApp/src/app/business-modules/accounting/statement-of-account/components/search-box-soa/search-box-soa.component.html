@@ -19,7 +19,7 @@
                         <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPartner"
                             (itemSelected)="onSelectDataFormSearch($event, 'partner')"
                             [selectedDisplayFields]="configPartner.selectedDisplayFields"
-                            [dataSources]="configPartner.dataSource" [displayFields]="configPartner.displayFields">
+                            [dataSources]="configPartner.dataSource" [displayFields]="configPartner.displayFields" [height]="200">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -48,6 +48,7 @@
                         </label>
                         <select class="form-control" [(ngModel)]="selectedStatus" name="status"
                             (ngModelChange)="onSelectDataFormSearch($event, 'status')">
+                            <option value="null" disabled>All</option>
                             <option *ngFor="let status of statusSOA" [ngValue]="status">{{status.title}}</option>
                         </select>
                     </div>
@@ -59,9 +60,11 @@
                         <label class="form-control-label" for="">
                             Currency
                         </label>
-                        <ng-select [items]="currencyList" (selected)="onSelectDataFormSearch($event, 'currency')"
-                            placeholder="Select currency" [active]="selectedCurrency">
-                        </ng-select>
+                        <select class="form-control" [(ngModel)]="selectedCurrency" name="currency"
+                            (ngModelChange)="onSelectDataFormSearch($event, 'currency')">
+                            <option [ngValue]="null" disabled>All</option>
+                            <option *ngFor="let currency of currencyList" [ngValue]="currency">{{currency.id}}</option>
+                        </select>
                     </div>
                 </div>
                 <!-- <div class="col-lg-4">
@@ -80,9 +83,11 @@
                         <label class="form-control-label" for="">
                             Personal Handle
                         </label>
-                        <ng-select [items]="users" [active]="currentUser" placeholder="Select user"
-                            (selected)="onSelectDataFormSearch($event, 'user')">
-                        </ng-select>
+                        <select class="form-control" [(ngModel)]="currentUser" name="user"
+                            (ngModelChange)="onSelectDataFormSearch($event, 'user')">
+                            <option [ngValue]="null" disabled>All</option>
+                            <option *ngFor="let user of users" [ngValue]="user">{{user.id}}</option>
+                        </select>
                     </div>
                 </div>
             </div>
