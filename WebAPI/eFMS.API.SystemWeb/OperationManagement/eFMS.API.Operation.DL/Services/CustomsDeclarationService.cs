@@ -130,7 +130,7 @@ namespace eFMS.API.Operation.DL.Services
                 type = ClearanceConstants.Import_Type_Value;
             }
             var serviceType = GetServiceType(clearance, out string cargoType);
-            var route = GetRouteType(clearance.PLUONG);
+            var route = clearance.PLUONG!= null?GetRouteType(clearance.PLUONG): string.Empty;
             var partnerTaxCode = clearance.MA_DV;
             if (clearance.MA_DV != null)
             {
@@ -150,11 +150,11 @@ namespace eFMS.API.Operation.DL.Services
                 PortCodeNn = clearance.MA_CANGNN,
                 ExportCountryCode = clearance.NUOC_XK,
                 ImportCountryCode = clearance.NUOC_NK,
-                Pcs = clearance.SO_KIEN == null ? (int?)clearance.SO_KIEN : null,
+                Pcs = clearance.SO_KIEN != null ? (int?)clearance.SO_KIEN : null,
                 UnitCode = clearance.DVT_KIEN,
                 QtyCont = clearance.SO_CONTAINER == null ? (int?)clearance.SO_CONTAINER : null,
                 GrossWeight = clearance.TR_LUONG,
-                Route = clearance.PLUONG,
+                Route = route,
                 Type = type,
                 ServiceType = serviceType,
                 UserCreated = currentUser.UserID,
@@ -167,6 +167,7 @@ namespace eFMS.API.Operation.DL.Services
         private string GetRouteType(string luong)
         {
             var route = string.Empty;
+            luong = luong.ToLower().Trim();
             switch (luong)
             {
                 case ClearanceConstants.Route_Type_Vang:
