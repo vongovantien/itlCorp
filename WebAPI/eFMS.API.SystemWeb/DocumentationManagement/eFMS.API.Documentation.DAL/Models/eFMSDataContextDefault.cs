@@ -160,6 +160,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
+                entity.Property(e => e.Description).HasMaxLength(50);
+
                 entity.Property(e => e.Hbl)
                     .HasColumnName("HBL")
                     .HasMaxLength(250)

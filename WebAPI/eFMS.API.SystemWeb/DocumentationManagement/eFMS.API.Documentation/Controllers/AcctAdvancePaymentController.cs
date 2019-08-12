@@ -45,6 +45,22 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
+        /// get and paging the list of Advance Payment by conditions
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <param name="pageNumber">page to retrieve data</param>
+        /// <param name="pageSize">number items per page</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("Paging")]
+        public IActionResult Paging(AcctAdvancePaymentCriteria criteria, int pageNumber, int pageSize)
+        {
+            var data = acctAdvancePaymentService.Paging(criteria, pageNumber, pageSize, out int totalItems);
+            var result = new { data, totalItems, pageNumber, pageSize };
+            return Ok(result);
+        }
+
+        /// <summary>
         /// Get shipments (JobId, HBL, MBL) from shipment documentation and shipment operation
         /// </summary>
         /// <returns></returns>
