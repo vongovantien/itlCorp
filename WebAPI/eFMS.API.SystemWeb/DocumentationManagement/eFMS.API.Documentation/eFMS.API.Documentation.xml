@@ -46,6 +46,13 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctAdvancePaymentController.Delete(System.Guid)">
+            <summary>
+            delete an existed item
+            </summary>
+            <param name="idAdvanceRequest">idAdvanceRequest of existed item that want to delete</param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.AcctSOAController">
             <summary>
             A base class for an MVC controller without view support.
