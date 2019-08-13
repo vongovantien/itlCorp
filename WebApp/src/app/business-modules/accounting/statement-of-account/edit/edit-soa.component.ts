@@ -10,7 +10,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AppList } from 'src/app/app.list';
 import { SortService, DataService } from 'src/app/shared/services';
 import { formatDate } from '@angular/common';
-import moment from 'moment';
 import { SystemConstants } from 'src/constants/system.const';
 @Component({
     selector: 'app-statement-of-account-edit',
@@ -240,11 +239,15 @@ export class StatementOfAccountEditComponent extends AppList {
 
     updateSOA() {
         /*
-        * endDate must greater or equal soaToDate
+        * endDate must >= soaToDate
                     * and 
-        * fromDate must less or equal soaFromDate
+        * startDate must <= soaFromDate
         */
-        if (!(moment(this.soa.soaformDate).isSameOrAfter(moment(this.selectedRange.startDate), 'day') && moment(this.selectedRange.endDate).isSameOrAfter(moment(this.soa.soatoDate), 'day'))) {
+        // if (!(moment(this.soa.soaformDate).isSameOrAfter(moment(this.selectedRange.startDate), 'day') && moment(this.selectedRange.endDate).isSameOrAfter(moment(this.soa.soatoDate), 'day'))) {
+        //     this._toastService.warning(`Range date invalid `, '', { positionClass: 'toast-bottom-right' });
+        //     return;
+        // }
+        if ((new Date(this.selectedRange.startDate).getDate() > new Date(this.soa.soaformDate).getDate()) || new Date(this.selectedRange.endDate).getDate() < new Date(this.soa.soatoDate).getDate()) {
             this._toastService.warning(`Range date invalid `, '', { positionClass: 'toast-bottom-right' });
             return;
         }
@@ -306,6 +309,6 @@ export class StatementOfAccountEditComponent extends AppList {
         this.addChargePopup.charges = this.charges;
         this.addChargePopup.configCharge = this.configCharge;
 
-        this.addChargePopup.show({ backdrop: 'static' });
+        this.addChargePopup.show();
     }
 }

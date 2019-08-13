@@ -7,7 +7,8 @@ export abstract class PopupBase extends AppPage {
 
     options: ModalOptions = {
         animated: false,
-        keyboard: true
+        keyboard: true,
+        backdrop: 'static'
     };
 
     constructor() {

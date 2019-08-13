@@ -58,22 +58,28 @@
                                         class="text-center">
                                         <td>
                                             <div class="m-checkbox-list d-flex">
-                                                <span>
-                                                    <a (click)="deleteAdvancePayment(advancePayment)" title="Delete advance payment" class="pointer">
+                                                <span
+                                                    *ngIf="advancePayment.statusApproval === 'New' || advancePayment.statusApproval === 'Denied'">
+                                                    <a (click)="deleteAdvancePayment(advancePayment)"
+                                                        title="Delete advance payment" class="pointer">
                                                         <i class="la la-trash"></i>
                                                     </a>
                                                 </span>
                                                 <span>
                                                     <a (click)="copyAdvancePayment(advancePayment)"
-                                                        title="Copy advance payment" class="pointer">
+                                                        title=" Copy advance payment" class="pointer">
                                                         <i class="la la-copy"></i>
                                                     </a>
                                                 </span>
                                             </div>
                                         </td>
-                                        <td class="text-underline text-primary pointer">{{advancePayment.advanceNo}}
+                                        <td class="text-underline text-primary pointer">
+                                            <a [routerLink]="[advancePayment.hbl]">
+                                                <!-- TODO change url-->
+                                                {{advancePayment.advanceNo}}
+                                            </a>
                                         </td>
-                                        <td>{{advancePayment.customNo}}</td>
+                                        <td> {{advancePayment.customNo}} </td>
                                         <td>{{advancePayment.jobId}}</td>
                                         <td>{{advancePayment.hbl}}</td>
                                         <td>{{advancePayment.description}}</td>
@@ -121,7 +127,8 @@
                                     <div class="select-box">
                                         <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
                                             (change)="selectPageSize(pageSize)" name="pagesize">
-                                            <ng-container *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
+                                            <ng-container
+                                                *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
                                                 <option [ngValue]="item">{{item}} line / screen</option>
                                             </ng-container>
                                         </select>
@@ -130,8 +137,9 @@
                             </div>
                             <div class="col-sm-6" *ngIf="totalItems > pageSize">
                                 <div class="float-right">
-                                    <pagination [boundaryLinks]="true" [totalItems]="totalItems" [itemsPerPage]="pageSize"
-                                        (pageChanged)="pageChanged($event)" [(ngModel)]="page">
+                                    <pagination [boundaryLinks]="true" [totalItems]="totalItems"
+                                        [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
+                                        [(ngModel)]="page">
                                     </pagination>
                                 </div>
                             </div>
