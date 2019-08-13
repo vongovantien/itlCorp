@@ -81,6 +81,21 @@ namespace AuthServer
             //         + "Check working: " + url
             //         + @".well-known/openid-configuration");
             //});
+            app.Run(async (context) =>
+            {
+                string url = string.Concat(
+                       context.Request.Scheme,
+                       "://",
+                       context.Request.Host.ToUriComponent(),
+                       context.Request.PathBase.ToUriComponent(),
+                      context.Request.Path.HasValue && context.Request.Path.ToUriComponent().EndsWith('/')
+                      ? "" : @"/");
+                await
+                context.Response.WriteAsync("Identity Server is running ..."
+                     + Environment.NewLine
+                     + "Check working: " + url
+                     + @".well-known/openid-configuration");
+            });
             app.UseCors("AllowAllOrigins");
         }
     }

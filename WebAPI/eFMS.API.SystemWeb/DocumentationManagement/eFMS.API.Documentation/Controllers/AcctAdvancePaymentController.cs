@@ -4,12 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.NoSql;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -92,7 +94,8 @@ namespace eFMS.API.Documentation.Controllers
                     var totalAmount = model.AdvanceRequests.Sum(x => x.Amount);
                     if (totalAmount > 100000000)
                     {
-                        return BadRequest();
+                        ResultHandle _result = new ResultHandle { Status = false, Message = "Total Advance Amount by cash is not exceed 100.000.000 VND" };
+                        return BadRequest(_result);
                     }
                 }
 
@@ -108,7 +111,8 @@ namespace eFMS.API.Documentation.Controllers
                     };
                     if (acctAdvancePaymentService.CheckShipmentsExistInAdvancePayment(shipment))
                     {
-                        return BadRequest();
+                        ResultHandle _result = new ResultHandle { Status = false, Message = "Duplicate Shipment" };
+                        return BadRequest(_result);
                     }
                 }
             }
@@ -137,6 +141,44 @@ namespace eFMS.API.Documentation.Controllers
             ResultHandle result = new ResultHandle { Status = data, Message = data ? "Exists" : "Not exists" };
             return Ok(result);
         }
+
+        /// <summary>
+        /// delete an existed item
+        /// </summary>
+        /// <param name="idAdvanceRequest">idAdvanceRequest of existed item that want to delete</param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpDelete]
+        [Route("Delete")]
+        public IActionResult Delete(Guid idAdvanceRequest)
+        {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
+
+            HandleState hs = acctAdvancePaymentService.DeleteAdvanceRequest(idAdvanceRequest);
+
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Get Advance Payment by AdvanceNo
+        /// </summary>
+        /// <param name="advanceNo">advanceNo that want to retrieve Advance Payment</param>
+        /// <returns></returns>
+        //[HttpGet]
+        //[Route("GetAdvancePaymentByAdvanceNo")]
+        //public IActionResult GetAdvancePaymentByAdvanceNo(string advanceNo)
+        //{
+        //    var data = acctAdvancePaymentService.GetAdvancePaymentByAdvanceNo(advanceNo);
+        //    if(data != null)
+        //        return Ok(data);
+        //    return NotFound();
+        //}
 
     }
 }

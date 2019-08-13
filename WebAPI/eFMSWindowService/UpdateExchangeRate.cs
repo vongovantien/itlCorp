@@ -36,13 +36,13 @@ namespace eFMSWindowService
         //Custom method to Stop the timer
         public new void Stop()
         {
-            WriteToFile("Service is stopped at " + DateTime.Now);
+            WriteToFile("Service update exchange rate is stopped at " + DateTime.Now);
             _aTimer.Stop();
             _aTimer.Dispose();
         }
         private void _aTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            WriteToFile("Service is recall at " + DateTime.Now);
+            WriteToFile("Service update exchange rate is recall at " + DateTime.Now);
             eFMSTestEntities db = new eFMSTestEntities();
             var newestExchanges = db.vw_catCurrencyExchangeNewest;
             foreach (var item in newestExchanges)
@@ -68,7 +68,7 @@ namespace eFMSWindowService
 
         protected override void OnStart(string[] args)
         {
-            WriteToFile("Service is started at " + DateTime.Now);
+            WriteToFile("Service update exchange rate is started at " + DateTime.Now);
             this.Start();
         }
 

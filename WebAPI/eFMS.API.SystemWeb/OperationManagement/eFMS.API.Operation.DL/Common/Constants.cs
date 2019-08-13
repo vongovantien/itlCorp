@@ -58,9 +58,9 @@ namespace eFMS.API.Operation.DL.Common
         public const string Import_Type_Value = "Import";
         public const string Export_Type_Value = "Export";
 
-        public const string Route_Type_Do = "Do";
-        public const string Route_Type_Xanh = "Xanh";
-        public const string Route_Type_Vang = "Vang";
+        public const string Route_Type_Do = "do";
+        public const string Route_Type_Xanh = "xanh";
+        public const string Route_Type_Vang = "vang";
         public const string Route_Type_Red = "Red";
         public const string Route_Type_Green = "Green";
         public const string Route_Type_Yellow = "Yellow";

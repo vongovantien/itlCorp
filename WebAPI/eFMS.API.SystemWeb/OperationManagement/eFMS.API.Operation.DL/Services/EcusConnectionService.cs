@@ -141,8 +141,8 @@ namespace eFMS.API.Operation.DL.Services
                                   ,[SO_CONTAINER]
                                   ,[PLUONG]
 	                              ,DTOKHAIMD_VNACCS2.[MA_HIEU_PTVC]
-                              FROM[ECUS5VNACCS].[dbo].[DTOKHAIMD]
-                                    INNER JOIN[ECUS5VNACCS].[dbo].[DTOKHAIMD_VNACCS2]
+                              FROM " + database + @".[dbo].[DTOKHAIMD]
+                                    INNER JOIN " + database + @".[dbo].[DTOKHAIMD_VNACCS2]
                                     ON DTOKHAIMD._DToKhaiMDID = DTOKHAIMD_VNACCS2._DTOKHAIMDID
                               WHERE NAMDK = YEAR(GETDATE()) AND (MONTH(GETDATE()) - MONTH(NGAY_DK)) < 4";
 
