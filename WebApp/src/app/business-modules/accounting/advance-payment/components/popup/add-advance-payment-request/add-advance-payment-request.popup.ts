@@ -18,7 +18,6 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
 
     action: string = 'create';
-    requestId: number;
 
     configShipment: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
@@ -135,7 +134,6 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             advanceType: form.value.type.value,
             requestCurrency: form.value.currency,
             description: form.value.description,
-            uuid: this.requestId
         });
         if (this.action === 'create') {
             this._accoutingRepo.checkShipmentsExistInAdvancePament(this.selectedShipmentData)
@@ -262,7 +260,6 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             advanceType: form.value.type.value,
             requestCurrency: form.value.currency,
             description: form.value.description,
-            uuid: this.requestId
         });
         this.onRequest.emit(body);
     }

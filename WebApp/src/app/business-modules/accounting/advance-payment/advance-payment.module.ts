@@ -14,6 +14,7 @@ import { AdvancePaymentFormCreateComponent } from './components/form-create-adva
 import { AdvancePaymentListRequestComponent } from './components/list-advance-payment-request/list-advance-payment-request.component';
 import { AdvancePaymentAddRequestPopupComponent } from './components/popup/add-advance-payment-request/add-advance-payment-request.popup';
 import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
+import { AdvancePaymentDetailComponent } from './detail/detail-advance-payment.component';
 
 registerLocaleData(localeVi, 'vi');
 const routing: Routes = [
@@ -24,6 +25,10 @@ const routing: Routes = [
     {
         path: "new", component: AdvancePaymentAddNewComponent,
         data: { name: "New", path: "New", level: 3 }
+    },
+    {
+        path: ":id", component: AdvancePaymentDetailComponent,
+        data: { name: "Detail", path: "Detail", level: 3 }
     }
 
 ];
@@ -51,7 +56,8 @@ const COMPONENTS = [
     declarations: [
         AdvancePaymentComponent,
         AdvancePaymentAddNewComponent,
-        ...COMPONENTS
+        AdvancePaymentDetailComponent,
+        ...COMPONENTS,
     ],
     providers: [
         { provide: LOCALE_ID, useValue: 'vi' },

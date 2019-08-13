@@ -8,6 +8,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
 import { NgProgressModule } from '@ngx-progressbar/core';
+import { ModalModule } from 'ngx-bootstrap';
 
 
 const routing: Routes = [
@@ -19,6 +20,7 @@ const routing: Routes = [
     imports: [
         CommonModule,
         SharedModule,
+        ModalModule.forRoot(),
         FormsModule,
         SelectModule,
         NgProgressModule,

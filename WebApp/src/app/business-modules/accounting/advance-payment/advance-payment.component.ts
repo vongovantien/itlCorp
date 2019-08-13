@@ -11,7 +11,6 @@ import { AdvancePaymentRequest } from 'src/app/shared/models';
 @Component({
     selector: 'app-advance-payment',
     templateUrl: './advance-payment.component.html',
-    styleUrls: ['./advance-payment.component.sass']
 })
 export class AdvancePaymentComponent extends AppList {
     @ViewChild(AdvancePaymentFormsearchComponent, { static: false }) formSearch: AdvancePaymentFormsearchComponent;
@@ -63,6 +62,7 @@ export class AdvancePaymentComponent extends AppList {
             ).subscribe(
                 (res: any) => {
                     this.advancePayments = res.data;
+                    console.log(this.advancePayments);
                     this.totalItems = res.totalItems || 0;
                 },
                 (errors: any) => {
@@ -99,12 +99,12 @@ export class AdvancePaymentComponent extends AppList {
         }
     }
 
-    deleteAdvancePayment() {
-
+    deleteAdvancePayment(selectedRequest: AdvancePaymentRequest) {
+        console.log(selectedRequest);
     }
 
-    copyAdvancePayment() {
-
+    copyAdvancePayment(selectedRequest: AdvancePaymentRequest) {
+        console.log(selectedRequest);
     }
 
     handleError(errors: any) {

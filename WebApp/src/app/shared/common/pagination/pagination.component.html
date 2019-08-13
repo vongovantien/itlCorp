@@ -10,7 +10,7 @@
           </div>
       </div>
 
-      <div class="col-sm-6">
+      <div class="col-sm-6" *ngIf="config.totalItems > config.pageSize">
             <nav aria-label="">
                 <ul class="pagination  justify-content-end">
                     <li [ngClass]="{disabled:pager.currentPage === 1}" class="page-item"><a class="page-link" href="javascript:void(0)" (click)="setPage(1)">First</a></li>
