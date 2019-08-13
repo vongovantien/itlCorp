@@ -170,8 +170,7 @@
                                         </button>
                                         <button type="button"
                                             class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            (click)="remove_stage(i,'confirm')" title="Remove stage" data-toggle="modal"
-                                            data-target="#confirm-delete-modal">
+                                            (click)="remove_stage(i)" title="Remove stage">
                                             <i class="la la-trash"></i>
                                         </button>
                                     </div>
@@ -222,7 +221,7 @@
             </div>
             <!--end: Datatable of stage-management-list-table -->
             <!--begin::pagination-->
-            <app-pagination currentPage *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)"
+            <app-pagination currentPage *ngIf="pager.totalItems > 0" [config]="pager" (pageChange)="setPage($event)"
                 (pagerObject)="setPage($event)"></app-pagination>
             <!--end::pagination-->
         </div>
@@ -231,7 +230,6 @@
 </div>
 <!--end::m-content of stage-management-->
 
-<!--begin::add-stage-management-modal-->
 <div class="modal fade" id="add-stage-management-modal" data-backdrop="static" role="dialog" aria-labelledby=""
     aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
@@ -374,9 +372,7 @@
         </div>
     </div>
 </div>
-<!--end::add-stage-management-modal-->
 
-<!--begin::edit-stage-management-modal-->
 <div class="modal fade" id="edit-stage-management-modal" data-backdrop="static" role="dialog" aria-labelledby=""
     *ngIf="index_stage_edit!=null" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
@@ -531,44 +527,5 @@
         </div>
     </div>
 </div>
-<!--end::edit-stage-management-modal-->
 
-<!--begin::confirm-delete-modal-->
-<div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby=""
-    aria-hidden="true">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Notification</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="confirm-text-block">
-                    <span>You want to delete this Stage</span>
-                </div>
-            </div>
-            <div class="modal-footer m--align-center c-button-actions">
-                <button type="reset" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="remove_stage(-1,'yes')" data-dismiss="modal">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span>
-                            Yes
-                        </span>
-                    </span>
-                </button>
-                <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            Cancel
-                        </span>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-<!--end::confirm-delete-modal-->
+<confirm-popup (onSubmit)="onConfirmRemoveStage()" [body]="'You want to delete this Stage'"></confirm-popup>

@@ -6,12 +6,15 @@ import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { NgForm } from '@angular/forms';
 import { SortService } from 'src/app/shared/services/sort.service';
-import * as lodash from 'lodash';
+
+import _findIndex from 'lodash/findIndex';
+import _map from 'lodash/map';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { SystemConstants } from 'src/constants/system.const';
 import * as dataHelper from 'src/helper/data.helper';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 // declare var jquery: any;
 declare var $: any;
 
@@ -20,7 +23,8 @@ declare var $: any;
     templateUrl: './stage-management.component.html',
     styleUrls: ['./stage-management.component.sass']
 })
-export class StageManagementComponent implements OnInit {
+export class StageManagementComponent {
+    @ViewChild(ConfirmPopupComponent, { static: false }) popupConfirm: ConfirmPopupComponent;
 
     selected_filter = "All";
     ListStages: any = [];
@@ -32,6 +36,27 @@ export class StageManagementComponent implements OnInit {
     index_stage_edit = null;
     index_current_department = null;
 
+    index_stage_remove = null;
+
+    resetNg2Select = true;
+    search_fields: any = ['id', 'deparmentId', 'stageNameVn', 'stageNameEn', 'code'];
+    condition = "or";
+    search_key = "";
+    searchObject = {
+        id: 0,
+        code: "",
+        stageNameVn: "",
+        stageNameEn: "",
+        condition: "OR",
+        departmentName: ""
+    };
+
+    value: any = {};
+    _disabledV: string = '0';
+    disabled: boolean = false;
+
+    isDesc = true;
+    sortKey: string = "id";
     @ViewChild(PaginationComponent, { static: false }) child;
 
     constructor(
@@ -53,7 +78,7 @@ export class StageManagementComponent implements OnInit {
     }
 
     async getStages(pager: PagerSetting) {
-        var response = await this.baseServices.postAsync(this.api_menu.Catalogue.Stage_Management.paging + "/" + pager.currentPage + "/" + pager.pageSize, this.searchObject, false, true);
+        const response = await this.baseServices.postAsync(this.api_menu.Catalogue.Stage_Management.paging + "/" + pager.currentPage + "/" + pager.pageSize, this.searchObject, false, true);
         pager.totalItems = response.totalItems;
         return response.data;
     }
@@ -61,58 +86,48 @@ export class StageManagementComponent implements OnInit {
     getDepartments() {
         this.baseServices.get(this.api_menu.System.Department.getAll).subscribe(data => {
             this.ListDepartment = data;
-            this.ListDepartment = dataHelper.prepareNg2SelectData(this.ListDepartment, 'id', 'code');  //this.ListDepartment.map(x => ({ "text": x.code, "id": x.id }));
+            this.ListDepartment = dataHelper.prepareNg2SelectData(this.ListDepartment, 'id', 'code');
         });
     }
 
-    index_stage_remove = null;
-    async remove_stage(index: number, action: string) {
-        if (action == "confirm") {
-            this.index_stage_remove = index;
-        }
-
-        if (action == 'yes') {
-            var id_stage = this.ListStages[this.index_stage_remove].id;
-            await this.baseServices.deleteAsync(this.api_menu.Catalogue.Stage_Management.delete + id_stage, true, true)
-            // await this.setPage(this.pager);
-            this.pager.currentPage = 1;
-            this.pager.totalItems = 0;
-            this.ListStages = await this.getStages(this.pager);
-
-            // this.child.setPage(this.pager.currentPage);
-            // if (this.pager.currentPage > this.pager.totalPages) {
-            //     this.pager.currentPage = this.pager.totalPages;
-            //     this.child.setPage(this.pager.currentPage);
-            // }
-
-
-        }
+    remove_stage(index: number) {
+        this.popupConfirm.show();
+        this.index_stage_remove = index;
     }
 
+    async onConfirmRemoveStage() {
+        await this.baseServices.deleteAsync(this.api_menu.Catalogue.Stage_Management.delete + this.ListStages[this.index_stage_remove].id, true, true);
+
+        this.pager.currentPage = 1;
+        this.pager.totalItems = 0;
+
+        this.ListStages = await this.getStages(this.pager);
+        this.popupConfirm.hide();
+    }
 
     async edit_stage(index: number, action: string, form: NgForm) {
 
         if (action == "confirm") {
 
             this.index_stage_edit = index;
-            var currentStage = this.ListStages[this.index_stage_edit];
-            this.index_current_department = lodash.findIndex(this.ListDepartment, function (d) {
+            const currentStage = this.ListStages[this.index_stage_edit];
+            this.index_current_department = _findIndex(this.ListDepartment, function (d) {
                 return d['id'] == currentStage.departmentId;
             });
 
         } else {
             if (form.form.status != "INVALID") {
                 this.StageToUpdate = this.ListStages[this.index_stage_edit];
-                var res = await this.baseServices.putAsync(this.api_menu.Catalogue.Stage_Management.update, this.StageToUpdate, true, true);
+                const res = await this.baseServices.putAsync(this.api_menu.Catalogue.Stage_Management.update, this.StageToUpdate, true, true);
                 if (res) {
                     this.StageToUpdate = new StageModel();
                     $('#edit-stage-management-modal').modal('hide');
 
-                    //this.pager.currentPage = 1;
-                    //this.child.setPage(this.pager.currentPage);
+                    // this.pager.currentPage = 1;
+                    // this.child.setPage(this.pager.currentPage);
                     this.pager.totalItems = 0;
                     // this.getStages(this.pager);
-                    //await this.getStages(this.pager);
+                    // await this.getStages(this.pager);
                     await this.setPage(this.pager);
                 }
             }
@@ -121,7 +136,6 @@ export class StageManagementComponent implements OnInit {
     }
 
 
-    resetNg2Select = true;
     resetNgSelect() {
         this.resetNg2Select = false;
         setTimeout(() => {
@@ -145,7 +159,7 @@ export class StageManagementComponent implements OnInit {
                     this.resetNgSelect();
                     form.onReset();
                 }
-                //await this.getStages(this.pager);
+                // await this.getStages(this.pager);
                 // this.child.setPage(this.pager.currentPage);
                 // if (this.pager.currentPage < this.pager.totalPages) {
                 //     this.pager.currentPage = this.pager.totalPages;
@@ -160,17 +174,6 @@ export class StageManagementComponent implements OnInit {
 
     }
 
-    search_fields: any = ['id', 'deparmentId', 'stageNameVn', 'stageNameEn', 'code'];
-    condition = "or";
-    search_key = "";
-    searchObject = {
-        id: 0,
-        code: "",
-        stageNameVn: "",
-        stageNameEn: "",
-        condition: "OR",
-        departmentName: ""
-    }
 
     select_filter(filter, event) {
         this.searchObject = {
@@ -180,9 +183,9 @@ export class StageManagementComponent implements OnInit {
             stageNameEn: "",
             condition: "OR",
             departmentName: ""
-        }
+        };
         this.selected_filter = filter;
-        var id_element = document.getElementById(event.target.id);
+        const id_element = document.getElementById(event.target.id);
         if ($(id_element).hasClass("active") == false) {
             $(id_element).siblings().removeClass('active');
             id_element.classList.add("active");
@@ -233,14 +236,12 @@ export class StageManagementComponent implements OnInit {
             stageNameEn: "",
             condition: "OR",
             departmentName: ""
-        }
+        };
         this.search_key = "";
         await this.setPage(this.pager);
     }
 
-    private value: any = {};
-    private _disabledV: string = '0';
-    private disabled: boolean = false;
+
 
     private get disabledV(): string {
         return this._disabledV;
@@ -264,7 +265,7 @@ export class StageManagementComponent implements OnInit {
 
     }
 
-    public removed(value: any, action): void {
+    removed(value: any, action): void {
         if (action == "add") {
             this.StageToAdd.departmentId = null;
             console.log(this.StageToAdd.departmentId);
@@ -272,45 +273,39 @@ export class StageManagementComponent implements OnInit {
         console.log('Removed value is: ', value);
     }
 
-    public typed(value: any): void {
+    typed(value: any): void {
         console.log('New search input: ', value);
     }
 
-    public refreshValue(value: any): void {
+    refreshValue(value: any): void {
         this.value = value;
     }
 
-    isDesc = true;
-    sortKey: string = "id";
+
     sort(property: any) {
         this.sortKey = property;
         this.isDesc = !this.isDesc;
         if (property === 'deptName') {
             this.ListStages = this.sortService.sort(this.ListStages, property, this.isDesc);
-        }
-        else {
+        } else {
             const temp = this.ListStages.map(x => Object.assign({}, x));
             this.ListStages = this.sortService.sort(this.ListStages.map(x => Object.assign({}, x.stage)), property, this.isDesc);
-            var getDept = this.getDepartmentname;
+            const getDept = this.getDepartmentname;
             this.ListStages = this.ListStages.map(x => ({ stage: x, deptName: getDept(x.id, temp) }));
         }
     }
 
     getDepartmentname(stageId, ListStages: any[]) {
-        var inx = lodash.findIndex(ListStages, function (o) { return o.stage.id === stageId });
+        const inx = _findIndex(ListStages, function (o) { return o.stage.id === stageId; });
         if (inx != -1) {
             return ListStages[inx].deptName;
         }
     }
 
-    async import() {
-
-    }
-
     async export() {
-        var stages = await this.baseServices.postAsync(this.api_menu.Catalogue.Stage_Management.query, this.searchObject);
+        let stages = await this.baseServices.postAsync(this.api_menu.Catalogue.Stage_Management.query, this.searchObject);
         if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-            stages = lodash.map(stages, function (stg, index) {
+            stages = _map(stages, function (stg, index) {
                 return [
                     index + 1,
                     stg['id'],
@@ -321,12 +316,12 @@ export class StageManagementComponent implements OnInit {
                     stg['descriptionVn'],
                     stg['descriptionEn'],
                     (stg['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
-                ]
+                ];
             });
         }
 
         if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-            stages = lodash.map(stages, function (stg, index) {
+            stages = _map(stages, function (stg, index) {
                 return [
                     index + 1,
                     stg['id'],
@@ -337,7 +332,7 @@ export class StageManagementComponent implements OnInit {
                     stg['descriptionVn'],
                     stg['descriptionEn'],
                     (stg['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
-                ]
+                ];
             });
         }
 
@@ -355,7 +350,7 @@ export class StageManagementComponent implements OnInit {
             { name: "Description VN", width: 30 },
             { name: "Description EN", width: 30 },
             { name: "Inactive", width: 30 }
-        ]
+        ];
         exportModel.data = stages;
         exportModel.fileName = "Stage - " + new Date().toISOString();
 
