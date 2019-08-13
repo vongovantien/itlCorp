@@ -26,9 +26,6 @@ namespace eFMS.API.Documentation.DL.Services
 
         public List<AcctAdvanceRequestResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount)
         {
-            var datefrom = criteria.AdvanceModifiedDateFrom.HasValue;
-            var dateto = criteria.AdvanceModifiedDateTo.HasValue;
-
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var advance = dc.AcctAdvancePayment;
             var request = dc.AcctAdvanceRequest;
@@ -43,11 +40,11 @@ namespace eFMS.API.Documentation.DL.Services
                             criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ?
                             (
                                 (
-                                       criteria.ReferenceNos.Contains(re.AdvanceNo)
-                                    || criteria.ReferenceNos.Contains(re.Hbl)
-                                    || criteria.ReferenceNos.Contains(re.Mbl)
-                                    || criteria.ReferenceNos.Contains(re.CustomNo)
-                                    || criteria.ReferenceNos.Contains(re.JobId)
+                                       criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.AdvanceNo) : 1 == 1
+                                    || criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.Hbl) : 1 == 1
+                                    || criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.Mbl) : 1 == 1
+                                    || criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.CustomNo) : 1 == 1
+                                    || criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.JobId) : 1 == 1
                                 )
                             )
                             :
@@ -60,7 +57,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                          (
                             !string.IsNullOrEmpty(criteria.Requester) ?
-                                ad.Requester.Equals(criteria.Requester)
+                                ad.Requester == criteria.Requester
                             :
                                 1 == 1
                          )
@@ -75,7 +72,7 @@ namespace eFMS.API.Documentation.DL.Services
                          &&
                          (
                             !string.IsNullOrEmpty(criteria.StatusApproval) && !criteria.StatusApproval.Equals("All") ?
-                                ad.StatusApproval.Equals(criteria.StatusApproval)
+                                ad.StatusApproval == criteria.StatusApproval
                             :
                                 1 == 1
                          )
@@ -91,14 +88,14 @@ namespace eFMS.API.Documentation.DL.Services
                          &&
                          (
                            !string.IsNullOrEmpty(criteria.StatusPayment) && !criteria.StatusPayment.Equals("All") ?
-                                re.StatusPayment.Equals(criteria.StatusPayment)
+                                re.StatusPayment == criteria.StatusPayment
                            :
                                 1 == 1
                          )
                          &&
                          (
                            !string.IsNullOrEmpty(criteria.PaymentMethod) && !criteria.PaymentMethod.Equals("All") ?
-                                ad.PaymentMethod.Equals(criteria.PaymentMethod)
+                                ad.PaymentMethod == criteria.PaymentMethod
                            :
                                 1 == 1
                           )
@@ -275,6 +272,74 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
+        public HandleState DeleteAdvanceRequest(Guid idAdvanceRequest)
+        {
+            try
+            {
+                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                //Lấy ra 1 Advance Request dựa vào Id của Advance Request
+                var request = dc.AcctAdvanceRequest.Where(x => x.Id == idAdvanceRequest).FirstOrDefault();
+                if (request != null)
+                {
+                    //Đếm số lượng Advance Request của 1 Advance Payment
+                    var countRequestOfAdvance = dc.AcctAdvanceRequest.Where(x => x.AdvanceNo == request.AdvanceNo).Count();
+                    //Lấy ra Advance Payment dựa vào AdvanceNo
+                    var advance = dc.AcctAdvancePayment.Where(x => x.AdvanceNo == request.AdvanceNo).FirstOrDefault();
+
+                    if (advance == null) return new HandleState("Not Found Advance Payment");
+
+                    if (countRequestOfAdvance == 1)
+                    {
+                        //Xóa Advance Payment nếu số lượng Advance Request của Advance Payment bằng 1
+                        dc.AcctAdvancePayment.Remove(advance);
+                    }
+                    else
+                    {
+                        //Cập nhật lại UserModified và DatetimeModified của Advance Payment
+                        advance.UserModified = currentUser.UserID;
+                        advance.DatetimeModified = DateTime.Now;
+                        dc.AcctAdvancePayment.Update(advance);
+                    }
+                    //Xóa 1 Advance Request
+                    dc.AcctAdvanceRequest.Remove(request);
+
+                    dc.SaveChanges();
+                    return new HandleState();
+                }
+                else
+                {
+                    return new HandleState("Not Found Advance Request");
+                }
+            }
+            catch (Exception ex)
+            {
+                var hs = new HandleState(ex.Message);
+                return hs;
+            }
+        }
+
+        public AcctAdvancePaymentModel GetAdvancePaymentByAdvanceNo(string advanceNo)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var advanceModel = new AcctAdvancePaymentModel();
+            
+            //Lấy ra Advance Payment dựa vào Advance No
+            var advance = dc.AcctAdvancePayment.Where(x => x.AdvanceNo == advanceNo).FirstOrDefault();
+            //Không tìm thấy Advance Payment thì trả về null
+            if (advance == null) return null;
+            
+            //Lấy ra danh sách Advance Request dựa vào Advance No và sắp xếp giảm dần theo DatetimeModified Advance Request
+            var request = dc.AcctAdvanceRequest.Where(x => x.AdvanceNo == advanceNo).OrderByDescending(x => x.DatetimeModified).ToList();
+            //Không tìm thấy Advance Request thì trả về null
+            if (request == null) return null;
+            
+            //Mapper AcctAdvancePayment thành AcctAdvancePaymentModel
+            advanceModel = mapper.Map<AcctAdvancePaymentModel>(advance);
+            //Mapper List<AcctAdvanceRequest> thành List<AcctAdvanceRequestModel>
+            advanceModel.AdvanceRequests = mapper.Map<List<AcctAdvanceRequestModel>>(request);
+            
+            return advanceModel;
+        }
 
     }
 }

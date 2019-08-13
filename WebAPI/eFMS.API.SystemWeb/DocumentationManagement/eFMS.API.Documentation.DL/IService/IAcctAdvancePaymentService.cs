@@ -21,5 +21,9 @@ namespace eFMS.API.Documentation.DL.IService
 
         // Kiểm tra lô hàng (JobId, HBL, MBL) đã được add trong advance payment nào hay chưa?
         bool CheckShipmentsExistInAdvancePayment(ShipmentAdvancePaymentCriteria criteria);
+
+        HandleState DeleteAdvanceRequest(Guid idAdvanceRequest);
+
+        AcctAdvancePaymentModel GetAdvancePaymentByAdvanceNo(string advanceNo);
     }
 }
