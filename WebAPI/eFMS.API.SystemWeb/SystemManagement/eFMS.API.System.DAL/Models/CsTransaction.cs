@@ -33,6 +33,8 @@ namespace eFMS.API.System.Service.Models
         public string ShipmentType { get; set; }
         public string ServiceMode { get; set; }
         public string Commodity { get; set; }
+        public string DesOfGoods { get; set; }
+        public string PackageContainer { get; set; }
         public string InvoiceNo { get; set; }
         public string Pono { get; set; }
         public string PersonIncharge { get; set; }
@@ -40,6 +42,7 @@ namespace eFMS.API.System.Service.Models
         public string RouteShipment { get; set; }
         public int? Quantity { get; set; }
         public int? Unit { get; set; }
+        public decimal? NetWeight { get; set; }
         public decimal? GrossWeight { get; set; }
         public decimal? ChargeWeight { get; set; }
         public decimal? Cbm { get; set; }
@@ -49,6 +52,7 @@ namespace eFMS.API.System.Service.Models
         public string Notes { get; set; }
         public bool? Locked { get; set; }
         public DateTime? LockedDate { get; set; }
+        public string TransactionType { get; set; }
         public string UserCreated { get; set; }
         public DateTime? CreatedDate { get; set; }
         public string UserModified { get; set; }

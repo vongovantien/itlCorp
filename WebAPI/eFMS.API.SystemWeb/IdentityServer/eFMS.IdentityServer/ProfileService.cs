@@ -15,8 +15,8 @@ namespace eFMS.IdentityServer
 {
     public class ProfileService : IProfileService
     {
-        private IAuthenUserService authenUserService;
-        private ISysUserLogService userLogService;
+        readonly IAuthenUserService authenUserService;
+        protected ISysUserLogService userLogService;
         public ProfileService(IAuthenUserService service,ISysUserLogService _userLogService)
         {
             authenUserService = service;

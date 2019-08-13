@@ -9,11 +9,11 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace AuthServer
+namespace eFMS.IdentityServer
 {
     public class ResourceOwnerPasswordValidator : IResourceOwnerPasswordValidator
     {
-        private IAuthenUserService authenUser;
+        private readonly IAuthenUserService authenUser;
         public ResourceOwnerPasswordValidator(IAuthenUserService service)
         {
             authenUser = service;

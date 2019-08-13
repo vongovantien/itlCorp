@@ -7,7 +7,6 @@ namespace eFMS.API.System.Service.Models
     {
         public CatBranch()
         {
-            SysUser = new HashSet<SysUser>();
             SysUserOtherWorkPlace = new HashSet<SysUserOtherWorkPlace>();
             SysUserRole = new HashSet<SysUserRole>();
         }
@@ -31,9 +30,9 @@ namespace eFMS.API.System.Service.Models
         public byte[] Logo { get; set; }
         public string Code { get; set; }
         public string UserCreated { get; set; }
-        public string DatetimeCreated { get; set; }
+        public DateTime? DatetimeCreated { get; set; }
+        public short? Buid { get; set; }
 
-        public virtual ICollection<SysUser> SysUser { get; set; }
         public virtual ICollection<SysUserOtherWorkPlace> SysUserOtherWorkPlace { get; set; }
         public virtual ICollection<SysUserRole> SysUserRole { get; set; }
     }

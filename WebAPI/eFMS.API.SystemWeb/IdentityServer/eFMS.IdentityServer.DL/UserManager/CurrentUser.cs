@@ -10,7 +10,7 @@ namespace eFMS.IdentityServer.DL.UserManager
     public class CurrentUser : ICurrentUser
     {
         private IHttpContextAccessor httpContext;
-        private IEnumerable<Claim> currentUser;
+        private readonly IEnumerable<Claim> currentUser;
         public CurrentUser(IHttpContextAccessor contextAccessor)
         {
             httpContext = contextAccessor;

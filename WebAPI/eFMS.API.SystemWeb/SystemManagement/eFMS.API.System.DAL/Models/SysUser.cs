@@ -29,7 +29,6 @@ namespace eFMS.API.System.Service.Models
         public DateTime? InactiveOn { get; set; }
 
         public virtual SysUserGroup UserGroup { get; set; }
-        public virtual CatBranch WorkPlace { get; set; }
         public virtual ICollection<SysAuthorization> SysAuthorizationAssignToNavigation { get; set; }
         public virtual ICollection<SysAuthorization> SysAuthorizationUser { get; set; }
         public virtual ICollection<SysUserOtherWorkPlace> SysUserOtherWorkPlace { get; set; }

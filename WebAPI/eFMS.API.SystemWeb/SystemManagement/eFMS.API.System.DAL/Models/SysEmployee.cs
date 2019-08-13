@@ -24,13 +24,13 @@ namespace eFMS.API.System.Service.Models
         public decimal? Bonus { get; set; }
         public string SaleResource { get; set; }
         public Guid? LdapObjectGuid { get; set; }
+        public bool? Inactive { get; set; }
+        public DateTime? InactiveOn { get; set; }
+        public byte[] Signature { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
-        public bool? Inactive { get; set; }
-        public DateTime? InactiveOn { get; set; }
-        public byte[] Signature { get; set; }
 
         public virtual CatSaleResource SaleResourceNavigation { get; set; }
     }

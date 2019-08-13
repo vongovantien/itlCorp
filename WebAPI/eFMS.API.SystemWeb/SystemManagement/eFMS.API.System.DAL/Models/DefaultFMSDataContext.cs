@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace eFMS.API.System.Service.Models
 {
-    public partial class eFMSDataContext : DbContext
+    public partial class DefaultFMSDataContext : DbContext
     {
-        public eFMSDataContext()
+        public DefaultFMSDataContext()
         {
         }
 
-        public eFMSDataContext(DbContextOptions<eFMSDataContext> options)
+        public DefaultFMSDataContext(DbContextOptions<DefaultFMSDataContext> options)
             : base(options)
         {
         }
