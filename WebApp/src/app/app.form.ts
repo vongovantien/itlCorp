@@ -18,4 +18,12 @@ export abstract class AppForm extends AppPage {
         }
     }
 
+    resetFormControl(control: FormControl | AbstractControl) {
+        if (!!control && control instanceof FormControl) {
+            control.setValue(null);
+            control.markAsUntouched({ onlySelf: true });
+            control.markAsPristine({ onlySelf: true });
+        }
+    }
+
 }

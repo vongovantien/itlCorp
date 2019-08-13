@@ -17,29 +17,7 @@
     <div class="m-portlet">
         <div class="m-form">
             <div class="m-portlet__body">
-                <div class="row">
-                    <div class="col-lg-12 m--align-left">
-                        <button type="button"
-                            class="btn btn-success  m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                            (click)="openPopupAdd()">
-                            <span>
-                                <i class="la la-plus"></i>
-                                <span>
-                                    Add
-                                </span>
-                            </span>
-                        </button>
-                        <button type="button" class="btn btn-danger  m-btn--square m-btn--icon m-btn--uppercase">
-                            <span>
-                                <i class="la la-trash"></i>
-                                <span>
-                                    Delete
-                                </span>
-                            </span>
-                        </button>
-                    </div>
-                </div>
-
+               
                 <adv-payment-list-request></adv-payment-list-request>
 
                 <div class="row">
@@ -57,7 +35,7 @@
                             </button>
                             <button
                                 class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                title="Save & Send Request">
+                                title="Save & Send Request" >
                                 <span>
                                     <i class="la la-download"></i>
                                     <span>
@@ -89,5 +67,3 @@
         </div>
     </div>
 </div>
-
-<adv-payment-add-popup (onRequest)="onCreateRequestAdvancePayment($event)"></adv-payment-add-popup>

@@ -11,23 +11,23 @@ export class AccoutingRepo {
     constructor(protected _api: ApiService) {
     }
 
-    getListChargeShipment(data: any = {}) {
-        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/CsShipmentSurcharge/ListChargeShipment`, data).pipe(
+    getListChargeShipment(body: any = {}) {
+        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/CsShipmentSurcharge/ListChargeShipment`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
-    createSOA(data: any = {}) {
-        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/AcctSOA/Add`, data).pipe(
+    createSOA(body: any = {}) {
+        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/AcctSOA/Add`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
-    getListSOA(page?: number, size?: number, data: any = {}) {
+    getListSOA(page?: number, size?: number, body: any = {}) {
         if (!!page && !!size) {
-            return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSOA/paging`, data, {
+            return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSOA/paging`, body, {
                 pageNumber: '' + page,
                 pageSize: '' + size
             }).pipe(
@@ -58,16 +58,16 @@ export class AccoutingRepo {
             );
     }
 
-    updateSOA(data: any = {}) {
-        return this._api.put(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSOA/update`, data)
+    updateSOA(body: any = {}) {
+        return this._api.put(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSOA/update`, body)
             .pipe(
                 catchError((error) => throwError(error)),
                 map((data: any) => data)
             );
     }
 
-    getListShipmentAndCDNote(data: any = {}) {
-        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSOA/GetShipmentsAndCDdNotesNotExistInResultFilter`, data)
+    getListShipmentAndCDNote(body: any = {}) {
+        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSOA/GetShipmentsAndCDdNotesNotExistInResultFilter`, body)
             .pipe(
                 catchError((error) => throwError(error)),
                 map((data: any) => data)
@@ -82,8 +82,8 @@ export class AccoutingRepo {
             );
     }
 
-    addMoreCharge(data: any = {}) {
-        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSOA/AddMoreCharge`, data)
+    addMoreCharge(body: any = {}) {
+        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSOA/AddMoreCharge`, body)
             .pipe(
                 catchError((error) => throwError(error)),
                 map((data: any) => data)
@@ -131,6 +131,15 @@ export class AccoutingRepo {
             );
     }
     
+    getListAdvancePayment(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctAdvancePayment/paging`, body, {
+            pageNumber: '' + page,
+            pageSize: '' + size
+        }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 
 
 }

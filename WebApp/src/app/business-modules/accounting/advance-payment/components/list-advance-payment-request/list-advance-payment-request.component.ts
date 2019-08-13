@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
-import { AdvancePaymentRequest } from 'src/app/shared/models';
-import { Subject } from 'rxjs';
+import { AdvancePaymentRequest, Currency } from 'src/app/shared/models';
+import { Subject, Observable } from 'rxjs';
 import { takeUntil, catchError } from 'rxjs/operators';
 import { SortService } from 'src/app/shared/services';
+import { AdvancePaymentAddRequestPopupComponent } from '../popup/add-advance-payment-request/add-advance-payment-request.popup';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'adv-payment-list-request',
@@ -12,17 +14,22 @@ import { SortService } from 'src/app/shared/services';
 })
 
 export class AdvancePaymentListRequestComponent extends AppList {
+    @ViewChild(AdvancePaymentAddRequestPopupComponent, { static: false }) addNewRequestPaymentPopup: AdvancePaymentAddRequestPopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
-    $listRequestAdvancePayment: Subject<AdvancePaymentRequest[]> = new Subject<AdvancePaymentRequest[]>();
 
+    readonly $dataRequest: Subject<AdvancePaymentRequest> = new Subject<AdvancePaymentRequest>();
+    $listRequestAdvancePayment: Observable<AdvancePaymentRequest> = this.$dataRequest.asObservable();
     listRequestAdvancePayment: AdvancePaymentRequest[] = [];
+
+    selectedRequestAdvancePayment: AdvancePaymentRequest;
 
     totalAmount: number = 0;
     currency: string = 'VND';
 
     constructor(
-        private _sortService: SortService
+        private _sortService: SortService,
+        private _toastService: ToastrService
     ) {
         super();
         this.requestList = this.sortRequestAdvancePament;
@@ -49,16 +56,11 @@ export class AdvancePaymentListRequestComponent extends AppList {
                 catchError(this.catchError),
             )
             .subscribe(
-                (data: AdvancePaymentRequest) => {
+                (data: any) => {
                     this.listRequestAdvancePayment.push(data);
 
-                    // * update total amount, Currency.
-                    this.totalAmount = this.listRequestAdvancePayment.reduce((acc, curr) => acc + curr.amount, 0);
-                    this.currency = data.requestCurrency;
-
-                    for (const request of this.listRequestAdvancePayment) {
-                        request.requestCurrency = data.requestCurrency;
-                    }
+                    this.totalAmount = this.updateTotalAmount(this.listRequestAdvancePayment);
+                    this.updateCurrencyForRequest(data);
                 }
             );
     }
@@ -66,4 +68,60 @@ export class AdvancePaymentListRequestComponent extends AppList {
     sortRequestAdvancePament() {
         this.listRequestAdvancePayment = this._sortService.sort(this.listRequestAdvancePayment, this.sort, this.order);
     }
+
+    copyRequestPayment(request: AdvancePaymentRequest) {
+        this.selectedRequestAdvancePayment = new AdvancePaymentRequest(request);
+        this.addNewRequestPaymentPopup.action = 'update';
+        this.addNewRequestPaymentPopup.selectedRequest = request; 
+        
+        this.addNewRequestPaymentPopup.initFormUpdate(this.selectedRequestAdvancePayment);
+        this.addNewRequestPaymentPopup.show({ backdrop: 'static' });
+    }
+
+    onRequestAdvancePaymentChange(dataRequest: AdvancePaymentRequest) {
+        this.$dataRequest.next(dataRequest);
+        this.totalAmount = this.updateTotalAmount(this.listRequestAdvancePayment);
+        this.updateCurrencyForRequest(dataRequest);
+    }
+
+    openPopupAdd() {
+        this.addNewRequestPaymentPopup.action = 'create';
+        this.addNewRequestPaymentPopup.show({ backdrop: 'static' });
+    }
+
+    changeCurrency(currency: Currency) {
+        this.addNewRequestPaymentPopup.currency.setValue(currency.id);
+    }
+
+    updateCurrencyForRequest(request: AdvancePaymentRequest) {
+        this.currency = request.requestCurrency;
+        for (const item of this.listRequestAdvancePayment) {
+            item.requestCurrency = request.requestCurrency;
+        }
+    }
+
+    updateTotalAmount(listRequest: AdvancePaymentRequest[]) {
+        try {
+            return listRequest.reduce((acc, curr) => acc + curr.amount, 0) || 0;
+        } catch (error) {
+            this._toastService.error(error + '', 'Không lấy được amount');
+        }
+    }
+
+    checkUncheckAllRequest() {
+        for (const request of this.listRequestAdvancePayment) {
+            request.isSelected = this.isCheckAll;
+        }
+    }
+
+    onChangeCheckBoxRequestAdvancePayent($event: Event) {
+        this.isCheckAll = this.listRequestAdvancePayment.every((item: any) => item.isSelected);
+    }
+
+    deleteItemRequestAdvancePayment() {
+        this.listRequestAdvancePayment = this.listRequestAdvancePayment.filter((item: AdvancePaymentRequest) => !item.isSelected);
+        this.isCheckAll = false;
+    }
 }
+
+

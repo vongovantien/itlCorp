@@ -55,8 +55,8 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
             department: [],
             requestDate: [new Date()],
             deadLine: [{
-                startDate: new Date(new Date().setDate(new Date().getDate() + 7)),
-                endDate: new Date(new Date().setDate(new Date().getDate() + 7)),
+                startDate: new Date(new Date().setDate(new Date().getDate() + 9)),
+                endDate: new Date(new Date().setDate(new Date().getDate() + 9)),
             }],
             paymentMethod: [],
             note: [],

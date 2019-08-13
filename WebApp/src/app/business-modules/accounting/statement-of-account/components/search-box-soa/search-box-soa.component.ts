@@ -22,7 +22,6 @@ export class StatementOfAccountSearchComponent extends AppPage {
 
     @Output() onSearch: EventEmitter<any> = new EventEmitter<any>();
 
-    items: any[];
     selectedRange: any;
 
     configPartner: CommonInterface.IComboGirdConfig = {
@@ -35,11 +34,11 @@ export class StatementOfAccountSearchComponent extends AppPage {
     selectedPartner: any = {};
 
     currencyList: Currency[] = [];
-    selectedCurrency: any;
+    selectedCurrency: any = null;
 
     users: User[] = [];
     userLogged: User;
-    currentUser: any;
+    currentUser: any = null;
 
     statusSOA: any[] = [];
     selectedStatus: any = null;
@@ -80,12 +79,8 @@ export class StatementOfAccountSearchComponent extends AppPage {
                     this.selectedPartner = { field: 'partnerNameEn', value: 'All' };
 
                     this.partners = this._sortService.sort(this.partners, 'shortName', true);
-                    this.currencyList = <any>this.utility.prepareNg2SelectData(this.mapModel(dataCurrency, Currency), 'id', 'id');
-                    this.selectedCurrency = [this.currencyList.filter((item: any) => item.id === 'VND')[0]];
-
-                    this.users = <any>this.utility.prepareNg2SelectData(this.mapModel(dataSystemUser, User), 'id', 'username');
-                    this.currentUser = [this.users.filter((user: any) => user.id === this.userLogged.id)[0]];
-
+                    this.currencyList = dataCurrency || [];
+                    this.users = dataSystemUser || [];
                     // * set config for combogird
                     this.configPartner.dataSource = this.partners;
                     this.configPartner.displayFields = [
@@ -115,7 +110,7 @@ export class StatementOfAccountSearchComponent extends AppPage {
             { title: 'Need Revise', name: 'NeedRevise' },
             { title: 'Done', name: 'Done' },
         ];
-        this.selectedStatus = this.statusSOA[0];
+        // this.selectedStatus = this.statusSOA[0];
     }
 
     onSelectDataFormSearch(data: any, key: string) {
@@ -124,10 +119,10 @@ export class StatementOfAccountSearchComponent extends AppPage {
                 this.selectedPartner = <any>{ field: data.partnerNameEn, value: data.id };
                 break;
             case 'currency':
-                this.selectedCurrency = [data];
+                this.selectedCurrency = data;
                 break;
             case 'user':
-                this.currentUser = [data];
+                this.currentUser = data;
                 break;
             case 'status':
                 this.selectedStatus = data;
@@ -153,9 +148,9 @@ export class StatementOfAccountSearchComponent extends AppPage {
             customerID: (this.selectedPartner.value === 'All' ? '' : this.selectedPartner.value) || '',
             soaFromDateCreate: !!this.selectedRange.startDate ? formatDate(this.selectedRange.startDate, 'yyyy-MM-dd', 'en') : null,
             soaToDateCreate: !!this.selectedRange.endDate ? formatDate(this.selectedRange.endDate, 'yyyy-MM-dd', 'en') : null,
-            soaStatus: this.selectedStatus.name || null,
-            soaCurrency: this.selectedCurrency[0].id || null,
-            soaUserCreate: this.currentUser[0].id || '',
+            soaStatus: !!this.selectedStatus ? this.selectedStatus.name : null,
+            soaCurrency: !!this.selectedCurrency ? this.selectedCurrency.id : null,
+            soaUserCreate: !!this.currentUser ? this.currentUser.id : null,
         };
         this.onSearch.emit(body);
     }
@@ -164,7 +159,8 @@ export class StatementOfAccountSearchComponent extends AppPage {
     reset() {
         this.reference = '';
         this.selectedPartner = { field: 'partnerNameEn', value: 'All' };
-        this.selectedStatus = this.statusSOA[0];
+        this.currentUser = null;
+        this.selectedStatus = null;
         this.selectedRange = null;
 
         // ? search again!

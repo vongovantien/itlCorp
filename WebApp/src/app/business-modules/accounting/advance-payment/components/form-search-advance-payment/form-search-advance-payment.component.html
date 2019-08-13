@@ -14,7 +14,7 @@
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="">Requester</label>
-                                <input type="text" formControlName="requester" class="form-control"
+                                <input type="text" formControlName="requester" class="form-control" disabled
                                     placeholder="Requester">
                             </div>
                         </div>
@@ -48,8 +48,8 @@
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [maxDate]="maxDate"
-                                        [singleDatePicker]="true" name="daterange" readonly [autoApply]="true"
-                                        formControlName="requestDate" />
+                                        name="daterange" readonly formControlName="requestDate" [ranges]="ranges"
+                                        [alwaysShowCalendars]="true" />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -63,8 +63,8 @@
                                 <label for="">Modified Date</label>
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [maxDate]="maxDate"
-                                    [singleDatePicker]="true" name="daterange" readonly [autoApply]="true"
-                                    formControlName="modifiedDate" />
+                                    name="daterange" readonly formControlName="modifiedDate" [ranges]="ranges"
+                                    [alwaysShowCalendars]="true" />
                             </div>
                         </div>
                         <div class="col-12">
@@ -84,7 +84,8 @@
                 <div class="row">
                     <div class="col-lg-6"></div>
                     <div class="col-lg-6 m--align-right">
-                        <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="search()">
+                        <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                            (click)="search()">
                             <span>
                                 <i class="la la-search"></i>
                                 <span>
@@ -92,7 +93,8 @@
                                 </span>
                             </span>
                         </button>
-                        <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" (click)="reset()">
+                        <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                            (click)="reset()">
                             <span>
                                 <i class="la la-refresh"></i>
                                 <span>

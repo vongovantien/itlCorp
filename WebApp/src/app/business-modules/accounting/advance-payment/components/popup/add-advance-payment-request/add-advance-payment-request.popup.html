@@ -90,7 +90,7 @@
                     <span>
                         <i class="la la-save"></i>
                         <span>
-                            Add
+                            {{action === 'create' ? 'Add' : 'Save'}}
                         </span>
                     </span>
                 </button>
@@ -108,5 +108,5 @@
     </div>
 </div>
 
-<confirm-popup (onSubmit)="onSubmitExitPopup()" [title]="'Warning'" [body]="'Do you want to exit ?'" [labelCancel]="'No'">
+<confirm-popup (onSubmit)="onSubmitExitPopup()" [title]="'Warning'" [body]="bodyConfirm" [labelCancel]="'No'">
 </confirm-popup>

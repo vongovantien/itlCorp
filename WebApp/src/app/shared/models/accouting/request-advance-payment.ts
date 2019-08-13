@@ -14,6 +14,19 @@ export class AdvancePaymentRequest {
     datetimeCreated: string = '';
     userModified: string = '';
     datetimeModified: string = '';
+    requester: string = '';
+    requesterName: string = '';
+    department: string = '';
+    paymentMethod: string = ''
+    advanceCurrency: string = '';
+    requestDate: string = '';
+    deadlinePayment: string = '';
+    statusApproval: string = '';
+    advanceNote: string = '';
+    advanceDatetimeModified: string = '';
+    statusPayment: string = '';
+
+    isSelected?: boolean;
     
     constructor(object?: any) {
         const self = this;
