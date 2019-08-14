@@ -170,15 +170,75 @@ namespace eFMS.API.Documentation.Controllers
         /// </summary>
         /// <param name="advanceNo">advanceNo that want to retrieve Advance Payment</param>
         /// <returns></returns>
-        //[HttpGet]
-        //[Route("GetAdvancePaymentByAdvanceNo")]
-        //public IActionResult GetAdvancePaymentByAdvanceNo(string advanceNo)
-        //{
-        //    var data = acctAdvancePaymentService.GetAdvancePaymentByAdvanceNo(advanceNo);
-        //    if(data != null)
-        //        return Ok(data);
-        //    return NotFound();
-        //}
+        [HttpGet]
+        [Route("GetAdvancePaymentByAdvanceNo")]
+        public IActionResult GetAdvancePaymentByAdvanceNo(string advanceNo)
+        {
+            var data = acctAdvancePaymentService.GetAdvancePaymentByAdvanceNo(advanceNo);
+            if (data != null)
+                return Ok(data);
+            return NotFound();
+        }
+
+        /// <summary>
+        /// Update Advance Payment
+        /// </summary>
+        /// <param name="model">object to update</param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("Update")]
+        [Authorize]
+        public IActionResult Update(AcctAdvancePaymentModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            if (!model.StatusApproval.Equals("New") && !model.StatusApproval.Equals("Denied"))
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = "Only allowed to edit the advance payment status is New or Deny" };
+                return BadRequest(_result);
+            }
+
+            if (model.AdvanceRequests.Count > 0)
+            {
+                //Nếu sum(Amount) > 100.000.000 & Payment Method là Cash thì báo lỗi
+                if (model.PaymentMethod.Equals("Cash"))
+                {
+                    var totalAmount = model.AdvanceRequests.Sum(x => x.Amount);
+                    if (totalAmount > 100000000)
+                    {
+                        ResultHandle _result = new ResultHandle { Status = false, Message = "Total Advance Amount by cash is not exceed 100.000.000 VND" };
+                        return BadRequest(_result);
+                    }
+                }
+
+                //Kiểm tra tồn tại shipment trong 1 Advance Payment khác. Nếu đã tồn tại thì báo lỗi
+                foreach (var item in model.AdvanceRequests)
+                {
+                    var shipment = new ShipmentAdvancePaymentCriteria
+                    {
+                        JobId = item.JobId,
+                        HBL = item.Hbl,
+                        MBL = item.Mbl,
+                        AdvanceNo = model.AdvanceNo//Truyền vào Advance No cần update
+                    };
+                    if (acctAdvancePaymentService.CheckShipmentsExistInAdvancePayment(shipment))
+                    {
+                        ResultHandle _result = new ResultHandle { Status = false, Message = "Duplicate Shipment" };
+                        return BadRequest(_result);
+                    }
+                }
+            }
+
+            var hs = acctAdvancePaymentService.UpdateAdvancePayment(model);
+
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
 
     }
 }
