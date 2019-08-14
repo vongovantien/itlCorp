@@ -31,7 +31,7 @@ namespace eFMS.API.System.Infrastructure
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-            services.AddTransient<IUserGroupService, UserGroupService>();
+            //services.AddTransient<IUserGroupService, UserGroupService>();
             services.AddTransient<ICatBranchService, CatBranchService>();
             services.AddTransient<ICatPlaceService, CatPlaceService>();
             services.AddTransient<ICatDepartmentService, CatDepartmentService>();

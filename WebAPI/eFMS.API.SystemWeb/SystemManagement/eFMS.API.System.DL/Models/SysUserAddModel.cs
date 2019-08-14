@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-
+using System.Collections.Generic;
 namespace eFMS.API.System.DL.Models
 {
     public class SysUserAddModel
@@ -11,7 +11,7 @@ namespace eFMS.API.System.DL.Models
         public string Password { get; set; }
         public short UserGroupId { get; set; }
         public string EmployeeId { get; set; }
-        public Guid WorkPlaceId { get; set; }
+        public Guid? WorkPlaceId { get; set; }
         public bool? RefuseEmail { get; set; }
         public Guid? LdapObjectGuid { get; set; }
         public string UserCreated { get; set; }

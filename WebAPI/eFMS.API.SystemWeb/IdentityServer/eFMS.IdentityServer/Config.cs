@@ -30,6 +30,12 @@ namespace AuthServer
                     SlidingRefreshTokenLifetime = slientRefreshToken,
                     RedirectUris = redirectUris,
                     AllowedCorsOrigins= originUris,
+                    //AllowedCorsOrigins = new List<string> {
+                    //    "http://localhost:4200",
+                    //    "http://test.efms.itlvn.com",
+                    //    "http://test.api-efms.itlvn.com",
+                    //    "http://staging.efms.itlvn.com",
+                    //    "http://staging.api-efms.itlvn.com" },
                     AlwaysIncludeUserClaimsInIdToken = true,
                     AllowedScopes =
                     {

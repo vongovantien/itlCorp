@@ -3,21 +3,19 @@ using System.Collections.Generic;
 
 namespace eFMS.API.System.Service.Models
 {
-    public partial class CatBranch
+    public partial class SysBranch
     {
-        public CatBranch()
+        public SysBranch()
         {
-            SysUser = new HashSet<SysUser>();
             SysUserOtherWorkPlace = new HashSet<SysUserOtherWorkPlace>();
-            SysUserRole = new HashSet<SysUserRole>();
         }
 
-        public string Id { get; set; }
-        public short? Buid { get; set; }
+        public Guid Id { get; set; }
         public string BranchNameVn { get; set; }
         public string BranchNameEn { get; set; }
         public string AddressVn { get; set; }
         public string AddressEn { get; set; }
+        public short? CountryId { get; set; }
         public string Tel { get; set; }
         public string Fax { get; set; }
         public string Email { get; set; }
@@ -34,8 +32,6 @@ namespace eFMS.API.System.Service.Models
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
 
-        public virtual ICollection<SysUser> SysUser { get; set; }
         public virtual ICollection<SysUserOtherWorkPlace> SysUserOtherWorkPlace { get; set; }
-        public virtual ICollection<SysUserRole> SysUserRole { get; set; }
     }
 }

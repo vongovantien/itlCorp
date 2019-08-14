@@ -9,7 +9,6 @@ namespace eFMS.API.System.Service.Models
         {
             InverseParent = new HashSet<SysMenu>();
             SysRoleMenu = new HashSet<SysRoleMenu>();
-            SysRolePermission = new HashSet<SysRolePermission>();
         }
 
         public string Id { get; set; }
@@ -27,6 +26,5 @@ namespace eFMS.API.System.Service.Models
         public virtual SysMenu Parent { get; set; }
         public virtual ICollection<SysMenu> InverseParent { get; set; }
         public virtual ICollection<SysRoleMenu> SysRoleMenu { get; set; }
-        public virtual ICollection<SysRolePermission> SysRolePermission { get; set; }
     }
 }

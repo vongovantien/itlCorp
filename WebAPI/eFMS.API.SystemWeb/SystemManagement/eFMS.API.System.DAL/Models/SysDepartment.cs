@@ -3,13 +3,14 @@ using System.Collections.Generic;
 
 namespace eFMS.API.System.Service.Models
 {
-    public partial class CatDepartment
+    public partial class SysDepartment
     {
-        public int Id { get; set; }
+        public short Id { get; set; }
         public string Code { get; set; }
-        public string DeptName { get; set; }
-        public string Description { get; set; }
-        public int? CompanyId { get; set; }
+        public string NameEn { get; set; }
+        public string NameVn { get; set; }
+        public Guid? BranchId { get; set; }
+        public string ManagerId { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }

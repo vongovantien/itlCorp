@@ -3,19 +3,19 @@ using System.Collections.Generic;
 
 namespace eFMS.API.System.Service.Models
 {
-    public partial class SysRolePermission
+    public partial class SysGroupRole
     {
-        public int Id { get; set; }
+        public short Id { get; set; }
+        public short GroupId { get; set; }
         public short RoleId { get; set; }
-        public short PermissionId { get; set; }
-        public short? OtherIntructionId { get; set; }
+        public string UserCreated { get; set; }
+        public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
 
-        public virtual SysMenuPermissionInstruction OtherIntruction { get; set; }
-        public virtual SysPermission Permission { get; set; }
+        public virtual SysGroup Group { get; set; }
         public virtual SysRole Role { get; set; }
     }
 }
