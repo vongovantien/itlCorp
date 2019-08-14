@@ -19,7 +19,8 @@
                         <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPartner"
                             (itemSelected)="onSelectDataFormSearch($event, 'partner')"
                             [selectedDisplayFields]="configPartner.selectedDisplayFields"
-                            [dataSources]="configPartner.dataSource" [displayFields]="configPartner.displayFields" [height]="200">
+                            [dataSources]="configPartner.dataSource" [displayFields]="configPartner.displayFields"
+                            [height]="200">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -48,7 +49,7 @@
                         </label>
                         <select class="form-control" [(ngModel)]="selectedStatus" name="status"
                             (ngModelChange)="onSelectDataFormSearch($event, 'status')">
-                            <option value="null" disabled>All</option>
+                            <option value="null">All</option>
                             <option *ngFor="let status of statusSOA" [ngValue]="status">{{status.title}}</option>
                         </select>
                     </div>
@@ -62,7 +63,7 @@
                         </label>
                         <select class="form-control" [(ngModel)]="selectedCurrency" name="currency"
                             (ngModelChange)="onSelectDataFormSearch($event, 'currency')">
-                            <option [ngValue]="null" disabled>All</option>
+                            <option [ngValue]="null">All</option>
                             <option *ngFor="let currency of currencyList" [ngValue]="currency">{{currency.id}}</option>
                         </select>
                     </div>
@@ -85,8 +86,8 @@
                         </label>
                         <select class="form-control" [(ngModel)]="currentUser" name="user"
                             (ngModelChange)="onSelectDataFormSearch($event, 'user')">
-                            <option [ngValue]="null" disabled>All</option>
-                            <option *ngFor="let user of users" [ngValue]="user">{{user.id}}</option>
+                            <option [ngValue]="null">All</option>
+                            <option *ngFor="let user of users" [ngValue]="user">{{user.username}}</option>
                         </select>
                     </div>
                 </div>

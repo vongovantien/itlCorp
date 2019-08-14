@@ -62,13 +62,13 @@
                                                     *ngIf="advancePayment.statusApproval === 'New' || advancePayment.statusApproval === 'Denied'">
                                                     <a (click)="deleteAdvancePayment(advancePayment)"
                                                         title="Delete advance payment" class="pointer">
-                                                        <i class="la la-trash"></i>
+                                                        <i class="la la-trash text-danger"></i>
                                                     </a>
                                                 </span>
                                                 <span>
                                                     <a (click)="copyAdvancePayment(advancePayment)"
-                                                        title=" Copy advance payment" class="pointer">
-                                                        <i class="la la-copy"></i>
+                                                        title=" Copy advance payment " class="pointer">
+                                                        <i class="la la-copy text-success"></i>
                                                     </a>
                                                 </span>
                                             </div>

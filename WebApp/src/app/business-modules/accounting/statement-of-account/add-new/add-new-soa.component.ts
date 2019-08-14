@@ -175,7 +175,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
     }
 
     getCurrencyUser(data: any) {
-        this.users = (data || []).map((item: any) => ({ id: item.id, text: item.id }));
+        this.users = (data || []).map((item: any) => ({ id: item.id, text: item.username }));
         this.selectedUser = [this.users.filter((i: any) => i.id === 'admin')[0]];
 
         this.updateDataSearch('strCreators', this.selectedUser.map((item: any) => item.id).toString());
