@@ -130,17 +130,13 @@ export class CustomClearanceComponent extends AppList {
         }
     }
 
-    cancelDelete() {
-    }
-
     getDataFromEcus() {
         this._cdNoteRepo.importCustomClearanceFromEcus()
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: CommonInterface.IResult) => {
-                    this._toastrService.success(res.message, '', { positionClass: 'toast-bottom-right' });
+                    this._toastrService.success(res.message, '');
                     this.getListCustomsDeclaration();
-
                 },
                 (errors: any) => { },
                 () => { }

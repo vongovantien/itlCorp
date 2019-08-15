@@ -51,7 +51,9 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         FormsModule,
         HttpClientModule,
         BrowserAnimationsModule,
-        ToastrModule.forRoot(),
+        ToastrModule.forRoot({
+            positionClass: 'toast-bottom-right',
+        }),
         NgxSpinnerModule,
         PerfectScrollbarModule,
         OAuthModule.forRoot({
