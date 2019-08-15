@@ -286,27 +286,27 @@ export class StatementOfAccountAddnewComponent extends AppList {
 
     initBasicData() {
         this.dateModes = [
-            { text: 'Created Date', id: 'CreatedDate' },
-            { text: 'Service Date', id: 'ServiceDate' },
-            { text: 'Invoice Issued Date', id: 'InvoiceIssuedDate' },
+            { title: 'Created Date', value: 'CreatedDate' },
+            { title: 'Service Date', value: 'ServiceDate' },
+            { title: 'Invoice Issued Date', value: 'InvoiceIssuedDate' },
         ];
-        this.selectedDateMode = [this.dateModes[0]];
+        this.selectedDateMode = this.dateModes[0];
 
         this.types = [
-            { id: 1, text: 'All' },
-            { text: 'Debit', id: 2 },
-            { text: 'Credit', id: 3 },
+            { title: 'All', value: 1 },
+            { title: 'Debit', value: 2 },
+            { title: 'Credit', value: 3 },
         ];
-        this.selectedType = [this.types[0]];
+        this.selectedType = this.types[0];
 
         this.obhs = [
-            { text: 'Yes', id: true },
-            { text: 'No', id: false }
+            { title: 'Yes', value: true },
+            { title: 'No', value: false }
         ];
         this.selectedObh = this.obhs[1];
-        this.updateDataSearch('isOBH', this.selectedObh.id);
-        this.updateDataSearch('dateType', this.selectedDateMode[0].id);
-        this.updateDataSearch('type', this.selectedType[0].text);
+        this.updateDataSearch('isOBH', this.selectedObh.value);
+        this.updateDataSearch('dateType', this.selectedDateMode.value);
+        this.updateDataSearch('type', this.selectedType.value);
     }
 
     updateDataSearch(key: string, data: any) {
@@ -320,16 +320,16 @@ export class StatementOfAccountAddnewComponent extends AppList {
                 this.updateDataSearch('customerID', this.selectedPartner.value);
                 break;
             case 'date-mode':
-                this.selectedDateMode = [data];
-                this.updateDataSearch('dateType', this.selectedDateMode[0].id);
+                this.selectedDateMode = data;
+                this.updateDataSearch('dateType', this.selectedDateMode.value);
                 break;
             case 'type':
-                this.selectedType = [data];
-                this.updateDataSearch('type', this.selectedType[0].text);
+                this.selectedType = data;
+                this.updateDataSearch('type', this.selectedType.value);
                 break;
             case 'obh':
                 this.selectedObh = data;
-                this.updateDataSearch('isOBH', this.selectedObh.id);
+                this.updateDataSearch('isOBH', this.selectedObh.value);
                 break;
             case 'currency':
                 this.selectedCurrency = data;
@@ -424,11 +424,11 @@ export class StatementOfAccountAddnewComponent extends AppList {
                 currencyLocal: 'VND', // Todo: get currency local follow location or login info
                 currency: this.selectedCurrency.id,
                 customerID: this.selectedPartner.value || '',
-                dateType: this.selectedDateMode[0].id,
+                dateType: this.selectedDateMode.value,
                 fromDate: formatDate(this.selectedRangeDate.startDate, 'yyyy-MM-dd', 'vi'),
                 toDate: formatDate(this.selectedRangeDate.endDate, 'yyyy-MM-dd', 'vi'),
-                type: this.selectedType[0].text,
-                isOBH: this.selectedObh.id,
+                type: this.selectedType.value,
+                isOBH: this.selectedObh.value,
                 strCreators: this.selectedUser.map((item: any) => item.id).toString(),
                 strCharges: this.selectedCharges.map((item: any) => item.code).toString(),
                 note: this.note,

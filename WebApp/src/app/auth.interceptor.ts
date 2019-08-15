@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthInterceptor implements HttpInterceptor {
   constructor() { }
 
@@ -10,7 +12,7 @@ export class AuthInterceptor implements HttpInterceptor {
     const authHeader = `Bearer ${localStorage.getItem('access_token')}`;
     const authReq = req.clone({ headers: req.headers.set('Authorization', authHeader), url: req.url });
 
-    
+
     return next.handle(authReq);
   }
 }

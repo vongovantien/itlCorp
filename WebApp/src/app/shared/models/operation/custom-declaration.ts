@@ -32,6 +32,12 @@ export class CustomDeclaration {
     userCreated: string = '';
     userModified: string = '';
 
+    isSelected: boolean = false;
+    gatewayName: string = '';
+    customerName: string = '';
+    importCountryName: string = '';
+    exportCountryName: string = '';
+
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

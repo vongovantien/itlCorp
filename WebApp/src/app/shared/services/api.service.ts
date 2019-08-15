@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { SystemConstants } from 'src/constants/system.const';
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class ApiService {
 
     baseUrl: string = '//';
