@@ -69,7 +69,7 @@
                                                         <div class="table-actions">
                                                             <button type="button"
                                                                 class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                                title="Remove" (click)="onDeleteSOA(soa)">
+                                                                title="Remove" (click)="deleteSOA(soa)">
                                                                 <i class="la la-trash"></i>
                                                             </button>
                                                         </div>
@@ -155,4 +155,4 @@
     </div>
 </div>
 
-<confirm-popup (onSubmit)="deleteSOA()" [body]="messageDelete" [iconConfirm]="'la la-trash'"></confirm-popup>
+<confirm-popup (onSubmit)="onConfirmDeleteSOA()" [body]="messageDelete" [iconConfirm]="'la la-trash'"></confirm-popup>
