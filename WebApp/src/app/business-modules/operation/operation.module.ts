@@ -25,7 +25,7 @@ import { BillingCustomDeclarationComponent } from "./job-edit/custom-declaration
 import { OpsModuleCreditDebitNoteComponent } from "./job-edit/credit-debit-note/ops-module-credit-debit-note.component";
 import { OpsModuleStageManagementComponent } from "./job-edit/stage-management/stage-management.component";
 import { OpsModuleStageManagementDetailComponent } from "./job-edit/stage-management/detail/detail-stage-popup.component";
-import { ModalModule, TabsModule } from "ngx-bootstrap";
+import { ModalModule, TabsModule, PaginationModule } from "ngx-bootstrap";
 import { OpsModuleStageManagementAddStagePopupComponent } from "./job-edit/stage-management/add/add-stage.popup.component";
 import { NotSelectedAlertModalComponent } from './job-edit/credit-debit-note/ops-module-credit-debit-note-addnew/not-selected-alert-modal/not-selected-alert-modal.component';
 import { ChangePartnerConfirmModalComponent } from './job-edit/credit-debit-note/ops-module-credit-debit-note-addnew/change-partner-confirm-modal/change-partner-confirm-modal.component';
@@ -43,6 +43,7 @@ import { EditSellingRatePopupComponent } from './job-edit/charge-list/edit-selli
 import { AddObhRatePopupComponent } from './job-edit/charge-list/add-obh-rate-popup/add-obh-rate-popup.component';
 import { EditObhRatePopupComponent } from './job-edit/charge-list/edit-obh-rate-popup/edit-obh-rate-popup.component';
 import { PlSheetPopupComponent } from "./job-edit/pl-sheet-popup/pl-sheet.popup";
+import { CustomClearanceFormSearchComponent } from "./custom-clearance/components/form-search-custom-clearance/form-search-custom-clearance.component";
 
 
 const LIB = [
@@ -51,6 +52,7 @@ const LIB = [
     SelectModule,
     TabsModule.forRoot(),
     ModalModule.forRoot(),
+    PaginationModule.forRoot(),
     NgProgressModule,
 
 
@@ -102,7 +104,9 @@ const LIB = [
         EditSellingRatePopupComponent,
         AddObhRatePopupComponent,
         EditObhRatePopupComponent,
-        PlSheetPopupComponent
+        PlSheetPopupComponent,
+
+        CustomClearanceFormSearchComponent
     ]
 })
 export class OperationModule { }

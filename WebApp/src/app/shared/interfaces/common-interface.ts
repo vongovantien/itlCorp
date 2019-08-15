@@ -25,7 +25,7 @@ namespace CommonInterface {
 
     export interface ICommonTitleValue {
         title: string;
-        value: string;
+        value: any;
     }
 }
 
