@@ -407,7 +407,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var isSOA = false;
                     foreach(var item in charges)
                     {
-                        if(item.Cdno!=null || item.Soano!=null)
+                        if(item.CreditNo!=null || item.DebitNo != null || item.Soano!=null)
                         {
                             isSOA = true;
                         }

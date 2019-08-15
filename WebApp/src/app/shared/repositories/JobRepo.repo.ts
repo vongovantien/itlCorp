@@ -38,8 +38,8 @@ export class JobRepo {
 
     //#region ops job billing 
     addOPSJob(body: any = {}) {
-        // return this._api.post(`${environment.HOST.WEB_URL}44366/api/${this.VERSION}/vi/OpsTransaction/Add`, body);
-        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/OpsTransaction/Add`, body);
+        return this._api.post(`${environment.HOST.WEB_URL}44366/api/${this.VERSION}/vi/OpsTransaction/Add`, body);
+        // return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/OpsTransaction/Add`, body);
     }
     //#endregion
 }

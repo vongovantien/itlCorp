@@ -45,19 +45,20 @@
 
               <div class="col-lg-4">
                 <div class="form-group"
-                  [ngClass]="{ 'm-form__group has-danger': addOBHChargeFormOps.submitted && (obhChargeToAdd.receiverId==null || obhChargeToAdd.receiverId==obhChargeToAdd.payerId)}">
+                  [ngClass]="{ 'm-form__group has-danger': addOBHChargeFormOps.submitted && (obhChargeToAdd.paymentObjectId==null || obhChargeToAdd.paymentObjectId==obhChargeToAdd.payerId)}">
                   <label class="form-control-label" for="">
                     Receiver <span class="m--font-danger">(*)</span>
                   </label>
 
-                  <app-combo-grid-virtual-scroll [currentActiveItemId]="{field:'id',value:obhChargeToAdd.receiverId}"
-                    (itemSelected)="obhChargeToAdd.receiverId = $event.id" [selectedDisplayFields]="['shortName']"
+                  <app-combo-grid-virtual-scroll
+                    [currentActiveItemId]="{field:'id',value:obhChargeToAdd.paymentObjectId}"
+                    (itemSelected)="obhChargeToAdd.paymentObjectId = $event.id" [selectedDisplayFields]="['shortName']"
                     [dataSources]="lstPartners"
                     [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                   </app-combo-grid-virtual-scroll>
 
                   <div class="form-control-feedback"
-                    *ngIf="addOBHChargeFormOps.submitted && (obhChargeToAdd.receiverId==null || obhChargeToAdd.receiverId==obhChargeToAdd.payerId)">
+                    *ngIf="addOBHChargeFormOps.submitted && (obhChargeToAdd.paymentObjectId==null || obhChargeToAdd.paymentObjectId==obhChargeToAdd.payerId)">
                     Receiver name is required and do not same with payer!
                   </div>
 

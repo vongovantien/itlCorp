@@ -42,7 +42,8 @@ namespace eFMS.API.Documentation.DL.Services
                 var charge = DataContext.Where(x => x.Id == chargeId).FirstOrDefault();
                 if (charge == null)
                     hs = new HandleState("Charge not found! ");
-                if(charge!=null && (charge.Cdno != null || charge.Soano!=null))
+                //if(charge!=null && (charge.Cdno != null || charge.Soano!=null)) - continue
+                if (charge != null && (charge.CreditNo != null || charge.Soano != null))
                 {
                     hs = new HandleState("Cannot delete, this charge is containing Credit Debit Note/SOA no!");
                 }
@@ -81,11 +82,11 @@ namespace eFMS.API.Documentation.DL.Services
                                     var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PaymentObjectId).FirstOrDefault();
                                     if (partner != null) listPartners.Add(partner);
                                 }
-                                if (c.ReceiverId != null)
-                                {
-                                    var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.ReceiverId).FirstOrDefault();
-                                    if (partner != null) listPartners.Add(partner);
-                                }
+                                //if (c.ReceiverId != null)
+                                //{
+                                //    var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.ReceiverId).FirstOrDefault();
+                                //    if (partner != null) listPartners.Add(partner);
+                                //}
                                 if (c.PayerId != null)
                                 {
                                     var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PayerId).FirstOrDefault();
@@ -111,11 +112,11 @@ namespace eFMS.API.Documentation.DL.Services
                                 var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PaymentObjectId).FirstOrDefault();
                                 if (partner != null) listPartners.Add(partner);
                             }
-                            if (c.ReceiverId != null)
-                            {
-                                var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.ReceiverId).FirstOrDefault();
-                                if (partner != null) listPartners.Add(partner);
-                            }
+                            //if (c.ReceiverId != null)
+                            //{
+                            //    var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.ReceiverId).FirstOrDefault();
+                            //    if (partner != null) listPartners.Add(partner);
+                            //}
                             if (c.PayerId != null)
                             {
                                 var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PayerId).FirstOrDefault();
@@ -174,7 +175,7 @@ namespace eFMS.API.Documentation.DL.Services
                     if (houseBill != null)
                     {
                         listCharges = Query(houseBill.Id, null);
-                        listCharges = listCharges.Where(x => (x.PayerId == PartnerId || x.ReceiverId == PartnerId || x.PaymentObjectId == PartnerId)).ToList();
+                        listCharges = listCharges.Where(x => (x.PayerId == PartnerId || x.Type == "OBH" || x.PaymentObjectId == PartnerId)).ToList();
                     }
 
                     //listCharges = getAll==true?listCharges : listCharges.Where(x => (x.Soano == null || x.Soano.Trim()=="")).ToList();
@@ -196,7 +197,7 @@ namespace eFMS.API.Documentation.DL.Services
                 List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
                 var houseBill = ((eFMSDataContext)DataContext.DC).OpsTransaction.Where(x => x.Hblid == Id).FirstOrDefault();
                 listCharges = Query(Id, null);
-                listCharges = listCharges.Where(x => (x.PayerId == PartnerId || x.ReceiverId == PartnerId || x.PaymentObjectId == PartnerId)).ToList();
+                listCharges = listCharges.Where(x => (x.PayerId == PartnerId || x.Type == "OBH" || x.PaymentObjectId == PartnerId)).ToList();
                 //listCharges = listCharges.Where(x => x.Cdno != null).ToList();
 
                 //foreach (var item in listCharges)
@@ -227,15 +228,15 @@ namespace eFMS.API.Documentation.DL.Services
                          join partner in ((eFMSDataContext)DataContext.DC).CatPartner on charge.PaymentObjectId equals partner.Id into partnerGroup
                          from p in partnerGroup.DefaultIfEmpty()
 
-                         join receiver in ((eFMSDataContext)DataContext.DC).CatPartner on charge.ReceiverId equals receiver.Id into receiverGroup
-                         from r in receiverGroup.DefaultIfEmpty()
+                         //join receiver in ((eFMSDataContext)DataContext.DC).CatPartner on charge.ReceiverId equals receiver.Id into receiverGroup
+                         //from r in receiverGroup.DefaultIfEmpty()
 
                          join payer in ((eFMSDataContext)DataContext.DC).CatPartner on charge.PayerId equals payer.Id into payerGroup
                          from pay in payerGroup.DefaultIfEmpty()
 
                          join unit in ((eFMSDataContext)DataContext.DC).CatUnit on charge.UnitId equals unit.Id
                          join currency in ((eFMSDataContext)DataContext.DC).CatCurrency on charge.CurrencyId equals currency.Id
-                         select new { charge, p, r, pay, unit.UnitNameEn, CurrencyCode = currency.Id, chargeDetail.ChargeNameEn, chargeDetail.Code }
+                         select new { charge, p, pay, unit.UnitNameEn, CurrencyCode = currency.Id, chargeDetail.ChargeNameEn, chargeDetail.Code }
                         ).ToList();
             foreach (var item in query)
             {
@@ -260,7 +261,10 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 charge.PartnerName = item.p?.PartnerNameEn;
                 charge.NameEn = item?.ChargeNameEn;
-                charge.ReceiverName = item.r?.ShortName;
+                if(charge.Type == "OBH")
+                {
+                    charge.ReceiverName = item.p?.ShortName;
+                }
                 charge.PayerName = item.pay?.ShortName;
                 charge.Unit = item.UnitNameEn;
                 charge.Currency = item.CurrencyCode;

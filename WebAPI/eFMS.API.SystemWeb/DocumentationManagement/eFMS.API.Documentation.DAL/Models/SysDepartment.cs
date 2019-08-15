@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eFMS.API.Operation.Service.Models
+namespace eFMS.API.Documentation.Service.Models
 {
-    public partial class CatStage
+    public partial class SysDepartment
     {
-        public int Id { get; set; }
+        public short Id { get; set; }
         public string Code { get; set; }
-        public string StageNameVn { get; set; }
-        public string StageNameEn { get; set; }
-        public int? DepartmentId { get; set; }
-        public string DescriptionVn { get; set; }
-        public string DescriptionEn { get; set; }
+        public string NameEn { get; set; }
+        public string NameVn { get; set; }
+        public Guid? BranchId { get; set; }
+        public string ManagerId { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }

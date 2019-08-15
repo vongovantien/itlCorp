@@ -17,8 +17,6 @@ namespace eFMS.API.Documentation.Service.Models
         public decimal? Vatrate { get; set; }
         public decimal Total { get; set; }
         public string PayerId { get; set; }
-        public string ReceiverObject { get; set; }
-        public string ReceiverId { get; set; }
         public string ObjectBePaid { get; set; }
         public string PaymentObjectId { get; set; }
         public bool? KickBack { get; set; }
@@ -51,8 +49,10 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? UnlockedSoadirectorDate { get; set; }
         public bool? Soaclosed { get; set; }
         public bool? Cdclosed { get; set; }
-        public string Cdno { get; set; }
+        public string CreditNo { get; set; }
+        public string DebitNo { get; set; }
         public string Soano { get; set; }
+        public string PaySoano { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }

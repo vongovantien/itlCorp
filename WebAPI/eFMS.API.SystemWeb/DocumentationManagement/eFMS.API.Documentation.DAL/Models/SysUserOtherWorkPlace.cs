@@ -12,7 +12,6 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? InactiveOn { get; set; }
         public Guid WorkPlaceId { get; set; }
 
-        public virtual SysUser User { get; set; }
-        public virtual CatBranch WorkPlace { get; set; }
+        public virtual SysBranch WorkPlace { get; set; }
     }
 }
