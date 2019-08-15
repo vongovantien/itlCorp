@@ -341,5 +341,51 @@ namespace eFMS.API.Documentation.DL.Services
             return advanceModel;
         }
 
+        public HandleState UpdateAdvancePayment(AcctAdvancePaymentModel model)
+        {
+            try
+            {
+                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                var advance = mapper.Map<AcctAdvancePayment>(model);
+                
+                advance.DatetimeModified = DateTime.Now;
+                advance.UserModified = currentUser.UserID;
+
+                var hs = DataContext.Update(advance, x => x.AdvanceNo == advance.AdvanceNo);
+
+                if (hs.Success)
+                {                    
+                    var request = mapper.Map<List<AcctAdvanceRequest>>(model.AdvanceRequests);
+                    //Lấy ra những request mới (có UserCreated = null)
+                    var requestNew = request.Where(x=>x.UserCreated == null || x.UserCreated == "").ToList();
+                    if (requestNew != null && requestNew.Count > 0)
+                    {
+                        requestNew.ForEach(req =>
+                        {
+                            req.Id = Guid.NewGuid();
+                            req.AdvanceNo = advance.AdvanceNo;
+                            req.DatetimeCreated = req.DatetimeModified = DateTime.Now;
+                            req.UserCreated = req.UserModified = currentUser.UserID;
+                            req.StatusPayment = "NotSettled";
+                        });
+                        dc.AcctAdvanceRequest.AddRange(requestNew);
+                    }
+
+                    //Lấy ra những request cũ cần update
+                    var requestUpdate = request.Where(x => x.UserCreated != null || x.UserCreated != "").ToList();
+                    requestUpdate.ForEach(req=> {
+                        req.DatetimeModified = DateTime.Now;
+                        req.UserModified = currentUser.UserID;
+                    });
+                }
+                dc.SaveChanges();
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                var hs = new HandleState(ex.Message);
+                return hs;
+            }
+        }
     }
 }
