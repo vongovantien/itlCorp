@@ -22,7 +22,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="IService\ICatBranchService.cs" />
+    <Compile Remove="IService\ICatPlaceTypeService.cs" />
     <Compile Remove="IService\IUserGroupService.cs" />
+    <Compile Remove="Models\CatBranchModel.cs" />
+    <Compile Remove="Models\CatPlaceTypeModel.cs" />
+    <Compile Remove="Services\CatBranchService.cs" />
+    <Compile Remove="Services\CatPlaceTypeService.cs" />
     <Compile Remove="Services\UserGroupService.cs" />
   </ItemGroup>
 

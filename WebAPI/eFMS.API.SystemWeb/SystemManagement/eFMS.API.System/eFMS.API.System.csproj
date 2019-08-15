@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\CatPlaceTypeController.cs" />
     <Compile Remove="Controllers\SysEmployeesController.cs" />
     <Compile Remove="Controllers\TestController.cs" />
     <Compile Remove="Controllers\UserGroupController.cs" />

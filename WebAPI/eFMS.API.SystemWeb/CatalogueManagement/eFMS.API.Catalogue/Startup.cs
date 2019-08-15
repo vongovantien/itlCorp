@@ -59,8 +59,6 @@ namespace eFMS.API.Catalogue
                 config.DefaultApiVersion = new ApiVersion(1, 0);
                 config.ApiVersionReader = new HeaderApiVersionReader("api-version");
             });
-
-            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddCulture(Configuration);
             services.AddSwagger();
             services.AddConfigureSetting(Configuration);

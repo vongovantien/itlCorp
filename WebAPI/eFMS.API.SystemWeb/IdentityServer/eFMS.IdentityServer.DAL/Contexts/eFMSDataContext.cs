@@ -5,7 +5,7 @@ using System.Text;
 
 namespace eFMS.IdentityServer.Service.Contexts
 {
-    public class eFMSDataContext: DefaulteFMSDataContext
+    public class eFMSDataContext: eFMSDataContextDefault
     {
     }
 }

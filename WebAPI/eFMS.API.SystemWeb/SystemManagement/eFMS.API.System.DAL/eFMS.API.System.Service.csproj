@@ -22,6 +22,7 @@
   <ItemGroup>
     <Compile Remove="Models\DefaulteFMSDataContext.cs" />
     <Compile Remove="Models\DefaultFMSDataContext.cs" />
+    <Compile Remove="Models\eFMSDataContext.cs" />
   </ItemGroup>
 
   <ItemGroup>

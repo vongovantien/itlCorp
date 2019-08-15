@@ -1,15 +1,18 @@
-﻿using eFMS.IdentityServer.Service.Contexts;
+﻿using eFMS.API.Common;
+using eFMS.API.Common.Globals.Configs;
+using eFMS.IdentityServer.Service.Contexts;
 using eFMS.IdentityServer.Service.Models;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Options;
 
 namespace eFMS.API.System.Service.Contexts
 {
     public class Base<T> : ContextBase<T>
         where T : class, new()
     {
-        public Base(): base()
+        public Base(IOptions<ConnectionString> connectStrings) : base()
         {
-            ConfigDataContext<eFMSDataContext>("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;");
+            ConfigDataContext<eFMSDataContext>(connectStrings.Value.eFMSConnection);
         }
     }
 }

@@ -10,6 +10,8 @@ using System.Security.Cryptography.X509Certificates;
 using System.IO;
 using eFMS.IdentityServer.Configuration;
 using eFMS.IdentityServer.Infrastructure;
+using eFMS.API.Common.Globals.Configs;
+using Microsoft.Extensions.Configuration;
 
 namespace AuthServer
 {
@@ -32,7 +34,8 @@ namespace AuthServer
             services.AddCustomMvc(_appConfig)
                 .AddCustomAuthentication(_environment, _appConfig);
             ServiceRegister.Register(services);
-
+            ServiceRegister.AddConfigureSetting(services, _appConfig.Configuration);
+            
             IdentityModelEventSource.ShowPII = true;
         }
 
@@ -78,41 +81,6 @@ namespace AuthServer
                      + @".well-known/openid-configuration");
             });
             app.UseCors("AllowAllOrigins");
-        }
-    }
-    static class CustomExtensionsMethods
-    {
-        public static IServiceCollection AddCustomAuthentication(this IServiceCollection services, IHostingEnvironment environment, IAppConfig appConfig)
-        {
-            var cert = new X509Certificate2(Path.Combine(environment.ContentRootPath, "certs", "IdentityServer4Auth.pfx"));
-            services.AddIdentityServer()
-                //.AddDeveloperSigningCredential()
-                .AddInMemoryApiResources(Config.GetApiResources())
-                .AddInMemoryIdentityResources(Config.GetIdentityResources())
-                .AddInMemoryClients(Config.GetClients(appConfig.CrosConfig.Urls, appConfig.AuthConfig.RedirectUris, appConfig.AuthConfig.AccessTokenLifetime, appConfig.AuthConfig.SlidingRefreshTokenLifetime))
-                .AddInMemoryPersistedGrants()
-                .AddSigningCredential(cert)
-                .AddValidationKey(cert);
-
-            return services;
-        }
-        public static IServiceCollection AddCustomMvc(this IServiceCollection services, IAppConfig appConfig)
-        {
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAllOrigins",
-                    builder =>
-                    {
-                        builder
-                        .AllowAnyOrigin()
-                            .AllowAnyHeader()
-                            .AllowAnyMethod()
-                            .AllowCredentials();
-                            //.WithOrigins(appConfig.CrosConfig.Urls);
-                    });
-            });
-            services.AddMvc();
-            return services;
         }
     }
 }

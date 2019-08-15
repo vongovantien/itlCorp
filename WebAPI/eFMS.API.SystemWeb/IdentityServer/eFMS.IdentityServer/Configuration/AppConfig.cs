@@ -9,7 +9,7 @@ namespace eFMS.IdentityServer.Configuration
 {
     public class AppConfig : IAppConfig
     {
-        private IConfiguration _configuration;
+        //private IConfiguration _configuration;
             
         public AppConfig(IHostingEnvironment env)
         {
@@ -18,29 +18,29 @@ namespace eFMS.IdentityServer.Configuration
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
 
-            _configuration = builder.Build();
+            Configuration = builder.Build();
 
             loadConfig();
         }
 
         private void loadConfig()
         {
-            ConnectString = _configuration.GetConnectionString("eFMSConnection");
+            ConnectString = Configuration.GetConnectionString("eFMSConnection");
             AuthConfig = new AuthConfig()
             {
-                AccessTokenLifetime = int.Parse(_configuration.GetSection("Auth:AccessTokenLifetime").Value),
-                Issuer = _configuration.GetSection("Auth:Issuer").Value,
-                RedirectUris = _configuration.GetSection("Auth:RedirectUris").GetChildren().Select(sl => sl.Value).ToArray(),
-                RequireHttps = bool.Parse(_configuration.GetSection("Auth:RequireHttpsMetadata").Value),
-                SlidingRefreshTokenLifetime = int.Parse(_configuration.GetSection("Auth:SlidingRefreshTokenLifetime").Value)
+                AccessTokenLifetime = int.Parse(Configuration.GetSection("Auth:AccessTokenLifetime").Value),
+                Issuer = Configuration.GetSection("Auth:Issuer").Value,
+                RedirectUris = Configuration.GetSection("Auth:RedirectUris").GetChildren().Select(sl => sl.Value).ToArray(),
+                RequireHttps = bool.Parse(Configuration.GetSection("Auth:RequireHttpsMetadata").Value),
+                SlidingRefreshTokenLifetime = int.Parse(Configuration.GetSection("Auth:SlidingRefreshTokenLifetime").Value)
             };
             CrosConfig = new CrosConfig()
             {
-                Urls = _configuration.GetSection("CrosOptions:Urls").GetChildren().Select(sl => sl.Value).ToArray()
+                Urls = Configuration.GetSection("CrosOptions:Urls").GetChildren().Select(sl => sl.Value).ToArray()
             };
-            
-        }
 
+        }
+        public IConfiguration Configuration { get; }
         public string ConnectString { get; private set; }
 
         public AuthConfig AuthConfig { get; private set; }

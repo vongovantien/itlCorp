@@ -11,6 +11,7 @@ namespace eFMS.IdentityServer.Configuration
         string ConnectString { get; }  
         AuthConfig AuthConfig { get; }
         CrosConfig CrosConfig { get; }
+        IConfiguration Configuration { get; }
     }
 
     public class AuthConfig

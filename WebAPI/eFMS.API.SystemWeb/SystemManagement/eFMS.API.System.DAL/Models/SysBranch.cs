@@ -5,11 +5,6 @@ namespace eFMS.API.System.Service.Models
 {
     public partial class SysBranch
     {
-        public SysBranch()
-        {
-            SysUserOtherWorkPlace = new HashSet<SysUserOtherWorkPlace>();
-        }
-
         public Guid Id { get; set; }
         public string BranchNameVn { get; set; }
         public string BranchNameEn { get; set; }
@@ -31,7 +26,5 @@ namespace eFMS.API.System.Service.Models
         public string Code { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
-
-        public virtual ICollection<SysUserOtherWorkPlace> SysUserOtherWorkPlace { get; set; }
     }
 }

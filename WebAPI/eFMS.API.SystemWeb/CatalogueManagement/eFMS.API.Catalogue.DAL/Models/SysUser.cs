@@ -9,8 +9,6 @@ namespace eFMS.API.Catalogue.Service.Models
         {
             SysAuthorizationAssignToNavigation = new HashSet<SysAuthorization>();
             SysAuthorizationUser = new HashSet<SysAuthorization>();
-            SysUserOtherWorkPlace = new HashSet<SysUserOtherWorkPlace>();
-            SysUserRole = new HashSet<SysUserRole>();
         }
 
         public string Id { get; set; }
@@ -18,7 +16,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public string Password { get; set; }
         public short UserGroupId { get; set; }
         public string EmployeeId { get; set; }
-        public Guid WorkPlaceId { get; set; }
+        public Guid? WorkPlaceId { get; set; }
         public bool? RefuseEmail { get; set; }
         public Guid? LdapObjectGuid { get; set; }
         public string UserCreated { get; set; }
@@ -28,11 +26,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
 
-        public virtual SysUserGroup UserGroup { get; set; }
-        public virtual CatBranch WorkPlace { get; set; }
         public virtual ICollection<SysAuthorization> SysAuthorizationAssignToNavigation { get; set; }
         public virtual ICollection<SysAuthorization> SysAuthorizationUser { get; set; }
-        public virtual ICollection<SysUserOtherWorkPlace> SysUserOtherWorkPlace { get; set; }
-        public virtual ICollection<SysUserRole> SysUserRole { get; set; }
     }
 }

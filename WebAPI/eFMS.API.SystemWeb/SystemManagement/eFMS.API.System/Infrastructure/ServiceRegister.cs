@@ -32,7 +32,7 @@ namespace eFMS.API.System.Infrastructure
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             //services.AddTransient<IUserGroupService, UserGroupService>();
-            services.AddTransient<ICatBranchService, CatBranchService>();
+            //services.AddTransient<ICatBranchService, CatBranchService>();
             services.AddTransient<ICatPlaceService, CatPlaceService>();
             services.AddTransient<ICatDepartmentService, CatDepartmentService>();
             services.AddTransient<ISysUserService, SysUserService>();

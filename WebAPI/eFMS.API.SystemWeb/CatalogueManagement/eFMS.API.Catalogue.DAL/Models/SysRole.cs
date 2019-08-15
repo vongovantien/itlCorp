@@ -7,9 +7,9 @@ namespace eFMS.API.Catalogue.Service.Models
     {
         public SysRole()
         {
+            SysGroupRole = new HashSet<SysGroupRole>();
             SysRoleMenu = new HashSet<SysRoleMenu>();
             SysRolePermission = new HashSet<SysRolePermission>();
-            SysUserRole = new HashSet<SysUserRole>();
         }
 
         public short Id { get; set; }
@@ -23,8 +23,8 @@ namespace eFMS.API.Catalogue.Service.Models
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
 
+        public virtual ICollection<SysGroupRole> SysGroupRole { get; set; }
         public virtual ICollection<SysRoleMenu> SysRoleMenu { get; set; }
         public virtual ICollection<SysRolePermission> SysRolePermission { get; set; }
-        public virtual ICollection<SysUserRole> SysUserRole { get; set; }
     }
 }
