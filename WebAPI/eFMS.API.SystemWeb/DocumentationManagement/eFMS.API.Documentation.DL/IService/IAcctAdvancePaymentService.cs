@@ -25,5 +25,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState DeleteAdvanceRequest(Guid idAdvanceRequest);
 
         AcctAdvancePaymentModel GetAdvancePaymentByAdvanceNo(string advanceNo);
+
+        HandleState UpdateAdvancePayment(AcctAdvancePaymentModel model);
     }
 }

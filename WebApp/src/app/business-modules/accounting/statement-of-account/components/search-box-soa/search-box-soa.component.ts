@@ -38,7 +38,7 @@ export class StatementOfAccountSearchComponent extends AppPage {
 
     users: User[] = [];
     userLogged: User;
-    currentUser: any = null;
+    currentUser: User = null;
 
     statusSOA: any[] = [];
     selectedStatus: any = null;
@@ -150,7 +150,7 @@ export class StatementOfAccountSearchComponent extends AppPage {
             soaToDateCreate: !!this.selectedRange.endDate ? formatDate(this.selectedRange.endDate, 'yyyy-MM-dd', 'en') : null,
             soaStatus: !!this.selectedStatus ? this.selectedStatus.name : null,
             soaCurrency: !!this.selectedCurrency ? this.selectedCurrency.id : null,
-            soaUserCreate: !!this.currentUser ? this.currentUser.id : null,
+            soaUserCreate: !!this.currentUser ? this.currentUser.username : null,
         };
         this.onSearch.emit(body);
     }

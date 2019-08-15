@@ -8,7 +8,6 @@ import { ToastrService } from "ngx-toastr";
 import { HttpErrorResponse } from "@angular/common/http";
 import { SortService } from "src/app/shared/services";
 
-
 @Component({
     selector: 'app-statement-of-account',
     templateUrl: './statement-of-account.component.html',
@@ -32,7 +31,7 @@ export class StatementOfAccountComponent extends AppList {
     ) {
         super();
 
-        this.requestList = this.getSOAs;
+        this.requestList = this.sortLocal;
     }
 
     ngOnInit() {
@@ -51,13 +50,13 @@ export class StatementOfAccountComponent extends AppList {
         this.getSOAs();
     }
 
-    onDeleteSOA(soaItem: SOA) {
+    deleteSOA(soaItem: SOA) {
         this.selectedSOA = new SOA(soaItem);
         this.messageDelete = `Do you want to delete SOA ${soaItem.soano} ? `;
         this.confirmPopup.show();
     }
 
-    deleteSOA() {
+    onConfirmDeleteSOA() {
         this._accoutingRepo.deleteSOA(this.selectedSOA.soano).pipe(
             catchError(this.catchError),
             finalize(() => { this.confirmPopup.hide(); })
@@ -94,30 +93,8 @@ export class StatementOfAccountComponent extends AppList {
             );
     }
 
-    setSortBy(sort?: string, order?: boolean): void {
-        this.sort = sort ? sort : 'code';
-        this.order = order;
-    }
-
-    sortClass(sort: string): string {
-        if (!!sort) {
-            let classes = 'sortable ';
-            if (this.sort === sort) {
-                classes += ('sort-' + (this.order ? 'asc' : 'desc') + ' ');
-            }
-
-            return classes;
-        }
-        return '';
-    }
-
-    sortBy(sort: string): void {
-        if (!!sort) {
-            this.setSortBy(sort, this.sort !== sort ? true : !this.order);
-            if (!!this.SOAs.length) {
-                this.SOAs = this._sortService.sort(this.SOAs, sort, this.order);
-            }
-        }
+    sortLocal(sort: string): void {
+        this.SOAs = this._sortService.sort(this.SOAs, sort, this.order);
     }
 
     handleError(errors: any) {

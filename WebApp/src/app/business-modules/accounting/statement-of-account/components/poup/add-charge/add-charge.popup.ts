@@ -251,6 +251,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
 
     onApplySearchCharge() {
         const body: ISearchMoreCharge = {
+            chargeShipments: this.searchInfo.chargeShipments,
             inSoa: this.selectedInSOA.id,
             jobId: !!this.selectedShipmentData ? this.selectedShipmentData.jobId : '',
             hbl: !!this.selectedShipmentData ? this.selectedShipmentData.hbl : '',
@@ -348,6 +349,7 @@ interface ICDNote {
     mbl: string;
 }
 interface ISearchMoreCharge {
+    chargeShipments: any[];
     inSoa: boolean;
     jobId: string;
     hbl: string;
