@@ -72,6 +72,17 @@ namespace eFMS.API.Documentation.DL.Services
                             {
                                 charge.DebitNo = cdNote.Code;
                             }
+                            else
+                            {
+                                if(model.PartnerId == charge.PaymentObjectId)
+                                {
+                                    charge.DebitNo = cdNote.Code;
+                                }
+                                if(model.PartnerId == charge.PayerId)
+                                {
+                                    charge.CreditNo = cdNote.Code;
+                                }
+                            }
                             //charge.Cdno = cdNote.Code; -- to continue
                             //charge.Soaclosed = true;
                             charge.DatetimeModified = DateTime.Now;
@@ -120,11 +131,12 @@ namespace eFMS.API.Documentation.DL.Services
                 if (stt.Success)
                 {
                     //var chargesOfCDNote = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Cdno == cdNote.Code).ToList(); ---to continue
-                    var chargesOfCDNote = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.CreditNo == cdNote.Code).ToList();
+                    var chargesOfCDNote = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code).ToList();
                     foreach (var item in chargesOfCDNote)
                     {
                         //item.Cdno = null; -- to continue
                         item.CreditNo = null;
+                        item.DebitNo = null;
                     }
                     foreach (var item in model.listShipmentSurcharge)
                     {
@@ -132,6 +144,25 @@ namespace eFMS.API.Documentation.DL.Services
                         if (charge != null)
                         {
                             //charge.Cdno = cdNote.Code; -- to continue
+                            if (charge.Type == "BUY")
+                            {
+                                charge.CreditNo = cdNote.Code;
+                            }
+                            else if (charge.Type == "SELL")
+                            {
+                                charge.DebitNo = cdNote.Code;
+                            }
+                            else
+                            {
+                                if (model.PartnerId == charge.PaymentObjectId)
+                                {
+                                    charge.DebitNo = cdNote.Code;
+                                }
+                                if (model.PartnerId == charge.PayerId)
+                                {
+                                    charge.CreditNo = cdNote.Code;
+                                }
+                            }
                             charge.Cdclosed = true;
                             charge.DatetimeModified = DateTime.Now;
                             charge.UserModified = currentUser.UserID; // need update in the future 
@@ -241,7 +272,7 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         // -to continue
                         //var chargesOfCDNote = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Cdno == cdNote.Code).ToList();
-                        var chargesOfCDNote = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.CreditNo == cdNote.Code).ToList();
+                        var chargesOfCDNote = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code).ToList();
                         listCDNote.Add(new { cdNote, total_charge= chargesOfCDNote.Count });                      
 
                     }
@@ -335,7 +366,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             //to continue
             //var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Cdno == CDNoteCode).ToList();
-            var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.CreditNo == CDNoteCode).ToList();
+            var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.CreditNo == CDNoteCode || x.DebitNo == CDNoteCode).ToList();
 
             List<CsTransactionDetail> HBList = new List<CsTransactionDetail>();
             List<CsShipmentSurchargeDetailsModel> listSurcharges = new List<CsShipmentSurchargeDetailsModel>();
@@ -447,7 +478,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     //to continue
                     //var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Cdno == cdNote.Code).ToList();
-                    var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.CreditNo == cdNote.Code).ToList();
+                    var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code).ToList();
                     var isOtherSOA = false;
                     foreach(var item in charges)
                     {
@@ -469,6 +500,8 @@ namespace eFMS.API.Documentation.DL.Services
                             {
                                 //-to contiue
                                 //item.Cdno = null;
+                                item.DebitNo = null;
+                                item.CreditNo = null;
                                 item.UserModified = cdNote.UserModified;
                                 item.DatetimeModified = DateTime.Now;
                                 ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Update(item);
