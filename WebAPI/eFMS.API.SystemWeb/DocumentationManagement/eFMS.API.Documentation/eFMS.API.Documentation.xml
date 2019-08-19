@@ -207,14 +207,14 @@
             <param name="type"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetByListHouseBill(System.Guid,System.String,System.Boolean,System.Boolean)">
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetByListHouseBill(System.Guid,System.String,System.Boolean,System.Nullable{System.Boolean})">
             <summary>
             get list of surcharge by house bill anf partner id
             </summary>
             <param name="Id"></param>
             <param name="partnerID"></param>
             <param name="IsHouseBillID"></param>
-            <param name="getAll"></param>
+            <param name="isAddCDNote"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetPartners(System.Guid,System.Boolean)">

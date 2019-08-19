@@ -162,7 +162,7 @@ namespace eFMS.API.Documentation.DL.Services
             return returnList;
         }
 
-        public List<object> GroupChargeByHB(Guid Id, string PartnerId,bool IsHouseBillID,bool getAll=false)
+        public List<object> GroupChargeByHB(Guid Id, string PartnerId,bool IsHouseBillID,bool? isAddCDNote = null)
         {
             List<object> returnList = new List<object>();
             if (IsHouseBillID == false)
@@ -177,9 +177,17 @@ namespace eFMS.API.Documentation.DL.Services
                         listCharges = Query(houseBill.Id, null);
                         listCharges = listCharges.Where(x => (x.PayerId == PartnerId || x.Type == "OBH" || x.PaymentObjectId == PartnerId)).ToList();
                     }
+                    if (isAddCDNote == true)
+                    {
+                        listCharges = listCharges.Where(x => x.DebitNo != null || x.CreditNo != null).ToList();
+                    }
+                    else if (isAddCDNote == false)
+                    {
+                        listCharges = listCharges.Where(x => x.DebitNo == null && x.CreditNo == null).ToList();
+                    }
 
                     //listCharges = getAll==true?listCharges : listCharges.Where(x => (x.Soano == null || x.Soano.Trim()=="")).ToList();
-                    listCharges = listCharges.Where(x => (x.Soano == null || x.Soano.Trim() == "")).ToList();
+                    listCharges = listCharges.Where(x => (x.CreditNo == null || x.CreditNo.Trim() == "" || x.DebitNo == null || x.DebitNo.Trim() == "")).ToList();
 
                     foreach (var item in listCharges)
                     {
@@ -197,6 +205,14 @@ namespace eFMS.API.Documentation.DL.Services
                 List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
                 var houseBill = ((eFMSDataContext)DataContext.DC).OpsTransaction.Where(x => x.Hblid == Id).FirstOrDefault();
                 listCharges = Query(Id, null);
+                if (isAddCDNote == true)
+                {
+                    listCharges = listCharges.Where(x => x.DebitNo != null || x.CreditNo != null).ToList();
+                }
+                else if(isAddCDNote == false)
+                {
+                    listCharges = listCharges.Where(x => x.DebitNo == null && x.CreditNo == null).ToList();
+                }
                 listCharges = listCharges.Where(x => (x.PayerId == PartnerId || x.Type == "OBH" || x.PaymentObjectId == PartnerId)).ToList();
                 //listCharges = listCharges.Where(x => x.Cdno != null).ToList();
 

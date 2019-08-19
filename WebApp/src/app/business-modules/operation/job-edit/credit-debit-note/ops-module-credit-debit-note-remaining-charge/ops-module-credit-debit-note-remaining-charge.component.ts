@@ -80,7 +80,8 @@ export class OpsModuleCreditDebitNoteRemainingChargeComponent extends PopupBase 
     }
   }
   addCharges() {
-    if (this.listChargeOfPartner[0].listCharges.filter(x => x.isSelected && x.isRemaining === true).length == 0) {
+    const listChargeToAdd = this.listChargeOfPartner[0].listCharges.filter(x => x.isSelected && x.isRemaining === true);
+    if (listChargeToAdd.length === 0) {
       this.popupNotSelected.show();
     } else {
       this.listChargeOfPartner[0].listCharges.forEach(o => {
@@ -88,7 +89,7 @@ export class OpsModuleCreditDebitNoteRemainingChargeComponent extends PopupBase 
           o.isRemaining = false;
         }
       });
-      this.newlistCharge.emit(this.listChargeOfPartner);
+      this.newlistCharge.emit(listChargeToAdd);
       this.hide();
     }
   }

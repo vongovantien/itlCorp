@@ -16,25 +16,25 @@ export class CreditAndDebitNoteDetailComponent implements OnInit,AfterViewChecke
         this.cdr.detectChanges();
     }
     CDNoteEditing:any = null;
-    currentSOANo : string = null;
+    currentCDNo : string = null;
     previewModalId = "preview-modal";
     dataReport: any;
     @Output() CdNoteEditingEmiter = new EventEmitter<any>();
-    @Input() set EditingCDNoteNo(soaNo:string){
-        if(soaNo!=null){
-            this.currentSOANo = soaNo;
-            this.getSOADetails(this.currentSOANo);
+    @Input() set EditingCDNoteNo(cdNo:string){
+        if(cdNo!=null){
+            this.currentCDNo = cdNo;
+            this.getSOADetails(this.currentCDNo);
         }
       }
 
     @Input() set updateStatus(updated:boolean){
         if(updated){
-            this.getSOADetails(this.currentSOANo);
+            this.getSOADetails(this.currentCDNo);
         }
     }
 
     async getSOADetails(soaNo:string){
-        this.CDNoteEditing = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails+"?JobId="+ExtendData.currentJobID+"&soaNo="+soaNo);
+        this.CDNoteEditing = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails+"?JobId="+ExtendData.currentJobID+"&cdNo="+soaNo);
         console.log(this.CDNoteEditing);
     }
     constructor(

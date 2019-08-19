@@ -164,8 +164,11 @@
                                             <td class="table-actions-col">
                                                 <div class="table-actions">
                                                     <label class="m-checkbox">
-                                                        <input type="checkbox" name="" [checked]="charge.isSelected"
+                                                        <!-- <input type="checkbox" name="" [checked]="charge.isSelected"
                                                             (change)="charge.isSelected=!charge.isSelected;charge.isRemaining=!charge.isRemaining; removeAllChargeSelected();">
+                                                        <span></span> -->
+                                                        <input type="checkbox" name="" [checked]="charge.isSelected"
+                                                            (change)="charge.isSelected=!charge.isSelected; removeAllChargeSelected();">
                                                         <span></span>
                                                     </label>
                                                 </div>
@@ -201,7 +204,7 @@
                                             </td>
                                             <td>
                                                 <span class="debit-value"
-                                                    *ngIf="charge.type==='SELL' || (charge.type==='OBH' && EditingCDNote.partnerId===charge.receiverId)">{{charge.total*charge.exchangeRate | number:'1.3-3'}}</span>
+                                                    *ngIf="charge.type==='SELL' || (charge.type==='OBH' && EditingCDNote.partnerId===charge.paymentObjectId)">{{charge.total*charge.exchangeRate | number:'1.3-3'}}</span>
                                                 <!-- <span class="debit-value" *ngIf="charge.type==='SELL' || (charge.type==='OBH' && CDNoteWorking.partnerId===charge.payerId)">{{charge.total | number:'1.3-3'}}</span>                                            -->
                                             </td>
                                             <td>

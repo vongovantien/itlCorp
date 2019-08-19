@@ -13,7 +13,7 @@ namespace eFMS.API.Documentation.DL.IService
     {
         List<CsShipmentSurchargeDetailsModel> GetByHB(Guid HbID,string type);
         HandleState DeleteCharge(Guid chargeId);
-        List<object> GroupChargeByHB(Guid id,string PartnerId,bool IsHouseBillID,bool getAll=false);
+        List<object> GroupChargeByHB(Guid id,string PartnerId,bool IsHouseBillID,bool? isAddCDNote = null);
         List<CatPartner> GetAllParner(Guid id,bool IsHouseBillID);
         ChargeShipmentResult GetListChargeShipment(ChargeShipmentCriteria criteria);
     }
