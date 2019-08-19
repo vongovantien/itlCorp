@@ -383,12 +383,12 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
     public getPartners() {
         this._data.getDataByKey('lstPartners')
-        .pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe(
-            (data: any) => {
-                this.lstPartners = data;
-            }
-        );
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (data: any) => {
+                    this.lstPartners = data;
+                }
+            );
 
         // this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.ALL, inactive: false }).subscribe((res: any) => {
         //     this.lstPartners = res;
@@ -532,6 +532,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                 this.ListBuyingRateCharges = res;
                 this.ConstListBuyingRateCharges = res;
                 this.totalBuyingCharge();
+                console.log('Buying rate of house');
                 console.log(this.ListBuyingRateCharges);
             }
             if (type === 'SELL') {
@@ -595,8 +596,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     CDNoteDetails: AcctCDNoteDetails = null;
-    async openCreditDebitNote(soaNo: string) {
-        this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.opsTransaction.id + "&soaNo=" + soaNo);
+    async openCreditDebitNote(cdNo: string) {
+        this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.opsTransaction.id + "&cdNo=" + cdNo);
         if (this.CDNoteDetails != null) {
             if (this.CDNoteDetails.listSurcharges != null) {
                 this.totalCreditDebitCalculate();
@@ -611,6 +612,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                 this.CDNoteDetails.cdNote.type = 'Invoice';
             }
             console.log('sfsfsfsf' + this.CDNoteDetails.cdNote.type);
+            this.poupDetail.currentJob = this.opsTransaction;
             this.poupDetail.show({ backdrop: 'static' });
             this.poupDetail.show({ backdrop: 'static' });
         }
@@ -626,7 +628,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
     async closeEditCDNoteModal(event) {
         console.log(event);
-        this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.opsTransaction.id + "&soaNo=" + this.CDNoteDetails.cdNote.code);
+        this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.opsTransaction.id + "&cdNo=" + this.CDNoteDetails.cdNote.code);
         if (this.CDNoteDetails != null) {
             if (this.CDNoteDetails.listSurcharges != null) {
                 this.totalCreditDebitCalculate();
@@ -643,7 +645,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                 // calculate total credit
                 totalCredit += (c.total * c.exchangeRate);
             }
-            if (c.type === "SELL" || (c.type === "OBH" && this.CDNoteDetails.partnerId === c.receiverId)) {
+            if (c.type === "SELL" || (c.type === "OBH" && this.CDNoteDetails.partnerId === c.objectBePaid)) {
                 // calculate total debit 
                 totalDebit += (c.total * c.exchangeRate);
             }

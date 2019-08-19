@@ -334,10 +334,10 @@ namespace eFMS.API.Documentation.DL.Services
             return listCharges;
         }
 
-        public AcctCDNoteDetailsModel GetCDNoteDetails(Guid JobId, string CDNoteCode)
+        public AcctCDNoteDetailsModel GetCDNoteDetails(Guid JobId, string cdNo)
         {
             AcctCDNoteDetailsModel soaDetails = new AcctCDNoteDetailsModel();
-            var cdNote = DataContext.Where(x => x.Code == CDNoteCode).FirstOrDefault();
+            var cdNote = DataContext.Where(x => x.Code == cdNo).FirstOrDefault();
             var partner = ((eFMSDataContext)DataContext.DC).CatPartner.FirstOrDefault(x => x.Id == cdNote.PartnerId);
 
             CatPlace pol = new CatPlace();
@@ -366,7 +366,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             //to continue
             //var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Cdno == CDNoteCode).ToList();
-            var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.CreditNo == CDNoteCode || x.DebitNo == CDNoteCode).ToList();
+            var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.CreditNo == cdNo || x.DebitNo == cdNo).ToList();
 
             List<CsTransactionDetail> HBList = new List<CsTransactionDetail>();
             List<CsShipmentSurchargeDetailsModel> listSurcharges = new List<CsShipmentSurchargeDetailsModel>();

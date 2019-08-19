@@ -56,6 +56,8 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
     });
   }
   async getListCharges(partnerId: string) {
+    console.log('CD Note working');
+    console.log(this.CDNoteWorking);
     if (ExtendData.currentJobID !== null && partnerId != null) {
       this.listChargeOfPartner = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getChargesByPartner + "?Id=" + ExtendData.currentJobID + "&partnerID=" + partnerId + "&IsHouseBillId=false");
       this.CDNoteWorking.listShipmentSurcharge = [];
@@ -183,11 +185,11 @@ export class CreditAndDebitNoteAddnewComponent implements OnInit {
     for (var i = 0; i < this.CDNoteWorking.listShipmentSurcharge.length; i++) {
       const c = this.CDNoteWorking.listShipmentSurcharge[i];
       if (!c["isRemaining"]) {
-        if (c.type == "BUY" || c.type == "LOGISTIC" || (c.type == "OBH" && this.CDNoteWorking.partnerId == c.receiverId)) {
+        if (c.type == "BUY" || c.type == "LOGISTIC" || (c.type == "OBH" && this.CDNoteWorking.partnerId == c.payerId)) {
           // calculate total credit
           this.totalCredit += (c.total * c.exchangeRate);
         }
-        if (c.type == "SELL" || (c.type == "OBH" && this.CDNoteWorking.partnerId == c.payerId)) {
+        if (c.type == "SELL" || (c.type == "OBH" && this.CDNoteWorking.partnerId == c.paymentObjectId)) {
           //calculate total debit 
           this.totalDebit += (c.total * c.exchangeRate);
         }

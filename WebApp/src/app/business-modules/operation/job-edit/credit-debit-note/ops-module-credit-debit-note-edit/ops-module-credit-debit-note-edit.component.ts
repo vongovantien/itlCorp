@@ -48,10 +48,10 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
         this.listChargeOfPartner = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getChargesByPartner + "?Id=" + this.currentJob.hblid + "&partnerID=" + partnerId + "&IsHouseBillId=true");
         this.listChargeOfPartner = map(this.listChargeOfPartner, function (o) {
             for (let i = 0; i < o.listCharges.length; i++) {
-                if (o.listCharges[i].cdno === null) {
+                if (o.listCharges[i].debitNo === null && o.listCharges[i].creditNo) {
                     o.listCharges[i].isRemaining = true;
                 } else {
-                    if (o.listCharges[i].cdno === cdNo) {
+                    if (o.listCharges[i].debitNo === cdNo || o.listCharges[i].creditNo === cdNo) {
                         o.listCharges[i].isSelected = true;
                         o.listCharges[i].isRemaining = false;
                     }
