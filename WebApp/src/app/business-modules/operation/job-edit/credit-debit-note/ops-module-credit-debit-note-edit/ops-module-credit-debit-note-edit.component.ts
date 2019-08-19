@@ -48,11 +48,11 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
         this.listChargeOfPartner = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getChargesByPartner + "?Id=" + this.currentJob.hblid + "&partnerID=" + partnerId + "&IsHouseBillId=true");
         this.listChargeOfPartner = map(this.listChargeOfPartner, function (o) {
             for (let i = 0; i < o.listCharges.length; i++) {
-                if (o.listCharges[i].debitNo === null && o.listCharges[i].creditNo) {
+                if (o.listCharges[i].debitNo === null || o.listCharges[i].creditNo) {
                     o.listCharges[i].isRemaining = true;
                 } else {
                     if (o.listCharges[i].debitNo === cdNo || o.listCharges[i].creditNo === cdNo) {
-                        o.listCharges[i].isSelected = true;
+                        o.listCharges[i].isSelected = false;
                         o.listCharges[i].isRemaining = false;
                     }
                 }
@@ -69,15 +69,23 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
         this.totalDebit = 0;
         for (let i = 0; i < this.listChargeOfPartner[0].listCharges.length; i++) {
             const c = this.listChargeOfPartner[0].listCharges[i];
-            if (c["isSelected"]) {
-                if (c.type === "BUY" || c.type === "LOGISTIC" || (c.type === "OBH" && this.EditingCDNote.partnerId === c.payerId)) {
-                    // calculate total credit
-                    this.totalCredit += (c.total * c.exchangeRate);
-                }
-                if (c.type === "SELL" || (c.type === "OBH" && this.EditingCDNote.partnerId === c.receiverId)) {
-                    // calculate total debit 
-                    this.totalDebit += (c.total * c.exchangeRate);
-                }
+            // if (c["isSelected"]) {
+            //     if (c.type === "BUY" || c.type === "LOGISTIC" || (c.type === "OBH" && this.EditingCDNote.partnerId === c.payerId)) {
+            //         // calculate total credit
+            //         this.totalCredit += (c.total * c.exchangeRate);
+            //     }
+            //     if (c.type === "SELL" || (c.type === "OBH" && this.EditingCDNote.partnerId === c.receiverId)) {
+            //         // calculate total debit 
+            //         this.totalDebit += (c.total * c.exchangeRate);
+            //     }
+            // }
+            if (c.type === "BUY" || c.type === "LOGISTIC" || (c.type === "OBH" && this.EditingCDNote.partnerId === c.payerId)) {
+                // calculate total credit
+                this.totalCredit += (c.total * c.exchangeRate);
+            }
+            if (c.type === "SELL" || (c.type === "OBH" && this.EditingCDNote.partnerId === c.receiverId)) {
+                // calculate total debit 
+                this.totalDebit += (c.total * c.exchangeRate);
             }
 
         }
@@ -120,6 +128,11 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
     }
 
     addChargeToCDNote(event) {
+        if (event != null) {
+            const listNewCharges = event;
+            this.listChargeOfPartner[0].listCharges = this.listChargeOfPartner[0].listCharges.concat(listNewCharges);
+        }
+
         this.totalCreditDebitCalculate();
     }
     addMoreChargeToCDNote() {
@@ -139,7 +152,8 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
         this.EditingCDNote.jobId = this.currentJob.id;
         this.EditingCDNote.currencyId = "USD"; // in the future , this id must be local currency of each country
         this.EditingCDNote.listShipmentSurcharge = filter(this.EditingCDNote.listShipmentSurcharge, function (o: any) {
-            return !o.isRemaining && o.isSelected;
+            // return !o.isRemaining && o.isSelected;
+            return !o.isRemaining;
         });
         console.log(this.EditingCDNote);
         const res = await this.baseServices.putAsync(this.api_menu.Documentation.AcctSOA.update, this.EditingCDNote);

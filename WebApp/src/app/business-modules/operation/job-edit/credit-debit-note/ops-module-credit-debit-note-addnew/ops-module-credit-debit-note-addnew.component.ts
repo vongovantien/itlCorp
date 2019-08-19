@@ -73,7 +73,7 @@ export class OpsModuleCreditDebitNoteAddnewComponent extends PopupBase implement
     }
     async getListCharges(partnerId: String) {
         if (this.currentHbID !== null && partnerId != null) {
-            this.listChargeOfPartner = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getChargesByPartner + "?Id=" + this.currentHbID + "&partnerID=" + partnerId + "&IsHouseBillId=true");
+            this.listChargeOfPartner = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getChargesByPartner + "?Id=" + this.currentHbID + "&partnerID=" + partnerId + "&IsHouseBillId=true" + "&isAddCDNote=false");
             console.log('CDNoteWorking');
             console.log(this.CDNoteWorking);
             this.CDNoteWorking.listShipmentSurcharge = [];

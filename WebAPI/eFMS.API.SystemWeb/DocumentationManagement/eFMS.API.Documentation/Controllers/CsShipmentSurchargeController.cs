@@ -62,14 +62,14 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="Id"></param>
         /// <param name="partnerID"></param>
         /// <param name="IsHouseBillID"></param>
-        /// <param name="getAll"></param>
+        /// <param name="isAddCDNote"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("GroupByListHB")]
-        public List<object> GetByListHouseBill(Guid Id,string partnerID,bool IsHouseBillID,bool getAll=false)
+        public List<object> GetByListHouseBill(Guid Id,string partnerID,bool IsHouseBillID,bool? isAddCDNote = null)
         {
 
-            return csShipmentSurchargeService.GroupChargeByHB(Id, partnerID,IsHouseBillID,getAll);
+            return csShipmentSurchargeService.GroupChargeByHB(Id, partnerID,IsHouseBillID, isAddCDNote);
         }
 
         /// <summary>

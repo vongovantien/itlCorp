@@ -164,8 +164,11 @@
                                             <td class="table-actions-col">
                                                 <div class="table-actions">
                                                     <label class="m-checkbox">
-                                                        <input type="checkbox" name="" [checked]="charge.isSelected"
+                                                        <!-- <input type="checkbox" name="" [checked]="charge.isSelected"
                                                             (change)="charge.isSelected=!charge.isSelected;charge.isRemaining=!charge.isRemaining; removeAllChargeSelected();">
+                                                        <span></span> -->
+                                                        <input type="checkbox" name="" [checked]="charge.isSelected"
+                                                            (change)="charge.isSelected=!charge.isSelected; removeAllChargeSelected();">
                                                         <span></span>
                                                     </label>
                                                 </div>
