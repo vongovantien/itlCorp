@@ -26,6 +26,20 @@
             <param name="pageSize">number items per page</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctAdvancePaymentController.GetGrpRequestsByAdvanceNo(System.String)">
+            <summary>
+            Get Group Requests by AdvanceNo
+            </summary>
+            <param name="advanceNo">advanceNo that want to retrieve Advance Request</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctAdvancePaymentController.GetGrpRequestsByAdvanceId(System.Guid)">
+            <summary>
+            Get Group Requests by AdvanceId
+            </summary>
+            <param name="advanceId">advanceId that want to retrieve Advance Request</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.AcctAdvancePaymentController.GetShipments">
             <summary>
             Get shipments (JobId, HBL, MBL) from shipment documentation and shipment operation
@@ -46,11 +60,11 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.AcctAdvancePaymentController.Delete(System.Guid)">
+        <member name="M:eFMS.API.Documentation.Controllers.AcctAdvancePaymentController.Delete(System.String)">
             <summary>
-            delete an existed item
+            delete an advance payment existed item
             </summary>
-            <param name="idAdvanceRequest">idAdvanceRequest of existed item that want to delete</param>
+            <param name="advanceNo">advanceNo of existed item that want to delete</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.AcctAdvancePaymentController.GetAdvancePaymentByAdvanceNo(System.String)">
@@ -58,6 +72,13 @@
             Get Advance Payment by AdvanceNo
             </summary>
             <param name="advanceNo">advanceNo that want to retrieve Advance Payment</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctAdvancePaymentController.GetAdvancePaymentByAdvanceId(System.Guid)">
+            <summary>
+            Get Advance Payment by AdvanceId
+            </summary>
+            <param name="advanceId">advanceId that want to retrieve Advance Payment</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.AcctAdvancePaymentController.Update(eFMS.API.Documentation.DL.Models.AcctAdvancePaymentModel)">
