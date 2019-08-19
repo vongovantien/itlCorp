@@ -108,7 +108,7 @@ namespace eFMS.API.Documentation.Controllers
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = acctSOAService.Delete(x => x.Soano == soaNo);
-            //Update SOANo = NULL for ShipmentSurcharge
+            //Update SOANo = NULL & PaySOANo = NULL for ShipmentSurcharge
             acctSOAService.UpdateSOASurCharge(soaNo);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
