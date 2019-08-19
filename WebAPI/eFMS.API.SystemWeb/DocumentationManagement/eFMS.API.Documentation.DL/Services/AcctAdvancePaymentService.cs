@@ -123,8 +123,8 @@ namespace eFMS.API.Documentation.DL.Services
                             : 
                                 request.Where(x => x.StatusPayment == "Settled" && x.AdvanceNo == ad.AdvanceNo).Count() == request.Where(x => x.AdvanceNo == ad.AdvanceNo).Count() ?
                                     "Settled" 
-                                : 
-                                    "SettledOnePart",
+                                :
+                                    "PartialSettlement",
                            PaymentMethod = ad.PaymentMethod
                        };
 
