@@ -14,10 +14,10 @@ import { SystemConstants } from 'src/constants/system.const';
 
 export class AdvancePaymentFormCreateComponent extends AppForm {
 
-    @Output() onChangeCurrency: EventEmitter<any> = new EventEmitter<any>()
+    @Output() onChangeCurrency: EventEmitter<any> = new EventEmitter<any>();
 
     methods: CommonInterface.ICommonTitleValue[];
-    currencyList: Currency[];
+    currencyList: Currency[] = [];
     userLogged: User;
 
     formCreate: FormGroup;

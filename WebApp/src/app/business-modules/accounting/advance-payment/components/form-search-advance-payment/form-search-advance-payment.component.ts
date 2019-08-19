@@ -89,7 +89,7 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
 
     getUserLogged() {
         this.userLogged = this._baseService.getUserLogin() || 'admin';
-        this.requester.setValue(this.userLogged.id);
+        this.requester.setValue(this.userLogged.preferred_username);
     }
 
     getStatusApproval(): CommonInterface.ICommonTitleValue[] {
@@ -97,7 +97,7 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
             { title: 'New', value: 'New' },
             { title: 'Leader Approved', value: 'LeaderApproved' },
             { title: 'Department Manager Approved', value: 'New' },
-            { title: 'NeAccountant Manager Approvedw', value: 'New' },
+            { title: 'Accountant Manager Approved', value: 'New' },
             { title: 'Done ', value: 'New' },
             { title: 'Denied  ', value: 'New' },
         ];
@@ -106,7 +106,8 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
     getStatusPayment(): CommonInterface.ICommonTitleValue[] {
         return [
             { title: 'Settled', value: 'Settled' },
-            { title: 'Not Settled ', value: 'NotSettled' },
+            { title: 'Not Settled', value: 'NotSettled' },
+            { title: 'Partial Settlement', value: 'PartialSettlement' },
         ];
     }
 

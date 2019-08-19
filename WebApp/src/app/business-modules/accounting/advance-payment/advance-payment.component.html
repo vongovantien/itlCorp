@@ -65,29 +65,25 @@
                                                         <i class="la la-trash text-danger"></i>
                                                     </a>
                                                 </span>
-                                                <span>
+                                                <!-- <span>
                                                     <a (click)="copyAdvancePayment(advancePayment)"
                                                         title=" Copy advance payment " class="pointer">
                                                         <i class="la la-copy text-success"></i>
                                                     </a>
-                                                </span>
+                                                </span> -->
                                             </div>
                                         </td>
                                         <td class="text-underline text-primary pointer">
-                                            <a [routerLink]="[advancePayment.hbl]">
-                                                <!-- TODO change url-->
+                                            <a [routerLink]="[advancePayment.id]">
                                                 {{advancePayment.advanceNo}}
                                             </a>
                                         </td>
-                                        <td> {{advancePayment.customNo}} </td>
-                                        <td>{{advancePayment.jobId}}</td>
-                                        <td>{{advancePayment.hbl}}</td>
-                                        <td>{{advancePayment.description}}</td>
-                                        <td>{{advancePayment.amount | number : '.0-3'}}</td>
-                                        <td>{{advancePayment.requestCurrency}}</td>
+                                        <td>{{advancePayment.advanceNote}}</td>
+                                        <td>{{advancePayment.advanceCurrency}}</td>
+                                        <td>{{advancePayment.requesterName}}</td>
                                         <td>{{advancePayment.requestDate | date: 'dd/MM/yyyy'}}</td>
                                         <td>{{advancePayment.deadlinePayment | date: 'dd/MM/yyyy'}}</td>
-                                        <td>{{advancePayment.advanceDatetimeModified | date: 'dd/MM/yyyy'}}</td>
+                                        <td>{{advancePayment.datetimeModified | date: 'dd/MM/yyyy'}}</td>
                                         <td [ngSwitch]="advancePayment.statusApproval">
                                             <div *ngSwitchCase="'New'" class="text-danger">
                                                 {{advancePayment.statusApproval}}</div>
@@ -98,12 +94,15 @@
                                             <div *ngSwitchDefault class="text-primary">{{advancePayment.statusApproval}}
                                             </div>
                                         </td>
-                                        <td [ngSwitch]="advancePayment.statusPayment">
+                                        <td [ngSwitch]="advancePayment.advanceStatusPayment">
                                             <div class="text-success" *ngSwitchCase="'Settled'">
-                                                {{advancePayment.statusPayment}}
+                                                {{advancePayment.advanceStatusPayment}}
                                             </div>
                                             <div class="text-danger" *ngSwitchCase="'NotSettled'">
                                                 Not Settled
+                                            </div>
+                                            <div class="text-danger" *ngSwitchCase="'PartialSettlement'">
+                                                Partial Settlement
                                             </div>
                                         </td>
                                         <td>{{advancePayment.paymentMethod}}</td>
@@ -150,3 +149,5 @@
         </div>
     </div>
 </div>
+
+<confirm-popup (onSubmit)="onDeleteAdvPayment()" [body]="'Do you want to delete ?'" [labelConfirm]="'Yes'" [labelCancel]="'No'"></confirm-popup>

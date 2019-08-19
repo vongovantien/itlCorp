@@ -6,7 +6,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
 import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
-import { AdvancePaymentRequest } from 'src/app/shared/models';
+import { AdvancePayment } from 'src/app/shared/models';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 @Component({
     selector: 'app-advance-payment',
@@ -14,9 +15,12 @@ import { AdvancePaymentRequest } from 'src/app/shared/models';
 })
 export class AdvancePaymentComponent extends AppList {
     @ViewChild(AdvancePaymentFormsearchComponent, { static: false }) formSearch: AdvancePaymentFormsearchComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+
 
     headers: CommonInterface.IHeaderTable[];
-    advancePayments: AdvancePaymentRequest[] = [];
+    advancePayments: AdvancePayment[] = [];
+    selectedAdv: AdvancePayment;
 
     constructor(
         private _accoutingRepo: AccoutingRepo,
@@ -31,12 +35,9 @@ export class AdvancePaymentComponent extends AppList {
     ngOnInit() {
         this.headers = [
             { title: 'Advance No', field: 'advanceNo', sortable: true },
-            { title: 'Custom No', field: 'customNo', sortable: true },
-            { title: 'Job ID', field: 'JobId', sortable: true },
-            { title: 'HBL', field: 'hbl', sortable: true },
-            { title: 'Description', field: 'description', sortable: true },
-            { title: 'Advance Amount', field: 'amount', sortable: true },
+            { title: 'Description', field: 'advanceNote', sortable: true },
             { title: 'Currency', field: 'requestCurrency', sortable: true },
+            { title: 'Requester', field: 'requester', sortable: true },
             { title: 'Request Date', field: 'requestDate', sortable: true },
             { title: 'DeadLine Date', field: 'deadlinePayment', sortable: true },
             { title: 'Modified Date', field: 'advanceDatetimeModified', sortable: true },
@@ -55,14 +56,13 @@ export class AdvancePaymentComponent extends AppList {
                 finalize(() => { this.isLoading = false; }),
                 map((data: any) => {
                     return {
-                        data: data.data.map((item: any) => new AdvancePaymentRequest(item)),
+                        data: data.data.map((item: any) => new AdvancePayment(item)),
                         totalItems: data.totalItems,
                     };
                 })
             ).subscribe(
                 (res: any) => {
                     this.advancePayments = res.data;
-                    console.log(this.advancePayments);
                     this.totalItems = res.totalItems || 0;
                 },
                 (errors: any) => {
@@ -99,11 +99,32 @@ export class AdvancePaymentComponent extends AppList {
         }
     }
 
-    deleteAdvancePayment(selectedRequest: AdvancePaymentRequest) {
-        console.log(selectedRequest);
+    onDeleteAdvPayment() {
+        this._accoutingRepo.deleteAdvPayment(this.selectedAdv.advanceNo)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this.confirmDeletePopup.hide();
+                })
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message, 'Delete Success');
+                        this.getListAdvancePayment();
+                    }
+                },
+                (errors: any) => { },
+                () => { }
+            );
     }
 
-    copyAdvancePayment(selectedRequest: AdvancePaymentRequest) {
+    deleteAdvancePayment(selectedAdv: AdvancePayment) {
+        this.confirmDeletePopup.show();
+        this.selectedAdv = new AdvancePayment(selectedAdv);
+    }
+
+    copyAdvancePayment(selectedRequest: AdvancePayment) {
         console.log(selectedRequest);
     }
 

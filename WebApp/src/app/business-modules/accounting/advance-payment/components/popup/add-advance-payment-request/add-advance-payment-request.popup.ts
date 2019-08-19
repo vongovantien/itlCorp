@@ -15,6 +15,8 @@ import { ToastrService } from 'ngx-toastr';
 export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
 
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
+    @Output() onUpdate: EventEmitter<any>  = new EventEmitter<any>();
+
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
 
     action: string = 'create';
@@ -76,7 +78,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     initForm() {
         this.form = this._fb.group({
             'description': [, Validators.compose([
-                Validators.pattern(/^[\w '_"/*\\\.,-]*$/),
+                // Validators.pattern(/^[\w '_"/*\\\.,-]*$/),
                 Validators.required
             ])],
             'amount': [,
@@ -153,17 +155,19 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
                     (errors: any) => { },
                     () => { }
                 );
-        } else {
-            console.log(this.detectRequestChange(this.selectedRequest, body));
+        } else if (this.action === 'copy') { 
             if (this.detectRequestChange(this.selectedRequest, body)) {
                 this.isDupplicate = true;
                 this.bodyConfirm = 'Data already exists, do you want to save or not ?';
-                this.confirmPopup.show();
+                this.confirmPopup.show();  
             } else {
                 this.isDupplicate = false;
-                this.onRequest.emit(body);
+                this.onRequest.emit(body);  // * create new request
                 this.hide();
             }
+        } else {
+            this.onUpdate.emit(body);   // * Update request
+            this.hide();
         }
     }
 
@@ -262,6 +266,8 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             description: form.value.description,
         });
         this.onRequest.emit(body);
+        // * create new request in dupplicating
+
     }
 
     onSubmitExitPopup() {
