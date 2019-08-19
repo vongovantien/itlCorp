@@ -226,6 +226,7 @@ export class StatementOfAccountEditComponent extends AppList {
 
     removeCharge() {
         this.soa.chargeShipments = this.soa.chargeShipments.filter((item: any) => !item.isSelected);
+        this.dataSearch.chargeShipments = this.soa.chargeShipments;
     }
 
     back() {
@@ -234,6 +235,7 @@ export class StatementOfAccountEditComponent extends AppList {
 
     onUpdateMoreSOA(data: any) {
         this.soa.chargeShipments = data.chargeShipments;
+        this.dataSearch.chargeShipments = this.soa.chargeShipments;
         this.isCheckAllCharge = false;
     }
 
@@ -256,7 +258,10 @@ export class StatementOfAccountEditComponent extends AppList {
             return;
         } else {
             const body = {
-                surchargeIds: this.soa.chargeShipments.map((item: any) => item.id),
+                surcharges: this.soa.chargeShipments.map((item: any) => ({
+                    surchargeId: item.id,
+                    type: item.type
+                })),
                 id: this.soa.id,
                 soano: this.soaNO,
                 soaformDate: !!this.selectedRange.startDate ? formatDate(this.selectedRange.startDate, 'yyyy-MM-dd', 'en') : null,

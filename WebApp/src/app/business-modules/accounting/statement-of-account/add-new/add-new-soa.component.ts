@@ -125,7 +125,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
             this.addChargePopup.configCharge = this.configCharge;
 
             this.addChargePopup.show({ backdrop: 'static' });
-            
+
         }
     }
 
@@ -257,7 +257,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
                     }
                 }
             )
-        
+
     }
 
     getCharge() {
@@ -293,9 +293,9 @@ export class StatementOfAccountAddnewComponent extends AppList {
         this.selectedDateMode = this.dateModes[0];
 
         this.types = [
-            { title: 'All', value: 1 },
-            { title: 'Debit', value: 2 },
-            { title: 'Credit', value: 3 },
+            { title: 'All', value: 'All' },
+            { title: 'Debit', value: 'Debit' },
+            { title: 'Credit', value: 'Credit' },
         ];
         this.selectedType = this.types[0];
 
@@ -435,6 +435,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
                 serviceTypeId: !!this.selectedService.length ? this.mapServiceId(this.selectedService[0].id) : this.mapServiceId('All'),
             };
             this.dataSearch = new SOASearchCharge(body);
+            console.log(this.dataSearch);
             this.searchChargeWithDataSearch(this.dataSearch);
         }
     }
@@ -482,7 +483,10 @@ export class StatementOfAccountAddnewComponent extends AppList {
         } else {
 
             const body = {
-                surchargeIds: this.listCharges.map((item: any) => item.id),
+                surcharges: this.listCharges.map((item: any) => ({
+                    surchargeId: item.id,
+                    type: item.type
+                })),
                 soaformDate: this.dataSearch.fromDate,
                 soatoDate: this.dataSearch.toDate,
                 currency: this.dataSearch.currency,
@@ -551,6 +555,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
 
     removeCharge() {
         this.listCharges = this.listCharges.filter((charge: any) => !charge.isSelected);
+        this.dataSearch.chargeShipments = this.listCharges;
     }
 
     handleError(errors?: any) {
@@ -566,6 +571,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
     onUpdateMoreSOA(data: any) {
         this.dataCharge = data;
         this.listCharges = data.chargeShipments || [];
+        this.dataSearch.chargeShipments = this.listCharges;
 
         this.totalCharge = data.totalCharge;
         this.totalShipment = data.shipment;
