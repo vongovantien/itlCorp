@@ -11,6 +11,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string HBL { get; set; }
         public string MBL { get; set; }
         public string CustomNo { get; set; }
+        public string Type { get; set; }
         public string InvoiceNo { get; set; }
         public DateTime ServiceDate { get; set; }
         public string Note { get; set; }

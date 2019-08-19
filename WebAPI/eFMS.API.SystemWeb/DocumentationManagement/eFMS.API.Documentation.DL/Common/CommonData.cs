@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace eFMS.API.Documentation.DL.Common
 {
@@ -46,5 +47,11 @@ namespace eFMS.API.Documentation.DL.Common
     public class CreditDebitNote : Shipments
     {
         public string CreditDebitNo { get; set; }
+    }
+
+    public class Surcharge
+    {
+        public Guid surchargeId { get; set; }
+        public string type { get; set; }
     }
 }
