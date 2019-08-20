@@ -41,11 +41,11 @@ namespace eFMS.API.Documentation.DL.Services
                             criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ?
                             (
                                 (
-                                       criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.AdvanceNo) : 1 == 1
-                                    || criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.Hbl) : 1 == 1
-                                    || criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.Mbl) : 1 == 1
-                                    || criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.CustomNo) : 1 == 1
-                                    || criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.JobId) : 1 == 1
+                                       (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.AdvanceNo) : 1 == 1)
+                                    || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.Hbl) : 1 == 1)
+                                    || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.Mbl) : 1 == 1)
+                                    || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.CustomNo) : 1 == 1)
+                                    || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.JobId) : 1 == 1)
                                 )
                             )
                             :
@@ -65,8 +65,11 @@ namespace eFMS.API.Documentation.DL.Services
                          &&
                          (
                             criteria.RequestDateFrom.HasValue && criteria.RequestDateTo.HasValue ?
-                                ad.RequestDate >= criteria.RequestDateFrom
-                                && ad.RequestDate <= criteria.RequestDateTo
+                                //ad.RequestDate >= criteria.RequestDateFrom
+                                //&& ad.RequestDate <= criteria.RequestDateTo
+                                //Convert RequestDate về date nếu RequestDate có value
+                                ad.RequestDate.Value.Date >= (criteria.RequestDateFrom.HasValue ? criteria.RequestDateFrom.Value.Date : criteria.RequestDateFrom)
+                                && ad.RequestDate.Value.Date <= (criteria.RequestDateTo.HasValue ? criteria.RequestDateTo.Value.Date : criteria.RequestDateTo)
                             :
                                 1 == 1
                          )
@@ -406,7 +409,11 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var advance = mapper.Map<AcctAdvancePayment>(model);
-                
+
+                var advanceCurrent = dc.AcctAdvancePayment.Where(x => x.Id == advance.Id).FirstOrDefault();
+                advance.DatetimeCreated = advanceCurrent.DatetimeCreated;
+                advance.UserCreated = advanceCurrent.UserCreated;
+
                 advance.DatetimeModified = DateTime.Now;
                 advance.UserModified = currentUser.UserID;
 
