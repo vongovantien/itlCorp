@@ -5,7 +5,8 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10" (click)="onOpePLPrint()">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                (click)="onOpePLPrint()">
                 <span>
                     <i class="la la-print"></i>
                     <span>
@@ -886,8 +887,8 @@
 							{{ charge.cdno }}
 						</a> -->
                                                             <a href="javascript:void(0)"
-                                                                (click)="openCreditDebitNote(charge.cdno)">
-                                                                {{ charge.cdno }}
+                                                                (click)="openCreditDebitNote(charge.creditNo)">
+                                                                {{ charge.creditNo }}
                                                             </a>
                                                         </td>
                                                         <td>
@@ -1160,8 +1161,8 @@
                                                                 {{ charge.cdno }}
                                                             </a> -->
                                                             <a href="javascript:void(0)"
-                                                                (click)="openCreditDebitNote(charge.cdno)">
-                                                                {{ charge.cdno }}
+                                                                (click)="openCreditDebitNote(charge.debitNo)">
+                                                                {{ charge.debitNo }}
                                                             </a>
                                                         </td>
                                                         <td>

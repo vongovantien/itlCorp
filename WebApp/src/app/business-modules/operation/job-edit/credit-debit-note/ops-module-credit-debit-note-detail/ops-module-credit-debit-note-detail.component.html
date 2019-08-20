@@ -211,7 +211,7 @@
                                     </td>
                                     <td>
                                         <span class="debit-value"
-                                            *ngIf="item.type==='SELL' || (item.type==='OBH' && CDNoteDetails.partnerId===item.receiverId)">{{item.total*item.exchangeRate | number:'1.3-3'}}</span>
+                                            *ngIf="item.type==='SELL' || (item.type==='OBH' && CDNoteDetails.partnerId===item.paymentObjectId)">{{item.total*item.exchangeRate | number:'1.3-3'}}</span>
                                     </td>
                                     <td>
                                         <span>{{item.notes}}</span>

@@ -185,7 +185,7 @@ export class CreditAndDebitNoteEditComponent implements OnInit {
     for (var i = 0; i < this.EditingCDNote.listShipmentSurcharge.length; i++) {
       const c = this.EditingCDNote.listShipmentSurcharge[i];
       if (!c["isRemaining"]) {
-        if (c.type == "BUY" || c.type == "LOGISTIC" || (c.type == "OBH" && this.EditingCDNote.partnerId == c.receiverId)) {
+        if (c.type == "BUY" || c.type == "LOGISTIC" || (c.type == "OBH" && this.EditingCDNote.partnerId == c.paymentObjectId)) {
           // calculate total credit
           this.totalCredit += (c.total * c.exchangeRate);
         }

@@ -73,7 +73,9 @@ export class OpsModuleCreditDebitNoteAddnewComponent extends PopupBase implement
     }
     async getListCharges(partnerId: String) {
         if (this.currentHbID !== null && partnerId != null) {
-            this.listChargeOfPartner = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getChargesByPartner + "?Id=" + this.currentHbID + "&partnerID=" + partnerId + "&IsHouseBillId=true");
+            this.listChargeOfPartner = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getChargesByPartner + "?Id=" + this.currentHbID + "&partnerID=" + partnerId + "&IsHouseBillId=true" + "&isAddCDNote=false");
+            console.log('CDNoteWorking');
+            console.log(this.CDNoteWorking);
             this.CDNoteWorking.listShipmentSurcharge = [];
             this.listChargeOfPartner = map(this.listChargeOfPartner, function (o) {
                 for (let i = 0; i < o.listCharges.length; i++) {
@@ -102,7 +104,7 @@ export class OpsModuleCreditDebitNoteAddnewComponent extends PopupBase implement
                     // calculate total credit
                     this.totalCredit += (c.total * c.exchangeRate);
                 }
-                if (c.type === "SELL" || (c.type === "OBH" && this.CDNoteWorking.partnerId === c.receiverId)) {
+                if (c.type === "SELL" || (c.type === "OBH" && this.CDNoteWorking.partnerId === c.paymentObjectId)) {
                     // calculate total debit 
                     this.totalDebit += (c.total * c.exchangeRate);
                 }

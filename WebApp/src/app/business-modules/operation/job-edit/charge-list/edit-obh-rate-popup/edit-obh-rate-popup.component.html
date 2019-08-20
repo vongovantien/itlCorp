@@ -45,21 +45,21 @@
               </div>
               <div class="col-lg-4">
                 <div class="form-group"
-                  [ngClass]="{ 'm-form__group has-danger': editOBHChargeFormOps.submitted && obhChargeToEdit.receiverId==null}">
+                  [ngClass]="{ 'm-form__group has-danger': editOBHChargeFormOps.submitted && obhChargeToEdit.paymentObjectId==null}">
                   <label class="form-control-label" for="">
                     Receiver <span class="m--font-danger">(*)</span>
                   </label>
 
                   <app-combo-grid-virtual-scroll [disabled]="obhChargeToEdit.cdno"
-                    [currentActiveItemId]="{field:'id',value:obhChargeToEdit.receiverId,hardValue:obhChargeToEdit.receiverName}"
-                    (itemSelected)="obhChargeToEdit.receiverId = $event.id;
+                    [currentActiveItemId]="{field:'id',value:obhChargeToEdit.paymentObjectId,hardValue:obhChargeToEdit.receiverName}"
+                    (itemSelected)="obhChargeToEdit.paymentObjectId = $event.id;
                                                                     obhChargeToEdit.receiverName = $event.shortName;"
                     [selectedDisplayFields]="['shortName']" [dataSources]="lstPartners"
                     [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                   </app-combo-grid-virtual-scroll>
 
                   <div class="form-control-feedback"
-                    *ngIf="editOBHChargeFormOps.submitted && obhChargeToEdit.receiverId==null">
+                    *ngIf="editOBHChargeFormOps.submitted && obhChargeToEdit.paymentObjectId==null">
                     Receiver name is required !
                   </div>
 
@@ -82,7 +82,7 @@
 
                   <div class="form-control-feedback"
                     *ngIf="editOBHChargeFormOps.submitted && obhChargeToEdit.payerId==null">
-                    Receiver name is required !
+                    Payer name is required !
                   </div>
 
                 </div>

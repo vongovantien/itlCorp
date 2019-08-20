@@ -62,6 +62,35 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+
+        /// <summary>
+        /// Get Group Requests by AdvanceNo
+        /// </summary>
+        /// <param name="advanceNo">advanceNo that want to retrieve Advance Request</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetGroupRequestsByAdvanceNo")]
+        public IActionResult GetGrpRequestsByAdvanceNo(string advanceNo)
+        {
+            //Sum(Amount) theo lô hàng (JobId, HBL)
+            var data = acctAdvancePaymentService.GetGroupRequestsByAdvanceNo(advanceNo);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Get Group Requests by AdvanceId
+        /// </summary>
+        /// <param name="advanceId">advanceId that want to retrieve Advance Request</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetGroupRequestsByAdvanceId")]
+        public IActionResult GetGrpRequestsByAdvanceId(Guid advanceId)
+        {
+            //Sum(Amount) theo lô hàng (JobId, HBL)
+            var data = acctAdvancePaymentService.GetGroupRequestsByAdvanceId(advanceId);
+            return Ok(data);
+        }
+
         /// <summary>
         /// Get shipments (JobId, HBL, MBL) from shipment documentation and shipment operation
         /// </summary>
@@ -143,18 +172,18 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
-        /// delete an existed item
+        /// delete an advance payment existed item
         /// </summary>
-        /// <param name="idAdvanceRequest">idAdvanceRequest of existed item that want to delete</param>
+        /// <param name="advanceNo">advanceNo of existed item that want to delete</param>
         /// <returns></returns>
         [Authorize]
         [HttpDelete]
         [Route("Delete")]
-        public IActionResult Delete(Guid idAdvanceRequest)
+        public IActionResult Delete(string advanceNo)
         {
             ChangeTrackerHelper.currentUser = currentUser.UserID;
 
-            HandleState hs = acctAdvancePaymentService.DeleteAdvanceRequest(idAdvanceRequest);
+            HandleState hs = acctAdvancePaymentService.DeleteAdvancePayment(advanceNo);
 
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -175,6 +204,21 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult GetAdvancePaymentByAdvanceNo(string advanceNo)
         {
             var data = acctAdvancePaymentService.GetAdvancePaymentByAdvanceNo(advanceNo);
+            if (data != null)
+                return Ok(data);
+            return NotFound();
+        }
+
+        /// <summary>
+        /// Get Advance Payment by AdvanceId
+        /// </summary>
+        /// <param name="advanceId">advanceId that want to retrieve Advance Payment</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetAdvancePaymentByAdvanceId")]
+        public IActionResult GetAdvancePaymentByAdvanceId(Guid advanceId)
+        {
+            var data = acctAdvancePaymentService.GetAdvancePaymentByAdvanceId(advanceId);
             if (data != null)
                 return Ok(data);
             return NotFound();

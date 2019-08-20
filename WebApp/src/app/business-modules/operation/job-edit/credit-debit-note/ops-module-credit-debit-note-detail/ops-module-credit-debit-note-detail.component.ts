@@ -49,7 +49,7 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
     const currentCDNoteDetail = this.CDNoteDetails;
     // this.CDNoteDetails = null;
     this.hide();
-    this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + currentCDNoteDetail.jobId + "&soaNo=" + currentCDNoteDetail.cdNote.code);
+    this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + currentCDNoteDetail.jobId + "&cdNo=" + currentCDNoteDetail.cdNote.code);
     // this.baseServices.setData("CDNoteDetails", this.CDNoteDetails);
     this.popupEdit.currentCDNo = currentCDNoteDetail.cdNote.code;
     this.popupEdit.currentJob = this.currentJob;
@@ -74,7 +74,7 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
   }
   async closeEditModal(event) {
     this.currentCDNo = this.CDNoteDetails.cdNote.code;
-    this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.currentJob.id + "&soaNo=" + this.currentCDNo);
+    this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.currentJob.id + "&cdNo=" + this.currentCDNo);
     this.show();
   }
   async Preview() {
