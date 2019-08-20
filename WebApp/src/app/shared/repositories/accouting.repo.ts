@@ -163,5 +163,12 @@ export class AccoutingRepo {
         );
     }
 
+    getGroupRequestAdvPayment(advanceNo: string) {
+        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctAdvancePayment/GetGroupRequestsByAdvanceNo`, { advanceNo: advanceNo}).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
 
 }

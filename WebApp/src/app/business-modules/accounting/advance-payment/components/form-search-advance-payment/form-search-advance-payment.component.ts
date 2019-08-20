@@ -74,16 +74,15 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
     onSubmit() {
         const body: ISearchAdvancePayment = {
             referenceNos: !!this.referenceNo.value ? this.referenceNo.value.replace(/(?:\r\n|\r|\n|\\n|\\r)/g, ',').trim().split(',').map((item: any) => item.trim()) : null,
-            advanceModifiedDateFrom: !!this.modifiedDate.value ? formatDate(this.modifiedDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-            advanceModifiedDateTo: !!this.modifiedDate.value ? formatDate(this.modifiedDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            requestDateFrom: !!this.requestDate.value ? formatDate(this.requestDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-            requestDateTo: !!this.requestDate.value ? formatDate(this.requestDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            paymentMethod: !!this.paymentMethod.value ? this.paymentMethod.value.value : null,
-            statusApproval: !!this.statusApproval.value ? this.statusApproval.value.value : null,
-            statusPayment: !!this.statusPayment.value ? this.statusPayment.value.value : null,
-            requester: this.requester.value
+            advanceModifiedDateFrom: !!this.modifiedDate.value && !!this.modifiedDate.value.startDate ? formatDate(this.modifiedDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            advanceModifiedDateTo: !!this.modifiedDate.value && !!this.modifiedDate.value.endDate ? formatDate(this.modifiedDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            requestDateFrom: !!this.requestDate.value && !!this.requestDate.value.startDate ? formatDate(this.requestDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            requestDateTo: !!this.requestDate.value && !!this.requestDate.value.endDate ? formatDate(this.requestDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            paymentMethod: !!this.paymentMethod.value ? this.paymentMethod.value.value : 'All',
+            statusApproval: !!this.statusApproval.value ? this.statusApproval.value.value : 'All',
+            statusPayment: !!this.statusPayment.value ? this.statusPayment.value.value : 'All',
+            requester: this.userLogged.id
         };
-
         this.onSearch.emit(body);
     }
 
@@ -127,6 +126,9 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
         this.resetFormControl(this.requestDate);
         this.resetFormControl(this.modifiedDate);
         this.resetFormControl(this.referenceNo);
+        this.resetFormControl(this.paymentMethod);
+        this.resetFormControl(this.statusApproval);
+        this.resetFormControl(this.statusPayment);
 
         this.onSearch.emit(<any>{});
     }
