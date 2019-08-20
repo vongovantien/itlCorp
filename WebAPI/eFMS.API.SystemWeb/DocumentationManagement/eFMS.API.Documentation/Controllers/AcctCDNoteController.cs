@@ -89,7 +89,7 @@ namespace eFMS.API.Documentation.Controllers
         //[Authorize]
         public List<object> Get(Guid Id,bool IsHouseBillID)
         {
-            return cdNoteServices.GroupCDNoteByPartner(Id, IsHouseBillID);
+             return cdNoteServices.GroupCDNoteByPartner(Id, IsHouseBillID);
         }
 
         [HttpGet]
