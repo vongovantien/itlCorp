@@ -226,6 +226,7 @@ export class StatementOfAccountEditComponent extends AppList {
 
     removeCharge() {
         this.soa.chargeShipments = this.soa.chargeShipments.filter((item: any) => !item.isSelected);
+        this.dataSearch.chargeShipments = this.soa.chargeShipments;
     }
 
     back() {
@@ -234,6 +235,7 @@ export class StatementOfAccountEditComponent extends AppList {
 
     onUpdateMoreSOA(data: any) {
         this.soa.chargeShipments = data.chargeShipments;
+        this.dataSearch.chargeShipments = this.soa.chargeShipments;
         this.isCheckAllCharge = false;
     }
 
@@ -248,15 +250,18 @@ export class StatementOfAccountEditComponent extends AppList {
         //     return;
         // }
         if ((new Date(this.selectedRange.startDate).getDate() > new Date(this.soa.soaformDate).getDate()) || new Date(this.selectedRange.endDate).getDate() < new Date(this.soa.soatoDate).getDate()) {
-            this._toastService.warning(`Range date invalid `, '', { positionClass: 'toast-bottom-right' });
+            this._toastService.warning(`Range date invalid `);
             return;
         }
         if (!this.soa.chargeShipments.length) {
-            this._toastService.warning(`SOA Don't have any charges in this period, Please check it again! `, '', { positionClass: 'toast-bottom-right' });
+            this._toastService.warning(`SOA Don't have any charges in this period, Please check it again! `);
             return;
         } else {
             const body = {
-                surchargeIds: this.soa.chargeShipments.map((item: any) => item.id),
+                surcharges: this.soa.chargeShipments.map((item: any) => ({
+                    surchargeId: item.id,
+                    type: item.type
+                })),
                 id: this.soa.id,
                 soano: this.soaNO,
                 soaformDate: !!this.selectedRange.startDate ? formatDate(this.selectedRange.startDate, 'yyyy-MM-dd', 'en') : null,
@@ -285,7 +290,7 @@ export class StatementOfAccountEditComponent extends AppList {
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
-                            this._toastService.success(`SOA ${res.data.soano} is successfull`, 'Update Success', { positionClass: 'toast-bottom-right' });
+                            this._toastService.success(`SOA ${res.data.soano} is successfull`, 'Update Success');
 
                             // * get detail again
                             this.getDetailSOA(this.soaNO, this.currencyLocal);

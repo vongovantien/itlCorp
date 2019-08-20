@@ -11,7 +11,6 @@ import { SortService } from "src/app/shared/services";
 @Component({
     selector: 'app-statement-of-account',
     templateUrl: './statement-of-account.component.html',
-    styleUrls: ['./statement-of-account.component.scss']
 })
 export class StatementOfAccountComponent extends AppList {
 

@@ -1,6 +1,8 @@
-// import * as lodash from 'lodash';
-import orderBy from 'lodash/orderBy'
-import deburr from 'lodash/deburr'
+import orderBy from 'lodash/orderBy';
+import deburr from 'lodash/deburr';
+import { Injectable } from '@angular/core';
+
+@Injectable({ providedIn: 'root' })
 export class SortService {
     sort(items: any[], property: string, isDesc: boolean) {
         if (isDesc) {
@@ -10,41 +12,9 @@ export class SortService {
         }
     }
 
-    // sort1(items: any[], property: string, isDesc: boolean){
-    //     var listItems = items.map(a=>a[property]);
-    //     console.log(listItems);
-    //     var finalResult:any=[];
-    //     var returnList:any[]=[];
-
-    //     if(isDesc){
-    //         var results:any[] = this.letterSort("en",listItems);
-
-    //         for(var i=0;i<=results.length;i++){
-    //             items.forEach(element => {
-    //                 if(element[property]==results[i]){
-    //                     returnList.push(element);
-    //                 }
-    //             });
-    //         }
-    //         console.log(returnList); 
-    //      }else{
-    //         var results:any[] = this.letterSort("en",listItems).reverse();
-
-    //         for(var i=0;i<=results.length;i++){
-    //             items.forEach(element => {
-    //                 if(element[property]==results[i]){
-    //                     returnList.push(element);
-    //                 }
-    //             });
-    //         }
-    //         console.log(returnList);           
-    //      }
-    //      return returnList;
-    // }
-
     private prepareStringToSort(str: any) {
         if (typeof str === "string") {
-            const x = Number("1000")
+            const x = Number("1000");
             if (isNaN(x)) {
                 return x;
             } else {
@@ -57,12 +27,6 @@ export class SortService {
         }
 
     }
-
-    private letterSort(lang: any, letters: any) {
-        letters.sort(new Intl.Collator(lang).compare);
-        return letters;
-    }
-
 }
 
 

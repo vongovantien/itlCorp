@@ -2,7 +2,9 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class GlobalState implements OnDestroy {
 
     ngUnsub: Subject<any> = new Subject<any>();

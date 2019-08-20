@@ -60,10 +60,9 @@
                             <label class="form-control-label">
                                 Date Mode
                             </label>
-                            <ng-select [items]="dateModes" (selected)="onSelectDataFormInfo($event, 'date-mode')"
-                                [active]="selectedDateMode" placeholder="Select Date Mode">
-                            </ng-select>
-
+                            <select [(ngModel)]="selectedDateMode" class="form-control"  (ngModelChange)="onSelectDataFormInfo($event , 'date-mode')">
+                                <option *ngFor="let dateMode of dateModes" [ngValue]="dateMode">{{dateMode.title}}</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -73,9 +72,10 @@
                             <label class="form-control-label">
                                 Type
                             </label>
-                            <ng-select [items]="types" (selected)="onSelectDataFormInfo($event, 'type')"
-                                [active]="selectedType">
-                            </ng-select>
+                            <select [(ngModel)]="selectedType" class="form-control"
+                                (ngModelChange)="onSelectDataFormInfo($event , 'type')">
+                                <option *ngFor="let type of types" [ngValue]="type">{{type.title}}</option>
+                            </select>
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -83,10 +83,9 @@
                             <label class="form-control-label">
                                 OBH
                             </label>
-
                             <select [(ngModel)]="selectedObh" class="form-control"
                                 (ngModelChange)="onSelectDataFormInfo($event , 'obh')">
-                                <option *ngFor="let item of obhs" [ngValue]="item">{{item.text}}</option>
+                                <option *ngFor="let item of obhs" [ngValue]="item">{{item.title}}</option>
                             </select>
                         </div>
                     </div>

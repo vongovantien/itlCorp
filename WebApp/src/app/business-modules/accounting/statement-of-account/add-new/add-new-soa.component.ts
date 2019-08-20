@@ -125,7 +125,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
             this.addChargePopup.configCharge = this.configCharge;
 
             this.addChargePopup.show({ backdrop: 'static' });
-            
+
         }
     }
 
@@ -257,7 +257,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
                     }
                 }
             )
-        
+
     }
 
     getCharge() {
@@ -286,27 +286,27 @@ export class StatementOfAccountAddnewComponent extends AppList {
 
     initBasicData() {
         this.dateModes = [
-            { text: 'Created Date', id: 'CreatedDate' },
-            { text: 'Service Date', id: 'ServiceDate' },
-            { text: 'Invoice Issued Date', id: 'InvoiceIssuedDate' },
+            { title: 'Created Date', value: 'CreatedDate' },
+            { title: 'Service Date', value: 'ServiceDate' },
+            { title: 'Invoice Issued Date', value: 'InvoiceIssuedDate' },
         ];
-        this.selectedDateMode = [this.dateModes[0]];
+        this.selectedDateMode = this.dateModes[0];
 
         this.types = [
-            { id: 1, text: 'All' },
-            { text: 'Debit', id: 2 },
-            { text: 'Credit', id: 3 },
+            { title: 'All', value: 'All' },
+            { title: 'Debit', value: 'Debit' },
+            { title: 'Credit', value: 'Credit' },
         ];
-        this.selectedType = [this.types[0]];
+        this.selectedType = this.types[0];
 
         this.obhs = [
-            { text: 'Yes', id: true },
-            { text: 'No', id: false }
+            { title: 'Yes', value: true },
+            { title: 'No', value: false }
         ];
         this.selectedObh = this.obhs[1];
-        this.updateDataSearch('isOBH', this.selectedObh.id);
-        this.updateDataSearch('dateType', this.selectedDateMode[0].id);
-        this.updateDataSearch('type', this.selectedType[0].text);
+        this.updateDataSearch('isOBH', this.selectedObh.value);
+        this.updateDataSearch('dateType', this.selectedDateMode.value);
+        this.updateDataSearch('type', this.selectedType.value);
     }
 
     updateDataSearch(key: string, data: any) {
@@ -320,16 +320,16 @@ export class StatementOfAccountAddnewComponent extends AppList {
                 this.updateDataSearch('customerID', this.selectedPartner.value);
                 break;
             case 'date-mode':
-                this.selectedDateMode = [data];
-                this.updateDataSearch('dateType', this.selectedDateMode[0].id);
+                this.selectedDateMode = data;
+                this.updateDataSearch('dateType', this.selectedDateMode.value);
                 break;
             case 'type':
-                this.selectedType = [data];
-                this.updateDataSearch('type', this.selectedType[0].text);
+                this.selectedType = data;
+                this.updateDataSearch('type', this.selectedType.value);
                 break;
             case 'obh':
                 this.selectedObh = data;
-                this.updateDataSearch('isOBH', this.selectedObh.id);
+                this.updateDataSearch('isOBH', this.selectedObh.value);
                 break;
             case 'currency':
                 this.selectedCurrency = data;
@@ -424,17 +424,18 @@ export class StatementOfAccountAddnewComponent extends AppList {
                 currencyLocal: 'VND', // Todo: get currency local follow location or login info
                 currency: this.selectedCurrency.id,
                 customerID: this.selectedPartner.value || '',
-                dateType: this.selectedDateMode[0].id,
+                dateType: this.selectedDateMode.value,
                 fromDate: formatDate(this.selectedRangeDate.startDate, 'yyyy-MM-dd', 'vi'),
                 toDate: formatDate(this.selectedRangeDate.endDate, 'yyyy-MM-dd', 'vi'),
-                type: this.selectedType[0].text,
-                isOBH: this.selectedObh.id,
+                type: this.selectedType.value,
+                isOBH: this.selectedObh.value,
                 strCreators: this.selectedUser.map((item: any) => item.id).toString(),
                 strCharges: this.selectedCharges.map((item: any) => item.code).toString(),
                 note: this.note,
                 serviceTypeId: !!this.selectedService.length ? this.mapServiceId(this.selectedService[0].id) : this.mapServiceId('All'),
             };
             this.dataSearch = new SOASearchCharge(body);
+            console.log(this.dataSearch);
             this.searchChargeWithDataSearch(this.dataSearch);
         }
     }
@@ -482,7 +483,10 @@ export class StatementOfAccountAddnewComponent extends AppList {
         } else {
 
             const body = {
-                surchargeIds: this.listCharges.map((item: any) => item.id),
+                surcharges: this.listCharges.map((item: any) => ({
+                    surchargeId: item.id,
+                    type: item.type
+                })),
                 soaformDate: this.dataSearch.fromDate,
                 soatoDate: this.dataSearch.toDate,
                 currency: this.dataSearch.currency,
@@ -551,6 +555,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
 
     removeCharge() {
         this.listCharges = this.listCharges.filter((charge: any) => !charge.isSelected);
+        this.dataSearch.chargeShipments = this.listCharges;
     }
 
     handleError(errors?: any) {
@@ -566,6 +571,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
     onUpdateMoreSOA(data: any) {
         this.dataCharge = data;
         this.listCharges = data.chargeShipments || [];
+        this.dataSearch.chargeShipments = this.listCharges;
 
         this.totalCharge = data.totalCharge;
         this.totalShipment = data.shipment;

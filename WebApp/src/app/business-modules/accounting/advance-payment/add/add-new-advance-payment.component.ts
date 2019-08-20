@@ -7,6 +7,7 @@ import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { AccoutingRepo } from 'src/app/shared/repositories';
 import { catchError } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-advance-payment-new',
@@ -20,7 +21,9 @@ export class AdvancePaymentAddNewComponent extends AppPage {
 
     constructor(
         private _toastService: ToastrService,
-        private _accoutingRepo: AccoutingRepo
+        private _accoutingRepo: AccoutingRepo,
+        private _router: Router
+
     ) {
         super();
     }
@@ -58,6 +61,10 @@ export class AdvancePaymentAddNewComponent extends AppPage {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(`${res.data.advanceNo + 'is added successfully'}`, 'Save Success !', { positionClass: 'toast-bottom-right' });
+
+                            //  * go to detail page
+                            this._router.navigate([`home/accounting/advance-payment/${res.data.id}`], { queryParams: { no: res.data.soano, currency: 'VND' } });
+
                         }
                     },
                     (errors: any) => { },

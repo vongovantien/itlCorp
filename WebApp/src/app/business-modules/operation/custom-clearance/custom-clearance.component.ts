@@ -1,192 +1,72 @@
-import { Component, OnInit } from '@angular/core';
-import moment from 'moment/moment';
+import { Component, ViewChild } from '@angular/core';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
-import { PAGINGSETTING } from 'src/constants/paging.const';
-import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
-import * as lodash from 'lodash';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
-declare var $: any;
+import { catchError, map, finalize } from 'rxjs/operators';
+import { CustomDeclaration } from 'src/app/shared/models';
+import { AppList } from 'src/app/app.list';
+import { CDNoteRepo } from 'src/app/shared/repositories';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+
+import _map from 'lodash/map';
+import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'app-custom-clearance',
     templateUrl: './custom-clearance.component.html',
     styleUrls: ['./custom-clearance.component.scss']
 })
-export class CustomClearanceComponent implements OnInit {
-    listCustomDeclaration: any = [];
-    pager: PagerSetting = PAGINGSETTING;
+export class CustomClearanceComponent extends AppList {
+    @ViewChild('confirmConvertPopup', { static: false }) confirmConvertPopup: ConfirmPopupComponent;
+    @ViewChild('confirmDeletePopup', { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+
+    listCustomDeclaration: CustomDeclaration[] = [];
     searchObject: any = {};
-    listUser: Array<string> = [];
-    clearanceNo: string = '';
-    customCheckedArray: any = [];
     listCustomer: any = [];
     listPort: any = [];
     listUnit: any = [];
-    isDesc = true;
-    sortKey: string = "";
 
+    headers: CommonInterface.IHeaderTable[];
     constructor(
         private excelService: ExcelService,
         private baseServices: BaseService,
         private api_menu: API_MENU,
-        private sortService: SortService,
+        private _sortService: SortService,
         private router: Router,
-        private toastr: ToastrService) {
-        this.keepCalendarOpeningWithRange = true;
-        this.selectedDate = Date.now();
-        this.selectedRange = { startDate: moment().subtract(30, 'days'), endDate: moment() };
+        private _toastrService: ToastrService,
+        private _cdNoteRepo: CDNoteRepo
+    ) {
+        super();
+        this.requestList = this.getListCustomsDeclaration;
+
     }
 
-    async ngOnInit() {
-        this.initPager();
-        this.getListUser();
-        this.currentUser = [localStorage.getItem('currently_userName')];
+    ngOnInit() {
+
+        this.headers = [
+            { title: 'Clearance No', field: 'clearanceNo', sortable: true },
+            { title: 'Type', field: 'type', sortable: true },
+            { title: 'Gateway', field: 'gatewayName', sortable: true },
+            { title: 'Partner Name', field: 'customerName', sortable: true },
+            { title: 'Import Country', field: 'importCountryName', sortable: true },
+            { title: 'Export Country', field: 'exportCountryName', sortable: true },
+            { title: 'Job ID', field: 'jobNo', sortable: true },
+            { title: 'Clearance Date', field: 'clearanceDate', sortable: true },
+            { title: 'Status', field: 'jobNo', sortable: true },
+        ];
         this.getListCustomsDeclaration();
         this.getListCustomer();
         this.getListPort();
         this.getListUnit();
     }
 
-    initPager(): any {
-        this.pager.totalItems = 0;
-        this.pager.currentPage = 1;
-
-        this.customCheckedArray = [];
-    }
-
-    async getListCustomsDeclaration() {
-        const res = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.paging + "?pageNumber=" + this.pager.currentPage + "&pageSize=" + this.pager.pageSize, this.searchObject, true, true);
-        this.listCustomDeclaration = res.data;
-        this.pager.totalItems = res.totalItems;
-
-        this.customCheckedArray = [];
-    }
-
-    getListUser() {
-        this.baseServices.get(this.api_menu.System.User_Management.getAll).subscribe((res: any) => {
-            this.listUser = res.map(x => ({ "text": x.username, "id": x.id }));
-        }, err => {
-            this.listUser = [];
-            this.baseServices.handleError(err);
-        });
-    }
-
-    setPage(pager: PagerSetting) {
-        this.pager.currentPage = pager.currentPage;
-        this.pager.pageSize = pager.pageSize;
-        this.pager.totalPages = pager.totalPages;
-        this.getListCustomsDeclaration();
-    }
-
-    async searchCustomClearance() {
-        this.initPager();
-        this.searchObject = {};
-
-        this.searchObject.ClearanceNo = this.clearanceNo;
-        this.searchObject.FromClearanceDate = this.selectedRange.startDate._d;
-        this.searchObject.ToClearanceDate = this.selectedRange.endDate._d;
-        if (this.defaultImportStatus[0] === 'All') {
-            this.searchObject.ImPorted = null;
-        } else {
-            this.searchObject.ImPorted = this.defaultImportStatus[0] === 'Imported' ? true : false;
-        }
-        this.searchObject.FromImportDate = this.selectedRangeImportDate.startDate ? this.selectedRangeImportDate.startDate._d : null;
-        this.searchObject.ToImportDate = this.selectedRangeImportDate.endDate ? this.selectedRangeImportDate.endDate._d : null;
-        if (this.defaultTypeClearance[0] !== 'All') {
-            this.searchObject.Type = this.defaultTypeClearance[0];
-        } else {
-            this.searchObject.Type = null;
-        }
-
-        this.searchObject.PersonHandle = this.currentUser[0].toString();
-        this.getListCustomsDeclaration();
-    }
-
-    async resetSearch() {
-        this.clearanceNo = '';
-        this.selectedRange = { startDate: moment().subtract(30, 'days'), endDate: moment() };
-        this.selectedRangeImportDate = null;
-        this.defaultImportStatus = ['Not imported'];
-        this.defaultTypeClearance = ['All'];
-        this.currentUser = [localStorage.getItem('currently_userName')];
-        this.searchObject = {};
-        this.initPager();
-        this.getListCustomsDeclaration();
-    }
-
-   
-    sort(property) {
-        this.isDesc = !this.isDesc;
-        this.sortKey = property;
-        this.listCustomDeclaration = this.sortService.sort(this.listCustomDeclaration, property, this.isDesc);
-    }
-
-    gotoEditPage(id) {
-        this.router.navigate(["/home/operation/custom-clearance-edit", { id: id }]);
-    }
-    async getDataFromEcus() {
-        await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.importClearancesFromEcus, null, true, true);
-        this.pager.totalItems = 0;
-        this.pager.currentPage = 1;
-        this.getListCustomsDeclaration();
-    }
-
-    onChangeAction(custom, isChecked: boolean) {
-        if (isChecked) {
-            this.customCheckedArray.push(custom);
-        } else {
-            let index = this.customCheckedArray.indexOf(custom);
-            this.customCheckedArray.splice(index, 1);
-        }
-        console.log(this.customCheckedArray);
-    }
-    confirmConvert() {
-        if (this.customCheckedArray.length > 0) {
-            $('#confirm-convert-modal').modal('show');
-        }
-        else {
-            this.toastr.warning('Not selected custom clearance');
-        }
-    }
-    confirmDelete() {
-        if (this.customCheckedArray.length > 0) {
-            $('#btnDeleteCustomClearance').attr('data-target', '#confirm-delete-modal');
-        } else {
-            $('#btnDeleteCustomClearance').removeAttr('data-target');
-            $('#delete-alert-modal').modal('show');
-        }
-    }
-
-    async delete() {
-        const response = await this.baseServices.putAsync(this.api_menu.Operation.CustomClearance.deleteMultiple, this.customCheckedArray, true, true);
-        console.log(response);
-        await this.initPager();
-        await this.getListCustomsDeclaration();
-    }
-
-    async cancelDelete() {
-
-    }
-
-    async convertToJobs() {
-        const clearancesToConvert = this.mapClearancesToJobs();
-        const clearanceNulls = clearancesToConvert.filter(x => x.opsTransaction == null);
-        if (clearanceNulls.length === 0) {
-            const response = await this.baseServices.postAsync(this.api_menu.Documentation.Operation.convertExistedClearancesToJobs, clearancesToConvert, true, true);
-            if (response.status) {
-                await this.initPager();
-                await this.getListCustomsDeclaration();
-            }
-        }
-    }
     async getListCustomer() {
         const res = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.CUSTOMER }, true, true);
         this.listCustomer = res;
@@ -199,13 +79,142 @@ export class CustomClearanceComponent implements OnInit {
         const res = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: 'Package' }, true, true);
         this.listUnit = res;
     }
+
+    getListCustomsDeclaration(dataSearch?: any) {
+        this.isLoading = true;
+        const body = dataSearch || {};
+        this._cdNoteRepo.getListCustomDeclaration(this.page, this.pageSize, body)
+            .pipe(
+                catchError(this.catchError),
+                map((data: any) => {
+                    return {
+                        data: data.data.map((item: any) => new CustomDeclaration(item)),
+                        totalItems: data.totalItems,
+                    };
+                }),
+                finalize(() => { this.isLoading = false; })
+            )
+            .subscribe(
+                (res: any) => {
+                    this.listCustomDeclaration = res.data;
+                    this.totalItems = res.totalItems;
+                },
+                (errors: any) => { },
+                () => { }
+            );
+    }
+
+    setSortBy(sort?: string, order?: boolean): void {
+        this.sort = sort ? sort : 'code';
+        this.order = order;
+    }
+
+    sortClass(sort: string): string {
+        if (!!sort) {
+            let classes = 'sortable ';
+            if (this.sort === sort) {
+                classes += ('sort-' + (this.order ? 'asc' : 'desc') + ' ');
+            }
+
+            return classes;
+        }
+        return '';
+    }
+
+    sortBy(sort: string): void {
+        if (!!sort) {
+            this.setSortBy(sort, this.sort !== sort ? true : !this.order);
+            if (!!this.listCustomDeclaration.length) {
+                this.listCustomDeclaration = this._sortService.sort(this.listCustomDeclaration, this.sort, this.order);
+            }
+        }
+    }
+
+    getDataFromEcus() {
+        this._cdNoteRepo.importCustomClearanceFromEcus()
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    this._toastrService.success(res.message, '');
+                    this.getListCustomsDeclaration();
+                },
+                (errors: any) => { },
+                () => { }
+            );
+    }
+
+    confirmConvert() {
+        if (this.listCustomDeclaration.filter(i => i.isSelected && !i.jobNo).length > 0) {
+            this.confirmConvertPopup.show();
+        } else {
+            this._toastrService.warning('Custom clearance was not selected');
+        }
+    }
+
+    deleteClearance() {
+        if (this.listCustomDeclaration.filter(i => i.isSelected && !i.jobNo).length > 0) {
+            this.confirmDeletePopup.show();
+        } else {
+            this._toastrService.warning(`You haven't selected any custom clearance yet. Please select one or more custom no to delete!`);
+        }
+    }
+
+    onConfirmDelete() {
+        this.confirmDeletePopup.hide();
+        const customCheckedArray: CustomDeclaration[] = this.listCustomDeclaration.filter(i => i.isSelected && !i.jobNo) || [];
+        this._cdNoteRepo.deleteMultipleClearance(customCheckedArray || [])
+            .pipe(
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    this._toastrService.success(res.message, '', { positionClass: 'toast-bottom-right' });
+                    this.getListCustomsDeclaration();
+                },
+                (errors: any) => { },
+                () => { }
+            );
+    }
+
+    onComfirmConvertToJobs() {
+        this.confirmConvertPopup.hide();
+        const clearancesToConvert = this.mapClearancesToJobs();
+        const clearanceNulls = clearancesToConvert.filter(x => x.opsTransaction == null);
+        if (clearanceNulls.length === 0) {
+            this._cdNoteRepo.convertClearanceToJob(clearancesToConvert)
+                .pipe(
+                    catchError(this.catchError),
+                )
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this.getListCustomsDeclaration();
+                        }
+                    },
+                    (errors: any) => { },
+                    () => { }
+                );
+        }
+    }
+
+    checkUncheckAll() {
+        for (const clearance of this.listCustomDeclaration) {
+            clearance.isSelected = this.isCheckAll;
+        }
+    }
+
+    onChangeAction() {
+        this.isCheckAll = this.listCustomDeclaration.every((item: CustomDeclaration) => item.isSelected);
+    }
+
     mapClearancesToJobs() {
         const clearancesToConvert = [];
-        for (let i = 0; i < this.customCheckedArray.length; i++) {
-            const clearance = this.customCheckedArray[i];
+        const customCheckedArray: any[] = this.listCustomDeclaration.filter((item: CustomDeclaration) => item.isSelected && !item.jobNo);
+        for (let i = 0; i < customCheckedArray.length; i++) {
+            const clearance: CustomDeclaration = customCheckedArray[i];
             let shipment = new OpsTransaction();
-            let index = this.listCustomer.findIndex(x => x.taxCode === clearance.partnerTaxCode);
-            if (index > -1) {
+            let index = this.listCustomer.findIndex(x => x.taxCode.trim() === clearance.partnerTaxCode.trim());
+            if (index !== -1) {
                 const customer = this.listCustomer[index];
                 shipment.customerId = customer.id;
                 shipment.salemanId = customer.salePersonId;
@@ -244,19 +253,19 @@ export class CustomClearanceComponent implements OnInit {
                     shipment.packageTypeId = this.listUnit[index].id;
                 }
             } else {
-                this.baseServices.errorToast("Không có customer để tạo job mới");
+                this.baseServices.errorToast(`Không có customer để tạo job mới`, `${clearance.clearanceNo}`);
                 shipment = null;
             }
             if (clearance.mblid == null) {
-                this.baseServices.errorToast("Không có MBL/MAWB để tạo job mới");
+                this.baseServices.errorToast(`Không có MBL/MAWB để tạo job mới`, `${clearance.clearanceNo} `);
                 shipment = null;
             }
             if (clearance.hblid == null) {
-                this.baseServices.errorToast("Không có HBL/HAWB để tạo job mới");
+                this.baseServices.errorToast(`Không có HBL/HAWB để tạo job mới`, `${clearance.clearanceNo} `);
                 shipment = null;
             }
             if (clearance.clearanceDate == null) {
-                this.baseServices.errorToast("Không có clearance date để tạo job mới");
+                this.baseServices.errorToast(`Không có clearance date để tạo job mới`, `${clearance.clearanceNo} `);
                 shipment = null;
             }
             clearancesToConvert.push({ opsTransaction: shipment, customsDeclaration: clearance });
@@ -265,11 +274,8 @@ export class CustomClearanceComponent implements OnInit {
     }
 
     async export() {
-        /**Prepare data */
-        var customClearances = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.query, this.searchObject);
-        console.log(customClearances);
-        //if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-        customClearances = lodash.map(customClearances, function (item, index) {
+        let customClearances = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.query, this.searchObject);
+        customClearances = _map(customClearances, function (item, index) {
             return [
                 index + 1,
                 item.clearanceNo,
@@ -279,27 +285,10 @@ export class CustomClearanceComponent implements OnInit {
                 item.importCountryName,
                 item.exportCountryName,
                 item.jobNo,
-                moment(item.clearanceDate).format('DD/MM/YYYY'),
+                formatDate(item.clearanceDate, 'dd/MM/yyyy', 'en'),
                 (item.jobNo != null && item.jobNo != '') ? 'Imported' : 'Not Imported'
-            ]
+            ];
         });
-        //}
-        // if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-        //     customClearances = lodash.map(customClearances, function (item, index) {
-        //         return [
-        //             index + 1,
-        //             item.clearanceNo,
-        //             item.type,
-        //             item.gateway,
-        //             item.customerName,
-        //             item.importCountryName,
-        //             item.exportCountryName,
-        //             item.jobNo,
-        //             moment(item.clearanceDate).format('DD/MM/YYYY'),
-        //             (item.jobNo != null && item.jobNo != '') ? 'Imported' : 'Not Imported'
-        //         ]
-        //     });
-        // }
 
         /**Set up stylesheet */
         const exportModel: ExportExcel = new ExportExcel();
@@ -324,79 +313,7 @@ export class CustomClearanceComponent implements OnInit {
         this.excelService.generateExcel(exportModel);
     }
 
-    /**
-     * Daterange picker
-     */
-    selectedRange: any;
-    selectedRangeImportDate: any;
-    selectedDate: any;
-    keepCalendarOpeningWithRange: true;
-    maxDate: moment.Moment = moment();
-    ranges: any = {
-        Today: [moment(), moment()],
-        Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-        'This Month': [moment().startOf('month'), moment().endOf('month')],
-        'Last Month': [
-            moment()
-                .subtract(1, 'month')
-                .startOf('month'),
-            moment()
-                .subtract(1, 'month')
-                .endOf('month')
-        ]
-    };
-
-    /**
-  * ng2-select
-  */
-    public items: Array<string> = ['option 1', 'option 2', 'option 3', 'option 4', 'option 5', 'option 6', 'option 7'];
-
-    statusClearance: Array<string> = ['All', 'Imported', 'Not imported'];
-    typeClearance: Array<string> = ['All', 'Export', 'Import'];
-    userList: Array<string> = [];
-    currentUser = ['Thor'];
-    defaultImportStatus = ['Not imported'];
-    defaultTypeClearance = ['All'];
-
-    private value: any = {};
-    private _disabledV: string = '0';
-    public disabled: boolean = false;
-
-    private get disabledV(): string {
-        return this._disabledV;
-    }
-
-    private set disabledV(value: string) {
-        this._disabledV = value;
-        this.disabled = this._disabledV === '1';
-    }
-
-    public selected(value: any): void {
-        console.log('Selected value is: ', value);
-    }
-
-    public removed(value: any): void {
-        console.log('Removed value is: ', value);
-    }
-
-    public typed(value: any): void {
-        console.log('New search input: ', value);
-    }
-
-    public refreshValue(value: any): void {
-        this.value = value;
-    }
-
-    public selectedImportStatus(value: any): void {
-        console.log('selected Import Status value is: ', value);
-        this.defaultImportStatus = [value.id];
-    }
-
-    public selectedTypeClearance(value: any): void {
-        console.log('selected Type Clearance value is: ', value);
-        this.defaultTypeClearance = [value.id];
-    }
-
 }
+
+
+

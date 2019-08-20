@@ -38,14 +38,32 @@ namespace eFMS.API.Documentation.DL.Services
 
                 if (hs.Success)
                 {
-                    var surcharge = dc.CsShipmentSurcharge.Where(x => model.SurchargeIds != null
-                                                                   && model.SurchargeIds.Contains(x.Id)
+                    //Lấy ra những charge có type là BUY hoặc OBH-BUY mà chưa tồn tại trong 1 SOA nào cả
+                    var surchargeCredit = dc.CsShipmentSurcharge.Where(x => model.Surcharges != null
+                                                                   && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == "BUY" || c.type == "OBH-BUY") )
                                                                    && (x.Soano == null || x.Soano == "")).ToList();
 
-                    if (surcharge.Count() > 0)
+                    //Lấy ra những charge có type là SELL hoặc OBH-SELL mà chưa tồn tại trong 1 SOA nào cả
+                    var surchargeDebit = dc.CsShipmentSurcharge.Where(x => model.Surcharges != null
+                                                                   && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == "SELL" || c.type == "OBH-SELL"))
+                                                                   && (x.Soano == null || x.Soano == "")).ToList();
+
+                    if (surchargeCredit.Count() > 0)
                     {
-                        //Update SOANo to CsShipmentSurcharge
-                        surcharge.ForEach(a =>
+                        //Update PaySOANo cho CsShipmentSurcharge có type BUY hoặc OBH-BUY(Payer)
+                        surchargeCredit.ForEach(a =>
+                            {
+                                a.PaySoano = soa.Soano;
+                                a.UserModified = currentUser.UserID;
+                                a.DatetimeModified = DateTime.Now;
+                            }
+                        );
+                    }
+
+                    if (surchargeDebit.Count() > 0)
+                    {
+                        //Update SOANo cho CsShipmentSurcharge có type là SELL hoặc OBH-SELL(Receiver)
+                        surchargeDebit.ForEach(a =>
                             {
                                 a.Soano = soa.Soano;
                                 a.UserModified = currentUser.UserID;
@@ -130,13 +148,14 @@ namespace eFMS.API.Documentation.DL.Services
             try
             {
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-                var surcharge = dc.CsShipmentSurcharge.Where(x => x.Soano == soaNo).ToList();
+                var surcharge = dc.CsShipmentSurcharge.Where(x => x.Soano == soaNo || x.PaySoano == soaNo).ToList();
                 if (surcharge.Count() > 0)
                 {
-                    //Update SOANo = NULL to CsShipmentSurcharge
+                    //Update SOANo = NULL & PaySOANo = NULL to CsShipmentSurcharge
                     surcharge.ForEach(a =>
                         {
                             a.Soano = null;
+                            a.PaySoano = null;
                             a.UserModified = currentUser.UserID;
                             a.DatetimeModified = DateTime.Now;
                         }
@@ -237,7 +256,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
 
-                //Gỡ bỏ các charge có SOANo = model.Soano
+                //Gỡ bỏ các charge có SOANo = model.Soano và PaySOANo = model.Soano
                 UpdateSOASurCharge(model.Soano);
 
                 var soa = mapper.Map<AcctSoa>(model);
@@ -247,23 +266,40 @@ namespace eFMS.API.Documentation.DL.Services
 
                 if (hs.Success)
                 {
-                    //Duyệt qua các charge được tick chọn. Chỉ lấy ra các charge chưa có gán SOA 
-                    var surcharge = dc.CsShipmentSurcharge.Where(x => model.SurchargeIds != null
-                                                                   && model.SurchargeIds.Contains(x.Id)
+                    //Lấy ra những charge có type là BUY hoặc OBH-BUY mà chưa tồn tại trong 1 SOA nào cả
+                    var surchargeCredit = dc.CsShipmentSurcharge.Where(x => model.Surcharges != null
+                                                                   && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == "BUY" || c.type == "OBH-BUY"))
                                                                    && (x.Soano == null || x.Soano == "")).ToList();
 
-                    if (surcharge.Count() > 0)
-                    {
-                        //Update SOANo to CsShipmentSurcharge
-                        surcharge.ForEach(a =>
-                            {
-                                a.Soano = model.Soano;
-                                a.UserModified = currentUser.UserID;
-                                a.DatetimeModified = DateTime.Now;
-                            }
-                        );
+                    //Lấy ra những charge có type là SELL hoặc OBH-SELL mà chưa tồn tại trong 1 SOA nào cả
+                    var surchargeDebit = dc.CsShipmentSurcharge.Where(x => model.Surcharges != null
+                                                                   && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == "SELL" || c.type == "OBH-SELL"))
+                                                                   && (x.Soano == null || x.Soano == "")).ToList();
 
+                    if (surchargeCredit.Count() > 0)
+                    {
+                        //Update PaySOANo cho CsShipmentSurcharge có type BUY hoặc OBH-BUY(Payer)
+                        surchargeCredit.ForEach(a =>
+                        {
+                            a.PaySoano = soa.Soano;
+                            a.UserModified = currentUser.UserID;
+                            a.DatetimeModified = DateTime.Now;
+                        }
+                        );
                     }
+
+                    if (surchargeDebit.Count() > 0)
+                    {
+                        //Update SOANo cho CsShipmentSurcharge có type là SELL hoặc OBH-SELL(Receiver)
+                        surchargeDebit.ForEach(a =>
+                        {
+                            a.Soano = soa.Soano;
+                            a.UserModified = currentUser.UserID;
+                            a.DatetimeModified = DateTime.Now;
+                        }
+                        );
+                    }
+
                 }
                 dc.SaveChanges();
 
@@ -279,20 +315,20 @@ namespace eFMS.API.Documentation.DL.Services
         public List<ChargeShipmentModel> GetListMoreChargeByCondition(MoreChargeShipmentCriteria criteria)
         {
             var moreChargeShipmentList = GetSpcMoreChargeShipmentByCondition(criteria);
-
-            List<Guid> SurchargeIds = new List<Guid>();
+            
+            List<Surcharge> Surcharges = new List<Surcharge>();
             if (criteria.ChargeShipments != null)
             {
-                foreach (var item in criteria.ChargeShipments)
+                foreach (var item in criteria.ChargeShipments.Where(x => x.SOANo == null || x.SOANo == "").ToList())
                 {
-                    SurchargeIds.Add(item.ID);
+                    Surcharges.Add(new Surcharge { surchargeId = item.ID, type = item.Type });
                 }
             }
 
-            //Lấy ra các charge chưa tồn tại trong list criteria.SurchargeIds(Các Id của charge đã có trong kết quả search ở form info)
-            var charges = moreChargeShipmentList.Where(x=> SurchargeIds != null 
-                                                        && !SurchargeIds.Contains(x.ID)).ToList();
-
+            //Lấy ra các charge chưa tồn tại trong list criteria.Surcharges(Các Id của charge đã có trong kết quả search ở form info)
+            List<spc_GetListMoreChargeMasterByCondition> charges = new List<spc_GetListMoreChargeMasterByCondition>();
+            charges = moreChargeShipmentList.Where(x => Surcharges != null
+                                                         && !Surcharges.Where(c => c.surchargeId == x.ID && c.type == x.Type).Any() ).ToList();            
             var dataMapMoreChargeShipment = mapper.Map<List<spc_GetListMoreChargeMasterByCondition>, List<ChargeShipmentModel>>(charges);
 
             return dataMapMoreChargeShipment;

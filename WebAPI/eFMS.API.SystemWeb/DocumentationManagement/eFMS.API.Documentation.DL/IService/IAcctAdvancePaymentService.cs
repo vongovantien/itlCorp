@@ -12,8 +12,15 @@ namespace eFMS.API.Documentation.DL.IService
 {
     public interface IAcctAdvancePaymentService : IRepositoryBase<AcctAdvancePayment, AcctAdvancePaymentModel>
     {
-        //List<AcctAdvanceRequestResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount);
-        List<AcctAdvanceRequestResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount);
+        List<AcctAdvancePaymentResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount);
+
+        AcctAdvancePaymentModel GetAdvancePaymentByAdvanceNo(string advanceNo);
+
+        AcctAdvancePaymentModel GetAdvancePaymentByAdvanceId(Guid advanceId);
+
+        List<AcctAdvanceRequestModel> GetGroupRequestsByAdvanceNo(string advanceNo);
+
+        List<AcctAdvanceRequestModel> GetGroupRequestsByAdvanceId(Guid advanceId);
 
         List<Shipments> GetShipments();
 
@@ -22,9 +29,7 @@ namespace eFMS.API.Documentation.DL.IService
         // Kiểm tra lô hàng (JobId, HBL, MBL) đã được add trong advance payment nào hay chưa?
         bool CheckShipmentsExistInAdvancePayment(ShipmentAdvancePaymentCriteria criteria);
 
-        HandleState DeleteAdvanceRequest(Guid idAdvanceRequest);
-
-        AcctAdvancePaymentModel GetAdvancePaymentByAdvanceNo(string advanceNo);
+        HandleState DeleteAdvancePayment(string advanceNo);
 
         HandleState UpdateAdvancePayment(AcctAdvancePaymentModel model);
     }

@@ -942,8 +942,8 @@ table.dataTable {
 
 //ngx-daterangepicker-material
 .md-drppicker {
-    top: 100% !important;
-    margin-top: 0 !important;
+    // top: 100% !important;
+    // margin-top: 0 !important;
     &.double {
         min-width: 600px;
     }
@@ -966,15 +966,14 @@ table.dataTable {
             margin-left: 5px;
         }
     }
-    // .calendar {
-    //     float: none !important;
-    // }
 }
 
 .daterange-rtl {
     .md-drppicker {
+        &.double{
+            right: 0 !important;
+        }
         left: auto !important;
-        right: 0 !important;
         margin-top: 0;
     }
 }
