@@ -98,9 +98,6 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
         this.customNo = this.form.controls['customNo'];
         this.type = this.form.controls['type'];
         this.currency = this.form.controls['currency'];
-
-
-
     }
 
     initFormUpdate(data: AdvancePaymentRequest) {
@@ -149,7 +146,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
                             this.hide();
                             this.resetForm();
                         } else {
-                            this._toastService.warning('Add New Advance Request Failed, please recheck !', 'Warning', { positionClass: 'toast-bottom-right' });
+                            this._toastService.warning('Add New Advance Request Failed, please recheck !', 'Warning');
                         }
                     },
                     (errors: any) => { },
@@ -253,7 +250,6 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     }
 
     onComfirmSaveDupplicateRequestAdvancePayment(form: FormGroup) {
-        console.log("Add data in dupplicating");
         const body: AdvancePaymentRequest = new AdvancePaymentRequest({
             customNo: !!form.value.customNo ? form.value.customNo.clearanceNo : '',
             amount: form.value.amount,

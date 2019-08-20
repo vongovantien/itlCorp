@@ -52,10 +52,10 @@
                                             <td>
                                                 <div class="m-checkbox-list d-flex align-items-center">
                                                     <button
-                                                        (click)="getRequestAdvancePaymentGroup(advancePayment.advanceNo, i)"
-                                                        class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        (click)="getRequestAdvancePaymentGroup(advancePayment.advanceNo)"
+                                                        class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed"
                                                         [attr.data-target]="'#collapse' + i" data-toggle="collapse"
-                                                        title="Collapse" type="button" aria-expanded="true">
+                                                        title="Collapse" type="button">
                                                         <i class="la la-angle-up"></i>
                                                     </button>
                                                     <span
@@ -104,8 +104,8 @@
                                         </tr>
                                         <tr class="collapse-panel-row">
                                             <td colspan="11">
-                                                <div class="detail-panel-block collapse" [attr.id]="'collapse' + i" data-parent="#adv-payment-list-table"
-                                                    colspan="11">
+                                                <div class="detail-panel-block collapse" [attr.id]="'collapse' + i"
+                                                    data-parent="#adv-payment-list-table">
                                                     <div class="table-inside-block">
                                                         <table class="table table-secondary dataTable">
                                                             <thead>
@@ -117,7 +117,7 @@
                                                                         <span class="sort-indicator"></span>
                                                                     </th>
                                                                 </tr>
-                                                               
+
                                                             </thead>
                                                             <tbody>
                                                                 <ng-container
@@ -147,7 +147,8 @@
                                                                     <td colspan="100">
                                                                         <div class="no-data">
                                                                             <i class="flaticon-coins"></i>
-                                                                            <span class="no-data-text">No records found</span>
+                                                                            <span class="no-data-text">No records
+                                                                                found</span>
                                                                         </div>
                                                                     </td>
                                                                 </tr>

@@ -172,7 +172,7 @@ export class AdvancePaymentComponent extends AppList {
         this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
     }
 
-    getRequestAdvancePaymentGroup(advanceNo: string, index: number) {
+    getRequestAdvancePaymentGroup(advanceNo: string) {
         this._accoutingRepo.getGroupRequestAdvPayment(advanceNo)
             .pipe(
                 catchError(this.catchError)
