@@ -130,7 +130,11 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
     addChargeToCDNote(event) {
         if (event != null) {
             const listNewCharges = event;
-            this.listChargeOfPartner[0].listCharges = this.listChargeOfPartner[0].listCharges.concat(listNewCharges);
+            listNewCharges.forEach(x => {
+                if (this.listChargeOfPartner[0].listCharges.filter(x => x.id === x.id).length > 0) {
+                    x.isSelected = false;
+                }
+            });
         }
 
         this.totalCreditDebitCalculate();

@@ -165,13 +165,13 @@ namespace eFMS.API.Documentation.DL.Services
         public List<object> GroupChargeByHB(Guid Id, string PartnerId,bool IsHouseBillID,bool? isAddCDNote = null)
         {
             List<object> returnList = new List<object>();
+            List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
             if (IsHouseBillID == false)
             {
                 List<Guid> lst_Hbid = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == Id).ToList().Select(x => x.Id).ToList();
                 foreach (var id in lst_Hbid)
                 {
                     var houseBill = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.Id == id).FirstOrDefault();
-                    List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
                     if (houseBill != null)
                     {
                         listCharges = Query(houseBill.Id, null);
@@ -183,7 +183,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     else if (isAddCDNote == false)
                     {
-                        listCharges = listCharges.Where(x => x.DebitNo == null && x.CreditNo == null).ToList();
+                        listCharges = listCharges.Where(x => (x.DebitNo == null && x.CreditNo == null) || (x.DebitNo == null ||  x.CreditNo == null && x.Type == "OBH")).ToList();
                     }
 
                     //listCharges = getAll==true?listCharges : listCharges.Where(x => (x.Soano == null || x.Soano.Trim()=="")).ToList();
@@ -202,7 +202,6 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
                 var houseBill = ((eFMSDataContext)DataContext.DC).OpsTransaction.Where(x => x.Hblid == Id).FirstOrDefault();
                 listCharges = Query(Id, null);
                 if (isAddCDNote == true)
@@ -211,9 +210,9 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else if(isAddCDNote == false)
                 {
-                    listCharges = listCharges.Where(x => x.DebitNo == null && x.CreditNo == null).ToList();
+                    listCharges = listCharges.Where(x => (x.DebitNo == null && x.CreditNo == null) || (x.DebitNo == null || x.CreditNo == null && x.Type == "OBH")).ToList();
                 }
-                listCharges = listCharges.Where(x => (x.PayerId == PartnerId || x.Type == "OBH" || x.PaymentObjectId == PartnerId)).ToList();
+                listCharges = listCharges.Where(x => ((x.PayerId == PartnerId && x.Type == "OBH") || x.PaymentObjectId == PartnerId)).ToList();
                 //listCharges = listCharges.Where(x => x.Cdno != null).ToList();
 
                 //foreach (var item in listCharges)

@@ -1438,9 +1438,17 @@
                                                                 {{ charge.cdno }}
                                                             </a> -->
                                                             <a href="javascript:void(0)"
-                                                                (click)="openCreditDebitNote(charge.cdno)">
-                                                                {{ charge.cdno }}
+                                                                (click)="openCreditDebitNote(charge.creditNo)"
+                                                                *ngIf="charge.creditNo">
+                                                                {{ charge.creditNo }}
                                                             </a>
+                                                            <a *ngIf="charge.creditNo === null">__ </a> /
+                                                            <a href="javascript:void(0)"
+                                                                (click)="openCreditDebitNote(charge.debitNo)"
+                                                                *ngIf="charge.debitNo">
+                                                                {{ charge.debitNo }}
+                                                            </a>
+                                                            <a *ngIf="charge.debitNo === null"> __</a>
                                                         </td>
                                                         <td>
                                                             <span>
