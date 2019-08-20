@@ -123,6 +123,14 @@ export class AccoutingRepo {
             );
     }
 
+    updateAdvPayment(body: any = {}): Observable<any> {
+        return this._api.put(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctAdvancePayment/Update`, body)
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => data)
+            );
+    }
+
     checkShipmentsExistInAdvancePament(body: any) {
         return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctAdvancePayment/CheckShipmentsExistInAdvancePament`, body)
             .pipe(
@@ -130,12 +138,33 @@ export class AccoutingRepo {
                 map((data: any) => data)
             );
     }
-    
+
     getListAdvancePayment(page?: number, size?: number, body: any = {}) {
         return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctAdvancePayment/paging`, body, {
             pageNumber: '' + page,
             pageSize: '' + size
         }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    getDetailAdvancePayment(advanceId: string) {
+        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctAdvancePayment/GetAdvancePaymentByAdvanceId`, { advanceId: advanceId }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    deleteAdvPayment(advanceNo: string) {
+        return this._api.delete(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctAdvancePayment/Delete`, { advanceNo: advanceNo}).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    getGroupRequestAdvPayment(advanceNo: string) {
+        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctAdvancePayment/GetGroupRequestsByAdvanceNo`, { advanceNo: advanceNo}).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

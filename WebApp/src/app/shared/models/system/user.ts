@@ -13,7 +13,7 @@ export class User {
     datetimeModified: string = '';
     inactive: string = '';
     inactiveOn: string = '';
-
+    preferred_username: string = '';
     constructor(data?: any) {
         let self = this;
         for (const key in data) {

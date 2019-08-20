@@ -23,6 +23,7 @@ export class AdvancePaymentListRequestComponent extends AppList {
     listRequestAdvancePayment: AdvancePaymentRequest[] = [];
 
     selectedRequestAdvancePayment: AdvancePaymentRequest;
+    selectedIndexRequest: number;
 
     totalAmount: number = 0;
     currency: string = 'VND';
@@ -71,17 +72,38 @@ export class AdvancePaymentListRequestComponent extends AppList {
 
     copyRequestPayment(request: AdvancePaymentRequest) {
         this.selectedRequestAdvancePayment = new AdvancePaymentRequest(request);
+        this.addNewRequestPaymentPopup.action = 'copy';
+        this.addNewRequestPaymentPopup.selectedRequest = request;
+
+        this.addNewRequestPaymentPopup.initFormUpdate(this.selectedRequestAdvancePayment);
+        this.addNewRequestPaymentPopup.show({ backdrop: 'static' });
+    }
+
+    updateRequestPayment(request: AdvancePaymentRequest, index: number) {
+        this.selectedRequestAdvancePayment = new AdvancePaymentRequest(request);
+        this.selectedIndexRequest = index;   // * index request adv in list
         this.addNewRequestPaymentPopup.action = 'update';
-        this.addNewRequestPaymentPopup.selectedRequest = request; 
-        
+        this.addNewRequestPaymentPopup.selectedRequest = request;
+
         this.addNewRequestPaymentPopup.initFormUpdate(this.selectedRequestAdvancePayment);
         this.addNewRequestPaymentPopup.show({ backdrop: 'static' });
     }
 
     onRequestAdvancePaymentChange(dataRequest: AdvancePaymentRequest) {
+        // * create or copy emit new item to $dataRequest and update amount, currency.
         this.$dataRequest.next(dataRequest);
+        
         this.totalAmount = this.updateTotalAmount(this.listRequestAdvancePayment);
         this.updateCurrencyForRequest(dataRequest);
+    }
+
+    onUpdateRequestAdvancePayment(dataRequest: AdvancePaymentRequest) {
+        if (!isNaN(this.selectedIndexRequest)) {
+            this.listRequestAdvancePayment[this.selectedIndexRequest] = dataRequest;
+
+            this.totalAmount = this.updateTotalAmount(this.listRequestAdvancePayment);
+            this.updateCurrencyForRequest(dataRequest);
+        }
     }
 
     openPopupAdd() {

@@ -68,7 +68,11 @@
                                     </span>
                                 </div>
                             </td>
-                            <td class="text-underline text-primary pointer">{{request.description}}</td>
+                            <td class="text-underline text-primary pointer">
+                                <a (click)="updateRequestPayment(request, i)" title="Copy request advance">
+                                    {{request.description}}
+                                </a>
+                            </td>
                             <td>{{request.customNo}}</td>
                             <td>{{request.jobId}}</td>
                             <td>{{request.hbl}}</td>
@@ -102,4 +106,4 @@
 </div>
 
 
-<adv-payment-add-popup (onRequest)="onRequestAdvancePaymentChange($event)"></adv-payment-add-popup>
+<adv-payment-add-popup (onRequest)="onRequestAdvancePaymentChange($event)" (onUpdate)="onUpdateRequestAdvancePayment($event)"></adv-payment-add-popup>
