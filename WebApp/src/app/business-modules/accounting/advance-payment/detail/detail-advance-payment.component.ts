@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AccoutingRepo } from 'src/app/shared/repositories';
 import { catchError } from 'rxjs/operators';
 import { AdvancePayment, Currency } from 'src/app/shared/models';
@@ -25,7 +25,8 @@ export class AdvancePaymentDetailComponent extends AppPage {
     constructor(
         private _activedRouter: ActivatedRoute,
         private _accoutingRepo: AccoutingRepo,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _router: Router
     ) {
         super();
     }
@@ -41,6 +42,10 @@ export class AdvancePaymentDetailComponent extends AppPage {
 
     onChangeCurrency(currency: Currency) {
         this.listRequestAdvancePaymentComponent.changeCurrency(currency);
+        for (const item of this.listRequestAdvancePaymentComponent.listRequestAdvancePayment) {
+            item.requestCurrency = currency.id;
+        }
+        this.listRequestAdvancePaymentComponent.currency = currency.id;
     }
 
     getDetail(advanceId: string) {
@@ -57,7 +62,7 @@ export class AdvancePaymentDetailComponent extends AppPage {
                         this.formCreateComponent.formCreate.setValue({
                             advanceNo: this.advancePayment.advanceNo,
                             requester: this.advancePayment.requester,
-                            requestDate: { startDate: new Date(this.advancePayment.datetimeCreated), endDate: new Date(this.advancePayment.datetimeCreated) },
+                            requestDate: { startDate: new Date(this.advancePayment.requestDate), endDate: new Date(this.advancePayment.requestDate) },
                             paymentMethod: this.formCreateComponent.methods.filter(method => method.value === this.advancePayment.paymentMethod)[0],
                             department: this.advancePayment.department,
                             deadLine: { startDate: new Date(this.advancePayment.deadlinePayment), endDate: new Date(this.advancePayment.deadlinePayment) },
@@ -94,7 +99,9 @@ export class AdvancePaymentDetailComponent extends AppPage {
                 advanceNote: this.formCreateComponent.note.value || '',
                 statusApproval: this.advancePayment.statusApproval,
                 advanceNo: this.advancePayment.advanceNo,
-                id: this.advancePayment.id
+                id: this.advancePayment.id,
+                UserCreated: this.advancePayment.userCreated,
+                DatetimeCreated: this.advancePayment.datetimeCreated
             };
             this._accoutingRepo.updateAdvPayment(body)
                 .pipe(
@@ -110,6 +117,10 @@ export class AdvancePaymentDetailComponent extends AppPage {
                     () => { }
                 );
         }
+    }
+
+    back() {
+        this._router.navigate(['home/accounting/advance-payment/new']);
     }
 
 

@@ -6,7 +6,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
 import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
-import { AdvancePayment } from 'src/app/shared/models';
+import { AdvancePayment, AdvancePaymentRequest } from 'src/app/shared/models';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 @Component({
@@ -19,8 +19,12 @@ export class AdvancePaymentComponent extends AppList {
 
 
     headers: CommonInterface.IHeaderTable[];
+    headerGroupRequest: CommonInterface.IHeaderTable[];
+
     advancePayments: AdvancePayment[] = [];
     selectedAdv: AdvancePayment;
+
+    groupRequest: AdvancePaymentRequest[] = [];
 
     constructor(
         private _accoutingRepo: AccoutingRepo,
@@ -45,6 +49,15 @@ export class AdvancePaymentComponent extends AppList {
             { title: 'Status Payment', field: 'statusPayment', sortable: true },
             { title: 'Payment Method', field: 'paymentMethod', sortable: true },
         ];
+
+        this.headerGroupRequest = [
+            { title: 'JobId', field: 'jobId', sortable: true },
+            { title: 'HBL', field: 'hbl', sortable: true },
+            { title: 'Amount', field: 'amount', sortable: true },
+            { title: 'Currency', field: 'requestCurrency', sortable: true },
+            { title: 'Status Payment', field: 'statusPayment', sortable: true },
+        ];
+
         this.getListAdvancePayment();
     }
 
@@ -99,6 +112,27 @@ export class AdvancePaymentComponent extends AppList {
         }
     }
 
+    sortClassCollapse(sort: string): string  {
+        if (!!sort) {
+            let classes = 'sortable ';
+            if (this.sort === sort) {
+                classes += ('sort-' + (this.order ? 'asc' : 'desc') + ' ');
+            }
+
+            return classes;
+        }
+        return '';
+    }
+
+    sortByCollapse(sort: string): void {
+        if (!!sort) {
+            this.setSortBy(sort, this.sort !== sort ? true : !this.order);
+            if (!!this.groupRequest.length) {
+                this.groupRequest = this._sortService.sort(this.groupRequest, sort, this.order);
+            }
+        }
+    }
+
     onDeleteAdvPayment() {
         this._accoutingRepo.deleteAdvPayment(this.selectedAdv.advanceNo)
             .pipe(
@@ -136,6 +170,20 @@ export class AdvancePaymentComponent extends AppList {
             title = errors.statusText;
         }
         this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
+    }
+
+    getRequestAdvancePaymentGroup(advanceNo: string, index: number) {
+        this._accoutingRepo.getGroupRequestAdvPayment(advanceNo)
+            .pipe(
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (res: any) => {
+                    this.groupRequest = res;
+                },
+                (errors: any) => { },
+                () => { }
+            )
     }
 
 }
