@@ -155,7 +155,7 @@
                                         </td>
                                     </tr> -->
                                     <ng-container *ngFor="let charge of item.listCharges;let k = index;">
-                                        <tr class="child" *ngIf="charge.cdno == null">
+                                        <tr class="child" *ngIf="charge.isRemaining == true">
                                             <td class="table-actions-col">
                                                 <div class="table-actions">
                                                     <label class="m-checkbox">
