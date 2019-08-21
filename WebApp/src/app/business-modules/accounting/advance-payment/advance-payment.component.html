@@ -71,7 +71,7 @@
                                                 <a [routerLink]="[advancePayment.id]">{{advancePayment.advanceNo}}
                                                 </a>
                                             </td>
-                                            <td>{{advancePayment.advanceNote}}</td>
+                                            <td>{{advancePayment.amount}}</td>
                                             <td>{{advancePayment.advanceCurrency}}</td>
                                             <td>{{advancePayment.requesterName}}</td>
                                             <td>{{advancePayment.requestDate | date: 'dd/MM/yyyy'}}</td>
@@ -89,20 +89,24 @@
                                                 </div>
                                             </td>
                                             <td [ngSwitch]="advancePayment.advanceStatusPayment">
-                                                <div class="text-success" *ngSwitchCase="'Settled'">
-                                                    {{advancePayment.advanceStatusPayment}}
-                                                </div>
-                                                <div class="text-danger" *ngSwitchCase="'NotSettled'">
-                                                    Not Settled
-                                                </div>
-                                                <div class="text-danger" *ngSwitchCase="'PartialSettlement'">
-                                                    Partial Settlement
-                                                </div>
+                                                <ng-container *ngIf="advancePayment.statusApproval === 'Done' else empty">
+                                                    <div class="text-success" *ngSwitchCase="'Settled'">
+                                                        {{advancePayment.advanceStatusPayment}}
+                                                    </div>
+                                                    <div class="text-danger" *ngSwitchCase="'NotSettled'">
+                                                        Not Settled
+                                                    </div>
+                                                    <div class="text-danger" *ngSwitchCase="'PartialSettlement'">
+                                                        Partial Settlement
+                                                    </div>
+                                                </ng-container>
+                                                <ng-template #empty>-</ng-template>
                                             </td>
                                             <td>{{advancePayment.paymentMethod}}</td>
+                                            <td>{{advancePayment.advanceNote}}</td>
                                         </tr>
                                         <tr class="collapse-panel-row">
-                                            <td colspan="11">
+                                            <td colspan="100">
                                                 <div class="detail-panel-block collapse" [attr.id]="'collapse' + i"
                                                     data-parent="#adv-payment-list-table">
                                                     <div class="table-inside-block">
@@ -122,6 +126,7 @@
                                                                     *ngFor="let request of groupRequest; let j = index; trackBy: trackByFn">
                                                                     <tr class="text-center">
                                                                         <td>{{request.jobId}}</td>
+                                                                        <td>{{request.customNo}}</td>
                                                                         <td>{{request.hbl}}</td>
                                                                         <td>{{request.amount | number :'.0-2'}}</td>
                                                                         <td>{{request.requestCurrency}}</td>
@@ -174,7 +179,6 @@
                                         </td>
                                     </tr>
                                 </tbody>
-
                             </table>
                         </div>
                     </perfect-scrollbar>

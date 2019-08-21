@@ -38,7 +38,7 @@ export class AdvancePaymentComponent extends AppList {
     ngOnInit() {
         this.headers = [
             { title: 'Advance No', field: 'advanceNo', sortable: true },
-            { title: 'Description', field: 'advanceNote', sortable: true },
+            { title: 'Amount', field: 'amount', sortable: true },
             { title: 'Currency', field: 'requestCurrency', sortable: true },
             { title: 'Requester', field: 'requester', sortable: true },
             { title: 'Request Date', field: 'requestDate', sortable: true },
@@ -47,10 +47,13 @@ export class AdvancePaymentComponent extends AppList {
             { title: 'Status Approval', field: 'statusApproval', sortable: true },
             { title: 'Status Payment', field: 'statusPayment', sortable: true },
             { title: 'Payment Method', field: 'paymentMethod', sortable: true },
+            { title: 'Description', field: 'advanceNote', sortable: true },
+
         ];
 
         this.headerGroupRequest = [
             { title: 'JobId', field: 'jobId', sortable: true },
+            { title: 'Custom No', field: 'customNo', sortable: true },
             { title: 'HBL', field: 'hbl', sortable: true },
             { title: 'Amount', field: 'amount', sortable: true },
             { title: 'Currency', field: 'requestCurrency', sortable: true },

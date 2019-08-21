@@ -20,7 +20,8 @@ export class AdvancePayment {
     advanceStatusPayment: string = '';
     isSelected?: boolean;
     advanceRequests: AdvancePaymentRequest[] = [];
-
+    amount: number = 0;
+    
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

@@ -226,7 +226,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
 
     filterCDByShipment(shipment: OperationInteface.IShipment): CustomDeclaration[] {
         return this.initCD.filter((item: CustomDeclaration) => {
-            return (item.hblid === shipment.hbl && item.mblid === shipment.mbl && item.jobNo === shipment.jobId);
+            return (item.jobNo === shipment.jobId);
         });
     }
 
