@@ -39,13 +39,12 @@ export class CustomClearanceComponent extends AppList {
         private baseServices: BaseService,
         private api_menu: API_MENU,
         private _sortService: SortService,
-        private router: Router,
         private _toastrService: ToastrService,
         private _cdNoteRepo: CDNoteRepo
     ) {
         super();
         this.requestList = this.getListCustomsDeclaration;
-
+        this.requestSort = this.sortCD;
     }
 
     ngOnInit() {
@@ -104,26 +103,8 @@ export class CustomClearanceComponent extends AppList {
             );
     }
 
-    setSortBy(sort?: string, order?: boolean): void {
-        this.sort = sort ? sort : 'code';
-        this.order = order;
-    }
-
-    sortClass(sort: string): string {
+    sortCD(sort: string): void {
         if (!!sort) {
-            let classes = 'sortable ';
-            if (this.sort === sort) {
-                classes += ('sort-' + (this.order ? 'asc' : 'desc') + ' ');
-            }
-
-            return classes;
-        }
-        return '';
-    }
-
-    sortBy(sort: string): void {
-        if (!!sort) {
-            this.setSortBy(sort, this.sort !== sort ? true : !this.order);
             if (!!this.listCustomDeclaration.length) {
                 this.listCustomDeclaration = this._sortService.sort(this.listCustomDeclaration, this.sort, this.order);
             }

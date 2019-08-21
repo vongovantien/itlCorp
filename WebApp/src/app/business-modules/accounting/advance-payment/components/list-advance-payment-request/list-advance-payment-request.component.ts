@@ -33,7 +33,7 @@ export class AdvancePaymentListRequestComponent extends AppList {
         private _toastService: ToastrService
     ) {
         super();
-        this.requestList = this.sortRequestAdvancePament;
+        this.requestSort = this.sortRequestAdvancePament;
     }
 
     ngOnInit() {

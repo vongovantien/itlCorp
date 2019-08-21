@@ -11,7 +11,8 @@ export abstract class AppList extends AppPage {
   order: any = false;
   keyword: string = '';
   requestList: any = null;
-
+  requestSort: any = null;
+  
   constructor() {
     super();
   }
@@ -25,8 +26,9 @@ export abstract class AppList extends AppPage {
     if (!!sort) {
       this.setSortBy(sort, this.sort !== sort ? true : !this.order);
 
-      if (typeof (this.requestList) === 'function') {
-        this.requestList(this.sort, this.order);   // local or server
+      if (typeof (this.requestSort) === 'function') {
+        // this.requestList(this.sort, this.order);   // sort server
+        this.requestSort(this.sort, this.order);   // sort Local
       }
     }
   }

@@ -30,7 +30,7 @@ export class StatementOfAccountComponent extends AppList {
     ) {
         super();
 
-        this.requestList = this.sortLocal;
+        this.requestSort = this.sortLocal;
     }
 
     ngOnInit() {

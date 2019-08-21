@@ -17,7 +17,6 @@ export class AdvancePaymentComponent extends AppList {
     @ViewChild(AdvancePaymentFormsearchComponent, { static: false }) formSearch: AdvancePaymentFormsearchComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
 
-
     headers: CommonInterface.IHeaderTable[];
     headerGroupRequest: CommonInterface.IHeaderTable[];
 
@@ -33,7 +32,7 @@ export class AdvancePaymentComponent extends AppList {
     ) {
         super();
         this.requestList = this.getListAdvancePayment;
-
+        this.requestSort = this.sortAdvancePayment;
     }
 
     ngOnInit() {
@@ -86,33 +85,13 @@ export class AdvancePaymentComponent extends AppList {
             );
     }
 
-    setSortBy(sort?: string, order?: boolean): void {
-        this.sort = sort ? sort : 'code';
-        this.order = order;
-    }
-
-    sortClass(sort: string): string {
+    sortAdvancePayment(sort: string): void {
         if (!!sort) {
-            let classes = 'sortable ';
-            if (this.sort === sort) {
-                classes += ('sort-' + (this.order ? 'asc' : 'desc') + ' ');
-            }
-
-            return classes;
-        }
-        return '';
-    }
-
-    sortBy(sort: string): void {
-        if (!!sort) {
-            this.setSortBy(sort, this.sort !== sort ? true : !this.order);
-            if (!!this.advancePayments.length) {
-                this.advancePayments = this._sortService.sort(this.advancePayments, sort, this.order);
-            }
+            this.advancePayments = this._sortService.sort(this.advancePayments, sort, this.order);
         }
     }
 
-    sortClassCollapse(sort: string): string  {
+    sortClassCollapse(sort: string): string {
         if (!!sort) {
             let classes = 'sortable ';
             if (this.sort === sort) {
@@ -179,7 +158,7 @@ export class AdvancePaymentComponent extends AppList {
                 },
                 (errors: any) => { },
                 () => { }
-            )
+            );
     }
 
 }
