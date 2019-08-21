@@ -94,7 +94,7 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
                     // calculate total credit
                     this.totalCredit += (c.total * c.exchangeRate);
                 }
-                if (c.type === "SELL" || (c.type === "OBH" && this.EditingCDNote.partnerId === c.receiverId)) {
+                if (c.type === "SELL" || (c.type === "OBH" && this.EditingCDNote.partnerId === c.paymentObjectId)) {
                     // calculate total debit 
                     this.totalDebit += (c.total * c.exchangeRate);
                 }
