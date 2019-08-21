@@ -158,10 +158,6 @@ export class AdvancePaymentComponent extends AppList {
         this.selectedAdv = new AdvancePayment(selectedAdv);
     }
 
-    copyAdvancePayment(selectedRequest: AdvancePayment) {
-        console.log(selectedRequest);
-    }
-
     handleError(errors: any) {
         let message: string = 'Has Error Please Check Again !';
         let title: string = '';
