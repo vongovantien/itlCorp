@@ -50,22 +50,57 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
             for (let i = 0; i < o.listCharges.length; i++) {
                 if (o.listCharges[i].debitNo === null && o.listCharges[i].creditNo === null) {
                     o.listCharges[i].isRemaining = true;
-                }
-                // else {
-                //     if (o.listCharges[i].debitNo === cdNo || o.listCharges[i].creditNo === cdNo) {
-                //         o.listCharges[i].isSelected = false;
-                //         o.listCharges[i].isRemaining = false;
-                //     }
-                // }
-                else if (o.listCharges[i].type === "OBH") {
-                    if ((o.listCharges[i].payerId === partnerId && o.listCharges[i].creditNo !== null)
-                        || (o.listCharges[i].paymentObjectId === partnerId && o.listCharges[i].debitNo !== null)) {
-                        o.listCharges[i].isRemaining = false;
+                } else {
+                    if (o.listCharges[i].type === "OBH") {
+                        if (o.listCharges[i].payerId === partnerId) {
+                            if (o.listCharges[i].creditNo === null) {
+                                o.listCharges[i].isRemaining = true;
+                            }
+                            if (o.listCharges[i].creditNo === cdNo) {
+                                o.listCharges[i].isRemaining = false;
+                            }
+                        }
+                        if (o.listCharges[i].paymentObjectId === partnerId) {
+                            if (o.listCharges[i].debitNo === null) {
+                                o.listCharges[i].isRemaining = true;
+                            }
+                            if (o.listCharges[i].debitNo === cdNo) {
+                                o.listCharges[i].isRemaining = false;
+                            }
+                        }
+                    }
+                    if (o.listCharges[i].type === "BUY") {
+                        if (o.listCharges[i].creditNo === null) {
+                            o.listCharges[i].isRemaining = true;
+                        }
+                        if (o.listCharges[i].creditNo === cdNo) {
+                            o.listCharges[i].isRemaining = false;
+                        }
+                    }
+                    if (o.listCharges[i].type === "SELL") {
+                        if (o.listCharges[i].debitNo === null) {
+                            o.listCharges[i].isRemaining = true;
+                        }
+                        if (o.listCharges[i].debitNo === cdNo) {
+                            o.listCharges[i].isRemaining = false;
+                        }
                     }
                 }
-                else {
-                    o.listCharges[i].isRemaining = false;
-                }
+                // // else {
+                // //     if (o.listCharges[i].debitNo === cdNo || o.listCharges[i].creditNo === cdNo) {
+                // //         o.listCharges[i].isSelected = false;
+                // //         o.listCharges[i].isRemaining = false;
+                // //     }
+                // // }
+                // else if (o.listCharges[i].type === "OBH") {
+                //     if ((o.listCharges[i].payerId === partnerId && o.listCharges[i].creditNo !== null)
+                //         || (o.listCharges[i].paymentObjectId === partnerId && o.listCharges[i].debitNo !== null)) {
+                //         o.listCharges[i].isRemaining = true;
+                //     }
+                // }
+                // else {
+                //     o.listCharges[i].isRemaining = false;
+                // }
                 listCharges.push(o.listCharges[i]);
             }
             return o;

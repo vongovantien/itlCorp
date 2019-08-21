@@ -51,6 +51,9 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
     this.hide();
     this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + currentCDNoteDetail.jobId + "&cdNo=" + currentCDNoteDetail.cdNote.code);
     // this.baseServices.setData("CDNoteDetails", this.CDNoteDetails);
+    if (this.CDNoteDetails != null) {
+      this.totalCreditDebitCalculate();
+    }
     this.popupEdit.currentCDNo = currentCDNoteDetail.cdNote.code;
     this.popupEdit.currentJob = this.currentJob;
     this.popupEdit.EditingCDNote.id = this.CDNoteDetails.cdNote.id;
@@ -75,7 +78,11 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
   async closeEditModal(event) {
     this.currentCDNo = this.CDNoteDetails.cdNote.code;
     this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.currentJob.id + "&cdNo=" + this.currentCDNo);
+
     this.show();
+    if (this.CDNoteDetails != null) {
+      this.totalCreditDebitCalculate();
+    }
   }
   async Preview() {
     this.dataReport = null;
@@ -102,5 +109,19 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
     this.sortKey = property;
     this.CDNoteDetails.listSurcharges = this.sortService.sort(this.CDNoteDetails.listSurcharges, property, this.isDesc);
   }
-
+  totalCreditDebitCalculate() {
+    this.totalCredit = 0;
+    this.totalDebit = 0;
+    for (let i = 0; i < this.CDNoteDetails.listSurcharges.length; i++) {
+      const c = this.CDNoteDetails.listSurcharges[i];
+      if (c.type === "BUY" || c.type === "LOGISTIC" || (c.type === "OBH" && this.CDNoteDetails.partnerId === c.payerId)) {
+        // calculate total credit
+        this.totalCredit += (c.total * c.exchangeRate);
+      }
+      if (c.type === "SELL" || (c.type === "OBH" && this.CDNoteDetails.partnerId === c.paymentObjectId)) {
+        // calculate total debit 
+        this.totalDebit += (c.total * c.exchangeRate);
+      }
+    }
+  }
 }
