@@ -81,19 +81,19 @@
                             <td>{{request.advanceType}}</td>
                             <td>{{request.requestNote}}</td>
                         </tr>
-                        <tr class="text-center text-white bg-success" *ngIf="!!listRequestAdvancePayment.length">
+                        <tr class="text-center text-black bg-secondary" *ngIf="!!listRequestAdvancePayment.length">
                             <td></td>
                             <td></td>
                             <td></td>
                             <td></td>
                             <td>
-                                <h5 class="font-weight-bold m--margin-top-10">Total Amount:</h5>
+                                <span class="font-weight-bold m--margin-top-10">Total Amount:</span>
                             </td>
                             <td>
-                                <span class="total-amount-content">{{totalAmount | number: '.0-3'}}</span>
+                                <span class="p-1 font-weight-bold">{{totalAmount | number: '.0-3'}}</span>
                             </td>
                             <td>
-                                <span class="total-amount-content">{{currency | uppercase}}</span>
+                                <span class="p-1 font-weight-bold">{{currency | uppercase}}</span>
                             </td>
                             <td></td>
                             <td></td>

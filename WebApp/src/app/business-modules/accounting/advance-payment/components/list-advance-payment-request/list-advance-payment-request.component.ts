@@ -11,7 +11,6 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 @Component({
     selector: 'adv-payment-list-request',
     templateUrl: './list-advance-payment-request.component.html',
-    styleUrls: ['./list-advance-payment-request.component.scss']
 })
 
 export class AdvancePaymentListRequestComponent extends AppList {

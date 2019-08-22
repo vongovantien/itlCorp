@@ -53,7 +53,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
                 department: this.formCreateComponent.department.value || '',
                 paymentMethod: this.formCreateComponent.paymentMethod.value.value,
                 advanceCurrency: this.formCreateComponent.currency.value.id || 'VND',
-                requestDate: formatDate(this.formCreateComponent.requestDate.value || new Date(), 'yyyy-MM-dd', 'vi'),
+                requestDate: formatDate(this.formCreateComponent.requestDate.value.startDate || new Date(), 'yyyy-MM-dd', 'vi'),
                 deadlinePayment: formatDate(this.formCreateComponent.deadLine.value.startDate || new Date(), 'yyyy-MM-dd', 'vi'),
                 advanceNote: this.formCreateComponent.note.value || '',
             };
@@ -67,7 +67,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
                             this._toastService.success(`${res.data.advanceNo + 'is added successfully'}`, 'Save Success !', { positionClass: 'toast-bottom-right' });
 
                             //  * go to detail page
-                            this._router.navigate([`home/accounting/advance-payment/${res.data.id}`], { queryParams: { no: res.data.soano, currency: 'VND' } });
+                            this._router.navigate([`home/accounting/advance-payment/${res.data.id}`]);
 
                         }
                     },

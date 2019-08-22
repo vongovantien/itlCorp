@@ -150,20 +150,24 @@ export class AdvancePaymentComponent extends AppList {
         this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
     }
 
-    getRequestAdvancePaymentGroup(advanceNo: string) {
-        this._accoutingRepo.getGroupRequestAdvPayment(advanceNo)
-            .pipe(
-                catchError(this.catchError)
-            )
-            .subscribe(
-                (res: any) => {
-                    this.groupRequest = res;
-                },
-                (errors: any) => { },
-                () => { }
-            );
+    getRequestAdvancePaymentGroup(advanceNo: string, index: number) {
+        if (!!this.advancePayments[index].advanceRequests.length) {
+            this.groupRequest = this.advancePayments[index].advanceRequests;
+        } else {
+            this._accoutingRepo.getGroupRequestAdvPayment(advanceNo)
+                .pipe(
+                    catchError(this.catchError)
+                )
+                .subscribe(
+                    (res: any) => {
+                        this.groupRequest = res;
+                        this.advancePayments[index].advanceRequests = res;
+                    },
+                    (errors: any) => { },
+                    () => { }
+                );
+        }
     }
-
 }
 
 
