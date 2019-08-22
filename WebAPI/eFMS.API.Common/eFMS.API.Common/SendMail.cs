@@ -19,10 +19,10 @@ namespace eFMS.API.Common
             string description = "";
             bool result = true;
 
-            MailAddress EmailFrom = new MailAddress("dntonetms@itlvn.com");
+            MailAddress emailFrom = new MailAddress("irene.tam@itlvn.com");
             MailMessage message = new MailMessage();
 
-            message.From = EmailFrom;
+            message.From = emailFrom;
             if (toEmails != null && toEmails.Count() > 0)
             {
                 foreach (string ToEmail in toEmails)
