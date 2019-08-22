@@ -62,7 +62,6 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
-
         /// <summary>
         /// Get Group Requests by AdvanceNo
         /// </summary>
@@ -281,6 +280,32 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(result);
             }
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Preview Advance Payment Request
+        /// </summary>
+        /// <param name="advanceId">advanceId that want to retrieve preview advance payment request</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("PreviewAdvancePaymentRequestByAdvanceId")]
+        public IActionResult PreviewAdvancePaymentRequest(Guid advanceId)
+        {
+            var result = acctAdvancePaymentService.Preview(advanceId);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Preview Advance Payment Request
+        /// </summary>
+        /// <param name="advance"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("PreviewAdvancePaymentRequest")]
+        public IActionResult PreviewAdvancePaymentRequest(AcctAdvancePaymentModel advance)
+        {
+            var result = acctAdvancePaymentService.Preview(advance);
             return Ok(result);
         }
 
