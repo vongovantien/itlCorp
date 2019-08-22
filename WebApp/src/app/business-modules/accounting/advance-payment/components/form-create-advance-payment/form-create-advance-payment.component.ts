@@ -2,7 +2,7 @@ import { Component, Output, EventEmitter } from '@angular/core';
 import { User, Currency } from 'src/app/shared/models';
 import { BaseService, DataService } from 'src/app/shared/services';
 import { SystemRepo } from 'src/app/shared/repositories';
-import { catchError, takeUntil, distinctUntilChanged, skip } from 'rxjs/operators';
+import { catchError, takeUntil, distinctUntilChanged, map } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
 import { FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
 import { SystemConstants } from 'src/constants/system.const';
@@ -80,13 +80,16 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         this.requestDate.valueChanges
             .pipe(
                 distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
+                map((data: any) => data.startDate)
             )
             .subscribe((value: any) => {
-                this.maxDateDeadLine = value.startDate;
-                this.deadLine.setValue({
-                    startDate: new Date(new Date(value.startDate).setDate(new Date(value.startDate).getDate() + 9)),
-                    endDate: new Date(new Date(value.endDate).setDate(new Date(value.endDate).getDate() + 9)),
-                });
+                this.maxDateDeadLine = value;
+                setTimeout(() => {
+                    this.deadLine.setValue({
+                        startDate: new Date(new Date(value).setDate(new Date(value).getDate() + 9)),
+                        endDate: new Date(new Date(value).setDate(new Date(value).getDate() + 9))
+                    });
+                }, 100);
             });
     }
 

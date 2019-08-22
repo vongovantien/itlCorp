@@ -12,7 +12,6 @@ import { ToastrService } from 'ngx-toastr';
 @Component({
     selector: 'app-advance-payment-detail',
     templateUrl: './detail-advance-payment.component.html',
-    styleUrls: ['./detail-advance-payment.component.scss']
 })
 export class AdvancePaymentDetailComponent extends AppPage {
 

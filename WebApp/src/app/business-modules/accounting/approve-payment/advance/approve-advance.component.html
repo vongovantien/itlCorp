@@ -9,7 +9,7 @@
     <div class="m-portlet">
         <div class="m-form">
             <div class="m-portlet__body">
-                <adv-payment-form-create (onChangeCurrency)="onChangeCurrency($event)"></adv-payment-form-create>
+                <adv-payment-form-create></adv-payment-form-create>
             </div>
         </div>
     </div>
@@ -17,26 +17,43 @@
         <div class="m-form">
             <div class="m-portlet__body">
                 <div>
-                    <adv-payment-list-request></adv-payment-list-request>
+                    <adv-payment-list-request> </adv-payment-list-request>
+                    <div class="row list-progress-wp">
+                        <div class="col-12">
+                            <ul class="list-unstyled list-progress d-flex justify-content-around">
+                                <li *ngFor="let item of progress">
+                                    <div class="progress-content text-center">
+                                        <div class="font-weight-bolder">Requester</div>
+                                        <div class="icon-check">
+                                            <i class="la la-check-circle-o"></i>
+                                        </div>
+                                        <div class="font-weight-bold">Name</div>
+                                        <div class="font-weight-bold">Date: 25/06/2019</div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-12">
-                        <div class="m--align-center m--margin-top-20">
-                            <button class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10" title="Save"
-                                (click)="updateAdvPayment()">
+                        <div class="justify-content-around d-flex w-50 m-auto m--margin-top-20">
+                            <button
+                                class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                                title="Save">
                                 <span>
                                     <i class="la la-save"></i>
                                     <span>
-                                        Save
+                                        Approve
                                     </span>
                                 </span>
                             </button>
-                            <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                            <button class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
                                 title="Save & Send Request">
                                 <span>
-                                    <i class="la la-download"></i>
+                                    <i class="la la-times"></i>
                                     <span>
-                                        Save & Send Request
+                                        Deny
                                     </span>
                                 </span>
                             </button>
@@ -49,7 +66,7 @@
                                     </span>
                                 </span>
                             </button>
-                            <button class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" title="Cancel" (click)="back()">
+                            <button class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" title="Cancel">
                                 <span>
                                     <i class="la la-ban"></i>
                                     <span>

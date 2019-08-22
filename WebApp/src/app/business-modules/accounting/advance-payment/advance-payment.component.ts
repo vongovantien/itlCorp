@@ -39,7 +39,7 @@ export class AdvancePaymentComponent extends AppList {
         this.headers = [
             { title: 'Advance No', field: 'advanceNo', sortable: true },
             { title: 'Amount', field: 'amount', sortable: true },
-            { title: 'Currency', field: 'requestCurrency', sortable: true },
+            { title: 'Currency', field: 'advanceCurrency', sortable: true },
             { title: 'Requester', field: 'requester', sortable: true },
             { title: 'Request Date', field: 'requestDate', sortable: true },
             { title: 'DeadLine Date', field: 'deadlinePayment', sortable: true },
@@ -84,7 +84,6 @@ export class AdvancePaymentComponent extends AppList {
                     this.handleError(errors);
                 },
                 () => { }
-
             );
     }
 
@@ -150,20 +149,24 @@ export class AdvancePaymentComponent extends AppList {
         this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
     }
 
-    getRequestAdvancePaymentGroup(advanceNo: string) {
-        this._accoutingRepo.getGroupRequestAdvPayment(advanceNo)
-            .pipe(
-                catchError(this.catchError)
-            )
-            .subscribe(
-                (res: any) => {
-                    this.groupRequest = res;
-                },
-                (errors: any) => { },
-                () => { }
-            );
+    getRequestAdvancePaymentGroup(advanceNo: string, index: number) {
+        if (!!this.advancePayments[index].advanceRequests.length) {
+            this.groupRequest = this.advancePayments[index].advanceRequests;
+        } else {
+            this._accoutingRepo.getGroupRequestAdvPayment(advanceNo)
+                .pipe(
+                    catchError(this.catchError)
+                )
+                .subscribe(
+                    (res: any) => {
+                        this.groupRequest = res;
+                        this.advancePayments[index].advanceRequests = res;
+                    },
+                    (errors: any) => { },
+                    () => { }
+                );
+        }
     }
-
 }
 
 
