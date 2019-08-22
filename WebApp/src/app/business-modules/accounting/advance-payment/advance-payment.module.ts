@@ -15,6 +15,7 @@ import { AdvancePaymentListRequestComponent } from './components/list-advance-pa
 import { AdvancePaymentAddRequestPopupComponent } from './components/popup/add-advance-payment-request/add-advance-payment-request.popup';
 import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
 import { AdvancePaymentDetailComponent } from './detail/detail-advance-payment.component';
+import { ApproveAdvancePaymentComponent } from '../approve-payment/advance/approve-advance.component';
 
 registerLocaleData(localeVi, 'vi');
 const routing: Routes = [
@@ -29,6 +30,10 @@ const routing: Routes = [
     {
         path: ":id", component: AdvancePaymentDetailComponent,
         data: { name: "Detail", path: "Detail", level: 3 }
+    },
+    {
+        path: ":id/approve", component: ApproveAdvancePaymentComponent,
+        data: { name: "Approve", path: "Approve", level: 3 }
     }
 
 ];
@@ -37,7 +42,7 @@ const COMPONENTS = [
     AdvancePaymentFormCreateComponent,
     AdvancePaymentListRequestComponent,
     AdvancePaymentAddRequestPopupComponent,
-    AdvancePaymentFormsearchComponent
+    AdvancePaymentFormsearchComponent,
 ];
 
 @NgModule({
@@ -57,6 +62,7 @@ const COMPONENTS = [
         AdvancePaymentComponent,
         AdvancePaymentAddNewComponent,
         AdvancePaymentDetailComponent,
+        ApproveAdvancePaymentComponent,
         ...COMPONENTS,
     ],
     providers: [
