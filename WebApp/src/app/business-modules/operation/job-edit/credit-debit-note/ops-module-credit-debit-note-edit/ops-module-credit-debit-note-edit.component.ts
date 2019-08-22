@@ -211,11 +211,13 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
             // return !o.isRemaining && o.isSelected;
             return !o.isRemaining;
         });
-        console.log(this.EditingCDNote);
-        const res = await this.baseServices.putAsync(this.api_menu.Documentation.AcctSOA.update, this.EditingCDNote);
-        if (res.status) {
-            this.EditingCDNote = new AcctCDNote();
-            this.closeModal();
+        if (this.EditingCDNote.listShipmentSurcharge.length > 0) {
+            console.log(this.EditingCDNote);
+            const res = await this.baseServices.putAsync(this.api_menu.Documentation.AcctSOA.update, this.EditingCDNote);
+            if (res.status) {
+                this.EditingCDNote = new AcctCDNote();
+                this.closeModal();
+            }
         }
     }
 

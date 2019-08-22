@@ -8,6 +8,7 @@ import { PopupBase } from 'src/app/popup.base';
 import { OpsModuleCreditDebitNoteEditComponent } from '../ops-module-credit-debit-note-edit/ops-module-credit-debit-note-edit.component';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
 import { SortService } from 'src/app/shared/services';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 declare var $: any;
 
 @Component({
@@ -17,6 +18,7 @@ declare var $: any;
 export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
 
   @ViewChild(OpsModuleCreditDebitNoteEditComponent, { static: false }) popupEdit: OpsModuleCreditDebitNoteEditComponent;
+  @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
 
   constructor(
     private baseServices: BaseService,
@@ -123,5 +125,17 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
         this.totalDebit += (c.total * c.exchangeRate);
       }
     }
+  }
+  async deleteCDNote() {
+    const res = await this.baseServices.deleteAsync(this.api_menu.Documentation.AcctSOA.delete + "?cdNoteId=" + this.CDNoteDetails.cdNote.id);
+    if (res.status) {
+      // this.getAllCDNote();
+      this.isCloseModal.emit(true);
+      this.confirmDeletePopup.hide();
+      this.hide();
+    }
+  }
+  showDeleteModal() {
+    this.confirmDeletePopup.show();
   }
 }
