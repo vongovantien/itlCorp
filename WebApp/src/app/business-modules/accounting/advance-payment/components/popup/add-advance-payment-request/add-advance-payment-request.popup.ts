@@ -190,7 +190,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
                         this.hide();
 
                     } else {
-                        this._toastService.warning('Add New Advance Request Failed, please recheck !', 'Warning');
+                        this._toastService.warning('Shipment has existed in another Advance !', 'Warning');
                     }
                 },
                 (errors: any) => { },

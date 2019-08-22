@@ -39,7 +39,7 @@ export class AdvancePaymentComponent extends AppList {
         this.headers = [
             { title: 'Advance No', field: 'advanceNo', sortable: true },
             { title: 'Amount', field: 'amount', sortable: true },
-            { title: 'Currency', field: 'requestCurrency', sortable: true },
+            { title: 'Currency', field: 'advanceCurrency', sortable: true },
             { title: 'Requester', field: 'requester', sortable: true },
             { title: 'Request Date', field: 'requestDate', sortable: true },
             { title: 'DeadLine Date', field: 'deadlinePayment', sortable: true },
@@ -84,7 +84,6 @@ export class AdvancePaymentComponent extends AppList {
                     this.handleError(errors);
                 },
                 () => { }
-
             );
     }
 
