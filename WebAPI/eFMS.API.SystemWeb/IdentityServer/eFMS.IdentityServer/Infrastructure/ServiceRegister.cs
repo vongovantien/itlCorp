@@ -50,11 +50,11 @@ namespace eFMS.IdentityServer.Infrastructure
                     builder =>
                     {
                         builder
-                        .AllowAnyOrigin()
+                            //.AllowAnyOrigin()
                             .AllowAnyHeader()
                             .AllowAnyMethod()
-                            .AllowCredentials();
-                        //.WithOrigins(appConfig.CrosConfig.Urls);
+                            .AllowCredentials()
+                            .WithOrigins(appConfig.CrosConfig.Urls);
                     });
             });
             services.AddMvc();
