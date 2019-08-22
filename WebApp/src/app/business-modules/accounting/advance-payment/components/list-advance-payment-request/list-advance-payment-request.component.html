@@ -78,7 +78,7 @@
                             <td>{{request.hbl}}</td>
                             <td>{{request.amount | number : '.0-3'}}</td>
                             <td>{{request.requestCurrency}}</td>
-                            <td>{{request.advanceType}}</td>
+                            <td>{{request.advanceType | titlecase}}</td>
                             <td>{{request.requestNote}}</td>
                         </tr>
                         <tr class="text-center text-black bg-secondary" *ngIf="!!listRequestAdvancePayment.length">
