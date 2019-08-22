@@ -284,7 +284,7 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
-        /// Preview Advance Payment Request
+        /// Preview Advance Payment Request By Advance Id
         /// </summary>
         /// <param name="advanceId">advanceId that want to retrieve preview advance payment request</param>
         /// <returns></returns>
