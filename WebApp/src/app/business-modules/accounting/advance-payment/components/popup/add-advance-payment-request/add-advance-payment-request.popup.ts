@@ -15,7 +15,7 @@ import { ToastrService } from 'ngx-toastr';
 export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
 
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
-    @Output() onUpdate: EventEmitter<any>  = new EventEmitter<any>();
+    @Output() onUpdate: EventEmitter<any> = new EventEmitter<any>();
 
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
 
@@ -135,36 +135,21 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             description: form.value.description,
         });
         if (this.action === 'create') {
-            this._accoutingRepo.checkShipmentsExistInAdvancePament(this.selectedShipmentData)
-                .pipe(
-                    catchError(this.catchError)
-                )
-                .subscribe(
-                    (res: CommonInterface.IResult) => {
-                        if (!res.status) {
-                            this.onRequest.emit(body);
-                            this.hide();
-                            this.resetForm();
-                        } else {
-                            this._toastService.warning('Add New Advance Request Failed, please recheck !', 'Warning');
-                        }
-                    },
-                    (errors: any) => { },
-                    () => { }
-                );
-        } else if (this.action === 'copy') { 
+            this.checkRequestAdvancePayment(body);
+
+
+        } else if (this.action === 'copy') {
             if (this.detectRequestChange(this.selectedRequest, body)) {
                 this.isDupplicate = true;
                 this.bodyConfirm = 'Data already exists, do you want to save or not ?';
-                this.confirmPopup.show();  
+                this.confirmPopup.show();
             } else {
                 this.isDupplicate = false;
                 this.onRequest.emit(body);  // * create new request
                 this.hide();
             }
         } else {
-            this.onUpdate.emit(body);   // * Update request
-            this.hide();
+            this.checkRequestAdvancePayment(body);
         }
     }
 
@@ -182,6 +167,31 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
                         { field: 'hbl', label: 'HBL' },
                     ];
                     this.configShipment.selectedDisplayFields = ['jobId', `mbl`, 'hbl'];
+                },
+                (errors: any) => { },
+                () => { }
+            );
+    }
+
+    checkRequestAdvancePayment(data: any) {
+        this._accoutingRepo.checkShipmentsExistInAdvancePament(this.selectedShipmentData)
+            .pipe(
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (!res.status) {
+                        if (this.action === 'create') {
+                            this.onRequest.emit(data);
+                            this.resetForm();
+                        } else {
+                            this.onUpdate.emit(data);
+                        }
+                        this.hide();
+
+                    } else {
+                        this._toastService.warning('Add New Advance Request Failed, please recheck !', 'Warning');
+                    }
                 },
                 (errors: any) => { },
                 () => { }

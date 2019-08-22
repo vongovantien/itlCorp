@@ -86,8 +86,8 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
                 this.maxDateDeadLine = value;
                 setTimeout(() => {
                     this.deadLine.setValue({
-                        startDate: new Date(new Date().setDate(new Date(value).getDate() + 9)),
-                        endDate: new Date(new Date().setDate(new Date(value).getDate() + 9))
+                        startDate: new Date(new Date(value).setDate(new Date(value).getDate() + 9)),
+                        endDate: new Date(new Date(value).setDate(new Date(value).getDate() + 9))
                     });
                 }, 100);
             });
