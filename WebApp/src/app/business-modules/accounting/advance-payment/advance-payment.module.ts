@@ -16,6 +16,7 @@ import { AdvancePaymentAddRequestPopupComponent } from './components/popup/add-a
 import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
 import { AdvancePaymentDetailComponent } from './detail/detail-advance-payment.component';
 import { ApproveAdvancePaymentComponent } from '../approve-payment/advance/approve-advance.component';
+import { NgProgressModule } from '@ngx-progressbar/core';
 
 registerLocaleData(localeVi, 'vi');
 const routing: Routes = [
@@ -56,7 +57,8 @@ const COMPONENTS = [
         PaginationModule.forRoot(),
         PerfectScrollbarModule,
         RouterModule.forChild(routing),
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        NgProgressModule
     ],
     declarations: [
         AdvancePaymentComponent,

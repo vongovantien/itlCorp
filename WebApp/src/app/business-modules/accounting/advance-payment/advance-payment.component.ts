@@ -8,6 +8,7 @@ import { SortService } from 'src/app/shared/services';
 import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
 import { AdvancePayment, AdvancePaymentRequest } from 'src/app/shared/models';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { NgProgress } from '@ngx-progressbar/core';
 
 @Component({
     selector: 'app-advance-payment',
@@ -24,15 +25,17 @@ export class AdvancePaymentComponent extends AppList {
     selectedAdv: AdvancePayment;
 
     groupRequest: AdvancePaymentRequest[] = [];
-
     constructor(
         private _accoutingRepo: AccoutingRepo,
         private _toastService: ToastrService,
-        private _sortService: SortService
+        private _sortService: SortService,
+        private _progressService: NgProgress
     ) {
         super();
         this.requestList = this.getListAdvancePayment;
         this.requestSort = this.sortAdvancePayment;
+
+        this._progressRef = this._progressService.ref('myProgress');
     }
 
     ngOnInit() {
@@ -59,16 +62,16 @@ export class AdvancePaymentComponent extends AppList {
             { title: 'Currency', field: 'requestCurrency', sortable: true },
             { title: 'Status Payment', field: 'statusPayment', sortable: true },
         ];
-
         this.getListAdvancePayment();
     }
 
     getListAdvancePayment(dataSearch?: any) {
         this.isLoading = true;
+        this._progressRef.start();
         this._accoutingRepo.getListAdvancePayment(this.page, this.pageSize, dataSearch)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { this.isLoading = false; }),
+                finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
                 map((data: any) => {
                     return {
                         data: data.data.map((item: any) => new AdvancePayment(item)),
@@ -115,11 +118,13 @@ export class AdvancePaymentComponent extends AppList {
     }
 
     onDeleteAdvPayment() {
+        this._progressRef.start();
         this._accoutingRepo.deleteAdvPayment(this.selectedAdv.advanceNo)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
                     this.confirmDeletePopup.hide();
+                    finalize(() => this._progressRef.complete());
                 })
             )
             .subscribe(
@@ -153,18 +158,20 @@ export class AdvancePaymentComponent extends AppList {
         if (!!this.advancePayments[index].advanceRequests.length) {
             this.groupRequest = this.advancePayments[index].advanceRequests;
         } else {
+            this._progressRef.start();
             this._accoutingRepo.getGroupRequestAdvPayment(advanceNo)
                 .pipe(
-                    catchError(this.catchError)
+                    catchError(this.catchError),
+                    finalize(() => this._progressRef.complete())
                 )
                 .subscribe(
-                    (res: any) => {
-                        this.groupRequest = res;
-                        this.advancePayments[index].advanceRequests = res;
-                    },
-                    (errors: any) => { },
-                    () => { }
-                );
+                        (res: any) => {
+                            this.groupRequest = res;
+                            this.advancePayments[index].advanceRequests = res;
+                        },
+                        (errors: any) => { },
+                        () => { }
+                    );
         }
     }
 }
