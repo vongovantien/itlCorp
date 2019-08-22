@@ -157,17 +157,32 @@ export class AccoutingRepo {
     }
 
     deleteAdvPayment(advanceNo: string) {
-        return this._api.delete(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctAdvancePayment/Delete`, { advanceNo: advanceNo}).pipe(
+        return this._api.delete(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctAdvancePayment/Delete`, { advanceNo: advanceNo }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     getGroupRequestAdvPayment(advanceNo: string) {
-        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctAdvancePayment/GetGroupRequestsByAdvanceNo`, { advanceNo: advanceNo}).pipe(
+        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctAdvancePayment/GetGroupRequestsByAdvanceNo`, { advanceNo: advanceNo }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
+    }
+
+    previewAdvancePayment(param: any) {
+        if (typeof param === 'string') {
+            return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctAdvancePayment/PreviewAdvancePaymentRequestByAdvanceId`, null, { advanceId: param }).pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => data)
+            );
+        } else {
+            return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctAdvancePayment/PreviewAdvancePaymentRequest`, param).pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => data)
+            );
+        }
+
     }
 
 

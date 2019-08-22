@@ -8,6 +8,7 @@ import { AdvancePaymentFormCreateComponent } from '../components/form-create-adv
 import { formatDate } from '@angular/common';
 import { AdvancePaymentListRequestComponent } from '../components/list-advance-payment-request/list-advance-payment-request.component';
 import { ToastrService } from 'ngx-toastr';
+import { ReportPreviewComponent } from 'src/app/shared/common';
 
 @Component({
     selector: 'app-advance-payment-detail',
@@ -17,10 +18,14 @@ export class AdvancePaymentDetailComponent extends AppPage {
 
     @ViewChild(AdvancePaymentFormCreateComponent, { static: false }) formCreateComponent: AdvancePaymentFormCreateComponent;
     @ViewChild(AdvancePaymentListRequestComponent, { static: true }) listRequestAdvancePaymentComponent: AdvancePaymentListRequestComponent;
+    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
 
     progress: any[] = [];
     advancePayment: AdvancePayment;
 
+    advId: string = '';
+
+    dataReport: any = null;
     constructor(
         private _activedRouter: ActivatedRoute,
         private _accoutingRepo: AccoutingRepo,
@@ -34,7 +39,8 @@ export class AdvancePaymentDetailComponent extends AppPage {
 
         this._activedRouter.params.subscribe((param: any) => {
             if (!!param.id) {
-                this.getDetail(param.id);
+                this.advId = param.id;
+                this.getDetail(this.advId);
             }
         });
     }
@@ -45,7 +51,7 @@ export class AdvancePaymentDetailComponent extends AppPage {
             item.requestCurrency = currency.id;
         }
         this.listRequestAdvancePaymentComponent.currency = currency.id;
-        
+
     }
 
     getDetail(advanceId: string) {
@@ -124,4 +130,19 @@ export class AdvancePaymentDetailComponent extends AppPage {
     }
 
 
+    previewAdvPayment() {
+        this._accoutingRepo.previewAdvancePayment(this.advId)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    setTimeout(() => {
+                        this.previewPopup.show();
+                    }, 1000);
+                 
+                },
+                (errors: any) => { },
+                () => { },
+            );
+    }
 }
