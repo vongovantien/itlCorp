@@ -18,10 +18,10 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
 
   @ViewChild(OpsModuleCreditDebitNoteEditComponent, { static: false }) popupEdit: OpsModuleCreditDebitNoteEditComponent;
   @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
+  @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
 
-    @Output() isCloseModal = new EventEmitter<any>();
-    @Input() CDNoteDetails: AcctCDNoteDetails = null;
+  @Output() isCloseModal = new EventEmitter<any>();
+  @Input() CDNoteDetails: AcctCDNoteDetails = null;
 
   constructor(
     private baseServices: BaseService,
@@ -42,8 +42,8 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
   totalCredit: number = 0;
   totalDebit: number = 0;
 
-    isDesc = true;
-    sortKey: string = '';
+  isDesc = true;
+  sortKey: string = '';
 
   ngOnInit() {
   }
@@ -73,7 +73,7 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
     this.hide();
   }
 
-    async closeEditModal(event: any) {
+  async closeEditModal(event: any) {
     this.currentCDNo = this.CDNoteDetails.cdNote.code;
     this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.currentJob.id + "&cdNo=" + this.currentCDNo);
 
@@ -90,32 +90,50 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
       const response = await this.baseServices.postAsync(this.api_menu.Documentation.AcctSOA.previewCDNote, this.CDNoteDetails);
       this.dataReport = response;
 
-            // * wait to report form submited
-            setTimeout(() => {
-                this.reportPopup.show();
+      // * wait to report form submited
+      setTimeout(() => {
+        this.reportPopup.show();
       }, 100);
     }
   }
 
-    sort(property: any) {
+  sort(property: any) {
     this.isDesc = !this.isDesc;
     this.sortKey = property;
     this.CDNoteDetails.listSurcharges = this.sortService.sort(this.CDNoteDetails.listSurcharges, property, this.isDesc);
   }
+  // totalCreditDebitCalculate() {
+  //   this.totalCredit = 0;
+  //   this.totalDebit = 0;
+  //   for (let i = 0; i < this.CDNoteDetails.listSurcharges.length; i++) {
+  //     const c = this.CDNoteDetails.listSurcharges[i];
+  //     if (c.type === "BUY" || c.type === "LOGISTIC" || (c.type === "OBH" && this.CDNoteDetails.partnerId === c.payerId)) {
+  //       // calculate total credit
+  //       this.totalCredit += (c.total * c.exchangeRate);
+  //     }
+  //     if (c.type === "SELL" || (c.type === "OBH" && this.CDNoteDetails.partnerId === c.paymentObjectId)) {
+  //       // calculate total debit 
+  //       this.totalDebit += (c.total * c.exchangeRate);
+  //     }
+  //   }
+  // }
   totalCreditDebitCalculate() {
-    this.totalCredit = 0;
-    this.totalDebit = 0;
+    let totalCredit = 0;
+    let totalDebit = 0;
     for (let i = 0; i < this.CDNoteDetails.listSurcharges.length; i++) {
       const c = this.CDNoteDetails.listSurcharges[i];
       if (c.type === "BUY" || c.type === "LOGISTIC" || (c.type === "OBH" && this.CDNoteDetails.partnerId === c.payerId)) {
         // calculate total credit
-        this.totalCredit += (c.total * c.exchangeRate);
+        totalCredit += (c.total * c.exchangeRate);
       }
       if (c.type === "SELL" || (c.type === "OBH" && this.CDNoteDetails.partnerId === c.paymentObjectId)) {
         // calculate total debit 
-        this.totalDebit += (c.total * c.exchangeRate);
+        totalDebit += (c.total * c.exchangeRate);
       }
+
     }
+    this.CDNoteDetails.totalCredit = totalCredit;
+    this.CDNoteDetails.totalDebit = totalDebit;
   }
   async deleteCDNote() {
     const res = await this.baseServices.deleteAsync(this.api_menu.Documentation.AcctSOA.delete + "?cdNoteId=" + this.CDNoteDetails.cdNote.id);
