@@ -6,6 +6,7 @@ import { takeUntil, catchError } from 'rxjs/operators';
 import { SortService } from 'src/app/shared/services';
 import { AdvancePaymentAddRequestPopupComponent } from '../popup/add-advance-payment-request/add-advance-payment-request.popup';
 import { ToastrService } from 'ngx-toastr';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 @Component({
     selector: 'adv-payment-list-request',
@@ -15,6 +16,7 @@ import { ToastrService } from 'ngx-toastr';
 
 export class AdvancePaymentListRequestComponent extends AppList {
     @ViewChild(AdvancePaymentAddRequestPopupComponent, { static: false }) addNewRequestPaymentPopup: AdvancePaymentAddRequestPopupComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
 
@@ -33,7 +35,7 @@ export class AdvancePaymentListRequestComponent extends AppList {
         private _toastService: ToastrService
     ) {
         super();
-        this.requestList = this.sortRequestAdvancePament;
+        this.requestSort = this.sortRequestAdvancePament;
     }
 
     ngOnInit() {
@@ -92,7 +94,7 @@ export class AdvancePaymentListRequestComponent extends AppList {
     onRequestAdvancePaymentChange(dataRequest: AdvancePaymentRequest) {
         // * create or copy emit new item to $dataRequest and update amount, currency.
         this.$dataRequest.next(dataRequest);
-        
+
         this.totalAmount = this.updateTotalAmount(this.listRequestAdvancePayment);
         this.updateCurrencyForRequest(dataRequest);
     }
@@ -141,8 +143,15 @@ export class AdvancePaymentListRequestComponent extends AppList {
     }
 
     deleteItemRequestAdvancePayment() {
+        if (!!this.listRequestAdvancePayment.filter((item: AdvancePaymentRequest) => item.isSelected).length) {
+            this.confirmDeletePopup.show();
+        } 
+    }
+
+    onDeletePaymentRequest() {
         this.listRequestAdvancePayment = this.listRequestAdvancePayment.filter((item: AdvancePaymentRequest) => !item.isSelected);
         this.isCheckAll = false;
+        this.confirmDeletePopup.hide();
     }
 }
 

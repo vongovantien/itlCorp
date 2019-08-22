@@ -51,7 +51,7 @@ export class StatementOfAccountEditComponent extends AppList {
         private _dataService: DataService
     ) {
         super();
-        this.requestList = this.sortChargeList;
+        this.requestSort = this.sortChargeList;
     }
 
     ngOnInit() {

@@ -1,22 +1,20 @@
-<!--begin::preview-test-modal-->
-<div class="modal fade" [id]="modalId" data-backdrop="static" role="dialog" aria-labelledby=""
-    aria-hidden="true">
+<div class="modal fade" role="dialog" bsModal #popup="bs-modal">
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Preview</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hide()">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-              <form #formReport target="frame" method="POST" [action]="scr" (ngSubmit)="submitForm($event)">
-                  <input name="crystal" type="hidden" [value]="value">
-              </form>
-              <iframe #frame id="frame" name="frame" src="" type="application/pdf" height="1200px"  width="100%"  allowfullscreen 
-                frameborder="0"  ></iframe>
+                <form #formReport target="frame" method="POST" [action]="scr" (ngSubmit)="submitForm($event)">
+                    <input name="crystal" type="hidden" [value]="value">
+                </form>
+                <iframe #frame id="frame" name="frame" src="" type="application/pdf" height="1200px" width="100%"
+                    allowfullscreen frameborder="0"></iframe>
             </div>
-            <div class="modal-footer m--align-center">
+            <div class="modal-footer m--align-center" (click)="hide()">
                 <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
                     <span>
                         <i class="la la-ban"></i>
@@ -29,4 +27,3 @@
         </div>
     </div>
 </div>
-<!--end::preview-test-modal-->

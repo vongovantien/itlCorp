@@ -282,7 +282,8 @@
 </div>
 <app-ops-module-credit-debit-note-edit *ngIf="!!CDNoteDetails" (isCloseModal)="closeEditModal($event)">
 </app-ops-module-credit-debit-note-edit>
-<app-report-preview [data]="dataReport" *ngIf="dataReport" [modalId]="previewModalId"></app-report-preview>
+
+<app-report-preview [data]="dataReport" *ngIf="dataReport" ></app-report-preview>
 
 <!-- <app-ops-module-credit-debit-note-edit></app-ops-module-credit-debit-note-edit> -->
 <confirm-popup [title]="'Delete Credit/Debit Note'" [body]="'All relate infomation will be lost. Are you sure you want to delete this Credit/Debit

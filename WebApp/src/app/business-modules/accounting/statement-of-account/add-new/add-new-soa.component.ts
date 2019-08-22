@@ -87,7 +87,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
         private _dataService: DataService
     ) {
         super();
-        this.requestList = this.sortLocal;
+        this.requestSort = this.sortLocal;
     }
 
     ngOnInit() {

@@ -46,6 +46,7 @@ export class AdvancePaymentDetailComponent extends AppPage {
             item.requestCurrency = currency.id;
         }
         this.listRequestAdvancePaymentComponent.currency = currency.id;
+        
     }
 
     getDetail(advanceId: string) {

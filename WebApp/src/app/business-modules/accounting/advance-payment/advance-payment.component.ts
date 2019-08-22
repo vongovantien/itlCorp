@@ -17,7 +17,6 @@ export class AdvancePaymentComponent extends AppList {
     @ViewChild(AdvancePaymentFormsearchComponent, { static: false }) formSearch: AdvancePaymentFormsearchComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
 
-
     headers: CommonInterface.IHeaderTable[];
     headerGroupRequest: CommonInterface.IHeaderTable[];
 
@@ -33,13 +32,13 @@ export class AdvancePaymentComponent extends AppList {
     ) {
         super();
         this.requestList = this.getListAdvancePayment;
-
+        this.requestSort = this.sortAdvancePayment;
     }
 
     ngOnInit() {
         this.headers = [
             { title: 'Advance No', field: 'advanceNo', sortable: true },
-            { title: 'Description', field: 'advanceNote', sortable: true },
+            { title: 'Amount', field: 'amount', sortable: true },
             { title: 'Currency', field: 'requestCurrency', sortable: true },
             { title: 'Requester', field: 'requester', sortable: true },
             { title: 'Request Date', field: 'requestDate', sortable: true },
@@ -48,10 +47,13 @@ export class AdvancePaymentComponent extends AppList {
             { title: 'Status Approval', field: 'statusApproval', sortable: true },
             { title: 'Status Payment', field: 'statusPayment', sortable: true },
             { title: 'Payment Method', field: 'paymentMethod', sortable: true },
+            { title: 'Description', field: 'advanceNote', sortable: true },
+
         ];
 
         this.headerGroupRequest = [
             { title: 'JobId', field: 'jobId', sortable: true },
+            { title: 'Custom No', field: 'customNo', sortable: true },
             { title: 'HBL', field: 'hbl', sortable: true },
             { title: 'Amount', field: 'amount', sortable: true },
             { title: 'Currency', field: 'requestCurrency', sortable: true },
@@ -86,33 +88,13 @@ export class AdvancePaymentComponent extends AppList {
             );
     }
 
-    setSortBy(sort?: string, order?: boolean): void {
-        this.sort = sort ? sort : 'code';
-        this.order = order;
-    }
-
-    sortClass(sort: string): string {
+    sortAdvancePayment(sort: string): void {
         if (!!sort) {
-            let classes = 'sortable ';
-            if (this.sort === sort) {
-                classes += ('sort-' + (this.order ? 'asc' : 'desc') + ' ');
-            }
-
-            return classes;
-        }
-        return '';
-    }
-
-    sortBy(sort: string): void {
-        if (!!sort) {
-            this.setSortBy(sort, this.sort !== sort ? true : !this.order);
-            if (!!this.advancePayments.length) {
-                this.advancePayments = this._sortService.sort(this.advancePayments, sort, this.order);
-            }
+            this.advancePayments = this._sortService.sort(this.advancePayments, sort, this.order);
         }
     }
 
-    sortClassCollapse(sort: string): string  {
+    sortClassCollapse(sort: string): string {
         if (!!sort) {
             let classes = 'sortable ';
             if (this.sort === sort) {
@@ -158,10 +140,6 @@ export class AdvancePaymentComponent extends AppList {
         this.selectedAdv = new AdvancePayment(selectedAdv);
     }
 
-    copyAdvancePayment(selectedRequest: AdvancePayment) {
-        console.log(selectedRequest);
-    }
-
     handleError(errors: any) {
         let message: string = 'Has Error Please Check Again !';
         let title: string = '';
@@ -172,7 +150,7 @@ export class AdvancePaymentComponent extends AppList {
         this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
     }
 
-    getRequestAdvancePaymentGroup(advanceNo: string, index: number) {
+    getRequestAdvancePaymentGroup(advanceNo: string) {
         this._accoutingRepo.getGroupRequestAdvPayment(advanceNo)
             .pipe(
                 catchError(this.catchError)
@@ -183,7 +161,7 @@ export class AdvancePaymentComponent extends AppList {
                 },
                 (errors: any) => { },
                 () => { }
-            )
+            );
     }
 
 }

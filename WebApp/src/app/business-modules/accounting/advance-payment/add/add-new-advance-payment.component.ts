@@ -32,6 +32,10 @@ export class AdvancePaymentAddNewComponent extends AppPage {
 
     onChangeCurrency(currency: Currency) {
         this.listRequestAdvancePaymentComponent.changeCurrency(currency);
+        for (const item of this.listRequestAdvancePaymentComponent.listRequestAdvancePayment) {
+            item.requestCurrency = currency.id;
+        }
+        this.listRequestAdvancePaymentComponent.currency = currency.id;
     }
 
     saveAdvancePayment() {
