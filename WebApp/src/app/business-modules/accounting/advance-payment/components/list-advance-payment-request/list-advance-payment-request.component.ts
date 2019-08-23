@@ -28,6 +28,7 @@ export class AdvancePaymentListRequestComponent extends AppList {
 
     totalAmount: number = 0;
     currency: string = 'VND';
+    advanceNo: string = '';
 
     constructor(
         private _sortService: SortService,
@@ -75,6 +76,7 @@ export class AdvancePaymentListRequestComponent extends AppList {
         this.selectedRequestAdvancePayment = new AdvancePaymentRequest(request);
         this.addNewRequestPaymentPopup.action = 'copy';
         this.addNewRequestPaymentPopup.selectedRequest = request;
+        this.addNewRequestPaymentPopup.advanceNo = this.advanceNo;
 
         this.addNewRequestPaymentPopup.initFormUpdate(this.selectedRequestAdvancePayment);
         this.addNewRequestPaymentPopup.show({ backdrop: 'static' });
@@ -85,6 +87,7 @@ export class AdvancePaymentListRequestComponent extends AppList {
         this.selectedIndexRequest = index;   // * index request adv in list
         this.addNewRequestPaymentPopup.action = 'update';
         this.addNewRequestPaymentPopup.selectedRequest = request;
+        this.addNewRequestPaymentPopup.advanceNo = this.advanceNo;
 
         this.addNewRequestPaymentPopup.initFormUpdate(this.selectedRequestAdvancePayment);
         this.addNewRequestPaymentPopup.show({ backdrop: 'static' });
@@ -109,6 +112,7 @@ export class AdvancePaymentListRequestComponent extends AppList {
 
     openPopupAdd() {
         this.addNewRequestPaymentPopup.action = 'create';
+        this.addNewRequestPaymentPopup.advanceNo = this.advanceNo;
         this.addNewRequestPaymentPopup.show({ backdrop: 'static' });
     }
 
