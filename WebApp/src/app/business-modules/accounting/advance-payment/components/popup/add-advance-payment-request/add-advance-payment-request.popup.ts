@@ -29,7 +29,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     };
 
     selectedShipment: any = {};
-    selectedShipmentData: OperationInteface.IShipment = null;
+    selectedShipmentData: any = null;
 
     types: CommonInterface.ICommonTitleValue[];
     selectedType: CommonInterface.ICommonTitleValue;
@@ -110,7 +110,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             currency: data.requestCurrency
         });
 
-        this.selectedShipmentData = <OperationInteface.IShipment>{ hbl: data.hbl, jobId: data.jobId, mbl: data.mbl };
+        this.selectedShipmentData = <OperationInteface.IShipment>{ hbl: data.hbl, jobId: data.jobId, mbl: data.mbl, advanceNo: data.advanceNo };
         this.selectedShipment = { field: 'jobId', value: data.jobId };
 
         this.customDeclarations = [];
@@ -133,11 +133,10 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             advanceType: form.value.type.value,
             requestCurrency: form.value.currency,
             description: form.value.description,
+            advanceNo: this.selectedShipmentData.advanceNo || null
         });
         if (this.action === 'create') {
             this.checkRequestAdvancePayment(body);
-
-
         } else if (this.action === 'copy') {
             if (this.detectRequestChange(this.selectedRequest, body)) {
                 this.isDupplicate = true;
@@ -173,8 +172,8 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             );
     }
 
-    checkRequestAdvancePayment(data: any) {
-        this._accoutingRepo.checkShipmentsExistInAdvancePament(this.selectedShipmentData)
+    checkRequestAdvancePayment(advRequest: AdvancePaymentRequest) {
+        this._accoutingRepo.checkShipmentsExistInAdvancePament(Object.assign({}, this.selectedShipmentData, { advanceNo: advRequest.advanceNo}))
             .pipe(
                 catchError(this.catchError)
             )
@@ -182,13 +181,12 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
                 (res: CommonInterface.IResult) => {
                     if (!res.status) {
                         if (this.action === 'create') {
-                            this.onRequest.emit(data);
-                            this.resetForm();
+                            this.onRequest.emit(advRequest);
                         } else {
-                            this.onUpdate.emit(data);
+                            this.onUpdate.emit(advRequest);
                         }
                         this.hide();
-
+                        this.resetForm();
                     } else {
                         this._toastService.warning('Shipment has existed in another Advance !', 'Warning');
                     }

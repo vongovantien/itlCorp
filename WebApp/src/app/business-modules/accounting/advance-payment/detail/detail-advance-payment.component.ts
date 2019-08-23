@@ -2,12 +2,14 @@ import { Component, ViewChild } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccoutingRepo } from 'src/app/shared/repositories';
-import { catchError } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';
 import { AdvancePayment, Currency } from 'src/app/shared/models';
 import { AdvancePaymentFormCreateComponent } from '../components/form-create-advance-payment/form-create-advance-payment.component';
 import { formatDate } from '@angular/common';
 import { AdvancePaymentListRequestComponent } from '../components/list-advance-payment-request/list-advance-payment-request.component';
 import { ToastrService } from 'ngx-toastr';
+import { ReportPreviewComponent } from 'src/app/shared/common';
+import { NgProgress } from '@ngx-progressbar/core';
 
 @Component({
     selector: 'app-advance-payment-detail',
@@ -17,24 +19,31 @@ export class AdvancePaymentDetailComponent extends AppPage {
 
     @ViewChild(AdvancePaymentFormCreateComponent, { static: false }) formCreateComponent: AdvancePaymentFormCreateComponent;
     @ViewChild(AdvancePaymentListRequestComponent, { static: true }) listRequestAdvancePaymentComponent: AdvancePaymentListRequestComponent;
+    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
 
     progress: any[] = [];
     advancePayment: AdvancePayment;
 
+    advId: string = '';
+
+    dataReport: any = null;
     constructor(
         private _activedRouter: ActivatedRoute,
         private _accoutingRepo: AccoutingRepo,
         private _toastService: ToastrService,
-        private _router: Router
+        private _router: Router,
+        private _progressService: NgProgress
     ) {
         super();
+        this._progressRef = this._progressService.ref("myProgress");
     }
 
     ngOnInit() {
 
         this._activedRouter.params.subscribe((param: any) => {
             if (!!param.id) {
-                this.getDetail(param.id);
+                this.advId = param.id;
+                this.getDetail(this.advId);
             }
         });
     }
@@ -45,13 +54,15 @@ export class AdvancePaymentDetailComponent extends AppPage {
             item.requestCurrency = currency.id;
         }
         this.listRequestAdvancePaymentComponent.currency = currency.id;
-        
+
     }
 
     getDetail(advanceId: string) {
+        this._progressRef.start();
         this._accoutingRepo.getDetailAdvancePayment(advanceId)
             .pipe(
                 catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (res: any) => {
@@ -103,14 +114,16 @@ export class AdvancePaymentDetailComponent extends AppPage {
                 UserCreated: this.advancePayment.userCreated,
                 DatetimeCreated: this.advancePayment.datetimeCreated
             };
+            this._progressRef.start();
             this._accoutingRepo.updateAdvPayment(body)
                 .pipe(
-                    catchError(this.catchError)
+                    catchError(this.catchError),
+                    finalize(() => this._progressRef.complete())
                 )
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
-                            this._toastService.success(`${res.data.advanceNo + 'is update successfully'}`, 'Update Success !');
+                            this._toastService.success(`${res.data.advanceNo + ' is update successfully'}`, 'Update Success !');
                         }
                     },
                     (errors: any) => { },
@@ -124,4 +137,23 @@ export class AdvancePaymentDetailComponent extends AppPage {
     }
 
 
+    previewAdvPayment() {
+        this._progressRef.start();
+        this._accoutingRepo.previewAdvancePayment(this.advId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    setTimeout(() => {
+                        this.previewPopup.show();
+                    }, 1000);
+
+                },
+                (errors: any) => { },
+                () => { },
+            );
+    }
 }

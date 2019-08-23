@@ -4,6 +4,7 @@ import { HttpErrorResponse } from "@angular/common/http";
 
 import moment from "moment";
 import { UtilityHelper } from "src/helper";
+import { NgProgressRef } from "@ngx-progressbar/core";
 
 export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit {
 
@@ -30,6 +31,8 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
 
   isLoading: boolean = false;
   isCheckAll: boolean = false;
+
+  _progressRef: NgProgressRef;
 
   ngOnInit(): void { }
 
