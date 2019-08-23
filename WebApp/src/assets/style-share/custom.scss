@@ -599,6 +599,11 @@ table.dataTable {
     }
 }
 
+.modal-report{
+    width: calc(100% - 1.75rem);
+    max-width: 800px;
+}
+
 .confirm-text-block {
     padding: 10px 0;
     text-align: center;
@@ -865,7 +870,6 @@ table.dataTable {
     }
 }
 
-//create job
 .c-modal-fullscreen {
     width: calc(100% - 1.75rem);
     max-width: 1200px;
