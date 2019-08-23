@@ -718,7 +718,7 @@ namespace eFMS.API.Documentation.DL.Services
                 strHbl += ")";
                 strHbl = strHbl.Replace(",)", "");
                 strCustomNo += ")";
-                strCustomNo = strCustomNo.Replace(",)", "");
+                strCustomNo = strCustomNo.Replace(",)", "").Replace(")","");
             }
 
             //Lấy ra tên requester
