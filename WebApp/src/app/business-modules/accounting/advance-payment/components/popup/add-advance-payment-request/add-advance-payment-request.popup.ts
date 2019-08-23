@@ -17,7 +17,8 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
     @Output() onUpdate: EventEmitter<any> = new EventEmitter<any>();
 
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
+    @ViewChild('exitPopup', { static: false }) exitPopup: ConfirmPopupComponent;
+    @ViewChild('confirmDuplicatePopup', { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
 
     action: string = 'create';
 
@@ -49,6 +50,8 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
 
     selectedRequest: AdvancePaymentRequest; // TODO detect form was changed when dupplicate
     isDupplicate: boolean = false;
+    
+    advanceNo: string = '';
 
     constructor(
         private _fb: FormBuilder,
@@ -69,7 +72,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
         this.types = [
             { title: 'Norm', value: 'Norm' },
             { title: 'Invoice', value: 'Invoice' },
-            { title: 'Other', value: 'other' },
+            { title: 'Other', value: 'Other' },
         ];
 
         this.type.setValue(this.types[2]);
@@ -106,12 +109,14 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             amount: data.amount,
             note: data.requestNote,
             customNo: !!data.customNo ? this.initCD.filter((item: CustomDeclaration) => item.clearanceNo === data.customNo)[0] : null,
-            type: this.types.filter((type: any) => type.value === data.advanceType)[0],
+            type: this.types.filter((type: any) => type.value.toLowerCase() === data.advanceType.toLowerCase())[0],
             currency: data.requestCurrency
         });
 
-        this.selectedShipmentData = <OperationInteface.IShipment>{ hbl: data.hbl, jobId: data.jobId, mbl: data.mbl, advanceNo: data.advanceNo };
+        this.selectedShipmentData = <OperationInteface.IShipment>{ hbl: data.hbl, jobId: data.jobId, mbl: data.mbl};
         this.selectedShipment = { field: 'jobId', value: data.jobId };
+
+        this.advanceNo = data.advanceNo;
 
         this.customDeclarations = [];
         this.customNo.setValue(null);
@@ -133,19 +138,17 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             advanceType: form.value.type.value,
             requestCurrency: form.value.currency,
             description: form.value.description,
-            advanceNo: this.selectedShipmentData.advanceNo || null
+            advanceNo: this.advanceNo,
         });
         if (this.action === 'create') {
             this.checkRequestAdvancePayment(body);
         } else if (this.action === 'copy') {
             if (this.detectRequestChange(this.selectedRequest, body)) {
                 this.isDupplicate = true;
-                this.bodyConfirm = 'Data already exists, do you want to save or not ?';
-                this.confirmPopup.show();
+                this.confirmDuplicatePopup.show();
             } else {
                 this.isDupplicate = false;
-                this.onRequest.emit(body);  // * create new request
-                this.hide();
+                this.checkRequestAdvancePayment(body);
             }
         } else {
             this.checkRequestAdvancePayment(body);
@@ -173,17 +176,17 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     }
 
     checkRequestAdvancePayment(advRequest: AdvancePaymentRequest) {
-        this._accoutingRepo.checkShipmentsExistInAdvancePament(Object.assign({}, this.selectedShipmentData, { advanceNo: advRequest.advanceNo}))
+        this._accoutingRepo.checkShipmentsExistInAdvancePament(Object.assign({}, this.selectedShipmentData, { advanceNo: this.advanceNo }))
             .pipe(
                 catchError(this.catchError)
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (!res.status) {
-                        if (this.action === 'create') {
-                            this.onRequest.emit(advRequest);
-                        } else {
+                        if (this.action === 'update') {
                             this.onUpdate.emit(advRequest);
+                        } else {
+                            this.onRequest.emit(advRequest);
                         }
                         this.hide();
                         this.resetForm();
@@ -239,8 +242,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     }
 
     onCancel() {
-        this.bodyConfirm = 'Do you want to exit ?';
-        this.confirmPopup.show();
+        this.exitPopup.show();
     }
 
     resetForm() {
@@ -275,8 +277,14 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     }
 
     onSubmitExitPopup() {
-        this.confirmPopup.hide();
         this.hide();
+        this.exitPopup.hide();
+        this.resetForm();
+    }
+
+    onSubmitDuplicatePopup() {
+        this.hide();
+        this.confirmDuplicatePopup.hide();
         if (this.isDupplicate) {
             this.onComfirmSaveDupplicateRequestAdvancePayment(this.form);
         }

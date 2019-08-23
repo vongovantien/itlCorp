@@ -4,9 +4,9 @@ import { AccoutingRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
-import { SortService } from 'src/app/shared/services';
+import { SortService, BaseService } from 'src/app/shared/services';
 import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
-import { AdvancePayment, AdvancePaymentRequest } from 'src/app/shared/models';
+import { AdvancePayment, AdvancePaymentRequest, User } from 'src/app/shared/models';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { NgProgress } from '@ngx-progressbar/core';
 
@@ -25,11 +25,14 @@ export class AdvancePaymentComponent extends AppList {
     selectedAdv: AdvancePayment;
 
     groupRequest: AdvancePaymentRequest[] = [];
+    userLogged: User;
+
     constructor(
         private _accoutingRepo: AccoutingRepo,
         private _toastService: ToastrService,
         private _sortService: SortService,
-        private _progressService: NgProgress
+        private _progressService: NgProgress,
+        private _baseService: BaseService
     ) {
         super();
         this.requestList = this.getListAdvancePayment;
@@ -62,13 +65,14 @@ export class AdvancePaymentComponent extends AppList {
             { title: 'Currency', field: 'requestCurrency', sortable: true },
             { title: 'Status Payment', field: 'statusPayment', sortable: true },
         ];
+        this.getUserLogged();
         this.getListAdvancePayment();
     }
 
     getListAdvancePayment(dataSearch?: any) {
         this.isLoading = true;
         this._progressRef.start();
-        this._accoutingRepo.getListAdvancePayment(this.page, this.pageSize, dataSearch)
+        this._accoutingRepo.getListAdvancePayment(this.page, this.pageSize, Object.assign({}, dataSearch, { requester: this.userLogged.id }))
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
@@ -165,14 +169,18 @@ export class AdvancePaymentComponent extends AppList {
                     finalize(() => this._progressRef.complete())
                 )
                 .subscribe(
-                        (res: any) => {
-                            this.groupRequest = res;
-                            this.advancePayments[index].advanceRequests = res;
-                        },
-                        (errors: any) => { },
-                        () => { }
-                    );
+                    (res: any) => {
+                        this.groupRequest = res;
+                        this.advancePayments[index].advanceRequests = res;
+                    },
+                    (errors: any) => { },
+                    () => { }
+                );
         }
+    }
+
+    getUserLogged() {
+        this.userLogged = this._baseService.getUserLogin() || 'admin';
     }
 }
 

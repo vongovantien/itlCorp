@@ -84,6 +84,8 @@ export class AdvancePaymentDetailComponent extends AppPage {
 
                     this.listRequestAdvancePaymentComponent.listRequestAdvancePayment = this.advancePayment.advanceRequests;
                     this.listRequestAdvancePaymentComponent.totalAmount = this.listRequestAdvancePaymentComponent.updateTotalAmount(this.advancePayment.advanceRequests);
+
+                    this.listRequestAdvancePaymentComponent.advanceNo = this.advancePayment.advanceNo;
                 },
                 (errors: any) => { },
                 () => { }
