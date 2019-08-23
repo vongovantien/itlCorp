@@ -73,13 +73,22 @@ export class OpsModuleCreditDebitNoteAddnewComponent extends PopupBase implement
     }
     async getListCharges(partnerId: String) {
         if (this.currentHbID !== null && partnerId != null) {
-            this.listChargeOfPartner = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getChargesByPartner + "?Id=" + this.currentHbID + "&partnerID=" + partnerId + "&IsHouseBillId=true" + "&isAddCDNote=false");
+            this.listChargeOfPartner = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getChargesByPartner + "?Id=" + this.currentHbID + "&partnerID=" + partnerId + "&IsHouseBillId=true");
             console.log('CDNoteWorking');
             console.log(this.CDNoteWorking);
             this.CDNoteWorking.listShipmentSurcharge = [];
             this.listChargeOfPartner = map(this.listChargeOfPartner, function (o) {
                 for (let i = 0; i < o.listCharges.length; i++) {
                     o.listCharges[i].isSelected = false;
+                    if (o.listCharges[i].debitNo === null && o.listCharges[i].creditNo === null) {
+                        o.listCharges[i].isRemaining = true;
+                    }
+                    if (o.listCharges[i].type === "OBH") {
+                        if ((o.listCharges[i].payerId === partnerId && o.listCharges[i].creditNo === null)
+                            || (o.listCharges[i].paymentObjectId === partnerId && o.listCharges[i].debitNo === null)) {
+                            o.listCharges[i].isRemaining = true;
+                        }
+                    }
                 }
                 return o;
             });

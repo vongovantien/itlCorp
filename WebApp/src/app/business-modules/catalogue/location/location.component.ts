@@ -199,10 +199,10 @@ export class LocationComponent implements OnInit, AfterViewInit {
   async ngOnInit() {
     this.pager.totalItems = 0;
     await this.getCountries();
-    this.getProvinceCities();
-    this.getDistrict();
-    this.getWards();
-    this.getAllCountries();
+    // this.getProvinceCities();
+    // this.getDistrict();
+    // this.getWards();
+    // this.getAllCountries();
   }
   activeTab: string = "country";
   changeTab(activeTab) {

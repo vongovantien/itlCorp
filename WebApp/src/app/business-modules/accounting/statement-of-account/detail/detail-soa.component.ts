@@ -35,7 +35,7 @@ export class StatementOfAccountDetailComponent extends AppList {
         private _router: Router
     ) {
         super();
-        this.requestList = this.sortChargeList;
+        this.requestSort = this.sortChargeList;
     }
 
     ngOnInit() {

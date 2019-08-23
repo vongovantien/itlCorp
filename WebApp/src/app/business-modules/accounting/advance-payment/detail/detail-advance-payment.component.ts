@@ -12,7 +12,6 @@ import { ToastrService } from 'ngx-toastr';
 @Component({
     selector: 'app-advance-payment-detail',
     templateUrl: './detail-advance-payment.component.html',
-    styleUrls: ['./detail-advance-payment.component.scss']
 })
 export class AdvancePaymentDetailComponent extends AppPage {
 
@@ -46,6 +45,7 @@ export class AdvancePaymentDetailComponent extends AppPage {
             item.requestCurrency = currency.id;
         }
         this.listRequestAdvancePaymentComponent.currency = currency.id;
+        
     }
 
     getDetail(advanceId: string) {

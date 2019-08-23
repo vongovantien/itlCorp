@@ -2,8 +2,12 @@
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add New Advance Request</h5>
-                <button type="button"  (click)="onCancel()" class="close">
+                <h5 class="modal-title" *ngIf="action !== 'update' else updateTitle">Add New Advance Request</h5>
+                <ng-template #updateTitle class="modal-title">
+                    <h5 class="modal-title">Update Advance Request</h5>
+                </ng-template>
+
+                <button type="button" (click)="onCancel()" class="close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -16,7 +20,8 @@
                                 <label for="">Description
                                     <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" class="form-control" formControlName="description" placeholder="Description">
+                                <input type="text" class="form-control" formControlName="description"
+                                    placeholder="Description">
                                 <div class="form-control-feedback" *ngIf="description.dirty">
                                     <span *ngIf="description.errors | equalError:'pattern'">Description invalid</span>
                                     <span *ngIf="description.errors | equalError:'required'">Description was
@@ -63,7 +68,6 @@
                             <div class="form-group">
                                 <label>Currency
                                 </label>
-                                <!-- Get default value from FormCreate -->
                                 <input type="text" class="form-control" formControlName="currency" disabled readonly>
                             </div>
                         </div>

@@ -500,8 +500,25 @@ namespace eFMS.API.Documentation.DL.Services
                             {
                                 //-to contiue
                                 //item.Cdno = null;
-                                item.DebitNo = null;
-                                item.CreditNo = null;
+                                if(item.Type == "BUY")
+                                {
+                                    item.CreditNo = null;
+                                }
+                                else if(item.Type == "BUY")
+                                {
+                                    item.DebitNo = null;
+                                }
+                                else
+                                {
+                                    if(item.DebitNo == cdNote.Code)
+                                    {
+                                        item.DebitNo = null;
+                                    }
+                                    if(item.CreditNo == cdNote.Code)
+                                    {
+                                        item.CreditNo = null;
+                                    }
+                                }
                                 item.UserModified = cdNote.UserModified;
                                 item.DatetimeModified = DateTime.Now;
                                 ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Update(item);

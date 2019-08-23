@@ -226,24 +226,32 @@
                             <div class="row">
                                 <div class="col">
                                     <strong>Total Credit:</strong><span
-                                        class="m--margin-left-5">{{ CDNoteDetails.totalCredit | number:'1.3-3' }}</span>
+                                        class="m--margin-left-5">{{ this.CDNoteDetails.totalCredit | number:'1.3-3' }}</span>
                                 </div>
                                 <div class="col-md-auto">
                                     <strong>Total Dedit:</strong> <span
-                                        class="m--margin-left-5">{{ CDNoteDetails.totalDebit | number:'1.3-3' }}</span>
+                                        class="m--margin-left-5">{{ this.CDNoteDetails.totalDebit | number:'1.3-3' }}</span>
                                 </div>
                             </div>
                         </div>
                         <div class="m-alert m-alert--square alert alert-brand m--align-right m--marginless">
                             <strong>Balance Amount:</strong><span class="m--margin-left-5">
-                                {{ (CDNoteDetails.totalCredit - CDNoteDetails.totalDebit) | number:'1.3-3' }}</span>
+                                {{ (this.CDNoteDetails.totalDebit - this.CDNoteDetails.totalCredit) | number:'1.3-3' }}</span>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
+                <!-- <button class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
                     data-target="#confirm-delete-CDnote-modal">
+                    <span>
+                        <i class="la la-trash"></i>
+                        <span>
+                            Delete note
+                        </span>
+                    </span>
+                </button> -->
+                <button class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="showDeleteModal()">
                     <span>
                         <i class="la la-trash"></i>
                         <span>
@@ -274,6 +282,9 @@
 </div>
 <app-ops-module-credit-debit-note-edit *ngIf="!!CDNoteDetails" (isCloseModal)="closeEditModal($event)">
 </app-ops-module-credit-debit-note-edit>
-<app-report-preview [data]="dataReport" *ngIf="dataReport" [modalId]="previewModalId"></app-report-preview>
+
+<app-report-preview [data]="dataReport" *ngIf="dataReport"></app-report-preview>
 
 <!-- <app-ops-module-credit-debit-note-edit></app-ops-module-credit-debit-note-edit> -->
+<confirm-popup [title]="'Delete Credit/Debit Note'" [body]="'All relate infomation will be lost. Are you sure you want to delete this Credit/Debit
+Note?'" (onSubmit)="deleteCDNote()"></confirm-popup>
