@@ -17,7 +17,8 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
     @Output() onUpdate: EventEmitter<any> = new EventEmitter<any>();
 
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
+    @ViewChild('exitPopup', { static: false }) exitPopup: ConfirmPopupComponent;
+    @ViewChild('confirmDuplicatePopup', { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
 
     action: string = 'create';
 
@@ -140,8 +141,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
         } else if (this.action === 'copy') {
             if (this.detectRequestChange(this.selectedRequest, body)) {
                 this.isDupplicate = true;
-                this.bodyConfirm = 'Data already exists, do you want to save or not ?';
-                this.confirmPopup.show();
+                this.confirmDuplicatePopup.show();
             } else {
                 this.isDupplicate = false;
                 this.onRequest.emit(body);  // * create new request
@@ -173,7 +173,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     }
 
     checkRequestAdvancePayment(advRequest: AdvancePaymentRequest) {
-        this._accoutingRepo.checkShipmentsExistInAdvancePament(Object.assign({}, this.selectedShipmentData, { advanceNo: advRequest.advanceNo}))
+        this._accoutingRepo.checkShipmentsExistInAdvancePament(Object.assign({}, this.selectedShipmentData, { advanceNo: advRequest.advanceNo }))
             .pipe(
                 catchError(this.catchError)
             )
@@ -239,8 +239,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     }
 
     onCancel() {
-        this.bodyConfirm = 'Do you want to exit ?';
-        this.confirmPopup.show();
+        this.exitPopup.show();
     }
 
     resetForm() {
@@ -275,8 +274,14 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     }
 
     onSubmitExitPopup() {
-        this.confirmPopup.hide();
         this.hide();
+        this.exitPopup.hide();
+        this.resetForm();
+    }
+
+    onSubmitDuplicatePopup() {
+        this.hide();
+        this.confirmDuplicatePopup.hide();
         if (this.isDupplicate) {
             this.onComfirmSaveDupplicateRequestAdvancePayment(this.form);
         }
