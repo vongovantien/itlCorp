@@ -1,0 +1,72 @@
+AdvID	String	50	
+RefNo	String	50	
+AdvDate	Date		
+AdvTo	String	150	
+AdvContactID	String	50	
+AdvContact	String	50	
+AdvAddress	String	50	
+AdvValue	Number		
+AdvCurrency	String	50	
+AdvCondition	String	255	
+AdvRef	String	50	
+AdvHBL	String	50	
+AdvPaymentDate	Date		
+AdvPaymentNote	String	150	
+AdvDpManagerID	String	50	
+AdvDpManagerStickDeny	Boolean		
+AdvDpManagerStickApp	Boolean		
+AdvDpManagerName	String	50	
+AdvDpSignDate	Date		
+AdvAcsDpManagerID	String	50	
+AdvAcsDpManagerStickDeny	Boolean		
+AdvAcsDpManagerStickApp	Boolean		
+AdvAcsDpManagerName	String	50	
+AdvAcsSignDate	Date		
+AdvBODID	String	50	
+AdvBODStickDeny	Boolean		
+AdvBODStickApp	Boolean		
+AdvBODName	String	50	
+AdvBODSignDate	Date		
+AdvCashier	String	50	
+AdvCashierName	String	50	
+CashedDate	Date		
+Saved	Boolean		
+SettleNo	String	50	
+PaidDate	Date		
+AmountSettle	Number		
+SettleCurrency	String	50	
+ClearStatus	Boolean		
+Status	String	255	
+AcsApproval	Boolean		
+Description	String	255	
+JobNo	String	50	
+MAWB	String	50	
+Amount	Number		
+Currency	String	50	
+ExchangeRate	Number		
+TotalAmount	Number		
+PaymentDate	Date		
+InvoiceNo	String	50	
+CustomID	String	255	
+HBLNO	String	255	
+Norm	Boolean		
+Validfee	Boolean		
+Others	Boolean		
+CSApp	Boolean		
+CSDecline	Boolean		
+CSUser	String	255	
+CSAppDate	Date		
+Customer	String	255	
+Shipper	String	255	
+Consignee	String	255	
+ContQty	String	255	
+Noofpieces	Number		
+UnitPieaces	String	255	
+GW	Number		
+NW	Number		
+CBM	Number		
+ServiceType	String	255	
+AdvCSName	String	255	
+AdvCSSignDate	Date		
+AdvCSStickApp	Boolean		
+AdvCSStickDeny	Boolean		

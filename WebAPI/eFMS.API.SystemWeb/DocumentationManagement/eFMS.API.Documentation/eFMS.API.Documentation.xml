@@ -88,6 +88,20 @@
             <param name="model">object to update</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctAdvancePaymentController.PreviewAdvancePaymentRequest(System.Guid)">
+            <summary>
+            Preview Advance Payment Request By Advance Id
+            </summary>
+            <param name="advanceId">advanceId that want to retrieve preview advance payment request</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctAdvancePaymentController.PreviewAdvancePaymentRequest(eFMS.API.Documentation.DL.Models.AcctAdvancePaymentModel)">
+            <summary>
+            Preview Advance Payment Request
+            </summary>
+            <param name="advance"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.AcctSOAController">
             <summary>
             A base class for an MVC controller without view support.

@@ -1,4 +1,5 @@
-﻿using eFMS.API.Documentation.DL.Common;
+﻿using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
@@ -32,5 +33,10 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState DeleteAdvancePayment(string advanceNo);
 
         HandleState UpdateAdvancePayment(AcctAdvancePaymentModel model);
+
+        Crystal Preview(Guid advanceId);
+
+        Crystal Preview(AcctAdvancePaymentModel advance);
+
     }
 }

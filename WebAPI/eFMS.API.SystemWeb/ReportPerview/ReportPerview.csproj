@@ -291,6 +291,7 @@
     <Content Include="Reports\LogisticsDebitNewDNTT.rpt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Reports\AdvancePaymentRequest.rpt" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
