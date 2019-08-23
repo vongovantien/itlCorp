@@ -70,7 +70,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
         this.types = [
             { title: 'Norm', value: 'Norm' },
             { title: 'Invoice', value: 'Invoice' },
-            { title: 'Other', value: 'other' },
+            { title: 'Other', value: 'Other' },
         ];
 
         this.type.setValue(this.types[2]);
@@ -107,7 +107,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             amount: data.amount,
             note: data.requestNote,
             customNo: !!data.customNo ? this.initCD.filter((item: CustomDeclaration) => item.clearanceNo === data.customNo)[0] : null,
-            type: this.types.filter((type: any) => type.value === data.advanceType)[0],
+            type: this.types.filter((type: any) => type.value.toLowerCase() === data.advanceType.toLowerCase())[0],
             currency: data.requestCurrency
         });
 
@@ -137,7 +137,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             advanceNo: this.selectedShipmentData.advanceNo || null
         });
         if (this.action === 'create') {
-            this.checkRequestAdvancePayment(body);
+            this.checkRequestAdvancePayment(body, null);
         } else if (this.action === 'copy') {
             if (this.detectRequestChange(this.selectedRequest, body)) {
                 this.isDupplicate = true;
@@ -148,7 +148,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
                 this.hide();
             }
         } else {
-            this.checkRequestAdvancePayment(body);
+            this.checkRequestAdvancePayment(body, body.advanceNo);
         }
     }
 
@@ -172,8 +172,8 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             );
     }
 
-    checkRequestAdvancePayment(advRequest: AdvancePaymentRequest) {
-        this._accoutingRepo.checkShipmentsExistInAdvancePament(Object.assign({}, this.selectedShipmentData, { advanceNo: advRequest.advanceNo }))
+    checkRequestAdvancePayment(advRequest: AdvancePaymentRequest, advNo: string) {
+        this._accoutingRepo.checkShipmentsExistInAdvancePament(Object.assign({}, this.selectedShipmentData, { advanceNo: advNo }))
             .pipe(
                 catchError(this.catchError)
             )
