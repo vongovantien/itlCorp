@@ -292,6 +292,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Reports\AdvancePaymentRequest.rpt" />
+    <Content Include="Reports\AdvancePaymentRequest.ttx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

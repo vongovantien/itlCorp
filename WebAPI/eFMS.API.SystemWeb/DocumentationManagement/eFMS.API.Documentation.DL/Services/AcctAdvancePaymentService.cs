@@ -533,7 +533,7 @@ namespace eFMS.API.Documentation.DL.Services
                 //Lấy ra chuỗi CustomNo
                 foreach (var customNo in advance.AdvanceRequests.Select(x => x.CustomNo))
                 {
-                    strCustomNo += (!string.IsNullOrEmpty(customNo) ? customNo : "N/A") + ",";
+                    strCustomNo += !string.IsNullOrEmpty(customNo) ? customNo + "," : "";
                 }
 
                 strJobId += ")";
@@ -541,19 +541,23 @@ namespace eFMS.API.Documentation.DL.Services
                 strHbl += ")";
                 strHbl = strHbl.Replace(",)", "");
                 strCustomNo += ")";
-                strCustomNo = strCustomNo.Replace(",)", "");
+                strCustomNo = strCustomNo.Replace(",)", "").Replace(")","");
             }
 
-            
+            //Lấy ra tên requester
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var employeeId = dc.SysUser.Where(x => x.Id == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
+            var requesterName = dc.SysEmployee.Where(x=>x.Id == employeeId).Select(x=>x.EmployeeNameVn).FirstOrDefault();
+
             var acctAdvance = new AdvancePaymentRequestReport
             {
                 AdvID = advance.AdvanceNo,
                 RefNo = "N/A",
-                AdvDate = advance.RequestDate,
+                AdvDate = advance.RequestDate.Value.Date,
                 AdvTo = "N/A",
                 AdvContactID = "N/A",
-                AdvContact = advance.Requester,//cần lấy ra username
-                AdvAddress = "N/A",
+                AdvContact = requesterName,//cần lấy ra username
+                AdvAddress = "",
                 AdvValue = advance.AdvanceRequests.Sum(x=>x.Amount),
                 AdvCurrency = advance.AdvanceCurrency,
                 AdvCondition = advance.AdvanceNote,
@@ -594,7 +598,7 @@ namespace eFMS.API.Documentation.DL.Services
                 Currency = "N/A",
                 ExchangeRate = 0,
                 TotalAmount = 0,
-                PaymentDate = advance.DeadlinePayment,
+                PaymentDate = advance.DeadlinePayment.Value.Date,
                 InvoiceNo = "N/A",
                 CustomID = strCustomNo,
                 HBLNO = "N/A",
@@ -618,7 +622,10 @@ namespace eFMS.API.Documentation.DL.Services
                 AdvCSName = "",
                 AdvCSSignDate = null,
                 AdvCSStickApp = null,
-                AdvCSStickDeny = null
+                AdvCSStickDeny = null,
+                TotalNorm = advance.AdvanceRequests.Where(x => x.AdvanceType == "Norm").Sum(x => x.Amount),
+                TotalInvoice = advance.AdvanceRequests.Where(x => x.AdvanceType == "Invoice").Sum(x => x.Amount),
+                TotalOrther = advance.AdvanceRequests.Where(x => x.AdvanceType == "Other").Sum(x => x.Amount)
             };
 
             var listAdvance = new List<AdvancePaymentRequestReport>
@@ -641,7 +648,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 CompanyName = "INDO TRANS LOGISTICS CORPORATION‎",
                 CompanyAddress1 = "52‎-‎54‎-‎56 ‎Truong Son St‎.‎, ‎Tan Binh Dist‎.‎, ‎HCM City‎, ‎Vietnam‎",
-                CompanyAddress2 = "N/A",
+                CompanyAddress2 = "",
                 Website = "www‎.‎itlvn‎.‎com‎",
                 Contact = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎",
                 Inword = _inword
@@ -703,7 +710,7 @@ namespace eFMS.API.Documentation.DL.Services
                 //Lấy ra chuỗi CustomNo
                 foreach (var customNo in advance.AdvanceRequests.Select(x => x.CustomNo))
                 {
-                    strCustomNo += (!string.IsNullOrEmpty(customNo) ? customNo : "N/A") + ",";
+                    strCustomNo += !string.IsNullOrEmpty(customNo) ? customNo + "," : "";
                 }
 
                 strJobId += ")";
@@ -714,15 +721,20 @@ namespace eFMS.API.Documentation.DL.Services
                 strCustomNo = strCustomNo.Replace(",)", "");
             }
 
+            //Lấy ra tên requester
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var employeeId = dc.SysUser.Where(x => x.Id == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
+            var requesterName = dc.SysEmployee.Where(x => x.Id == employeeId).Select(x => x.EmployeeNameVn).FirstOrDefault();
+
             var acctAdvance = new AdvancePaymentRequestReport
             {
                 AdvID = advance.AdvanceNo,
                 RefNo = "N/A",
-                AdvDate = advance.RequestDate,
+                AdvDate = advance.RequestDate.Value.Date,
                 AdvTo = "N/A",
                 AdvContactID = "N/A",
-                AdvContact = advance.Requester,//cần lấy ra username
-                AdvAddress = "N/A",
+                AdvContact = requesterName,
+                AdvAddress = "",
                 AdvValue = advance.AdvanceRequests.Sum(x => x.Amount),
                 AdvCurrency = advance.AdvanceCurrency,
                 AdvCondition = advance.AdvanceNote,
@@ -763,7 +775,7 @@ namespace eFMS.API.Documentation.DL.Services
                 Currency = "N/A",
                 ExchangeRate = 0,
                 TotalAmount = 0,
-                PaymentDate = advance.DeadlinePayment,
+                PaymentDate = advance.DeadlinePayment.Value.Date,
                 InvoiceNo = "N/A",
                 CustomID = strCustomNo,
                 HBLNO = "N/A",
@@ -787,7 +799,10 @@ namespace eFMS.API.Documentation.DL.Services
                 AdvCSName = "",
                 AdvCSSignDate = null,
                 AdvCSStickApp = null,
-                AdvCSStickDeny = null
+                AdvCSStickDeny = null,
+                TotalNorm = advance.AdvanceRequests.Where(x=>x.AdvanceType == "Norm").Sum(x=>x.Amount),
+                TotalInvoice = advance.AdvanceRequests.Where(x => x.AdvanceType == "Invoice").Sum(x => x.Amount),
+                TotalOrther = advance.AdvanceRequests.Where(x => x.AdvanceType == "Other").Sum(x => x.Amount)
             };
 
             var listAdvance = new List<AdvancePaymentRequestReport>
@@ -797,7 +812,6 @@ namespace eFMS.API.Documentation.DL.Services
 
             //Chuyển tiền Amount thành chữ
             decimal _amount = acctAdvance.AdvValue.HasValue ? acctAdvance.AdvValue.Value : 0;
-            //decimal _amount = 30291920291102;
 
             var _currency = advance.AdvanceCurrency == "VND" ?
                        (_amount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
@@ -809,7 +823,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 CompanyName = "INDO TRANS LOGISTICS CORPORATION‎",
                 CompanyAddress1 = "52‎-‎54‎-‎56 ‎Truong Son St‎.‎, ‎Tan Binh Dist‎.‎, ‎HCM City‎, ‎Vietnam‎",
-                CompanyAddress2 = "N/A",
+                CompanyAddress2 = "‎",
                 Website = "www‎.‎itlvn‎.‎com‎",
                 Contact = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎",
                 Inword = _inword
