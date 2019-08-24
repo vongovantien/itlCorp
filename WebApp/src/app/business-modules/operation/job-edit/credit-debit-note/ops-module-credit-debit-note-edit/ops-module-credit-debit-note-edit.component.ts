@@ -27,6 +27,7 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
     checkAllCharge: boolean = false;
     currentCDNo: String = '';
     currentJob: OpsTransaction;
+    // currentPartnerId: String = '';
 
     totalCredit: number = 0;
     totalDebit: number = 0;
@@ -44,6 +45,7 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
 
     async getListCharges(partnerId: String) {
         const listCharges = [];
+        // this.currentPartnerId = partnerId;
         const cdNo = this.currentCDNo;
         this.listChargeOfPartner = await this.baseServices.getAsync(this.api_menu.Documentation.CsShipmentSurcharge.getChargesByPartner + "?Id=" + this.currentJob.hblid + "&partnerID=" + partnerId + "&IsHouseBillId=true");
         this.listChargeOfPartner = map(this.listChargeOfPartner, function (o) {
@@ -86,21 +88,6 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
                         }
                     }
                 }
-                // // else {
-                // //     if (o.listCharges[i].debitNo === cdNo || o.listCharges[i].creditNo === cdNo) {
-                // //         o.listCharges[i].isSelected = false;
-                // //         o.listCharges[i].isRemaining = false;
-                // //     }
-                // // }
-                // else if (o.listCharges[i].type === "OBH") {
-                //     if ((o.listCharges[i].payerId === partnerId && o.listCharges[i].creditNo !== null)
-                //         || (o.listCharges[i].paymentObjectId === partnerId && o.listCharges[i].debitNo !== null)) {
-                //         o.listCharges[i].isRemaining = true;
-                //     }
-                // }
-                // else {
-                //     o.listCharges[i].isRemaining = false;
-                // }
                 listCharges.push(o.listCharges[i]);
             }
             return o;
@@ -114,16 +101,6 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
         this.totalDebit = 0;
         for (let i = 0; i < this.listChargeOfPartner[0].listCharges.length; i++) {
             const c = this.listChargeOfPartner[0].listCharges[i];
-            // if (c["isSelected"]) {
-            //     if (c.type === "BUY" || c.type === "LOGISTIC" || (c.type === "OBH" && this.EditingCDNote.partnerId === c.payerId)) {
-            //         // calculate total credit
-            //         this.totalCredit += (c.total * c.exchangeRate);
-            //     }
-            //     if (c.type === "SELL" || (c.type === "OBH" && this.EditingCDNote.partnerId === c.receiverId)) {
-            //         // calculate total debit 
-            //         this.totalDebit += (c.total * c.exchangeRate);
-            //     }
-            // }
             if (!c["isRemaining"]) {
                 if (c.type === "BUY" || c.type === "LOGISTIC" || (c.type === "OBH" && this.EditingCDNote.partnerId === c.payerId)) {
                     // calculate total credit
@@ -163,17 +140,25 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
         if (this.listChargeOfPartner.length > 0) {
             if (this.listChargeOfPartner[0].listCharges != null) {
                 this.listChargeOfPartner[0].listCharges.forEach(element => {
-                    // element.isSelected = false;
-                    // if (element.isRemaining === false) {
-                    //     element.isRemaining = true;
-                    // }
                     if (element.isSelected === true) {
+                        if (element.type === "OBH") {
+                            if (element.payerId === this.EditingCDNote.partnerId) {
+                                element.creditNo = null;
+                            }
+                            if (element.paymentObjectId === this.EditingCDNote.partnerId) {
+                                element.debitNo = null;
+                            }
+                        }
+                        if (element.type === "SELL") {
+                            element.debitNo = null;
+                        }
+                        if (element.type === "BUY") {
+                            element.creditNo = null;
+                        }
                         element.isRemaining = true;
                         element.isSelected = false;
                     }
                 });
-                // this.totalCredit = 0;
-                // this.totalDebit = 0;
             }
         }
         this.totalCreditDebitCalculate();
@@ -184,6 +169,20 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
             const listNewCharges = event;
             listNewCharges.forEach(x => {
                 if (this.listChargeOfPartner[0].listCharges.filter(x => x.id === x.id).length > 0) {
+                    if (x.type === "OBH") {
+                        if (x.payerId === this.EditingCDNote.partnerId) {
+                            x.creditNo = this.currentCDNo;
+                        }
+                        if (x.paymentObjectId === this.EditingCDNote.partnerId) {
+                            x.debitNo = this.currentCDNo;
+                        }
+                    }
+                    if (x.type === "SELL") {
+                        x.debitNo = this.currentCDNo;
+                    }
+                    if (x.type === "BUY") {
+                        x.creditNo = this.currentCDNo;
+                    }
                     x.isSelected = false;
                 }
             });
@@ -207,10 +206,10 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
         this.EditingCDNote.total = this.totalDebit - this.totalCredit;
         this.EditingCDNote.jobId = this.currentJob.id;
         this.EditingCDNote.currencyId = "USD"; // in the future , this id must be local currency of each country
-        this.EditingCDNote.listShipmentSurcharge = filter(this.EditingCDNote.listShipmentSurcharge, function (o: any) {
-            // return !o.isRemaining && o.isSelected;
-            return !o.isRemaining;
-        });
+        // this.EditingCDNote.listShipmentSurcharge = filter(this.EditingCDNote.listShipmentSurcharge, function (o: any) {
+        //     // return !o.isRemaining && o.isSelected;
+        //     return !o.isRemaining;
+        // });
         if (this.EditingCDNote.listShipmentSurcharge.length > 0) {
             console.log(this.EditingCDNote);
             const res = await this.baseServices.putAsync(this.api_menu.Documentation.AcctSOA.update, this.EditingCDNote);

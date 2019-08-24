@@ -1,10 +1,11 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 
 @Component({
     selector: 'confirm-popup',
     templateUrl: './confirm.popup.html',
-    styleUrls: ['./confirm.popup.scss']
+    styleUrls: ['./confirm.popup.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ConfirmPopupComponent extends PopupBase {
 

@@ -131,43 +131,54 @@ namespace eFMS.API.Documentation.DL.Services
                 if (stt.Success)
                 {
                     //var chargesOfCDNote = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Cdno == cdNote.Code).ToList(); ---to continue
-                    var chargesOfCDNote = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code).ToList();
-                    foreach (var item in chargesOfCDNote)
-                    {
-                        //item.Cdno = null; -- to continue
-                        item.CreditNo = null;
-                        item.DebitNo = null;
-                    }
+                    //var chargesOfCDNote = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code).ToList();
+                    //foreach (var item in chargesOfCDNote)
+                    //{
+                    //    item.CreditNo = null;
+                    //    item.DebitNo = null;
+                    //}
                     foreach (var item in model.listShipmentSurcharge)
                     {
-                        var charge = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.FirstOrDefault(x => x.Id == item.Id);
-                        if (charge != null)
-                        {
-                            //charge.Cdno = cdNote.Code; -- to continue
-                            if (charge.Type == "BUY")
-                            {
-                                charge.CreditNo = cdNote.Code;
-                            }
-                            else if (charge.Type == "SELL")
-                            {
-                                charge.DebitNo = cdNote.Code;
-                            }
-                            else
-                            {
-                                if (model.PartnerId == charge.PaymentObjectId)
-                                {
-                                    charge.DebitNo = cdNote.Code;
-                                }
-                                if (model.PartnerId == charge.PayerId)
-                                {
-                                    charge.CreditNo = cdNote.Code;
-                                }
-                            }
-                            charge.Cdclosed = true;
-                            charge.DatetimeModified = DateTime.Now;
-                            charge.UserModified = currentUser.UserID; // need update in the future 
-                            ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Update(charge);
-                        }
+                        //var charge = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.FirstOrDefault(x => x.Id == item.Id);
+                        //if (charge != null)
+                        //{
+                        //    //charge.Cdno = cdNote.Code; -- to continue
+                        //    //if (charge.Type == "BUY")
+                        //    //{
+                        //    //    charge.CreditNo = cdNote.Code;
+                        //    //}
+                        //    //else if (charge.Type == "SELL")
+                        //    //{
+                        //    //    charge.DebitNo = cdNote.Code;
+                        //    //}
+                        //    //else
+                        //    //{
+                        //    //    if (model.PartnerId == charge.PaymentObjectId)
+                        //    //    {
+                        //    //        charge.DebitNo = cdNote.Code;
+                        //    //        if(item.CreditNo != null)
+                        //    //        {
+                        //    //            charge.CreditNo = item.CreditNo;
+                        //    //        }
+                        //    //    }
+                        //    //    if (model.PartnerId == charge.PayerId)
+                        //    //    {
+                        //    //        charge.CreditNo = cdNote.Code;
+                        //    //        if(item.DebitNo != null)
+                        //    //        {
+                        //    //            charge.DebitNo = item.DebitNo;
+                        //    //        }
+                        //    //    }
+                        //    //}
+                        //    charge.Cdclosed = true;
+                        //    charge.DatetimeModified = DateTime.Now;
+                        //    charge.UserModified = currentUser.UserID; // need update in the future 
+                        //    ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Update(charge);
+                        //}
+                        item.Cdclosed = true;
+                        item.DatetimeModified = DateTime.Now;
+                        item.UserModified = currentUser.UserID; // need update in the future 
+                        ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Update(item);
                     }
                     var jobOpsTrans = ((eFMSDataContext)DataContext.DC).OpsTransaction.FirstOrDefault();
                     if(jobOpsTrans != null)

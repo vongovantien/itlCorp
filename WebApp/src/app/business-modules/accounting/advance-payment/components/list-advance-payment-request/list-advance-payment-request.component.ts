@@ -28,6 +28,7 @@ export class AdvancePaymentListRequestComponent extends AppList {
 
     totalAmount: number = 0;
     currency: string = 'VND';
+    advanceNo: string = '';
 
     constructor(
         private _sortService: SortService,
@@ -75,6 +76,7 @@ export class AdvancePaymentListRequestComponent extends AppList {
         this.selectedRequestAdvancePayment = new AdvancePaymentRequest(request);
         this.addNewRequestPaymentPopup.action = 'copy';
         this.addNewRequestPaymentPopup.selectedRequest = request;
+        this.addNewRequestPaymentPopup.advanceNo = this.advanceNo;
 
         this.addNewRequestPaymentPopup.initFormUpdate(this.selectedRequestAdvancePayment);
         this.addNewRequestPaymentPopup.show({ backdrop: 'static' });
@@ -85,14 +87,16 @@ export class AdvancePaymentListRequestComponent extends AppList {
         this.selectedIndexRequest = index;   // * index request adv in list
         this.addNewRequestPaymentPopup.action = 'update';
         this.addNewRequestPaymentPopup.selectedRequest = request;
+        this.addNewRequestPaymentPopup.advanceNo = this.advanceNo;
 
         this.addNewRequestPaymentPopup.initFormUpdate(this.selectedRequestAdvancePayment);
         this.addNewRequestPaymentPopup.show({ backdrop: 'static' });
     }
 
     onRequestAdvancePaymentChange(dataRequest: AdvancePaymentRequest) {
+        // * update advance no for new requestAdv and 
         // * create or copy emit new item to $dataRequest and update amount, currency.
-        this.$dataRequest.next(dataRequest);
+        this.$dataRequest.next(Object.assign({}, dataRequest, { advanceNo: !!this.selectedRequestAdvancePayment ? this.selectedRequestAdvancePayment.advanceNo : ''}));
 
         this.totalAmount = this.updateTotalAmount(this.listRequestAdvancePayment);
         this.updateCurrencyForRequest(dataRequest);
@@ -101,7 +105,6 @@ export class AdvancePaymentListRequestComponent extends AppList {
     onUpdateRequestAdvancePayment(dataRequest: AdvancePaymentRequest) {
         if (!isNaN(this.selectedIndexRequest)) {
             this.listRequestAdvancePayment[this.selectedIndexRequest] = dataRequest;
-
             this.totalAmount = this.updateTotalAmount(this.listRequestAdvancePayment);
             this.updateCurrencyForRequest(dataRequest);
         }
@@ -109,6 +112,7 @@ export class AdvancePaymentListRequestComponent extends AppList {
 
     openPopupAdd() {
         this.addNewRequestPaymentPopup.action = 'create';
+        this.addNewRequestPaymentPopup.advanceNo = this.advanceNo;
         this.addNewRequestPaymentPopup.show({ backdrop: 'static' });
     }
 

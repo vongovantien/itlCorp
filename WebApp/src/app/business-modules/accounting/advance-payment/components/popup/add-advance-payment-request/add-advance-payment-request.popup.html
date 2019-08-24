@@ -114,5 +114,8 @@
     </div>
 </div>
 
-<confirm-popup (onSubmit)="onSubmitExitPopup()" [title]="'Warning'" [body]="bodyConfirm" [labelCancel]="'No'">
+<confirm-popup #confirmDuplicatePopup (onSubmit)="onSubmitDuplicatePopup()" [title]="'Warning'" [body]="'Data already exists, do you want to save or not ?'" [labelCancel]="'No'" >
+</confirm-popup>
+
+<confirm-popup #exitPopup (onSubmit)="onSubmitExitPopup()" [title]="'Warning'" [body]="'Do you want to exit ?'" [labelCancel]="'No'">
 </confirm-popup>
