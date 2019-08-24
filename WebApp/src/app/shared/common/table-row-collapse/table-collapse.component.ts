@@ -16,6 +16,5 @@ export class TableCollapseComponent extends AppPage {
     }
 
     ngOnInit() {
-        this.subscribseStateCollapse().subscribe(i => console.log(i));
     }
 }
