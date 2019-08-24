@@ -14,12 +14,14 @@ import { SearchStage, FilterPipe, NegativeNumberePipe, EqualErrorPipe } from "./
 import { InfoPopupComponent, ConfirmPopupComponent } from "./common/popup";
 import { DecimalNumberGreaterThan0Directive, StyleCellDirective, AutofocusDirective, TwoDigitDecimaNumberDirective, ThreeDigitDecimaNumberDirective, IntergerInputDirective, SpecialCharacterDirective, EcusSpecicalCharacterAllowSpaceDirective, EcusSpecicalCharacterNoSpaceDirective, ClickOutSideDirective } from "./directives";
 
-import { PaginationComponent, TableLayoutComponent, InputTableLayoutComponent, BreadcrumbComponent, DefaultButtonComponent, DeleteConfirmModalComponent, SearchOptionsComponent, InputFormComponent, TableDetailComponent, CloseModalButtonComponent, ReportPreviewComponent, ComboGridVirtualScrollComponent, CfBeforeLeaveModalComponent, AppMultipleSelectComponent } from "./common";
+import { PaginationComponent, TableLayoutComponent, InputTableLayoutComponent, BreadcrumbComponent, DefaultButtonComponent, DeleteConfirmModalComponent, SearchOptionsComponent, InputFormComponent, TableDetailComponent, CloseModalButtonComponent, ReportPreviewComponent, ComboGridVirtualScrollComponent, CfBeforeLeaveModalComponent, AppMultipleSelectComponent, TableCollapseComponent } from "./common";
+import { CollapseModule } from "ngx-bootstrap/collapse";
 
 const Libary = [
   ModalModule,
   SelectModule,
   ScrollingModule,
+  CollapseModule
 ];
 
 const APP_PIPES = [
@@ -49,6 +51,7 @@ const APP_COMPONENTS = [
   ComboGridVirtualScrollComponent,
   CfBeforeLeaveModalComponent,
   AppMultipleSelectComponent,
+  TableCollapseComponent,
   ...APP_POPUP
 ];
 
