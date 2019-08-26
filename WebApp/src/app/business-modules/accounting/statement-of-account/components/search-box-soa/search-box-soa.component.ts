@@ -8,7 +8,6 @@ import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { Currency, Partner, User } from 'src/app/shared/models';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { BaseService, SortService, DataService } from 'src/app/shared/services';
-import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { SystemConstants } from 'src/constants/system.const';
 
@@ -95,7 +94,9 @@ export class StatementOfAccountSearchComponent extends AppPage {
                     this._dataService.setData(SystemConstants.CSTORAGE.SYSTEM_USER, dataSystemUser);
                 },
                 (errors: any) => {
-                    this.handleError(errors);
+                    this.handleError(errors, (data: any) => {
+                        this._toastService.error(data.message, data.title);
+                    });
                 },
                 // complete
                 () => { }
@@ -166,15 +167,4 @@ export class StatementOfAccountSearchComponent extends AppPage {
         // ? search again!
         this.onSearch.emit({});
     }
-
-    handleError(errors: any) {
-        let message: string = 'Has Error Please Check Again !';
-        let title: string = '';
-        if (errors instanceof HttpErrorResponse) {
-            message = errors.message;
-            title = errors.statusText;
-        }
-        this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
-    }
-
 }

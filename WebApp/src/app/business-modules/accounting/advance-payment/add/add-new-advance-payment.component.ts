@@ -74,10 +74,17 @@ export class AdvancePaymentAddNewComponent extends AppPage {
 
                             //  * go to detail page
                             this._router.navigate([`home/accounting/advance-payment/${res.data.id}`]);
-
+                        } else {
+                            this.handleError(null, (data: any) => {
+                                this._toastService.error(data.message, data.title);
+                            });
                         }
                     },
-                    (errors: any) => { },
+                    (errors: any) => {
+                        this.handleError(errors, (data: any) => {
+                            this._toastService.error(data.message, data.title);
+                        });
+                    },
                     () => { }
                 );
         }

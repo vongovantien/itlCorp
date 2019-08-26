@@ -3,7 +3,6 @@ import { StatementOfAccountAddChargeComponent } from '../components/poup/add-cha
 import { AccoutingRepo, SystemRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { SOA, SOASearchCharge, Charge } from 'src/app/shared/models';
-import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppList } from 'src/app/app.list';
@@ -128,7 +127,9 @@ export class StatementOfAccountEditComponent extends AppList {
 
                 },
                 (errors: any) => {
-                    this.handleError(errors);
+                    this.handleError(errors, (data: any) => {
+                        this._toastService.error(data.message, data.title);
+                    });
                 },
                 () => { }
             );
@@ -152,7 +153,9 @@ export class StatementOfAccountEditComponent extends AppList {
                                     this.currencyList = dataCurrency;
                                 },
                                 (errors: any) => {
-                                    this.handleError(errors);
+                                    this.handleError(errors, (data: any) => {
+                                        this._toastService.error(data.message, data.title);
+                                    });
                                 },
                                 // complete
                                 () => { }
@@ -199,16 +202,6 @@ export class StatementOfAccountEditComponent extends AppList {
             { field: 'chargeNameEn', label: 'Charge Name EN ' },
         ];
         this.configCharge.selectedDisplayFields = ['code'];
-    }
-
-    handleError(errors: any) {
-        let message: string = 'Has Error Please Check Again !';
-        let title: string = '';
-        if (errors instanceof HttpErrorResponse) {
-            message = errors.message;
-            title = errors.statusText;
-        }
-        this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
     }
 
     sortChargeList(sortField?: string, order?: boolean) {
