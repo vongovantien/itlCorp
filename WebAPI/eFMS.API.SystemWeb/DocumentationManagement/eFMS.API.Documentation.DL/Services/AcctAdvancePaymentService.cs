@@ -486,7 +486,8 @@ namespace eFMS.API.Documentation.DL.Services
                 return hs;
             }
         }
-        
+
+        #region PREVIEW ADVANCE PAYMENT
         public Crystal Preview(Guid advanceId)
         {
             Crystal result = null;
@@ -840,6 +841,163 @@ namespace eFMS.API.Documentation.DL.Services
             result.SetParameter(parameter);
             return result;
         }
+        #endregion PREVIEW ADVANCE PAYMENT
+
+        #region APPROVAL ADVANCE PAYMENT
+        //Inset Or Update AcctApproveAdvance by AdvanceNo
+        private bool InsertOrUpdateApproveAdvance(AcctApproveAdvance acctApprove)
+        {
+            try
+            {
+                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                var checkExistsApproveByAdvanceNo = dc.AcctApproveAdvance.Where(x => x.AdvanceNo == acctApprove.AdvanceNo).FirstOrDefault();
+                if (checkExistsApproveByAdvanceNo == null) //Insert AcctApproveAdvance
+                {
+                    acctApprove.Id = Guid.NewGuid();
+                    acctApprove.UserCreated = acctApprove.UserModified = "admin";
+                    acctApprove.DateCreated = acctApprove.DateModified = DateTime.Now;
+                    dc.AcctApproveAdvance.Add(acctApprove);
+                }
+                else //Update AcctApproveAdvance by AdvanceNo
+                {
+                    acctApprove.UserCreated = checkExistsApproveByAdvanceNo.UserCreated;
+                    acctApprove.DateCreated = checkExistsApproveByAdvanceNo.DateCreated;
+                    dc.AcctApproveAdvance.Update(acctApprove);
+                }
+                dc.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+        
+        //Lấy ra các thông tin của leader, manager department, accountant manager, BUHead
+        private AcctApproveAdvance GetUsersApproveByDepartment(string dept)
+        {
+            var approver = new AcctApproveAdvance {
+                Requester = "",
+                Leader = "",
+                Manager = "",
+                Buhead = ""
+            };
+            return approver;
+        }
+
+        //Lấy ra ds các user được ủy quyền theo nhóm leader, manager department, accountant manager, BUHead
+        
+
+        //Check group trước đó đã được approve hay chưa? Nếu group trước đó đã approve thì group hiện tại mới được Approve
+        //Nếu group hiện tại đã được approve thì không cho approve nữa
+        private bool CheckApproved(string advanceNo, string grpOfUser)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+
+            var result = false;
+            //Lấy ra Advance Approval dựa vào advanceNo
+            var acctApprove = dc.AcctApproveAdvance.Where(x => x.AdvanceNo == advanceNo).FirstOrDefault();
+            if (acctApprove == null) return result;
+
+            //Lấy ra Advance Payment dựa vào advanceNo
+            var advance = dc.AcctAdvancePayment.Where(x => x.AdvanceNo == advanceNo).FirstOrDefault();
+            if (advance == null) return result;
+
+            //Trường hợp không có Leader
+            if (string.IsNullOrEmpty(acctApprove.Requester))
+            {
+                //Manager Department Approve
+                if (grpOfUser == "CSManager" || grpOfUser == "SaleManager")
+                {
+                    if (!string.IsNullOrEmpty(acctApprove.Requester) 
+                        && !advance.StatusApproval.Equals("DepartmentManagerApproved"))
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                }
+                
+                //Accountant Approve
+                if (grpOfUser == "AccountantManager")
+                {
+                    if (!string.IsNullOrEmpty(acctApprove.Manager) 
+                        && advance.StatusApproval.Equals("DepartmentManagerApproved")
+                        && !advance.StatusApproval.Equals("AccountantManagerApproved"))
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                }
+            }
+            else //Trường hợp có leader
+            {
+                //grp leader là group mẫu (chưa có tồn tại trong db)
+                //Leader Approve
+                if(grpOfUser == "leader")
+                {
+                    if (!string.IsNullOrEmpty(acctApprove.Requester) 
+                        && !advance.StatusApproval.Equals("LeaderApproved"))
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                }
+                
+                //Manager Department Approve
+                if (grpOfUser == "CSManager" || grpOfUser == "SaleManager")
+                {
+                    if (!string.IsNullOrEmpty(acctApprove.Leader) 
+                        && advance.StatusApproval.Equals("LeaderApproved")
+                        && !advance.StatusApproval.Equals("DepartmentManagerApproved"))
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                }
+                
+                //Accountant Approve
+                if (grpOfUser == "AccountantManager")
+                {
+                    if (!string.IsNullOrEmpty(acctApprove.Manager) 
+                        && advance.StatusApproval.Equals("DepartmentManagerApproved")
+                        && !advance.StatusApproval.Equals("AccountantManagerApproved"))
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        result = false;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        //Update Approve cho từng group
+        public bool UpdateApproval(string advanceNo, string userApprove)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var approve = dc.AcctApproveAdvance.Where(x => x.AdvanceNo == advanceNo).FirstOrDefault();
+
+            return true;
+        }
+
+        //Send Mail
+
+        #endregion APPROVAL ADVANCE PAYMENT
 
     }
 }
