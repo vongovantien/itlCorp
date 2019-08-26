@@ -4,7 +4,7 @@ import { AccoutingRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
-import { SortService, BaseService, DataService } from 'src/app/shared/services';
+import { SortService, BaseService} from 'src/app/shared/services';
 import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
 import { AdvancePayment, AdvancePaymentRequest, User } from 'src/app/shared/models';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
@@ -26,6 +26,8 @@ export class AdvancePaymentComponent extends AppList {
 
     groupRequest: AdvancePaymentRequest[] = [];
     userLogged: User;
+
+    dataSearch: any = {};
 
     constructor(
         private _accoutingRepo: AccoutingRepo,
@@ -66,6 +68,11 @@ export class AdvancePaymentComponent extends AppList {
         ];
         this.getUserLogged();
         this.getListAdvancePayment();
+    }
+
+    onSearchAdvPayment(data: any) {
+        this.dataSearch = data;
+        this.getListAdvancePayment(this.dataSearch);
     }
 
     getListAdvancePayment(dataSearch?: any) {

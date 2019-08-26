@@ -54,9 +54,9 @@ export abstract class AppList extends AppPage {
         }
     }
 
-    selectPageSize(pageSize: number) {
+    selectPageSize(pageSize: number, data?: any) {
         this.pageSize = pageSize;
-        this.requestList();
+        this.requestList(data);
     }
 
 }
