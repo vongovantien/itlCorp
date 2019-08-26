@@ -20,10 +20,7 @@ import { OpsModuleCreditDebitNoteRemainingChargeComponent } from '../job-edit/cr
 import { OpsModuleCreditDebitNoteDetailComponent } from '../job-edit/credit-debit-note/ops-module-credit-debit-note-detail/ops-module-credit-debit-note-detail.component';
 import { OpsModuleCreditDebitNoteEditComponent } from '../job-edit/credit-debit-note/ops-module-credit-debit-note-edit/ops-module-credit-debit-note-edit.component';
 import { OpsModuleStageManagementDetailComponent } from '../job-edit/stage-management/detail/detail-stage-popup.component';
-import { CustomClearanceComponent } from '../custom-clearance/custom-clearance.component';
-import { CustomClearanceAddnewComponent } from '../custom-clearance-addnew/custom-clearance-addnew.component';
-import { CustomClearanceEditComponent } from '../custom-clearance-edit/custom-clearance-edit.component';
-import { CustomClearanceImportComponent } from '../custom-clearance-import/custom-clearance-import.component';
+
 import { OpsModuleStageManagementAddStagePopupComponent } from '../job-edit/stage-management/add/add-stage.popup.component';
 import { NotSelectedAlertModalComponent } from '../job-edit/credit-debit-note/ops-module-credit-debit-note-addnew/not-selected-alert-modal/not-selected-alert-modal.component';
 import { ChangePartnerConfirmModalComponent } from '../job-edit/credit-debit-note/ops-module-credit-debit-note-addnew/change-partner-confirm-modal/change-partner-confirm-modal.component';
