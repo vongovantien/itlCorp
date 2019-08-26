@@ -180,8 +180,20 @@ namespace eFMS.API.Operation.Controllers
         [HttpGet("SendMail")]
         public IActionResult SendEmailMail()
         {
-            List<string> list = new List<string> { "alex.phuong@itlvn.com", "luis.quang@itlvn.com", "cara.oanh@itlvn.com" };
-            if (SendMail.Send("ABC", "ABC", "andy.hoa@itlvn.com", null, list))
+            List<string> list = new List<string> { "andy.hoa@itlvn.com", "alex.phuong@itlvn.com", "luis.quang@itlvn.com", "cara.oanh@itlvn.com" };
+            List<string> tos = new List<string> { "irene.tam@itlvn.com" };
+            string body = "Dear Mr/Mrs [User Name], You have new Advance Payment Approval Request from[Requester Name] as below info:" +
+                "Anh / Chị có một yêu cầu duyệt tạm ứng từ[Tên người đề nghị] với thông tin như sau:" +
+                "• Advance No / Mã tạm ứng : [Mã Advance]" +
+                "• Advance Amount/ Số tiền tạm ứng : [Total Amount của Advance]" +
+                "• Shipments/ Lô hàng : [List Mã shipment của tạm ứng - mỗi mã cách nhau là ';']" +
+                "• Requester/ Người đề nghị : [Full Name của Requester]" +
+                "• Request date/ Thời gian đề nghị : [Ngày request]" +
+                "You click here to check more detail and approve." +
+                "Anh/ Chị chọn vào đây để biết thêm thông tin chi tiết và phê duyệt." +
+                "Thanks and Regards," +
+                "eFMS System";
+            if (SendMail.Send("eFMS - Advance Payment Approval Request from [Requester Name]", body, tos, null, list))
             {
                 return Ok();
             }

@@ -19,7 +19,7 @@ namespace eFMS.API.Common
             string description = "";
             bool result = true;
 
-            MailAddress emailFrom = new MailAddress("dntonetms@itlvn.com");
+            MailAddress emailFrom = new MailAddress("info.fms@itlvn.com");
             MailMessage message = new MailMessage();
 
             message.From = emailFrom;
@@ -66,14 +66,14 @@ namespace eFMS.API.Common
             client.EnableSsl = true;
             client.DeliveryMethod = SmtpDeliveryMethod.Network;
             client.Credentials =
-                new System.Net.NetworkCredential("itl\\dntonetms",
-                    "0TMS@ne2");
+                new System.Net.NetworkCredential("info.fms",
+                    "ITPr0No1!");
             client.Timeout = 300000;
 
             // send message
             try
             {
-                ServicePointManager.ServerCertificateValidationCallback = delegate(object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) { return true; };
+                ServicePointManager.ServerCertificateValidationCallback = delegate (object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) { return true; };
                 client.Send(message);
                 message.Attachments.Dispose();
                 client.Dispose();
@@ -85,18 +85,18 @@ namespace eFMS.API.Common
             }
             finally
             {
-               // InsertEmailHistory(SentUser, Receivers, CCs, "", Subject, result, Description);
+                // InsertEmailHistory(SentUser, Receivers, CCs, "", Subject, result, Description);
             }
             return result;
         }
         public static bool Send(string Subject, string Body, string ToEmail, List<string> Attachments, List<string> EmailCCs)
         {
-            List<string> ToEmails = new List<string>(){ ToEmail };
-            return Send(Subject, Body, ToEmails, Attachments, EmailCCs); 
+            List<string> ToEmails = new List<string>() { ToEmail };
+            return Send(Subject, Body, ToEmails, Attachments, EmailCCs);
         }
         private static DateTime GetDateTime()
         {
-           
+
             return DateTime.Now;
         }
     }
