@@ -7,6 +7,7 @@ import { SOA } from "src/app/shared/models";
 import { ToastrService } from "ngx-toastr";
 import { HttpErrorResponse } from "@angular/common/http";
 import { SortService } from "src/app/shared/services";
+import { NgProgress } from "@ngx-progressbar/core";
 
 @Component({
     selector: 'app-statement-of-account',
@@ -26,11 +27,15 @@ export class StatementOfAccountComponent extends AppList {
     constructor(
         private _accoutingRepo: AccoutingRepo,
         private _toastService: ToastrService,
-        private _sortService: SortService
+        private _sortService: SortService,
+        private _progressService: NgProgress,
+
     ) {
         super();
 
         this.requestSort = this.sortLocal;
+        this.requestList = this.getSOAs;
+        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
@@ -56,9 +61,10 @@ export class StatementOfAccountComponent extends AppList {
     }
 
     onConfirmDeleteSOA() {
+        this._progressRef.start();
         this._accoutingRepo.deleteSOA(this.selectedSOA.soano).pipe(
             catchError(this.catchError),
-            finalize(() => { this.confirmPopup.hide(); })
+            finalize(() => { this.confirmPopup.hide(); this._progressRef.complete(); })
         ).subscribe(
             (res: any) => {
                 this._toastService.success(res.message, '', { positionClass: 'toast-bottom-right' });
@@ -75,10 +81,11 @@ export class StatementOfAccountComponent extends AppList {
 
     getSOAs(data: any = {}) {
         this.isLoading = true;
+        this._progressRef.start();
         this._accoutingRepo.getListSOA(this.page, this.pageSize, Object.assign(data, { CurrencyLocal: 'VND' }))
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { this.isLoading = false; })
+                finalize(() => { this.isLoading = false; this._progressRef.complete(); })
             ).subscribe(
                 (res: any) => {
                     this.SOAs = (res.data || []).map((item: SOA) => new SOA(item));

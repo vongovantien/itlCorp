@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccoutingRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
-import { NgxSpinnerService } from 'ngx-spinner';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { SOA } from 'src/app/shared/models';
@@ -13,6 +12,7 @@ import { Workbook } from "exceljs/dist/exceljs.min.js";
 import fs from 'file-saver';
 import { Worksheet, Cell, Row } from 'exceljs';
 import { formatDate } from '@angular/common';
+import { NgProgress } from '@ngx-progressbar/core';
 @Component({
     selector: 'app-statement-of-account-detail',
     templateUrl: './detail-soa.component.html',
@@ -29,13 +29,16 @@ export class StatementOfAccountDetailComponent extends AppList {
     constructor(
         private _activedRoute: ActivatedRoute,
         private _accoutingRepo: AccoutingRepo,
-        private _spinner: NgxSpinnerService,
         private _toastService: ToastrService,
         private _sortService: SortService,
-        private _router: Router
+        private _router: Router,
+        private _progressService: NgProgress,
+
     ) {
         super();
         this.requestSort = this.sortChargeList;
+        this._progressRef = this._progressService.ref();
+
     }
 
     ngOnInit() {
@@ -63,11 +66,11 @@ export class StatementOfAccountDetailComponent extends AppList {
     }
 
     getDetailSOA(soaNO: string, currency: string) {
-        this._spinner.show();
+        this._progressRef.start();
         this._accoutingRepo.getDetaiLSOA(soaNO, currency)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { this._spinner.hide(); })
+                finalize(() => { this._progressRef.complete(); })
             )
             .subscribe(
                 (res: any) => {
@@ -93,7 +96,7 @@ export class StatementOfAccountDetailComponent extends AppList {
     }
 
     async getDetailSOAExport(soaNO: string) {
-        this._spinner.show();
+        this._progressRef.start();
         try {
             const res: any = await (this._accoutingRepo.getDetailSOAToExport(soaNO, 'VND').toPromise());
             if (!!res) {
@@ -103,7 +106,7 @@ export class StatementOfAccountDetailComponent extends AppList {
             this.handleError(error);
         }
         finally {
-            this._spinner.hide();
+            this._progressRef.complete();
         }
     }
 

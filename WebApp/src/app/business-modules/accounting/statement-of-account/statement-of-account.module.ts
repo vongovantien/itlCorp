@@ -16,6 +16,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import localeVi from '@angular/common/locales/vi';
 import { StatementOfAccountSummaryComponent } from './components/summary/summary-soa.component';
+import { NgProgressModule } from '@ngx-progressbar/core';
 
 registerLocaleData(localeVi, 'vi');
 const routing: Routes = [
@@ -80,6 +81,7 @@ const COMPONENTS = [
         PaginationModule.forRoot(),
         PerfectScrollbarModule,
         AccordionModule.forRoot(),
+        NgProgressModule
     ],
     exports: [],
     providers: [

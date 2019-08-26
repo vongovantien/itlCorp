@@ -37,8 +37,7 @@ export class AdvancePaymentComponent extends AppList {
         super();
         this.requestList = this.getListAdvancePayment;
         this.requestSort = this.sortAdvancePayment;
-
-        this._progressRef = this._progressService.ref('myProgress');
+        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {

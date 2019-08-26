@@ -28,6 +28,7 @@ import { NgxDaterangepickerMd } from "ngx-daterangepicker-material";
 import { ScrollingModule } from "@angular/cdk/scrolling";
 import { AuthInterceptor } from "./auth.interceptor";
 import { GlobalState } from "./global-state";
+import { NgProgressModule } from "@ngx-progressbar/core";
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     // wheelPropagation: true
@@ -64,6 +65,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         }),
         NgxDaterangepickerMd.forRoot(),
         HighchartsChartModule,
+        NgProgressModule
         
     ],
     providers: [

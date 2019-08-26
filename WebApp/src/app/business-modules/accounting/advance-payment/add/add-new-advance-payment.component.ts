@@ -28,7 +28,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
 
     ) {
         super();
-        this._progressRef = this._progressService.ref("myProgress");
+        this._progressRef = this._progressService.ref();
 
     }
 

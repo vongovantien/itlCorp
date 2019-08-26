@@ -18,7 +18,7 @@ export class AdvancePayment {
     advanceDatetimeModified: string = '';
     statusPayment: string = '';
     advanceStatusPayment: string = '';
-    isSelected?: boolean;
+    isSelected: boolean = true;
     advanceRequests: AdvancePaymentRequest[] = [];
     amount: number = 0;
     

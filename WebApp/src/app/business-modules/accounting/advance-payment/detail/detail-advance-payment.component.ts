@@ -35,7 +35,7 @@ export class AdvancePaymentDetailComponent extends AppPage {
         private _progressService: NgProgress
     ) {
         super();
-        this._progressRef = this._progressService.ref("myProgress");
+        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
