@@ -113,7 +113,7 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
     }
     CDNoteDetails: AcctCDNoteDetails = null;
     async openDetails(cdNo: string) {
-        this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.currentJob.id + "&cdNo=" + cdNo);
+        this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?jobId=" + this.currentJob.id + "&cdNo=" + cdNo);
         if (this.CDNoteDetails != null) {
             if (this.CDNoteDetails.listSurcharges != null) {
                 this.totalCreditDebitCalculate();
@@ -156,7 +156,7 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
         this.CDNoteDetails = null;
         console.log(event);
         if (event != null) {
-            this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.currentJob.id + "&cdNo=" + event);
+            this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?jobId=" + this.currentJob.id + "&cdNo=" + event);
             // this.baseServices.setData("CDNoteDetails", event);
             // this.popupEdit.cdNoteDetails = this.CDNoteDetails;
             if (!!this.CDNoteDetails) {
@@ -167,7 +167,7 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
     }
     async closeEditModal(event) {
         console.log(event);
-        this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.currentJob.id + "&cdNo=" + this.CDNoteDetails.cdNote.code);
+        this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?jobId=" + this.currentJob.id + "&cdNo=" + this.CDNoteDetails.cdNote.code);
         if (this.CDNoteDetails != null) {
             if (this.CDNoteDetails.listSurcharges != null) {
                 this.totalCreditDebitCalculate();

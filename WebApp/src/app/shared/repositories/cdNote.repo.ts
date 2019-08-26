@@ -16,6 +16,9 @@ export class CDNoteRepo {
         // return this._api.get(`${environment.HOST.WEB_URL}44366/api/${this.VERSION}/vi/AcctCDNote/Get`, { Id: houseBillId, IsHouseBillID: true });
         return this._api.get(`${environment.HOST.WEB_URL}/${this.MODULE}/api/${this.VERSION}/vi/AcctCDNote/Get`, { Id: houseBillId, IsHouseBillID: true });
     }
+    getDetails(jobId: string, cdNo: String) {
+        return this._api.get(`${environment.HOST.WEB_URL}/${this.MODULE}/api/${this.VERSION}/en-US/AcctCDNote/GetDetails`, { jobId: jobId, cdNo: cdNo });
+    }
 
     getListCustomDeclaration(page: number, pageSize: number, body: any) {
         return this._api.post(`${environment.HOST.WEB_URL}/operation/api/${this.VERSION}/en-US/CustomsDeclaration/Paging`, body, {
