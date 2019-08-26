@@ -2,7 +2,6 @@ import { Component, ViewChild } from '@angular/core';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
-import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';

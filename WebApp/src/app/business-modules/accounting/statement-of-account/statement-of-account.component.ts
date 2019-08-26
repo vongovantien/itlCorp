@@ -5,7 +5,6 @@ import { catchError, finalize } from "rxjs/operators";
 import { AppList } from "src/app/app.list";
 import { SOA } from "src/app/shared/models";
 import { ToastrService } from "ngx-toastr";
-import { HttpErrorResponse } from "@angular/common/http";
 import { SortService } from "src/app/shared/services";
 import { NgProgress } from "@ngx-progressbar/core";
 
@@ -73,7 +72,9 @@ export class StatementOfAccountComponent extends AppList {
                 this.getSOAs();
             },
             (errors: any) => {
-                this.handleError(errors);
+                this.handleError(errors, (data: any) => {
+                    this._toastService.error(data.message, data.title);
+                });
             },
             () => { }
         );
@@ -92,7 +93,9 @@ export class StatementOfAccountComponent extends AppList {
                     this.totalItems = res.totalItems || 0;
                 },
                 (errors: any) => {
-                    this.handleError(errors);
+                    this.handleError(errors, (errorData: any) => {
+                        this._toastService.error(errorData.message, errorData.title);
+                    });
                 },
                 () => { }
 
@@ -101,16 +104,6 @@ export class StatementOfAccountComponent extends AppList {
 
     sortLocal(sort: string): void {
         this.SOAs = this._sortService.sort(this.SOAs, sort, this.order);
-    }
-
-    handleError(errors: any) {
-        let message: string = 'Has Error Please Check Again !';
-        let title: string = '';
-        if (errors instanceof HttpErrorResponse) {
-            message = errors.message;
-            title = errors.statusText;
-        }
-        this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
     }
 
 }
