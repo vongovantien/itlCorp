@@ -75,12 +75,20 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
 
   async closeEditModal(event: any) {
     this.currentCDNo = this.CDNoteDetails.cdNote.code;
-    this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.currentJob.id + "&cdNo=" + this.currentCDNo);
+    // this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.currentJob.id + "&cdNo=" + this.currentCDNo);
+    this.baseServices.get(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.currentJob.id + "&cdNo=" + this.currentCDNo).subscribe((responses: any) => {
+      if (responses) {
+        this.CDNoteDetails = responses;
 
-    this.show();
-    if (this.CDNoteDetails != null) {
-      this.totalCreditDebitCalculate();
-    }
+        if (this.CDNoteDetails != null) {
+          this.show();
+          this.totalCreditDebitCalculate();
+        } else {
+          this.close();
+        }
+      }
+    }, err => {
+    });
   }
   async Preview() {
     this.dataReport = null;
