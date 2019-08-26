@@ -19,7 +19,7 @@ namespace eFMS.API.Common
             string description = "";
             bool result = true;
 
-            MailAddress emailFrom = new MailAddress("info.fms@itlvn.com");
+            MailAddress emailFrom = new MailAddress("dntonetms@itlvn.com");
             MailMessage message = new MailMessage();
 
             message.From = emailFrom;
@@ -66,8 +66,8 @@ namespace eFMS.API.Common
             client.EnableSsl = true;
             client.DeliveryMethod = SmtpDeliveryMethod.Network;
             client.Credentials =
-                new System.Net.NetworkCredential("info.fms@itlvn.com",
-                    "ITPr0No1!");
+                new System.Net.NetworkCredential("itl\\dntonetms",
+                    "0TMS@ne2");
             client.Timeout = 300000;
 
             // send message

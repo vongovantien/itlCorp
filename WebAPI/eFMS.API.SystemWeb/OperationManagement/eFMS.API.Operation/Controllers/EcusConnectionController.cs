@@ -176,5 +176,16 @@ namespace eFMS.API.Operation.Controllers
             var results = ecusConnectionService.GetDataEcusByUser(userId, serverName, dbusername, dbpassword, database);
             return Ok(results);
         }
+
+        [HttpGet("SendMail")]
+        public IActionResult SendEmailMail()
+        {
+            List<string> list = new List<string> { "alex.phuong@itlvn.com", "luis.quang@itlvn.com", "cara.oanh@itlvn.com" };
+            if (SendMail.Send("ABC", "ABC", "andy.hoa@itlvn.com", null, list))
+            {
+                return Ok();
+            }
+            return BadRequest();
+        }
     }
 }
