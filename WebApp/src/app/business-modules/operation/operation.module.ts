@@ -44,6 +44,7 @@ import { AddObhRatePopupComponent } from './job-edit/charge-list/add-obh-rate-po
 import { EditObhRatePopupComponent } from './job-edit/charge-list/edit-obh-rate-popup/edit-obh-rate-popup.component';
 import { PlSheetPopupComponent } from "./job-edit/pl-sheet-popup/pl-sheet.popup";
 import { CustomClearanceFormSearchComponent } from "./custom-clearance/components/form-search-custom-clearance/form-search-custom-clearance.component";
+import { ListNotImportedComponent } from "./job-edit/custom-declaration/list-not-imported/list-not-imported.component";
 
 
 const LIB = [
@@ -105,6 +106,7 @@ const LIB = [
         AddObhRatePopupComponent,
         EditObhRatePopupComponent,
         PlSheetPopupComponent,
+        ListNotImportedComponent,
 
         CustomClearanceFormSearchComponent
     ]

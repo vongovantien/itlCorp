@@ -12,7 +12,7 @@ namespace eFMS.API.Operation.DL.Common
             public static string ExelImportFileName = "CustomClearance";
             public struct NameCaching
             {
-                public static string ListName = "Areas";
+                public static string ListName = "CustomClearances";
             }
         }
 
@@ -20,7 +20,7 @@ namespace eFMS.API.Operation.DL.Common
         {
             public struct NameCaching
             {
-                public static string ListName = "Areas";
+                public static string ListName = "OpsTransactions";
             }
         }
     }

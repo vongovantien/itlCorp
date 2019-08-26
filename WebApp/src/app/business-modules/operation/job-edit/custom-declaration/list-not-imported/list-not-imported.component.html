@@ -1,0 +1,170 @@
+<!--begin::Form-->
+<div class="m-form m-form--state">
+  <!--begin::m-portlet -->
+  <!--begin: Search Form -->
+  <div class="m-form m-form--label-align-right">
+    <div class="row align-items-center">
+      <div class="col-lg-4 order-2 order-lg-1">
+        <div class="form-group">
+          <div class="m-input-icon m-input-icon--left">
+            <input type="text" class="form-control m-input m-input--square" placeholder="Search..." autocomplete="nope"
+              [(ngModel)]="searchString" name="searchString" (change)="searchString = searchString.trim()"
+              (keyup)="searchClearanceNotImported($event)">
+            <span class="m-input-icon__icon m-input-icon__icon--left">
+              <span>
+                <i class="la la-search"></i>
+              </span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--end: Search Form -->
+  <!--begin: Datatable-->
+  <div class="table-wrapper fit-height-div">
+    <table class="table table-striped table-brand dataTable">
+      <thead>
+        <tr>
+          <th class="table-actions-col no-sorting">
+            <div class="table-actions">
+              <label class="m-checkbox">
+                <input type="checkbox" name="checkAllNotImported" [checked]="checkAllNotImported"
+                  (change)="checkAllNotImported =! checkAllNotImported; changeAllNotImported()">
+                <span></span>
+              </label>
+            </div>
+          </th>
+          <th class="sorting"
+            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceNo'), 'sorting_desc': (!isDesc && sortKey == 'clearanceNo') }"
+            (click)="sort('clearanceNo', false)">
+            <span>Custom No</span>
+          </th>
+          <th class="sorting"
+            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'datetimeCreated'), 'sorting_desc': (!isDesc && sortKey == 'datetimeCreated') }"
+            (click)="sort('datetimeCreated', false)">
+            <span>Import Date</span>
+          </th>
+          <th class="sorting"
+            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceDate'), 'sorting_desc': (!isDesc && sortKey == 'clearanceDate') }"
+            (click)="sort('clearanceDate', false)">
+            <span>Clearance Date</span>
+          </th>
+          <th class="sorting"
+            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'hblid'), 'sorting_desc': (!isDesc && sortKey == 'hblid') }"
+            (click)="sort('hblid', false)">
+            <span>HBL No</span>
+          </th>
+          <th class="sorting"
+            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'exportCountryCode'), 'sorting_desc': (!isDesc && sortKey == 'exportCountryCode') }"
+            (click)="sort('exportCountryCode', false)">
+            <span>Export Country</span>
+          </th>
+          <th class="sorting"
+            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'importCountryCode'), 'sorting_desc': (!isDesc && sortKey == 'importCountryCode') }"
+            (click)="sort('importCountryCode', false)">
+            <span>Import Country</span>
+          </th>
+          <th class="sorting"
+            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'commodityCode'), 'sorting_desc': (!isDesc && sortKey == 'commodityCode') }"
+            (click)="sort('commodityCode', false)">
+            <span>Commodity Code</span>
+          </th>
+          <th class="sorting"
+            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'qtyCont'), 'sorting_desc': (!isDesc && sortKey == 'qtyCont') }"
+            (click)="sort('qtyCont', false)">
+            <span>Qty</span>
+          </th>
+          <th class="sorting"
+            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'firstClearanceNo'), 'sorting_desc': (!isDesc && sortKey == 'firstClearanceNo') }"
+            (click)="sort('firstClearanceNo', false)">
+            <span>Parentdoc</span>
+          </th>
+          <th class="sorting"
+            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'note'), 'sorting_desc': (!isDesc && sortKey == 'note') }"
+            (click)="sort('note', false)">
+            <span>Note</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody class="tbody-group" *ngIf="notImportedCustomClearances">
+        <tr class="" *ngFor="let item of notImportedCustomClearances; let i=index">
+          <td class="table-actions-col">
+            <div class="table-actions">
+              <label class="m-checkbox">
+                <input type="checkbox" [attr.name]="item.clearanceNo" [checked]="item.isChecked"
+                  (change)="item.isChecked=!item.isChecked; removeAllChecked();">
+                <span></span>
+              </label>
+            </div>
+          </td>
+          <td>
+            <span>{{ item.clearanceNo }}</span>
+          </td>
+          <td>
+            <span>{{ item.datetimeCreated | date:'dd/MM/yyyy' }}</span>
+          </td>
+          <td>
+            <span>{{ item.clearanceDate| date:'dd/MM/yyyy' }}</span>
+          </td>
+          <td>
+            <span>{{ item.hblid }}</span>
+          </td>
+          <td>
+            <span>{{ item.exportCountryCode }}</span>
+          </td>
+          <td>
+            <span>{{ item.importCountryCode }}</span>
+          </td>
+          <td>
+            <span>{{ item.commodityCode }}</span>
+          </td>
+          <td>
+            <span>{{ item.qtyCont }}</span>
+          </td>
+          <td>
+            <span>{{ item.firstClearanceNo }}</span>
+          </td>
+          <td>
+            <span>{{ item.note }}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!--end: Datatable-->
+  <!--begin::pagination-->
+  <!-- <div class="pagination-nav">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="tatable__pager-size" style="max-width: 190px">
+                                    <div class="select-box">
+                                        <select class="form-control m-input m-input--square" id="" aria-label="">
+                                            <option value="1">15 line/screen</option>
+                                            <option value="2">30 line/screen</option>
+                                            <option value="3">50 line/screen</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <nav aria-label="">
+                                    <ul class="pagination justify-content-end">
+                                        <li class="page-item"><a class="page-link" href="#">First</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">Back</a></li>
+                                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">Last</a></li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div> -->
+  <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)" #pagingNotImported
+    (pagerObject)="setPage($event)"></app-pagination>
+  <!--end::pagination-->
+  <!--end::m-portlet -->
+</div>
+<!--end::Form-->
