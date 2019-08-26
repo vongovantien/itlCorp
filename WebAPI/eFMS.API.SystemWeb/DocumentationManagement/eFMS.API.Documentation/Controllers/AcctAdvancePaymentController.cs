@@ -309,5 +309,16 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Test send mail
+        /// </summary>
+        /// <returns></returns>
+        //[HttpGet]
+        //[Route("TestSendMail")]
+        //public IActionResult TestSendMail(string advanceNo, string userApprove)
+        //{
+        //    var result = acctAdvancePaymentService.UpdateApproval(advanceNo, userApprove);
+        //    return Ok(result);
+        //}
     }
 }

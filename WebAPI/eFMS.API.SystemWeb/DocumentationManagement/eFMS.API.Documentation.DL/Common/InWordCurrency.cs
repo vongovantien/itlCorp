@@ -58,23 +58,23 @@ namespace eFMS.API.Documentation.DL.Common
             {
                 case 0:
                     if (_nunit == 0)
-                        return String.Format("{0} trăm", OneNumber2Letter(_hunit));
+                        return String.Format("{0} trăm", OneNumber2Letter(_hunit, ""));
                     else
-                        return String.Format("{0} trăm lẻ {1}", OneNumber2Letter(_hunit), OneNumber2Letter(_nunit));
+                        return String.Format("{0} trăm lẻ {1}", OneNumber2Letter(_hunit, ""), OneNumber2Letter(_nunit, ""));
                 case 1:
                     if (_nunit == 0)
-                        return String.Format("{0} trăm mười", OneNumber2Letter(_hunit));
+                        return String.Format("{0} trăm mười", OneNumber2Letter(_hunit, ""));
                     else
-                        return String.Format("{0} trăm mười {1}", OneNumber2Letter(_hunit), OneNumber2Letter(_nunit));
+                        return String.Format("{0} trăm mười {1}", OneNumber2Letter(_hunit, ""), OneNumber2Letter(_nunit, "muoi"));
                 default:
                     if (_nunit == 0)
-                        return String.Format("{0} trăm {1} mươi", OneNumber2Letter(_hunit), OneNumber2Letter(_tunit));
+                        return String.Format("{0} trăm {1} mươi", OneNumber2Letter(_hunit, ""), OneNumber2Letter(_tunit, ""));
                     else if (_nunit == 1)
-                        return String.Format("{0} trăm {1} mươi mốt", OneNumber2Letter(_hunit), OneNumber2Letter(_tunit));
+                        return String.Format("{0} trăm {1} mươi mốt", OneNumber2Letter(_hunit, ""), OneNumber2Letter(_tunit, ""));
                     else if (_nunit == 4)
-                        return String.Format("{0} trăm {1} mươi tư", OneNumber2Letter(_hunit), OneNumber2Letter(_tunit));
+                        return String.Format("{0} trăm {1} mươi tư", OneNumber2Letter(_hunit, ""), OneNumber2Letter(_tunit, ""));
                     else
-                        return String.Format("{0} trăm {1} mươi {2}", OneNumber2Letter(_hunit), OneNumber2Letter(_tunit), OneNumber2Letter(_nunit));
+                        return String.Format("{0} trăm {1} mươi {2}", OneNumber2Letter(_hunit, ""), OneNumber2Letter(_tunit, ""), OneNumber2Letter(_nunit, "muoi"));
             }
         }
 
@@ -96,7 +96,7 @@ namespace eFMS.API.Documentation.DL.Common
             }
         }
 
-        private static string OneNumber2Letter(int _number)
+        private static string OneNumber2Letter(int _number, string muoi)
         {
             switch (_number)
             {
@@ -111,7 +111,7 @@ namespace eFMS.API.Documentation.DL.Common
                 case 4:
                     return "bốn";
                 case 5:
-                    return "lăm";
+                    return muoi == "muoi" ? "lăm" : "năm";
                 case 6:
                     return "sáu";
                 case 7:
@@ -123,7 +123,9 @@ namespace eFMS.API.Documentation.DL.Common
                 default:
                     return "";
             }
+
         }
-        //Code chuyển số tiền thành chữ
     }
+    //Code chuyển số tiền thành chữ
 }
+

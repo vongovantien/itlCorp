@@ -14,6 +14,7 @@ using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using eFMS.API.Common;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -505,7 +506,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (advance.AdvanceRequests.Count > 0)
             {
-                foreach (var jobId in advance.AdvanceRequests.Select(x => x.JobId))
+                foreach (var jobId in advance.AdvanceRequests.GroupBy(x=>x.JobId).Select(x => x.FirstOrDefault().JobId))
                 {
                     OpsTransactionCriteria criteria = new OpsTransactionCriteria
                     {
@@ -522,17 +523,17 @@ namespace eFMS.API.Documentation.DL.Services
                     }
 
                     //Lấy ra chuỗi JobId
-                    strJobId += jobId + ",";
+                    strJobId += !string.IsNullOrEmpty(jobId) ? jobId + "," : "";
                 }
 
                 //Lấy ra chuỗi HBL
-                foreach (var hbl in advance.AdvanceRequests.Select(x => x.Hbl))
+                foreach (var hbl in advance.AdvanceRequests.GroupBy(x=>x.Hbl).Select(x => x.FirstOrDefault().Hbl))
                 {
-                    strHbl += hbl + ",";
+                    strHbl += !string.IsNullOrEmpty(hbl) ? hbl + "," : "";
                 }
 
                 //Lấy ra chuỗi CustomNo
-                foreach (var customNo in advance.AdvanceRequests.Select(x => x.CustomNo))
+                foreach (var customNo in advance.AdvanceRequests.GroupBy(x=>x.CustomNo).Select(x => x.FirstOrDefault().CustomNo))
                 {
                     strCustomNo += !string.IsNullOrEmpty(customNo) ? customNo + "," : "";
                 }
@@ -629,6 +630,10 @@ namespace eFMS.API.Documentation.DL.Services
                 TotalOrther = advance.AdvanceRequests.Where(x => x.AdvanceType == "Other").Sum(x => x.Amount)
             };
 
+            acctAdvance.TotalNorm = acctAdvance.TotalNorm != 0 ? acctAdvance.TotalNorm : null;
+            acctAdvance.TotalInvoice = acctAdvance.TotalInvoice != 0 ? acctAdvance.TotalInvoice : null;
+            acctAdvance.TotalOrther = acctAdvance.TotalOrther != 0 ? acctAdvance.TotalOrther : null;
+
             var listAdvance = new List<AdvancePaymentRequestReport>
             {
                 acctAdvance
@@ -682,7 +687,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (advance.AdvanceRequests.Count > 0)
             {
-                foreach (var jobId in advance.AdvanceRequests.Select(x => x.JobId))
+                foreach (var jobId in advance.AdvanceRequests.GroupBy(x=>x.JobId).Select(x => x.FirstOrDefault().JobId))
                 {
                     OpsTransactionCriteria criteria = new OpsTransactionCriteria
                     {
@@ -699,17 +704,17 @@ namespace eFMS.API.Documentation.DL.Services
                     }
 
                     //Lấy ra chuỗi JobId
-                    strJobId += jobId + ",";
+                    strJobId += !string.IsNullOrEmpty(jobId) ? jobId + "," : "";
                 }
 
                 //Lấy ra chuỗi HBL
-                foreach (var hbl in advance.AdvanceRequests.Select(x => x.Hbl))
+                foreach (var hbl in advance.AdvanceRequests.GroupBy(x=>x.Hbl).Select(x => x.FirstOrDefault().Hbl))
                 {
-                    strHbl += hbl + ",";
+                    strHbl += !string.IsNullOrEmpty(hbl) ? hbl + "," : "";
                 }
 
                 //Lấy ra chuỗi CustomNo
-                foreach (var customNo in advance.AdvanceRequests.Select(x => x.CustomNo))
+                foreach (var customNo in advance.AdvanceRequests.GroupBy(x=>x.CustomNo).Select(x => x.FirstOrDefault().CustomNo))
                 {
                     strCustomNo += !string.IsNullOrEmpty(customNo) ? customNo + "," : "";
                 }
@@ -806,6 +811,10 @@ namespace eFMS.API.Documentation.DL.Services
                 TotalOrther = advance.AdvanceRequests.Where(x => x.AdvanceType == "Other").Sum(x => x.Amount)
             };
 
+            acctAdvance.TotalNorm = acctAdvance.TotalNorm != 0 ? acctAdvance.TotalNorm : null;
+            acctAdvance.TotalInvoice = acctAdvance.TotalInvoice != 0 ? acctAdvance.TotalInvoice : null;
+            acctAdvance.TotalOrther = acctAdvance.TotalOrther != 0 ? acctAdvance.TotalOrther : null;
+
             var listAdvance = new List<AdvancePaymentRequestReport>
             {
                 acctAdvance
@@ -845,11 +854,18 @@ namespace eFMS.API.Documentation.DL.Services
 
         #region APPROVAL ADVANCE PAYMENT
         //Inset Or Update AcctApproveAdvance by AdvanceNo
-        private bool InsertOrUpdateApproveAdvance(AcctApproveAdvance acctApprove)
+        private HandleState InsertOrUpdateApprovalAdvance(AcctApproveAdvance acctApprove)
         {
             try
             {
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+
+                //Lấy ra các user Leader, Manager Dept của user requester, user Accountant, BUHead(nếu có)
+                acctApprove.Leader = null;
+                acctApprove.Manager = null;
+                acctApprove.Accountant = null;
+                acctApprove.Buhead = null;
+
                 var checkExistsApproveByAdvanceNo = dc.AcctApproveAdvance.Where(x => x.AdvanceNo == acctApprove.AdvanceNo).FirstOrDefault();
                 if (checkExistsApproveByAdvanceNo == null) //Insert AcctApproveAdvance
                 {
@@ -865,24 +881,17 @@ namespace eFMS.API.Documentation.DL.Services
                     dc.AcctApproveAdvance.Update(acctApprove);
                 }
                 dc.SaveChanges();
-                return true;
+
+                //Send mail đề nghị approve đến Leader(Nếu có) nếu không có thì send tới Manager Dept
+                //Lấy ra Leader của User & Manager Dept của User Requester
+                var sendMailResult = SendMailSuggestApproval(acctApprove.AdvanceNo, "admin");
+
+                return !sendMailResult ? new HandleState("Send Mail Suggest Approval Fail") : new HandleState();
             }
             catch (Exception ex)
             {
-                return false;
+                return new HandleState(ex.Message.ToString());
             }
-        }
-        
-        //Lấy ra các thông tin của leader, manager department, accountant manager, BUHead
-        private AcctApproveAdvance GetUsersApproveByDepartment(string dept)
-        {
-            var approver = new AcctApproveAdvance {
-                Requester = "",
-                Leader = "",
-                Manager = "",
-                Buhead = ""
-            };
-            return approver;
         }
 
         //Lấy ra ds các user được ủy quyền theo nhóm leader, manager department, accountant manager, BUHead
@@ -890,95 +899,200 @@ namespace eFMS.API.Documentation.DL.Services
 
         //Check group trước đó đã được approve hay chưa? Nếu group trước đó đã approve thì group hiện tại mới được Approve
         //Nếu group hiện tại đã được approve thì không cho approve nữa
-        private bool CheckApproved(string advanceNo, string grpOfUser)
+        private HandleState CheckApproved(string advanceNo, string grpOfUser)
         {
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
 
-            var result = false;
+            var result = new HandleState();
             //Lấy ra Advance Approval dựa vào advanceNo
             var acctApprove = dc.AcctApproveAdvance.Where(x => x.AdvanceNo == advanceNo).FirstOrDefault();
-            if (acctApprove == null) return result;
+            if (acctApprove == null) return new HandleState("Not Found Advance Approval by AdvanceNo is" + advanceNo);
 
             //Lấy ra Advance Payment dựa vào advanceNo
             var advance = dc.AcctAdvancePayment.Where(x => x.AdvanceNo == advanceNo).FirstOrDefault();
-            if (advance == null) return result;
+            if (advance == null) return new HandleState("Not Found Advance Payment by AdvanceNo is" + advanceNo);
 
             //Trường hợp không có Leader
-            if (string.IsNullOrEmpty(acctApprove.Requester))
+            if (string.IsNullOrEmpty(acctApprove.Leader))
             {
                 //Manager Department Approve
-                if (grpOfUser == "CSManager" || grpOfUser == "SaleManager")
+                if (grpOfUser == "CSManager")
                 {
-                    if (!string.IsNullOrEmpty(acctApprove.Requester) 
-                        && !advance.StatusApproval.Equals("DepartmentManagerApproved"))
+                    //Requester đã approve
+                    if (!string.IsNullOrEmpty(acctApprove.Requester) && acctApprove.RequesterAprDate != null)
                     {
-                        result = true;
+                        result = new HandleState();
                     }
                     else
                     {
-                        result = false;
+                        result = new HandleState("Not found Requester or Requester not approve");
+                    }
+
+                    //Check group CSManager đã approve chưa
+                    if (!advance.StatusApproval.Equals("DepartmentManagerApproved") && acctApprove.ManagerAprDate == null)
+                    {
+                        result = new HandleState();
+                    }
+                    else
+                    {
+                        result = new HandleState("Manager Department Approved");
+                    }
+                }
+
+                if (grpOfUser == "SaleManager")
+                {
+                    //Requester đã approve
+                    if (!string.IsNullOrEmpty(acctApprove.Requester) && acctApprove.RequesterAprDate != null)
+                    {
+                        result = new HandleState();
+                    }
+                    else //Requester chưa approve
+                    {
+                        result = new HandleState("Not found Requester or Requester not approve");
+                    }
+
+                    //Check group SaleManager đã approve chưa
+                    if (!advance.StatusApproval.Equals("DepartmentManagerApproved") && acctApprove.ManagerAprDate == null)
+                    {
+                        result = new HandleState();
+                    }
+                    else
+                    {
+                        result = new HandleState("Manager Department Approved");
                     }
                 }
                 
+
                 //Accountant Approve
                 if (grpOfUser == "AccountantManager")
                 {
+                    //Check group DepartmentManager đã được Approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Manager) 
-                        && advance.StatusApproval.Equals("DepartmentManagerApproved")
-                        && !advance.StatusApproval.Equals("AccountantManagerApproved"))
+                        && advance.StatusApproval.Equals("DepartmentManagerApproved") 
+                        && acctApprove.ManagerAprDate != null)
                     {
-                        result = true;
+                        result = new HandleState();
                     }
                     else
                     {
-                        result = false;
+                        result = new HandleState("Not found Manager or Manager not approve");
+                    }
+
+                    //Check group Accountant đã approve chưa
+                    if(!advance.StatusApproval.Equals("Done"))
+                    {
+                        result = new HandleState();
+                    }
+                    else
+                    {
+                        result = new HandleState("Accountant Approved");
                     }
                 }
             }
             else //Trường hợp có leader
             {
-                //grp leader là group mẫu (chưa có tồn tại trong db)
+                //grp Leader là group mẫu (chưa có tồn tại trong db)
                 //Leader Approve
-                if(grpOfUser == "leader")
+                if(grpOfUser == "Leader")
                 {
                     if (!string.IsNullOrEmpty(acctApprove.Requester) 
-                        && !advance.StatusApproval.Equals("LeaderApproved"))
+                        && acctApprove.RequesterAprDate != null)
                     {
-                        result = true;
+                        result = new HandleState();
                     }
                     else
                     {
-                        result = false;
+                        result = new HandleState("Not found Requester or Requester not approve");
+                    }
+
+                    //Check group Leader đã được approve chưa
+                    if (!advance.StatusApproval.Equals("LeaderApproved") 
+                        && acctApprove.LeaderAprDate != null)
+                    {
+                        result = new HandleState();
+                    }
+                    else
+                    {
+                        result = new HandleState("Leader Approved");
                     }
                 }
                 
                 //Manager Department Approve
-                if (grpOfUser == "CSManager" || grpOfUser == "SaleManager")
+                if (grpOfUser == "CSManager")
                 {
                     if (!string.IsNullOrEmpty(acctApprove.Leader) 
                         && advance.StatusApproval.Equals("LeaderApproved")
-                        && !advance.StatusApproval.Equals("DepartmentManagerApproved"))
+                        && acctApprove.LeaderAprDate != null)
                     {
-                        result = true;
+                        result = new HandleState();
                     }
                     else
                     {
-                        result = false;
+                        result = new HandleState("Not found Leader or Leader not approve");
+                    }
+
+                    //Check group Manager Department đã approve chưa
+                    if (!advance.StatusApproval.Equals("DepartmentManagerApproved") 
+                        && acctApprove.ManagerAprDate != null)
+                    {
+                        result = new HandleState();
+                    }
+                    else
+                    {
+                        result = new HandleState("Manager Department Approved");
                     }
                 }
-                
+
+                if (grpOfUser == "SaleManager")
+                {
+                    if (!string.IsNullOrEmpty(acctApprove.Leader)
+                        && advance.StatusApproval.Equals("LeaderApproved")
+                        && acctApprove.LeaderAprDate != null)
+                    {
+                        result = new HandleState();
+                    }
+                    else
+                    {
+                        result = new HandleState("Not found Leader or Leader not approve");
+                    }
+
+                    //Check group Manager Department đã approve chưa
+                    if (!advance.StatusApproval.Equals("DepartmentManagerApproved")
+                        && acctApprove.ManagerAprDate != null)
+                    {
+                        result = new HandleState();
+                    }
+                    else
+                    {
+                        result = new HandleState("Manager Department Approved");
+                    }
+                }
+
+
                 //Accountant Approve
                 if (grpOfUser == "AccountantManager")
                 {
+                    //Check group DepartmentManager đã được Approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Manager) 
                         && advance.StatusApproval.Equals("DepartmentManagerApproved")
-                        && !advance.StatusApproval.Equals("AccountantManagerApproved"))
+                        && acctApprove.ManagerAprDate != null)
                     {
-                        result = true;
+                        result = new HandleState();
                     }
                     else
                     {
-                        result = false;
+                        result = new HandleState("Not found Manager or Manager not approve");
+                    }
+
+                    //Check group Accountant đã approve chưa
+                    if (!advance.StatusApproval.Equals("Done") 
+                        && acctApprove.AccountantAprDate != null)
+                    {
+                        result = new HandleState();
+                    }
+                    else
+                    {
+                        result = new HandleState("Accountant Approved");
                     }
                 }
             }
@@ -986,16 +1100,162 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        //Update Approve cho từng group
-        public bool UpdateApproval(string advanceNo, string userApprove)
+        //Update Approval cho từng group
+        public HandleState UpdateApproval(string advanceNo, string userApprove)
         {
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var approve = dc.AcctApproveAdvance.Where(x => x.AdvanceNo == advanceNo).FirstOrDefault();
+            var advance = dc.AcctAdvancePayment.Where(x => x.AdvanceNo == advanceNo).FirstOrDefault();
 
-            return true;
+            if (approve == null) return new HandleState("Not Found Advance Approval by AdvanceNo is " + advanceNo);
+
+            //Lấy ra group của userApprove dựa vào userApprove
+            var grpOfUser = "CSManager";
+
+            //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
+            var checkApr = CheckApproved(advanceNo, grpOfUser);
+            if (checkApr.Success == false) return new HandleState(checkApr.Message.ToString());
+
+            if (grpOfUser.Equals("Leader"))
+            {
+                advance.StatusApproval = "LeaderApproved";
+                approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Approve của Leader
+            }
+            else if (grpOfUser.Equals("CSManager") || grpOfUser.Equals("SaleManager"))
+            {
+                advance.StatusApproval = "DepartmentManagerApproved";
+                approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Approve của Manager
+            }
+            else if (grpOfUser.Equals("AccountantManager"))
+            {
+                advance.StatusApproval = "Done";
+                approve.AccountantAprDate = approve.BuheadAprDate = DateTime.Now;//Cập nhật ngày Approve của Accountant & BUHead
+            }
+
+            dc.AcctAdvancePayment.Update(advance);
+            dc.AcctApproveAdvance.Update(approve);
+            dc.SaveChanges();
+
+            //Send mail đề nghị approve
+            var sendMailResult = SendMailSuggestApproval(advanceNo, userApprove);
+
+            return sendMailResult ? new HandleState() : new HandleState("Send Mail Suggest Approval Fail");
         }
 
-        //Send Mail
+        //Send Mail đề nghị Approve
+        private bool SendMailSuggestApproval(string advanceNo, string userApprove)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;  
+            //Lấy ra AdvancePayment dựa vào AdvanceNo
+            var advance = dc.AcctAdvancePayment.Where(x => x.AdvanceNo == advanceNo).FirstOrDefault();
+
+            //Lấy ra tên & email của user Requester
+            var requesterId = dc.SysUser.Where(x => x.Id == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
+            var requesterName = dc.SysEmployee.Where(x => x.Id == requesterId).Select(x => x.EmployeeNameVn).FirstOrDefault();
+            var emailRequester = dc.SysEmployee.Where(x => x.Id == requesterId).Select(x => x.Email).FirstOrDefault();
+
+            //Lấy ra email của user Approve (Leader, Manager Dept, Accountant, BUHead)
+            var approverId = dc.SysUser.Where(x => x.Id == userApprove).Select(x => x.EmployeeId).FirstOrDefault();
+            var emailApprover = "andy.hoa@itlvn.com"; //dc.SysEmployee.Where(x => x.Id == approverId).Select(x => x.Email).FirstOrDefault();
+            if (emailApprover == null) return false;
+
+            //Lấy ra email của các User được ủy quyền của group của User Approve
+
+
+            //Mail Info
+            string subject = "eFMS - Advance Payment Approval Request from [RequesterName]";
+            subject = subject.Replace("[RequesterName]", requesterName);
+            string body = "<div style='font-family: Time New Roman; font-size: 12pt'><p><i><b>Dear Mr/Mrs [UserName],</b></i></p><p>You have new Advance Payment Approval Request from [RequesterName] as below info:</p><p><i>Anh/ Chị có một yêu cầu duyệt tạm ứng từ [RequesterName] với thông tin như sau:</i></p><ul><li>Advance No / <i>Mã tạm ứng</i> : [AdvanceNo]</li><li>Advance Amount/ <i>Số tiền tạm ứng</i> : [TotalAmount]<li>Shipments/ <i>Lô hàng</i> : [JobIds]</li><li>Requester/ <i>Người đề nghị</i> : [RequesterName]</li><li>Request date/ <i>Thời gian đề nghị</i> : [RequestDate]</li></ul><p>You click here to check more detail and approve.</p><p><i>Anh/ Chị chọn vào đây để biết thêm thông tin chi tiết và phê duyệt.</i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p></div>";
+            body = body.Replace("[UserName]", userApprove);
+            body = body.Replace("[RequesterName]", requesterName);
+            body = body.Replace("[AdvanceNo]", advanceNo);
+            body = body.Replace("[TotalAmount]", "100");
+            body = body.Replace("[JobIds]", "LOG1908/0001,LOG1908/0002");
+            body = body.Replace("[RequestDate]", advance.RequestDate.Value.ToString("dd/MM/yyyy"));
+            List<string> toEmails = new List<string> {
+                emailApprover
+            };
+            List<string> attachments = null;
+
+            //CC cho User Requester để biết được quá trình Approve đã đến bước nào
+            //Và các User thuộc group của User Approve được ủy quyền
+            List<string> emailCCs = new List<string> {
+                emailRequester
+            };
+
+            var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+            return sendMailResult;
+        }
+
+        //Send Mail Approved
+        private bool SendMailApproved(string advanceNo, string userApprove, DateTime approvedDate)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            //Lấy ra AdvancePayment dựa vào AdvanceNo
+            var advance = dc.AcctAdvancePayment.Where(x => x.AdvanceNo == advanceNo).FirstOrDefault();
+
+            //Lấy ra tên của user Requester
+            var requesterId = dc.SysUser.Where(x => x.Id == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
+            var requesterName = dc.SysEmployee.Where(x => x.Id == requesterId).Select(x => x.EmployeeNameVn).FirstOrDefault();
+            var emailRequester = dc.SysEmployee.Where(x => x.Id == requesterId).Select(x => x.Email).FirstOrDefault();            
+
+            //Mail Info
+            string subject = "eFMS - Advance Payment from [RequesterName] is approved";
+            subject = subject.Replace("[RequesterName]", requesterName);
+            string body = "<div style='font-family: Time New Roman; font-size: 12pt'><p><i><b>Dear Mr/Mrs [RequesterName],</b></i></p><p>You have an Advance Payment is approved at [ApprovedDate] as below info:</p><p><i>Anh/ Chị có một yêu cầu tạm ứng đã được phê duyệt vào lúc [ApprovedDate] với thông tin như sau:</i></p><ul><li>Advance No / <i>Mã tạm ứng</i> : [AdvanceNo]</li><li>Advance Amount/ <i>Số tiền tạm ứng</i> : [TotalAmount]<li>Shipments/ <i>Lô hàng</i> : [JobIds]</li><li>Requester/ <i>Người đề nghị</i> : [RequesterName]</li><li>Request date/ <i>Thời gian đề nghị</i> : [RequestDate]</li></ul><p>You can click here to check more detail.</p><p><i>Anh/ Chị có thể chọn vào đây để biết thêm thông tin chi tiết.</i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p></div>";
+            body = body.Replace("[RequesterName]", requesterName);
+            body = body.Replace("[ApprovedDate]", approvedDate.ToString("HH:MM - DD/MM/YYYY"));
+            body = body.Replace("[AdvanceNo]", advanceNo);
+            body = body.Replace("[TotalAmount]", "100");
+            body = body.Replace("[JobIds]", "LOG1908/0001,LOG1908/0002");
+            body = body.Replace("[RequestDate]", advance.RequestDate.Value.ToString("dd/MM/yyyy"));
+            List<string> toEmails = new List<string> {
+                emailRequester
+            };
+            List<string> attachments = null;
+            List<string> emailCCs = new List<string> {
+                
+            };
+
+            var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+            return sendMailResult;
+        }
+
+        //Send Mail Deny Approve (Gửi đến Requester và các Leader, Manager, Accountant, BUHead đã approve trước đó)
+        private bool SendMailDeniedApproval(string advanceNo, string userApprove, DateTime DeniedDate)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            //Lấy ra AdvancePayment dựa vào AdvanceNo
+            var advance = dc.AcctAdvancePayment.Where(x => x.AdvanceNo == advanceNo).FirstOrDefault();
+
+            //Lấy ra tên của user Requester
+            var requesterId = dc.SysUser.Where(x => x.Id == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
+            var requesterName = dc.SysEmployee.Where(x => x.Id == requesterId).Select(x => x.EmployeeNameVn).FirstOrDefault();
+            var emailRequester = dc.SysEmployee.Where(x => x.Id == requesterId).Select(x => x.Email).FirstOrDefault();
+
+            //Mail Info
+            string subject = "eFMS - Advance Payment from [RequesterName] is denied";
+            subject = subject.Replace("[RequesterName]", requesterName);
+            string body = "<div style='font-family: Time New Roman; font-size: 12pt'><p><i><b>Dear Mr/Mrs [RequesterName],</b></i></p><p>You have an Advance Payment is denied at [DeniedDate] by as below info:</p><p><i>Anh/ Chị có một yêu cầu tạm ứng đã bị từ chối vào lúc [DeniedDate] by với thông tin như sau:</i></p><ul><li>Advance No / <i>Mã tạm ứng</i> : [AdvanceNo]</li><li>Advance Amount/ <i>Số tiền tạm ứng</i> : [TotalAmount]<li>Shipments/ <i>Lô hàng</i> : [JobIds]</li><li>Requester/ <i>Người đề nghị</i> : [RequesterName]</li><li>Request date/ <i>Thời gian đề nghị</i> : [RequestDate]</li><li>Comment/ <i>Lý do từ chối</i> : [Comment]</li></ul><p>You click here to recheck detail.</p><p><i>Anh/ Chị chọn vào đây để kiểm tra lại thông tin chi tiết.</i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p></div>";
+            body = body.Replace("[RequesterName]", requesterName);
+            body = body.Replace("[DeniedDate]", DeniedDate.ToString("HH:MM - DD/MM/YYYY"));
+            body = body.Replace("[AdvanceNo]", advanceNo);
+            body = body.Replace("[TotalAmount]", "100");
+            body = body.Replace("[JobIds]", "LOG1908/0001,LOG1908/0002");
+            body = body.Replace("[RequestDate]", advance.RequestDate.Value.ToString("dd/MM/yyyy"));
+            body = body.Replace("[Comment]", "Không được phép tam ứng");
+            List<string> toEmails = new List<string> {
+                emailRequester
+            };
+            List<string> attachments = null;
+            List<string> emailCCs = new List<string>
+            {
+                //Add các email của các user  đã approve trước đó
+            };
+
+            var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+            return sendMailResult;
+        }
 
         #endregion APPROVAL ADVANCE PAYMENT
 

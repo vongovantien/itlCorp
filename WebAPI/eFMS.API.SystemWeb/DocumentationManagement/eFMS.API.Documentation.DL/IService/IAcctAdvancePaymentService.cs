@@ -38,5 +38,7 @@ namespace eFMS.API.Documentation.DL.IService
 
         Crystal Preview(AcctAdvancePaymentModel advance);
 
+        HandleState UpdateApproval(string advanceNo, string userApprove);
+
     }
 }
