@@ -597,7 +597,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
     CDNoteDetails: AcctCDNoteDetails = null;
     async openCreditDebitNote(cdNo: string) {
-        this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.opsTransaction.id + "&cdNo=" + cdNo);
+        this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?jobId=" + this.opsTransaction.id + "&cdNo=" + cdNo);
         if (this.CDNoteDetails != null) {
             if (this.CDNoteDetails.listSurcharges != null) {
                 this.totalCreditDebitCalculate();
@@ -628,7 +628,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
     async closeEditCDNoteModal(event) {
         console.log(event);
-        this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.opsTransaction.id + "&cdNo=" + this.CDNoteDetails.cdNote.code);
+        this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?jobId=" + this.opsTransaction.id + "&cdNo=" + this.CDNoteDetails.cdNote.code);
         if (this.CDNoteDetails != null) {
             if (this.CDNoteDetails.listSurcharges != null) {
                 this.totalCreditDebitCalculate();
