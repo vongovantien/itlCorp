@@ -1,7 +1,7 @@
-import { NgModule } from '@angular/core';
+import { NgModule, LOCALE_ID } from '@angular/core';
 import { JobManagementComponent } from './job-management.component';
 import { Routes, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, registerLocaleData } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
@@ -37,9 +37,10 @@ import { EditSellingRatePopupComponent } from '../job-edit/charge-list/edit-sell
 import { AddObhRatePopupComponent } from '../job-edit/charge-list/add-obh-rate-popup/add-obh-rate-popup.component';
 import { EditObhRatePopupComponent } from '../job-edit/charge-list/edit-obh-rate-popup/edit-obh-rate-popup.component';
 import { PlSheetPopupComponent } from '../job-edit/pl-sheet-popup/pl-sheet.popup';
-import { CustomClearanceFormSearchComponent } from '../custom-clearance/components/form-search-custom-clearance/form-search-custom-clearance.component';
+import { JobManagementFormSearchComponent } from './components/form-search-job/form-search-job.component';
+import localeVi from '@angular/common/locales/vi';
 
-
+registerLocaleData(localeVi, 'vi');
 
 const routing: Routes = [
     {
@@ -124,8 +125,12 @@ const LIB = [
         
         PlSheetPopupComponent,
 
+        JobManagementFormSearchComponent
+
     ],
-    providers: [],
+    providers: [
+        { provide: LOCALE_ID, useValue: 'vi' },
+    ],
     bootstrap: [
         JobManagementComponent
     ],

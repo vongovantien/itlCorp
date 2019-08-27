@@ -184,6 +184,7 @@ export class CustomClearanceComponent extends AppList {
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
+                            this._toastrService.success(res.message, 'Convert Success');
                             this.getListCustomsDeclaration();
                         }
                     },

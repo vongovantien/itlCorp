@@ -38,7 +38,7 @@ export class CDNoteRepo {
     }
 
     convertClearanceToJob(body: any) {
-        return this._api.post(`${environment.HOST.WEB_URL}/operation/api/${this.VERSION}/en-US/OpsTransaction/ConvertExistedClearancesToJobs`, body).pipe(
+        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/OpsTransaction/ConvertExistedClearancesToJobs`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

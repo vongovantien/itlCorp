@@ -27,6 +27,12 @@ namespace CommonInterface {
         title: string;
         value: any;
     }
+
+    export interface IError {
+        message: string;
+        title: string;
+        data?: any;
+    }
 }
 
 
