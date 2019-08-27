@@ -17,7 +17,7 @@ import { AdvancePaymentFormsearchComponent } from './components/form-search-adva
 import { AdvancePaymentDetailComponent } from './detail/detail-advance-payment.component';
 import { ApproveAdvancePaymentComponent } from '../approve-payment/advance/approve-advance.component';
 import { NgProgressModule } from '@ngx-progressbar/core';
-
+import { NgxCurrencyModule } from "ngx-currency";
 registerLocaleData(localeVi, 'vi');
 const routing: Routes = [
     {
@@ -46,6 +46,18 @@ const COMPONENTS = [
     AdvancePaymentFormsearchComponent,
 ];
 
+const customCurrencyMaskConfig = {
+    align: "right",
+    allowNegative: false,
+    allowZero: true,
+    decimal: ",",
+    precision: 2,
+    prefix: "",
+    suffix: "",
+    thousands: ".",
+    nullable: true
+};
+
 @NgModule({
     imports: [
         CommonModule,
@@ -58,7 +70,8 @@ const COMPONENTS = [
         PerfectScrollbarModule,
         RouterModule.forChild(routing),
         ReactiveFormsModule,
-        NgProgressModule
+        NgProgressModule,
+        NgxCurrencyModule.forRoot(customCurrencyMaskConfig)
     ],
     declarations: [
         AdvancePaymentComponent,
