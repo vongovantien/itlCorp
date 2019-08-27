@@ -19,6 +19,8 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
 
     @ViewChild('exitPopup', { static: false }) exitPopup: ConfirmPopupComponent;
     @ViewChild('confirmDuplicatePopup', { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
+    @ViewChild('existedPopup', { static: false }) existedShipmentPopup: ConfirmPopupComponent;
+
 
     action: string = 'create';
 
@@ -52,6 +54,8 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     isDupplicate: boolean = false;
     
     advanceNo: string = '';
+
+    dataRequest: any = {};
 
     constructor(
         private _fb: FormBuilder,
@@ -191,7 +195,8 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
                         this.hide();
                         this.resetForm();
                     } else {
-                        this._toastService.warning('Shipment has existed in another Advance !', 'Warning');
+                        this.dataRequest = advRequest;
+                        this.existedShipmentPopup.show();
                     }
                 },
                 (errors: any) => { 
@@ -201,6 +206,16 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
                 },
                 () => { }
             );
+    }
+
+    onSubmitShipmentExisted() {
+        if (this.action === 'update') {
+            this.onUpdate.emit(this.dataRequest);
+        } else {
+            this.onRequest.emit(this.dataRequest);
+        }
+        this.existedShipmentPopup.hide();
+        this.hide();
     }
 
     getCustomNo() {
