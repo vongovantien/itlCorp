@@ -78,6 +78,9 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public DateTime? AdvCSSignDate { get; set; }
         public bool? AdvCSStickApp { get; set; }
         public bool? AdvCSStickDeny { get; set; }
+        public decimal? TotalNorm { get; set; }
+        public decimal? TotalInvoice { get; set; }
+        public decimal? TotalOrther { get; set; }
     }
 
     public class AdvancePaymentRequestReportParams

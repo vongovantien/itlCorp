@@ -12,6 +12,7 @@ import { PopupBase } from 'src/app/popup.base';
 import { OpsModuleCreditDebitNoteRemainingChargeComponent } from '../ops-module-credit-debit-note-remaining-charge/ops-module-credit-debit-note-remaining-charge.component';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
 import { SortService } from 'src/app/shared/services';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 declare var $: any;
 
 @Component({
@@ -20,6 +21,7 @@ declare var $: any;
 })
 export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements OnInit, OnDestroy {
     @ViewChild(OpsModuleCreditDebitNoteRemainingChargeComponent, { static: false }) popupAddCharge: OpsModuleCreditDebitNoteRemainingChargeComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     listChargeOfPartner: any[] = [];
     constListChargeOfPartner: any[] = [];
     isDisplay: boolean = true;
@@ -71,7 +73,7 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
                             }
                         }
                     }
-                    if (o.listCharges[i].type === "BUY") {
+                    else if (o.listCharges[i].type === "BUY") {
                         if (o.listCharges[i].creditNo === null) {
                             o.listCharges[i].isRemaining = true;
                         }
@@ -79,7 +81,7 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
                             o.listCharges[i].isRemaining = false;
                         }
                     }
-                    if (o.listCharges[i].type === "SELL") {
+                    else if (o.listCharges[i].type === "SELL") {
                         if (o.listCharges[i].debitNo === null) {
                             o.listCharges[i].isRemaining = true;
                         }
@@ -87,7 +89,49 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
                             o.listCharges[i].isRemaining = false;
                         }
                     }
+                    else {
+
+                        o.listCharges[i].isRemaining = false;
+                    }
                 }
+                // if (o.listCharges[i].type === "OBH") {
+                //     if (o.listCharges[i].payerId === partnerId) {
+                //         if (o.listCharges[i].creditNo === null) {
+                //             o.listCharges[i].isRemaining = true;
+                //         }
+                //         if (o.listCharges[i].creditNo === cdNo) {
+                //             o.listCharges[i].isRemaining = false;
+                //         }
+                //     } else if (o.listCharges[i].paymentObjectId === partnerId) {
+                //         if (o.listCharges[i].debitNo === null) {
+                //             o.listCharges[i].isRemaining = true;
+                //         }
+                //         if (o.listCharges[i].debitNo === cdNo) {
+                //             o.listCharges[i].isRemaining = false;
+                //         }
+                //     } else {
+                //         o.listCharges[i].isRemaining = false;
+                //     }
+                // }
+                // if (o.listCharges[i].type === "BUY") {
+                //     if (o.listCharges[i].creditNo === null) {
+                //         o.listCharges[i].isRemaining = true;
+                //     }
+                //     if (o.listCharges[i].creditNo === cdNo) {
+                //         o.listCharges[i].isRemaining = false;
+                //     }
+                // }
+                // if (o.listCharges[i].type === "SELL") {
+                //     if (o.listCharges[i].debitNo === null) {
+                //         o.listCharges[i].isRemaining = true;
+                //     }
+                //     if (o.listCharges[i].debitNo === cdNo) {
+                //         o.listCharges[i].isRemaining = false;
+                //     }
+                // }
+                // if (o.listCharges[i].debitNo === null && o.listCharges[i].creditNo === null) {
+                //     o.listCharges[i].isRemaining = true;
+                // }
                 listCharges.push(o.listCharges[i]);
             }
             return o;
@@ -205,18 +249,25 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
         this.setChargesForCDNote();
         this.EditingCDNote.total = this.totalDebit - this.totalCredit;
         this.EditingCDNote.jobId = this.currentJob.id;
-        this.EditingCDNote.currencyId = "USD"; // in the future , this id must be local currency of each country
-        // this.EditingCDNote.listShipmentSurcharge = filter(this.EditingCDNote.listShipmentSurcharge, function (o: any) {
-        //     // return !o.isRemaining && o.isSelected;
-        //     return !o.isRemaining;
-        // });
-        if (this.EditingCDNote.listShipmentSurcharge.length > 0) {
-            console.log(this.EditingCDNote);
-            const res = await this.baseServices.putAsync(this.api_menu.Documentation.AcctSOA.update, this.EditingCDNote);
-            if (res.status) {
-                this.EditingCDNote = new AcctCDNote();
-                this.closeModal();
+        this.EditingCDNote.currencyId = "USD";
+        let isAllowEdit = false;
+        for (let i = 0; i < this.EditingCDNote.listShipmentSurcharge.length; i++) {
+            if (this.EditingCDNote.listShipmentSurcharge[i].isRemaining === false) {
+                isAllowEdit = true;
+                break;
             }
+        }
+        if (isAllowEdit) {
+            if (this.EditingCDNote.listShipmentSurcharge.length > 0) {
+                console.log(this.EditingCDNote);
+                const res = await this.baseServices.putAsync(this.api_menu.Documentation.AcctSOA.update, this.EditingCDNote);
+                if (res.status) {
+                    this.EditingCDNote = new AcctCDNote();
+                    this.closeModal();
+                }
+            }
+        } else {
+            this.confirmDeletePopup.show();
         }
     }
 
@@ -283,5 +334,13 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
         this.isDesc = !this.isDesc;
         this.sortKey = property;
         this.listChargeOfPartner[0].listCharges = this.sortService.sort(this.listChargeOfPartner[0].listCharges, property, this.isDesc);
+    }
+    async deleteCDNote() {
+        const res = await this.baseServices.deleteAsync(this.api_menu.Documentation.AcctSOA.delete + "?cdNoteId=" + this.EditingCDNote.id);
+        if (res.status) {
+            this.confirmDeletePopup.hide();
+            this.EditingCDNote = new AcctCDNote();
+            this.closeModal();
+        }
     }
 }

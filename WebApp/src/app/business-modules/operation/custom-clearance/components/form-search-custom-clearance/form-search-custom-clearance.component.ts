@@ -109,7 +109,11 @@ export class CustomClearanceFormSearchComponent extends AppForm {
                                     this.users = data || [];
                                     this.personalHandle.setValue(this.users.filter((user: User) => user.username === this.userLogged.id)[0]);
                                 },
-                                (errors: any) => { },
+                                (errors: any) => {
+                                    this.handleError(errors, (data) => {
+                                        console.log(data);
+                                    });
+                                },
                                 () => { }
                             );
                     }

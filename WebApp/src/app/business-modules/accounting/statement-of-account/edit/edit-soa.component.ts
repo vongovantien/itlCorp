@@ -1,16 +1,15 @@
 import { Component, ViewChild } from '@angular/core';
 import { StatementOfAccountAddChargeComponent } from '../components/poup/add-charge/add-charge.popup';
-import { NgxSpinnerService } from 'ngx-spinner';
 import { AccoutingRepo, SystemRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { SOA, SOASearchCharge, Charge } from 'src/app/shared/models';
-import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppList } from 'src/app/app.list';
 import { SortService, DataService } from 'src/app/shared/services';
 import { formatDate } from '@angular/common';
 import { SystemConstants } from 'src/constants/system.const';
+import { NgProgress } from '@ngx-progressbar/core';
 @Component({
     selector: 'app-statement-of-account-edit',
     templateUrl: './edit-soa.component.html',
@@ -41,17 +40,19 @@ export class StatementOfAccountEditComponent extends AppList {
     };
 
     constructor(
-        private _spinner: NgxSpinnerService,
         private _accoutingRepo: AccoutingRepo,
         private _toastService: ToastrService,
         private _activedRoute: ActivatedRoute,
         private _sysRepo: SystemRepo,
         private _sortService: SortService,
         private _router: Router,
-        private _dataService: DataService
+        private _dataService: DataService,
+        private _progressService: NgProgress,
+
     ) {
         super();
         this.requestSort = this.sortChargeList;
+        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
@@ -85,11 +86,11 @@ export class StatementOfAccountEditComponent extends AppList {
     }
 
     getDetailSOA(soaNO: string, currency: string) {
-        this._spinner.show();
+        this._progressRef.start();
         this._accoutingRepo.getDetaiLSOA(soaNO, currency)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { this._spinner.hide(); })
+                finalize(() => { this._progressRef.complete(); })
             ).subscribe(
                 (dataSoa: any) => {
                     this.soa = new SOA(dataSoa);
@@ -126,7 +127,9 @@ export class StatementOfAccountEditComponent extends AppList {
 
                 },
                 (errors: any) => {
-                    this.handleError(errors);
+                    this.handleError(errors, (data: any) => {
+                        this._toastService.error(data.message, data.title);
+                    });
                 },
                 () => { }
             );
@@ -150,7 +153,9 @@ export class StatementOfAccountEditComponent extends AppList {
                                     this.currencyList = dataCurrency;
                                 },
                                 (errors: any) => {
-                                    this.handleError(errors);
+                                    this.handleError(errors, (data: any) => {
+                                        this._toastService.error(data.message, data.title);
+                                    });
                                 },
                                 // complete
                                 () => { }
@@ -198,17 +203,6 @@ export class StatementOfAccountEditComponent extends AppList {
         ];
         this.configCharge.selectedDisplayFields = ['code'];
     }
-
-    handleError(errors: any) {
-        let message: string = 'Has Error Please Check Again !';
-        let title: string = '';
-        if (errors instanceof HttpErrorResponse) {
-            message = errors.message;
-            title = errors.statusText;
-        }
-        this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
-    }
-
 
     sortChargeList(sortField?: string, order?: boolean) {
         this.soa.chargeShipments = this._sortService.sort(this.soa.chargeShipments, sortField, order);
@@ -280,12 +274,11 @@ export class StatementOfAccountEditComponent extends AppList {
                 creatorShipment: this.soa.creatorShipment,
                 customer: this.soa.customer
             };
-            this._spinner.show();
-
+            this._progressRef.start();
             this._accoutingRepo.updateSOA(body)
                 .pipe(
                     catchError(this.catchError),
-                    finalize(() => { this._spinner.hide(); })
+                    finalize(() => { this._progressRef.complete(); })
                 )
                 .subscribe(
                     (res: CommonInterface.IResult) => {

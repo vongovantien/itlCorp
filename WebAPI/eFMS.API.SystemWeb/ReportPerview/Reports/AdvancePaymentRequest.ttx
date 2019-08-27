@@ -70,3 +70,6 @@ AdvCSName	String	255
 AdvCSSignDate	Date		
 AdvCSStickApp	Boolean		
 AdvCSStickDeny	Boolean		
+TotalNorm	Number	
+TotalInvoice	Number	
+TotalOrther	Number	

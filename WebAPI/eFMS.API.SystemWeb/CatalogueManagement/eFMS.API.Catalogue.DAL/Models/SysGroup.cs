@@ -8,11 +8,13 @@ namespace eFMS.API.Catalogue.Service.Models
         public SysGroup()
         {
             SysGroupRole = new HashSet<SysGroupRole>();
+            SysUserGroup = new HashSet<SysUserGroup>();
         }
 
         public short Id { get; set; }
         public string Code { get; set; }
         public string Name { get; set; }
+        public int? DepartmentId { get; set; }
         public short ParentId { get; set; }
         public string ManagerId { get; set; }
         public string Decription { get; set; }
@@ -24,5 +26,6 @@ namespace eFMS.API.Catalogue.Service.Models
         public DateTime? InactiveOn { get; set; }
 
         public virtual ICollection<SysGroupRole> SysGroupRole { get; set; }
+        public virtual ICollection<SysUserGroup> SysUserGroup { get; set; }
     }
 }

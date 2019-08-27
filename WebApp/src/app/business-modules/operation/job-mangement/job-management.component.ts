@@ -9,17 +9,20 @@ import * as dataHelper from 'src/helper/data.helper';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { JobConstants } from 'src/constants/job.const';
-import { ConfirmDeleteJobPopupComponent } from '../job-edit/job-confirm-popup/confirm-delete-job-popup/confirm-delete-job-popup.component';
-import { CanNotDeleteJobPopupComponent } from '../job-edit/job-confirm-popup/can-not-delete-job-popup/can-not-delete-job-popup.component';
 import { DataService } from 'src/app/shared/services';
-declare var $: any;
+import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
+
 
 @Component({
-    selector: 'app-ops-module-billing',
-    templateUrl: './ops-module-billing.component.html',
-    styleUrls: ['./ops-module-billing.component.scss']
+    selector: 'app-job-mangement',
+    templateUrl: './job-management.component.html',
+    styleUrls: ['./job-management.component.scss']
 })
-export class OpsModuleBillingComponent implements OnInit {
+export class JobManagementComponent implements OnInit {
+
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
+    @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
+
     jobStatusConts = {
         overdued: JobConstants.Overdued,
         processing: JobConstants.Processing,
@@ -51,13 +54,46 @@ export class OpsModuleBillingComponent implements OnInit {
     customClearances: any[] = [];
     itemToDelete: any = null;
 
-    @ViewChild(ConfirmDeleteJobPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmDeleteJobPopupComponent;
-    @ViewChild(CanNotDeleteJobPopupComponent, { static: false }) canNotDeleteJobPopup: CanNotDeleteJobPopupComponent;
+    isDesc = true;
+    sortKey: string = "clearanceNo";
+    isCusDesc = true;
+
+    deleteMessage: string = '';
+
+    searchFilters: Array<string> = ['Job ID', 'HBL'];
+    selectedRange: any;
+    selectedDate: any;
+    keepCalendarOpeningWithRange: true;
+    maxDate: moment.Moment = moment().endOf('month');
+    ranges: any = {
+        Today: [moment(), moment()],
+        Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+        'This Month': [moment().startOf('month'), moment().endOf('month')],
+        'Last Month': [
+            moment()
+                .subtract(1, 'month')
+                .startOf('month'),
+            moment()
+                .subtract(1, 'month')
+                .endOf('month')
+        ]
+    };
+
+    public items: Array<string> = ['option 1', 'option 2', 'option 3', 'option 4',
+        'option 5', 'option 6', 'option 7'];
+
+    private value: any = {};
+    private _disabledV: string = '0';
+    public disabled: boolean = false;
+
+
     constructor(private baseServices: BaseService,
         private sortService: SortService,
         private api_menu: API_MENU,
-        private _dataService: DataService 
-        ) {
+        private _dataService: DataService
+    ) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
@@ -74,7 +110,7 @@ export class OpsModuleBillingComponent implements OnInit {
         this.getShipments();
     }
     async getUserInCharges() {
-        let responses = await this.baseServices.postAsync(this.api_menu.System.User_Management.paging + "?page=1&size=20", { all: null }, false, false);
+        const responses = await this.baseServices.postAsync(this.api_menu.System.User_Management.paging + "?page=1&size=20", { all: null }, false, false);
         if (responses != null) {
             this.userInCharges = responses.data;
             console.log(this.userInCharges);
@@ -86,6 +122,7 @@ export class OpsModuleBillingComponent implements OnInit {
         this.pager.totalPages = pager.totalPages;
         await this.getShipments();
     }
+
     searchShipment() {
         this.pager.totalItems = 0;
         this.pager.currentPage = 1;
@@ -109,6 +146,7 @@ export class OpsModuleBillingComponent implements OnInit {
         }
         this.getShipments();
     }
+
     resetSearch() {
         this.selectedFilter = 'Job ID';
         this.searchFilterActive = ['Job ID'];
@@ -125,74 +163,71 @@ export class OpsModuleBillingComponent implements OnInit {
         }, 100);
         this.getShipments();
     }
-    async showCustomClearance(jobNo) {
-        let responses = await this.baseServices.getAsync(this.api_menu.Operation.CustomClearance.getByJob + "?jobNo=" + jobNo, false, true);
+
+    async showCustomClearance(jobNo: string) {
+        const responses = await this.baseServices.getAsync(this.api_menu.Operation.CustomClearance.getByJob + "?jobNo=" + jobNo, false, true);
         if (responses) {
             this.customClearances = this.sortService.sort(responses, 'clearanceNo', true);;
-        }
-        else {
+        } else {
             this.customClearances = [];
         }
-        console.log(this.customClearances);
     }
-    async confirmDelete(item: { id: string; }) {
+
+    async confirmDelete(item: any) {
         this.itemToDelete = item;
         const respone = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.checkAllowDelete + item.id, false, true);
-        if (respone === true) {
-            // $('#confirm-delete-job-modal').modal('show');
+        if (respone) {
             this.confirmDeleteJobPopup.show();
+            this.deleteMessage = `Do you want to delete job No ${item.jobNo}?`;
         } else {
             this.canNotDeleteJobPopup.show();
-            // $('#confirm-can-not-delete-job-modal').modal('show');
         }
     }
+
     async deleteJob() {
         const respone = await this.baseServices.deleteAsync(this.api_menu.Documentation.Operation.delete + this.itemToDelete.id, true, true);
         if (respone.status) {
-            // $('#confirm-delete-job-modal').modal('hide');
             this.confirmDeleteJobPopup.hide();
             this.getShipments();
         }
     }
-    isDesc = true;
-    sortKey: string = "clearanceNo";
-    sort(property) {
+
+    sort(property: string) {
         this.isDesc = !this.isDesc;
         this.sortKey = property;
         this.shipments = this.sortService.sort(this.shipments, property, this.isDesc);
     }
-    isCusDesc = true;
-    sortClearance(property) {
+
+    sortClearance(property: string) {
         this.isCusDesc = !this.isCusDesc;
         this.sortKey = property;
         this.customClearances = this.sortService.sort(this.customClearances, property, this.isCusDesc);
     }
+
     async getCustomers() {
-        let criteriaSearchColoader = { partnerGroup: PartnerGroupEnum.CUSTOMER, all: null };
+        const criteriaSearchColoader = { partnerGroup: PartnerGroupEnum.CUSTOMER, all: null };
         const partners = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, criteriaSearchColoader, false, false);
         if (partners != null) {
             this.customers = partners;
             this._dataService.setData('lstPartners', this.customers);
         }
     }
+
     async getShipments() {
         const responses = await this.baseServices.postAsync(this.api_menu.Documentation.Operation.paging + "?page=" + this.pager.currentPage + "&size=" + this.pager.pageSize, this.criteria, true, true);
         if (responses.data != null) {
-            console.log(responses.data);
             this.shipments = responses.data.opsTransactions;
             this.totalInProcess = responses.data.toTalInProcessing;
             this.totalOverdued = responses.data.totalOverdued;
             this.totalComplete = responses.data.toTalFinish;
             this.totalCanceled = responses.data.totalCanceled;
-        }
-        else {
+        } else {
             this.shipments = [];
             this.totalInProcess = 0;
             this.totalOverdued = 0;
             this.totalComplete = 0;
             this.totalCanceled = 0;
         }
-        console.log(this.shipments);
         this.pager.totalItems = responses.totalItems;
     }
     async getShipmentCommonData() {
@@ -201,39 +236,7 @@ export class OpsModuleBillingComponent implements OnInit {
         this.serviceModes = dataHelper.prepareNg2SelectData(data.serviceModes, 'value', 'displayName');
         this.shipmentModes = dataHelper.prepareNg2SelectData(data.shipmentModes, 'value', 'displayName');
     }
-    /**
-     * Daterange picker
-     */
-    searchFilters: Array<string> = ['Job ID', 'HBL'];
-    selectedRange: any;
-    selectedDate: any;
-    keepCalendarOpeningWithRange: true;
-    maxDate: moment.Moment = moment().endOf('month');
-    ranges: any = {
-        Today: [moment(), moment()],
-        Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-        'This Month': [moment().startOf('month'), moment().endOf('month')],
-        'Last Month': [
-            moment()
-                .subtract(1, 'month')
-                .startOf('month'),
-            moment()
-                .subtract(1, 'month')
-                .endOf('month')
-        ]
-    };
 
-    /**
-   * ng2-select
-   */
-    public items: Array<string> = ['option 1', 'option 2', 'option 3', 'option 4',
-        'option 5', 'option 6', 'option 7'];
-
-    private value: any = {};
-    private _disabledV: string = '0';
-    public disabled: boolean = false;
 
     private get disabledV(): string {
         return this._disabledV;
@@ -259,4 +262,5 @@ export class OpsModuleBillingComponent implements OnInit {
     public refreshValue(value: any): void {
         this.value = value;
     }
+
 }

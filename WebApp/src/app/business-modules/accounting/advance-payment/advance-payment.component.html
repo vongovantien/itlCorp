@@ -1,4 +1,3 @@
-<ng-progress id="myProgress"></ng-progress>
 <div class="advance-payment-page">
     <div class="m-subheader">
         <div class="d-flex align-items-center">
@@ -27,7 +26,7 @@
         </div>
     </div>
     <div class="m-content">
-        <adv-payment-form-search (onSearch)="getListAdvancePayment($event)"></adv-payment-form-search>
+        <adv-payment-form-search (onSearch)="onSearchAdvPayment($event)"></adv-payment-form-search>
         <div class="m-portlet">
             <div class="m-form">
                 <div class="m-portlet__body">
@@ -189,7 +188,7 @@
                                 <div class="tatable__pager-size">
                                     <div class="select-box">
                                         <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
-                                            (change)="selectPageSize(pageSize)" name="pagesize">
+                                            (change)="selectPageSize(pageSize, dataSearch)" name="pagesize">
                                             <ng-container
                                                 *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
                                                 <option [ngValue]="item">{{item}} line / screen</option>

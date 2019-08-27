@@ -5,7 +5,7 @@
         </div>
         <div class="c-button-actions">
             <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                routerLink="/home/operation/custom-clearance-addnew">
+                routerLink="/home/operation/custom-clearance/new">
                 <span>
                     <i class="la la-plus"></i>
                     <span>
@@ -22,7 +22,7 @@
                 </span>
             </button>
             <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                routerLink="/home/operation/custom-clearance-import">
+                routerLink="/home/operation/custom-clearance/import">
                 <span>
                     <i class="la la-download"></i>
                     <span>
@@ -109,7 +109,7 @@
                             </td>
                             <td>
                                 <a
-                                    [routerLink]="['/home/operation/custom-clearance-edit', { id: custom.id }]">{{custom.clearanceNo}}</a>
+                                    [routerLink]="['/home/operation/custom-clearance/detail', { id: custom.id }]">{{custom.clearanceNo}}</a>
                             </td>
                             <td>
                                 <span>{{custom.type}}</span>

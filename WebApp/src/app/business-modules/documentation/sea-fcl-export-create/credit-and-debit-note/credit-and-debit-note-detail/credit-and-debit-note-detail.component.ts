@@ -9,39 +9,39 @@ declare var $: any;
     templateUrl: './credit-and-debit-note-detail.component.html',
     styleUrls: ['./credit-and-debit-note-detail.component.scss']
 })
-export class CreditAndDebitNoteDetailComponent implements OnInit,AfterViewChecked {
-  
+export class CreditAndDebitNoteDetailComponent implements OnInit, AfterViewChecked {
+
     ngAfterViewChecked(): void {
         this.open = true;
         this.cdr.detectChanges();
     }
-    CDNoteEditing:any = null;
-    currentCDNo : string = null;
+    CDNoteEditing: any = null;
+    currentCDNo: string = null;
     previewModalId = "preview-modal";
     dataReport: any;
     @Output() CdNoteEditingEmiter = new EventEmitter<any>();
-    @Input() set EditingCDNoteNo(cdNo:string){
-        if(cdNo!=null){
+    @Input() set EditingCDNoteNo(cdNo: string) {
+        if (cdNo != null) {
             this.currentCDNo = cdNo;
-            this.getSOADetails(this.currentCDNo);
-        }
-      }
-
-    @Input() set updateStatus(updated:boolean){
-        if(updated){
             this.getSOADetails(this.currentCDNo);
         }
     }
 
-    async getSOADetails(soaNo:string){
-        this.CDNoteEditing = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails+"?JobId="+ExtendData.currentJobID+"&cdNo="+soaNo);
+    @Input() set updateStatus(updated: boolean) {
+        if (updated) {
+            this.getSOADetails(this.currentCDNo);
+        }
+    }
+
+    async getSOADetails(soaNo: string) {
+        this.CDNoteEditing = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?jobId=" + ExtendData.currentJobID + "&cdNo=" + soaNo);
         console.log(this.CDNoteEditing);
     }
     constructor(
         private baseServices: BaseService,
         private api_menu: API_MENU,
         private cdr: ChangeDetectorRef
-      ) { }
+    ) { }
 
     ngOnInit() {
     }
@@ -52,17 +52,17 @@ export class CreditAndDebitNoteDetailComponent implements OnInit,AfterViewChecke
         this.CdNoteEditingEmiter.emit(this.CDNoteEditing);
     }
 
-    open:boolean = false;
+    open: boolean = false;
 
-    close(){
+    close() {
         this.open = false;
     }
 
-    async Preview(){
+    async Preview() {
         this.dataReport = null;
     }
 
 
 
- 
+
 }

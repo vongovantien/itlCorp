@@ -8,7 +8,7 @@ namespace eFMS.API.System.DL.ViewModels
     {
         public string Id { get; set; }
         public string Username { get; set; }
-        public short UserGroupId { get; set; }
+        //public short UserGroupId { get; set; }
         public string EmployeeId { get; set; }
         public Guid? WorkPlaceId { get; set; }
         public bool? RefuseEmail { get; set; }

@@ -64,6 +64,11 @@ export class AdvancePaymentListRequestComponent extends AppList {
 
                     this.totalAmount = this.updateTotalAmount(this.listRequestAdvancePayment);
                     this.updateCurrencyForRequest(data);
+                },
+                (errors: any) => {
+                    this.handleError(errors, (data: any) => {
+                        this._toastService.error(data.message, data.title);
+                    });
                 }
             );
     }

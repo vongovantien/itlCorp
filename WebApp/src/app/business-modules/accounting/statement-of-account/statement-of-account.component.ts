@@ -5,8 +5,8 @@ import { catchError, finalize } from "rxjs/operators";
 import { AppList } from "src/app/app.list";
 import { SOA } from "src/app/shared/models";
 import { ToastrService } from "ngx-toastr";
-import { HttpErrorResponse } from "@angular/common/http";
 import { SortService } from "src/app/shared/services";
+import { NgProgress } from "@ngx-progressbar/core";
 
 @Component({
     selector: 'app-statement-of-account',
@@ -26,11 +26,15 @@ export class StatementOfAccountComponent extends AppList {
     constructor(
         private _accoutingRepo: AccoutingRepo,
         private _toastService: ToastrService,
-        private _sortService: SortService
+        private _sortService: SortService,
+        private _progressService: NgProgress,
+
     ) {
         super();
 
         this.requestSort = this.sortLocal;
+        this.requestList = this.getSOAs;
+        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
@@ -56,9 +60,10 @@ export class StatementOfAccountComponent extends AppList {
     }
 
     onConfirmDeleteSOA() {
+        this._progressRef.start();
         this._accoutingRepo.deleteSOA(this.selectedSOA.soano).pipe(
             catchError(this.catchError),
-            finalize(() => { this.confirmPopup.hide(); })
+            finalize(() => { this.confirmPopup.hide(); this._progressRef.complete(); })
         ).subscribe(
             (res: any) => {
                 this._toastService.success(res.message, '', { positionClass: 'toast-bottom-right' });
@@ -67,7 +72,9 @@ export class StatementOfAccountComponent extends AppList {
                 this.getSOAs();
             },
             (errors: any) => {
-                this.handleError(errors);
+                this.handleError(errors, (data: any) => {
+                    this._toastService.error(data.message, data.title);
+                });
             },
             () => { }
         );
@@ -75,17 +82,20 @@ export class StatementOfAccountComponent extends AppList {
 
     getSOAs(data: any = {}) {
         this.isLoading = true;
+        this._progressRef.start();
         this._accoutingRepo.getListSOA(this.page, this.pageSize, Object.assign(data, { CurrencyLocal: 'VND' }))
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { this.isLoading = false; })
+                finalize(() => { this.isLoading = false; this._progressRef.complete(); })
             ).subscribe(
                 (res: any) => {
                     this.SOAs = (res.data || []).map((item: SOA) => new SOA(item));
                     this.totalItems = res.totalItems || 0;
                 },
                 (errors: any) => {
-                    this.handleError(errors);
+                    this.handleError(errors, (errorData: any) => {
+                        this._toastService.error(errorData.message, errorData.title);
+                    });
                 },
                 () => { }
 
@@ -94,16 +104,6 @@ export class StatementOfAccountComponent extends AppList {
 
     sortLocal(sort: string): void {
         this.SOAs = this._sortService.sort(this.SOAs, sort, this.order);
-    }
-
-    handleError(errors: any) {
-        let message: string = 'Has Error Please Check Again !';
-        let title: string = '';
-        if (errors instanceof HttpErrorResponse) {
-            message = errors.message;
-            title = errors.statusText;
-        }
-        this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
     }
 
 }

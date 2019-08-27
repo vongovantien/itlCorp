@@ -2,61 +2,61 @@ import { AppPage } from './app.base';
 
 export abstract class AppList extends AppPage {
 
-  page: number = 1;
-  totalItems: number = 0;
-  numberToShow: number[] = [3, 15, 30,  50];
-  pageSize: number = this.numberToShow[1];
+    page: number = 1;
+    totalItems: number = 0;
+    numberToShow: number[] = [3, 15, 30, 50];
+    pageSize: number = this.numberToShow[1];
 
-  sort: string = null;
-  order: any = false;
-  keyword: string = '';
-  requestList: any = null;
-  requestSort: any = null;
-  
-  constructor() {
-    super();
-  }
+    sort: string = null;
+    order: any = false;
+    keyword: string = '';
+    requestList: any = null;
+    requestSort: any = null;
 
-  setSortBy(sort?: string, order?: boolean): void {
-    this.sort = sort ? sort : 'code';
-    this.order = order;
-  }
-
-  sortBy(sort: string): void {
-    if (!!sort) {
-      this.setSortBy(sort, this.sort !== sort ? true : !this.order);
-
-      if (typeof (this.requestSort) === 'function') {
-        // this.requestList(this.sort, this.order);   // sort server
-        this.requestSort(this.sort, this.order);   // sort Local
-      }
+    constructor() {
+        super();
     }
-  }
 
-  sortClass(sort: string): string {
-    if (!!sort) {
-      let classes = 'sortable ';
-      if (this.sort === sort) {
-        classes += ('sort-' + (this.order ? 'asc' : 'desc') + ' ');
-      }
-
-      return classes;
+    setSortBy(sort?: string, order?: boolean): void {
+        this.sort = sort ? sort : 'code';
+        this.order = order;
     }
-    return '';
-  }
 
-  pageChanged(event: any): void {
-    if (this.page !== event.page || this.pageSize !== event.itemsPerPage) {
-      this.page = event.page;
-      this.pageSize = event.itemsPerPage;
+    sortBy(sort: string): void {
+        if (!!sort) {
+            this.setSortBy(sort, this.sort !== sort ? true : !this.order);
 
-      this.requestList();
+            if (typeof (this.requestSort) === 'function') {
+                // this.requestList(this.sort, this.order);   // sort server
+                this.requestSort(this.sort, this.order);   // sort Local
+            }
+        }
     }
-  }
 
-  selectPageSize(pageSize: number) {
-    this.pageSize = pageSize;
-    this.requestList();
-  }
+    sortClass(sort: string): string {
+        if (!!sort) {
+            let classes = 'sortable ';
+            if (this.sort === sort) {
+                classes += ('sort-' + (this.order ? 'asc' : 'desc') + ' ');
+            }
+
+            return classes;
+        }
+        return '';
+    }
+
+    pageChanged(event: any): void {
+        if (this.page !== event.page || this.pageSize !== event.itemsPerPage) {
+            this.page = event.page;
+            this.pageSize = event.itemsPerPage;
+
+            this.requestList();
+        }
+    }
+
+    selectPageSize(pageSize: number, data?: any) {
+        this.pageSize = pageSize;
+        this.requestList(data);
+    }
 
 }
