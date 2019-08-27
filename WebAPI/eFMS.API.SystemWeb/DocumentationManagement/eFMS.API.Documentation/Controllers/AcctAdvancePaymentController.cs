@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -127,22 +129,23 @@ namespace eFMS.API.Documentation.Controllers
                     }
                 }
 
-                //Kiểm tra tồn tại shipment trong 1 Advance Payment khác. Nếu đã tồn tại thì báo lỗi
-                foreach(var item in model.AdvanceRequests)
-                {
-                    var shipment = new ShipmentAdvancePaymentCriteria
-                    {
-                        JobId = item.JobId,
-                        HBL = item.Hbl,
-                        MBL = item.Mbl,
-                        AdvanceNo = item.AdvanceNo
-                    };
-                    if (acctAdvancePaymentService.CheckShipmentsExistInAdvancePayment(shipment))
-                    {
-                        ResultHandle _result = new ResultHandle { Status = false, Message = "Duplicate Shipment" };
-                        return BadRequest(_result);
-                    }
-                }
+                //Kiểm tra tồn tại shipment trong 1 Advance Payment khác. Nếu đã tồn tại thì báo lỗi 
+                //Updated 27/08/2019 by Andy.Hoa - [ĐÃ THAY ĐỔI YÊU CẦU - 1 SHIPMENT CHO PHÉP ĐƯỢC TẠO TRONG NHIỀU ADVANCE PAYMENT]
+                //foreach(var item in model.AdvanceRequests)
+                //{
+                //    var shipment = new ShipmentAdvancePaymentCriteria
+                //    {
+                //        JobId = item.JobId,
+                //        HBL = item.Hbl,
+                //        MBL = item.Mbl,
+                //        AdvanceNo = item.AdvanceNo
+                //    };
+                //    if (acctAdvancePaymentService.CheckShipmentsExistInAdvancePayment(shipment))
+                //    {
+                //        ResultHandle _result = new ResultHandle { Status = false, Message = "Duplicate Shipment" };
+                //        return BadRequest(_result);
+                //    }
+                //}
             }
 
             var hs = acctAdvancePaymentService.AddAdvancePayment(model);
@@ -255,21 +258,22 @@ namespace eFMS.API.Documentation.Controllers
                 }
 
                 //Kiểm tra tồn tại shipment trong 1 Advance Payment khác. Nếu đã tồn tại thì báo lỗi
-                foreach (var item in model.AdvanceRequests)
-                {
-                    var shipment = new ShipmentAdvancePaymentCriteria
-                    {
-                        JobId = item.JobId,
-                        HBL = item.Hbl,
-                        MBL = item.Mbl,
-                        AdvanceNo = model.AdvanceNo//Truyền vào Advance No cần update
-                    };
-                    if (acctAdvancePaymentService.CheckShipmentsExistInAdvancePayment(shipment))
-                    {
-                        ResultHandle _result = new ResultHandle { Status = false, Message = "Duplicate Shipment" };
-                        return BadRequest(_result);
-                    }
-                }
+                //Updated 27/08/2019 by Andy.Hoa - [ĐÃ THAY ĐỔI YÊU CẦU - 1 SHIPMENT CHO PHÉP ĐƯỢC TẠO TRONG NHIỀU ADVANCE PAYMENT]
+                //foreach (var item in model.AdvanceRequests)
+                //{
+                //    var shipment = new ShipmentAdvancePaymentCriteria
+                //    {
+                //        JobId = item.JobId,
+                //        HBL = item.Hbl,
+                //        MBL = item.Mbl,
+                //        AdvanceNo = model.AdvanceNo//Truyền vào Advance No cần update
+                //    };
+                //    if (acctAdvancePaymentService.CheckShipmentsExistInAdvancePayment(shipment))
+                //    {
+                //        ResultHandle _result = new ResultHandle { Status = false, Message = "Duplicate Shipment" };
+                //        return BadRequest(_result);
+                //    }
+                //}
             }
 
             var hs = acctAdvancePaymentService.UpdateAdvancePayment(model);
@@ -310,15 +314,85 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
-        /// Test send mail
+        /// Save and Send Request
         /// </summary>
+        /// <param name="model"></param>
         /// <returns></returns>
-        //[HttpGet]
-        //[Route("TestSendMail")]
-        //public IActionResult TestSendMail(string advanceNo, string userApprove)
-        //{
-        //    var result = acctAdvancePaymentService.UpdateApproval(advanceNo, userApprove);
-        //    return Ok(result);
-        //}
+        [HttpPost]
+        [Route("SaveAndSendRequest")]
+        public IActionResult SaveAndSendRequest(AcctAdvancePaymentModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest();           
+
+            if (model.AdvanceRequests.Count > 0)
+            {
+                //Nếu sum(Amount) > 100.000.000 & Payment Method là Cash thì báo lỗi
+                if (model.PaymentMethod.Equals("Cash"))
+                {
+                    var totalAmount = model.AdvanceRequests.Sum(x => x.Amount);
+                    if (totalAmount > 100000000)
+                    {
+                        ResultHandle _result = new ResultHandle { Status = false, Message = "Total Advance Amount by cash is not exceed 100.000.000 VND" };
+                        return BadRequest(_result);
+                    }
+                }
+
+                //Kiểm tra tồn tại shipment trong 1 Advance Payment khác. Nếu đã tồn tại thì báo lỗi
+                //Updated 27/08/2019 by Andy.Hoa - [ĐÃ THAY ĐỔI YÊU CẦU - 1 SHIPMENT CHO PHÉP ĐƯỢC TẠO TRONG NHIỀU ADVANCE PAYMENT]
+                //foreach (var item in model.AdvanceRequests)
+                //{
+                //    var shipment = new ShipmentAdvancePaymentCriteria
+                //    {
+                //        JobId = item.JobId,
+                //        HBL = item.Hbl,
+                //        MBL = item.Mbl,
+                //        AdvanceNo = model.AdvanceNo//Truyền vào Advance No cần update
+                //    };
+                //    if (acctAdvancePaymentService.CheckShipmentsExistInAdvancePayment(shipment))
+                //    {
+                //        ResultHandle _result = new ResultHandle { Status = false, Message = "Duplicate Shipment" };
+                //        return BadRequest(_result);
+                //    }
+                //}
+            }
+
+            HandleState hs;
+            if (string.IsNullOrEmpty(model.AdvanceNo))//Insert Advance Payment
+            {
+                hs = acctAdvancePaymentService.AddAdvancePayment(model);
+            }
+            else //Update Advance Payment
+            {
+                if (!model.StatusApproval.Equals("New") && !model.StatusApproval.Equals("Denied"))
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = "Only allowed to edit the advance payment status is New or Deny" };
+                    return BadRequest(_result);
+                }
+
+                hs = acctAdvancePaymentService.UpdateAdvancePayment(model);
+            }
+
+            AcctApproveAdvanceModel approve = new AcctApproveAdvanceModel
+            {
+                AdvanceNo = model.AdvanceNo,
+                Requester = model.Requester
+            };
+            var resultInsertUpdateApprove = acctAdvancePaymentService.InsertOrUpdateApprovalAdvance(approve);
+            if (!resultInsertUpdateApprove.Success)
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = resultInsertUpdateApprove.Exception.Message };
+                return BadRequest(_result);
+            }
+
+            var message = HandleError.GetMessage(hs, Crud.Insert);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);           
+        }
+
+
     }
 }

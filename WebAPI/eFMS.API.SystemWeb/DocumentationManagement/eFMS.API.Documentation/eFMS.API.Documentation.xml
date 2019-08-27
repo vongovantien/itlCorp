@@ -102,6 +102,13 @@
             <param name="advance"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctAdvancePaymentController.SaveAndSendRequest(eFMS.API.Documentation.DL.Models.AcctAdvancePaymentModel)">
+            <summary>
+            Save and Send Request
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.AcctSOAController">
             <summary>
             A base class for an MVC controller without view support.
