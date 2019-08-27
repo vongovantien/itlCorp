@@ -172,10 +172,10 @@ export class CustomClearanceComponent extends AppList {
 
     onComfirmConvertToJobs() {
         this.confirmConvertPopup.hide();
-        this._progressRef.start();
         const clearancesToConvert = this.mapClearancesToJobs();
         const clearanceNulls = clearancesToConvert.filter(x => x.opsTransaction == null);
         if (clearanceNulls.length === 0) {
+            this._progressRef.start();
             this._cdNoteRepo.convertClearanceToJob(clearancesToConvert)
                 .pipe(
                     catchError(this.catchError),
