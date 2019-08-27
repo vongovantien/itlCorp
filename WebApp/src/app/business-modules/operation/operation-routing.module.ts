@@ -21,16 +21,16 @@ const routes: Routes = [
         path: "custom-clearance",
         loadChildren: () => import('./custom-clearance/custom-clearance.module').then(m => m.CustomClearanceModule),
     },
-   
+
     {
         path: "trucking-assigment",
         component: TruckingAssignmentComponent,
         data: {
             name: "Trucking Assigment",
-            level: 2
-        }
-    },
-    
+            evel: 2
+
+        },
+    }
 ];
 
 @NgModule({
