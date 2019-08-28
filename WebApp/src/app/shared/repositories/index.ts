@@ -4,4 +4,5 @@ export * from './cdNote.repo';
 export * from './accouting.repo';
 export * from './container.repo';
 export * from './unit.repo';
+export * from './customdeclaration.repo';
 

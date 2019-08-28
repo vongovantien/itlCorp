@@ -4,11 +4,13 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Add Custom Declaration</h5>
-        <button type="button" class="close" aria-label="Close" (click)="close()">
+        <button type="button" class="close" aria-label="Close"
+          (click)="checkAllNotImported = false;changeAllNotImported(); close()">
           <span aria-hidden="true">&times;</span>
         </button>
         <div class="modal-actions c-button-actions">
-          <button type="button" class="btn btn-sm btn-default m-btn--square m-btn--icon m-btn--uppercase">
+          <button type="button" class="btn btn-sm btn-default m-btn--square m-btn--icon m-btn--uppercase"
+            (click)="refreshData(); checkAllNotImported = false; changeAllNotImported()">
             <span>
               <i class="la la-refresh"></i>
               <span>
@@ -31,7 +33,8 @@
                   <div class="form-group">
                     <div class="m-input-icon m-input-icon--left">
                       <input type="text" class="form-control m-input m-input--square" placeholder="Search..."
-                        autocomplete="nope">
+                        autocomplete="nope" [(ngModel)]="keyword" name="keyword" (change)="keyword = keyword.trim();"
+                        (keyup)="searchClearanceNotImported($event)">
                       <span class="m-input-icon__icon m-input-icon__icon--left">
                         <span>
                           <i class="la la-search"></i>
@@ -75,7 +78,7 @@
                     </td>
                   </tr>
                   <ng-container *ngIf="notImportedCustomClearances">
-                    <tr class="" *ngFor="let item of notImportedCustomClearances; let i=index">
+                    <tr class="" *ngFor="let item of notImportedCustomClearances; let i=index; trackBy: trackByFn">
                       <td class="table-actions-col">
                         <div class="table-actions">
                           <label class="m-checkbox">
@@ -181,7 +184,7 @@
         <!--end::Form-->
       </div>
       <div class="modal-footer m--align-center">
-        <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+        <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="updateJobToClearance()">
           <span>
             <i class="la la-save"></i>
             <span>
@@ -189,7 +192,8 @@
             </span>
           </span>
         </button>
-        <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" (click)="close()">
+        <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
+          (click)="checkAllNotImported = false;changeAllNotImported();close()">
           <span>
             <i class="la la-ban"></i>
             <span>
