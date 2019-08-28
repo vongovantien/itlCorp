@@ -56,6 +56,7 @@ export abstract class AppList extends AppPage {
 
     selectPageSize(pageSize: number, data?: any) {
         this.pageSize = pageSize;
+        this.page = 1;  // TODO reset page to initial
         this.requestList(data);
     }
 

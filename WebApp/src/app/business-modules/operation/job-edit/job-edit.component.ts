@@ -19,7 +19,7 @@ import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDeta
 import { OpsModuleCreditDebitNoteEditComponent } from './credit-debit-note/ops-module-credit-debit-note-edit/ops-module-credit-debit-note-edit.component';
 import { ChargeConstants } from 'src/constants/charge.const';
 import { ContainerListComponent } from './container-list/container-list.component';
-import { ContainerRepo, UnitRepo } from 'src/app/shared/repositories';
+import { OperationRepo, UnitRepo } from 'src/app/shared/repositories';
 import { AppPage } from "src/app/app.base";
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { CancelCreateJobPopupComponent } from './job-confirm-popup/cancel-create-job-popup/cancel-create-job-popup.component';
@@ -129,7 +129,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         private route: ActivatedRoute,
         private router: Router,
         private _unitRepo: UnitRepo,
-        private _containerRepo: ContainerRepo,
+        private _operationRepo: OperationRepo,
         private _data: DataService,
         private sortService: SortService) {
         super();
@@ -187,7 +187,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     getListContainersOfJob() {
-        this._containerRepo.getListContainersOfJob({ mblid: this.opsTransaction.id })
+        this._operationRepo.getListContainersOfJob({ mblid: this.opsTransaction.id })
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {

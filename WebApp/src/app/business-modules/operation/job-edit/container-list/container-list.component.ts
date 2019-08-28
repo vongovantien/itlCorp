@@ -1,5 +1,4 @@
 import { Component, OnInit, Input, EventEmitter, Output, ViewChild } from '@angular/core';
-import { ContainerRepo } from 'src/app/shared/repositories/container.repo';
 import { catchError, finalize } from 'rxjs/operators';
 import * as dataHelper from 'src/helper/data.helper';
 import { BaseService, SortService } from 'src/app/shared/services';
@@ -34,7 +33,6 @@ export class ContainerListComponent extends PopupBase implements OnInit {
   listUnits: any[] = [];
 
   constructor(
-    private _containerRepo: ContainerRepo,
     private baseServices: BaseService,
     private api_menu: API_MENU,
     private sortService: SortService,

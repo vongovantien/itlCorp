@@ -1,4 +1,3 @@
-<!--begin:: subheader-->
 <div class="m-subheader">
     <div class="d-flex align-items-center">
         <div class="mr-auto">
@@ -21,159 +20,8 @@
 <div class="m-content">
     <div class="row">
         <div class="col-xl-12">
-            <div class="m-portlet">
-                <div class="m-form">
-                    <div class="m-portlet__body">
-                        <div class="row">
-                            <div class="col-lg-8">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        Search text
-                                    </label>
-                                    <input type="text" class="form-control m-input m-input--square" autocomplete="nope"
-                                        placeholder="Search text" [(ngModel)]="searchString" name="searchString"
-                                        (change)="searchString = searchString.trim()">
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">
-                                        Select filter
-                                    </label>
-                                    <ng-select [allowClear]="true" [items]="searchFilters" (data)="refreshValue($event)"
-                                        (selected)="selectedFilter  = $event.id" (removed)="selectedFilter = null"
-                                        (typed)="typed($event)" placeholder="Select filter"
-                                        [active]="searchFilterActive">
-                                    </ng-select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="collapse" id="advance-search-of-job">
-                            <div class="div-inside bg-secondary">
-                                <div class="row">
-                                    <div class="col-lg-4">
-                                        <div class="form-group">
-                                            <label class="form-control-label" for="">
-                                                Product Service
-                                            </label>
-                                            <ng-select [allowClear]="true" [items]="productServices"
-                                                (data)="refreshValue($event)"
-                                                (selected)="criteria.productService = $event.id"
-                                                (removed)="criteria.productService = null" (typed)="typed($event)"
-                                                placeholder="Select filter">
-                                            </ng-select>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <div class="form-group">
-                                            <label class="form-control-label" for="">
-                                                Service Mode
-                                            </label>
-                                            <ng-select [allowClear]="true" [items]="serviceModes"
-                                                (data)="refreshValue($event)"
-                                                (selected)="criteria.serviceMode = $event.id"
-                                                (removed)="criteria.serviceMode = null" (typed)="typed($event)"
-                                                placeholder="Select filter">
-                                            </ng-select>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <div class="form-group">
-                                            <label class="form-control-label" for="">
-                                                Shipment Mode
-                                            </label>
-                                            <ng-select [allowClear]="true" [items]="shipmentModes"
-                                                (data)="refreshValue($event)"
-                                                (selected)="criteria.shipmentMode = $event.id"
-                                                (removed)="criteria.shipmentMode = null" (typed)="typed($event)"
-                                                placeholder="Select filter">
-                                            </ng-select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row" *ngIf="isReset">
-                                    <div class="col-lg-4">
-                                        <div class="form-group">
-                                            <label class="form-control-label" for="">
-                                                Customer (Payer)
-                                            </label>
-                                            <app-combo-grid-virtual-scroll
-                                                [currentActiveItemId]="{field:'id',value:criteria.customerId}"
-                                                (itemSelected)="criteria.customerId = $event.id;"
-                                                [selectedDisplayFields]="['partnerNameEn']" [dataSources]="customers"
-                                                [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
-                                            </app-combo-grid-virtual-scroll>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <div class="form-group">
-                                            <label class="form-control-label" for="">
-                                                Field OPS
-                                            </label>
-                                            <app-combo-grid-virtual-scroll
-                                                [currentActiveItemId]="{field:'id',value:criteria.fieldOps}"
-                                                (itemSelected)="criteria.fieldOps = $event.id;"
-                                                [selectedDisplayFields]="['employeeNameVn']"
-                                                [dataSources]="userInCharges"
-                                                [displayFields]="[{'field':'username','label':'User Name'},{'field':'employeeNameVn','label':'Full Name'}]">
-                                            </app-combo-grid-virtual-scroll>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <div class="form-group form-control-serviceDateFromTo">
-                                            <label class="form-control-label" for="">
-                                                Service Date From - To
-                                            </label>
-                                            <input type="text" class="form-control m-input m-input--square"
-                                                ngxDaterangepickerMd [autoApply]="true"
-                                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                                [(ngModel)]="selectedRange" [ranges]="ranges" [maxDate]="maxDate"
-                                                [alwaysShowCalendars]="true" name="daterange"
-                                                placeholder="From date - to date" readonly />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-actions">
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <a class="btn btn-link collapsed collapse-toggle" data-toggle="collapse"
-                                        href="#advance-search-of-job" role="button" aria-expanded="false"
-                                        (click)="isFilterTime = !isFilterTime" aria-controls="advance-search-of-job">
-                                        <span>
-                                            <i class="la la-angle-up"></i>
-                                            <span>Advance search</span>
-                                        </span>
-                                    </a>
-                                </div>
-                                <div class="col-lg-6 m--align-right">
-                                    <button type="button"
-                                        class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                                        (click)="searchShipment()">
-                                        <span>
-                                            <i class="la la-search"></i>
-                                            <span>
-                                                Search
-                                            </span>
-                                        </span>
-                                    </button>
-                                    <button type="button"
-                                        class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
-                                        (click)="resetSearch()">
-                                        <span>
-                                            <i class="la la-refresh"></i>
-                                            <span>
-                                                Reset
-                                            </span>
-                                        </span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <job-management-form-search (onSearch)="onSearchShipment($event)"></job-management-form-search>
+            
             <div class="m-portlet">
                 <div class="alert-block alert-block-red">
                     <div class="alert-block__heading">
@@ -222,68 +70,16 @@
                                     <thead>
                                         <tr>
                                             <th class="table-actions-col no-sorting"></th>
-                                            <th class="sorting"
-                                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'jobNo'), 'sorting_desc': (!isDesc && sortKey == 'jobNo') }"
-                                                (click)="sort('jobNo')">
-                                                <span>Job ID</span>
-                                            </th>
-                                            <th class="sorting"
-                                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'hwbno'), 'sorting_desc': (!isDesc && sortKey == 'hwbno') }"
-                                                (click)="sort('hwbno')">
-                                                <span>HBL</span>
-                                            </th>
-                                            <th class="sorting"
-                                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'serviceDate'), 'sorting_desc': (!isDesc && sortKey == 'serviceDate') }"
-                                                (click)="sort('serviceDate')">
-                                                <span>Service Date</span>
-                                            </th>
-                                            <th>
-                                                <span>Service Port</span>
-                                            </th>
-                                            <th class="sorting"
-                                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'flightVessel'), 'sorting_desc': (!isDesc && sortKey == 'flightVessel') }"
-                                                (click)="sort('flightVessel')">
-                                                <span>Flight/Vessel</span>
-                                            </th>
-                                            <th class="sorting"
-                                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'sumContainers'), 'sorting_desc': (!isDesc && sortKey == 'sumContainers') }"
-                                                (click)="sort('sumContainers')">
-                                                <span>Cont Q'ty</span>
-                                            </th>
-                                            <th class="sorting"
-                                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'sumPackages'), 'sorting_desc': (!isDesc && sortKey == 'sumPackages') }"
-                                                (click)="sort('sumPackages')">
-                                                <span>Pack Q'ty</span>
-                                            </th>
-                                            <th class="sorting"
-                                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'sumGrossWeight'), 'sorting_desc': (!isDesc && sortKey == 'sumGrossWeight') }"
-                                                (click)="sort('sumGrossWeight')">
-                                                <span>G.W</span>
-                                            </th>
-                                            <th class="sorting"
-                                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'sumCBM'), 'sorting_desc': (!isDesc && sortKey == 'sumCBM') }"
-                                                (click)="sort('sumCBM')">
-                                                <span>CBM</span>
-                                            </th>
-                                            <th class="sorting"
-                                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'invoiceNo'), 'sorting_desc': (!isDesc && sortKey == 'invoiceNo') }"
-                                                (click)="sort('invoiceNo')">
-                                                <span>Invoice No</span>
-                                            </th>
-                                            <th class="sorting"
-                                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'modifiedDate'), 'sorting_desc': (!isDesc && sortKey == 'modifiedDate') }"
-                                                (click)="sort('modifiedDate')">
-                                                <span>Modified Date</span>
-                                            </th>
-                                            <th class="sorting"
-                                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'currentStatus'), 'sorting_desc': (!isDesc && sortKey == 'currentStatus') }"
-                                                (click)="sort('currentStatus')">
-                                                <span>Status</span>
+                                            <th *ngFor="let header of headers; trackBy: trackByFn"
+                                                [class]="sortClass(header.sortable ? header.field : '')"
+                                                (click)="sortBy(header.sortable ? header.field : '')">
+                                                <span>{{header.title}}</span>
+                                                <span class="sort-indicator"></span>
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody class="tbody-group" *ngIf="shipments.length > 0; else norecord">
-                                        <ng-container *ngFor="let item of shipments; let i=index">
+                                        <ng-container *ngFor="let item of shipments; let i = index; trackBy: trackByFn">
 
                                             <tr class="collapse-toggle-row">
                                                 <td class="table-actions-col">
@@ -292,7 +88,7 @@
                                                             class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed"
                                                             data-toggle="collapse"
                                                             [attr.data-target]="'#ops-shipment-00' + (item.id+1)"
-                                                            title="Collapse" (click)="showCustomClearance(item.jobNo)">
+                                                            title="Collapse" (click)="showCustomClearance(item.jobNo, i)">
                                                             <i class="la la-angle-up"></i>
                                                         </button>
                                                         <button type="button"
@@ -303,7 +99,7 @@
                                                         </button>
                                                         <button type="button"
                                                             class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            title="Remove" (click)="confirmDelete(item)">
+                                                            title="Remove" (click)="deleteSipment(item)">
                                                             <i class="la la-trash"></i>
                                                         </button>
                                                     </div>
@@ -367,56 +163,16 @@
                                                             <table class="table table-secondary dataTable">
                                                                 <thead>
                                                                     <tr>
-                                                                        <th class="sorting"
-                                                                            [ngClass]="{ 'sorting_asc ': (isCusDesc && sortKey == 'clearanceNo'), 'sorting_desc': (!isCusDesc && sortKey == 'clearanceNo') }"
-                                                                            (click)="sortClearance('clearanceNo')">
-                                                                            <span>Custom No</span>
-                                                                        </th>
-                                                                        <th class="sorting"
-                                                                            [ngClass]="{ 'sorting_asc ': (isCusDesc && sortKey == 'clearanceDate'), 'sorting_desc': (!isCusDesc && sortKey == 'clearanceDate') }"
-                                                                            (click)="sortClearance('clearanceDate')">
-                                                                            <span>Transfer Date</span>
-                                                                        </th>
-                                                                        <th class="sorting"
-                                                                            [ngClass]="{ 'sorting_asc ': (isCusDesc && sortKey == 'hblid'), 'sorting_desc': (!isCusDesc && sortKey == 'hblid') }"
-                                                                            (click)="sortClearance('hblid')">
-                                                                            <span>HBL No</span>
-                                                                        </th>
-                                                                        <th class="sorting"
-                                                                            [ngClass]="{ 'sorting_asc ': (isCusDesc && sortKey == 'exportCountryCode'), 'sorting_desc': (!isCusDesc && sortKey == 'exportCountryCode') }"
-                                                                            (click)="sortClearance('exportCountryCode')">
-                                                                            <span>Export Country</span>
-                                                                        </th>
-                                                                        <th class="sorting"
-                                                                            [ngClass]="{ 'sorting_asc ': (isCusDesc && sortKey == 'importCountryCode'), 'sorting_desc': (!isCusDesc && sortKey == 'importCountryCode') }"
-                                                                            (click)="sortClearance('importCountryCode')">
-                                                                            <span>Import Country</span>
-                                                                        </th>
-                                                                        <th class="sorting"
-                                                                            [ngClass]="{ 'sorting_asc ': (isCusDesc && sortKey == 'commodityCode'), 'sorting_desc': (!isCusDesc && sortKey == 'commodityCode') }"
-                                                                            (click)="sortClearance('commodityCode')">
-                                                                            <span>Commodity Code</span>
-                                                                        </th>
-                                                                        <th class="sorting"
-                                                                            [ngClass]="{ 'sorting_asc ': (isCusDesc && sortKey == 'qtyCont'), 'sorting_desc': (!isCusDesc && sortKey == 'qtyCont') }"
-                                                                            (click)="sortClearance('qtyCont')">
-                                                                            <span>Q'ty</span>
-                                                                        </th>
-                                                                        <th class="sorting"
-                                                                            [ngClass]="{ 'sorting_asc ': (isCusDesc && sortKey == 'source'), 'sorting_desc': (!isCusDesc && sortKey == 'source') }"
-                                                                            (click)="sortClearance('source')">
-                                                                            <span>Source</span>
-                                                                        </th>
-                                                                        <th class="sorting"
-                                                                            [ngClass]="{ 'sorting_asc ': (isCusDesc && sortKey == 'note'), 'sorting_desc': (!isCusDesc && sortKey == 'note') }"
-                                                                            (click)="sortClearance('note')">
-                                                                            <span>Note</span>
+                                                                        <th *ngFor="let header of headerCustomClearance; trackBy: trackByFn" [class]="sortClassCustomClearance(header.sortable ? header.field : '')"
+                                                                            (click)="sortByCustomClearance(header.sortable ? header.field : '')">
+                                                                            <span>{{header.title}}</span>
+                                                                            <span class="sort-indicator"></span>
                                                                         </th>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody *ngIf="customClearances.length > 0">
                                                                     <tr
-                                                                        *ngFor="let clearance of customClearances; let j=index">
+                                                                        *ngFor="let clearance of customClearances; let j = index; trackBy: trackByFn">
                                                                         <td>
                                                                             <span>{{ clearance.clearanceNo }}</span>
                                                                         </td>
@@ -465,8 +221,30 @@
                                     </ng-template>
                                 </table>
                             </div>
-                            <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)"
-                                (pagerObject)="setPage($event)"></app-pagination>
+                            <div class="pagination-nav">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="tatable__pager-size">
+                                            <div class="select-box">
+                                                <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
+                                                    (change)="selectPageSize(pageSize, dataSearch)" name="pagesize">
+                                                    <ng-container *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
+                                                        <option [ngValue]="item">{{item}} line / screen</option>
+                                                    </ng-container>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6" *ngIf="totalItems > pageSize">
+                                        <div class="float-right">
+                                            <pagination [boundaryLinks]="true" [totalItems]="totalItems" [itemsPerPage]="pageSize"
+                                                (pageChanged)="pageChanged($event)" [(ngModel)]="page">
+                                            </pagination>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                           
                         </div>
                     </div>
                 </div>
@@ -480,6 +258,6 @@
     </div>
 </div>
 
-<confirm-popup (onSubmit)="deleteJob()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>
+<confirm-popup (onSubmit)="onDeleteShipment()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>
 
 <info-popup [body]="'You are not allow to delete this job'"></info-popup>

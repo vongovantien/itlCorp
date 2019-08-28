@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { JobRepo, SystemRepo, CDNoteRepo, AccoutingRepo, UnitRepo } from '.';
-import { ContainerRepo } from './container.repo';
+import { OperationRepo } from './operation.repo';
 
 @NgModule({
     providers: [
@@ -8,8 +8,8 @@ import { ContainerRepo } from './container.repo';
         SystemRepo,
         CDNoteRepo,
         AccoutingRepo,
-        ContainerRepo,
-        UnitRepo
+        UnitRepo,
+        OperationRepo
     ],
 })
 export class RepositoryModule {

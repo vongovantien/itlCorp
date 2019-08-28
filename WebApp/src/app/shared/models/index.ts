@@ -1,3 +1,4 @@
+import { from } from 'rxjs';
 
 export * from './system/user';
 export * from './operation/stage';
@@ -8,6 +9,8 @@ export * from './accouting/soa.model';
 export * from './accouting/soa-search-charge';
 export * from './operation/custom-declaration';
 export * from './accouting/advance-payment';
+export * from './operation/shipment';
+
 
 
 
