@@ -14,6 +14,7 @@ using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using eFMS.API.Common;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -505,7 +506,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (advance.AdvanceRequests.Count > 0)
             {
-                foreach (var jobId in advance.AdvanceRequests.Select(x => x.JobId))
+                foreach (var jobId in advance.AdvanceRequests.GroupBy(x=>x.JobId).Select(x => x.FirstOrDefault().JobId))
                 {
                     OpsTransactionCriteria criteria = new OpsTransactionCriteria
                     {
@@ -522,25 +523,25 @@ namespace eFMS.API.Documentation.DL.Services
                     }
 
                     //Lấy ra chuỗi JobId
-                    strJobId += jobId + ",";
+                    strJobId += !string.IsNullOrEmpty(jobId) ? jobId + "," : "";
                 }
 
                 //Lấy ra chuỗi HBL
-                foreach (var hbl in advance.AdvanceRequests.Select(x => x.Hbl))
+                foreach (var hbl in advance.AdvanceRequests.GroupBy(x=>x.Hbl).Select(x => x.FirstOrDefault().Hbl))
                 {
-                    strHbl += hbl + ",";
+                    strHbl += !string.IsNullOrEmpty(hbl) ? hbl + "," : "";
                 }
 
                 //Lấy ra chuỗi CustomNo
-                foreach (var customNo in advance.AdvanceRequests.Select(x => x.CustomNo))
+                foreach (var customNo in advance.AdvanceRequests.GroupBy(x=>x.CustomNo).Select(x => x.FirstOrDefault().CustomNo))
                 {
                     strCustomNo += !string.IsNullOrEmpty(customNo) ? customNo + "," : "";
                 }
 
                 strJobId += ")";
-                strJobId = strJobId.Replace(",)", "");
+                strJobId = strJobId.Replace(",)", "").Replace(")", "");
                 strHbl += ")";
-                strHbl = strHbl.Replace(",)", "");
+                strHbl = strHbl.Replace(",)", "").Replace(")", "");
                 strCustomNo += ")";
                 strCustomNo = strCustomNo.Replace(",)", "").Replace(")","");
             }
@@ -629,6 +630,10 @@ namespace eFMS.API.Documentation.DL.Services
                 TotalOrther = advance.AdvanceRequests.Where(x => x.AdvanceType == "Other").Sum(x => x.Amount)
             };
 
+            acctAdvance.TotalNorm = acctAdvance.TotalNorm != 0 ? acctAdvance.TotalNorm : null;
+            acctAdvance.TotalInvoice = acctAdvance.TotalInvoice != 0 ? acctAdvance.TotalInvoice : null;
+            acctAdvance.TotalOrther = acctAdvance.TotalOrther != 0 ? acctAdvance.TotalOrther : null;
+
             var listAdvance = new List<AdvancePaymentRequestReport>
             {
                 acctAdvance
@@ -682,7 +687,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (advance.AdvanceRequests.Count > 0)
             {
-                foreach (var jobId in advance.AdvanceRequests.Select(x => x.JobId))
+                foreach (var jobId in advance.AdvanceRequests.GroupBy(x=>x.JobId).Select(x => x.FirstOrDefault().JobId))
                 {
                     OpsTransactionCriteria criteria = new OpsTransactionCriteria
                     {
@@ -699,25 +704,25 @@ namespace eFMS.API.Documentation.DL.Services
                     }
 
                     //Lấy ra chuỗi JobId
-                    strJobId += jobId + ",";
+                    strJobId += !string.IsNullOrEmpty(jobId) ? jobId + "," : "";
                 }
 
                 //Lấy ra chuỗi HBL
-                foreach (var hbl in advance.AdvanceRequests.Select(x => x.Hbl))
+                foreach (var hbl in advance.AdvanceRequests.GroupBy(x=>x.Hbl).Select(x => x.FirstOrDefault().Hbl))
                 {
-                    strHbl += hbl + ",";
+                    strHbl += !string.IsNullOrEmpty(hbl) ? hbl + "," : "";
                 }
 
                 //Lấy ra chuỗi CustomNo
-                foreach (var customNo in advance.AdvanceRequests.Select(x => x.CustomNo))
+                foreach (var customNo in advance.AdvanceRequests.GroupBy(x=>x.CustomNo).Select(x => x.FirstOrDefault().CustomNo))
                 {
                     strCustomNo += !string.IsNullOrEmpty(customNo) ? customNo + "," : "";
                 }
 
                 strJobId += ")";
-                strJobId = strJobId.Replace(",)", "");
+                strJobId = strJobId.Replace(",)", "").Replace(")", "");
                 strHbl += ")";
-                strHbl = strHbl.Replace(",)", "");
+                strHbl = strHbl.Replace(",)", "").Replace(")", "");
                 strCustomNo += ")";
                 strCustomNo = strCustomNo.Replace(",)", "").Replace(")","");
             }
@@ -806,6 +811,10 @@ namespace eFMS.API.Documentation.DL.Services
                 TotalOrther = advance.AdvanceRequests.Where(x => x.AdvanceType == "Other").Sum(x => x.Amount)
             };
 
+            acctAdvance.TotalNorm = acctAdvance.TotalNorm != 0 ? acctAdvance.TotalNorm : null;
+            acctAdvance.TotalInvoice = acctAdvance.TotalInvoice != 0 ? acctAdvance.TotalInvoice : null;
+            acctAdvance.TotalOrther = acctAdvance.TotalOrther != 0 ? acctAdvance.TotalOrther : null;
+
             var listAdvance = new List<AdvancePaymentRequestReport>
             {
                 acctAdvance
@@ -844,17 +853,26 @@ namespace eFMS.API.Documentation.DL.Services
         #endregion PREVIEW ADVANCE PAYMENT
 
         #region APPROVAL ADVANCE PAYMENT
-        //Inset Or Update AcctApproveAdvance by AdvanceNo
-        private bool InsertOrUpdateApproveAdvance(AcctApproveAdvance acctApprove)
+        //Insert Or Update AcctApproveAdvance by AdvanceNo
+        public HandleState InsertOrUpdateApprovalAdvance(AcctApproveAdvanceModel approve)
         {
             try
             {
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+
+                var acctApprove = mapper.Map<AcctApproveAdvance>(approve);
+
+                //Lấy ra các user Leader, Manager Dept của user requester, user Accountant, BUHead(nếu có) của user requester
+                acctApprove.Leader = null;
+                acctApprove.Manager = null;
+                acctApprove.Accountant = null;
+                acctApprove.Buhead = null;
+
                 var checkExistsApproveByAdvanceNo = dc.AcctApproveAdvance.Where(x => x.AdvanceNo == acctApprove.AdvanceNo).FirstOrDefault();
                 if (checkExistsApproveByAdvanceNo == null) //Insert AcctApproveAdvance
                 {
                     acctApprove.Id = Guid.NewGuid();
-                    acctApprove.UserCreated = acctApprove.UserModified = "admin";
+                    acctApprove.UserCreated = acctApprove.UserModified = "admin";//currentUser.UserID;
                     acctApprove.DateCreated = acctApprove.DateModified = DateTime.Now;
                     dc.AcctApproveAdvance.Add(acctApprove);
                 }
@@ -862,27 +880,33 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     acctApprove.UserCreated = checkExistsApproveByAdvanceNo.UserCreated;
                     acctApprove.DateCreated = checkExistsApproveByAdvanceNo.DateCreated;
+                    acctApprove.UserModified = "admin";//currentUser.UserID;
+                    acctApprove.DateModified = DateTime.Now;
                     dc.AcctApproveAdvance.Update(acctApprove);
                 }
                 dc.SaveChanges();
-                return true;
+
+                var emailLeaderOrManager = "";
+                //Send mail đề nghị approve đến Leader(Nếu có) nếu không có thì send tới Manager Dept
+                //Lấy ra Leader của User & Manager Dept của User Requester
+                if (string.IsNullOrEmpty(acctApprove.Leader))
+                {
+                    //Lấy ra mail của Manager
+
+                }
+                else
+                {
+                    //Lấy ra mail của Leader
+
+                }
+                var sendMailResult = SendMailSuggestApproval(acctApprove.AdvanceNo, "01");
+
+                return !sendMailResult ? new HandleState("Send Mail Suggest Approval Fail") : new HandleState();
             }
             catch (Exception ex)
             {
-                return false;
+                return new HandleState(ex.Message.ToString());
             }
-        }
-        
-        //Lấy ra các thông tin của leader, manager department, accountant manager, BUHead
-        private AcctApproveAdvance GetUsersApproveByDepartment(string dept)
-        {
-            var approver = new AcctApproveAdvance {
-                Requester = "",
-                Leader = "",
-                Manager = "",
-                Buhead = ""
-            };
-            return approver;
         }
 
         //Lấy ra ds các user được ủy quyền theo nhóm leader, manager department, accountant manager, BUHead
@@ -890,95 +914,256 @@ namespace eFMS.API.Documentation.DL.Services
 
         //Check group trước đó đã được approve hay chưa? Nếu group trước đó đã approve thì group hiện tại mới được Approve
         //Nếu group hiện tại đã được approve thì không cho approve nữa
-        private bool CheckApproved(string advanceNo, string grpOfUser)
+        private HandleState CheckApproved(string advanceNo, string grpOfUser)
         {
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
 
-            var result = false;
+            HandleState result = null;
             //Lấy ra Advance Approval dựa vào advanceNo
             var acctApprove = dc.AcctApproveAdvance.Where(x => x.AdvanceNo == advanceNo).FirstOrDefault();
-            if (acctApprove == null) return result;
+            if (acctApprove == null)
+            {
+                result = new HandleState("Not Found Advance Approval by AdvanceNo is " + advanceNo);
+                return result;
+            }
 
             //Lấy ra Advance Payment dựa vào advanceNo
             var advance = dc.AcctAdvancePayment.Where(x => x.AdvanceNo == advanceNo).FirstOrDefault();
-            if (advance == null) return result;
+            if (advance == null)
+            {
+                result = new HandleState("Not Found Advance Payment by AdvanceNo is" + advanceNo);
+                return result;
+            }
 
             //Trường hợp không có Leader
-            if (string.IsNullOrEmpty(acctApprove.Requester))
+            if (string.IsNullOrEmpty(acctApprove.Leader))
             {
                 //Manager Department Approve
-                if (grpOfUser == "CSManager" || grpOfUser == "SaleManager")
+                if (grpOfUser == "CSManager")
                 {
-                    if (!string.IsNullOrEmpty(acctApprove.Requester) 
-                        && !advance.StatusApproval.Equals("DepartmentManagerApproved"))
+                    //Requester đã approve
+                    if (!string.IsNullOrEmpty(acctApprove.Requester) && acctApprove.RequesterAprDate != null)
                     {
-                        result = true;
+                        result = new HandleState();
                     }
                     else
                     {
-                        result = false;
+                        result = new HandleState("Not found Requester or Requester not approve");
+                    }
+
+                    //Check group CSManager đã approve chưa
+                    if (!advance.StatusApproval.Equals("DepartmentManagerApproved") && acctApprove.ManagerAprDate == null)
+                    {
+                        result = new HandleState();
+                    }
+                    else
+                    {
+                        result = new HandleState("Manager Department Approved");
                     }
                 }
-                
+
+                if (grpOfUser == "SaleManager")
+                {
+                    //Requester đã approve
+                    if (!string.IsNullOrEmpty(acctApprove.Requester) && acctApprove.RequesterAprDate != null)
+                    {
+                        result = new HandleState();
+                    }
+                    else //Requester chưa approve
+                    {
+                        result = new HandleState("Not found Requester or Requester not approve");
+                    }
+
+                    //Check group SaleManager đã approve chưa
+                    if (!advance.StatusApproval.Equals("DepartmentManagerApproved") && acctApprove.ManagerAprDate == null)
+                    {
+                        result = new HandleState();
+                    }
+                    else
+                    {
+                        result = new HandleState("Manager Department Approved");
+                    }
+                }
+
+                if (grpOfUser == "OPSManager")
+                {
+                    //Requester đã approve
+                    if (!string.IsNullOrEmpty(acctApprove.Requester) && acctApprove.RequesterAprDate != null)
+                    {
+                        result = new HandleState();
+                    }
+                    else //Requester chưa approve
+                    {
+                        result = new HandleState("Not found Requester or Requester not approve");
+                    }
+
+                    //Check group SaleManager đã approve chưa
+                    if (!advance.StatusApproval.Equals("DepartmentManagerApproved") && acctApprove.ManagerAprDate == null)
+                    {
+                        result = new HandleState();
+                    }
+                    else
+                    {
+                        result = new HandleState("Manager Department Approved");
+                    }
+                }
+
+
                 //Accountant Approve
                 if (grpOfUser == "AccountantManager")
                 {
+                    //Check group DepartmentManager đã được Approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Manager) 
-                        && advance.StatusApproval.Equals("DepartmentManagerApproved")
-                        && !advance.StatusApproval.Equals("AccountantManagerApproved"))
+                        && advance.StatusApproval.Equals("DepartmentManagerApproved") 
+                        && acctApprove.ManagerAprDate != null)
                     {
-                        result = true;
+                        result = new HandleState();
                     }
                     else
                     {
-                        result = false;
+                        result = new HandleState("Not found Manager or Manager not approve");
+                    }
+
+                    //Check group Accountant đã approve chưa
+                    if(!advance.StatusApproval.Equals("Done"))
+                    {
+                        result = new HandleState();
+                    }
+                    else
+                    {
+                        result = new HandleState("Accountant Approved");
                     }
                 }
             }
             else //Trường hợp có leader
             {
-                //grp leader là group mẫu (chưa có tồn tại trong db)
+                //grp Leader là group mẫu (chưa có tồn tại trong db)
                 //Leader Approve
-                if(grpOfUser == "leader")
+                if(grpOfUser == "Leader")
                 {
                     if (!string.IsNullOrEmpty(acctApprove.Requester) 
-                        && !advance.StatusApproval.Equals("LeaderApproved"))
+                        && acctApprove.RequesterAprDate != null)
                     {
-                        result = true;
+                        result = new HandleState();
                     }
                     else
                     {
-                        result = false;
+                        result = new HandleState("Not found Requester or Requester not approve");
+                    }
+
+                    //Check group Leader đã được approve chưa
+                    if (!advance.StatusApproval.Equals("LeaderApproved") 
+                        && acctApprove.LeaderAprDate != null)
+                    {
+                        result = new HandleState();
+                    }
+                    else
+                    {
+                        result = new HandleState("Leader Approved");
                     }
                 }
                 
                 //Manager Department Approve
-                if (grpOfUser == "CSManager" || grpOfUser == "SaleManager")
+                if (grpOfUser == "CSManager")
                 {
                     if (!string.IsNullOrEmpty(acctApprove.Leader) 
                         && advance.StatusApproval.Equals("LeaderApproved")
-                        && !advance.StatusApproval.Equals("DepartmentManagerApproved"))
+                        && acctApprove.LeaderAprDate != null)
                     {
-                        result = true;
+                        result = new HandleState();
                     }
                     else
                     {
-                        result = false;
+                        result = new HandleState("Not found Leader or Leader not approve");
+                    }
+
+                    //Check group Manager Department đã approve chưa
+                    if (!advance.StatusApproval.Equals("DepartmentManagerApproved") 
+                        && acctApprove.ManagerAprDate != null)
+                    {
+                        result = new HandleState();
+                    }
+                    else
+                    {
+                        result = new HandleState("Manager Department Approved");
                     }
                 }
-                
+
+                if (grpOfUser == "SaleManager")
+                {
+                    if (!string.IsNullOrEmpty(acctApprove.Leader)
+                        && advance.StatusApproval.Equals("LeaderApproved")
+                        && acctApprove.LeaderAprDate != null)
+                    {
+                        result = new HandleState();
+                    }
+                    else
+                    {
+                        result = new HandleState("Not found Leader or Leader not approve");
+                    }
+
+                    //Check group Manager Department đã approve chưa
+                    if (!advance.StatusApproval.Equals("DepartmentManagerApproved")
+                        && acctApprove.ManagerAprDate != null)
+                    {
+                        result = new HandleState();
+                    }
+                    else
+                    {
+                        result = new HandleState("Manager Department Approved");
+                    }
+                }
+
+                if (grpOfUser == "OPSManager")
+                {
+                    if (!string.IsNullOrEmpty(acctApprove.Leader)
+                        && advance.StatusApproval.Equals("LeaderApproved")
+                        && acctApprove.LeaderAprDate != null)
+                    {
+                        result = new HandleState();
+                    }
+                    else
+                    {
+                        result = new HandleState("Not found Leader or Leader not approve");
+                    }
+
+                    //Check group Manager Department đã approve chưa
+                    if (!advance.StatusApproval.Equals("DepartmentManagerApproved")
+                        && acctApprove.ManagerAprDate != null)
+                    {
+                        result = new HandleState();
+                    }
+                    else
+                    {
+                        result = new HandleState("Manager Department Approved");
+                    }
+                }
+
+
                 //Accountant Approve
                 if (grpOfUser == "AccountantManager")
                 {
+                    //Check group DepartmentManager đã được Approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Manager) 
                         && advance.StatusApproval.Equals("DepartmentManagerApproved")
-                        && !advance.StatusApproval.Equals("AccountantManagerApproved"))
+                        && acctApprove.ManagerAprDate != null)
                     {
-                        result = true;
+                        result = new HandleState();
                     }
                     else
                     {
-                        result = false;
+                        result = new HandleState("Not found Manager or Manager not approve");
+                    }
+
+                    //Check group Accountant đã approve chưa
+                    if (!advance.StatusApproval.Equals("Done") 
+                        && acctApprove.AccountantAprDate != null)
+                    {
+                        result = new HandleState();
+                    }
+                    else
+                    {
+                        result = new HandleState("Accountant Approved");
                     }
                 }
             }
@@ -986,16 +1171,264 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        //Update Approve cho từng group
-        public bool UpdateApproval(string advanceNo, string userApprove)
+        //Update Approval cho từng group
+        public HandleState UpdateApproval(Guid advanceId, string userApprove)
         {
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var approve = dc.AcctApproveAdvance.Where(x => x.AdvanceNo == advanceNo).FirstOrDefault();
+            var advance = dc.AcctAdvancePayment.Where(x => x.Id == advanceId).FirstOrDefault();
 
-            return true;
+            if (advance == null) return new HandleState("Not Found Advance Approval");
+
+            var approve = dc.AcctApproveAdvance.Where(x => x.AdvanceNo == advance.AdvanceNo).FirstOrDefault();
+
+            if (approve == null) return new HandleState("Not Found Advance Approval by AdvanceNo is " + advance.AdvanceNo);
+
+            //Lấy ra group của userApprove dựa vào userApprove
+            var grpOfUser = "CSManager";
+
+
+            //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
+            var checkApr = CheckApproved(advance.AdvanceNo, grpOfUser);
+            if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
+            if (approve != null && advance != null)
+            {
+                if (grpOfUser.Equals("Leader"))
+                {
+                    advance.StatusApproval = "LeaderApproved";
+                    approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Approve của Leader
+                }
+                else if (grpOfUser.Equals("CSManager") || grpOfUser.Equals("SaleManager"))
+                {
+                    advance.StatusApproval = "DepartmentManagerApproved";
+                    approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Approve của Manager
+                }
+                else if (grpOfUser.Equals("AccountantManager"))
+                {
+                    advance.StatusApproval = "Done";
+                    approve.AccountantAprDate = approve.BuheadAprDate = DateTime.Now;//Cập nhật ngày Approve của Accountant & BUHead
+
+                    //Send mail approval success when Accountant approved, mail send to requester
+                    SendMailApproved(advance.AdvanceNo, DateTime.Now);
+                }
+
+                dc.AcctAdvancePayment.Update(advance);
+                dc.AcctApproveAdvance.Update(approve);
+                dc.SaveChanges();
+            }
+            //Send mail đề nghị approve
+            var sendMailResult = SendMailSuggestApproval(advance.AdvanceNo, userApprove);
+
+            return sendMailResult ? new HandleState() : new HandleState("Send Mail Suggest Approval Fail");
         }
 
-        //Send Mail
+        public HandleState DeniedApprove(Guid advanceId, string userDenie, string comment)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var advance = dc.AcctAdvancePayment.Where(x => x.Id == advanceId).FirstOrDefault();
+
+            if (advance == null) return new HandleState("Not Found Advance Approval");
+
+            var approve = dc.AcctApproveAdvance.Where(x => x.AdvanceNo == advance.AdvanceNo).FirstOrDefault();
+            if (approve == null) return new HandleState("Not Found Approve Advance by advanceNo " + advance.AdvanceNo);
+
+            if (advance != null && approve != null)
+            {
+                //Cập nhật tất cả các field bằng null ngoại trừ ID, AdvanceNo, UserCreated, DateCreated
+                approve.Requester = approve.Leader = approve.Manager = approve.Accountant = approve.Buhead = null;
+                approve.RequesterAprDate = approve.LeaderAprDate = approve.ManagerAprDate = approve.AccountantAprDate = approve.BuheadAprDate = null;
+                approve.UserModified = userDenie;
+                approve.DateModified = DateTime.Now;
+                dc.AcctApproveAdvance.Update(approve);
+                dc.SaveChanges();
+            }
+
+            //Send mail denied approval
+            var sendMailResult = SendMailDeniedApproval(advance.AdvanceNo, userDenie, comment, DateTime.Now);
+            return sendMailResult ? new HandleState() : new HandleState("Send Mail Denie Approval Fail");
+        }
+
+        //Send Mail đề nghị Approve
+        private bool SendMailSuggestApproval(string advanceNo, string userApprove)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;  
+            //Lấy ra AdvancePayment dựa vào AdvanceNo
+            var advance = dc.AcctAdvancePayment.Where(x => x.AdvanceNo == advanceNo).FirstOrDefault();
+
+            //Lấy ra tên & email của user Requester
+            var requesterId = dc.SysUser.Where(x => x.Id == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
+            var requesterName = dc.SysEmployee.Where(x => x.Id == requesterId).Select(x => x.EmployeeNameVn).FirstOrDefault();
+            var emailRequester = dc.SysEmployee.Where(x => x.Id == requesterId).Select(x => x.Email).FirstOrDefault();
+
+            //Lấy ra email của user Approve (Leader, Manager Dept, Accountant, BUHead)
+            var approverId = dc.SysUser.Where(x => x.Id == userApprove).Select(x => x.EmployeeId).FirstOrDefault();
+            var emailApprover = dc.SysEmployee.Where(x => x.Id == approverId).Select(x => x.Email).FirstOrDefault();
+            if (emailApprover == null) return false;
+
+            //Lấy ra email của các User được ủy quyền của group của User Approve
+
+            //Lấy ra thông tin của Advance Request dựa vào AdvanceNo
+            var requests = dc.AcctAdvanceRequest.Where(x => x.AdvanceNo == advanceNo).GroupBy(x=>x.JobId).Select(x=>x.FirstOrDefault().JobId);
+            string jobIds = "";
+            foreach(var request in requests)
+            {
+                jobIds += !string.IsNullOrEmpty(request) ? request + "; " : "";
+            }
+            jobIds += jobIds + ")";
+            jobIds = jobIds.Replace("; )", "").Replace(")","");
+
+            var totalAmount = dc.AcctAdvanceRequest.Where(x => x.AdvanceNo == advanceNo).Sum(x => x.Amount);
+            if (totalAmount != null)
+            {
+                totalAmount = Math.Round(totalAmount.Value, 2);
+            }
+
+            //Mail Info
+            string subject = "eFMS - Advance Payment Approval Request from <b>[RequesterName]</b>";
+            subject = subject.Replace("[RequesterName]", requesterName);
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [UserName],</b></i></p><p>You have new Advance Payment Approval Request from <b>[RequesterName]</b> as below info:</p><p><i>Anh/ Chị có một yêu cầu duyệt tạm ứng từ <b>[RequesterName]</b> với thông tin như sau:</i></p><ul><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNo]</b></li><li>Advance Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencyAdvance]</b><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li></ul><p>You click here to check more detail and approve.</p><p><i>Anh/ Chị chọn vào đây để biết thêm thông tin chi tiết và phê duyệt.</i></p><p><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]/approve' target='_blank'>[Url]/[lang]/[UrlFunc]/[AdvanceId]/Approve</a></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='{0}'/></p></div>", logoeFMSBase64());
+            body = body.Replace("[UserName]", userApprove);
+            body = body.Replace("[RequesterName]", requesterName);
+            body = body.Replace("[AdvanceNo]", advanceNo);
+            body = body.Replace("[TotalAmount]", String.Format("{0:n}", totalAmount));            
+            body = body.Replace("[CurrencyAdvance]", advance.AdvanceCurrency);
+            body = body.Replace("[JobIds]", jobIds);
+            body = body.Replace("[RequestDate]", advance.RequestDate.Value.ToString("dd/MM/yyyy"));
+            body = body.Replace("[Url]", "http://test.efms.itlvn.com");//Đang gán cứng
+            body = body.Replace("[lang]", "en");
+            body = body.Replace("[UrlFunc]", "#/home/accounting/advance-payment");
+            body = body.Replace("[AdvanceId]", advance.Id.ToString());
+            List<string> toEmails = new List<string> {
+                emailApprover
+            };
+            List<string> attachments = null;
+
+            //CC cho User Requester để biết được quá trình Approve đã đến bước nào
+            //Và các User thuộc group của User Approve được ủy quyền
+            List<string> emailCCs = new List<string> {
+                emailRequester
+            };
+
+            var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+            return sendMailResult;
+        }
+
+        //Send Mail Approved
+        private bool SendMailApproved(string advanceNo, DateTime approvedDate)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            //Lấy ra AdvancePayment dựa vào AdvanceNo
+            var advance = dc.AcctAdvancePayment.Where(x => x.AdvanceNo == advanceNo).FirstOrDefault();
+
+            //Lấy ra tên của user Requester
+            var requesterId = dc.SysUser.Where(x => x.Id == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
+            var requesterName = dc.SysEmployee.Where(x => x.Id == requesterId).Select(x => x.EmployeeNameVn).FirstOrDefault();
+            var emailRequester = dc.SysEmployee.Where(x => x.Id == requesterId).Select(x => x.Email).FirstOrDefault();
+
+            //Lấy ra thông tin của Advance Request dựa vào AdvanceNo
+            var requests = dc.AcctAdvanceRequest.Where(x => x.AdvanceNo == advanceNo).GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId);
+            string jobIds = "";
+            foreach (var request in requests)
+            {
+                jobIds += !string.IsNullOrEmpty(request) ? request + ", " : "";
+            }
+            jobIds += jobIds + ")";
+            jobIds = jobIds.Replace(", )", "").Replace(")","");
+
+            var totalAmount = dc.AcctAdvanceRequest.Where(x => x.AdvanceNo == advanceNo).Sum(x => x.Amount);
+            if (totalAmount != null)
+            {
+                totalAmount = Math.Round(totalAmount.Value, 2);
+            }
+
+            //Mail Info
+            string subject = "eFMS - Advance Payment from <b>[RequesterName]</b> is approved";
+            subject = subject.Replace("[RequesterName]", requesterName);
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [RequesterName],</b></i></p><p>You have an Advance Payment is approved at <b>[ApprovedDate]</b> as below info:</p><p><i>Anh/ Chị có một yêu cầu tạm ứng đã được phê duyệt vào lúc <b>[ApprovedDate]</b> với thông tin như sau:</i></p><ul><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNo]</b></li><li>Advance Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencyAdvance]</b><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li></ul><p>You can click here to check more detail.</p><p><i>Anh/ Chị có thể chọn vào đây để biết thêm thông tin chi tiết.</i></p><p><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>[Url]/[lang]/[UrlFunc]/[AdvanceId]</a></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='{0}'/></p></div>",logoeFMSBase64());
+            body = body.Replace("[RequesterName]", requesterName);
+            body = body.Replace("[ApprovedDate]", approvedDate.ToString("HH:MM - DD/MM/YYYY"));
+            body = body.Replace("[AdvanceNo]", advanceNo);
+            body = body.Replace("[TotalAmount]", String.Format("{0:n}", totalAmount));
+            body = body.Replace("[CurrencyAdvance]", advance.AdvanceCurrency);
+            body = body.Replace("[JobIds]", jobIds);
+            body = body.Replace("[RequestDate]", advance.RequestDate.Value.ToString("dd/MM/yyyy"));
+            body = body.Replace("[Url]", "http://test.efms.itlvn.com");//Đang gán cứng
+            body = body.Replace("[lang]", "en");
+            body = body.Replace("[UrlFunc]", "#/home/accounting/advance-payment");
+            body = body.Replace("[AdvanceId]", advance.Id.ToString());
+            List<string> toEmails = new List<string> {
+                emailRequester
+            };
+            List<string> attachments = null;
+            List<string> emailCCs = new List<string> {
+                
+            };
+
+            var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+            return sendMailResult;
+        }
+
+        //Send Mail Deny Approve (Gửi đến Requester và các Leader, Manager, Accountant, BUHead đã approve trước đó)
+        private bool SendMailDeniedApproval(string advanceNo, string userDenie, string comment, DateTime DeniedDate)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            //Lấy ra AdvancePayment dựa vào AdvanceNo
+            var advance = dc.AcctAdvancePayment.Where(x => x.AdvanceNo == advanceNo).FirstOrDefault();
+
+            //Lấy ra tên của user Requester
+            var requesterId = dc.SysUser.Where(x => x.Id == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
+            var requesterName = dc.SysEmployee.Where(x => x.Id == requesterId).Select(x => x.EmployeeNameVn).FirstOrDefault();
+            var emailRequester = dc.SysEmployee.Where(x => x.Id == requesterId).Select(x => x.Email).FirstOrDefault();
+
+            //Lấy ra thông tin của Advance Request dựa vào AdvanceNo
+            var requests = dc.AcctAdvanceRequest.Where(x => x.AdvanceNo == advanceNo).GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId);
+            string jobIds = "";
+            foreach (var request in requests)
+            {
+                jobIds += !string.IsNullOrEmpty(request) ? request + ", " : "";
+            }
+            jobIds += jobIds + ")";
+            jobIds = jobIds.Replace(", )", "").Replace(")", "");
+
+            var totalAmount = dc.AcctAdvanceRequest.Where(x => x.AdvanceNo == advanceNo).Sum(x => x.Amount);
+            if (totalAmount != null)
+            {
+                totalAmount = Math.Round(totalAmount.Value, 2);
+            }
+
+            //Mail Info
+            string subject = "eFMS - Advance Payment from <b>[RequesterName]</b> is denied";
+            subject = subject.Replace("[RequesterName]", requesterName);
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [RequesterName],</b></i></p><p>You have an Advance Payment is denied at <b>[DeniedDate]</b> by as below info:</p><p><i>Anh/ Chị có một yêu cầu tạm ứng đã bị từ chối vào lúc <b>[DeniedDate]</b> by với thông tin như sau:</i></p><ul><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNo]</b></li><li>Advance Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencyAdvance]</b><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li><li>Comment/ <i>Lý do từ chối</i> : <b>[Comment]</b></li></ul><p>You click here to recheck detail.</p><p><i>Anh/ Chị chọn vào đây để kiểm tra lại thông tin chi tiết.</i></p><p><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>[Url]/[lang]/[UrlFunc]/[AdvanceId]</a></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='{0}'/></p></div>",logoeFMSBase64());
+            body = body.Replace("[RequesterName]", requesterName);
+            body = body.Replace("[DeniedDate]", DeniedDate.ToString("HH:MM - DD/MM/YYYY"));
+            body = body.Replace("[AdvanceNo]", advanceNo);
+            body = body.Replace("[TotalAmount]", String.Format("{0:n}",  totalAmount));
+            body = body.Replace("[CurrencyAdvance]", advance.AdvanceCurrency);
+            body = body.Replace("[JobIds]", jobIds);
+            body = body.Replace("[RequestDate]", advance.RequestDate.Value.ToString("dd/MM/yyyy"));
+            body = body.Replace("[Comment]", comment);
+            body = body.Replace("[Url]", "http://test.efms.itlvn.com");//Đang gán cứng
+            body = body.Replace("[lang]", "en");
+            body = body.Replace("[UrlFunc]", "#/home/accounting/advance-payment");
+            body = body.Replace("[AdvanceId]", advance.Id.ToString());
+            List<string> toEmails = new List<string> {
+                emailRequester
+            };
+            List<string> attachments = null;
+            List<string> emailCCs = new List<string>
+            {
+                //Add các email của các user đã approve trước đó
+            };
+
+            var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+            return sendMailResult;
+        }
+
+        //Logo eFMS
+        private string logoeFMSBase64()
+        {
+            return "data:image/png;base64,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";
+        }
 
         #endregion APPROVAL ADVANCE PAYMENT
 
