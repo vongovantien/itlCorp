@@ -11,16 +11,12 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? RequesterAprDate { get; set; }
         public string Leader { get; set; }
         public DateTime? LeaderAprDate { get; set; }
-        public string LeaderComment { get; set; }
         public string Manager { get; set; }
         public DateTime? ManagerAprDate { get; set; }
-        public string ManagerComment { get; set; }
         public string Accountant { get; set; }
         public DateTime? AccountantAprDate { get; set; }
-        public string AccountantComment { get; set; }
         public string Buhead { get; set; }
         public DateTime? BuheadAprDate { get; set; }
-        public string BuheadComment { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DateCreated { get; set; }
         public string UserModified { get; set; }
