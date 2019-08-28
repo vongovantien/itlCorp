@@ -139,12 +139,6 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
                                     this.currencyList = data || [];
                                     this.currency.setValue(this.currencyList.filter((item: Currency) => item.id === 'VND')[0]);
                                 },
-                                (errors: any) => {
-                                    this.handleError(errors, (data: any) => {
-                                        this._toastService.error(data.message, data.title);
-                                    });
-                                 },
-                                () => { }
                             );
                     }
                 }

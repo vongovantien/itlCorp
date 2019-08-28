@@ -5,7 +5,6 @@ import localeVi from '@angular/common/locales/vi';
 import { Routes, RouterModule } from '@angular/router';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { SelectModule } from 'ng2-select';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { ModalModule, PaginationModule, } from 'ngx-bootstrap';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
@@ -63,7 +62,6 @@ const customCurrencyMaskConfig = {
         CommonModule,
         SharedModule,
         FormsModule,
-        SelectModule,
         NgxDaterangepickerMd,
         ModalModule.forRoot(),
         PaginationModule.forRoot(),

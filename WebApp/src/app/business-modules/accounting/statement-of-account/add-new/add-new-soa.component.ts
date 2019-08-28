@@ -143,13 +143,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
                                 (dataPartner: any) => {
                                     this.getPartnerData(dataPartner)
                                 },
-                                (errors: any) => {
-                                    this.handleError(errors, (data) => {
-                                        this._toastService.error(data.message, data.title);
-                                    });
-                                },
-                                // complete
-                                () => { }
                             );
                     } else {
                         this.getPartnerData(data);
@@ -199,12 +192,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
                         });
                     }
                 },
-                (errors: any) => {
-                    this.handleError(errors, (data: any) => {
-                            this._toastService.error(data.message, data.title);
-                        });
-                },
-                () => { }
             );
     }
 
@@ -225,13 +212,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
                                 (dataCurrency: any) => {
                                     this.getCurrencyData(dataCurrency)
                                 },
-                                (errors: any) => {
-                                    this.handleError(errors, (data) => {
-                                        this._toastService.error(data.message, data.title);
-                                    });
-                                },
-                                // complete
-                                () => { }
                             );
                     }
                 }
@@ -255,13 +235,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
                                 (dataUser: any) => {
                                     this.getCurrencyUser(dataUser);
                                 },
-                                (errors: any) => {
-                                    this.handleError(errors, (data) => {
-                                        this._toastService.error(data.message, data.title);
-                                    });
-                                },
-                                // complete
-                                () => { }
                             );
                     }
                 }
@@ -285,13 +258,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
 
                 this._dataService.setData(SystemConstants.CSTORAGE.CHARGE, data || []);
             },
-                (errors: any) => {
-                    this.handleError(errors, (data) => {
-                        this._toastService.error(data.message, data.title);
-                    });
-                },
-                // complete
-                () => { }
             );
     }
 
@@ -522,12 +488,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
                             this._toastService.error(res, '', { positionClass: 'toast-bottom-right' });
                         }
                     },
-                    (errors: any) => {
-                        this.handleError(errors, (data) => {
-                            this._toastService.error(data.message, data.title);
-                        });
-                    },
-                    () => { }
                 );
         }
 
@@ -550,12 +510,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
 
                     this.updateDataSearch('chargeShipments', this.listCharges);
                 },
-                (errors: any) => {
-                    this.handleError(errors, (data) => {
-                        this._toastService.error(data.message, data.title);
-                    });
-                },
-                () => { }
             );
     }
 

@@ -5,7 +5,6 @@ import { AccoutingRepo } from 'src/app/shared/repositories';
 import { catchError, map } from 'rxjs/operators';
 import { CustomDeclaration, AdvancePaymentRequest } from 'src/app/shared/models';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
-import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'adv-payment-add-popup',
@@ -60,7 +59,6 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     constructor(
         private _fb: FormBuilder,
         private _accoutingRepo: AccoutingRepo,
-        private _toastService: ToastrService
     ) {
         super();
     }
@@ -199,12 +197,6 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
                         this.existedShipmentPopup.show();
                     }
                 },
-                (errors: any) => { 
-                    this.handleError(errors, (data: any) => {
-                        this._toastService.error(data.message, data.title);
-                    });
-                },
-                () => { }
             );
     }
 
@@ -228,12 +220,6 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
                 (res: any) => {
                     this.customDeclarations = this.initCD = res || [];
                 },
-                (errors: any) => { 
-                    this.handleError(errors, (data: any) => {
-                        this._toastService.error(data.message, data.title);
-                    });
-                },
-                () => { },
             );
     }
 

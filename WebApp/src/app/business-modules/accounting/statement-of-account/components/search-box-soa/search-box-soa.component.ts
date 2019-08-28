@@ -93,13 +93,6 @@ export class StatementOfAccountSearchComponent extends AppPage {
                     this._dataService.setData(SystemConstants.CSTORAGE.PARTNER, dataPartner);
                     this._dataService.setData(SystemConstants.CSTORAGE.SYSTEM_USER, dataSystemUser);
                 },
-                (errors: any) => {
-                    this.handleError(errors, (data: any) => {
-                        this._toastService.error(data.message, data.title);
-                    });
-                },
-                // complete
-                () => { }
             );
     }
 
