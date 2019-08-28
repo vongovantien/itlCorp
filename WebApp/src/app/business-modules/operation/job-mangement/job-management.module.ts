@@ -38,6 +38,8 @@ import { AddObhRatePopupComponent } from '../job-edit/charge-list/add-obh-rate-p
 import { EditObhRatePopupComponent } from '../job-edit/charge-list/edit-obh-rate-popup/edit-obh-rate-popup.component';
 import { PlSheetPopupComponent } from '../job-edit/pl-sheet-popup/pl-sheet.popup';
 import { CustomClearanceFormSearchComponent } from '../custom-clearance/components/form-search-custom-clearance/form-search-custom-clearance.component';
+import { AddMoreModalComponent } from '../job-edit/custom-declaration/add-more-modal/add-more-modal.component';
+import { ListNotImportedComponent } from '../job-edit/custom-declaration/list-not-imported/list-not-imported.component';
 
 
 
@@ -64,7 +66,7 @@ const routing: Routes = [
             level: 3
         }
     },
-    
+
 ];
 
 
@@ -121,9 +123,10 @@ const LIB = [
         EditSellingRatePopupComponent,
         AddObhRatePopupComponent,
         EditObhRatePopupComponent,
-        
-        PlSheetPopupComponent,
 
+        PlSheetPopupComponent,
+        AddMoreModalComponent,
+        ListNotImportedComponent
     ],
     providers: [],
     bootstrap: [

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, Input } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, Input, ViewChild } from '@angular/core';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
 import { API_MENU } from 'src/constants/api-menu.const';
@@ -8,6 +8,7 @@ import { PagingService } from 'src/app/shared/services/paging-service';
 import { SystemConstants } from 'src/constants/system.const';
 import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
 import { SortService } from 'src/app/shared/services/sort.service';
+import { AddMoreModalComponent } from './add-more-modal/add-more-modal.component';
 
 @Component({
   selector: 'app-billing-custom-declaration',
@@ -15,6 +16,7 @@ import { SortService } from 'src/app/shared/services/sort.service';
   styleUrls: ['./billing-custom-declaration.component.scss']
 })
 export class BillingCustomDeclarationComponent implements OnInit {
+  @ViewChild(AddMoreModalComponent, { static: false }) poupAddMore: AddMoreModalComponent;
   @Input() currentJob: OpsTransaction;
   notImportedCustomClearances: any[];
   customClearances: any[];
@@ -97,12 +99,19 @@ export class BillingCustomDeclarationComponent implements OnInit {
     this.pager.currentPage = 1;
     this.getCustomClearancesNotImported();
   }
-  showPopupAdd() {
-    this.pager.totalItems = 0;
-    this.pager.currentPage = 1;
-    if (this.dataNotImportedSearch != null) {
-      this.cdr.detectChanges();
-      this.setPage(this.pager);
+  async showPopupAdd() {
+    // this.pager.totalItems = 0;
+    // this.pager.currentPage = 1;
+    // if (this.dataNotImportedSearch != null) {
+    //   this.cdr.detectChanges();
+    //   this.setPage(this.pager);
+    // }
+
+    this.notImportedData = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.query, { "imPorted": false }, false, true);
+    if (this.notImportedData) {
+      this.poupAddMore.notImportedData = this.notImportedData;
+      this.poupAddMore.getDataNotImported();
+      this.poupAddMore.show({ backdrop: 'static' });
     }
   }
   async getCustomClearancesNotImported() {
@@ -178,7 +187,7 @@ export class BillingCustomDeclarationComponent implements OnInit {
       for (let i = 0; i < this.importedData.length; i++) {
         this.currentJob.sumGrossWeight = this.currentJob.sumGrossWeight + this.importedData[i].grossWeight == null ? 0 : this.importedData[i].grossWeight;
         this.currentJob.sumNetWeight = this.currentJob.sumNetWeight + this.importedData[i].netWeight == null ? 0 : this.importedData[i].netWeight;
-        this.currentJob.sumCbm = this.currentJob.sumCbm + this.importedData[i].sumCbm == null ? 0 : this.importedData[i].sumCbm;
+        this.currentJob.sumCbm = this.currentJob.sumCbm + this.importedData[i].cbm == null ? 0 : this.importedData[i].cbm;
       }
       await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.currentJob, false, false);
     }

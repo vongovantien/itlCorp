@@ -7,9 +7,7 @@
       <div class="col-lg-4 order-2 order-lg-1">
         <div class="form-group">
           <div class="m-input-icon m-input-icon--left">
-            <input type="text" class="form-control m-input m-input--square" placeholder="Search..." autocomplete="nope"
-              [(ngModel)]="searchString" name="searchString" (change)="searchString = searchString.trim()"
-              (keyup)="searchClearanceNotImported($event)">
+            <input type="text" class="form-control m-input m-input--square" placeholder="Search..." autocomplete="nope">
             <span class="m-input-icon__icon m-input-icon__icon--left">
               <span>
                 <i class="la la-search"></i>
@@ -35,59 +33,63 @@
               </label>
             </div>
           </th>
-          <th class="sorting"
-            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceNo'), 'sorting_desc': (!isDesc && sortKey == 'clearanceNo') }"
-            (click)="sort('clearanceNo', false)">
+          <!-- <th class="sorting"
+            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceNo'), 'sorting_desc': (!isDesc && sortKey == 'clearanceNo') }">
             <span>Custom No</span>
           </th>
           <th class="sorting"
-            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'datetimeCreated'), 'sorting_desc': (!isDesc && sortKey == 'datetimeCreated') }"
-            (click)="sort('datetimeCreated', false)">
+            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'datetimeCreated'), 'sorting_desc': (!isDesc && sortKey == 'datetimeCreated') }">
             <span>Import Date</span>
           </th>
           <th class="sorting"
-            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceDate'), 'sorting_desc': (!isDesc && sortKey == 'clearanceDate') }"
-            (click)="sort('clearanceDate', false)">
+            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceDate'), 'sorting_desc': (!isDesc && sortKey == 'clearanceDate') }">
             <span>Clearance Date</span>
           </th>
           <th class="sorting"
-            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'hblid'), 'sorting_desc': (!isDesc && sortKey == 'hblid') }"
-            (click)="sort('hblid', false)">
+            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'hblid'), 'sorting_desc': (!isDesc && sortKey == 'hblid') }">
             <span>HBL No</span>
           </th>
           <th class="sorting"
-            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'exportCountryCode'), 'sorting_desc': (!isDesc && sortKey == 'exportCountryCode') }"
-            (click)="sort('exportCountryCode', false)">
+            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'exportCountryCode'), 'sorting_desc': (!isDesc && sortKey == 'exportCountryCode') }">
             <span>Export Country</span>
           </th>
           <th class="sorting"
-            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'importCountryCode'), 'sorting_desc': (!isDesc && sortKey == 'importCountryCode') }"
-            (click)="sort('importCountryCode', false)">
+            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'importCountryCode'), 'sorting_desc': (!isDesc && sortKey == 'importCountryCode') }">
             <span>Import Country</span>
           </th>
           <th class="sorting"
-            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'commodityCode'), 'sorting_desc': (!isDesc && sortKey == 'commodityCode') }"
-            (click)="sort('commodityCode', false)">
+            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'commodityCode'), 'sorting_desc': (!isDesc && sortKey == 'commodityCode') }">
             <span>Commodity Code</span>
           </th>
           <th class="sorting"
-            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'qtyCont'), 'sorting_desc': (!isDesc && sortKey == 'qtyCont') }"
-            (click)="sort('qtyCont', false)">
+            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'qtyCont'), 'sorting_desc': (!isDesc && sortKey == 'qtyCont') }">
             <span>Qty</span>
           </th>
           <th class="sorting"
-            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'firstClearanceNo'), 'sorting_desc': (!isDesc && sortKey == 'firstClearanceNo') }"
-            (click)="sort('firstClearanceNo', false)">
+            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'firstClearanceNo'), 'sorting_desc': (!isDesc && sortKey == 'firstClearanceNo') }">
             <span>Parentdoc</span>
           </th>
           <th class="sorting"
-            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'note'), 'sorting_desc': (!isDesc && sortKey == 'note') }"
-            (click)="sort('note', false)">
+            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'note'), 'sorting_desc': (!isDesc && sortKey == 'note') }">
             <span>Note</span>
+          </th> -->
+          <th *ngFor="let header of headers; let i = index; trackBy: trackByFn"
+            [class]="sortClass(header.sortable ? header.field : '')"
+            (click)="sortBy(header.sortable ? header.field : '')">
+            <span>{{header.title}}</span>
+            <span class="sort-indicator"></span>
           </th>
         </tr>
       </thead>
-      <tbody class="tbody-group" *ngIf="notImportedCustomClearances">
+      <tbody class="tbody-group">
+        <tr *ngIf="!notImportedCustomClearances.length">
+          <td colspan="100">
+            <div class="no-data">
+              <i class="flaticon-coins"></i>
+              <span class="no-data-text">No records found</span>
+            </div>
+          </td>
+        </tr>
         <tr class="" *ngFor="let item of notImportedCustomClearances; let i=index">
           <td class="table-actions-col">
             <div class="table-actions">
@@ -162,8 +164,29 @@
                             </div>
                         </div>
                     </div> -->
-  <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)" #pagingNotImported
-    (pagerObject)="setPage($event)"></app-pagination>
+  <div class="pagination-nav">
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="tatable__pager-size">
+          <div class="select-box">
+            <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize" (change)="selectPageSize(pageSize)"
+              name="pagesize">
+              <ng-container *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
+                <option [ngValue]="item">{{item}} line / screen</option>
+              </ng-container>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6" *ngIf="totalItems > pageSize">
+        <div class="float-right">
+          <pagination [boundaryLinks]="true" [totalItems]="totalItems" [itemsPerPage]="pageSize" [maxSize]="10"
+            (pageChanged)="pageChanged($event)" [(ngModel)]="page">
+          </pagination>
+        </div>
+      </div>
+    </div>
+  </div>
   <!--end::pagination-->
   <!--end::m-portlet -->
 </div>
