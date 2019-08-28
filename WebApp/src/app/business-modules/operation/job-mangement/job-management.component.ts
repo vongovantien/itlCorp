@@ -102,8 +102,6 @@ export class JobManagementComponent extends AppList implements OnInit {
                             this.shipments[indexsShipment].customClearances = this.customClearances;
                         }
                     },
-                    (errors: any) => { },
-                    () => { }
                 );
         }
     }
@@ -125,12 +123,6 @@ export class JobManagementComponent extends AppList implements OnInit {
                         this.canNotDeleteJobPopup.show();
                     }
                 },
-                (errors: any) => {
-                    this.handleError(errors, (dataError: { message: string; title: string; }) => {
-                        this._toastService.error(dataError.message, dataError.title);
-                    });
-                },
-                () => { }
             );
     }
 
@@ -150,12 +142,6 @@ export class JobManagementComponent extends AppList implements OnInit {
                         this.getShipments();
                     }
                 },
-                (errors: any) => {
-                    this.handleError(errors, (dataError: any) => {
-                        this._toastService.error(dataError.message, dataError.title);
-                    });
-                },
-                () => { }
             );
 
     }
@@ -209,12 +195,6 @@ export class JobManagementComponent extends AppList implements OnInit {
                         });
                     }
                 },
-                (errors: any) => {
-                    this.handleError(errors, (dataError: { message: string; title: string; }) => {
-                        this._toastService.error(dataError.message, dataError.title);
-                    });
-                },
-                () => { }
             );
     }
 

@@ -101,12 +101,6 @@ export class CustomClearanceComponent extends AppList {
                     this.listCustomDeclaration = res.data;
                     this.totalItems = res.totalItems;
                 },
-                (errors: any) => { 
-                    this.handleError(errors, (data) => {
-                        this._toastrService.error(data.message, data.title);
-                    });
-                },
-                () => { }
             );
     }
 
@@ -161,12 +155,6 @@ export class CustomClearanceComponent extends AppList {
                     this._toastrService.success(res.message, '', { positionClass: 'toast-bottom-right' });
                     this.getListCustomsDeclaration();
                 },
-                (errors: any) => { 
-                    this.handleError(errors, (data) => {
-                        this._toastrService.error(data.message, data.title);
-                    });
-                },
-                () => { }
             );
     }
 
@@ -188,12 +176,6 @@ export class CustomClearanceComponent extends AppList {
                             this.getListCustomsDeclaration();
                         }
                     },
-                    (errors: any) => {
-                        this.handleError(errors, (data) => {
-                            this._toastrService.error(data.message, data.title);
-                        });
-                     },
-                    () => { }
                 );
         }
     }
