@@ -15,10 +15,10 @@ namespace eFMS.API.System.Service.Models
         {
         }
 
+        public virtual DbSet<CatDepartment> CatDepartment { get; set; }
         public virtual DbSet<CatPlace> CatPlace { get; set; }
         public virtual DbSet<SysBranch> SysBranch { get; set; }
         public virtual DbSet<SysBu> SysBu { get; set; }
-        public virtual DbSet<SysDepartment> SysDepartment { get; set; }
         public virtual DbSet<SysEmployee> SysEmployee { get; set; }
         public virtual DbSet<SysGroup> SysGroup { get; set; }
         public virtual DbSet<SysGroupRole> SysGroupRole { get; set; }
@@ -42,6 +42,57 @@ namespace eFMS.API.System.Service.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+
+            modelBuilder.Entity<CatDepartment>(entity =>
+            {
+                entity.ToTable("catDepartment");
+
+                entity.HasIndex(e => e.Code)
+                    .HasName("U_catDepartment_Code")
+                    .IsUnique();
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.BranchId).HasColumnName("BranchID");
+
+                entity.Property(e => e.Code)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DatetimeCreated)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DatetimeModified)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DeptName).HasMaxLength(1600);
+
+                entity.Property(e => e.Description).HasMaxLength(4000);
+
+                entity.Property(e => e.Inactive).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.ManagerId)
+                    .HasColumnName("ManagerID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.Branch)
+                    .WithMany(p => p.CatDepartment)
+                    .HasForeignKey(d => d.BranchId)
+                    .HasConstraintName("FK_catDepartment_sysBranch");
+            });
 
             modelBuilder.Entity<CatPlace>(entity =>
             {
@@ -161,6 +212,8 @@ namespace eFMS.API.System.Service.Models
                     .HasColumnName("BranchName_VN")
                     .HasMaxLength(4000);
 
+                entity.Property(e => e.Buid).HasColumnName("BUID");
+
                 entity.Property(e => e.Code).HasMaxLength(640);
 
                 entity.Property(e => e.CountryId).HasColumnName("CountryID");
@@ -196,6 +249,11 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.Website)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.Bu)
+                    .WithMany(p => p.SysBranch)
+                    .HasForeignKey(d => d.Buid)
+                    .HasConstraintName("FK_sysBranch_sysBU");
             });
 
             modelBuilder.Entity<SysBu>(entity =>
@@ -298,52 +356,6 @@ namespace eFMS.API.System.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Website).HasMaxLength(1600);
-            });
-
-            modelBuilder.Entity<SysDepartment>(entity =>
-            {
-                entity.ToTable("sysDepartment");
-
-                entity.Property(e => e.Id).HasColumnName("ID");
-
-                entity.Property(e => e.BranchId).HasColumnName("BranchID");
-
-                entity.Property(e => e.Code)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.DatetimeCreated)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getdate())");
-
-                entity.Property(e => e.DatetimeModified)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getdate())");
-
-                entity.Property(e => e.Inactive).HasDefaultValueSql("((0))");
-
-                entity.Property(e => e.InactiveOn).HasColumnType("datetime");
-
-                entity.Property(e => e.ManagerId)
-                    .HasColumnName("ManagerID")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.NameEn)
-                    .HasColumnName("NameEN")
-                    .HasMaxLength(150);
-
-                entity.Property(e => e.NameVn)
-                    .HasColumnName("NameVN")
-                    .HasMaxLength(150);
-
-                entity.Property(e => e.UserCreated)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UserModified)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<SysEmployee>(entity =>
@@ -450,6 +462,8 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.Decription).HasMaxLength(4000);
 
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
                 entity.Property(e => e.Inactive).HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
@@ -470,6 +484,11 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.Department)
+                    .WithMany(p => p.SysGroup)
+                    .HasForeignKey(d => d.DepartmentId)
+                    .HasConstraintName("FK_sysGroup_catDepartment");
             });
 
             modelBuilder.Entity<SysGroupRole>(entity =>
@@ -696,8 +715,6 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.Property(e => e.UserGroupId).HasColumnName("UserGroupID");
 
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)

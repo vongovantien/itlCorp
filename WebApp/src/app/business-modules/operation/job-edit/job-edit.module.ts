@@ -27,10 +27,11 @@ import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
 import { Routes, RouterModule } from '@angular/router';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SelectModule } from 'ng2-select';
-import { TabsModule, ModalModule } from 'ngx-bootstrap';
+import { TabsModule, ModalModule, PaginationModule } from 'ngx-bootstrap';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AddMoreModalComponent } from './custom-declaration/add-more-modal/add-more-modal.component';
 
 const routing: Routes = [
     {
@@ -56,6 +57,7 @@ const LIB = [
     imports: [
         CommonModule,
         RouterModule.forChild(routing),
+        PaginationModule.forRoot(),
         SharedModule,
         FormsModule,
         ReactiveFormsModule,
@@ -92,6 +94,7 @@ const LIB = [
         EditObhRatePopupComponent,
 
         PlSheetPopupComponent,
+        AddMoreModalComponent
     ],
     providers: [],
     bootstrap: [

@@ -137,4 +137,8 @@ export class AddBuyingRatePopupComponent extends PopupBase implements OnInit, On
   public typed(value: any): void {
     console.log('New search input: ', value);
   }
+  value;
+  public refreshValue(value: any): void {
+    this.value = value;
+  }
 }
