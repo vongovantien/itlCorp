@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccoutingRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
-import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { SOA } from 'src/app/shared/models';
 import { AppList } from 'src/app/app.list';
@@ -78,7 +77,9 @@ export class StatementOfAccountDetailComponent extends AppList {
                     this.totalItems = this.soa.chargeShipments.length;
                 },
                 (errors: any) => {
-                    this.handleError(errors);
+                    this.handleError(errors, (data: any) => {
+                        this._toastService.error(data.message, data.title);
+                    });
                 },
                 () => { },
             );
@@ -102,8 +103,10 @@ export class StatementOfAccountDetailComponent extends AppList {
             if (!!res) {
                 return res;
             }
-        } catch (error) {
-            this.handleError(error);
+        } catch (errors) {
+            this.handleError(errors, (data: any) => {
+                this._toastService.error(data.message, data.title);
+            });
         }
         finally {
             this._progressRef.complete();
@@ -298,16 +301,6 @@ export class StatementOfAccountDetailComponent extends AppList {
             fs.saveAs(blob, exportModel.fileName + '.xlsx');
         });
 
-    }
-
-    handleError(errors?: any) {
-        let message: string = 'Has Error Please Check Again !';
-        let title: string = '';
-        if (errors instanceof HttpErrorResponse) {
-            message = errors.message;
-            title = errors.statusText;
-        }
-        this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
     }
 
     back() {

@@ -95,9 +95,9 @@ namespace eFMS.API.Documentation.Controllers
         [HttpGet]
         [Route("GetDetails")]
         //[Authorize]
-        public AcctCDNoteDetailsModel Get(Guid JobId,string cdNo)
+        public AcctCDNoteDetailsModel Get(Guid jobId,string cdNo)
         {
-            return cdNoteServices.GetCDNoteDetails(JobId, cdNo);
+            return cdNoteServices.GetCDNoteDetails(jobId, cdNo);
         }
 
         [HttpPost]

@@ -8,6 +8,9 @@ import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mo
 import { SortService } from 'src/app/shared/services';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ReportPreviewComponent } from 'src/app/shared/common';
+import { CDNoteRepo } from 'src/app/shared/repositories';
+import { takeUntil, catchError, finalize } from 'rxjs/operators';
+import { NgxSpinnerService } from 'ngx-spinner';
 declare var $: any;
 
 @Component({
@@ -26,7 +29,9 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
   constructor(
     private baseServices: BaseService,
     private api_menu: API_MENU,
-    private sortService: SortService
+    private sortService: SortService,
+    private cdNoteRepo: CDNoteRepo,
+    private spinner: NgxSpinnerService
   ) {
     super();
   }
@@ -52,7 +57,7 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
     const currentCDNoteDetail = this.CDNoteDetails;
     // this.CDNoteDetails = null;
     this.hide();
-    this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + currentCDNoteDetail.jobId + "&cdNo=" + currentCDNoteDetail.cdNote.code);
+    this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?jobId=" + currentCDNoteDetail.jobId + "&cdNo=" + currentCDNoteDetail.cdNote.code);
     // this.baseServices.setData("CDNoteDetails", this.CDNoteDetails);
     if (this.CDNoteDetails != null) {
       this.totalCreditDebitCalculate();
@@ -76,19 +81,33 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
   async closeEditModal(event: any) {
     this.currentCDNo = this.CDNoteDetails.cdNote.code;
     // this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.currentJob.id + "&cdNo=" + this.currentCDNo);
-    this.baseServices.get(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.currentJob.id + "&cdNo=" + this.currentCDNo).subscribe((responses: any) => {
-      if (responses) {
-        this.CDNoteDetails = responses;
-
-        if (this.CDNoteDetails != null) {
-          this.show();
-          this.totalCreditDebitCalculate();
+    this.cdNoteRepo.getDetails(this.currentJob.id, this.currentCDNo).pipe(
+      takeUntil(this.ngUnsubscribe),
+      catchError(this.catchError),
+      finalize(() => { this.spinner.hide(); }),
+    ).subscribe(
+      (res: any) => {
+        if (res instanceof Error) {
         } else {
-          this.close();
+          if (res != null) {
+            this.CDNoteDetails = res;
+            if (this.CDNoteDetails != null) {
+              this.show();
+              this.totalCreditDebitCalculate();
+            } else {
+              this.close();
+            }
+          }
         }
-      }
-    }, err => {
-    });
+      },
+      // error
+      (errs: any) => {
+        this.close();
+        // this.handleErrors(errs)
+      },
+      // complete
+      () => { }
+    );
   }
   async Preview() {
     this.dataReport = null;

@@ -87,7 +87,11 @@ export class AdvancePaymentDetailComponent extends AppPage {
 
                     this.listRequestAdvancePaymentComponent.advanceNo = this.advancePayment.advanceNo;
                 },
-                (errors: any) => { },
+                (errors: any) => {
+                    this.handleError(errors, (data: any) => {
+                        this._toastService.error(data.message, data.title);
+                    });
+                },
                 () => { }
             );
     }
@@ -126,9 +130,17 @@ export class AdvancePaymentDetailComponent extends AppPage {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(`${res.data.advanceNo + ' is update successfully'}`, 'Update Success !');
+                        } else {
+                            this.handleError((data: any) => {
+                                this._toastService.error(data.message, data.title);
+                            });
                         }
                     },
-                    (errors: any) => { },
+                    (errors: any) => {
+                        this.handleError(errors, (data: any) => {
+                            this._toastService.error(data.message, data.title);
+                        });
+                    },
                     () => { }
                 );
         }
@@ -154,7 +166,11 @@ export class AdvancePaymentDetailComponent extends AppPage {
                     }, 1000);
 
                 },
-                (errors: any) => { },
+                (errors: any) => {
+                    this.handleError(errors, (data: any) => {
+                        this._toastService.error(data.message, data.title);
+                    });
+                },
                 () => { },
             );
     }

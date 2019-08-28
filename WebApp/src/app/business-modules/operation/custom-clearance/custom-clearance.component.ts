@@ -2,7 +2,6 @@ import { Component, ViewChild } from '@angular/core';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
-import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
@@ -17,6 +16,7 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 import _map from 'lodash/map';
 import { formatDate } from '@angular/common';
+import { NgProgress } from '@ngx-progressbar/core';
 
 @Component({
     selector: 'app-custom-clearance',
@@ -40,11 +40,13 @@ export class CustomClearanceComponent extends AppList {
         private api_menu: API_MENU,
         private _sortService: SortService,
         private _toastrService: ToastrService,
-        private _cdNoteRepo: CDNoteRepo
+        private _cdNoteRepo: CDNoteRepo,
+        private _ngProgressService: NgProgress
     ) {
         super();
         this.requestList = this.getListCustomsDeclaration;
         this.requestSort = this.sortCD;
+        this._progressRef = this._ngProgressService.ref();
     }
 
     ngOnInit() {
@@ -81,6 +83,7 @@ export class CustomClearanceComponent extends AppList {
 
     getListCustomsDeclaration(dataSearch?: any) {
         this.isLoading = true;
+        this._progressRef.start();
         const body = dataSearch || {};
         this._cdNoteRepo.getListCustomDeclaration(this.page, this.pageSize, body)
             .pipe(
@@ -91,14 +94,18 @@ export class CustomClearanceComponent extends AppList {
                         totalItems: data.totalItems,
                     };
                 }),
-                finalize(() => { this.isLoading = false; })
+                finalize(() => { this.isLoading = false; this._progressRef.complete(); })
             )
             .subscribe(
                 (res: any) => {
                     this.listCustomDeclaration = res.data;
                     this.totalItems = res.totalItems;
                 },
-                (errors: any) => { },
+                (errors: any) => { 
+                    this.handleError(errors, (data) => {
+                        this._toastrService.error(data.message, data.title);
+                    });
+                },
                 () => { }
             );
     }
@@ -141,18 +148,24 @@ export class CustomClearanceComponent extends AppList {
     }
 
     onConfirmDelete() {
+        this._progressRef.start();
         this.confirmDeletePopup.hide();
         const customCheckedArray: CustomDeclaration[] = this.listCustomDeclaration.filter(i => i.isSelected && !i.jobNo) || [];
         this._cdNoteRepo.deleteMultipleClearance(customCheckedArray || [])
             .pipe(
-                catchError(this.catchError)
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); })
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     this._toastrService.success(res.message, '', { positionClass: 'toast-bottom-right' });
                     this.getListCustomsDeclaration();
                 },
-                (errors: any) => { },
+                (errors: any) => { 
+                    this.handleError(errors, (data) => {
+                        this._toastrService.error(data.message, data.title);
+                    });
+                },
                 () => { }
             );
     }
@@ -162,9 +175,11 @@ export class CustomClearanceComponent extends AppList {
         const clearancesToConvert = this.mapClearancesToJobs();
         const clearanceNulls = clearancesToConvert.filter(x => x.opsTransaction == null);
         if (clearanceNulls.length === 0) {
+            this._progressRef.start();
             this._cdNoteRepo.convertClearanceToJob(clearancesToConvert)
                 .pipe(
                     catchError(this.catchError),
+                    finalize(() => { this._progressRef.complete(); })
                 )
                 .subscribe(
                     (res: CommonInterface.IResult) => {
@@ -172,7 +187,11 @@ export class CustomClearanceComponent extends AppList {
                             this.getListCustomsDeclaration();
                         }
                     },
-                    (errors: any) => { },
+                    (errors: any) => {
+                        this.handleError(errors, (data) => {
+                            this._toastrService.error(data.message, data.title);
+                        });
+                     },
                     () => { }
                 );
         }

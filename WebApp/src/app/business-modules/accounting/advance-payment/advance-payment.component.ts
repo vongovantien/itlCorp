@@ -4,7 +4,7 @@ import { AccoutingRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
-import { SortService, BaseService } from 'src/app/shared/services';
+import { SortService, BaseService} from 'src/app/shared/services';
 import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
 import { AdvancePayment, AdvancePaymentRequest, User } from 'src/app/shared/models';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
@@ -27,12 +27,14 @@ export class AdvancePaymentComponent extends AppList {
     groupRequest: AdvancePaymentRequest[] = [];
     userLogged: User;
 
+    dataSearch: any = {};
+
     constructor(
         private _accoutingRepo: AccoutingRepo,
         private _toastService: ToastrService,
         private _sortService: SortService,
         private _progressService: NgProgress,
-        private _baseService: BaseService
+        private _baseService: BaseService,
     ) {
         super();
         this.requestList = this.getListAdvancePayment;
@@ -68,6 +70,11 @@ export class AdvancePaymentComponent extends AppList {
         this.getListAdvancePayment();
     }
 
+    onSearchAdvPayment(data: any) {
+        this.dataSearch = data;
+        this.getListAdvancePayment(this.dataSearch);
+    }
+
     getListAdvancePayment(dataSearch?: any) {
         this.isLoading = true;
         this._progressRef.start();
@@ -87,7 +94,9 @@ export class AdvancePaymentComponent extends AppList {
                     this.totalItems = res.totalItems || 0;
                 },
                 (errors: any) => {
-                    this.handleError(errors);
+                    this.handleError(errors, (data: any) => {
+                        this._toastService.error(data.message, data.title);
+                    });
                 },
                 () => { }
             );
@@ -137,7 +146,11 @@ export class AdvancePaymentComponent extends AppList {
                         this.getListAdvancePayment();
                     }
                 },
-                (errors: any) => { },
+                (errors: any) => {
+                    this.handleError(errors, (data: any) => {
+                        this._toastService.error(data.message, data.title);
+                    });
+                },
                 () => { }
             );
     }
@@ -145,16 +158,6 @@ export class AdvancePaymentComponent extends AppList {
     deleteAdvancePayment(selectedAdv: AdvancePayment) {
         this.confirmDeletePopup.show();
         this.selectedAdv = new AdvancePayment(selectedAdv);
-    }
-
-    handleError(errors: any) {
-        let message: string = 'Has Error Please Check Again !';
-        let title: string = '';
-        if (errors instanceof HttpErrorResponse) {
-            message = errors.message;
-            title = errors.statusText;
-        }
-        this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
     }
 
     getRequestAdvancePaymentGroup(advanceNo: string, index: number) {
@@ -172,7 +175,11 @@ export class AdvancePaymentComponent extends AppList {
                         this.groupRequest = res;
                         this.advancePayments[index].advanceRequests = res;
                     },
-                    (errors: any) => { },
+                    (errors: any) => {
+                        this.handleError(errors, (data: any) => {
+                            this._toastService.error(data.message, data.title);
+                        });
+                    },
                     () => { }
                 );
         }

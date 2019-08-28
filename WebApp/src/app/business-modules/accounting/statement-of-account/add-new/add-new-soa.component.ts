@@ -1,5 +1,4 @@
 import { Component, ViewChild } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
@@ -145,7 +144,9 @@ export class StatementOfAccountAddnewComponent extends AppList {
                                     this.getPartnerData(dataPartner)
                                 },
                                 (errors: any) => {
-                                    this.handleError(errors);
+                                    this.handleError(errors, (data) => {
+                                        this._toastService.error(data.message, data.title);
+                                    });
                                 },
                                 // complete
                                 () => { }
@@ -193,11 +194,15 @@ export class StatementOfAccountAddnewComponent extends AppList {
 
                         this.selectedService = [this.services[0]];
                     } else {
-                        this.handleError();
+                        this.handleError(null, (data) => {
+                            this._toastService.error(data.message, data.title);
+                        });
                     }
                 },
                 (errors: any) => {
-                    this.handleError(errors);
+                    this.handleError(errors, (data: any) => {
+                            this._toastService.error(data.message, data.title);
+                        });
                 },
                 () => { }
             );
@@ -221,7 +226,9 @@ export class StatementOfAccountAddnewComponent extends AppList {
                                     this.getCurrencyData(dataCurrency)
                                 },
                                 (errors: any) => {
-                                    this.handleError(errors);
+                                    this.handleError(errors, (data) => {
+                                        this._toastService.error(data.message, data.title);
+                                    });
                                 },
                                 // complete
                                 () => { }
@@ -249,7 +256,9 @@ export class StatementOfAccountAddnewComponent extends AppList {
                                     this.getCurrencyUser(dataUser);
                                 },
                                 (errors: any) => {
-                                    this.handleError(errors);
+                                    this.handleError(errors, (data) => {
+                                        this._toastService.error(data.message, data.title);
+                                    });
                                 },
                                 // complete
                                 () => { }
@@ -277,7 +286,9 @@ export class StatementOfAccountAddnewComponent extends AppList {
                 this._dataService.setData(SystemConstants.CSTORAGE.CHARGE, data || []);
             },
                 (errors: any) => {
-                    this.handleError(errors);
+                    this.handleError(errors, (data) => {
+                        this._toastService.error(data.message, data.title);
+                    });
                 },
                 // complete
                 () => { }
@@ -512,7 +523,9 @@ export class StatementOfAccountAddnewComponent extends AppList {
                         }
                     },
                     (errors: any) => {
-                        this.handleError(errors);
+                        this.handleError(errors, (data) => {
+                            this._toastService.error(data.message, data.title);
+                        });
                     },
                     () => { }
                 );
@@ -538,7 +551,9 @@ export class StatementOfAccountAddnewComponent extends AppList {
                     this.updateDataSearch('chargeShipments', this.listCharges);
                 },
                 (errors: any) => {
-                    this.handleError(errors);
+                    this.handleError(errors, (data) => {
+                        this._toastService.error(data.message, data.title);
+                    });
                 },
                 () => { }
             );
@@ -556,16 +571,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
     removeCharge() {
         this.listCharges = this.listCharges.filter((charge: any) => !charge.isSelected);
         this.dataSearch.chargeShipments = this.listCharges;
-    }
-
-    handleError(errors?: any) {
-        let message: string = 'Has Error Please Check Again !';
-        let title: string = '';
-        if (errors instanceof HttpErrorResponse) {
-            message = errors.message;
-            title = errors.statusText;
-        }
-        this._toastService.error(message, title, { positionClass: 'toast-bottom-right' });
     }
 
     onUpdateMoreSOA(data: any) {

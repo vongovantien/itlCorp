@@ -194,7 +194,11 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
                         this._toastService.warning('Shipment has existed in another Advance !', 'Warning');
                     }
                 },
-                (errors: any) => { },
+                (errors: any) => { 
+                    this.handleError(errors, (data: any) => {
+                        this._toastService.error(data.message, data.title);
+                    });
+                },
                 () => { }
             );
     }
@@ -209,7 +213,11 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
                 (res: any) => {
                     this.customDeclarations = this.initCD = res || [];
                 },
-                (errors: any) => { },
+                (errors: any) => { 
+                    this.handleError(errors, (data: any) => {
+                        this._toastService.error(data.message, data.title);
+                    });
+                },
                 () => { },
             );
     }

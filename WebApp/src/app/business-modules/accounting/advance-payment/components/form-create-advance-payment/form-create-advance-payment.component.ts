@@ -7,6 +7,7 @@ import { AppForm } from 'src/app/app.form';
 import { FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
 import { SystemConstants } from 'src/constants/system.const';
 import moment from 'moment';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'adv-payment-form-create',
@@ -37,7 +38,8 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         private _fb: FormBuilder,
         private _baseService: BaseService,
         private _sysRepo: SystemRepo,
-        private _dataService: DataService
+        private _dataService: DataService,
+        private _toastService: ToastrService
     ) {
         super();
 
@@ -110,7 +112,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     getMethod(): CommonInterface.ICommonTitleValue[] {
         return [
             { title: 'Cash', value: 'Cash' },
-            { title: 'Bank Transer', value: 'Bank' },
+            { title: 'Bank Transfer', value: 'Bank' },
         ];
     }
 
@@ -137,7 +139,11 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
                                     this.currencyList = data || [];
                                     this.currency.setValue(this.currencyList.filter((item: Currency) => item.id === 'VND')[0]);
                                 },
-                                (errors: any) => { },
+                                (errors: any) => {
+                                    this.handleError(errors, (data: any) => {
+                                        this._toastService.error(data.message, data.title);
+                                    });
+                                 },
                                 () => { }
                             );
                     }
