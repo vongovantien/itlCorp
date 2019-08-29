@@ -40,7 +40,6 @@ export class OpsTransaction {
         podName: string = null;
         polName: string = null;
         packageTypeId: null;
-        containerDescription: string;
         //sumCont: number = null;
         //packageQuantity: number = null;
         csMawbcontainers: Container[] = null;
