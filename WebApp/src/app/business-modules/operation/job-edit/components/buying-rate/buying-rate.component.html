@@ -1,0 +1,116 @@
+<div class="m-form m-form--label-align-right m--margin-bottom-10">
+    <div class="row align-items-center">
+        <div class="col-lg-4 order-2 order-lg-1">
+            <div class="form-group">
+                <div class="m-input-icon m-input-icon--left">
+                    <input type="text" class="form-control m-input m-input--square" placeholder="Search..."
+                        [(ngModel)]="keyword">
+                    <span class="m-input-icon__icon m-input-icon__icon--left">
+                        <span>
+                            <i class="la la-search"></i>
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                (click)="openAddNewBuyingRatePopup()">
+                <span>
+                    <i class="la la-plus"></i>
+                    <span>
+                        add charge
+                    </span>
+                </span>
+            </button>
+        </div>
+    </div>
+</div>
+<div class="table-wrapper">
+    <table class="table table-striped table-brand dataTable">
+        <thead class="">
+            <tr class="">
+                <th class=""></th>
+                <th *ngFor="let header of headers; trackBy: trackByFn"
+                    [class]="sortClass(header.sortable ? header.field : '')"
+                    (click)="sortBy(header.sortable ? header.field : '')">
+                    <span>{{header.title}}</span>
+                    <span class="sort-indicator"></span>
+                </th>
+            </tr>
+        </thead>
+        <tbody *ngIf="!!data.length">
+            <tr
+                *ngFor="let charge of data | filter: keyword : ['partnerName', 'nameEn', 'currency','docNo']; let i = index">
+                <td class="table-actions-col">
+                    <div class="table-actions" style="width: 70px">
+                        <button type="button" (click)="prepareEditCharge(charge)"
+                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit">
+                            <i class="la la-edit"></i>
+                        </button>
+                        <button type="button" (click)="showConfirmDeleteCharge(charge.id)"
+                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Remove">
+                            <i class="la la-trash"></i>
+                        </button>
+                    </div>
+                </td>
+                <td>
+                    {{charge.partnerName}}
+                </td>
+                <td>
+                    <a href="javascript:void(0)" (click)="prepareEditCharge(charge)">{{charge.nameEn}}</a>
+                </td>
+                <td>
+                    {{charge.quantity}}
+                </td>
+                <td>
+                    {{charge.unit}}
+                </td>
+                <td>
+                    {{charge.unitPrice | number : '1.3-3'}}
+                </td>
+
+                <td>
+                    {{charge.currency}}
+                </td>
+                <td>
+                    {{charge.vatrate}}
+                </td>
+                <td>
+                    {{charge.total | number : '1.3-3'}}
+                </td>
+                <td>
+                    {{charge.notes}}
+                </td>
+                <td>
+                    {{charge.docNo}}
+                </td>
+                <td>
+                    {{charge.soano}}
+                </td>
+                <td>
+                    <a href="javascript:void(0)" (click)="openCreditDebitNote(charge.creditNo)">
+                        {{ charge.creditNo }}
+                    </a>
+                </td>
+                <td>
+                    {{ charge.settlementCode }}
+                </td>
+                <td>
+                    {{charge.exchangeDate | date:'dd/MM/yyyy'}}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<app-edit-buying-rate-popup [buyingRateChargeToEdit]="BuyingRateChargeToEdit"
+    (outputEditBuying)="onSaveBuyingRate($event)"></app-edit-buying-rate-popup>
+
+<confirm-popup [title]="'Delete Charge'" [body]="'Are you sure want to delete this Charge?'"
+    (onSubmit)="deleteCharge()"></confirm-popup>
+
+<app-ops-module-credit-debit-note-detail [CDNoteDetails]="CDNoteDetails"></app-ops-module-credit-debit-note-detail>
+
+<app-add-buying-rate-popup [opsTransaction]="opsTransaction" (outputAddBuying)="onSaveNewBuyingRate($event)">
+</app-add-buying-rate-popup>
