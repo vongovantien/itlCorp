@@ -1,7 +1,7 @@
 import { Component, Input, ViewChild, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
-import { BaseService } from 'src/app/shared/services';
+import { BaseService, SortService } from 'src/app/shared/services';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSurcharge';
 import cloneDeep from 'lodash/cloneDeep';
@@ -34,9 +34,11 @@ export class JobManagementBuyingRateComponent extends AppList {
     constructor(
         private baseServices: BaseService,
         private api_menu: API_MENU,
+        private sortService: SortService
 
     ) {
         super();
+        this.requestSort = this.sortBuyingRateCharges;
     }
 
     ngOnInit() {
@@ -135,4 +137,11 @@ export class JobManagementBuyingRateComponent extends AppList {
     openAddNewBuyingRatePopup() {
         this.addBuyingRatePopup.show();
     }
+
+    sortBuyingRateCharges() {
+        this.data = this.sortService.sort(this.data, this.sort, this.order);
+    }
+
+
+
 }

@@ -2,7 +2,7 @@ import { Component, ViewChild, Output, EventEmitter, Input } from '@angular/core
 import { AppList } from 'src/app/app.list';
 import { AddObhRatePopupComponent } from '../../charge-list/add-obh-rate-popup/add-obh-rate-popup.component';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
-import { BaseService } from 'src/app/shared/services';
+import { BaseService, SortService } from 'src/app/shared/services';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDetails.model';
@@ -34,14 +34,17 @@ export class JobManagementOBHComponent extends AppList {
     constructor(
         private baseServices: BaseService,
         private api_menu: API_MENU,
+        private sortService: SortService
     ) {
         super();
+        this.requestSort = this.sortOBHRateCharges;
+
     }
 
     ngOnInit() {
         this.headers = [
-            { title: 'Receiver', field: 'partnerName', sortable: true },
-            { title: 'Payer ', field: 'partnerName', sortable: true },
+            { title: 'Receiver', field: 'receiverName', sortable: true },
+            { title: 'Payer ', field: 'payerName', sortable: true },
             { title: 'Name EN', field: 'nameEn', sortable: true },
             { title: 'Quantity', field: 'quantity', sortable: true },
             { title: 'Unit', field: 'unit', sortable: true },
@@ -134,6 +137,10 @@ export class JobManagementOBHComponent extends AppList {
         }
         this.CDNoteDetails.totalCredit = totalCredit;
         this.CDNoteDetails.totalDebit = totalDebit;
+    }
+
+    sortOBHRateCharges() {
+        this.data = this.sortService.sort(this.data, this.sort, this.order);
     }
 
 }

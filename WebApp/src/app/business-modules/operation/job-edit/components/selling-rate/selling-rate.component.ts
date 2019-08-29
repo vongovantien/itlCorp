@@ -6,7 +6,7 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import cloneDeep from 'lodash/cloneDeep';
 import { EditSellingRatePopupComponent } from '../../charge-list/edit-selling-rate-popup/edit-selling-rate-popup.component';
 import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSurcharge';
-import { BaseService } from 'src/app/shared/services';
+import { BaseService, SortService } from 'src/app/shared/services';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDetails.model';
 import { OpsModuleCreditDebitNoteDetailComponent } from '../../credit-debit-note/ops-module-credit-debit-note-detail/ops-module-credit-debit-note-detail.component';
@@ -35,9 +35,11 @@ export class JobManagementSellingRateComponent extends AppList {
     constructor(
         private baseServices: BaseService,
         private api_menu: API_MENU,
+        private sortService: SortService
 
     ) {
         super();
+        this.requestSort = this.sortSellingRateCharges;
     }
 
     ngOnInit() {
@@ -135,6 +137,10 @@ export class JobManagementSellingRateComponent extends AppList {
         }
         this.CDNoteDetails.totalCredit = totalCredit;
         this.CDNoteDetails.totalDebit = totalDebit;
+    }
+
+    sortSellingRateCharges() {
+        this.data = this.sortService.sort(this.data, this.sort, this.order);
     }
 
 }

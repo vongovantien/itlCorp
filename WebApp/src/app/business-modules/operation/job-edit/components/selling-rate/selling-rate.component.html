@@ -40,9 +40,9 @@
                 </th>
             </tr>
         </thead>
-        <tbody>
+        <tbody *ngIf="!!data.length else norecord">
             <tr class=""
-                *ngFor="let charge of data | filter: keyword : ['partnerName', 'nameEn', 'currency','docNo']; let i = index">
+                *ngFor="let charge of data | filter: keyword : ['partnerName', 'nameEn', 'currency','docNo','soano']; let i = index">
                 <td class="table-actions-col">
                     <div class="table-actions" style="width: 70px">
 
@@ -107,11 +107,21 @@
                 </td>
             </tr>
         </tbody>
+        <ng-template #norecord>
+            <tr>
+                <td colspan="14">
+                    <div class="no-data">
+                        <i class="flaticon-coins"></i>
+                        <span class="no-data-text">No records found</span>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
     </table>
 </div>
 
-<app-add-selling-rate-popup [opsTransaction]="opsTransaction" 
-    (outputAddSelling)="onSaveNewSellingRate($event)"></app-add-selling-rate-popup>
+<app-add-selling-rate-popup [opsTransaction]="opsTransaction" (outputAddSelling)="onSaveNewSellingRate($event)">
+</app-add-selling-rate-popup>
 
 <app-edit-selling-rate-popup [opsTransaction]="opsTransaction" [sellingRateChargeToEdit]="SellingRateChargeToEdit"
     (outputEditSelling)="onSaveSellingRate($event)">
