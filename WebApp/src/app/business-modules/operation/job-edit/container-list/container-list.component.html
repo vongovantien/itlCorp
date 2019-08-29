@@ -151,8 +151,7 @@
                             (data)="refreshValue($event)"
                             (selected)="container.containerTypeId = $event.id;container.containerTypeName = $event.text"
                             (removed)="container.containerTypeId = null;container.containerTypeName = null"
-                            (typed)="typed($event)" [active]="container.containerTypeActive"
-                            placeholder="Select filter">
+                            [active]="container.containerTypeActive" placeholder="Select filter">
                           </ng-select>
                           <div class="form-control-feedback"
                             *ngIf="containerMasterForm.submitted && container.containerTypeId == null && container.verifying">
@@ -215,7 +214,7 @@
                           <ng-select [allowClear]="true" [items]="packageTypes" (data)="refreshValue($event)"
                             (selected)="container.packageTypeId = $event.id; container.packageTypeName = $event.text"
                             (removed)="container.packageTypeId = null; container.packageTypeName = null"
-                            (typed)="typed($event)" [active]="container.packageTypeActive" placeholder="Select filter">
+                            [active]="container.packageTypeActive" placeholder="Select filter">
                           </ng-select>
                         </div>
                       </td>
@@ -273,8 +272,7 @@
                           <ng-select [allowClear]="true" [items]="weightMesurements" (data)="refreshValue($event)"
                             (selected)="container.unitOfMeasureId = $event.id; container.unitOfMeasureName = $event.text"
                             (removed)="container.unitOfMeasureId = null; container.unitOfMeasureName = null"
-                            (typed)="typed($event)" [active]="container.unitOfMeasureActive"
-                            placeholder="Select filter">
+                            [active]="container.unitOfMeasureActive" placeholder="Select filter">
                           </ng-select>
                         </div>
                       </td>

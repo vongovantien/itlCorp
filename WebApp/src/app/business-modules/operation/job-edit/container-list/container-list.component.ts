@@ -304,4 +304,8 @@ export class ContainerListComponent extends PopupBase implements OnInit {
       )
     );
   }
+  value: any
+  refreshValue(value: any) {
+    this.value = value;
+  }
 }
