@@ -84,8 +84,37 @@ export class AdvancePaymentAddNewComponent extends AppPage {
         }
     }
 
+    sendRequest() {
+        const body = {
+            advanceRequests: this.listRequestAdvancePaymentComponent.listRequestAdvancePayment,
+            requester: this.formCreateComponent.requester.value || 'Admin',
+            department: this.formCreateComponent.department.value || '',
+            paymentMethod: this.formCreateComponent.paymentMethod.value.value,
+            advanceCurrency: this.formCreateComponent.currency.value.id || 'VND',
+            requestDate: formatDate(this.formCreateComponent.requestDate.value.startDate || new Date(), 'yyyy-MM-dd', 'vi'),
+            deadlinePayment: formatDate(this.formCreateComponent.deadLine.value.startDate || new Date(), 'yyyy-MM-dd', 'vi'),
+            advanceNote: this.formCreateComponent.note.value || '',
+        };
+        this._progressRef.start();
+        this._accoutingRepo.sendRequestAdvPayment(body)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(`${res.data.advanceNo + 'Save and Send Request successfully'}`, 'Save Success !', { positionClass: 'toast-bottom-right' });
+                    } else {
+                        this.handleError(null, (data: any) => {
+                            this._toastService.error(data.message, data.title);
+                        });
+                    }
+                },
+            );
+
+    }
 
 }
-
 
 

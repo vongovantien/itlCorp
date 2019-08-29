@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, Input } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { AdvancePaymentRequest, Currency } from 'src/app/shared/models';
 import { Subject, Observable } from 'rxjs';
@@ -17,6 +17,8 @@ export class AdvancePaymentListRequestComponent extends AppList {
     @ViewChild(AdvancePaymentAddRequestPopupComponent, { static: false }) addNewRequestPaymentPopup: AdvancePaymentAddRequestPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
 
+    @Input() action: string = 'update';
+    
     headers: CommonInterface.IHeaderTable[];
 
     readonly $dataRequest: Subject<AdvancePaymentRequest> = new Subject<AdvancePaymentRequest>();

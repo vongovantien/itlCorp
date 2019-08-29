@@ -44,5 +44,5 @@ export class OpsTransaction {
         //sumCont: number = null;
         //packageQuantity: number = null;
         csMawbcontainers: Container[] = null;
-        containerDescription: string = '';
+       
 }

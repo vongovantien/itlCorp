@@ -156,4 +156,39 @@ export class AdvancePaymentDetailComponent extends AppPage {
                 },
             );
     }
+
+    sendRequest() {
+        const body = {
+            advanceRequests: this.listRequestAdvancePaymentComponent.listRequestAdvancePayment,
+            requester: this.formCreateComponent.requester.value || 'Admin',
+            department: this.formCreateComponent.department.value || '',
+            paymentMethod: this.formCreateComponent.paymentMethod.value.value,
+            advanceCurrency: this.formCreateComponent.currency.value.id || 'VND',
+            requestDate: !!this.formCreateComponent.requestDate.value.startDate ? formatDate(this.formCreateComponent.requestDate.value.startDate, 'yyyy-MM-dd', 'vi') : null,
+            deadlinePayment: !!this.formCreateComponent.deadLine.value.startDate ? formatDate(this.formCreateComponent.deadLine.value.startDate, 'yyyy-MM-dd', 'vi') : null,
+            advanceNote: this.formCreateComponent.note.value || '',
+            statusApproval: this.advancePayment.statusApproval,
+            advanceNo: this.advancePayment.advanceNo,
+            id: this.advancePayment.id,
+            UserCreated: this.advancePayment.userCreated,
+            DatetimeCreated: this.advancePayment.datetimeCreated
+        };
+        this._progressRef.start();
+        this._accoutingRepo.sendRequestAdvPayment(body)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(`${res.data.advanceNo + 'Send request successfully'}`, 'Update Success !');
+                    } else {
+                        this.handleError((data: any) => {
+                            this._toastService.error(data.message, data.title);
+                        });
+                    }
+                },
+            );
+    }
 }

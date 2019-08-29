@@ -9,7 +9,7 @@
     <div class="m-portlet">
         <div class="m-form">
             <div class="m-portlet__body">
-                <adv-payment-form-create></adv-payment-form-create>
+                <adv-payment-form-create [action]="'approve'"></adv-payment-form-create>
             </div>
         </div>
     </div>
@@ -17,7 +17,7 @@
         <div class="m-form">
             <div class="m-portlet__body">
                 <div>
-                    <adv-payment-list-request> </adv-payment-list-request>
+                    <adv-payment-list-request [action]="'approve'"> </adv-payment-list-request>
                     <div class="row list-progress-wp">
                         <div class="col-12">
                             <ul class="list-unstyled list-progress d-flex justify-content-around">
