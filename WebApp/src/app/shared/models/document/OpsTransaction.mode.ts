@@ -1,4 +1,5 @@
-import { Container } from "@angular/compiler/src/i18n/i18n_ast";
+import { Container } from "./container.model";
+
 
 export class OpsTransaction {
         userModified: string = null;
@@ -39,6 +40,7 @@ export class OpsTransaction {
         podName: string = null;
         polName: string = null;
         packageTypeId: null;
+        containerDescription: string;
         //sumCont: number = null;
         //packageQuantity: number = null;
         csMawbcontainers: Container[] = null;

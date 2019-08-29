@@ -2727,6 +2727,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.ContainerDescription).HasMaxLength(200);
+
                 entity.Property(e => e.CreatedDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
