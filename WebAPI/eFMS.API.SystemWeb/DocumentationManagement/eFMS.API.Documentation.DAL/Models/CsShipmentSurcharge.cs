@@ -28,6 +28,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string CsstatusSettlement { get; set; }
         public DateTime? CsdateSettlement { get; set; }
         public string InvoiceNo { get; set; }
+        public DateTime? InvoiceDate { get; set; }
         public string PaymentRefNo { get; set; }
         public string AccountantId { get; set; }
         public DateTime? AccountantDate { get; set; }
@@ -52,6 +53,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string CreditNo { get; set; }
         public string DebitNo { get; set; }
         public string Soano { get; set; }
+        public bool? IsFromShipment { get; set; }
         public string PaySoano { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }

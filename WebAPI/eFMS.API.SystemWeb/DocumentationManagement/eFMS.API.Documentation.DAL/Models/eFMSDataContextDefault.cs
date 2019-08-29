@@ -2032,7 +2032,11 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.IncludedVat).HasColumnName("IncludedVAT");
 
+                entity.Property(e => e.InvoiceDate).HasColumnType("datetime");
+
                 entity.Property(e => e.InvoiceNo).HasMaxLength(50);
+
+                entity.Property(e => e.IsFromShipment).HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.Notes).HasMaxLength(500);
 
