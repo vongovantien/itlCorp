@@ -31,6 +31,9 @@ import { TabsModule, ModalModule, PaginationModule } from 'ngx-bootstrap';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { JobManagementBuyingRateComponent } from './components/buying-rate/buying-rate.component';
+import { JobManagementSellingRateComponent } from './components/selling-rate/selling-rate.component';
+import { JobManagementOBHComponent } from './components/obh/obh.component';
 import { AddMoreModalComponent } from './custom-declaration/add-more-modal/add-more-modal.component';
 
 const routing: Routes = [
@@ -51,6 +54,12 @@ const LIB = [
     SelectModule,
     TabsModule.forRoot(),
     ModalModule.forRoot(),
+];
+
+const COMPONENTS = [
+    JobManagementBuyingRateComponent,
+    JobManagementSellingRateComponent,
+    JobManagementOBHComponent
 ];
 
 @NgModule({
@@ -94,6 +103,7 @@ const LIB = [
         EditObhRatePopupComponent,
 
         PlSheetPopupComponent,
+        ...COMPONENTS,
         AddMoreModalComponent
     ],
     providers: [],

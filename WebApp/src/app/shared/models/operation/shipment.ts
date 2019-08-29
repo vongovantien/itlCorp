@@ -42,8 +42,8 @@ export class Shipment {
     userModified: string = '';
     warehouseId: string = '';
 
-    customClearances: CustomDeclaration[] = [];
-
+    customClearances: CustomDeclaration[] = []; // * custom
+    customerName: string = '';
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

@@ -59,6 +59,7 @@ export class JobManagementComponent extends AppList implements OnInit {
         this.headers = [
             { title: 'Job ID', field: 'jobNo', sortable: true },
             { title: 'HBL', field: 'hwbno', sortable: true },
+            { title: 'Customer', field: 'customerName', sortable: true },
             { title: 'Service Date', field: 'serviceDate', sortable: true },
             { title: 'Service Port', field: 'polName', sortable: true },
             { title: 'Flight/Vessel', field: 'flightVessel', sortable: true },
