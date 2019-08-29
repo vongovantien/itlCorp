@@ -209,6 +209,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.AccountantApr)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.AccountantAprDate).HasColumnType("datetime");
 
                 entity.Property(e => e.AdvanceNo)
@@ -217,6 +221,11 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Buhead)
                     .HasColumnName("BUHead")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BuheadApr)
+                    .HasColumnName("BUHeadApr")
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
@@ -235,6 +244,10 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.LeaderAprDate).HasColumnType("datetime");
 
                 entity.Property(e => e.Manager)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ManagerApr)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
@@ -3033,6 +3046,11 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Logo).HasColumnType("image");
 
+                entity.Property(e => e.ManagerId)
+                    .HasColumnName("ManagerID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Taxcode)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -3129,6 +3147,11 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.Logo).HasColumnType("image");
+
+                entity.Property(e => e.ManagerId)
+                    .HasColumnName("ManagerID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Notes).HasMaxLength(4000);
 
@@ -3288,6 +3311,11 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.Department)
+                    .WithMany(p => p.SysGroup)
+                    .HasForeignKey(d => d.DepartmentId)
+                    .HasConstraintName("FK_sysGroup_catDepartment");
             });
 
             modelBuilder.Entity<SysGroupRole>(entity =>
@@ -3693,11 +3721,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.Department)
-                    .WithMany(p => p.SysUserGroup)
-                    .HasForeignKey(d => d.DepartmentId)
-                    .HasConstraintName("FK_sysUserGroup_catDepartment");
 
                 entity.HasOne(d => d.Group)
                     .WithMany(p => p.SysUserGroup)

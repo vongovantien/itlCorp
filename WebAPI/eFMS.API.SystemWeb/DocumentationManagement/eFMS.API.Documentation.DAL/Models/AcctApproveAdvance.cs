@@ -12,14 +12,19 @@ namespace eFMS.API.Documentation.Service.Models
         public string Leader { get; set; }
         public DateTime? LeaderAprDate { get; set; }
         public string Manager { get; set; }
+        public string ManagerApr { get; set; }
         public DateTime? ManagerAprDate { get; set; }
         public string Accountant { get; set; }
+        public string AccountantApr { get; set; }
         public DateTime? AccountantAprDate { get; set; }
         public string Buhead { get; set; }
+        public string BuheadApr { get; set; }
         public DateTime? BuheadAprDate { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DateCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DateModified { get; set; }
+        public string Comment { get; set; }
+        public bool? IsDeputy { get; set; }
     }
 }

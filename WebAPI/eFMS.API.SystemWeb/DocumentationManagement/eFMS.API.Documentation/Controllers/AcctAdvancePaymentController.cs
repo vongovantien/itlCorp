@@ -393,6 +393,42 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);           
         }
 
+        /// <summary>
+        /// Update Approve Advance
+        /// </summary>
+        /// <param name="addvanceId">addvanceId that want to retrieve Update Approve</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("UpdateApprove")]
+        public IActionResult UpdateApprove(Guid addvanceId)
+        {
+            var updateApproval = acctAdvancePaymentService.UpdateApproval(addvanceId);
+            if (!updateApproval.Success)
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = updateApproval.Exception.Message };
+                return BadRequest(_result);
+            }
+            return Ok(updateApproval);
+        }
+
+        /// <summary>
+        /// Denie Approve Advance
+        /// </summary>
+        /// <param name="advanceId">addvanceId that want to retrieve Denie Approve</param>
+        /// <param name="comment">comment reason that want to retrieve Denie Approve</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("DeniedApprove")]
+        public IActionResult DeniedApprove(Guid advanceId, string comment)
+        {
+            var denieApproval = acctAdvancePaymentService.DeniedApprove(advanceId, comment);
+            if (!denieApproval.Success)
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = denieApproval.Exception.Message };
+                return BadRequest(_result);
+            }
+            return Ok(denieApproval);
+        }
 
     }
 }

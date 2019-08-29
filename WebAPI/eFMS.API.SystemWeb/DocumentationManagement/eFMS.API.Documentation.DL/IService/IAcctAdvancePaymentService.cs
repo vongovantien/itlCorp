@@ -40,8 +40,9 @@ namespace eFMS.API.Documentation.DL.IService
 
         HandleState InsertOrUpdateApprovalAdvance(AcctApproveAdvanceModel approve);
 
-        HandleState UpdateApproval(Guid addvanceId, string userApprove);
+        HandleState UpdateApproval(Guid addvanceId);
 
-        HandleState DeniedApprove(Guid advanceId, string userDenie, string comment);
+        HandleState DeniedApprove(Guid advanceId, string comment);
+        
     }
 }

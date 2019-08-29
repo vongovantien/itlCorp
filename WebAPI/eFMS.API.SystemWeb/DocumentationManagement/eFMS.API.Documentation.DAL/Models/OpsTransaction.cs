@@ -27,6 +27,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string InvoiceNo { get; set; }
         public string SalemanId { get; set; }
         public string FieldOpsId { get; set; }
+        public Guid? ClearanceLocation { get; set; }
         public decimal? SumNetWeight { get; set; }
         public decimal? SumGrossWeight { get; set; }
         public decimal? SumChargeWeight { get; set; }
