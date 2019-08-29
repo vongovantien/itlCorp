@@ -54,7 +54,7 @@ export class CustomClearanceComponent extends AppList {
         this.headers = [
             { title: 'Clearance No', field: 'clearanceNo', sortable: true },
             { title: 'Type', field: 'type', sortable: true },
-            { title: 'Gateway', field: 'gatewayName', sortable: true },
+            { title: 'Clearance Location', field: 'gatewayName', sortable: true },
             { title: 'Partner Name', field: 'customerName', sortable: true },
             { title: 'Import Country', field: 'importCountryName', sortable: true },
             { title: 'Export Country', field: 'exportCountryName', sortable: true },
@@ -206,9 +206,11 @@ export class CustomClearanceComponent extends AppList {
                 if (index > -1) {
                     if (clearance.type === "Export") {
                         shipment.pol = this.listPort[index].id;
+                        shipment.clearanceLocation = shipment.pol;
                     }
                     if (clearance.type === "Import") {
                         shipment.pod = this.listPort[index].id;
+                        shipment.clearanceLocation = shipment.pod;
                     }
                 }
                 if (clearance.serviceType === "Sea") {

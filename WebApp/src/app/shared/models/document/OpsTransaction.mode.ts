@@ -20,6 +20,7 @@ export class OpsTransaction {
         supplierId: string = null;
         pod: string = null;
         pol: string = null;
+        clearanceLocation: string = null;
         customerId: string = null;
         shipmentMode: string = null;
         serviceMode: string = null;

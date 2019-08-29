@@ -163,6 +163,15 @@ export class BillingCustomDeclarationComponent extends AppPage implements OnInit
           this.currentJob.sumCbm = this.currentJob.sumCbm + this.importedData[i].cbm == null ? 0 : this.importedData[i].cbm;
         }
       }
+      if (this.currentJob.sumGrossWeight === 0) {
+        this.currentJob.sumGrossWeight = null;
+      }
+      if (this.currentJob.sumNetWeight === 0) {
+        this.currentJob.sumNetWeight = null;
+      }
+      if (this.currentJob.sumCbm === 0) {
+        this.currentJob.sumCbm = null;
+      }
       await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.currentJob, false, false);
     }
   }

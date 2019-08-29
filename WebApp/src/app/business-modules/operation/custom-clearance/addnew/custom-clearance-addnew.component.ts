@@ -54,18 +54,18 @@ export class CustomClearanceAddnewComponent implements OnInit {
 
         var pattern = /^[a-zA-Z0-9./_-\s]*$/;
 
-        if(!this.customDeclaration.clearanceNo.match(pattern)){
-            this.toastr.warning("Clearance No - Not allowed to enter special characters. Except for characters ./_- and space",'',{ positionClass: 'toast-bottom-right', closeButton: true, timeOut: 5000 });
+        if (!this.customDeclaration.clearanceNo.match(pattern)) {
+            this.toastr.warning("Clearance No - Not allowed to enter special characters. Except for characters ./_- and space", '', { positionClass: 'toast-bottom-right', closeButton: true, timeOut: 5000 });
             return;
         }
 
-        if(this.customDeclaration.hblid != null && !this.customDeclaration.hblid.toString().match(pattern)){
-            this.toastr.warning("HBL - Not allowed to enter special characters. Except for characters ./_- and space",'',{ positionClass: 'toast-bottom-right', closeButton: true, timeOut: 5000 });
+        if (this.customDeclaration.hblid != null && !this.customDeclaration.hblid.toString().match(pattern)) {
+            this.toastr.warning("HBL - Not allowed to enter special characters. Except for characters ./_- and space", '', { positionClass: 'toast-bottom-right', closeButton: true, timeOut: 5000 });
             return;
         }
 
-        if(this.customDeclaration.mblid != null && !this.customDeclaration.mblid.toString().match(pattern)){
-            this.toastr.warning("MBL - Not allowed to enter special characters. Except for characters ./_- and space",'',{ positionClass: 'toast-bottom-right', closeButton: true, timeOut: 5000 });
+        if (this.customDeclaration.mblid != null && !this.customDeclaration.mblid.toString().match(pattern)) {
+            this.toastr.warning("MBL - Not allowed to enter special characters. Except for characters ./_- and space", '', { positionClass: 'toast-bottom-right', closeButton: true, timeOut: 5000 });
             return;
         }
 
@@ -140,9 +140,11 @@ export class CustomClearanceAddnewComponent implements OnInit {
             if (index > -1) {
                 if (this.customDeclaration.type === "Export") {
                     shipment.pol = this.listPort[index].id;
+                    shipment.clearanceLocation = shipment.pol;
                 }
                 if (this.customDeclaration.type === "Import") {
                     shipment.pod = this.listPort[index].id;
+                    shipment.clearanceLocation = shipment.pod;
                 }
             }
             if (this.customDeclaration.serviceType === "Sea") {

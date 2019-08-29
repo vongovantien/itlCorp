@@ -85,13 +85,13 @@ namespace eFMS.API.Documentation.Service.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=192.168.7.31;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;");
+                optionsBuilder.UseSqlServer("Server=192.168.7.31; Database=eFMSTest; User ID=sa; Password=P@ssw0rd");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
             modelBuilder.Entity<AcctAdvancePayment>(entity =>
             {
@@ -209,6 +209,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.AccountantApr)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.AccountantAprDate).HasColumnType("datetime");
 
                 entity.Property(e => e.AdvanceNo)
@@ -217,6 +221,11 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Buhead)
                     .HasColumnName("BUHead")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BuheadApr)
+                    .HasColumnName("BUHeadApr")
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
@@ -235,6 +244,10 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.LeaderAprDate).HasColumnType("datetime");
 
                 entity.Property(e => e.Manager)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ManagerApr)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
@@ -1705,16 +1718,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.ContainerType)
-                    .WithMany(p => p.CsMawbcontainerContainerType)
-                    .HasForeignKey(d => d.ContainerTypeId)
-                    .HasConstraintName("FK_csMAWBContainer_catUnit1");
-
-                entity.HasOne(d => d.UnitOfMeasure)
-                    .WithMany(p => p.CsMawbcontainerUnitOfMeasure)
-                    .HasForeignKey(d => d.UnitOfMeasureId)
-                    .HasConstraintName("FK_csMAWBContainer_catUnit");
             });
 
             modelBuilder.Entity<CsShipmentHawbdetail>(entity =>
@@ -3033,6 +3036,11 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Logo).HasColumnType("image");
 
+                entity.Property(e => e.ManagerId)
+                    .HasColumnName("ManagerID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Taxcode)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -3129,6 +3137,11 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.Logo).HasColumnType("image");
+
+                entity.Property(e => e.ManagerId)
+                    .HasColumnName("ManagerID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Notes).HasMaxLength(4000);
 
@@ -3693,11 +3706,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.Department)
-                    .WithMany(p => p.SysUserGroup)
-                    .HasForeignKey(d => d.DepartmentId)
-                    .HasConstraintName("FK_sysUserGroup_catDepartment");
 
                 entity.HasOne(d => d.Group)
                     .WithMany(p => p.SysUserGroup)
