@@ -24,7 +24,7 @@ namespace eFMS.IdentityServer.DL.Services
             var result = new SysUserViewModel();
             result.Id = data.y.Id;
             result.Username = data.y.Username;
-            result.UserGroupId = data.y.UserGroupId;
+            //result.UserGroupId = data.y.UserGroupId;
             result.EmployeeId = data.y.EmployeeId;
             result.WorkPlaceId = data.y.WorkPlaceId;
             result.RefuseEmail = data.y.RefuseEmail;

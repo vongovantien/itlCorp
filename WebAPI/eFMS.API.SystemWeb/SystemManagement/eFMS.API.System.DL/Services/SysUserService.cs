@@ -36,7 +36,7 @@ namespace eFMS.API.System.DL.Services
                 sysUser.Username = model.Username;
                 sysUser.Password = model.Password;
                 sysUser.WorkPlaceId = model.WorkPlaceId;
-                sysUser.UserGroupId = model.UserGroupId;
+                //sysUser.UserGroupId = model.UserGroupId;
                 sysUser.DatetimeCreated = DateTime.Now;
                 sysUser.UserCreated = "Thor";
                 sysUser.Inactive = false;

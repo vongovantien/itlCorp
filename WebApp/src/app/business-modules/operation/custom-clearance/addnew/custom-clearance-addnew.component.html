@@ -28,8 +28,7 @@
                                 <input type="text" [(ngModel)]="customDeclaration.clearanceNo" placeholder="Enter text"
                                     (change)="customDeclaration.clearanceNo=customDeclaration.clearanceNo.trim()"
                                     autocomplete="nope" maxlength="100" class="form-control m-input m-input--square"
-                                    #clearance_no="ngModel"
-                                    onpaste="return true;"
+                                    #clearance_no="ngModel" onpaste="return true;"
                                     onkeypress="return event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)"
                                     name="clearance_no" required placeholder="" autoFocus>
                                 <div class="form-control-feedback" *ngIf="addForm.submitted && clearance_no.invalid">
@@ -136,7 +135,7 @@
                             <div class="form-group"
                                 [ngClass]="{ 'm-form__group has-danger': addForm.submitted && strPortCurrent.trim().length==0 }">
                                 <label class="form-control-label" for="">
-                                    Gateway <span class="m--font-danger">(*)</span>
+                                    Clearance Location <span class="m--font-danger">(*)</span>
                                 </label>
                                 <app-combo-grid-virtual-scroll
                                     [currentActiveItemId]="{field:'code',value:strPortCurrent,hardValue:''}"
@@ -146,7 +145,7 @@
                                 </app-combo-grid-virtual-scroll>
                                 <div class="form-control-feedback"
                                     *ngIf="addForm.submitted && strPortCurrent.trim().length==0">
-                                    Gateway is required
+                                    Clearance location is required
                                 </div>
                             </div>
                         </div>

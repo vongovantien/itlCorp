@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import moment from 'moment/moment';          
+import moment from 'moment/moment';
 import { ActivatedRoute } from '@angular/router';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
@@ -190,9 +190,11 @@ export class CustomClearanceEditComponent implements OnInit {
             if (index > -1) {
                 if (this.customDeclaration.type === "Export") {
                     shipment.pol = this.listPort[index].id;
+                    shipment.clearanceLocation = shipment.pol;
                 }
                 if (this.customDeclaration.type === "Import") {
                     shipment.pod = this.listPort[index].id;
+                    shipment.clearanceLocation = shipment.pod;
                 }
             }
             if (this.customDeclaration.serviceType === "Sea") {

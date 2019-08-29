@@ -263,6 +263,16 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
     async saveContainers(event) {
         this.opsTransaction.csMawbcontainers = event;
+        let containers = '';
+        if (this.opsTransaction.csMawbcontainers != null) {
+            for (let i = 0; i < this.opsTransaction.csMawbcontainers.length; i++) {
+                containers = containers + this.opsTransaction.csMawbcontainers[i].quantity + "x" + this.opsTransaction.csMawbcontainers[i].containerTypeName;
+                if (i < this.opsTransaction.csMawbcontainers.length - 1) {
+                    containers = containers + ";";
+                }
+            }
+        }
+        this.opsTransaction.containerDescription = containers;
         await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.opsTransaction, false, false);
         this.getListContainersOfJob();
         this.getGoodInfomation(this.opsTransaction.csMawbcontainers);

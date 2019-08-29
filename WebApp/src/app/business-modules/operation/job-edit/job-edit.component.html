@@ -442,6 +442,19 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                                <div class="col-lg-4">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label" for="">
+                                                            Clearance Location
+                                                        </label>
+                                                        <app-combo-grid-virtual-scroll
+                                                            [currentActiveItemId]="{field:'id',value:opsTransaction.clearanceLocation}"
+                                                            (itemSelected)="opsTransaction.clearanceLocation = $event.id"
+                                                            [selectedDisplayFields]="['nameEn']" [dataSources]="ports"
+                                                            [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                                                        </app-combo-grid-virtual-scroll>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div class="row">
                                                 <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">

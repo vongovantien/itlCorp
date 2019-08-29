@@ -57,14 +57,14 @@ namespace eFMS.API.Operation.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            var results = customsDeclarationService.Get();
+            var results = customsDeclarationService.GetAll();
             return Ok(results);
         }
 
         /// <summary>
-        /// get the list of custom declarations by job id
+        /// get the list of custom declarations by job no
         /// </summary>
-        /// <param name="jobNo">jobId that want to retrieve custom declarations</param>
+        /// <param name="jobNo">jobNo that want to retrieve custom declarations</param>
         /// <returns></returns>
         [HttpGet("GetBy")]
         public IActionResult GetBy(string jobNo)
@@ -126,10 +126,7 @@ namespace eFMS.API.Operation.Controllers
             {
                 return BadRequest(result);
             }
-            else
-            {
-                cache.Remove(Templates.CustomDeclaration.NameCaching.ListName);
-            }
+            cache.Remove(Templates.CustomDeclaration.NameCaching.ListName);
             return Ok(result);
         }
 
@@ -155,9 +152,9 @@ namespace eFMS.API.Operation.Controllers
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
-                cache.Remove(Templates.CustomDeclaration.NameCaching.ListName);
                 return BadRequest(result);
             }
+            cache.Remove(Templates.CustomDeclaration.NameCaching.ListName);
             return Ok(result);
         }
 
@@ -179,6 +176,7 @@ namespace eFMS.API.Operation.Controllers
             {
                 return BadRequest(result);
             }
+            cache.Remove(Templates.CustomDeclaration.NameCaching.ListName);
             return Ok(result);
         }
 
@@ -281,6 +279,7 @@ namespace eFMS.API.Operation.Controllers
             {
                 return BadRequest(result);
             }
+            cache.Remove(Templates.CustomDeclaration.NameCaching.ListName);
             return Ok(result);
         }
 

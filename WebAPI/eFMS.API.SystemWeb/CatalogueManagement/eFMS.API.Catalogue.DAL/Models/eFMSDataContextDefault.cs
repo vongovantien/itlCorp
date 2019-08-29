@@ -224,10 +224,6 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnName("BUHeadAprDate")
                     .HasColumnType("datetime");
 
-                entity.Property(e => e.BuheadComment)
-                    .HasColumnName("BUHeadComment")
-                    .HasMaxLength(10);
-
                 entity.Property(e => e.DateCreated).HasColumnType("datetime");
 
                 entity.Property(e => e.DateModified).HasColumnType("datetime");
@@ -3270,6 +3266,8 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.Decription).HasMaxLength(4000);
 
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
                 entity.Property(e => e.Inactive).HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
@@ -3650,8 +3648,6 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.Property(e => e.UserGroupId).HasColumnName("UserGroupID");
 
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
