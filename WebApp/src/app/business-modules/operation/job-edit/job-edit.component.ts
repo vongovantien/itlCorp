@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import moment from 'moment/moment';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
 import * as shipmentHelper from 'src/helper/shipment.helper';
@@ -6,17 +6,12 @@ import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import * as dataHelper from 'src/helper/data.helper';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSurcharge';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { NgForm } from '@angular/forms';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
-import filter from 'lodash/filter';
-import cloneDeep from 'lodash/cloneDeep';
 import { SortService } from 'src/app/shared/services/sort.service';
-import { OpsModuleCreditDebitNoteDetailComponent } from './credit-debit-note/ops-module-credit-debit-note-detail/ops-module-credit-debit-note-detail.component';
-import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDetails.model';
-import { OpsModuleCreditDebitNoteEditComponent } from './credit-debit-note/ops-module-credit-debit-note-edit/ops-module-credit-debit-note-edit.component';
+
 import { ChargeConstants } from 'src/constants/charge.const';
 import { ContainerListComponent } from './container-list/container-list.component';
 import { OperationRepo, UnitRepo } from 'src/app/shared/repositories';
@@ -25,38 +20,22 @@ import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { CancelCreateJobPopupComponent } from './job-confirm-popup/cancel-create-job-popup/cancel-create-job-popup.component';
 import { CanNotDeleteJobPopupComponent } from './job-confirm-popup/can-not-delete-job-popup/can-not-delete-job-popup.component';
 import { ConfirmDeleteJobPopupComponent } from './job-confirm-popup/confirm-delete-job-popup/confirm-delete-job-popup.component';
-import { AddBuyingRatePopupComponent } from './charge-list/add-buying-rate-popup/add-buying-rate-popup.component';
-import { AddSellingRatePopupComponent } from './charge-list/add-selling-rate-popup/add-selling-rate-popup.component';
-import { AddObhRatePopupComponent } from './charge-list/add-obh-rate-popup/add-obh-rate-popup.component';
+
 import { DataService } from 'src/app/shared/services';
-import { EditBuyingRatePopupComponent } from './charge-list/edit-buying-rate-popup/edit-buying-rate-popup.component';
-import { EditSellingRatePopupComponent } from './charge-list/edit-selling-rate-popup/edit-selling-rate-popup.component';
-import { EditObhRatePopupComponent } from './charge-list/edit-obh-rate-popup/edit-obh-rate-popup.component';
-import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+
 import { ConfirmCancelJobPopupComponent } from './job-confirm-popup/confirm-cancel-job-popup/confirm-cancel-job-popup.component';
 import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
-declare var $: any;
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
     templateUrl: './job-edit.component.html',
-    styleUrls: ['./job-edit.component.scss']
 })
 export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit {
 
-    @ViewChild(OpsModuleCreditDebitNoteDetailComponent, { static: false }) poupDetail: OpsModuleCreditDebitNoteDetailComponent;
-    @ViewChild(OpsModuleCreditDebitNoteEditComponent, { static: false }) popupEdit: OpsModuleCreditDebitNoteEditComponent;
     @ViewChild(ContainerListComponent, { static: false }) popupContainerList: ContainerListComponent;
     @ViewChild(CancelCreateJobPopupComponent, { static: false }) cancelCreateJobPopup: CancelCreateJobPopupComponent;
     @ViewChild(CanNotDeleteJobPopupComponent, { static: false }) canNotDeleteJobPopup: CanNotDeleteJobPopupComponent;
     @ViewChild(ConfirmDeleteJobPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmDeleteJobPopupComponent;
-    @ViewChild(AddBuyingRatePopupComponent, { static: false }) addBuyingRatePopup: AddBuyingRatePopupComponent;
-    @ViewChild(AddSellingRatePopupComponent, { static: false }) addSellingRatePopup: AddSellingRatePopupComponent;
-    @ViewChild(AddObhRatePopupComponent, { static: false }) addOHBRatePopup: AddObhRatePopupComponent;
-    @ViewChild(EditBuyingRatePopupComponent, { static: false }) editBuyingRatePopup: EditBuyingRatePopupComponent;
-    @ViewChild(EditSellingRatePopupComponent, { static: false }) editSellingRatePopup: EditSellingRatePopupComponent;
-    @ViewChild(EditObhRatePopupComponent, { static: false }) editOHBRatePopup: EditObhRatePopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteCharge: ConfirmPopupComponent;
     @ViewChild(ConfirmCancelJobPopupComponent, { static: false }) confirmCancelJobPopup: ConfirmCancelJobPopupComponent;
     @ViewChild(PlSheetPopupComponent, { static: false }) plSheetPopup: PlSheetPopupComponent;
 
@@ -97,10 +76,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     ListOBHCharges: any[] = [];
     ConstListOBHCharges: any[] = [];
 
-    BuyingRateChargeToEdit: CsShipmentSurcharge = null;
-    SellingRateChargeToEdit: CsShipmentSurcharge = null;
-    OBHChargeToEdit: any = null;
-
     totalSellingUSD: number = 0;
     totalSellingLocal: number = 0;
 
@@ -133,11 +108,9 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         private _data: DataService,
         private sortService: SortService) {
         super();
-        this.keepCalendarOpeningWithRange = true;
-        // this.selectedDate = Date.now();
-        // this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
     }
-    async ngOnInit() {
+
+    ngOnInit() {
 
         this.route.params.subscribe(async (params: any) => {
             this.tab = 'job-edit';
@@ -203,32 +176,33 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                 () => { }
             );
     }
+
     async confirmDelete() {
         const respone = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.checkAllowDelete + this.opsTransaction.id, false, true);
         if (respone === true) {
-            // $('#confirm-delete-job-modal').modal('show');
             this.confirmDeleteJobPopup.show();
         } else {
-            // $('#confirm-can-not-delete-job-modal').modal('show');
             this.canNotDeleteJobPopup.show();
         }
     }
+
     async deleteJob() {
         const respone = await this.baseServices.deleteAsync(this.api_menu.Documentation.Operation.delete + this.opsTransaction.id, true, true);
         if (respone.status) {
-            // $('#confirm-delete-job-modal').modal('hide');
             this.confirmDeleteJobPopup.hide();
             this.router.navigate(["/home/operation/job-management"]);
         }
     }
+
     cancelCreatJob() {
         this.cancelCreateJobPopup.show();
     }
+
     confirmCancelJob() {
         this.confirmCancelJobPopup.show();
     }
+
     async saveShipment(form: NgForm) {
-        console.log(this.opsTransaction);
         this.opsTransaction.serviceDate = this.serviceDate.startDate != null ? dataHelper.dateTimeToUTC(this.serviceDate.startDate) : null;
         this.opsTransaction.finishDate = this.finishDate.startDate != null ? dataHelper.dateTimeToUTC(this.finishDate.startDate) : null;
         const s = this.finishDate.startDate != null && this.serviceDate.startDate != null && (this.finishDate.startDate < this.serviceDate.startDate);
@@ -265,6 +239,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         }
         this.popupContainerList.show({ backdrop: 'static' });
     }
+
     getListPackageTypes() {
         this._unitRepo.getListUnitByType({ unitType: 'package' })
             .pipe(
@@ -285,8 +260,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                 () => { }
             );
     }
+
     async saveContainers(event) {
-        console.log(event);
         this.opsTransaction.csMawbcontainers = event;
         await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.opsTransaction, false, false);
         this.getListContainersOfJob();
@@ -304,6 +279,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this.opsTransaction.sumCbm = 0;
         this.opsTransaction.sumContainers = 0;
         this.opsTransaction.sumPackages = 0;
+        // tslint:disable-next-line: prefer-for-of
         for (let i = 0; i < listContainers.length; i++) {
             listContainers[i].isSave = true;
             this.opsTransaction.sumGrossWeight = this.opsTransaction.sumGrossWeight + listContainers[i].gw;
@@ -316,21 +292,25 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
     // -------------    End Container   -------------------//
 
-    async getWarehouses() {
+    getWarehouses() {
         this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { placeType: PlaceTypeEnum.Warehouse, inactive: false }).subscribe((res: any) => {
             this.warehouses = res;
         });
     }
+
     async getShipmentDetails(id: any) {
         this.opsTransaction = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.getById + "?id=" + id, false, true);
+        console.log("des",this.opsTransaction);
         this.baseServices.setData("CurrentOpsTransaction", this.opsTransaction);
     }
+
     async getShipmentCommonData() {
         const data = await shipmentHelper.getOPSShipmentCommonData(this.baseServices, this.api_menu);
         this.productServices = dataHelper.prepareNg2SelectData(data.productServices, 'value', 'displayName');
         this.serviceModes = dataHelper.prepareNg2SelectData(data.serviceModes, 'value', 'displayName');
         this.shipmentModes = dataHelper.prepareNg2SelectData(data.shipmentModes, 'value', 'displayName');
     }
+
     private getPorts() {
         this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { placeType: PlaceTypeEnum.Port, inactive: false }).subscribe((res: any) => {
             this.ports = res;
@@ -342,16 +322,19 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             this.customers = res;
         });
     }
+
     private getSuppliers() {
         this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.CARRIER, inactive: false, all: null }).subscribe((res: any) => {
             this.suppliers = res;
         });
     }
+
     private getAgents() {
         this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.AGENT, inactive: false, all: null }).subscribe((res: any) => {
             this.agents = res;
         });
     }
+
     private getBillingOps() {
         this.baseServices.get(this.api_menu.System.User_Management.getAll).subscribe((res: any) => {
             this.billingOps = res;
@@ -389,11 +372,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                     this.lstPartners = data;
                 }
             );
-
-        // this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.ALL, inactive: false }).subscribe((res: any) => {
-        //     this.lstPartners = res;
-        //     this._data.setData('lstPartners', this.lstPartners);
-        // });
     }
 
     public getUnits() {
@@ -421,24 +399,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         }
     }
 
-    onSaveNewBuyingRate(event) {
-        if (event === true) {
-            console.log('add buying charge thành công');
-            this.getSurCharges('BUY');
-        }
-    }
-    onSaveNewSellingRate(event) {
-        if (event === true) {
-            console.log('add selling charge thành công');
-            this.getSurCharges('SELL');
-        }
-    }
-    onSaveNewOBHRate(event) {
-        if (event === true) {
-            console.log('add OHB charge thành công');
-            this.getSurCharges('OBH');
-        }
-    }
     onSaveBuyingRate(event) {
         if (event === true) {
             console.log('edit buying charge thành công');
@@ -457,15 +417,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             this.getSurCharges('OBH');
         }
     }
-    openAddNewBuyingRatePopup() {
-        this.addBuyingRatePopup.show({ backdrop: 'static' });
-    }
-    openAddNewSellingRatePopup() {
-        this.addSellingRatePopup.show({ backdrop: 'static' });
-    }
-    openAddNewOBHRatePopup() {
-        this.addOHBRatePopup.show({ backdrop: 'static' });
-    }
+
 
     private totalProfit() {
         this.totalProfitUSD = this.totalSellingUSD - this.totalBuyingUSD - this.totalLogisticChargeUSD;
@@ -496,15 +448,12 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this.totalSellingUSD = 0;
         this.totalSellingLocal = 0;
         if (this.ListSellingRateCharges.length > 0) {
-
             this.ListSellingRateCharges.forEach(element => {
                 const currentLocalSelling = element.total * element.exchangeRate;
                 this.totalSellingLocal += currentLocalSelling;
                 this.totalSellingUSD += currentLocalSelling / element.exchangeRateUSDToVND;
                 this.totalProfit();
-
             });
-
         }
     }
 
@@ -532,8 +481,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                 this.ListBuyingRateCharges = res;
                 this.ConstListBuyingRateCharges = res;
                 this.totalBuyingCharge();
-                console.log('Buying rate of house');
-                console.log(this.ListBuyingRateCharges);
             }
             if (type === 'SELL') {
                 this.ListSellingRateCharges = res;
@@ -553,170 +500,10 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this.getSurCharges('OBH');
     }
 
-
-
-    prepareEditCharge(type: 'BUY' | 'SELL' | 'OBH', charge: any) {
-        if (type === 'BUY') {
-            this.BuyingRateChargeToEdit = cloneDeep(charge);
-            if (this.BuyingRateChargeToEdit) {
-                setTimeout(() => {
-                    this.editBuyingRatePopup.show({ backdrop: 'static' });
-                }, 100);
-            }
-        }
-        if (type === 'SELL') {
-            this.SellingRateChargeToEdit = cloneDeep(charge);
-            if (this.SellingRateChargeToEdit) {
-                setTimeout(() => {
-                    this.editSellingRatePopup.show({ backdrop: 'static' });
-                }, 100);
-            }
-        }
-        if (type === 'OBH') {
-            this.OBHChargeToEdit = cloneDeep(charge);
-            if (this.OBHChargeToEdit) {
-                setTimeout(() => {
-                    this.editOHBRatePopup.show({ backdrop: 'static' });
-                }, 100);
-            }
-        }
-    }
-
-    chargeIdToDelete: string = null;
-    showConfirmDeleteCharge(chargeId: string = null) {
-        this.chargeIdToDelete = chargeId;
-        this.confirmDeleteCharge.show();
-    }
-    async deleteCharge() {
-        const res = await this.baseServices.deleteAsync(this.api_menu.Documentation.CsShipmentSurcharge.delete + "?chargId=" + this.chargeIdToDelete);
-        if (res.status) {
-            this.getAllSurCharges();
-        }
-        this.confirmDeleteCharge.hide();
-    }
-
-    CDNoteDetails: AcctCDNoteDetails = null;
-    async openCreditDebitNote(cdNo: string) {
-        this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?jobId=" + this.opsTransaction.id + "&cdNo=" + cdNo);
-        if (this.CDNoteDetails != null) {
-            if (this.CDNoteDetails.listSurcharges != null) {
-                this.totalCreditDebitCalculate();
-            }
-            if (this.CDNoteDetails.cdNote.type === 'CREDIT') {
-                this.CDNoteDetails.cdNote.type = 'Credit';
-            }
-            if (this.CDNoteDetails.cdNote.type === 'DEBIT') {
-                this.CDNoteDetails.cdNote.type = 'Debit';
-            }
-            if (this.CDNoteDetails.cdNote.type === 'INVOICE') {
-                this.CDNoteDetails.cdNote.type = 'Invoice';
-            }
-            console.log('sfsfsfsf' + this.CDNoteDetails.cdNote.type);
-            this.poupDetail.currentJob = this.opsTransaction;
-            this.poupDetail.show({ backdrop: 'static' });
-            this.poupDetail.show({ backdrop: 'static' });
-        }
-    }
-
-    openEditCDNotePopUp(event) {
-        this.CDNoteDetails = null;
-        console.log(event);
-        if (event != null) {
-            this.CDNoteDetails = event;
-            this.popupEdit.show({ backdrop: 'static' });
-        }
-    }
-    async closeEditCDNoteModal(event) {
-        console.log(event);
-        this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?jobId=" + this.opsTransaction.id + "&cdNo=" + this.CDNoteDetails.cdNote.code);
-        if (this.CDNoteDetails != null) {
-            if (this.CDNoteDetails.listSurcharges != null) {
-                this.totalCreditDebitCalculate();
-            }
-            this.poupDetail.show({ backdrop: 'static' });
-        }
-    }
-    totalCreditDebitCalculate() {
-        let totalCredit = 0;
-        let totalDebit = 0;
-        for (let i = 0; i < this.CDNoteDetails.listSurcharges.length; i++) {
-            const c = this.CDNoteDetails.listSurcharges[i];
-            if (c.type === "BUY" || c.type === "LOGISTIC" || (c.type === "OBH" && this.CDNoteDetails.partnerId === c.payerId)) {
-                // calculate total credit
-                totalCredit += (c.total * c.exchangeRate);
-            }
-            if (c.type === "SELL" || (c.type === "OBH" && this.CDNoteDetails.partnerId === c.objectBePaid)) {
-                // calculate total debit 
-                totalDebit += (c.total * c.exchangeRate);
-            }
-
-        }
-        this.CDNoteDetails.totalCredit = totalCredit;
-        this.CDNoteDetails.totalDebit = totalDebit;
-    }
-
-
-    searchCharge(key: string, type: 'BUY' | 'SELL' | 'OBH') {
-        const search_key = key.toString().trim().toLowerCase();
-        let referenceData: any[] = [];
-        if (type === 'BUY') {
-            referenceData = this.ConstListBuyingRateCharges;
-        }
-        if (type === 'SELL') {
-            referenceData = this.ConstListSellingRateCharges;
-        }
-        if (type === 'OBH') {
-            referenceData = this.ConstListOBHCharges;
-        }
-        const results = filter(referenceData, function (x: any) {
-            return (
-                ((x.partnerName == null ? "" : x.partnerName.toLowerCase().includes(search_key)) ||
-                    (x.nameEn == null ? "" : x.nameEn.toLowerCase().includes(search_key)) ||
-                    (x.unit == null ? "" : x.unit.toLowerCase().includes(search_key)) ||
-                    (x.currency == null ? "" : x.currency.toLowerCase().includes(search_key)) ||
-                    (x.notes == null ? "" : x.notes.toLowerCase().includes(search_key)) ||
-                    (x.docNo == null ? "" : x.docNo.toLowerCase().includes(search_key)) ||
-                    (x.quantity == null ? "" : x.quantity.toString().toLowerCase().includes(search_key)) ||
-                    (x.unitPrice == null ? "" : x.unitPrice.toString().toLowerCase().includes(search_key)) ||
-                    (x.vatrate == null ? "" : x.vatrate.toString().toLowerCase().includes(search_key)) ||
-                    (x.total == null ? "" : x.total.toString().toLowerCase().includes(search_key)))
-            )
-        });
-
-        return results;
-    }
-
-    /**
-       * Daterange picker
-       */
-    //selectedRange: any;
-    //selectedDate: any;
-    keepCalendarOpeningWithRange: true;
-    maxDate: moment.Moment = moment();
-    ranges: any = {
-        Today: [moment(), moment()],
-        Yesterday: [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-        'This Month': [moment().startOf('month'), moment().endOf('month')],
-        'Last Month': [
-            moment()
-                .subtract(1, 'month')
-                .startOf('month'),
-            moment()
-                .subtract(1, 'month')
-                .endOf('month')
-        ]
-    };
-
-    /**
-        * ng2-select
-    */
     public items: Array<string> = ['option 1', 'option 2', 'option 3', 'option 4',
         'option 5', 'option 6', 'option 7'];
 
 
-    //packagesUnit: Array<string> = ['PKG', 'PCS', 'BOX', 'CNTS'];
     packagesUnitActive = [];
 
     private value: any = {};
@@ -759,24 +546,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this.tab = tabName;
         this.getAllSurCharges();
         // this.router.navigate([`home/operation/job-edit/${this.jobId}`], {queryParams: {tab: this.tab}});
-    }
-
-    isDesc = true;
-    sortKey: string = '';
-    sortBuyingRateCharges(property) {
-        this.isDesc = !this.isDesc;
-        this.sortKey = property;
-        this.ListBuyingRateCharges = this.sortService.sort(this.ListBuyingRateCharges, property, this.isDesc);
-    }
-    sortSellingRateCharges(property) {
-        this.isDesc = !this.isDesc;
-        this.sortKey = property;
-        this.ListSellingRateCharges = this.sortService.sort(this.ListSellingRateCharges, property, this.isDesc);
-    }
-    sortOBHRateCharges(property) {
-        this.isDesc = !this.isDesc;
-        this.sortKey = property;
-        this.ListOBHCharges = this.sortService.sort(this.ListOBHCharges, property, this.isDesc);
     }
 
     onOpePLPrint() {
