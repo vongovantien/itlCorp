@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, Observer } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-// @Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: 'root' })
 export class DataService {
 
     private messageSource = new BehaviorSubject({ "default": "hello world !" });
     currentMessage = this.messageSource.asObservable();
 
-    constructor() { }
+    constructor() {
+    }
 
     setData(key: string, value: any) {
         this.messageSource.next({ ...this.messageSource.value, [key]: value });

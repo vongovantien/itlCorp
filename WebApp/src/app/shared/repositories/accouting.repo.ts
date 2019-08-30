@@ -168,8 +168,28 @@ export class AccoutingRepo {
                 map((data: any) => data)
             );
         }
-
     }
+
+    getInfoApprove(advanceNo: string) {
+        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctAdvancePayment/GetInfoApproveAdvanceByAdvanceNo`, { advanceNo: advanceNo }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    approveAdvPayment(advanceId: string) {
+        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctAdvancePayment/UpdateApprove`, {}, { advanceId: advanceId })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    deniedApprove(advanceId: string, comment: string) {
+        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctAdvancePayment/DeniedApprove`, {}, { advanceId: advanceId, comment: comment })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
 
 
 }

@@ -14,6 +14,7 @@ export class AdvancePayment {
     requestDate: string = '';
     deadlinePayment: string = '';
     statusApproval: string = '';
+    statusApprovalName: string = '';
     advanceNote: string = '';
     advanceDatetimeModified: string = '';
     statusPayment: string = '';
