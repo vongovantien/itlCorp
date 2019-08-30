@@ -59,6 +59,7 @@ export class JobManagementComponent extends AppList implements OnInit {
         this.headers = [
             { title: 'Job ID', field: 'jobNo', sortable: true },
             { title: 'HBL', field: 'hwbno', sortable: true },
+            { title: 'Customer', field: 'customerName', sortable: true },
             { title: 'Service Date', field: 'serviceDate', sortable: true },
             { title: 'Service Port', field: 'polName', sortable: true },
             { title: 'Flight/Vessel', field: 'flightVessel', sortable: true },
@@ -102,8 +103,6 @@ export class JobManagementComponent extends AppList implements OnInit {
                             this.shipments[indexsShipment].customClearances = this.customClearances;
                         }
                     },
-                    (errors: any) => { },
-                    () => { }
                 );
         }
     }
@@ -125,12 +124,6 @@ export class JobManagementComponent extends AppList implements OnInit {
                         this.canNotDeleteJobPopup.show();
                     }
                 },
-                (errors: any) => {
-                    this.handleError(errors, (dataError: { message: string; title: string; }) => {
-                        this._toastService.error(dataError.message, dataError.title);
-                    });
-                },
-                () => { }
             );
     }
 
@@ -150,12 +143,6 @@ export class JobManagementComponent extends AppList implements OnInit {
                         this.getShipments();
                     }
                 },
-                (errors: any) => {
-                    this.handleError(errors, (dataError: any) => {
-                        this._toastService.error(dataError.message, dataError.title);
-                    });
-                },
-                () => { }
             );
 
     }
@@ -209,12 +196,6 @@ export class JobManagementComponent extends AppList implements OnInit {
                         });
                     }
                 },
-                (errors: any) => {
-                    this.handleError(errors, (dataError: { message: string; title: string; }) => {
-                        this._toastService.error(dataError.message, dataError.title);
-                    });
-                },
-                () => { }
             );
     }
 

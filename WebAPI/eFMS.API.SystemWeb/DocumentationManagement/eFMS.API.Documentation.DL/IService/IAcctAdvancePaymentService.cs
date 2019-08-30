@@ -43,6 +43,9 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState UpdateApproval(Guid addvanceId);
 
         HandleState DeniedApprove(Guid advanceId, string comment);
-        
+
+        AcctApproveAdvanceModel GetInfoApproveAdvanceByAdvanceNo(string advanceNo);
+
+
     }
 }

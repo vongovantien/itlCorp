@@ -71,12 +71,6 @@ export class StatementOfAccountComponent extends AppList {
                 // * search SOA when success.
                 this.getSOAs();
             },
-            (errors: any) => {
-                this.handleError(errors, (data: any) => {
-                    this._toastService.error(data.message, data.title);
-                });
-            },
-            () => { }
         );
     }
 
@@ -92,13 +86,6 @@ export class StatementOfAccountComponent extends AppList {
                     this.SOAs = (res.data || []).map((item: SOA) => new SOA(item));
                     this.totalItems = res.totalItems || 0;
                 },
-                (errors: any) => {
-                    this.handleError(errors, (errorData: any) => {
-                        this._toastService.error(errorData.message, errorData.title);
-                    });
-                },
-                () => { }
-
             );
     }
 

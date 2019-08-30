@@ -414,7 +414,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <summary>
         /// Denie Approve Advance
         /// </summary>
-        /// <param name="advanceId">addvanceId that want to retrieve Denie Approve</param>
+        /// <param name="advanceId">advanceId that want to retrieve Denie Approve</param>
         /// <param name="comment">comment reason that want to retrieve Denie Approve</param>
         /// <returns></returns>
         [HttpPost]
@@ -430,5 +430,17 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(denieApproval);
         }
 
+        /// <summary>
+        /// Get information approve advance by advanceNo
+        /// </summary>
+        /// <param name="advanceNo">advanceNo that want to retrieve approve advance</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetInfoApproveAdvanceByAdvanceNo")]
+        public IActionResult GetInfoApproveAdvanceByAdvanceNo(string advanceNo)
+        {
+            var data = acctAdvancePaymentService.GetInfoApproveAdvanceByAdvanceNo(advanceNo);
+            return Ok(data);
+        }
     }
 }

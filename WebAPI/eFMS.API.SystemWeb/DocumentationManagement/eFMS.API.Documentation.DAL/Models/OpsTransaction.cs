@@ -32,6 +32,7 @@ namespace eFMS.API.Documentation.Service.Models
         public decimal? SumGrossWeight { get; set; }
         public decimal? SumChargeWeight { get; set; }
         public decimal? SumCbm { get; set; }
+        public string ContainerDescription { get; set; }
         public int? SumContainers { get; set; }
         public int? SumPackages { get; set; }
         public short? PackageTypeId { get; set; }

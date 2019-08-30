@@ -3,7 +3,6 @@ import { AppForm } from 'src/app/app.form';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 import { OperationRepo, SystemRepo } from 'src/app/shared/repositories';
 import { catchError, takeUntil } from 'rxjs/operators';
-import { ToastrService } from 'ngx-toastr';
 import { SystemConstants } from 'src/constants/system.const';
 import { DataService } from 'src/app/shared/services';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
@@ -45,7 +44,6 @@ export class JobManagementFormSearchComponent extends AppForm {
     constructor(
         private _opearationRepo: OperationRepo,
         private _fb: FormBuilder,
-        private _toastService: ToastrService,
         private _dataService: DataService,
         private _sysRepo: SystemRepo
     ) {
@@ -75,12 +73,6 @@ export class JobManagementFormSearchComponent extends AppForm {
                     this.serviceModes = response.serviceModes;
                     this.shipmentModes = response.shipmentModes;
                 },
-                (errors: any) => {
-                    this.handleError(errors, (data: CommonInterface.IError) => {
-                        this._toastService.error(data.message, data.title);
-                    });
-                },
-                () => { }
             );
     }
 
@@ -99,13 +91,6 @@ export class JobManagementFormSearchComponent extends AppForm {
                                 (dataPartner: any) => {
                                     this.getPartnerData(dataPartner);
                                 },
-                                (errors: any) => {
-                                    this.handleError(errors, (data) => {
-                                        this._toastService.error(data.message, data.title);
-                                    });
-                                },
-                                // complete
-                                () => { }
                             );
                     } else {
                         this.getPartnerData(data);
@@ -131,13 +116,6 @@ export class JobManagementFormSearchComponent extends AppForm {
                                 (dataUser: any) => {
                                     this.users = dataUser;
                                 },
-                                (errors: any) => {
-                                    this.handleError(errors, (data) => {
-                                        this._toastService.error(data.message, data.title);
-                                    });
-                                },
-                                // complete
-                                () => { }
                             );
                     }
                 }

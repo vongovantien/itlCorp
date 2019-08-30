@@ -76,12 +76,6 @@ export class StatementOfAccountDetailComponent extends AppList {
                     this.soa = new SOA(res);
                     this.totalItems = this.soa.chargeShipments.length;
                 },
-                (errors: any) => {
-                    this.handleError(errors, (data: any) => {
-                        this._toastService.error(data.message, data.title);
-                    });
-                },
-                () => { },
             );
     }
 

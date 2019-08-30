@@ -138,7 +138,7 @@
                             <div class="form-group"
                                 [ngClass]="{ 'm-form__group has-danger': updateForm.submitted && strPortCurrent.trim().length==0 }">
                                 <label class="form-control-label" for="">
-                                    Gateway <span class="m--font-danger">(*)</span>
+                                    Clearance location <span class="m--font-danger">(*)</span>
                                 </label>
                                 <app-combo-grid-virtual-scroll
                                     [currentActiveItemId]="{field:'code',value:strPortCurrent,hardValue:''}"
@@ -148,7 +148,7 @@
                                 </app-combo-grid-virtual-scroll>
                                 <div class="form-control-feedback"
                                     *ngIf="updateForm.submitted && strPortCurrent.trim().length==0">
-                                    Gateway is required
+                                    Clearance location is required
                                 </div>
                             </div>
                         </div>

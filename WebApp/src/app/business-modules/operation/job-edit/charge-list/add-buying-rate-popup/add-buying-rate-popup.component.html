@@ -59,8 +59,7 @@
                   <ng-select [allowClear]="true" [items]="[
                                                 { 'text': 'AGENT', 'id': 'AGENT' },
                                                 { 'text': 'SHIPPING LINE','id': 'SHIPPING' },
-                                                { 'text': 'OTHER', 'id': 'OTHER' }]" [disabled]="disabled"
-                    (data)="refreshValue($event)"
+                                                { 'text': 'OTHER', 'id': 'OTHER' }]" (data)="refreshValue($event)"
                     (selected)="buyingRateChargeToAdd.objectBePaid=$event.id;
                                                     buyingRateChargeToAdd.objectBePaid==='AGENT'? buyingRateChargeToAdd.paymentObjectId=opsTransaction.agentId:null;
                                                     buyingRateChargeToAdd.objectBePaid==='SHIPPING'? buyingRateChargeToAdd.paymentObjectId=opsTransaction.supplierId:null;
@@ -181,9 +180,8 @@
                     Currency <span class="m--font-danger">(*)</span>
                   </label>
 
-                  <ng-select [allowClear]="true" [items]="lstCurrencies" [disabled]="disabled"
-                    (data)="refreshValue($event)" [active]="currentActiveItemDefault"
-                    (selected)="buyingRateChargeToAdd.currencyId=$event.id"
+                  <ng-select [allowClear]="true" [items]="lstCurrencies" (data)="refreshValue($event)"
+                    [active]="currentActiveItemDefault" (selected)="buyingRateChargeToAdd.currencyId=$event.id"
                     (removed)="buyingRateChargeToAdd.currencyId=null" placeholder="Select filter">
                   </ng-select>
 

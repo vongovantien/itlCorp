@@ -80,12 +80,6 @@ export class AdvancePaymentAddNewComponent extends AppPage {
                             });
                         }
                     },
-                    (errors: any) => {
-                        this.handleError(errors, (data: any) => {
-                            this._toastService.error(data.message, data.title);
-                        });
-                    },
-                    () => { }
                 );
         }
     }

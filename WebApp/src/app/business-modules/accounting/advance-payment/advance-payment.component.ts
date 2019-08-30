@@ -2,9 +2,8 @@ import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { AccoutingRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
-import { SortService, BaseService} from 'src/app/shared/services';
+import { SortService, BaseService } from 'src/app/shared/services';
 import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
 import { AdvancePayment, AdvancePaymentRequest, User } from 'src/app/shared/models';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
@@ -93,12 +92,6 @@ export class AdvancePaymentComponent extends AppList {
                     this.advancePayments = res.data;
                     this.totalItems = res.totalItems || 0;
                 },
-                (errors: any) => {
-                    this.handleError(errors, (data: any) => {
-                        this._toastService.error(data.message, data.title);
-                    });
-                },
-                () => { }
             );
     }
 
@@ -114,7 +107,6 @@ export class AdvancePaymentComponent extends AppList {
             if (this.sort === sort) {
                 classes += ('sort-' + (this.order ? 'asc' : 'desc') + ' ');
             }
-
             return classes;
         }
         return '';
@@ -146,12 +138,6 @@ export class AdvancePaymentComponent extends AppList {
                         this.getListAdvancePayment();
                     }
                 },
-                (errors: any) => {
-                    this.handleError(errors, (data: any) => {
-                        this._toastService.error(data.message, data.title);
-                    });
-                },
-                () => { }
             );
     }
 
@@ -175,12 +161,6 @@ export class AdvancePaymentComponent extends AppList {
                         this.groupRequest = res;
                         this.advancePayments[index].advanceRequests = res;
                     },
-                    (errors: any) => {
-                        this.handleError(errors, (data: any) => {
-                            this._toastService.error(data.message, data.title);
-                        });
-                    },
-                    () => { }
                 );
         }
     }

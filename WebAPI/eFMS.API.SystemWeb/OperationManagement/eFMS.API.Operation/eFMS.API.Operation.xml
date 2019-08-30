@@ -25,9 +25,9 @@
         </member>
         <member name="M:eFMS.API.Operation.Controllers.CustomsDeclarationController.GetBy(System.String)">
             <summary>
-            get the list of custom declarations by job id
+            get the list of custom declarations by job no
             </summary>
-            <param name="jobNo">jobId that want to retrieve custom declarations</param>
+            <param name="jobNo">jobNo that want to retrieve custom declarations</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Operation.Controllers.CustomsDeclarationController.Query(eFMS.API.Operation.DL.Models.Criteria.CustomsDeclarationCriteria)">

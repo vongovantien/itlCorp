@@ -13,6 +13,7 @@ import { JobManagementDetailJobComponent } from './detail/detail-job.component';
 
 import { JobManagementFormSearchComponent } from './components/form-search-job/form-search-job.component';
 import localeVi from '@angular/common/locales/vi';
+import { AddMoreModalComponent } from '../job-edit/custom-declaration/add-more-modal/add-more-modal.component';
 
 registerLocaleData(localeVi, 'vi');
 
@@ -35,6 +36,7 @@ const routing: Routes = [
         path: "job-edit",
         loadChildren: () => import('./../job-edit/job-edit.module').then(m => m.JobEditModule),
     },
+
 ];
 
 

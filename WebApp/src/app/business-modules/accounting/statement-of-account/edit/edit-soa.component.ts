@@ -126,12 +126,6 @@ export class StatementOfAccountEditComponent extends AppList {
                     this.dataSearch = new SOASearchCharge(datSearchMoreCharge);
 
                 },
-                (errors: any) => {
-                    this.handleError(errors, (data: any) => {
-                        this._toastService.error(data.message, data.title);
-                    });
-                },
-                () => { }
             );
     }
 
@@ -152,13 +146,6 @@ export class StatementOfAccountEditComponent extends AppList {
                                 (dataCurrency: any) => {
                                     this.currencyList = dataCurrency;
                                 },
-                                (errors: any) => {
-                                    this.handleError(errors, (data: any) => {
-                                        this._toastService.error(data.message, data.title);
-                                    });
-                                },
-                                // complete
-                                () => { }
                             );
                     }
                 }
@@ -181,11 +168,6 @@ export class StatementOfAccountEditComponent extends AppList {
                             .subscribe((dataCharge: any) => {
                                 this.getDataCharge(dataCharge);
                             },
-                                (errors: any) => {
-                                    this.handleError(errors);
-                                },
-                                // complete
-                                () => { }
                             );
                     }
                 }
@@ -292,10 +274,6 @@ export class StatementOfAccountEditComponent extends AppList {
                             this.isCheckAllCharge = false;
                         }
                     },
-                    (errors: any) => {
-                        this.handleError(errors);
-                    },
-                    () => { }
                 );
         }
     }

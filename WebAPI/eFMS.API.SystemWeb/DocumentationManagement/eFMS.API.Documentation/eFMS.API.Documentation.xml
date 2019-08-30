@@ -120,8 +120,15 @@
             <summary>
             Denie Approve Advance
             </summary>
-            <param name="advanceId">addvanceId that want to retrieve Denie Approve</param>
+            <param name="advanceId">advanceId that want to retrieve Denie Approve</param>
             <param name="comment">comment reason that want to retrieve Denie Approve</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctAdvancePaymentController.GetInfoApproveAdvanceByAdvanceNo(System.String)">
+            <summary>
+            Get information approve advance by advanceNo
+            </summary>
+            <param name="advanceNo">advanceNo that want to retrieve approve advance</param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Documentation.Controllers.AcctSOAController">

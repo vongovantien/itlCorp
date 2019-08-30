@@ -275,12 +275,6 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
                         this.listCharges = res;
                     }
                 },
-                (errors: any) => {
-                    this.handleError(errors, (data) => {
-                        this._toastService.error(data.message, data.title);
-                    });
-                },
-                () => { }
             );
     }
 
@@ -300,12 +294,6 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
                         this.onChange.emit(res);
                         this.hide();
                     },
-                    (errors: any) => { 
-                        this.handleError( errors, (data) => {
-                            this._toastService.error(data.message, data.title);
-                        });
-                    },
-                    () => { }
                 );
         }
     }
