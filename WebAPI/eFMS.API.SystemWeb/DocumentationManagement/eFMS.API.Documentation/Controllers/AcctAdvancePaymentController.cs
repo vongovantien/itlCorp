@@ -396,13 +396,13 @@ namespace eFMS.API.Documentation.Controllers
         /// <summary>
         /// Update Approve Advance
         /// </summary>
-        /// <param name="addvanceId">addvanceId that want to retrieve Update Approve</param>
+        /// <param name="advanceId">advanceId that want to retrieve Update Approve</param>
         /// <returns></returns>
         [HttpPost]
         [Route("UpdateApprove")]
-        public IActionResult UpdateApprove(Guid addvanceId)
+        public IActionResult UpdateApprove(Guid advanceId)
         {
-            var updateApproval = acctAdvancePaymentService.UpdateApproval(addvanceId);
+            var updateApproval = acctAdvancePaymentService.UpdateApproval(advanceId);
             if (!updateApproval.Success)
             {
                 ResultHandle _result = new ResultHandle { Status = false, Message = updateApproval.Exception.Message };
