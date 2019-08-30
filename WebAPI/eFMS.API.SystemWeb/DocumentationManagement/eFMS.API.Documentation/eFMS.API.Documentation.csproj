@@ -111,7 +111,7 @@
     <None Update="Resources\Files\DistrictImportTemplate.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\Files\Import Container List.xlsx">
+    <None Update="Resources\Files\ContainerImportTemplate.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Files\PartnerImportTemplate.xlsx">

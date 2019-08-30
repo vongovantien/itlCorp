@@ -1,4 +1,4 @@
-<div class="form-create-advpayment">
+<div class="form-update-advpayment">
     <form action="" [formGroup]="formCreate">
         <div class="row">
             <div class="col-4">
@@ -26,9 +26,9 @@
                     </label>
                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                         <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                            [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                            [singleDatePicker]="true" name="daterange" placeholder="Select request date" readonly
-                            [autoApply]="true" formControlName="requestDate"/>
+                            [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
+                            name="daterange" placeholder="Select request date" [autoApply]="true"
+                            formControlName="requestDate" [attr.disabled]="action !== 'update' ? 'disabled' : null" />
                         <span class="m-input-icon__icon m-input-icon__icon--right">
                             <span>
                                 <i class="la la-calendar"></i>
@@ -44,7 +44,8 @@
                     <label class="form-control-label">
                         Payment Method:
                     </label>
-                    <select class="form-control" formControlName="paymentMethod" name="method">
+                    <select class="form-control" formControlName="paymentMethod" name="method"
+                        [attr.disabled]="action !== 'update' ? 'disabled' : null" >
                         <option *ngFor="let method of methods; let i = index" [ngValue]="method">{{method.title}}
                         </option>
                     </select>
@@ -55,8 +56,8 @@
                     <label class="form-control-label">
                         Department:
                     </label>
-                    <input type="text" class="form-control m-input m-input--square" placeholder="Department" readonly
-                        formControlName="department">
+                    <input type="text" class="form-control m-input m-input--square" placeholder="Department"
+                        formControlName="department" [attr.disabled]="action !== 'update' ? 'disabled' : null" >
                 </div>
             </div>
             <div class="col-4">
@@ -67,8 +68,8 @@
                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                         <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                             [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
-                            name="daterange" [minDate]="maxDateDeadLine" placeholder="Select Deadline Date" readonly
-                            [autoApply]="true" formControlName="deadLine" />
+                            name="daterange" [minDate]="maxDateDeadLine" placeholder="Select Deadline Date"
+                            [autoApply]="true" formControlName="deadLine" [attr.disabled]="action !== 'update' ? 'disabled' : null"  />
                         <span class="m-input-icon__icon m-input-icon__icon--right">
                             <span>
                                 <i class="la la-calendar"></i>
@@ -84,8 +85,8 @@
                     <label class="form-control-label" for="">
                         Note:
                     </label>
-                    <textarea class="form-control m-input m-input--square" name="note" rows="2"
-                        formControlName="note"></textarea>
+                    <textarea class="form-control m-input m-input--square" name="note" rows="2" formControlName="note"
+                        [attr.disabled]="action !== 'update' ? 'disabled' : null" ></textarea>
                 </div>
             </div>
             <div class="col-4">
@@ -93,7 +94,8 @@
                     <label class="form-control-label" for="">
                         Currency:
                     </label>
-                    <select class="form-control" formControlName="currency" name="currency" (ngModelChange)="changeCurrency($event)">
+                    <select [disabled]="action !== 'update'" class="form-control" formControlName="currency"
+                        name="currency" (ngModelChange)="changeCurrency($event)" [attr.disabled]="action !== 'update' ? 'disabled' : null" >
                         <option *ngFor="let currency of currencyList" [ngValue]="currency">{{currency.id}}</option>
                     </select>
                 </div>

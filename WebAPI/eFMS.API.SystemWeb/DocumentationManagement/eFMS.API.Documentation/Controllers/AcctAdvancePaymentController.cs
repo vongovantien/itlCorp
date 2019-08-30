@@ -388,11 +388,59 @@ namespace eFMS.API.Documentation.Controllers
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
             {
-                return BadRequest(result);
+                return Ok(result);
             }
             return Ok(result);           
         }
 
+        /// <summary>
+        /// Update Approve Advance
+        /// </summary>
+        /// <param name="addvanceId">addvanceId that want to retrieve Update Approve</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("UpdateApprove")]
+        public IActionResult UpdateApprove(Guid addvanceId)
+        {
+            var updateApproval = acctAdvancePaymentService.UpdateApproval(addvanceId);
+            if (!updateApproval.Success)
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = updateApproval.Exception.Message };
+                return Ok(_result);
+            }
+            return Ok(updateApproval);
+        }
 
+        /// <summary>
+        /// Denie Approve Advance
+        /// </summary>
+        /// <param name="advanceId">advanceId that want to retrieve Denie Approve</param>
+        /// <param name="comment">comment reason that want to retrieve Denie Approve</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("DeniedApprove")]
+        public IActionResult DeniedApprove(Guid advanceId, string comment)
+        {
+            var denieApproval = acctAdvancePaymentService.DeniedApprove(advanceId, comment);
+            if (!denieApproval.Success)
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = denieApproval.Exception.Message };
+                return Ok(_result);
+            }
+            return Ok(denieApproval);
+        }
+
+        /// <summary>
+        /// Get information approve advance by advanceNo
+        /// </summary>
+        /// <param name="advanceNo">advanceNo that want to retrieve approve advance</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetInfoApproveAdvanceByAdvanceNo")]
+        public IActionResult GetInfoApproveAdvanceByAdvanceNo(string advanceNo)
+        {
+            var data = acctAdvancePaymentService.GetInfoApproveAdvanceByAdvanceNo(advanceNo);
+            return Ok(data);
+        }
     }
 }

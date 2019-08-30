@@ -17,7 +17,7 @@
                 <div class="row">
                   <div class="col-lg-4">
                     <input type="file" id="inputFile" class="form-control m-input m-input--square" placeholder=""
-                      onclick="this.value=null;" accept=".xlsx">
+                      (change)="chooseFile($event)" onclick="this.value=null;" accept=".xlsx">
                     <span class="m-form__help">
                       <a class="btn-link" href="javascript:void(0)" (click)="downloadFile()">Download sample</a>
                     </span>

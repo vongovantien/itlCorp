@@ -10,5 +10,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string RequesterName { get; set; }
         public string AdvanceStatusPayment { get; set; }
         public decimal? Amount { get; set; }
+        public string StatusApprovalName { get; set; }
     }
 }

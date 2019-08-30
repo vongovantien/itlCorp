@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, Input } from '@angular/core';
 import { User, Currency } from 'src/app/shared/models';
 import { BaseService, DataService } from 'src/app/shared/services';
 import { SystemRepo } from 'src/app/shared/repositories';
@@ -17,6 +17,7 @@ import { ToastrService } from 'ngx-toastr';
 export class AdvancePaymentFormCreateComponent extends AppForm {
 
     @Output() onChangeCurrency: EventEmitter<any> = new EventEmitter<any>();
+    @Input() action: string = 'update';
 
     methods: CommonInterface.ICommonTitleValue[];
     currencyList: Currency[] = [];
@@ -50,6 +51,10 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         this.initBasicData();
         this.getUserLogged();
         this.getCurrency();
+    }
+
+    ngOnChanges() {
+        console.log(this.action);
     }
 
     initForm() {
