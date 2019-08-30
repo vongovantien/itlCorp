@@ -388,7 +388,7 @@ namespace eFMS.API.Documentation.Controllers
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
             {
-                return BadRequest(result);
+                return Ok(result);
             }
             return Ok(result);           
         }
@@ -406,7 +406,7 @@ namespace eFMS.API.Documentation.Controllers
             if (!updateApproval.Success)
             {
                 ResultHandle _result = new ResultHandle { Status = false, Message = updateApproval.Exception.Message };
-                return BadRequest(_result);
+                return Ok(_result);
             }
             return Ok(updateApproval);
         }
@@ -425,7 +425,7 @@ namespace eFMS.API.Documentation.Controllers
             if (!denieApproval.Success)
             {
                 ResultHandle _result = new ResultHandle { Status = false, Message = denieApproval.Exception.Message };
-                return BadRequest(_result);
+                return Ok(_result);
             }
             return Ok(denieApproval);
         }

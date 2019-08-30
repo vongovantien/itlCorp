@@ -1,9 +1,7 @@
 ﻿using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
-using eFMS.API.Documentation.Infrastructure.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Options;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 namespace eFMS.API.Documentation.Controllers
@@ -27,7 +25,6 @@ namespace eFMS.API.Documentation.Controllers
         [Route("GetShipmentCommonData")]
         public IActionResult Get()
         {
-            var s = url;
             var results = terminologyService.GetAllShipmentCommonData();
             return Ok(results);
         }

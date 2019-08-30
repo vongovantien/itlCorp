@@ -23,7 +23,7 @@ using eFMS.API.Common;
 using System.Reflection;
 using System.IO;
 using System;
-using eFMS.API.Documentation.Infrastructure.Common;
+using eFMS.API.Documentation.DL.Common;
 
 namespace eFMS.API.Shipment.Infrastructure
 {
