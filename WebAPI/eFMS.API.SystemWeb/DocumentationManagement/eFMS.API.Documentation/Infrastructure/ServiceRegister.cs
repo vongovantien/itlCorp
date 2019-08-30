@@ -23,6 +23,7 @@ using eFMS.API.Common;
 using System.Reflection;
 using System.IO;
 using System;
+using eFMS.API.Documentation.Infrastructure.Common;
 
 namespace eFMS.API.Shipment.Infrastructure
 {
@@ -144,6 +145,9 @@ namespace eFMS.API.Shipment.Infrastructure
                     = configuration.GetSection("ConnectionStrings:Redis").Value;
                 options.eFMSConnection
                     = configuration.GetSection("ConnectionStrings:eFMSConnection").Value;
+            });
+            service.Configure<WebUrl>(option => {
+                option.Url = configuration.GetSection("WebUrl").Value;
             });
             return service;
         }
