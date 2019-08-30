@@ -421,5 +421,117 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return null;
         }
+
+        public List<CsMawbcontainerImportModel> CheckValidContainerImport(List<CsMawbcontainerImportModel> list)
+        {
+            var units = ((eFMSDataContext)DataContext.DC).CatUnit.ToList();
+            var commpdities = ((eFMSDataContext)DataContext.DC).CatCommodity.ToList();
+            var containers = units.Where(x => x.UnitType == "Container");
+            var packages = units.Where(x => x.UnitType == "Package");
+            var unitOfMeasures = units.Where(x => x.UnitType == "Weight Measurement");
+            list.ForEach(item => {
+                if (string.IsNullOrEmpty(item.ContainerTypeName))
+                {
+                    item.IsValid = false;
+                    item.ContainerTypeNameError = "Container name is empty";
+                }
+                else
+                {
+                    var container = containers.FirstOrDefault(x => x.UnitNameEn == item.ContainerTypeName);
+                    if (container == null)
+                    {
+                        item.IsValid = false;
+                        item.ContainerTypeNameError = "Container name not found";
+                    }
+                    else
+                    {
+                        item.ContainerTypeId = container.Id;
+                    }
+                }
+                if(item.Quantity == null)
+                {
+                    item.QuantityError = "Quantity is empty";
+                    item.IsValid = false;
+                }
+                if (!string.IsNullOrEmpty(item.PackageTypeName))
+                {
+                    var packageType = packages.FirstOrDefault(x => x.UnitNameEn == item.PackageTypeName);
+                    if (packageType == null)
+                    {
+                        item.IsValid = false;
+                        item.PackageTypeNameError = "Package type name is not found";
+                    }
+                    else
+                    {
+                        item.PackageTypeId = packageType.Id;
+                        if (!string.IsNullOrEmpty(item.ContainerNo))
+                        {
+                            var existedItems = list.Where(x => x.ContainerTypeId == item.ContainerTypeId && x.Quantity == item.Quantity && x.ContainerNo == item.ContainerNo && x.PackageTypeId == item.PackageTypeId);
+                            if (existedItems.Count() > 1)
+                            {
+                                list.Where(x => x.ContainerTypeId == item.ContainerTypeId && x.Quantity == item.Quantity && x.ContainerNo == item.ContainerNo && x.PackageTypeId == item.PackageTypeId).ToList().ForEach(x =>
+                                {
+                                    x.IsValid = false;
+                                    item.ContainerTypeNameError = "duplicate(Cont Type && Cont Q'ty && Container No && Package Type)";
+                                });
+                            }
+                        }
+                    }
+                }
+                if (!string.IsNullOrEmpty(item.CommodityName))
+                {
+                    var commodity = commpdities.FirstOrDefault(x => x.CommodityNameEn == item.CommodityName);
+                    if(commodity == null)
+                    {
+                        item.IsValid = false;
+                        item.CommodityNameError = "Commodity name is not found";
+                    }
+                    else
+                    {
+                        item.CommodityId = commodity.Id;
+                    }
+                }
+                if (!string.IsNullOrEmpty(item.UnitOfMeasureName))
+                {
+                    var unitOfMeasure = unitOfMeasures.FirstOrDefault(x => x.UnitNameEn == item.UnitOfMeasureName);
+                    if(unitOfMeasure == null)
+                    {
+                        item.IsValid = false;
+                        item.UnitOfMeasureNameError = "Unit of measure name is not found";
+                    }
+                    else
+                    {
+                        item.UnitOfMeasureId = unitOfMeasure.Id;
+                    }
+                }
+                if(!string.IsNullOrEmpty(item.ContainerNo) || !string.IsNullOrEmpty(item.MarkNo) || !string.IsNullOrEmpty(item.SealNo))
+                {
+                    item.IsValid = false;
+                    item.QuantityError = "Quantity must be 1";
+                }
+            });
+            return list;
+        }
+
+        public HandleState Importcontainer(List<CsMawbcontainerImportModel> data)
+        {
+            try
+            {
+                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                foreach (var item in data)
+                {
+                    var container = mapper.Map<CsMawbcontainer>(item);
+                    container.DatetimeModified = DateTime.Now;
+                    container.UserModified = currentUser.UserID;
+                    dc.CsMawbcontainer.Add(container);
+                }
+                dc.SaveChanges();
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
     }
 }

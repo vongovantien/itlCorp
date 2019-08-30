@@ -1,0 +1,172 @@
+<div class="modal fade" id="container-list-of-ops-billing-modal" bsModal #popup="bs-modal" role="dialog"
+  (onHide)="onHide($event)" (onShow)="onShow($event)">
+  <div class="modal-dialog c-modal-fullscreen" role="document">
+    <div class="modal-content m-form m-form--state">
+      <div class="modal-header">
+        <h5 class="modal-title">List of container</h5>
+        <button type="button" class="close" aria-label="Close" (click)="close()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-list-table">
+          <div class="m-portlet">
+            <div class="m-portlet__body">
+              <!--begin::Form-->
+              <div class="m-form m-form--state">
+                <div class="row">
+                  <div class="col-lg-4">
+                    <input type="file" id="inputFile" class="form-control m-input m-input--square" placeholder=""
+                      onclick="this.value=null;" accept=".xlsx">
+                    <span class="m-form__help">
+                      <a class="btn-link" href="javascript:void(0)" (click)="downloadFile()">Download sample</a>
+                    </span>
+                  </div>
+                  <div class="col-lg-7 offset-lg-1">
+                    <div class="row">
+                      <div class="col-sm-4 m--margin-top-10 text-right">
+                        <span class="m--font-brand m--font-bolder">
+                          Total rows:
+                        </span>
+                      </div>
+                      <div class="col-sm-4 m--margin-top-10 text-right">
+                        <span class="m--font-success m--font-bolder">
+                          Valid rows:
+                        </span>
+                      </div>
+                      <div class="col-sm-4 m--margin-top-10 text-right">
+                        <span class="m--font-danger  m--font-bolder">
+                          Invalid rows:
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-actions m--margin-top-5 m--align-right">
+                  <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                      <span>
+                        Show invalid rows
+                      </span>
+                      <span>
+                        Show All
+                      </span>
+                    </span>
+                  </button>
+                  <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                      <i class="la la-save"></i>
+                      <span>
+                        save
+                      </span>
+                    </span>
+                  </button>
+                  <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
+                    routerLink="/home/operation/custom-clearance">
+                    <span>
+                      <i class="la la-ban"></i>
+                      <span>
+                        close
+                      </span>
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <!--end::Form-->
+            </div>
+          </div>
+          <!--end::m-portlet-->
+          <!--begin:: m-portlet-->
+          <div class="m-portlet" style="position: relative">
+            <div class="m-portlet__body">
+              <!--begin: Datatable of trucking-table -->
+              <div class="table-wrapper table-scrollable" id="">
+                <table class="table table-striped table-brand dataTable">
+                  <thead>
+                    <tr>
+                      <th class="sorting_asc">No</th>
+                      <th class="sorting"
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceNo'), 'sorting_desc': (!isDesc && sortKey == 'clearanceNo') }">
+                        <span>Cont Type *</span>
+                      </th>
+                      <th class="sorting"
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'type'), 'sorting_desc': (!isDesc && sortKey == 'type') }">
+                        <span>Cont Qty *</span>
+                      </th>
+                      <th class="sorting"
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceDateStr'), 'sorting_desc': (!isDesc && sortKey == 'clearanceDateStr') }">
+                        <span>Cont No</span>
+                      </th>
+                      <th class="sorting"
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'customerName'), 'sorting_desc': (!isDesc && sortKey == 'customerName') }">
+                        <span>Seal No</span>
+                      </th>
+                      <th class="sorting"
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'mblid'), 'sorting_desc': (!isDesc && sortKey == 'mblid') }">
+                        <span>GW</span>
+                      </th>
+                      <th class="sorting"
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'hblid'), 'sorting_desc': (!isDesc && sortKey == 'hblid') }">
+                        <span>CBM</span>
+                      </th>
+                      <th class="sorting"
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'gatewayName'), 'sorting_desc': (!isDesc && sortKey == 'gatewayName') }">
+                        <span>NW</span>
+                      </th>
+                      <th class="sorting"
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'grossWeightStr'), 'sorting_desc': (!isDesc && sortKey == 'grossWeightStr') }">
+                        <span>Package Qty</span>
+                      </th>
+                      <th class="sorting"
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'netWeightStr'), 'sorting_desc': (!isDesc && sortKey == 'netWeightStr') }">
+                        <span>Package Type</span>
+                      </th>
+                      <th class="sorting"
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'cbmStr'), 'sorting_desc': (!isDesc && sortKey == 'cbmStr') }">
+                        <span>Mark No</span>
+                      </th>
+                      <th class="sorting"
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'qtyContStr'), 'sorting_desc': (!isDesc && sortKey == 'qtyContStr') }">
+                        <span>Description</span>
+                      </th>
+                      <th class="sorting"
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'pcsStr'), 'sorting_desc': (!isDesc && sortKey == 'pcsStr') }">
+                        <span>Commodity</span>
+                      </th>
+                      <th class="sorting"
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'commodityName'), 'sorting_desc': (!isDesc && sortKey == 'commodityName') }">
+                        <span>Unit</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+                </table>
+              </div>
+              <!--end: Datatable of trucking-table -->
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer m--align-center">
+        <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+          <span>
+            <i class="la la-save"></i>
+            <span>
+              save
+            </span>
+          </span>
+        </button>
+        <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" (click)="close()">
+          <span>
+            <i class="la la-ban"></i>
+            <span>
+              cancel
+            </span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

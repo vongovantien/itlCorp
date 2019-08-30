@@ -29,7 +29,8 @@
                   </div>
                 </div>
                 <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
-                  <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                  <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)="showImportPopup()">
                     <span>
                       <i class="la la-download"></i>
                       <span>
@@ -413,3 +414,4 @@
 
 <confirm-popup [title]="'Delete Container'" [body]="'Are you sure you want to delete the selected container?'"
   (onSubmit)="deleteContainer()"></confirm-popup>
+<app-container-import></app-container-import>

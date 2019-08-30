@@ -7,6 +7,7 @@ import { PopupBase } from 'src/app/popup.base';
 import { NgForm } from '@angular/forms';
 import { UnitRepo } from 'src/app/shared/repositories';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { ContainerImportComponent } from './container-import/container-import.component';
 
 @Component({
   selector: 'app-container-list',
@@ -17,6 +18,7 @@ export class ContainerListComponent extends PopupBase implements OnInit {
   @Input() lstMasterContainers: any[];
   @Output() outputContainers = new EventEmitter<any[]>();
   @ViewChild(ConfirmPopupComponent, { static: false }) popupConfirmDelete: ConfirmPopupComponent;
+  @ViewChild(ContainerImportComponent, { static: false }) popupContainerImport: ContainerImportComponent;
   // lstMasterContainers: any[] = [];
   saveContainerSuccess = false;
   listContainerType: any[] = [];
@@ -46,7 +48,9 @@ export class ContainerListComponent extends PopupBase implements OnInit {
     this.getUnits();
     this.lstContainerTemp = this.lstMasterContainers;
   }
-
+  showImportPopup() {
+    this.popupContainerImport.show();
+  }
   async onSubmitContainer(form: NgForm) {
     for (let i = 0; i < this.lstMasterContainers.length; i++) {
       this.lstMasterContainers[i].verifying = true;

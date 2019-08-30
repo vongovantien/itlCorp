@@ -35,6 +35,7 @@ import { JobManagementBuyingRateComponent } from './components/buying-rate/buyin
 import { JobManagementSellingRateComponent } from './components/selling-rate/selling-rate.component';
 import { JobManagementOBHComponent } from './components/obh/obh.component';
 import { AddMoreModalComponent } from './custom-declaration/add-more-modal/add-more-modal.component';
+import { ContainerImportComponent } from './container-list/container-import/container-import.component';
 
 const routing: Routes = [
     {
@@ -104,7 +105,8 @@ const COMPONENTS = [
 
         PlSheetPopupComponent,
         ...COMPONENTS,
-        AddMoreModalComponent
+        AddMoreModalComponent,
+        ContainerImportComponent
     ],
     providers: [],
     bootstrap: [

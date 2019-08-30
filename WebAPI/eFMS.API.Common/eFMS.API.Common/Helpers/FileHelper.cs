@@ -39,6 +39,32 @@ namespace eFMS.API.Common.Helpers
             }
         }
 
+        public async Task<FileStreamResult> ExportExcel(string pathTeamplate, string fileName)
+        {
+            try
+            {
+                pathTeamplate = pathTeamplate + Template.Resources.ExcelTemplate;
+                string path = Path.Combine(pathTeamplate, fileName);
+                FileInfo file = new FileInfo(path);
+                var memory = new MemoryStream();
+
+                if (file.Exists == false)
+                {
+                    return null;
+                }
+                using (var stream = new FileStream(path, FileMode.Open))
+                {
+                    await stream.CopyToAsync(memory);
+                }
+                memory.Position = 0;
+                return File(memory, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
         public ExcelPackage UploadExcel(IFormFile file)
         {
             ExcelPackage rs = new ExcelPackage(file.OpenReadStream());

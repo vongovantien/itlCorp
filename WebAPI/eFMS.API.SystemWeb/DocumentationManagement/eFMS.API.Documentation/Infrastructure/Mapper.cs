@@ -38,10 +38,11 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<spc_GetListChargeShipmentMasterBySOANo, ChargeShipmentModel>();
             CreateMap<spc_GetListMoreChargeMasterByCondition, ChargeShipmentModel>();
             CreateMap<spc_GetDataExportSOABySOANo, ExportSOAModel>();
+            CreateMap<CsShipmentSurchargeModel, CsShipmentSurcharge>();
 
             CreateMap<AcctAdvancePayment, AcctAdvancePaymentModel>();
             CreateMap<AcctAdvancePaymentModel, AcctAdvancePayment>();
-            CreateMap<AcctAdvancePaymentModel, AcctAdvanceRequest>();
+            CreateMap<CsMawbcontainerImportModel, CsMawbcontainer>();
         }
     }
 }

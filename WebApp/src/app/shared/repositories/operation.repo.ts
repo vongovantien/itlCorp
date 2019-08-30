@@ -18,7 +18,7 @@ export class OperationRepo {
                 return res;
             })
         );
-      
+
     }
 
     getListShipment(page?: number, size?: number, body = {}) {
@@ -32,7 +32,7 @@ export class OperationRepo {
     }
 
     checkShipmentAllowToDelete(id: string) {
-        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/OpsTransaction/CheckAllowDelete/${id}`,).pipe(
+        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/OpsTransaction/CheckAllowDelete/${id}`).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -46,7 +46,7 @@ export class OperationRepo {
     }
 
     getCustomDeclaration(jobNo: string) {
-        return this._api.get(`${environment.HOST.WEB_URL}/Operation/api/${this.VERSION}/vi/CustomsDeclaration/GetBy`, {jobNo: jobNo}).pipe(
+        return this._api.get(`${environment.HOST.WEB_URL}/Operation/api/${this.VERSION}/vi/CustomsDeclaration/GetBy`, { jobNo: jobNo }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -56,6 +56,12 @@ export class OperationRepo {
         return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/Terminology/GetOPSShipmentCommonData`).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
+        );
+    }
+    downloadfileExel(saveAsFileName: string) {
+        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/OpsTransaction/DownloadContainerExcel`, { responseType: 'blob' }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => saveAs(data, saveAsFileName))
         );
     }
 }

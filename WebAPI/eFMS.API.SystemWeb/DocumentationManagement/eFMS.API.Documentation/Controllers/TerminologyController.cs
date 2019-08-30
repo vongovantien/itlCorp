@@ -27,7 +27,6 @@ namespace eFMS.API.Documentation.Controllers
         [Route("GetShipmentCommonData")]
         public IActionResult Get()
         {
-            var s = url;
             var results = terminologyService.GetAllShipmentCommonData();
             return Ok(results);
         }
