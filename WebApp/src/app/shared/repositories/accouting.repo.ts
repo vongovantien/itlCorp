@@ -117,6 +117,13 @@ export class AccoutingRepo {
             );
     }
 
+    sendRequestAdvPayment(body: any = {}): Observable<any> {
+        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctAdvancePayment/SaveAndSendRequest`, body)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
     checkShipmentsExistInAdvancePament(body: any) {
         return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctAdvancePayment/CheckShipmentsExistInAdvancePament`, body)
             .pipe(
