@@ -42,6 +42,8 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<AcctAdvancePayment, AcctAdvancePaymentModel>();
             CreateMap<AcctAdvancePaymentModel, AcctAdvancePayment>();
             CreateMap<AcctAdvancePaymentModel, AcctAdvanceRequest>();
+
+            CreateMap<AcctApproveAdvance, AcctApproveAdvanceModel>();
         }
     }
 }
