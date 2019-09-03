@@ -10,7 +10,7 @@ import { NgForm } from '@angular/forms';
 import { Subject } from 'rxjs/internal/Subject';
 import { PopupBase } from 'src/app/popup.base';
 import { OpsModuleCreditDebitNoteRemainingChargeComponent } from '../ops-module-credit-debit-note-remaining-charge/ops-module-credit-debit-note-remaining-charge.component';
-import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { SortService } from 'src/app/shared/services';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 declare var $: any;

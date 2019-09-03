@@ -3,7 +3,7 @@ import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { ToastrService } from 'ngx-toastr';
-import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { ExcelService } from 'src/app/shared/services/excel.service';

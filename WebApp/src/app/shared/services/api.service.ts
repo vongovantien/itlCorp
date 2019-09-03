@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { SystemConstants } from 'src/constants/system.const';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class ApiService {
 
     baseUrl: string = '//';
@@ -37,6 +37,19 @@ export class ApiService {
             })
     }
 
+    postFile(url: string, files: any, name: string = null, params?: any, headers?: any) {
+        const formData = new FormData();
+        for (const file of files) {
+            formData.append(name || file.name, file);
+        }
+        const options = {
+            params: params,
+            reportProgress: true,
+            headers: headers
+        };
+        return this._http.post(this.setUrl(url), formData, options);
+    }
+
     put(url: string, data?: any, params?: any, headers?: any) {
         return this._http
             .put(this.setUrl(url), data, {
@@ -44,7 +57,9 @@ export class ApiService {
                 headers: Object.assign({}, this._headers, headers)
             })
     }
-
+    downloadfile(url: string) {
+        return this._http.get(this.setUrl(url), { responseType: 'blob' });
+    }
     get(url: string = '', params?: any, headers: any = {}) {
         return this._http.get(this.setUrl(url), { params, headers });
     }

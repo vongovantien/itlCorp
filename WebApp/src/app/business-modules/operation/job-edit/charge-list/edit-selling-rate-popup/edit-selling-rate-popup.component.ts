@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
-import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSurcharge';
 import { PopupBase } from 'src/app/popup.base';
 import { NgForm } from '@angular/forms';
@@ -139,5 +139,5 @@ export class EditSellingRatePopupComponent extends PopupBase implements OnInit, 
   }
   public typed(value: any): void {
     console.log('New search input: ', value);
-}
+  }
 }

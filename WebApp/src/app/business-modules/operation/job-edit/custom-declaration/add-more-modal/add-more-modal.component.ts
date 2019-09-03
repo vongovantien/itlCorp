@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { SortService, BaseService } from 'src/app/shared/services';
-import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { finalize, catchError, takeUntil } from 'rxjs/operators';
 import { CustomDeclarationRepo } from 'src/app/shared/repositories';

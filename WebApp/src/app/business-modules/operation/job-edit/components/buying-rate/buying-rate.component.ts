@@ -8,7 +8,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { EditBuyingRatePopupComponent } from '../../charge-list/edit-buying-rate-popup/edit-buying-rate-popup.component';
 import { OpsModuleCreditDebitNoteDetailComponent } from '../../credit-debit-note/ops-module-credit-debit-note-detail/ops-module-credit-debit-note-detail.component';
 import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDetails.model';
-import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { AddBuyingRatePopupComponent } from '../../charge-list/add-buying-rate-popup/add-buying-rate-popup.component';
 
 @Component({

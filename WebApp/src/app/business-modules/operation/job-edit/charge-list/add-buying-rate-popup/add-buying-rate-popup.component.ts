@@ -6,7 +6,7 @@ import { ChargeConstants } from 'src/constants/charge.const';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
 import { DataService } from 'src/app/shared/services';
 import cloneDeep from 'lodash/cloneDeep';

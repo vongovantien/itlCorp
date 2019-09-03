@@ -22,11 +22,11 @@ export class ContainerImportComponent extends PopupBase implements OnInit {
     this.hide();
   }
   downloadFile() {
-    this.operationRepo.downloadcontainerfileExel("ContainerImportTemplate.xlsx")
+    this.operationRepo.downloadcontainerfileExel()
       .pipe(catchError(this.catchError))
       .subscribe(
         (res: any) => {
-          console.log(res);
+          saveAs(res, "ContainerImportTemplate.xlsx");
         },
         (errors: any) => { },
         () => { }
@@ -35,5 +35,13 @@ export class ContainerImportComponent extends PopupBase implements OnInit {
   chooseFile(file: Event) {
     if (file.target['files'] == null) return;
     this._progressRef.start();
+    this.operationRepo.uploadContainerExcelFile(file.target['files']).pipe(catchError(this.catchError))
+      .subscribe(
+        (res: any) => {
+          console.log('upload file');
+        },
+        (errors: any) => { },
+        () => { }
+      );
   }
 }

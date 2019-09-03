@@ -1,6 +1,6 @@
 import { Component, Input, ViewChild, Output, EventEmitter } from '@angular/core';
 import { AppList } from 'src/app/app.list';
-import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { AddSellingRatePopupComponent } from '../../charge-list/add-selling-rate-popup/add-selling-rate-popup.component';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import cloneDeep from 'lodash/cloneDeep';

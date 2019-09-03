@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import moment from 'moment/moment';
-import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import * as shipmentHelper from 'src/helper/shipment.helper';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
@@ -310,7 +310,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
     async getShipmentDetails(id: any) {
         this.opsTransaction = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.getById + "?id=" + id, false, true);
-        console.log("des",this.opsTransaction);
+        console.log("des", this.opsTransaction);
         this.baseServices.setData("CurrentOpsTransaction", this.opsTransaction);
     }
 

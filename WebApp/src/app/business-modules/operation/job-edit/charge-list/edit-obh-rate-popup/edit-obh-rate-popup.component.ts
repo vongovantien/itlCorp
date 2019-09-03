@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSurcharge';
-import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { PopupBase } from 'src/app/popup.base';
 import { DataService, BaseService } from 'src/app/shared/services';
 import { API_MENU } from 'src/constants/api-menu.const';

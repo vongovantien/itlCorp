@@ -58,18 +58,18 @@ export class OperationRepo {
             map((data: any) => data)
         );
     }
-    downloadcontainerfileExel(saveAsFileName: string) {
-        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/OpsTransaction/DownloadContainerExcel`, { responseType: 'blob' }).pipe(
+    downloadcontainerfileExel() {
+        return this._api.downloadfile(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/OpsTransaction/DownloadContainerExcel`).pipe(
             catchError((error) => throwError(error)),
-            map((data: any) => saveAs(data, saveAsFileName))
+            map((data: any) => data)
         );
     }
-    // uploadContainerExcelFile(data) {
-    //     return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/OpsTransaction/Paging`, data, ).pipe(
-    //         catchError((error) => throwError(error)),
-    //         map((data: any) => data)
-    //     );
-    // }
+    uploadContainerExcelFile(data) {
+        return this._api.postFile(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/OpsTransaction/Importcontainer`, data, "uploadedFile").pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 }
 
 

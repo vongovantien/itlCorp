@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef, Input, ViewChild } from '@angular/core';
 import { BaseService } from 'src/app/shared/services/base.service';
-import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';

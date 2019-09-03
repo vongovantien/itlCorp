@@ -1,7 +1,7 @@
 import { Component, ViewChild, Output, EventEmitter, Input } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { AddObhRatePopupComponent } from '../../charge-list/add-obh-rate-popup/add-obh-rate-popup.component';
-import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { BaseService, SortService } from 'src/app/shared/services';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';

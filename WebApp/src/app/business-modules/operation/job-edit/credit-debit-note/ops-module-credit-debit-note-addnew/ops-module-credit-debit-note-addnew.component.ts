@@ -8,7 +8,7 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
 import { NgForm } from '@angular/forms';
 import { SortService } from 'src/app/shared/services/sort.service';
-import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { PopupBase } from 'src/app/popup.base';
 import { NotSelectedAlertModalComponent } from './not-selected-alert-modal/not-selected-alert-modal.component';
 import { ChangePartnerConfirmModalComponent } from './change-partner-confirm-modal/change-partner-confirm-modal.component';

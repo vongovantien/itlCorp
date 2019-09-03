@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from "@angular/core";
 import moment from "moment/moment";
 import { BaseService } from "src/app/shared/services/base.service";
 import { API_MENU } from "src/constants/api-menu.const";
-import { OpsTransaction } from "src/app/shared/models/document/OpsTransaction.mode";
+import { OpsTransaction } from "src/app/shared/models/document/OpsTransaction.model";
 import * as shipmentHelper from "src/helper/shipment.helper";
 import * as dataHelper from "src/helper/data.helper";
 import { PartnerGroupEnum } from "src/app/shared/enums/partnerGroup.enum";

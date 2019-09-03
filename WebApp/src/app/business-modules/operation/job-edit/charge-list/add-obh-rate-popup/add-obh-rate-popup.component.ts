@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core';
-import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { PopupBase } from 'src/app/popup.base';
 import { NgForm } from '@angular/forms';
 import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSurcharge';

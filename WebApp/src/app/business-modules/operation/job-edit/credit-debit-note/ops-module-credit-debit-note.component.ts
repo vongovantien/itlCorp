@@ -5,7 +5,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import filter from 'lodash/filter';
 import moment from 'moment/moment';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { AppPage } from 'src/app/app.base';
 import { OpsModuleCreditDebitNoteAddnewComponent } from './ops-module-credit-debit-note-addnew/ops-module-credit-debit-note-addnew.component';
 import { NgxSpinnerService } from 'ngx-spinner';

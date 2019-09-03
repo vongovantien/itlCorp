@@ -6,7 +6,7 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
 import { ChargeConstants } from 'src/constants/charge.const';
-import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mode';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { PopupBase } from 'src/app/popup.base';
 import moment from 'moment/moment';
 import { NgForm } from '@angular/forms';
