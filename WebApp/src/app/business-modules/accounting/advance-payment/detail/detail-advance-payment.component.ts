@@ -88,8 +88,13 @@ export class AdvancePaymentDetailComponent extends AppPage {
 
                     this.listRequestAdvancePaymentComponent.advanceNo = this.advancePayment.advanceNo;
 
-                    if ((this.advancePayment.statusApproval !== <string>'New' && this.advancePayment.statusApproval !== <string>'Denied') || this.advancePayment.statusApproval !== <string>'Denied') {
-                        this.actionForm = 'approve';
+                    switch (this.advancePayment.statusApproval) {
+                        case 'New':
+                        case 'Denied':
+                            break;
+                        default:
+                            this.actionForm = 'approve';
+                            break;
                     }
                 },
             );

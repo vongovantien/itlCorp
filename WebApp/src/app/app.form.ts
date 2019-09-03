@@ -3,6 +3,9 @@ import { AbstractControl, FormControl, FormGroup, FormBuilder } from '@angular/f
 
 export abstract class AppForm extends AppPage {
 
+    requestSearch: any = null;
+    requestReset: any = null;
+
     constructor() {
         super();
     }
@@ -24,6 +27,14 @@ export abstract class AppForm extends AppPage {
             control.markAsUntouched({ onlySelf: true });
             control.markAsPristine({ onlySelf: true });
         }
+    }
+
+    search() {
+        this.requestSearch();
+    }
+
+    reset() {
+        this.requestReset();
     }
 
 }

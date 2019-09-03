@@ -1,10 +1,12 @@
-import { NgModule } from '@angular/core';
+import { NgModule, LOCALE_ID } from '@angular/core';
 import { routing } from './accounting-routing.module';
-import { SettlementPaymentComponent } from './settlement-payment/settlement-payment.component';
 import { AccountReceivablePayableComponent } from './account-receivable-payable/account-receivable-payable.component';
+import { registerLocaleData } from '@angular/common';
+
+import localeVi from '@angular/common/locales/vi';
+registerLocaleData(localeVi, 'vi');
 
 const PAGES = [
-  SettlementPaymentComponent,
   AccountReceivablePayableComponent,
 ];
 
@@ -15,6 +17,9 @@ const PAGES = [
   declarations: [
     ...PAGES
   ],
-  bootstrap: []
+  bootstrap: [],
+  providers: [
+    { provide: LOCALE_ID, useValue: 'vi' },
+  ],
 })
 export class AccountingModule { }

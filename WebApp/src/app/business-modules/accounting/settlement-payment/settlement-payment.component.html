@@ -1,3 +1,207 @@
-<p>
-  settlement-payment works!
-</p>
+<div class="advance-payment-page">
+    <div class="m-subheader">
+        <div class="d-flex align-items-center">
+            <div class="mr-auto">
+                <app-breadcrumb></app-breadcrumb>
+            </div>
+            <div class="c-button-actions">
+                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                    [routerLink]="'/home/accounting/settlement-payment/new'">
+                    <span>
+                        <i class="la la-plus"></i>
+                        <span>
+                            add new
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-upload"></i>
+                        <span>
+                            export
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="m-content">
+        <settle-payment-form-search></settle-payment-form-search>
+        <div class="m-portlet">
+            <div class="m-form">
+                <div class="m-portlet__body">
+                    <perfect-scrollbar style="max-height: 900px">
+                        <div class="table-wrapper" id="adv-payment-list-table">
+                            <table class="table table-brand table-hover dataTable">
+                                <thead>
+                                    <tr class="text-center">
+                                        <th class="m--w-50">
+                                        </th>
+                                        <th *ngFor="let header of headers; let i = index; trackBy: trackByFn"
+                                            [class]="sortClass(header.sortable ? header.field : '')"
+                                            (click)="sortBy(header.sortable ? header.field : '')">
+                                            <span>{{header.title}}</span>
+                                            <span class="sort-indicator"></span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="tbody-group">
+                                    <ng-container *ngFor="let advancePayment of settlements; let i = index; trackBy: trackByFn">
+                                        <tr class="text-center">
+                                            <td>
+                                                <div class="m-checkbox-list d-flex align-items-center">
+                                                    <button (click)="getRequestAdvancePaymentGroup(advancePayment.advanceNo, i)"
+                                                        class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed"
+                                                        [attr.data-target]="'#collapse' + i" data-toggle="collapse" title="Collapse"
+                                                        type="button">
+                                                        <i class="la la-angle-up"></i>
+                                                    </button>
+                                                    <span
+                                                        *ngIf="advancePayment.statusApproval === 'New' || advancePayment.statusApproval === 'Denied'">
+                                                        <a (click)="deleteAdvancePayment(advancePayment)" title="Delete advance payment"
+                                                            class="pointer">
+                                                            <i class="la la-trash text-danger"></i>
+                                                        </a>
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td class="text-underline text-primary pointer">
+                                                <a [routerLink]="[advancePayment.id]">{{advancePayment.advanceNo}}
+                                                </a>
+                                            </td>
+                                            <td>{{advancePayment.amount | number: '.0-3'}}</td>
+                                            <td>{{advancePayment.advanceCurrency}}</td>
+                                            <td>{{advancePayment.requesterName}}</td>
+                                            <td>{{advancePayment.requestDate | date: 'dd/MM/yyyy'}}</td>
+                                            <td>{{advancePayment.deadlinePayment | date: 'dd/MM/yyyy'}}</td>
+                                            <td>{{advancePayment.datetimeModified | date: 'dd/MM/yyyy'}}</td>
+                                            <td [ngSwitch]="advancePayment.statusApprovalName">
+                                                <div *ngSwitchCase="'New'" class="text-danger">
+                                                    {{advancePayment.statusApprovalName}}</div>
+                                                <div *ngSwitchCase="'Done'" class="text-success">
+                                                    {{advancePayment.statusApprovalName}}</div>
+                                                <div *ngSwitchCase="'Denied'" class="text-danger">
+                                                    {{advancePayment.statusApprovalName}}</div>
+                                                <div *ngSwitchDefault class="text-primary">
+                                                    {{advancePayment.statusApprovalName}}
+                                                </div>
+                                            </td>
+                                            <td [ngSwitch]="advancePayment.advanceStatusPayment">
+                                                <ng-container *ngIf="advancePayment.statusApproval === 'Done' else empty">
+                                                    <div class="text-success" *ngSwitchCase="'Settled'">
+                                                        {{advancePayment.advanceStatusPayment}}
+                                                    </div>
+                                                    <div class="text-danger" *ngSwitchCase="'NotSettled'">
+                                                        Not Settled
+                                                    </div>
+                                                    <div class="text-danger" *ngSwitchCase="'PartialSettlement'">
+                                                        Partial Settlement
+                                                    </div>
+                                                </ng-container>
+                                                <ng-template #empty>-</ng-template>
+                                            </td>
+                                            <td>{{advancePayment.paymentMethod}}</td>
+                                            <td>{{advancePayment.advanceNote}}</td>
+                                        </tr>
+                                        <tr class="collapse-panel-row">
+                                            <td colspan="100">
+                                                <div class="detail-panel-block collapse" [attr.id]="'collapse' + i"
+                                                    data-parent="#adv-payment-list-table">
+                                                    <div class="table-inside-block">
+                                                        <!-- <table class="table table-secondary dataTable">
+                                                            <thead>
+                                                                <tr class="text-center">
+                                                                    <th *ngFor="let header of headerGroupRequest; trackBy: trackByFn"
+                                                                        [class]="sortClassCollapse(header.sortable ? header.field : '')"
+                                                                        (click)="sortByCollapse(header.sortable ? header.field : '')">
+                                                                        <span>{{header.title}}</span>
+                                                                        <span class="sort-indicator"></span>
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <ng-container
+                                                                    *ngFor="let request of groupRequest; let j = index; trackBy: trackByFn">
+                                                                    <tr class="text-center">
+                                                                        <td>{{request.jobId}}</td>
+                                                                        <td>{{request.customNo}}</td>
+                                                                        <td>{{request.hbl}}</td>
+                                                                        <td>{{request.amount | number :'.0-2'}}</td>
+                                                                        <td>{{request.requestCurrency}}</td>
+                                                                        <td [ngSwitch]="request.statusPayment">
+                                                                            <div class="text-success" *ngSwitchCase="'Settled'">
+                                                                                {{request.statusPayment}}
+                                                                            </div>
+                                                                            <div class="text-danger" *ngSwitchCase="'NotSettled'">
+                                                                                Not Settled
+                                                                            </div>
+                                                                            <div class="text-danger" *ngSwitchCase="'PartialSettlement'">
+                                                                                Partial Settlement
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </ng-container>
+                                                                <tr *ngIf="!groupRequest.length">
+                                                                    <td colspan="100">
+                                                                        <div class="no-data">
+                                                                            <i class="flaticon-coins"></i>
+                                                                            <span class="no-data-text">No records
+                                                                                found</span>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table> -->
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </ng-container>
+                                    <tr *ngIf="!isLoading && !settlements.length">
+                                        <td colspan="100">
+                                            <div class="no-data">
+                                                <i class="flaticon-coins"></i>
+                                                <span class="no-data-text">No records found</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="loading-wrapper" *ngIf="isLoading">
+                                        <td colspan="100">
+                                            <div class="on-loading">
+                                                <div class="m-loader m-loader--brand">
+                                                </div><span>Loading</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </perfect-scrollbar>
+                    <div class="pagination-nav">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="tatable__pager-size">
+                                    <div class="select-box">
+                                        <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
+                                            (change)="selectPageSize(pageSize, dataSearch)" name="pagesize">
+                                            <ng-container *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
+                                                <option [ngValue]="item">{{item}} line / screen</option>
+                                            </ng-container>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6" *ngIf="totalItems > pageSize">
+                                <div class="float-right">
+                                    <pagination [boundaryLinks]="true" [totalItems]="totalItems" [itemsPerPage]="pageSize"
+                                        (pageChanged)="pageChanged($event)" [(ngModel)]="page">
+                                    </pagination>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

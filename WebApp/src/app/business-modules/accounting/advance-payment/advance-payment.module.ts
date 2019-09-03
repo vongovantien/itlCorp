@@ -1,7 +1,6 @@
-import { NgModule, LOCALE_ID } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { AdvancePaymentComponent } from './advance-payment.component';
-import { registerLocaleData, CommonModule } from '@angular/common';
-import localeVi from '@angular/common/locales/vi';
+import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -17,7 +16,6 @@ import { AdvancePaymentDetailComponent } from './detail/detail-advance-payment.c
 import { ApproveAdvancePaymentComponent } from '../approve-payment/advance/approve-advance.component';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgxCurrencyModule } from "ngx-currency";
-registerLocaleData(localeVi, 'vi');
 const routing: Routes = [
     {
         path: "", component: AdvancePaymentComponent, pathMatch: 'full',
@@ -79,7 +77,6 @@ const customCurrencyMaskConfig = {
         ...COMPONENTS,
     ],
     providers: [
-        { provide: LOCALE_ID, useValue: 'vi' },
     ],
     bootstrap: [
         AdvancePaymentComponent
