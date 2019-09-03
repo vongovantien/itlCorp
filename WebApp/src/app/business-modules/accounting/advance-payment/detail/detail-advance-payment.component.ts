@@ -22,9 +22,10 @@ export class AdvancePaymentDetailComponent extends AppPage {
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
 
     progress: any[] = [];
-    advancePayment: AdvancePayment;
+    advancePayment: AdvancePayment = null;
 
     advId: string = '';
+    actionForm: string = 'update';
 
     dataReport: any = null;
     constructor(
@@ -86,6 +87,10 @@ export class AdvancePaymentDetailComponent extends AppPage {
                     this.listRequestAdvancePaymentComponent.totalAmount = this.listRequestAdvancePaymentComponent.updateTotalAmount(this.advancePayment.advanceRequests);
 
                     this.listRequestAdvancePaymentComponent.advanceNo = this.advancePayment.advanceNo;
+
+                    if ((this.advancePayment.statusApproval !== <string>'New' && this.advancePayment.statusApproval !== <string>'Denied') || this.advancePayment.statusApproval !== <string>'Denied') {
+                        this.actionForm = 'approve';
+                    }
                 },
             );
     }
@@ -138,7 +143,6 @@ export class AdvancePaymentDetailComponent extends AppPage {
         this._router.navigate(['home/accounting/advance-payment']);
     }
 
-
     previewAdvPayment() {
         this._progressRef.start();
         this._accoutingRepo.previewAdvancePayment(this.advId)
@@ -158,6 +162,14 @@ export class AdvancePaymentDetailComponent extends AppPage {
     }
 
     sendRequest() {
+        if (this.listRequestAdvancePaymentComponent.totalAmount > 100000000 && this.formCreateComponent.paymentMethod.value.value === 'Cash') {
+            this._toastService.warning(`Total Advance Amount by cash is not exceed 100.000.000 VND `, '', { positionClass: 'toast-bottom-right' });
+            return;
+        }
+        if (!this.listRequestAdvancePaymentComponent.listRequestAdvancePayment.length) {
+            this._toastService.warning(`Advance Payment don't have any request in this period, Please check it again! `, '', { positionClass: 'toast-bottom-right' });
+            return;
+        }
         const body = {
             advanceRequests: this.listRequestAdvancePaymentComponent.listRequestAdvancePayment,
             requester: this.formCreateComponent.requester.value || 'Admin',
@@ -182,7 +194,9 @@ export class AdvancePaymentDetailComponent extends AppPage {
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
-                        this._toastService.success(`${res.data.advanceNo + 'Send request successfully'}`, 'Update Success !');
+                        this._toastService.success(`${res.data.advanceNo + ' Send request successfully'}`, 'Update Success !');
+                        this._router.navigate([`home/accounting/advance-payment/${res.data.id}`]);
+
                     } else {
                         this.handleError((data: any) => {
                             this._toastService.error(data.message, data.title);

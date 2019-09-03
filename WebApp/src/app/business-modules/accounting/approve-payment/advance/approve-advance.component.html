@@ -18,29 +18,95 @@
             <div class="m-portlet__body">
                 <div>
                     <adv-payment-list-request [action]="'approve'"> </adv-payment-list-request>
-                    <div class="row list-progress-wp">
-                        <div class="col-12">
-                            <ul class="list-unstyled list-progress d-flex justify-content-around">
-                                <li *ngFor="let item of progress">
-                                    <div class="progress-content text-center">
-                                        <div class="font-weight-bolder">Requester</div>
-                                        <div class="icon-check">
-                                            <i class="la la-check-circle-o"></i>
-                                        </div>
-                                        <div class="font-weight-bold">Name</div>
-                                        <div class="font-weight-bold">Date: 25/06/2019</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="m-portlet">
+        <div class="m-form">
+            <div class="m-portlet__body">
+                <div class="row list-progress-wp p-5">
+                    <div class="col-12">
+                        <ul class="list-unstyled list-progress d-flex justify-content-around">
+                            <li>
+                                <div class="progress-content text-center">
+                                    <div class="font-weight-bolder">Requester</div>
+                                    <div class="icon-check">
+                                        <i class="la la-check-circle-o"></i>
                                     </div>
-                                </li>
-                            </ul>
-                        </div>
+                                    <div class="font-weight-bold">{{approveInfo.requesterName}}</div>
+                                    <div class="font-weight-bold">Date:
+                                        {{approveInfo.requesterAprDate | date: 'HH:mm dd/MM/yyyy'}}</div>
+                                </div>
+                            </li>
+                            <li *ngIf="!!approveInfo.leader">
+                                <div class="progress-content text-center">
+                                    <div class="font-weight-bolder">Leader</div>
+                                    <div class="icon-check">
+                                        <i class="la la-check-circle-o" *ngIf="!!approveInfo.leaderAprDate"></i>
+                                    </div>
+                                    <div class="font-weight-bold">
+                                        <ng-template>
+                                            {{approveInfo.leaderName}}
+                                        </ng-template>
+                                    </div>
+                                    <div class="font-weight-bold">Date:
+                                        {{!!approveInfo.leaderAprDate ? (approveInfo.leaderAprDate | date: 'HH:mm dd/MM/yyyy') : '/ /'}}
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="progress-content text-center">
+                                    <div class="font-weight-bolder">Manager</div>
+                                    <div class="icon-check">
+                                        <i class="la la-check-circle-o" *ngIf="!!approveInfo.managerApr"></i>
+                                    </div>
+                                    <div class="font-weight-bold">
+                                        {{approveInfo.managerName}}
+                                    </div>
+                                    <div class="font-weight-bold">
+                                        Date:
+                                        {{!!approveInfo.managerAprDate ? (approveInfo.managerAprDate | date: 'HH:mm dd/MM/yyyy') : '/ /'}}
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="progress-content text-center">
+                                    <div class="font-weight-bolder">Accoutant</div>
+                                    <div class="icon-check">
+                                        <i class="la la-check-circle-o" *ngIf="!!approveInfo.accountantApr"></i>
+                                    </div>
+                                    <div class="font-weight-bold">
+                                        {{approveInfo.accountantName}}
+                                    </div>
+                                    <div class="font-weight-bold">Date:
+                                        {{!!approveInfo.accountantAprDate ? (approveInfo.accountantAprDate | date: 'HH:mm dd/MM/yyyy') : '/ /'}}
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="progress-content text-center">
+                                    <div class="font-weight-bolder">BU HEAD</div>
+                                    <div class="icon-check">
+                                        <i class="la la-check-circle-o"></i>
+                                    </div>
+                                    <div class="font-weight-bold">
+                                        {{approveInfo.buHeadName}}
+                                    </div>
+                                    <div class="font-weight-bold">Date:
+                                        {{!!approveInfo.buheadAprDate ? (approveInfo.buheadAprDate | date: 'HH:mm dd/MM/yyyy') : '/ /'}}
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-12">
-                        <div class="justify-content-around d-flex w-50 m-auto m--margin-top-20">
+                        <div class="text-center w-50 m-auto m--margin-top-20">
                             <button
                                 class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                title="Save">
+                                title="Save" (click)="showModalApprove()" *ngIf="!approveInfo.isApproved">
                                 <span>
                                     <i class="la la-save"></i>
                                     <span>
@@ -49,7 +115,7 @@
                                 </span>
                             </button>
                             <button class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                title="Save & Send Request">
+                                title="Save & Send Request" *ngIf="!approveInfo.isApproved" (click)="showDenyPopup()">
                                 <span>
                                     <i class="la la-times"></i>
                                     <span>
@@ -58,7 +124,7 @@
                                 </span>
                             </button>
                             <button class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                title="Preview">
+                                title="Preview" (click)="preview()">
                                 <span>
                                     <i class="la la-print"></i>
                                     <span>
@@ -66,7 +132,8 @@
                                     </span>
                                 </span>
                             </button>
-                            <button class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" title="Cancel">
+                            <button class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" title="Cancel"
+                                (click)="back()">
                                 <span>
                                     <i class="la la-ban"></i>
                                     <span>
@@ -81,3 +148,47 @@
         </div>
     </div>
 </div>
+
+<ng-template #modal_deny>
+    <div class="modal-header">
+        <h4 class="modal-title pull-left">Comment</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="form-group">
+            <textarea class="form-control" name="comment" id="" cols="30" rows="10" [(ngModel)]="comment"></textarea>
+        </div>
+    </div>
+    <div class="modal-footer m--align-center c-button-actions">
+        <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+            (click)="onSaveComment()">
+            <span>
+                <i class="la la-save"></i>
+                <span>
+                    Continute
+                </span>
+            </span>
+        </button>
+        <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
+            (click)="modalRef.hide()">
+            <span>
+                <i class="la la-ban"></i>
+                <span>
+                    Cancel
+                </span>
+            </span>
+        </button>
+    </div>
+</ng-template>
+
+<ng-container *ngIf="dataReport">
+    <app-report-preview [data]="dataReport"></app-report-preview>
+</ng-container>
+
+<!-- <confirm-popup #confirmDenyPopup (onSubmit)="openModalDeny(modal_deny)"
+    [body]="'Do you want to deny this advance payment ?'" [labelConfirm]="'Yes'"></confirm-popup> -->
+
+<confirm-popup #confirmApprovePopup (onSubmit)="onApprove()" [body]="'Do you want to approve this advance payment?'"
+    [labelConfirm]="'Yes'"></confirm-popup>

@@ -97,6 +97,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     packageTypes: any[] = [];
 
     tab: string = '';
+    tabCharge: string = '';
     jobId: string = '';
 
     constructor(private baseServices: BaseService,
@@ -114,6 +115,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
         this.route.params.subscribe(async (params: any) => {
             this.tab = 'job-edit';
+            this.tabCharge = 'buying';
             // this.getPackageTypes();
             this.getUnits();
             this.getPartners();
@@ -147,7 +149,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                     index = this.packageTypes.findIndex(x => x.id === this.opsTransaction.packageTypeId);
                     if (index > -1) { this.packagesUnitActive = [this.packageTypes[index]]; }
                     console.log(this.packagesUnitActive);
-                    this.getAllSurCharges();
+                    // this.getAllSurCharges();
+                    this.getSurCharges('BUY');
                     // this.getShipmentContainer();
                     this.getCustomClearances();
                 } else {
@@ -355,21 +358,21 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     public getListBuyingRateCharges() {
         this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'CREDIT', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
             this.lstBuyingRateChargesComboBox = res['data'];
-            this._data.setData('buyingCharges', this.lstBuyingRateChargesComboBox);
+            // this._data.setData('buyingCharges', this.lstBuyingRateChargesComboBox);
         });
     }
 
     public getListSellingRateCharges() {
         this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'DEBIT', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
             this.lstSellingRateChargesComboBox = res['data'];
-            this._data.setData('sellingCharges', this.lstSellingRateChargesComboBox);
+            // this._data.setData('sellingCharges', this.lstSellingRateChargesComboBox);
         });
     }
 
     public getListOBHCharges() {
         this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'OBH', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
             this.lstOBHChargesComboBox = res['data'];
-            this._data.setData('obhCharges', this.lstOBHChargesComboBox);
+            // this._data.setData('obhCharges', this.lstOBHChargesComboBox);
         });
 
     }
@@ -387,13 +390,13 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     public getUnits() {
         this.baseServices.post(this.api_menu.Catalogue.Unit.getAllByQuery, { inactive: false }).subscribe((data: any) => {
             this.lstUnits = data;
-            this._data.setData('lstUnits', this.lstUnits);
+            // this._data.setData('lstUnits', this.lstUnits);
         });
     }
 
     public getListCurrencies() {
         this.baseServices.post(this.api_menu.Catalogue.Currency.getAllByQuery, { inactive: false }).subscribe((res: any) => {
-            this._data.setData('lstCurrencies', res);
+            // this._data.setData('lstCurrencies', res);
         });
     }
 
@@ -560,5 +563,24 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
     onOpePLPrint() {
         this.plSheetPopup.show({ backdrop: 'static' });
+    }
+
+    selectTabCharge(tabName: string) {
+        this.tabCharge = tabName;
+        switch (tabName) {
+            case 'buying':
+                this.getSurCharges('BUY');
+                break;
+            case 'selling':
+                this.getSurCharges('SELL');
+                break;
+            case 'obh' :
+                this.getSurCharges('OBH');
+            break;
+            default:
+                this.getSurCharges('BUY');
+                break;
+        }
+        console.log(tabName);
     }
 }

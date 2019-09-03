@@ -85,6 +85,14 @@ export class AdvancePaymentAddNewComponent extends AppPage {
     }
 
     sendRequest() {
+        if (this.listRequestAdvancePaymentComponent.totalAmount > 100000000 && this.formCreateComponent.paymentMethod.value.value === 'Cash') {
+            this._toastService.warning(`Total Advance Amount by cash is not exceed 100.000.000 VND `, '', { positionClass: 'toast-bottom-right' });
+            return;
+        }
+        if (!this.listRequestAdvancePaymentComponent.listRequestAdvancePayment.length) {
+            this._toastService.warning(`Advance Payment don't have any request in this period, Please check it again! `, '', { positionClass: 'toast-bottom-right' });
+            return;
+        }
         const body = {
             advanceRequests: this.listRequestAdvancePaymentComponent.listRequestAdvancePayment,
             requester: this.formCreateComponent.requester.value || 'Admin',
@@ -105,6 +113,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(`${res.data.advanceNo + 'Save and Send Request successfully'}`, 'Save Success !', { positionClass: 'toast-bottom-right' });
+                        this._router.navigate([`home/accounting/advance-payment/${res.data.id}`]);
                     } else {
                         this.handleError(null, (data: any) => {
                             this._toastService.error(data.message, data.title);

@@ -77,15 +77,15 @@
                                             <td>{{advancePayment.requestDate | date: 'dd/MM/yyyy'}}</td>
                                             <td>{{advancePayment.deadlinePayment | date: 'dd/MM/yyyy'}}</td>
                                             <td>{{advancePayment.datetimeModified | date: 'dd/MM/yyyy'}}</td>
-                                            <td [ngSwitch]="advancePayment.statusApproval">
+                                            <td [ngSwitch]="advancePayment.statusApprovalName">
                                                 <div *ngSwitchCase="'New'" class="text-danger">
-                                                    {{advancePayment.statusApproval}}</div>
+                                                    {{advancePayment.statusApprovalName}}</div>
                                                 <div *ngSwitchCase="'Done'" class="text-success">
-                                                    {{advancePayment.statusApproval}}</div>
+                                                    {{advancePayment.statusApprovalName}}</div>
                                                 <div *ngSwitchCase="'Denied'" class="text-danger">
-                                                    {{advancePayment.statusApproval}}</div>
+                                                    {{advancePayment.statusApprovalName}}</div>
                                                 <div *ngSwitchDefault class="text-primary">
-                                                    {{advancePayment.statusApproval}}
+                                                    {{advancePayment.statusApprovalName}}
                                                 </div>
                                             </td>
                                             <td [ngSwitch]="advancePayment.advanceStatusPayment">

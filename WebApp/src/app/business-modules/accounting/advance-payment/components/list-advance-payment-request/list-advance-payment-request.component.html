@@ -28,7 +28,7 @@
                 <table class="table table-brand table-hover dataTable">
                     <thead>
                         <tr class="text-center">
-                            <th class="m--w-50">
+                            <th class="m--w-50" *ngIf="action === 'update'">
                                 <label class="m-checkbox">
                                     <input type="checkbox" [(ngModel)]="isCheckAll" (change)="checkUncheckAllRequest()">
                                     <span></span>
@@ -51,37 +51,43 @@
                                 </div>
                             </td>
                         </tr>
-                        <tr *ngFor="let request of listRequestAdvancePayment; let i = index; trackBy: trackByFn"
-                            class="text-center">
-                            <td>
-                                <div class="m-checkbox-list d-flex">
-                                    <label class="m-checkbox">
-                                        <input type="checkbox" (change)="onChangeCheckBoxRequestAdvancePayent($event)"
-                                            [(ngModel)]="request.isSelected">
-                                        <span></span>
-                                    </label>
-                                    <span>
-                                        <a (click)="copyRequestPayment(request)" title="Copy request advance"
-                                            class="pointer">
-                                            <i class="la la-copy"></i>
-                                        </a>
-                                    </span>
-                                </div>
-                            </td>
-                            <td class="text-underline text-primary pointer">
-                                <a (click)="updateRequestPayment(request, i)" title="Copy request advance">
-                                    {{request.description}}
-                                </a>
-                            </td>
-                            <td>{{request.customNo}}</td>
-                            <td>{{request.jobId}}</td>
-                            <td>{{request.hbl}}</td>
-                            <td>{{request.amount | number : '.0-3'}}</td>
-                            <td>{{request.requestCurrency}}</td>
-                            <td>{{request.advanceType | titlecase}}</td>
-                            <td>{{request.requestNote}}</td>
-                        </tr>
-                        <tr class="text-center text-black bg-secondary" *ngIf="!!listRequestAdvancePayment.length">
+                        <ng-container
+                            *ngFor="let request of listRequestAdvancePayment; let i = index; trackBy: trackByFn">
+                            <tr class="text-center">
+                                <td *ngIf="action === 'update'">
+                                    <div class="m-checkbox-list d-flex">
+                                        <label class="m-checkbox">
+                                            <input type="checkbox"
+                                                (change)="onChangeCheckBoxRequestAdvancePayent($event)"
+                                                [(ngModel)]="request.isSelected">
+                                            <span></span>
+                                        </label>
+                                        <span>
+                                            <a (click)="copyRequestPayment(request)" title="Copy request advance"
+                                                class="pointer">
+                                                <i class="la la-copy"></i>
+                                            </a>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="text-primary pointer">
+                                    <a class="text-underline " (click)="updateRequestPayment(request, i)"
+                                        title="Copy request advance" *ngIf="action === 'update' else notedit">
+                                        {{request.description}}
+                                    </a>
+                                    <ng-template #notedit>{{request.description}}</ng-template>
+                                </td>
+                                <td>{{request.customNo}}</td>
+                                <td>{{request.jobId}}</td>
+                                <td>{{request.hbl}}</td>
+                                <td>{{request.amount | number : '.0-3'}}</td>
+                                <td>{{request.requestCurrency}}</td>
+                                <td>{{request.advanceType | titlecase}}</td>
+                                <td>{{request.requestNote}}</td>
+                            </tr>
+                        </ng-container>
+
+                        <tr class="text-center text-black" *ngIf="!!listRequestAdvancePayment.length">
                             <td></td>
                             <td></td>
                             <td></td>
@@ -106,6 +112,8 @@
 </div>
 
 
-<adv-payment-add-popup (onRequest)="onRequestAdvancePaymentChange($event)" (onUpdate)="onUpdateRequestAdvancePayment($event)"></adv-payment-add-popup>
+<adv-payment-add-popup (onRequest)="onRequestAdvancePaymentChange($event)"
+    (onUpdate)="onUpdateRequestAdvancePayment($event)"></adv-payment-add-popup>
 
-<confirm-popup [body]="'Do you want to delete ?'" [labelCancel]="'No'" [labelConfirm]="'Yes'" (onSubmit)="onDeletePaymentRequest()"></confirm-popup>
+<confirm-popup [body]="'Do you want to delete ?'" [labelCancel]="'No'" [labelConfirm]="'Yes'"
+    (onSubmit)="onDeletePaymentRequest()"></confirm-popup>

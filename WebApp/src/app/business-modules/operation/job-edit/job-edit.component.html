@@ -43,15 +43,12 @@
                 <tab heading="Job detail" (selectTab)="selectTab($event,'job-edit')">
                     <div *ngIf="tab === 'job-edit'">
                         <form novalidate #addOpsForm="ngForm" name="addOpsForm" (ngSubmit)="addOpsForm.form.valid">
-
                             <div class="m-form m-form--state">
-                                <!--begin::m-portlet -->
                                 <div class="m-portlet">
                                     <div class="alert-block__heading">
                                         <h3 class="alert-block__title">Job Information</h3>
                                     </div>
                                     <div class="m-portlet__body" id="edit-ops-job-form">
-                                        <!--begin:: form-actions-->
                                         <div class="form-actions m--align-right">
                                             <button type=""
                                                 class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
@@ -63,16 +60,6 @@
                                                     </span>
                                                 </span>
                                             </button>
-                                            <!-- <button type="button"
-                                                class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                                                data-toggle="modal" data-target="#cancel-create-ops-job-modal">
-                                                <span>
-                                                    <i class="la la-ban"></i>
-                                                    <span>
-                                                        cancel
-                                                    </span>
-                                                </span>
-                                            </button> -->
                                             <button type="button"
                                                 class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
                                                 (click)="cancelCreatJob()">
@@ -84,8 +71,7 @@
                                                 </span>
                                             </button>
                                         </div>
-                                        <!--end:: form-actions-->
-                                        <!--begin:: General Information -->
+
                                         <div class="div-inside bg-secondary m--margin-bottom-15">
                                             <h3 class="c-block-title">General Information</h3>
                                             <hr>
@@ -94,26 +80,14 @@
                                                     <div class="form-group">
                                                         <label class="form-control-label" for="">
                                                             Job ID
-                                                            <!-- <span class="m--font-danger">(*)</span> -->
                                                         </label>
                                                         <input type="text" required
                                                             class="form-control m-input m-input--square"
                                                             placeholder="Enter text" name="jobNo" disabled=true
                                                             [(ngModel)]="opsTransaction.jobNo" #jobNo="ngModel">
-                                                        <!-- <div class="form-control-feedback" style="display: none">
-                                                    HBL No is required!
-                                                </div> -->
+
                                                     </div>
                                                 </div>
-                                                <!-- <div class="col-lg-4">
-                                            <div class="form-group">
-                                                <label class="form-control-label" for="">
-                                                    MBL No
-                                                </label>
-                                                <input type="text" required class="form-control m-input m-input--square"
-                                                    placeholder="Enter text" name="">
-                                            </div>
-                                        </div> -->
                                                 <div class="col-lg-4">
                                                     <div class="form-group"
                                                         [ngClass]="{ 'has-danger': addOpsForm.submitted && serviceDate == null }">
@@ -338,10 +312,7 @@
                                                             placeholder="Enter text" name="flightVessel"
                                                             [(ngModel)]="opsTransaction.flightVessel"
                                                             #flightVessel="ngModel">
-                                                        <!-- <div class="form-control-feedback"
-                                                *ngIf="addOpsForm.submitted && flightVessel.invalid">
-                                                Vessel/Flight No is required!
-                                            </div> -->
+
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-4">
@@ -475,8 +446,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <!--end:: General Information -->
-                                        <!--begin:: Good Information -->
+
                                         <div class="div-inside bg-secondary">
                                             <h3 class="c-block-title">Good Information</h3>
                                             <hr>
@@ -615,30 +585,28 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <!--end:: Good Information-->
+
                                     </div>
                                 </div>
-                                <!--end::m-portlet -->
                             </div>
                         </form>
-
                         <div class="row">
                             <div class="col-12">
                                 <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand m-tabs-line-danger"
                                     role="tablist">
-                                    <li class="nav-item m-tabs__item">
+                                    <li class="nav-item m-tabs__item" (click)="selectTabCharge('buying')">
                                         <a class="nav-link m-tabs__link active" data-toggle="tab" href="#buying-rate"
                                             role="tab">
                                             Buying Rate
                                         </a>
                                     </li>
-                                    <li class="nav-item m-tabs__item">
+                                    <li class="nav-item m-tabs__item" (click)="selectTabCharge('selling')">
                                         <a class="nav-link m-tabs__link" data-toggle="tab" href="#selling-rate"
                                             role="tab">
                                             Selling Rate
                                         </a>
                                     </li>
-                                    <li class="nav-item m-tabs__item">
+                                    <li class="nav-item m-tabs__item" (click)="selectTabCharge('obh')">
                                         <a class="nav-link m-tabs__link" data-toggle="tab" href="#obh-charge"
                                             role="tab">
                                             OBH
@@ -647,29 +615,27 @@
                                 </ul>
                             </div>
                         </div>
-
                         <div class="m-portlet">
                             <div class="m-portlet__body">
                                 <div class="tab-content" id="">
-                                    <div class="tab-pane fade show active" id="buying-rate" role="tabpanel">
+                                    <div class="tab-pane fade show active" id="buying-rate" role="tabpanel" *ngIf="tabCharge === 'buying'">
                                         <job-management-buying-rate [data]="ListBuyingRateCharges"
                                             [opsTransaction]="opsTransaction" (onChange)="onSaveBuyingRate($event)">
                                         </job-management-buying-rate>
                                     </div>
-                                    <div class="tab-pane fade" id="selling-rate" role="tabpanel">
+                                    <div class="tab-pane fade" id="selling-rate" role="tabpanel" *ngIf="tabCharge === 'selling'">
                                         <job-management-selling-rate [data]="ListSellingRateCharges"
                                             [opsTransaction]="opsTransaction" (onChange)="onSaveSellingRate($event)">
                                         </job-management-selling-rate>
                                     </div>
 
-                                    <div class="tab-pane fade" id="obh-charge" role="tabpanel">
+                                    <div class="tab-pane fade" id="obh-charge" role="tabpanel" *ngIf="tabCharge === 'obh'">
                                         <job-management-obh [data]="ListOBHCharges" [opsTransaction]="opsTransaction"
                                             (onChange)="onSaveOHBRate($event)"></job-management-obh>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                         <div class="m-portlet m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
                             <div class="alert-block__heading">
                                 <h3 class="alert-block__title collapse-toggle" data-toggle="collapse"

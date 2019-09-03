@@ -38,25 +38,7 @@ export class JobManagementCreateJobComponent extends PopupBase implements OnInit
     listBillingOps: any[] = [];
     OpsTransactionToAdd: OpsTransaction = new OpsTransaction();
 
-    selectedRange: any;
     selectedDate: any;
-    keepCalendarOpeningWithRange: true;
-    maxDate: moment.Moment = moment();
-    ranges: any = {
-        Today: [moment(), moment()],
-        Yesterday: [moment().subtract(1, "days"), moment().subtract(1, "days")],
-        "Last 7 Days": [moment().subtract(6, "days"), moment()],
-        "Last 30 Days": [moment().subtract(29, "days"), moment()],
-        "This Month": [moment().startOf("month"), moment().endOf("month")],
-        "Last Month": [
-            moment()
-                .subtract(1, "month")
-                .startOf("month"),
-            moment()
-                .subtract(1, "month")
-                .endOf("month")
-        ]
-    };
 
     public items: Array<string> = [
         "option 1",
@@ -84,18 +66,14 @@ export class JobManagementCreateJobComponent extends PopupBase implements OnInit
         private _toaster: ToastrService
     ) {
         super();
-        this.keepCalendarOpeningWithRange = true;
-        this.selectedRange = {
-            startDate: moment().startOf("month"),
-            endDate: moment().endOf("month")
-        };
-
+  
         this.baseServices.dataStorage.subscribe(data => {
             this.DataStorage = data;
         });
     }
 
     ngOnInit() {
+        console.log(this.OpsTransactionToAdd);
         this.getShipmentCommonData();
         this.getListCustomers();
         this.getListPorts();
