@@ -25,7 +25,7 @@ export class AdvancePaymentDetailComponent extends AppPage {
     advancePayment: AdvancePayment = null;
 
     advId: string = '';
-    actionForm: string = 'update';
+    actionList: string = 'update';
 
     dataReport: any = null;
     constructor(
@@ -68,7 +68,17 @@ export class AdvancePaymentDetailComponent extends AppPage {
             .subscribe(
                 (res: any) => {
                     this.advancePayment = new AdvancePayment(res);
+                    switch (this.advancePayment.statusApproval) {
+                        case 'New':
+                        case 'Denied':
+                            break;
+                        default:
+                            this.formCreateComponent.formCreate.disable();
+                            this.formCreateComponent.isDisabled = true;
 
+                            this.actionList = 'read';
+                            break;
+                    }
                     // * wait to currecy list api
                     setTimeout(() => {
                         this.formCreateComponent.formCreate.setValue({
@@ -88,14 +98,7 @@ export class AdvancePaymentDetailComponent extends AppPage {
 
                     this.listRequestAdvancePaymentComponent.advanceNo = this.advancePayment.advanceNo;
 
-                    switch (this.advancePayment.statusApproval) {
-                        case 'New':
-                        case 'Denied':
-                            break;
-                        default:
-                            this.actionForm = 'approve';
-                            break;
-                    }
+                    
                 },
             );
     }

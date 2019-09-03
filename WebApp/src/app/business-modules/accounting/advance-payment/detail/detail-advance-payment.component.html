@@ -9,7 +9,7 @@
     <div class="m-portlet">
         <div class="m-form">
             <div class="m-portlet__body">
-                <adv-payment-form-create (onChangeCurrency)="onChangeCurrency($event)" [action]="actionForm"></adv-payment-form-create>
+                <adv-payment-form-create (onChangeCurrency)="onChangeCurrency($event)" ></adv-payment-form-create>
             </div>
         </div>
     </div>
@@ -17,7 +17,7 @@
         <div class="m-form">
             <div class="m-portlet__body">
                 <div>
-                    <adv-payment-list-request [action]="actionForm"></adv-payment-list-request>
+                    <adv-payment-list-request [state]="actionList"></adv-payment-list-request>
                 </div>
                 <div class="row">
                     <div class="col-12">

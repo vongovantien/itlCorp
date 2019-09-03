@@ -1,5 +1,5 @@
 import { Component, Output, EventEmitter } from '@angular/core';
-import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 import { AppForm } from 'src/app/app.form';
 import { User } from 'src/app/shared/models';
 import { BaseService } from 'src/app/shared/services';
@@ -46,7 +46,7 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
             //     Validators.pattern(/^[\w '_"/*\\\.,-]*$/),
             // ])],
             referenceNo: [],
-            requester: [],
+            requester: [{ value: null, disabled: true }],
             requestDate: [],
             modifiedDate: [],
             statusApproval: [],

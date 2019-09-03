@@ -7,7 +7,6 @@ import { AppForm } from 'src/app/app.form';
 import { FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
 import { SystemConstants } from 'src/constants/system.const';
 import moment from 'moment';
-import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'adv-payment-form-create',
@@ -17,7 +16,6 @@ import { ToastrService } from 'ngx-toastr';
 export class AdvancePaymentFormCreateComponent extends AppForm {
 
     @Output() onChangeCurrency: EventEmitter<any> = new EventEmitter<any>();
-    @Input() action: string = 'update';
 
     methods: CommonInterface.ICommonTitleValue[];
     currencyList: Currency[] = [];
@@ -40,7 +38,6 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         private _baseService: BaseService,
         private _sysRepo: SystemRepo,
         private _dataService: DataService,
-        private _toastService: ToastrService
     ) {
         super();
 
@@ -54,13 +51,12 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     }
 
     ngOnChanges() {
-        console.log(this.action);
     }
 
     initForm() {
         this.formCreate = this._fb.group({
-            advanceNo: [],
-            requester: [],
+            advanceNo: [{ value: null, disabled: true }],
+            requester: [{ value: null, disabled: true }],
             department: [],
             requestDate: [{
                 startDate: new Date(),

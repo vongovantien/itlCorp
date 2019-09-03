@@ -68,6 +68,9 @@ export class ApproveAdvancePaymentComponent extends AppPage {
                     if (!!res) {
                         this.advancePayment = new AdvancePayment(res);
 
+                        this.formCreateComponent.formCreate.disable();
+                        this.formCreateComponent.isDisabled = true;
+
                         // * wait to currecy list api
                         setTimeout(() => {
                             this.formCreateComponent.formCreate.setValue({

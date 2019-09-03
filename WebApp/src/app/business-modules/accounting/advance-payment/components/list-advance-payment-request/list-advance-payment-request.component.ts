@@ -17,8 +17,8 @@ export class AdvancePaymentListRequestComponent extends AppList {
     @ViewChild(AdvancePaymentAddRequestPopupComponent, { static: false }) addNewRequestPaymentPopup: AdvancePaymentAddRequestPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
 
-    @Input() action: string = 'update';
-    
+    @Input() state: string = 'update';
+
     headers: CommonInterface.IHeaderTable[];
 
     readonly $dataRequest: Subject<AdvancePaymentRequest> = new Subject<AdvancePaymentRequest>();
@@ -98,7 +98,7 @@ export class AdvancePaymentListRequestComponent extends AppList {
     onRequestAdvancePaymentChange(dataRequest: AdvancePaymentRequest) {
         // * update advance no for new requestAdv and 
         // * create or copy emit new item to $dataRequest and update amount, currency.
-        this.$dataRequest.next(Object.assign({}, dataRequest, { advanceNo: !!this.selectedRequestAdvancePayment ? this.selectedRequestAdvancePayment.advanceNo : ''}));
+        this.$dataRequest.next(Object.assign({}, dataRequest, { advanceNo: !!this.selectedRequestAdvancePayment ? this.selectedRequestAdvancePayment.advanceNo : '' }));
 
         this.totalAmount = this.updateTotalAmount(this.listRequestAdvancePayment);
         this.updateCurrencyForRequest(dataRequest);
@@ -150,7 +150,7 @@ export class AdvancePaymentListRequestComponent extends AppList {
     deleteItemRequestAdvancePayment() {
         if (!!this.listRequestAdvancePayment.filter((item: AdvancePaymentRequest) => item.isSelected).length) {
             this.confirmDeletePopup.show();
-        } 
+        }
     }
 
     onDeletePaymentRequest() {

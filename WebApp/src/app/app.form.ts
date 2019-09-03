@@ -5,6 +5,7 @@ export abstract class AppForm extends AppPage {
 
     requestSearch: any = null;
     requestReset: any = null;
+    isDisabled: boolean = null;
 
     constructor() {
         super();
