@@ -1,7 +1,7 @@
-import { NgModule, LOCALE_ID } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { JobManagementComponent } from './job-management.component';
 import { Routes, RouterModule } from '@angular/router';
-import { CommonModule, registerLocaleData } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
@@ -12,10 +12,7 @@ import { JobManagementCreateJobComponent } from './create/create-job.component';
 import { JobManagementDetailJobComponent } from './detail/detail-job.component';
 
 import { JobManagementFormSearchComponent } from './components/form-search-job/form-search-job.component';
-import localeVi from '@angular/common/locales/vi';
-import { AddMoreModalComponent } from '../job-edit/custom-declaration/add-more-modal/add-more-modal.component';
 
-registerLocaleData(localeVi, 'vi');
 
 const routing: Routes = [
     {
@@ -65,7 +62,6 @@ const LIB = [
         JobManagementFormSearchComponent
     ],
     providers: [
-        { provide: LOCALE_ID, useValue: 'vi' },
     ],
     bootstrap: [
         JobManagementComponent

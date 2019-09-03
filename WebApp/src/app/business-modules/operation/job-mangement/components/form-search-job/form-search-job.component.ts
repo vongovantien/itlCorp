@@ -173,8 +173,8 @@ export class JobManagementFormSearchComponent extends AppForm {
             productService: !!this.productService.value ? this.productService.value.value : null,
             serviceMode: !!this.serviceMode.value ? this.serviceMode.value.value : null,
             shipmentMode: !!this.shipmentMode.value ? this.shipmentMode.value.value : null,
-            serviceDateFrom: (!!this.serviceDate.value && !!this.serviceDate.value.startDate) ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'vi') : null,
-            serviceDateTo: (!!this.serviceDate.value && !!this.serviceDate.value.endDate) ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'vi') : null,
+            serviceDateFrom: (!!this.serviceDate.value && !!this.serviceDate.value.startDate) ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            serviceDateTo: (!!this.serviceDate.value && !!this.serviceDate.value.endDate) ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             customerId: !!this.selectedPartner.value ? this.selectedPartner.value : null,
             fieldOps: !!this.user.value ? this.user.value.id : null,
         };

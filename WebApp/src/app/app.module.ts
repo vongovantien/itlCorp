@@ -33,6 +33,7 @@ import { NgProgressModule } from "@ngx-progressbar/core";
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     // wheelPropagation: true
 };
+
 @NgModule({
     declarations: [
         AppComponent,
@@ -66,7 +67,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         NgxDaterangepickerMd.forRoot(),
         HighchartsChartModule,
         NgProgressModule
-        
+
     ],
     providers: [
         GlobalState,
@@ -79,8 +80,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
             provide: HTTP_INTERCEPTORS,
             useClass: AuthInterceptor,
             multi: true,
-        }
-
+        },
     ],
 
     bootstrap: [AppComponent],
