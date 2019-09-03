@@ -54,6 +54,8 @@ export class JobManagementBuyingRateComponent extends AppList {
             { title: 'Note', field: 'notes', sortable: true },
             { title: 'Docs', field: 'docNo', sortable: true },
             { title: 'SOA', field: 'soano', sortable: true },
+            { title: 'Invoice No', field: 'invoiceNo', sortable: true },
+            { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
             { title: 'Credit/ Debit note', field: 'cdno', sortable: true },
             { title: 'Settle payment', field: 'settlementCode', sortable: true },
             { title: 'Exchange rate date', field: 'exchangeDate', sortable: true },

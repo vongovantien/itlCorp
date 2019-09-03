@@ -42,7 +42,7 @@
             </tr>
         </thead>
         <tbody *ngIf="!!data.length else norecord">
-            <tr class=""
+            <tr [ngClass]="!charge.isFromShipment ? 'bg-warning' : ''"
                 *ngFor="let charge of data  | filter: keyword : ['receiverName','payerName', 'nameEn', 'currency','docNo', 'soano']; let i = index ;let i = index">
                 <td class="table-actions-col">
                     <div class="table-actions" style="width: 70px">
@@ -114,6 +114,12 @@
                     <span>
                         {{charge.soano}}
                     </span>
+                </td>
+                <td>
+                    {{charge.invoiceNo}}
+                </td>
+                <td>
+                    {{charge.invoiceDate | date: 'dd/MM/yyyy'}}
                 </td>
                 <td>
                     <a href="javascript:void(0)" (click)="openCreditDebitNote(charge.creditNo)" *ngIf="charge.creditNo">

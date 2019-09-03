@@ -147,11 +147,10 @@
                                                             Product Service <span class="m--font-danger">(*)</span>
                                                         </label>
                                                         <ng-select [allowClear]="true" [items]="productServices"
-                                                            (data)="refreshValue($event)"
                                                             [active]="productServiceActive"
                                                             (selected)="opsTransaction.productService = $event.id"
                                                             (removed)="opsTransaction.productService = null"
-                                                            (typed)="typed($event)" placeholder="Please Select">
+                                                            placeholder="Please Select">
                                                         </ng-select>
                                                         <div class="form-control-feedback"
                                                             *ngIf="addOpsForm.submitted && opsTransaction.productService === null">
@@ -166,10 +165,10 @@
                                                             Service Mode <span class="m--font-danger">(*)</span>
                                                         </label>
                                                         <ng-select [allowClear]="true" [items]="serviceModes"
-                                                            (data)="refreshValue($event)" [active]="serviceModeActive"
+                                                            [active]="serviceModeActive"
                                                             (selected)="opsTransaction.serviceMode = $event.id"
                                                             (removed)="opsTransaction.serviceMode = null"
-                                                            (typed)="typed($event)" placeholder="Please Select">
+                                                            placeholder="Please Select">
                                                         </ng-select>
                                                         <div class="form-control-feedback"
                                                             *ngIf="addOpsForm.submitted && opsTransaction.serviceMode === null">
@@ -184,10 +183,10 @@
                                                             Shipment Mode <span class="m--font-danger">(*)</span>
                                                         </label>
                                                         <ng-select [allowClear]="true" [items]="shipmentModes"
-                                                            (data)="refreshValue($event)" [active]="shipmentModeActive"
+                                                            [active]="shipmentModeActive"
                                                             (selected)="opsTransaction.shipmentMode = $event.id"
                                                             (removed)="opsTransaction.shipmentMode = null"
-                                                            (typed)="typed($event)" placeholder="Please Select">
+                                                            placeholder="Please Select">
                                                         </ng-select>
                                                         <div class="form-control-feedback"
                                                             *ngIf="addOpsForm.submitted && opsTransaction.shipmentMode === null">
@@ -520,10 +519,9 @@
                                                             <div class="input-group-prepend">
                                                                 <ng-select [allowClear]="false" [items]="packageTypes"
                                                                     [active]="packagesUnitActive" [disabled]="disabled"
-                                                                    (data)="refreshValue($event)"
                                                                     (selected)="opsTransaction.packageTypeId = $event.id"
                                                                     (removed)="opsTransaction.packageTypeId = null"
-                                                                    (typed)="typed($event)" placeholder="">
+                                                                    placeholder="">
                                                                 </ng-select>
                                                             </div>
                                                         </div>
@@ -618,18 +616,21 @@
                         <div class="m-portlet">
                             <div class="m-portlet__body">
                                 <div class="tab-content" id="">
-                                    <div class="tab-pane fade show active" id="buying-rate" role="tabpanel" *ngIf="tabCharge === 'buying'">
+                                    <div class="tab-pane fade show active" id="buying-rate" role="tabpanel"
+                                        >
                                         <job-management-buying-rate [data]="ListBuyingRateCharges"
                                             [opsTransaction]="opsTransaction" (onChange)="onSaveBuyingRate($event)">
                                         </job-management-buying-rate>
                                     </div>
-                                    <div class="tab-pane fade" id="selling-rate" role="tabpanel" *ngIf="tabCharge === 'selling'">
+                                    <div class="tab-pane fade" id="selling-rate" role="tabpanel"
+                                        >
                                         <job-management-selling-rate [data]="ListSellingRateCharges"
                                             [opsTransaction]="opsTransaction" (onChange)="onSaveSellingRate($event)">
                                         </job-management-selling-rate>
                                     </div>
 
-                                    <div class="tab-pane fade" id="obh-charge" role="tabpanel" *ngIf="tabCharge === 'obh'">
+                                    <div class="tab-pane fade" id="obh-charge" role="tabpanel"
+                                        >
                                         <job-management-obh [data]="ListOBHCharges" [opsTransaction]="opsTransaction"
                                             (onChange)="onSaveOHBRate($event)"></job-management-obh>
                                     </div>

@@ -16,7 +16,6 @@ import { CancelCreateJobPopupComponent } from './job-confirm-popup/cancel-create
 import { CanNotDeleteJobPopupComponent } from './job-confirm-popup/can-not-delete-job-popup/can-not-delete-job-popup.component';
 import { ConfirmCancelJobPopupComponent } from './job-confirm-popup/confirm-cancel-job-popup/confirm-cancel-job-popup.component';
 import { ConfirmDeleteJobPopupComponent } from './job-confirm-popup/confirm-delete-job-popup/confirm-delete-job-popup.component';
-import { ChargeListComponent } from './charge-list/charge-list.component';
 import { AddBuyingRatePopupComponent } from './charge-list/add-buying-rate-popup/add-buying-rate-popup.component';
 import { EditBuyingRatePopupComponent } from './charge-list/edit-buying-rate-popup/edit-buying-rate-popup.component';
 import { AddSellingRatePopupComponent } from './charge-list/add-selling-rate-popup/add-selling-rate-popup.component';
@@ -94,7 +93,6 @@ const COMPONENTS = [
         CanNotDeleteJobPopupComponent,
         ConfirmCancelJobPopupComponent,
         ConfirmDeleteJobPopupComponent,
-        ChargeListComponent,
 
         AddBuyingRatePopupComponent,
         EditBuyingRatePopupComponent,
