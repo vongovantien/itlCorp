@@ -30,7 +30,7 @@ export class JobManagementComponent extends AppList implements OnInit {
 
     shipments: Shipment[] = [];
     selectedShipment: Shipment = null;
- 
+
     totalInProcess = 0;
     totalComplete = 0;
     totalOverdued = 0;
@@ -83,8 +83,10 @@ export class JobManagementComponent extends AppList implements OnInit {
             { title: 'Source', field: 'source', sortable: true },
             { title: 'Note', field: 'note', sortable: true },
         ];
-
-        this.getShipments();
+        const today = new Date();
+        this.dataSearch.serviceDateFrom = new Date(today.getFullYear(), today.getMonth(), 1);
+        this.dataSearch.serviceDateTo = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        this.getShipments(this.dataSearch);
     }
 
     showCustomClearance(jobNo: string, indexsShipment: number) {
@@ -191,9 +193,8 @@ export class JobManagementComponent extends AppList implements OnInit {
                         this.totalComplete = responses.data.toTalFinish;
                         this.totalCanceled = responses.data.totalCanceled;
                     } else {
-                        this.handleError(null, (dataError: { message: string; title: string; }) => {
-                            this._toastService.error(dataError.message, dataError.title);
-                        });
+                        this.totalItems = 0;
+                        this.shipments = [];
                     }
                 },
             );

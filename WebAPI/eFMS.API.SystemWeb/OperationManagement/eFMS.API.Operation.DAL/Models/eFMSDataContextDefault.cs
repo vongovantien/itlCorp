@@ -259,6 +259,8 @@ namespace eFMS.API.Operation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.ContainerDescription).HasMaxLength(200);
+
                 entity.Property(e => e.CreatedDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
@@ -529,8 +531,6 @@ namespace eFMS.API.Operation.Service.Models
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.Property(e => e.UserGroupId).HasColumnName("UserGroupID");
 
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)

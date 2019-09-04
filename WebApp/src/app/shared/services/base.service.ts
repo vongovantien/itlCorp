@@ -232,6 +232,8 @@ export class BaseService implements ErrorHandler {
     var formData = new FormData();
     for (let file of files)
       formData.append(name || file.name, file);
+    console.log(formData);
+
     let params = new HttpParams();
     const options = {
       params: params,
