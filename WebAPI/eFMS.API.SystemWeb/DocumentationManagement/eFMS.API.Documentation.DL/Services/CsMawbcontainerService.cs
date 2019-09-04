@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
@@ -10,6 +11,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,9 +21,11 @@ namespace eFMS.API.Documentation.DL.Services
 {
     public class CsMawbcontainerService : RepositoryBase<CsMawbcontainer, CsMawbcontainerModel>, ICsMawbcontainerService
     {
+        private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
-        public CsMawbcontainerService(IContextBase<CsMawbcontainer> repository, IMapper mapper, ICurrentUser user) : base(repository, mapper)
+        public CsMawbcontainerService(IContextBase<CsMawbcontainer> repository, IMapper mapper, ICurrentUser user, IStringLocalizer localize) : base(repository, mapper)
         {
+            stringLocalizer = localize;
             currentUser = user;
         }
 
@@ -97,7 +101,7 @@ namespace eFMS.API.Documentation.DL.Services
                     if (item.Id == Guid.Empty)
                     {
                         item.Id = Guid.NewGuid();
-                        item.UserModified = "01";
+                        item.UserModified = currentUser.UserID;
                         item.Mblid = (Guid)masterId;
                         item.DatetimeModified = DateTime.Now;
                         var hs = Add(item);
@@ -106,7 +110,7 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         if (((eFMSDataContext)DataContext.DC).CsMawbcontainer.Count(x => x.Id == item.Id) == 1)
                         {
-                            item.UserModified = "01";
+                            item.UserModified = currentUser.UserID;
                             item.DatetimeModified = DateTime.Now;
                             var hs = Update(item, x => x.Id == item.Id);
                         }
@@ -156,7 +160,7 @@ namespace eFMS.API.Documentation.DL.Services
                 if (string.IsNullOrEmpty(item.ContainerTypeName))
                 {
                     item.IsValid = false;
-                    item.ContainerTypeNameError = "Container name is empty";
+                    item.ContainerTypeNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_CONTAINERTYPE_EMPTY].Value;
                 }
                 else
                 {
@@ -164,7 +168,7 @@ namespace eFMS.API.Documentation.DL.Services
                     if (container == null)
                     {
                         item.IsValid = false;
-                        item.ContainerTypeNameError = "Container name not found";
+                        item.ContainerTypeNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_CONTAINERTYPE_NOT_FOUND].Value;
                     }
                     else
                     {
@@ -173,7 +177,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 if (item.QuantityError == null)
                 {
-                    item.QuantityError = "Quantity is empty";
+                    item.QuantityError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_QUANTITY_EMPTY].Value;
                     item.IsValid = false;
                 }
                 else
@@ -185,15 +189,11 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     else
                     {
-                        item.QuantityError = "Quantity must be a number";
+                        item.QuantityError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_QUANTITY_MUST_BE_NUMBER].Value;
                         item.IsValid = false;
                     }
                 }
-                if(item.PackageQuantityError == null)
-                {
-                    item.PackageQuantityError = "Package quantity is empty";
-                }
-                else
+                if(item.PackageQuantityError != null)
                 {
                     if (Int64.TryParse(item.PackageQuantityError, out long x))
                     {
@@ -202,7 +202,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     else
                     {
-                        item.PackageQuantityError = "Package quantity must be a number";
+                        item.PackageQuantityError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_PACKAGE_QUANTITY_MUST_BE_NUMBER].Value;
                         item.IsValid = false;
                     }
                 }
@@ -215,7 +215,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     else
                     {
-                        item.NwError = "Nw must be a number";
+                        item.NwError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_NW_MUST_BE_NUMBER].Value;
                         item.IsValid = false;
                     }
                 }
@@ -228,7 +228,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     else
                     {
-                        item.NwError = "Gw must be a number";
+                        item.NwError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_GW_MUST_BE_NUMBER].Value;
                         item.IsValid = false;
                     }
                 }
@@ -240,7 +240,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     else
                     {
-                        item.CbmError = "Cbm must be a number";
+                        item.CbmError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_CBM_MUST_BE_NUMBER].Value;
                         item.IsValid = false;
                     }
                 }
@@ -250,7 +250,7 @@ namespace eFMS.API.Documentation.DL.Services
                     if (packageType == null)
                     {
                         item.IsValid = false;
-                        item.PackageTypeNameError = "Package type name is not found";
+                        item.PackageTypeNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_PACKAGE_TYPE_NOT_FOUND].Value;
                     }
                     else
                     {
@@ -263,7 +263,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 list.Where(x => x.ContainerTypeId == item.ContainerTypeId && x.Quantity == item.Quantity && x.ContainerNo == item.ContainerNo && x.PackageTypeId == item.PackageTypeId).ToList().ForEach(x =>
                                 {
                                     x.IsValid = false;
-                                    item.ContainerTypeNameError = "duplicate(Cont Type && Cont Q'ty && Container No && Package Type)";
+                                    item.ContainerTypeNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_DUPLICATE].Value;
                                 });
                             }
                         }
@@ -275,7 +275,7 @@ namespace eFMS.API.Documentation.DL.Services
                     if (commodity == null)
                     {
                         item.IsValid = false;
-                        item.CommodityNameError = "Commodity name is not found";
+                        item.CommodityNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_COMMODITY_NAME_NOT_FOUND].Value;
                     }
                     else
                     {
@@ -288,7 +288,7 @@ namespace eFMS.API.Documentation.DL.Services
                     if (unitOfMeasure == null)
                     {
                         item.IsValid = false;
-                        item.UnitOfMeasureNameError = "Unit of measure name is not found";
+                        item.UnitOfMeasureNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_UNIT_OF_MEASURE_NOT_FOUND].Value;
                     }
                     else
                     {
@@ -298,7 +298,7 @@ namespace eFMS.API.Documentation.DL.Services
                 if (!string.IsNullOrEmpty(item.ContainerNo) || !string.IsNullOrEmpty(item.MarkNo) || !string.IsNullOrEmpty(item.SealNo))
                 {
                     item.IsValid = false;
-                    item.QuantityError = "Quantity must be 1";
+                    item.QuantityError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_QUANTITY_MUST_BE_1].Value;
                 }
             });
             return list;
