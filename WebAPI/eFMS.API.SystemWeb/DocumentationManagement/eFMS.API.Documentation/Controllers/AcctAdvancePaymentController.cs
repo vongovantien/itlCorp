@@ -404,12 +404,16 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult UpdateApprove(Guid advanceId)
         {
             var updateApproval = acctAdvancePaymentService.UpdateApproval(advanceId);
+            ResultHandle _result;
             if (!updateApproval.Success)
             {
-                ResultHandle _result = new ResultHandle { Status = false, Message = updateApproval.Exception.Message };
-                return Ok(_result);
+                _result = new ResultHandle { Status = updateApproval.Success, Message = updateApproval.Exception.Message };
             }
-            return Ok(updateApproval);
+            else
+            {
+                _result = new ResultHandle { Status = updateApproval.Success };
+            }
+            return Ok(_result);
         }
 
         /// <summary>
@@ -423,12 +427,16 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult DeniedApprove(Guid advanceId, string comment)
         {
             var denieApproval = acctAdvancePaymentService.DeniedApprove(advanceId, comment);
+            ResultHandle _result;
             if (!denieApproval.Success)
             {
-                ResultHandle _result = new ResultHandle { Status = false, Message = denieApproval.Exception.Message };
-                return Ok(_result);
+                _result  = new ResultHandle { Status = denieApproval.Success, Message = denieApproval.Exception.Message };
             }
-            return Ok(denieApproval);
+            else
+            {
+                _result = new ResultHandle { Status = denieApproval.Success };               
+            }
+            return Ok(_result);
         }
 
         /// <summary>
