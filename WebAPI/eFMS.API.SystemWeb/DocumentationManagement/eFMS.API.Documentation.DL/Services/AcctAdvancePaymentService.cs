@@ -300,7 +300,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var advance = mapper.Map<AcctAdvancePayment>(model);
                 advance.Id = model.Id = Guid.NewGuid();
                 advance.AdvanceNo = model.AdvanceNo = CreateAdvanceNo(dc);
-                advance.StatusApproval = model.StatusApproval = "New";
+                advance.StatusApproval = model.StatusApproval = string.IsNullOrEmpty(model.StatusApproval) ? "New" : model.StatusApproval;
 
                 advance.DatetimeCreated = advance.DatetimeModified = DateTime.Now;
                 advance.UserCreated = advance.UserModified = userCurrent;
@@ -558,6 +558,10 @@ namespace eFMS.API.Documentation.DL.Services
             var employeeId = dc.SysUser.Where(x => x.Id == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
             var requesterName = dc.SysEmployee.Where(x => x.Id == employeeId).Select(x => x.EmployeeNameVn).FirstOrDefault();
 
+            var approveAdvance = dc.AcctApproveAdvance.Where(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
+            var managerName = string.IsNullOrEmpty(approveAdvance.Manager) ? null : GetEmployeeByUserId(approveAdvance.Manager).EmployeeNameVn;
+            var accountantName = string.IsNullOrEmpty(approveAdvance.Accountant) ? null : GetEmployeeByUserId(approveAdvance.Accountant).EmployeeNameVn;
+
             var acctAdvance = new AdvancePaymentRequestReport
             {
                 AdvID = advance.AdvanceNo,
@@ -577,12 +581,12 @@ namespace eFMS.API.Documentation.DL.Services
                 AdvDpManagerID = "N/A",
                 AdvDpManagerStickDeny = null,
                 AdvDpManagerStickApp = null,
-                AdvDpManagerName = "",
+                AdvDpManagerName = managerName,
                 AdvDpSignDate = null,
                 AdvAcsDpManagerID = "N/A",
                 AdvAcsDpManagerStickDeny = null,
                 AdvAcsDpManagerStickApp = null,
-                AdvAcsDpManagerName = "N/A",
+                AdvAcsDpManagerName = accountantName,
                 AdvAcsSignDate = null,
                 AdvBODID = "N/A",
                 AdvBODStickDeny = null,
@@ -739,6 +743,10 @@ namespace eFMS.API.Documentation.DL.Services
             var employeeId = dc.SysUser.Where(x => x.Id == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
             var requesterName = dc.SysEmployee.Where(x => x.Id == employeeId).Select(x => x.EmployeeNameVn).FirstOrDefault();
 
+            var approveAdvance = dc.AcctApproveAdvance.Where(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
+            var managerName = string.IsNullOrEmpty(approveAdvance.Manager) ? null : GetEmployeeByUserId(approveAdvance.Manager).EmployeeNameVn;
+            var accountantName = string.IsNullOrEmpty(approveAdvance.Accountant) ? null : GetEmployeeByUserId(approveAdvance.Accountant).EmployeeNameVn;
+
             var acctAdvance = new AdvancePaymentRequestReport
             {
                 AdvID = advance.AdvanceNo,
@@ -758,12 +766,12 @@ namespace eFMS.API.Documentation.DL.Services
                 AdvDpManagerID = "N/A",
                 AdvDpManagerStickDeny = null,
                 AdvDpManagerStickApp = null,
-                AdvDpManagerName = "",
+                AdvDpManagerName = managerName,
                 AdvDpSignDate = null,
                 AdvAcsDpManagerID = "N/A",
                 AdvAcsDpManagerStickDeny = null,
                 AdvAcsDpManagerStickApp = null,
-                AdvAcsDpManagerName = "N/A",
+                AdvAcsDpManagerName = accountantName,
                 AdvAcsSignDate = null,
                 AdvBODID = "N/A",
                 AdvBODStickDeny = null,
@@ -964,7 +972,7 @@ namespace eFMS.API.Documentation.DL.Services
                 if (!string.IsNullOrEmpty(approve.AdvanceNo))
                 {
                     var advance = dc.AcctAdvancePayment.Where(x => x.AdvanceNo == approve.AdvanceNo).FirstOrDefault();
-                    if(advance.StatusApproval != "New" && advance.StatusApproval != "Denied" && advance.StatusApproval != "Done")
+                    if(advance.StatusApproval != "New" && advance.StatusApproval != "RequestApproval" && advance.StatusApproval != "Denied" && advance.StatusApproval != "Done")
                     {
                         return new HandleState("Awaiting Approval");
                     }
@@ -1627,11 +1635,11 @@ namespace eFMS.API.Documentation.DL.Services
             //Kiểm tra User đăng nhập vào có thuộc các user Approve Advance không, nếu không thuộc bất kỳ 1 user nào thì gán cờ IsApproved bằng true
             //Kiểm tra xem dept đã approve chưa, nếu dept của user đó đã approve thì gán cờ IsApproved bằng true           
             aprAdvanceMap.IsApproved = CheckUserInApproveAdvanceAndDeptApproved(userCurrent, aprAdvanceMap);
-            aprAdvanceMap.RequesterName = string.IsNullOrEmpty(aprAdvanceMap.Requester) ? null : GetEmployeeByUserId(aprAdvanceMap.Requester).EmployeeNameEn;
-            aprAdvanceMap.LeaderName = string.IsNullOrEmpty(aprAdvanceMap.Leader) ? null : GetEmployeeByUserId(aprAdvanceMap.Leader).EmployeeNameEn;
-            aprAdvanceMap.ManagerName = string.IsNullOrEmpty(aprAdvanceMap.Manager) ? null : GetEmployeeByUserId(aprAdvanceMap.Manager).EmployeeNameEn;
-            aprAdvanceMap.AccountantName = string.IsNullOrEmpty(aprAdvanceMap.Accountant) ? null : GetEmployeeByUserId(aprAdvanceMap.Accountant).EmployeeNameEn;
-            aprAdvanceMap.BUHeadName = string.IsNullOrEmpty(aprAdvanceMap.Buhead) ? null : GetEmployeeByUserId(aprAdvanceMap.Buhead).EmployeeNameEn;
+            aprAdvanceMap.RequesterName = string.IsNullOrEmpty(aprAdvanceMap.Requester) ? null : GetEmployeeByUserId(aprAdvanceMap.Requester).EmployeeNameVn;
+            aprAdvanceMap.LeaderName = string.IsNullOrEmpty(aprAdvanceMap.Leader) ? null : GetEmployeeByUserId(aprAdvanceMap.Leader).EmployeeNameVn;
+            aprAdvanceMap.ManagerName = string.IsNullOrEmpty(aprAdvanceMap.Manager) ? null : GetEmployeeByUserId(aprAdvanceMap.Manager).EmployeeNameVn;
+            aprAdvanceMap.AccountantName = string.IsNullOrEmpty(aprAdvanceMap.Accountant) ? null : GetEmployeeByUserId(aprAdvanceMap.Accountant).EmployeeNameVn;
+            aprAdvanceMap.BUHeadName = string.IsNullOrEmpty(aprAdvanceMap.Buhead) ? null : GetEmployeeByUserId(aprAdvanceMap.Buhead).EmployeeNameVn;
             
             return aprAdvanceMap;
         }
