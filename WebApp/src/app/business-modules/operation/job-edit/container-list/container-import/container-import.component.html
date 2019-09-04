@@ -160,7 +160,8 @@
                         <span>{{ item.sealNo }}</span>
                       </td>
                       <td>
-                        <span>{{ item.gw }}</span>
+                        <span *ngIf="item.gwError === null">{{ item.gw }}</span>
+                        <span class="m--font-danger" *ngIf="item.gwError !== null">{{ item.gwError }}</span>
                       </td>
                       <td>
                         <span>{{ item.cbm }}</span>

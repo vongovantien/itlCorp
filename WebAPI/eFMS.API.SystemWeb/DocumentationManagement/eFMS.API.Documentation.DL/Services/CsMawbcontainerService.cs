@@ -23,7 +23,7 @@ namespace eFMS.API.Documentation.DL.Services
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
-        public CsMawbcontainerService(IContextBase<CsMawbcontainer> repository, IMapper mapper, ICurrentUser user, IStringLocalizer localize) : base(repository, mapper)
+        public CsMawbcontainerService(IContextBase<CsMawbcontainer> repository, IMapper mapper, ICurrentUser user, IStringLocalizer<LanguageSub> localize) : base(repository, mapper)
         {
             stringLocalizer = localize;
             currentUser = user;
@@ -228,7 +228,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     else
                     {
-                        item.NwError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_GW_MUST_BE_NUMBER].Value;
+                        item.GwError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_GW_MUST_BE_NUMBER].Value;
                         item.IsValid = false;
                     }
                 }
@@ -237,6 +237,7 @@ namespace eFMS.API.Documentation.DL.Services
                     if (Int64.TryParse(item.CbmError, out long x))
                     {
                         item.Cbm = x;
+                        item.CbmError = null;
                     }
                     else
                     {
@@ -262,7 +263,7 @@ namespace eFMS.API.Documentation.DL.Services
                             {
                                 list.Where(x => x.ContainerTypeId == item.ContainerTypeId && x.Quantity == item.Quantity && x.ContainerNo == item.ContainerNo && x.PackageTypeId == item.PackageTypeId).ToList().ForEach(x =>
                                 {
-                                    x.IsValid = false;
+                                    x.IsValid = true;
                                     item.ContainerTypeNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_DUPLICATE].Value;
                                 });
                             }
