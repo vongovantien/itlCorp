@@ -36,7 +36,7 @@
                                     </div>
                                     <div class="font-weight-bold">{{approveInfo.requesterName}}</div>
                                     <div class="font-weight-bold">
-                                        {{!!approveInfo.requesterAprDate ? (approveInfo.requesterAprDate | date: 'HH:mm dd/MM/yyyy') : '/ /'}}</div>
+                                        {{!!approveInfo.requesterAprDate ? (approveInfo.requesterAprDate | date: 'HH:mm dd/MM/yyyy') : '/.../'}}</div>
                                 </div>
                             </li>
                             <li *ngIf="!!approveInfo.leader">
@@ -51,7 +51,7 @@
                                         </ng-template>
                                     </div>
                                     <div class="font-weight-bold">Date:
-                                        {{!!approveInfo.leaderAprDate ? (approveInfo.leaderAprDate | date: 'HH:mm dd/MM/yyyy') : '/ /'}}
+                                        {{!!approveInfo.leaderAprDate ? (approveInfo.leaderAprDate | date: 'HH:mm dd/MM/yyyy') : '/.../'}}
                                     </div>
                                 </div>
                             </li>
@@ -65,7 +65,7 @@
                                         {{approveInfo.managerName}}
                                     </div>
                                     <div class="font-weight-bold">
-                                        {{!!approveInfo.managerAprDate ? (approveInfo.managerAprDate | date: 'HH:mm dd/MM/yyyy') : '/ /'}}
+                                        {{!!approveInfo.managerAprDate ? (approveInfo.managerAprDate | date: 'HH:mm dd/MM/yyyy') : '/.../'}}
                                     </div>
                                 </div>
                             </li>
@@ -79,7 +79,7 @@
                                         {{approveInfo.accountantName}}
                                     </div>
                                     <div class="font-weight-bold">
-                                        {{!!approveInfo.accountantAprDate ? (approveInfo.accountantAprDate | date: 'HH:mm dd/MM/yyyy') : '/ /'}}
+                                        {{!!approveInfo.accountantAprDate ? (approveInfo.accountantAprDate | date: 'HH:mm dd/MM/yyyy') : '/.../'}}
                                     </div>
                                 </div>
                             </li>
@@ -93,7 +93,7 @@
                                         {{approveInfo.buHeadName}}
                                     </div>
                                     <div class="font-weight-bold">
-                                        {{!!approveInfo.buheadAprDate ? (approveInfo.buheadAprDate | date: 'HH:mm dd/MM/yyyy') : '/ /'}}
+                                        {{!!approveInfo.buheadAprDate ? (approveInfo.buheadAprDate | date: 'HH:mm dd/MM/yyyy') : '/.../'}}
                                     </div>
                                 </div>
                             </li>
@@ -166,7 +166,7 @@
             <span>
                 <i class="la la-save"></i>
                 <span>
-                    Continute
+                    Continue
                 </span>
             </span>
         </button>
