@@ -23,8 +23,8 @@ export class ApproveAdvancePaymentComponent extends AppPage {
     @ViewChild(AdvancePaymentFormCreateComponent, { static: false }) formCreateComponent: AdvancePaymentFormCreateComponent;
     @ViewChild(AdvancePaymentListRequestComponent, { static: true }) listRequestAdvancePaymentComponent: AdvancePaymentListRequestComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDenyPopup: ConfirmPopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmApprovePopup: ConfirmPopupComponent;
+    @ViewChild('confirmDenyPopup', { static: false }) confirmDenyPopup: ConfirmPopupComponent;
+    @ViewChild('confirmApprovePopup', { static: false }) confirmApprovePopup: ConfirmPopupComponent;
 
     idAdvPayment: string = '';
     advancePayment: AdvancePayment;
@@ -117,10 +117,13 @@ export class ApproveAdvancePaymentComponent extends AppPage {
                 finalize(() => { this._progressRef.complete(); })
             )
             .subscribe(
-                (res: any) => {
-                    if (res.success) {
+                (res: CommonInterface.IResult) => {
+                    console.log(res);
+                    if (res.status) {
                         this._toastService.success(res.message, 'Approve Is Successfull');
                         this.getInfoApprove(this.advancePayment.advanceNo);
+                    } else {
+                        this._toastService.error(res.message, '');
                     }
                 },
             );
@@ -191,4 +194,5 @@ export class ApproveAdvancePaymentComponent extends AppPage {
         }
         this.listRequestAdvancePaymentComponent.currency = currency.id;
     }
+
 }
