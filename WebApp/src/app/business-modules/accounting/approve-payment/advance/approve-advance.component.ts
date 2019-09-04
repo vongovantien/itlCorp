@@ -28,7 +28,7 @@ export class ApproveAdvancePaymentComponent extends AppPage {
 
     idAdvPayment: string = '';
     advancePayment: AdvancePayment;
-    approveInfo: any = {};
+    approveInfo: any = null;
     dataReport: any = null;
 
     modalRef: BsModalRef;
