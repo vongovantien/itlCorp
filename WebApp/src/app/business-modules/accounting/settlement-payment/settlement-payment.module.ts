@@ -10,6 +10,7 @@ import { PaginationModule } from 'ngx-bootstrap';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { SettlementPaymentAddNewComponent } from './add/add-settlement-payment.component';
+import { SettlementFormCreateComponent } from './components/form-create-settlement/form-create-settlement.component';
 
 const routing: Routes = [
     {
@@ -25,7 +26,8 @@ const routing: Routes = [
 ];
 
 const COMPONENT = [
-    SettlementFormSearchComponent
+    SettlementFormSearchComponent,
+    SettlementFormCreateComponent
 ];
 
 @NgModule({

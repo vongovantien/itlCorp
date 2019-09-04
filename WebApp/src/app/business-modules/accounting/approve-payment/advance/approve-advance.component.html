@@ -9,7 +9,7 @@
     <div class="m-portlet">
         <div class="m-form">
             <div class="m-portlet__body">
-                <adv-payment-form-create></adv-payment-form-create>
+                <adv-payment-form-create (onChangeCurrency)="onChangeCurrency($event)"></adv-payment-form-create>
             </div>
         </div>
     </div>
@@ -35,8 +35,8 @@
                                         <i class="la la-check-circle-o"></i>
                                     </div>
                                     <div class="font-weight-bold">{{approveInfo.requesterName}}</div>
-                                    <div class="font-weight-bold">Date:
-                                        {{approveInfo.requesterAprDate | date: 'HH:mm dd/MM/yyyy'}}</div>
+                                    <div class="font-weight-bold">
+                                        {{approveInfo.requesterAprDate | date: 'dd/MM/yyyy HH:mm'}}</div>
                                 </div>
                             </li>
                             <li *ngIf="!!approveInfo.leader">
@@ -84,11 +84,11 @@
                                     </div>
                                 </div>
                             </li>
-                            <li>
+                            <li >
                                 <div class="progress-content text-center">
                                     <div class="font-weight-bolder">BU HEAD</div>
-                                    <div class="icon-check">
-                                        <i class="la la-check-circle-o"></i>
+                                    <div class="icon-check" >
+                                        <i class="la la-check-circle-o" *ngIf="approveInfo.buheadAprDate"></i>
                                     </div>
                                     <div class="font-weight-bold">
                                         {{approveInfo.buHeadName}}
@@ -187,8 +187,8 @@
     <app-report-preview [data]="dataReport"></app-report-preview>
 </ng-container>
 
-<!-- <confirm-popup #confirmDenyPopup (onSubmit)="openModalDeny(modal_deny)"
-    [body]="'Do you want to deny this advance payment ?'" [labelConfirm]="'Yes'"></confirm-popup> -->
+<confirm-popup #confirmDenyPopup (onSubmit)="openModalDeny(modal_deny)"
+    [body]="'Do you want to deny this advance payment ?'" [labelConfirm]="'Yes'"></confirm-popup>
 
 <confirm-popup #confirmApprovePopup (onSubmit)="onApprove()" [body]="'Do you want to approve this advance payment?'"
     [labelConfirm]="'Yes'"></confirm-popup>

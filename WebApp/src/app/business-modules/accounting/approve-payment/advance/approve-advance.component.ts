@@ -6,7 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize } from 'rxjs/operators';
-import { AdvancePayment } from 'src/app/shared/models';
+import { AdvancePayment, Currency } from 'src/app/shared/models';
 import { AdvancePaymentFormCreateComponent } from '../../advance-payment/components/form-create-advance-payment/form-create-advance-payment.component';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap';
@@ -185,5 +185,13 @@ export class ApproveAdvancePaymentComponent extends AppPage {
     onApprove() {
         this.confirmApprovePopup.hide();
         this.apporve();
+    }
+
+    onChangeCurrency(currency: Currency) {
+        this.listRequestAdvancePaymentComponent.changeCurrency(currency);
+        for (const item of this.listRequestAdvancePaymentComponent.listRequestAdvancePayment) {
+            item.requestCurrency = currency.id;
+        }
+        this.listRequestAdvancePaymentComponent.currency = currency.id;
     }
 }

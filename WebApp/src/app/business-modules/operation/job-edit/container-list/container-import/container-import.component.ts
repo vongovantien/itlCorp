@@ -9,7 +9,8 @@ import { NgProgress } from '@ngx-progressbar/core';
   templateUrl: './container-import.component.html'
 })
 export class ContainerImportComponent extends PopupBase implements OnInit {
-
+  isDesc: string = '';
+  sortKey: string = '';
   constructor(private operationRepo: OperationRepo,
     private _progressService: NgProgress) {
     super();

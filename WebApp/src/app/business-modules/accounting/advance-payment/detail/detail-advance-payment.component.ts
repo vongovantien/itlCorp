@@ -203,7 +203,7 @@ export class AdvancePaymentDetailComponent extends AppPage {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(`${res.data.advanceNo + ' Send request successfully'}`, 'Update Success !');
-                        this._router.navigate([`home/accounting/advance-payment/${res.data.id}`]);
+                        this._router.navigate([`home/accounting/advance-payment/${res.data.id}/approve`]);
 
                     } else {
                         this.handleError((data: any) => {
