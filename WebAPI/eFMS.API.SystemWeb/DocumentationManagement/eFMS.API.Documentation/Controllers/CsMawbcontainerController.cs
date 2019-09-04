@@ -92,7 +92,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Import")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Importcontainer([FromBody] List<CsMawbcontainerImportModel> data)
         {
             var result = csContainerService.Importcontainer(data);

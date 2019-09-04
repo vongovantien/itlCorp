@@ -157,6 +157,7 @@ namespace eFMS.API.Documentation.DL.Services
             var containers = units.Where(x => x.UnitType == "Container");
             var packages = units.Where(x => x.UnitType == "Package");
             var unitOfMeasures = units.Where(x => x.UnitType == "Weight Measurement");
+            var containerShipments = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.ToList();
             list.ForEach(item => {
                 if (string.IsNullOrEmpty(item.ContainerTypeName))
                 {
@@ -263,18 +264,26 @@ namespace eFMS.API.Documentation.DL.Services
                     else
                     {
                         item.PackageTypeId = packageType.Id;
-                        if (!string.IsNullOrEmpty(item.ContainerNo))
+                        item.PackageQuantityError = null;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(item.ContainerNo) && item.PackageTypeId != null)
+                {
+                    var duplicateItems = list.Where(x => x.ContainerTypeId == item.ContainerTypeId && x.Quantity == item.Quantity && x.ContainerNo == item.ContainerNo && x.PackageTypeId == item.PackageTypeId);
+                    if (duplicateItems.Count() > 1)
+                    {
+                        list.Where(x => x.ContainerTypeId == item.ContainerTypeId && x.Quantity == item.Quantity && x.ContainerNo == item.ContainerNo && x.PackageTypeId == item.PackageTypeId).ToList().ForEach(x =>
                         {
-                            var existedItems = list.Where(x => x.ContainerTypeId == item.ContainerTypeId && x.Quantity == item.Quantity && x.ContainerNo == item.ContainerNo && x.PackageTypeId == item.PackageTypeId);
-                            if (existedItems.Count() > 1)
-                            {
-                                list.Where(x => x.ContainerTypeId == item.ContainerTypeId && x.Quantity == item.Quantity && x.ContainerNo == item.ContainerNo && x.PackageTypeId == item.PackageTypeId).ToList().ForEach(x =>
-                                {
-                                    x.IsValid = true;
-                                    item.ContainerTypeNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_DUPLICATE].Value;
-                                });
-                            }
-                        }
+                            x.IsValid = false;
+                            item.ContainerTypeNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_DUPLICATE].Value;
+                        });
+                    }
+                    var existedItems = containerShipments.Where(x => x.ContainerTypeId == item.ContainerTypeId && x.Quantity == item.Quantity && x.ContainerNo == item.ContainerNo && x.PackageTypeId == item.PackageTypeId);
+                    if(existedItems.Count() > 0)
+                    {
+                        item.IsValid = false;
+                        item.ContainerTypeNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_EXISTED].Value;
                     }
                 }
                 if (!string.IsNullOrEmpty(item.CommodityName))

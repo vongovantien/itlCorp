@@ -8,12 +8,12 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { UploadAlertComponent } from 'src/app/shared/common/popup/upload-alert/upload-alert.component';
 
 @Component({
-  selector: 'app-container-import',
-  templateUrl: './container-import.component.html'
+    selector: 'app-container-import',
+    templateUrl: './container-import.component.html'
 })
 export class ContainerImportComponent extends PopupBase implements OnInit {
-  isDesc: string = '';
-  sortKey: string = '';
+    isDesc: string = '';
+    sortKey: string = '';
     @Input() jobId: string;
     @ViewChild(UploadAlertComponent, { static: false }) importAlert: UploadAlertComponent;
     @Output() isImportSuccess = new EventEmitter();
@@ -35,18 +35,18 @@ export class ContainerImportComponent extends PopupBase implements OnInit {
     totalInvalidRow: number = 0;
     isShowInvalid: boolean = true;
 
-  constructor(private operationRepo: OperationRepo,
+    constructor(private operationRepo: OperationRepo,
         private _progressService: NgProgress,
         private baseService: BaseService,
         private api_menu: API_MENU,
         private _sortService: SortService) {
-    super();
-    this._progressRef = this._progressService.ref();
+        super();
+        this._progressRef = this._progressService.ref();
 
         this.requestSort = this.sortLocal;
-  }
+    }
 
-  ngOnInit() {
+    ngOnInit() {
         this.headers = [
             { title: 'Cont Type *', field: 'containerTypeName', sortable: true },
             { title: 'Cont Qty *', field: 'quantity', sortable: true },
@@ -58,56 +58,59 @@ export class ContainerImportComponent extends PopupBase implements OnInit {
             { title: 'Parentdoc', field: 'firstClearanceNo', sortable: true },
             { title: 'Note', field: 'note', sortable: true },
         ];
-  }
-  close() {
+    }
+    reset() {
         this.data = null;
         this.importedData = [];
         this.totalItems = 0;
         this.totalValidRow = 0;
         this.totalInvalidRow = 0;
-    this.hide();
-  }
+    }
+    close() {
+        this.reset();
+        this.hide();
+    }
     sortLocal(sort: string): void {
         this.importedData = this._sortService.sort(this.importedData, sort, this.order);
     }
-  downloadFile() {
+    downloadFile() {
         this.operationRepo.downloadcontainerfileExcel()
-      .pipe(catchError(this.catchError))
-      .subscribe(
-        (res: any) => {
-          saveAs(res, "ContainerImportTemplate.xlsx");
-        },
-        (errors: any) => { },
-        () => { }
-      );
-  }
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    saveAs(res, "ContainerImportTemplate.xlsx");
+                },
+                (errors: any) => { },
+                () => { }
+            );
+    }
     async import() {
         if (this.data == null) { return; }
         if (this.totalInvalidRow > 0) {
             this.importAlert.show();
         } else {
-    this._progressRef.start();
-            const data = this.data.forEach(x => {
+            this._progressRef.start();
+            this.data.forEach(x => {
                 x.mblid = this.jobId;
             });
-            this.operationRepo.importContainerExcel(data)
+            this.operationRepo.importContainerExcel(this.data)
                 .pipe(catchError(this.catchError))
-      .subscribe(
-        (res: any) => {
+                .subscribe(
+                    (res: any) => {
                         if (res.success) {
+                            this.reset();
                             this._progressRef.complete();
                             this.isImportSuccess.emit(true);
                             this.hide();
                         }
                         console.log(res);
-        },
-        (errors: any) => { },
-        () => { }
-      );
-  }
+                    },
+                    (errors: any) => { },
+                    () => { }
+                );
+        }
     }
     hideInvalid() {
-
         this.page = 0;
         const end = this.page + (this.pageSize - 1);
         if (this.data == null) { return; }

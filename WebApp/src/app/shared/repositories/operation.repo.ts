@@ -66,7 +66,9 @@ export class OperationRepo {
     }
     importContainerExcel(data) {
         return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/CsMawbcontainer/Import`, data).pipe(
-            map((data: any) => data)
+            map((res: any) => {
+                return res;
+            })
         );
     }
 }

@@ -29,6 +29,7 @@
   "MSG_MAWBCONTAINER_CBM_MUST_BE_NUMBER": "Cbm must be a number",
   "MSG_MAWBCONTAINER_PACKAGE_TYPE_NOT_FOUND": "Package type name is not found",
   "MSG_MAWBCONTAINER_DUPLICATE": "duplicate(Cont Type && Cont Q'ty && Container No && Package Type)",
+  "MSG_MAWBCONTAINER_EXISTED": "Data has been existed",
   "MSG_MAWBCONTAINER_COMMODITY_NAME_NOT_FOUND": "Commodity name is not found",
   "MSG_MAWBCONTAINER_UNIT_OF_MEASURE_NOT_FOUND": "Unit of measure name is not found",
   "MSG_MAWBCONTAINER_QUANTITY_MUST_BE_1": "Quantity must be 1"
