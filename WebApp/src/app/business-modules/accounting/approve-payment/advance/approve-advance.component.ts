@@ -26,7 +26,6 @@ export class ApproveAdvancePaymentComponent extends AppPage {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDenyPopup: ConfirmPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmApprovePopup: ConfirmPopupComponent;
 
-    progress: any[] = [1, 2, 3, 4, 5, 6];
     idAdvPayment: string = '';
     advancePayment: AdvancePayment;
     approveInfo: any = {};
@@ -91,7 +90,6 @@ export class ApproveAdvancePaymentComponent extends AppPage {
                         this.listRequestAdvancePaymentComponent.advanceNo = this.advancePayment.advanceNo;
 
                         this.getInfoApprove(this.advancePayment.advanceNo);
-                        console.log(this.advancePayment);
                     }
                 },
                 () => { },
@@ -107,7 +105,6 @@ export class ApproveAdvancePaymentComponent extends AppPage {
             .subscribe(
                 (res: any) => {
                     this.approveInfo = res;
-                    console.log(res);
                 },
             );
     }
