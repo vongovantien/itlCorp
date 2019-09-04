@@ -66,7 +66,6 @@ export class OperationRepo {
     }
     uploadContainerExcelFile(data) {
         return this._api.postFile(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/OpsTransaction/Importcontainer`, data, "uploadedFile").pipe(
-            catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }

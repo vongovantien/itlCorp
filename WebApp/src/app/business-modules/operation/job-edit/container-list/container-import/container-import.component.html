@@ -139,7 +139,60 @@
                       </th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody *ngIf="importedData.length > 0">
+                    <tr *ngFor="let item of importedData; let i = index; trackBy: trackByFn"
+                      [ngClass]="{ 'invalid-row': !item.isValid }">
+                      <td>{{ (i + this.page + 1) }}
+                      </td>
+                      <td>
+                        <span *ngIf="item.containerTypeNameError === null">{{ item.containerTypeName }}</span>
+                        <span class="m--font-danger"
+                          *ngIf="item.containerTypeNameError !== null">{{ item.containerTypeNameError }}</span>
+                      </td>
+                      <td>
+                        <span *ngIf="item.quantityError === null">{{ item.quantity }}</span>
+                        <span class="m--font-danger" *ngIf="item.quantityError !== null">{{ item.quantityError }}</span>
+                      </td>
+                      <td>
+                        <span>{{ item.containerNo }}</span>
+                      </td>
+                      <td>
+                        <span>{{ item.sealNo }}</span>
+                      </td>
+                      <td>
+                        <span>{{ item.gw }}</span>
+                      </td>
+                      <td>
+                        <span>{{ item.cbm }}</span>
+                      </td>
+                      <td>
+                        <span>{{ item.nw }}</span>
+                      </td>
+                      <td>
+                        <span>{{ item.packageQuantity }}</span>
+                      </td>
+                      <td>
+                        <span *ngIf="item.packageTypeNameError === null">{{ item.packageTypeName }}</span>
+                        <span class="m--font-danger"
+                          *ngIf="item.packageTypeNameError !== null">{{ item.packageTypeNameError }}</span>
+                      </td>
+                      <td>
+                        <span>{{ item.markNo }}</span>
+                      </td>
+                      <td>
+                        <span>{{ item.description }}</span>
+                      </td>
+                      <td>
+                        <span *ngIf="item.commodityNameError === null">{{ item.commodityName }}</span>
+                        <span class="m--font-danger"
+                          *ngIf="item.commodityNameError !== null">{{ item.commodityNameError }}</span>
+                      </td>
+                      <td>
+                        <span *ngIf="item.unitOfMeasureNameError === null">{{ item.unitOfMeasureName }}</span>
+                        <span class="m--font-danger"
+                          *ngIf="item.unitOfMeasureNameError !== null">{{ item.unitOfMeasureNameError }}</span>
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
