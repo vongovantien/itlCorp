@@ -96,10 +96,10 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
             { title: 'New', value: 'New' },
             { title: 'Request Approval', value: 'RequestApproval'},
             { title: 'Leader Approved', value: 'LeaderApproved' },
-            { title: 'Department Manager Approved', value: 'New' },
-            { title: 'Accountant Manager Approved', value: 'New' },
-            { title: 'Done ', value: 'New' },
-            { title: 'Denied  ', value: 'New' },
+            { title: 'Department Manager Approved', value: 'DepartmentManagerApproved' },
+            { title: 'Accountant Manager Approved', value: 'AccountantManagerApproved' },
+            { title: 'Done ', value: 'Done' },
+            { title: 'Denied  ', value: 'Denied' },
         ];
     }
 
