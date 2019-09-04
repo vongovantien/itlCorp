@@ -558,9 +558,14 @@ namespace eFMS.API.Documentation.DL.Services
             var employeeId = dc.SysUser.Where(x => x.Id == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
             var requesterName = dc.SysEmployee.Where(x => x.Id == employeeId).Select(x => x.EmployeeNameVn).FirstOrDefault();
 
+            string managerName = "";
+            string accountantName = "";
             var approveAdvance = dc.AcctApproveAdvance.Where(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
-            var managerName = string.IsNullOrEmpty(approveAdvance.Manager) ? null : GetEmployeeByUserId(approveAdvance.Manager).EmployeeNameVn;
-            var accountantName = string.IsNullOrEmpty(approveAdvance.Accountant) ? null : GetEmployeeByUserId(approveAdvance.Accountant).EmployeeNameVn;
+            if (approveAdvance != null)
+            {
+                managerName = string.IsNullOrEmpty(approveAdvance.Manager) ? null : GetEmployeeByUserId(approveAdvance.Manager).EmployeeNameVn;
+                accountantName = string.IsNullOrEmpty(approveAdvance.Accountant) ? null : GetEmployeeByUserId(approveAdvance.Accountant).EmployeeNameVn;
+            }
 
             var acctAdvance = new AdvancePaymentRequestReport
             {
@@ -743,9 +748,14 @@ namespace eFMS.API.Documentation.DL.Services
             var employeeId = dc.SysUser.Where(x => x.Id == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
             var requesterName = dc.SysEmployee.Where(x => x.Id == employeeId).Select(x => x.EmployeeNameVn).FirstOrDefault();
 
+            string managerName = "";
+            string accountantName = "";
             var approveAdvance = dc.AcctApproveAdvance.Where(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
-            var managerName = string.IsNullOrEmpty(approveAdvance.Manager) ? null : GetEmployeeByUserId(approveAdvance.Manager).EmployeeNameVn;
-            var accountantName = string.IsNullOrEmpty(approveAdvance.Accountant) ? null : GetEmployeeByUserId(approveAdvance.Accountant).EmployeeNameVn;
+            if (approveAdvance != null)
+            {
+                managerName = string.IsNullOrEmpty(approveAdvance.Manager) ? null : GetEmployeeByUserId(approveAdvance.Manager).EmployeeNameVn;
+                accountantName = string.IsNullOrEmpty(approveAdvance.Accountant) ? null : GetEmployeeByUserId(approveAdvance.Accountant).EmployeeNameVn;
+            }
 
             var acctAdvance = new AdvancePaymentRequestReport
             {
