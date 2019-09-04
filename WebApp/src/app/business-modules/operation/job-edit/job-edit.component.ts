@@ -25,6 +25,7 @@ import { DataService } from 'src/app/shared/services';
 
 import { ConfirmCancelJobPopupComponent } from './job-confirm-popup/confirm-cancel-job-popup/confirm-cancel-job-popup.component';
 import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
+import { CsShipmentSurcharge } from 'src/app/shared/models';
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
@@ -66,14 +67,14 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     lstUnits: any[] = [];
     lstCurrencies: any[] = [];
 
-    ListBuyingRateCharges: any[] = [];
+    ListBuyingRateCharges: CsShipmentSurcharge[] = [];
     ConstListBuyingRateCharges: any = [];
     numberOfTimeSaveContainer: number = 0;
 
     ListSellingRateCharges: any[] = [];
     ConstListSellingRateCharges: any[] = [];
 
-    ListOBHCharges: any[] = [];
+    ListOBHCharges: CsShipmentSurcharge[] = [];
     ConstListOBHCharges: any[] = [];
 
     totalSellingUSD: number = 0;
@@ -100,6 +101,13 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     tabCharge: string = '';
     jobId: string = '';
 
+    items: Array<string> = ['option 1', 'option 2', 'option 3', 'option 4',
+        'option 5', 'option 6', 'option 7'];
+
+    packagesUnitActive = [];
+
+    disabled: boolean = false;
+
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU,
         private route: ActivatedRoute,
@@ -107,7 +115,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         private _unitRepo: UnitRepo,
         private _operationRepo: OperationRepo,
         private _data: DataService,
-        private sortService: SortService) {
+        ) {
         super();
     }
 
@@ -148,7 +156,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                     if (index > -1) { this.shipmentModeActive = [this.shipmentModes[index]]; }
                     index = this.packageTypes.findIndex(x => x.id === this.opsTransaction.packageTypeId);
                     if (index > -1) { this.packagesUnitActive = [this.packageTypes[index]]; }
-                    console.log(this.packagesUnitActive);
                     // this.getAllSurCharges();
                     this.getSurCharges('BUY');
                     // this.getShipmentContainer();
@@ -414,19 +421,16 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
     onSaveBuyingRate(event) {
         if (event === true) {
-            console.log('edit buying charge thành công');
             this.getSurCharges('BUY');
         }
     }
     onSaveSellingRate(event) {
         if (event === true) {
-            console.log('edit selling charge thành công');
             this.getSurCharges('SELL');
         }
     }
     onSaveOHBRate(event) {
         if (event === true) {
-            console.log('edit obh charge thành công');
             this.getSurCharges('OBH');
         }
     }
@@ -445,7 +449,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this.totalBuyingLocal = 0;
         if (this.ListBuyingRateCharges.length > 0) {
 
-            this.ListBuyingRateCharges.forEach(element => {
+            this.ListBuyingRateCharges.forEach((element: any) => {
                 const currentLocalBuying = element.total * element.exchangeRate;
                 this.totalBuyingLocal += currentLocalBuying;
                 this.totalBuyingUSD += currentLocalBuying / element.exchangeRateUSDToVND;
@@ -478,7 +482,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this.totalOBHLocal = 0;
         if (this.ListOBHCharges.length > 0) {
 
-            this.ListOBHCharges.forEach(element => {
+            this.ListOBHCharges.forEach((element: any) => {
                 const currentOBHCharge = element.total * element.exchangeRate;
                 this.totalOBHLocal += currentOBHCharge;
                 this.totalOBHUSD += currentOBHCharge / element.exchangeRateUSDToVND;
@@ -513,40 +517,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this.getSurCharges('OBH');
     }
 
-    public items: Array<string> = ['option 1', 'option 2', 'option 3', 'option 4',
-        'option 5', 'option 6', 'option 7'];
-
-
-    packagesUnitActive = [];
-
-    private value: any = {};
-    private _disabledV: string = '0';
-    public disabled: boolean = false;
-
-    private get disabledV(): string {
-        return this._disabledV;
-    }
-
-    private set disabledV(value: string) {
-        this._disabledV = value;
-        this.disabled = this._disabledV === '1';
-    }
-
-    public selected(value: any): void {
-        console.log('Selected value is: ', value);
-    }
-
-    public removed(value: any): void {
-        console.log('Removed value is: ', value);
-    }
-
-    public typed(value: any): void {
-        console.log('New search input: ', value);
-    }
-
-    public refreshValue(value: any): void {
-        this.value = value;
-    }
 
     /**
      * get custom clearances
@@ -581,6 +551,5 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                 this.getSurCharges('BUY');
                 break;
         }
-        console.log(tabName);
     }
 }

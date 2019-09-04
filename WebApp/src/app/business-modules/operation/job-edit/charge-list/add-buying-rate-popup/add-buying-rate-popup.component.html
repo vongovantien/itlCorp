@@ -7,17 +7,12 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Add buying charge</h5>
-          <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-            (click)="closeChargeForm('ops-add-buying-rate-modal',addBuyingRateChargeFormOps)">
-            <span aria-hidden="true">&times;</span>
-          </button> -->
           <button type="button" class="close" aria-label="Close" (click)="close(addBuyingRateChargeFormOps)">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
 
         <div class="modal-body" *ngIf="isDisplay">
-          <!--begin::Form-->
           <div class="m-form m-form--state">
             <div class="row">
               <div class="col-lg-4">
@@ -59,13 +54,13 @@
                   <ng-select [allowClear]="true" [items]="[
                                                 { 'text': 'AGENT', 'id': 'AGENT' },
                                                 { 'text': 'SHIPPING LINE','id': 'SHIPPING' },
-                                                { 'text': 'OTHER', 'id': 'OTHER' }]" (data)="refreshValue($event)"
+                                                { 'text': 'OTHER', 'id': 'OTHER' }]"
                     (selected)="buyingRateChargeToAdd.objectBePaid=$event.id;
                                                     buyingRateChargeToAdd.objectBePaid==='AGENT'? buyingRateChargeToAdd.paymentObjectId=opsTransaction.agentId:null;
                                                     buyingRateChargeToAdd.objectBePaid==='SHIPPING'? buyingRateChargeToAdd.paymentObjectId=opsTransaction.supplierId:null;
                                                     buyingRateChargeToAdd.objectBePaid==='OTHER'? buyingRateChargeToAdd.paymentObjectId=null:null;"
                     (removed)="buyingRateChargeToAdd.objectBePaid=null;buyingRateChargeToAdd.paymentObjectId=null;"
-                    (typed)="typed($event)" placeholder="Select filter">
+                   placeholder="Select filter">
                   </ng-select>
 
                   <div class="form-control-feedback"
@@ -80,9 +75,6 @@
                 <div class="form-group"
                   [ngClass]="{ 'm-form__group has-danger': (addBuyingRateChargeFormOps.submitted && buyingRateChargeToAdd.paymentObjectId==null)||(!addBuyingRateChargeFormOps.submitted && buyingRateChargeToAdd.objectBePaid!==null && buyingRateChargeToAdd.objectBePaid!=='OTHER' && buyingRateChargeToAdd.paymentObjectId ===null)}">
                   <label class="form-control-label" for="">
-                    <!-- <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': (addBuyingRateChargeFormOps.submitted && buyingRateChargeToAdd.paymentObjectId==null)||(!addBuyingRateChargeFormOps.submitted && buyingRateChargeToAdd.objectBePaid!==null && buyingRateChargeToAdd.paymentObjectId==null)}">
-                                    <label class="form-control-label" for=""> -->
                     Partner name <span class="m--font-danger">(*)</span>
                   </label>
                   <app-combo-grid-virtual-scroll [disabled]="buyingRateChargeToAdd.objectBePaid!=='OTHER'"
@@ -117,11 +109,6 @@
                       placeholder="Enter number" name="buyingRateChangeQuantityNameOps" decimalNumberGreaterThan0
                       #buyingRateChangeQuantityNameOps="ngModel" [(ngModel)]="buyingRateChargeToAdd.quantity"
                       (change)="calculateTotalEachBuying()" (keyup)="calculateTotalEachBuying()">
-                    <!-- <div class="input-group-prepend">
-                                            <button type="button" class="btn btn-secondary">
-                                                CBM
-                                            </button>
-                                        </div> -->
                   </div>
                   <div class="form-control-feedback"
                     *ngIf="addBuyingRateChargeFormOps.submitted && buyingRateChangeQuantityNameOps.invalid">
@@ -180,7 +167,7 @@
                     Currency <span class="m--font-danger">(*)</span>
                   </label>
 
-                  <ng-select [allowClear]="true" [items]="lstCurrencies" (data)="refreshValue($event)"
+                  <ng-select [allowClear]="true" [items]="lstCurrencies"
                     [active]="currentActiveItemDefault" (selected)="buyingRateChargeToAdd.currencyId=$event.id"
                     (removed)="buyingRateChargeToAdd.currencyId=null" placeholder="Select filter">
                   </ng-select>
@@ -254,8 +241,30 @@
                 </div>
               </div>
             </div>
+            <div class="row">
+              <div class="col-lg-4">
+                <div class="form-group">
+                  <label for="">Invoice No</label>
+                  <input type="text" class="form-control" [(ngModel)]="buyingRateChargeToAdd.invoiceNo" name="invoiceNo">
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="form-group">
+                  <label for="">Invoice Date</label>
+                  <div class="m-input-icon m-input-icon--right down">
+                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd [autoApply]="true"
+                      [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}" [(ngModel)]="invoiceDate" [singleDatePicker]="true"
+                      name="invoiceDate" readonly />
+                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                      <span>
+                        <i class="la la-calendar"></i>
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <!--end::Form-->
         </div>
         <div class="modal-footer m--align-center">
           <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" type=""
@@ -276,15 +285,6 @@
               </span>
             </span>
           </button>
-          <!-- <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-            (click)="closeChargeForm('ops-add-buying-rate-modal',addBuyingRateChargeFormOps)">
-            <span>
-              <i class="la la-ban"></i>
-              <span>
-                cancel
-              </span>
-            </span>
-          </button> -->
           <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
             (click)="close(addBuyingRateChargeFormOps)">
             <span>
@@ -297,6 +297,5 @@
         </div>
       </div>
     </div>
-
   </div>
 </form>

@@ -22,6 +22,7 @@ export class CsShipmentSurcharge {
     csstatusSettlement: String = null;
     csdateSettlement: Date = null;
     invoiceNo: String = null;
+    invoiceDate: any = null;
     paymentRefNo: String = null;
     accountantId: String = null;
     accountantDate: Date = null;

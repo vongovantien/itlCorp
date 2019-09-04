@@ -58,7 +58,7 @@
                   </app-combo-grid-virtual-scroll>
 
                   <div class="form-control-feedback"
-                    *ngIf="addOBHChargeFormOps.submitted && (obhChargeToAdd.paymentObjectId==null || obhChargeToAdd.paymentObjectId==obhChargeToAdd.payerId)">
+                    *ngIf="addOBHChargeFormOps.submitted && (obhChargeToAdd.paymentObjectId == null || obhChargeToAdd.paymentObjectId === obhChargeToAdd.payerId)">
                     Receiver name is required and do not same with payer!
                   </div>
 
@@ -81,7 +81,7 @@
                   </app-combo-grid-virtual-scroll>
 
                   <div class="form-control-feedback"
-                    *ngIf="addOBHChargeFormOps.submitted && (obhChargeToAdd.payerId==null || obhChargeToAdd.receiverId==obhChargeToAdd.payerId)">
+                    *ngIf="addOBHChargeFormOps.submitted && (obhChargeToAdd.payerId==null || obhChargeToAdd.receiverId === obhChargeToAdd.payerId)">
                     Payer name is required and do not same with receiver!
                   </div>
 
@@ -157,13 +157,12 @@
             <div class="row">
               <div class="col-lg-4">
                 <div class="form-group"
-                  [ngClass]="{ 'm-form__group has-danger': addOBHChargeFormOps.submitted && obhChargeToAdd.currencyId===null }">
+                  [ngClass]="{ 'm-form__group has-danger': addOBHChargeFormOps.submitted && obhChargeToAdd.currencyId ===  null }">
                   <label class="form-control-label" for="">
                     Currency <span class="m--font-danger">(*)</span>
                   </label>
 
-                  <ng-select [allowClear]="true" [items]="lstCurrencies" [disabled]="disabled"
-                    [active]="currentActiveItemDefault" (data)="refreshValue($event)"
+                  <ng-select [allowClear]="true" [items]="lstCurrencies" [active]="currentActiveItemDefault"
                     (selected)="obhChargeToAdd.currencyId=$event.id" (removed)="obhChargeToAdd.currencyId=null"
                     placeholder="Select filter">
                   </ng-select>
@@ -217,6 +216,29 @@
                   </label>
                   <input type="text" [(ngModel)]="obhChargeToAdd.notes" autocomplete="nope"
                     class="form-control m-input m-input--square" placeholder="Enter text" name="OBHChargeNoteNameOps">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-4">
+                <div class="form-group">
+                  <label for="">Invoice No</label>
+                  <input type="text" class="form-control" [(ngModel)]="obhChargeToAdd.invoiceNo" name="invoiceNo">
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="form-group">
+                  <label for="">Invoice Date</label>
+                  <div class="m-input-icon m-input-icon--right down">
+                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                      [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}" [(ngModel)]="invoiceDate"
+                      [singleDatePicker]="true" name="invoiceDate" readonly />
+                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                      <span>
+                        <i class="la la-calendar"></i>
+                      </span>
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

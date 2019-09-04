@@ -60,13 +60,13 @@
                                                 { 'text': 'SHIPPING LINE','id': 'SHIPPING' },
                                                 { 'text': 'OTHER', 'id': 'OTHER' }]"
                     [active]="[{'text':buyingRateChargeToEdit.objectBePaid,'id':buyingRateChargeToEdit.objectBePaid}]"
-                    (data)="refreshValue($event)" [disabled]="buyingRateChargeToEdit.cdno"
+                    [disabled]="buyingRateChargeToEdit.cdno"
                     (selected)="buyingRateChargeToEdit.objectBePaid=$event.id;
                                         buyingRateChargeToEdit.objectBePaid==='AGENT'? buyingRateChargeToEdit.paymentObjectId=opsTransaction.agentId:null;
                                         buyingRateChargeToEdit.objectBePaid==='SHIPPING'? buyingRateChargeToEdit.paymentObjectId=opsTransaction.supplierId:null;
                                         buyingRateChargeToEdit.objectBePaid==='OTHER'? buyingRateChargeToEdit.paymentObjectId=null:null;"
                     (removed)="buyingRateChargeToEdit.objectBePaid=null;buyingRateChargeToEdit.paymentObjectId=null;"
-                    (typed)="typed($event)" placeholder="Select filter">
+                    placeholder="Select filter">
                   </ng-select>
 
                   <div class="form-control-feedback"
@@ -116,11 +116,6 @@
                       name="buyingRateChangeQuantityNameOps" #buyingRateChangeQuantityNameOps="ngModel"
                       [(ngModel)]="buyingRateChargeToEdit.quantity" (keyup)="calculateTotalEachBuying()" min="0"
                       (change)="calculateTotalEachBuying()">
-                    <!-- <div class="input-group-prepend">
-                                            <button type="button" class="btn btn-secondary">
-                                                CBM
-                                            </button>
-                                        </div> -->
                   </div>
                   <div class="form-control-feedback"
                     *ngIf="editBuyingRateChargeFormOps.submitted && buyingRateChangeQuantityNameOps.invalid">
@@ -181,8 +176,7 @@
                   </label>
 
                   <ng-select [allowClear]="true" [items]="lstCurrencies" [disabled]="buyingRateChargeToEdit.cdno"
-                    [active]="buyingRateChargeActive" (data)="refreshValue($event)"
-                    (selected)="buyingRateChargeToEdit.currencyId=$event.id"
+                    [active]="buyingRateChargeActive" (selected)="buyingRateChargeToEdit.currencyId=$event.id"
                     (removed)="buyingRateChargeToEdit.currencyId=null" placeholder="Select filter">
                   </ng-select>
 
@@ -266,6 +260,28 @@
             <div class="row">
               <div class="col-lg-4">
                 <div class="form-group">
+                  <label>Invoice No</label>
+                  <input type="text" class="form-control" [(ngModel)]="buyingRateChargeToEdit.invoiceNo" name="invoiceNo"></div>
+              </div>
+              <div class="col-lg-4">
+                <div class="form-group">
+                  <label>Invoice Date</label>
+                  <div class="m-input-icon m-input-icon--right down">
+                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                      [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}" [(ngModel)]="invoiceDate"
+                      [singleDatePicker]="true" name="invoiceDate" readonly />
+                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                      <span>
+                        <i class="la la-calendar"></i>
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-4">
+                <div class="form-group">
                   <label class="form-control-label" for="">
                     &nbsp;
                   </label>
@@ -281,10 +297,9 @@
               </div>
             </div>
           </div>
-          <!--end::Form-->
         </div>
         <div class="modal-footer m--align-center">
-          <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="buyingRateChargeToEdit.exchangeDate=(buyingRateChargeToEdit.exchangeDate)==null?null:buyingRateChargeToEdit.exchangeDate.startDate;
+          <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="
                         editCharge('ops-edit-buying-rate-modal',editBuyingRateChargeFormOps,buyingRateChargeToEdit)"
             [disabled]="buyingRateChargeToEdit.cdno">
             <span>

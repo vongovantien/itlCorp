@@ -157,9 +157,8 @@
                     Currency
                   </label>
                   <ng-select [allowClear]="true" [items]="lstCurrencies" [disabled]="obhChargeToEdit.cdno"
-                    [active]="obhChargeActive" (data)="refreshValue($event)"
-                    (selected)="obhChargeToEdit.currencyId=$event.id" (removed)="obhChargeToEdit.currencyId=null"
-                    (typed)="getListCurrency($event)" placeholder="Select filter">
+                    [active]="obhChargeActive" (selected)="obhChargeToEdit.currencyId=$event.id"
+                    (removed)="obhChargeToEdit.currencyId=null" placeholder="Select filter">
                   </ng-select>
                   <div class="form-control-feedback"
                     *ngIf="editOBHChargeFormOps.submitted && obhChargeToEdit.currencyId===null ">
@@ -238,11 +237,34 @@
                 </div>
               </div>
             </div>
+            <div class="row">
+              <div class="col-lg-4">
+                <div class="form-group">
+                  <label>Invoice No</label>
+                  <input type="text" class="form-control" [(ngModel)]="obhChargeToEdit.invoiceNo" name="invoiceNo">
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="form-group">
+                  <label>Invoice Date</label>
+                  <div class="m-input-icon m-input-icon--right down">
+                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                      [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}" [(ngModel)]="invoiceDate"
+                      [singleDatePicker]="true" name="invoiceDate" readonly />
+                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                      <span>
+                        <i class="la la-calendar"></i>
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           <!--end::Form-->
         </div>
         <div class="modal-footer m--align-center">
-          <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="obhChargeToEdit.exchangeDate=(obhChargeToEdit.exchangeDate)==null?null:obhChargeToEdit.exchangeDate.startDate;
+          <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="
                         editCharge('ops-edit-obh-charge-modal',editOBHChargeFormOps)"
             [disabled]="obhChargeToEdit.cdno">
             <span>
