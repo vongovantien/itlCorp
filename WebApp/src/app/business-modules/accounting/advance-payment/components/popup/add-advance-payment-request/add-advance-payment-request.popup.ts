@@ -94,7 +94,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             'note': [],
             'customNo': [],
             'type': [],
-            'currency': [{value: null, disabled: true}],
+            'currency': [],
         });
 
         this.description = this.form.controls['description'];
