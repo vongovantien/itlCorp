@@ -53,10 +53,14 @@ export class ContainerImportComponent extends PopupBase implements OnInit {
             { title: 'Cont No', field: 'containerNo', sortable: true },
             { title: 'Seal No', field: 'sealNo', sortable: true },
             { title: 'GW', field: 'gw', sortable: true },
+            { title: 'CBM', field: 'cbm', sortable: true },
             { title: 'NW', field: 'nw', sortable: true },
             { title: 'Package Qty', field: 'packageQuantity', sortable: true },
-            { title: 'Parentdoc', field: 'firstClearanceNo', sortable: true },
-            { title: 'Note', field: 'note', sortable: true },
+            { title: 'Package Type', field: 'packageTypeName', sortable: true },
+            { title: 'Mark No', field: 'markNo', sortable: true },
+            { title: 'Description', field: 'description', sortable: true },
+            { title: 'Commodity', field: 'commodityName', sortable: true },
+            { title: 'Unit', field: 'unitOfMeasureName', sortable: true },
         ];
     }
     reset() {

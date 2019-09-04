@@ -288,8 +288,9 @@ export class ContainerListComponent extends PopupBase implements OnInit {
         [{ id: this.lstMasterContainers[index].containerTypeId, text: this.lstMasterContainers[index].containerTypeName }] : [];
       this.lstMasterContainers[index].packageTypeActive = this.lstMasterContainers[index].packageTypeId != null ?
         [{ id: this.lstMasterContainers[index].packageTypeId, text: this.lstMasterContainers[index].packageTypeName }] : [];
-      this.lstMasterContainers[index].unitOfMeasureActive = this.lstMasterContainers[index].unitOfMeasureID != null ?
-        [{ id: this.lstMasterContainers[index].unitOfMeasureID, text: this.lstMasterContainers[index].unitOfMeasureName }] : [];
+      this.lstMasterContainers[index].unitOfMeasureActive = this.lstMasterContainers[index].unitOfMeasureId != null ?
+        [{ id: this.lstMasterContainers[index].unitOfMeasureId, text: this.lstMasterContainers[index].unitOfMeasureName }] : [];
+      console.log(this.lstMasterContainers[index].unitOfMeasureActive);
       for (let i = 0; i < this.lstMasterContainers.length; i++) {
         if (i !== index) {
           this.lstMasterContainers[i].allowEdit = false;
