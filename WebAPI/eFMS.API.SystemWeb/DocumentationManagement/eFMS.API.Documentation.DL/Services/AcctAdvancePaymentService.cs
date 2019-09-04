@@ -1638,19 +1638,26 @@ namespace eFMS.API.Documentation.DL.Services
 
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var approveAdvance = dc.AcctApproveAdvance.Where(x => x.AdvanceNo == advanceNo && x.IsDeputy == false).FirstOrDefault();
-            var aprAdvanceMap = mapper.Map<AcctApproveAdvanceModel>(approveAdvance);
+            var aprAdvanceMap = new AcctApproveAdvanceModel();           
 
-            if (aprAdvanceMap == null) return null;
+            if (approveAdvance != null)
+            {
+                aprAdvanceMap = mapper.Map<AcctApproveAdvanceModel>(approveAdvance);
 
-            //Kiểm tra User đăng nhập vào có thuộc các user Approve Advance không, nếu không thuộc bất kỳ 1 user nào thì gán cờ IsApproved bằng true
-            //Kiểm tra xem dept đã approve chưa, nếu dept của user đó đã approve thì gán cờ IsApproved bằng true           
-            aprAdvanceMap.IsApproved = CheckUserInApproveAdvanceAndDeptApproved(userCurrent, aprAdvanceMap);
-            aprAdvanceMap.RequesterName = string.IsNullOrEmpty(aprAdvanceMap.Requester) ? null : GetEmployeeByUserId(aprAdvanceMap.Requester).EmployeeNameVn;
-            aprAdvanceMap.LeaderName = string.IsNullOrEmpty(aprAdvanceMap.Leader) ? null : GetEmployeeByUserId(aprAdvanceMap.Leader).EmployeeNameVn;
-            aprAdvanceMap.ManagerName = string.IsNullOrEmpty(aprAdvanceMap.Manager) ? null : GetEmployeeByUserId(aprAdvanceMap.Manager).EmployeeNameVn;
-            aprAdvanceMap.AccountantName = string.IsNullOrEmpty(aprAdvanceMap.Accountant) ? null : GetEmployeeByUserId(aprAdvanceMap.Accountant).EmployeeNameVn;
-            aprAdvanceMap.BUHeadName = string.IsNullOrEmpty(aprAdvanceMap.Buhead) ? null : GetEmployeeByUserId(aprAdvanceMap.Buhead).EmployeeNameVn;
-            
+                //Kiểm tra User đăng nhập vào có thuộc các user Approve Advance không, nếu không thuộc bất kỳ 1 user nào thì gán cờ IsApproved bằng true
+                //Kiểm tra xem dept đã approve chưa, nếu dept của user đó đã approve thì gán cờ IsApproved bằng true           
+                aprAdvanceMap.IsApproved = CheckUserInApproveAdvanceAndDeptApproved(userCurrent, aprAdvanceMap);
+                aprAdvanceMap.RequesterName = string.IsNullOrEmpty(aprAdvanceMap.Requester) ? null : GetEmployeeByUserId(aprAdvanceMap.Requester).EmployeeNameVn;
+                aprAdvanceMap.LeaderName = string.IsNullOrEmpty(aprAdvanceMap.Leader) ? null : GetEmployeeByUserId(aprAdvanceMap.Leader).EmployeeNameVn;
+                aprAdvanceMap.ManagerName = string.IsNullOrEmpty(aprAdvanceMap.Manager) ? null : GetEmployeeByUserId(aprAdvanceMap.Manager).EmployeeNameVn;
+                aprAdvanceMap.AccountantName = string.IsNullOrEmpty(aprAdvanceMap.Accountant) ? null : GetEmployeeByUserId(aprAdvanceMap.Accountant).EmployeeNameVn;
+                aprAdvanceMap.BUHeadName = string.IsNullOrEmpty(aprAdvanceMap.Buhead) ? null : GetEmployeeByUserId(aprAdvanceMap.Buhead).EmployeeNameVn;
+            }
+            else
+            {
+                //Mặc định nếu chưa send request thì gán IsApproved bằng true (nhằm để disable button Approve & Deny)
+                aprAdvanceMap.IsApproved = true;
+            }
             return aprAdvanceMap;
         }
 
