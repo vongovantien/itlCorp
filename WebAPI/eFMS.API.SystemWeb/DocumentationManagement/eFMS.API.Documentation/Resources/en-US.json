@@ -18,5 +18,19 @@
   "MSG_NOT_ALLOW_DELETED": "This shipment has payment informations. Not allow deleted",
   "MSG_CLEARANCENO_EXISTED": "Custom No [{0}] existed ! Please recheck it?",
   "MSG_CLEARANCE_CONVERT_TO_JOB": "Clearance convert to a job successfully!!!",
-  "MSG_LIST_CLEARANCE_CONVERT_TO_JOB": "List of clearances convert to list of jobs successfully!!!"
+  "MSG_LIST_CLEARANCE_CONVERT_TO_JOB": "List of clearances convert to list of jobs successfully!!!",
+
+  "MSG_MAWBCONTAINER_CONTAINERTYPE_EMPTY": "Container type name is empty",
+  "MSG_MAWBCONTAINER_CONTAINERTYPE_NOT_FOUND": "Container type name not found",
+  "MSG_MAWBCONTAINER_QUANTITY_EMPTY": "Quantity is empty",
+  "MSG_MAWBCONTAINER_QUANTITY_MUST_BE_NUMBER": "Quantity must be a number",
+  "MSG_MAWBCONTAINER_PACKAGE_QUANTITY_MUST_BE_NUMBER": "Package quantity must be a number",
+  "MSG_MAWBCONTAINER_NW_MUST_BE_NUMBER": "Nw must be a number",
+  "MSG_MAWBCONTAINER_GW_MUST_BE_NUMBER": "Gw must be a number",
+  "MSG_MAWBCONTAINER_CBM_MUST_BE_NUMBER": "Cbm must be a number",
+  "MSG_MAWBCONTAINER_PACKAGE_TYPE_NOT_FOUND": "Package type name is not found",
+  "MSG_MAWBCONTAINER_DUPLICATE": "duplicate(Cont Type && Cont Q'ty && Container No && Package Type)",
+  "MSG_MAWBCONTAINER_COMMODITY_NAME_NOT_FOUND": "Commodity name is not found",
+  "MSG_MAWBCONTAINER_UNIT_OF_MEASURE_NOT_FOUND": "Unit of measure name is not found",
+  "MSG_MAWBCONTAINER_QUANTITY_MUST_BE_1": "Quantity must be 1"
 }
