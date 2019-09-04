@@ -414,4 +414,4 @@
 
 <confirm-popup [title]="'Delete Container'" [body]="'Are you sure you want to delete the selected container?'"
   (onSubmit)="deleteContainer()"></confirm-popup>
-<app-container-import></app-container-import>
+<app-container-import (isImportSuccess)="import($event)" [jobId]="jobId"></app-container-import>

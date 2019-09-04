@@ -139,6 +139,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var container = mapper.Map<CsMawbcontainer>(item);
                     container.DatetimeModified = DateTime.Now;
                     container.UserModified = currentUser.UserID;
+                    container.Id = Guid.NewGuid();
                     dc.CsMawbcontainer.Add(container);
                 }
                 dc.SaveChanges();
@@ -186,6 +187,12 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         item.Quantity = x;
                         item.QuantityError = null;
+
+                        if ((!string.IsNullOrEmpty(item.ContainerNo) || !string.IsNullOrEmpty(item.MarkNo) || !string.IsNullOrEmpty(item.SealNo)) && item.Quantity > 1)
+                        {
+                            item.IsValid = false;
+                            item.QuantityError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_QUANTITY_MUST_BE_1].Value;
+                        }
                     }
                     else
                     {
@@ -295,11 +302,6 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         item.UnitOfMeasureId = unitOfMeasure.Id;
                     }
-                }
-                if (!string.IsNullOrEmpty(item.ContainerNo) || !string.IsNullOrEmpty(item.MarkNo) || !string.IsNullOrEmpty(item.SealNo))
-                {
-                    item.IsValid = false;
-                    item.QuantityError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_QUANTITY_MUST_BE_1].Value;
                 }
             });
             return list;

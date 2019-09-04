@@ -26,47 +26,40 @@
                     <div class="row">
                       <div class="col-sm-4 m--margin-top-10 text-right">
                         <span class="m--font-brand m--font-bolder">
-                          Total rows:
+                          Total rows: {{ totalItems }}
                         </span>
                       </div>
                       <div class="col-sm-4 m--margin-top-10 text-right">
                         <span class="m--font-success m--font-bolder">
-                          Valid rows:
+                          Valid rows: {{ totalValidRow }}
                         </span>
                       </div>
                       <div class="col-sm-4 m--margin-top-10 text-right">
                         <span class="m--font-danger  m--font-bolder">
-                          Invalid rows:
+                          Invalid rows: {{ totalInvalidRow }}
                         </span>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div class="form-actions m--margin-top-5 m--align-right">
-                  <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                  <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)="hideInvalid()">
                     <span>
-                      <span>
+                      <span *ngIf="isShowInvalid">
                         Show invalid rows
                       </span>
-                      <span>
+                      <span *ngIf="isShowInvalid == false">
                         Show All
                       </span>
                     </span>
                   </button>
-                  <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                  <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)="import()">
                     <span>
                       <i class="la la-save"></i>
                       <span>
                         save
-                      </span>
-                    </span>
-                  </button>
-                  <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                    routerLink="/home/operation/custom-clearance">
-                    <span>
-                      <i class="la la-ban"></i>
-                      <span>
-                        close
                       </span>
                     </span>
                   </button>
@@ -164,13 +157,17 @@
                         <span class="m--font-danger" *ngIf="item.gwError !== null">{{ item.gwError }}</span>
                       </td>
                       <td>
-                        <span>{{ item.cbm }}</span>
+                        <span *ngIf="item.nwError === null">{{ item.nw }}</span>
+                        <span class="m--font-danger" *ngIf="item.nwError !== null">{{ item.nwError }}</span>
                       </td>
                       <td>
-                        <span>{{ item.nw }}</span>
+                        <span *ngIf="item.cbmError === null">{{ item.cbm }}</span>
+                        <span class="m--font-danger" *ngIf="item.cbmError !== null">{{ item.cbmError }}</span>
                       </td>
                       <td>
-                        <span>{{ item.packageQuantity }}</span>
+                        <span *ngIf="item.packageQuantityError === null">{{ item.packageQuantity }}</span>
+                        <span class="m--font-danger"
+                          *ngIf="item.packageQuantityError !== null">{{ item.packageQuantityError }}</span>
                       </td>
                       <td>
                         <span *ngIf="item.packageTypeNameError === null">{{ item.packageTypeName }}</span>
@@ -204,14 +201,6 @@
         </div>
       </div>
       <div class="modal-footer m--align-center">
-        <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-          <span>
-            <i class="la la-save"></i>
-            <span>
-              save
-            </span>
-          </span>
-        </button>
         <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" (click)="close()">
           <span>
             <i class="la la-ban"></i>
@@ -224,3 +213,4 @@
     </div>
   </div>
 </div>
+<app-upload-alert></app-upload-alert>

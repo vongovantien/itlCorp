@@ -16,6 +16,7 @@ import { DecimalNumberGreaterThan0Directive, StyleCellDirective, AutofocusDirect
 
 import { PaginationComponent, TableLayoutComponent, InputTableLayoutComponent, BreadcrumbComponent, DefaultButtonComponent, DeleteConfirmModalComponent, SearchOptionsComponent, InputFormComponent, TableDetailComponent, CloseModalButtonComponent, ReportPreviewComponent, ComboGridVirtualScrollComponent, CfBeforeLeaveModalComponent, AppMultipleSelectComponent, TableCollapseComponent } from "./common";
 import { CollapseModule } from "ngx-bootstrap/collapse";
+import { UploadAlertComponent } from './common/popup/upload-alert/upload-alert.component';
 
 const Libary = [
   ModalModule,
@@ -33,7 +34,8 @@ const APP_PIPES = [
 
 const APP_POPUP = [
   ConfirmPopupComponent,
-  InfoPopupComponent
+  InfoPopupComponent,
+  UploadAlertComponent
 ];
 
 const APP_COMPONENTS = [
