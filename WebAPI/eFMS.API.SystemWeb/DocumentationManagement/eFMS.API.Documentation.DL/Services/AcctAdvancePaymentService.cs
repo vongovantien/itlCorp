@@ -1442,7 +1442,8 @@ namespace eFMS.API.Documentation.DL.Services
             };
 
             //Lấy ra email của các User được ủy quyền của group của User Approve
-            var deptCodeOfUserReciver = GetInfoDeptOfUser(advance.Requester).Code;
+            //var deptCodeOfUserReciver = GetInfoDeptOfUser(advance.Requester).Code;
+            var deptCodeOfUserReciver = GetInfoDeptOfUser(userReciver).Code;
             var usersDeputy = GetListUserDeputyByDept(deptCodeOfUserReciver);
             if (usersDeputy.Count > 0)
             {
