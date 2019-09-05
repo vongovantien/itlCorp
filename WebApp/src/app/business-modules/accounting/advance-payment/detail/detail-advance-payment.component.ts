@@ -143,7 +143,7 @@ export class AdvancePaymentDetailComponent extends AppPage {
                             });
                         }
                     },
-                );
+              );
         }
     }
 

@@ -73,7 +73,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
                             this._toastService.success(`${res.data.advanceNo + ' is added successfully'}`, 'Save Success !', { positionClass: 'toast-bottom-right' });
 
                             //  * go to detail page
-                            this._router.navigate([`home/accounting/advance-payment/${res.data.id}/approve`]);
+                            this._router.navigate([`home/accounting/advance-payment/${res.data.id}`]);
                         } else {
                             this.handleError(null, (data: any) => {
                                 this._toastService.error(data.message, data.title);
@@ -113,7 +113,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(`${res.data.advanceNo + 'Save and Send Request successfully'}`, 'Save Success !', { positionClass: 'toast-bottom-right' });
-                        this._router.navigate([`home/accounting/advance-payment/${res.data.id}`]);
+                        this._router.navigate([`home/accounting/advance-payment/${res.data.id}/approve`]);
                     } else {
                         this.handleError(null, (data: any) => {
                             this._toastService.error(data.message, data.title);

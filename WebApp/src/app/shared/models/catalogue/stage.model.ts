@@ -1,5 +1,4 @@
 // import { moment } from "ngx-bootstrap/chronos/test/chain";
-import * as _ from 'lodash';
 export class StageModel {
     
     public id: number = -1;
@@ -17,12 +16,12 @@ export class StageModel {
     public inactiveOn?: string = '';
 
     constructor(data?: any) {
-        let self = this;
-        _.forEach(data, (val, key) => {
+        const self = this;
+        for (const key in data) {
             if (self.hasOwnProperty(key)) {
-                self[key] = val;
+                self[key] = data[key];
             }
-        });
+        }
       }
 
 }
