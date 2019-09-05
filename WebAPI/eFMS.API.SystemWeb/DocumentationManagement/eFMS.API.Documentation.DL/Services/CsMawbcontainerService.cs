@@ -278,6 +278,10 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             x.IsValid = false;
                             x.ContainerTypeNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_DUPLICATE, item.ContainerTypeName, item.Quantity.ToString(), item.ContainerNo, item.PackageTypeName].Value;
+                            x.ContainerNoError = item.ContainerNo;
+                            x.QuantityError = x.Quantity + string.Empty;
+                            x.ContainerTypeNameError = x.ContainerTypeName;
+                            x.PackageTypeNameError = x.PackageTypeName;
                         });
                     }
                     var existedItems = containerShipments.Where(x => x.ContainerTypeId == item.ContainerTypeId && x.Quantity == item.Quantity && x.ContainerNo == item.ContainerNo && x.PackageTypeId == item.PackageTypeId);
@@ -285,6 +289,10 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         item.IsValid = false;
                         item.ContainerTypeNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_EXISTED, item.ContainerTypeName, item.Quantity.ToString(), item.ContainerNo, item.PackageTypeName].Value;
+                        item.ContainerNoError = item.ContainerNo;
+                        item.QuantityError = item.Quantity + string.Empty;
+                        item.ContainerTypeNameError = item.ContainerTypeName;
+                        item.PackageTypeNameError = item.PackageTypeName;
                     }
                 }
                 if (!string.IsNullOrEmpty(item.CommodityName))

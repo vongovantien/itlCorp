@@ -49,7 +49,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
 
     bodyConfirm: string = 'Do you want to exit ?';
 
-    selectedRequest: AdvancePaymentRequest; // TODO detect form was changed when dupplicate
+    selectedRequest: AdvancePaymentRequest = new AdvancePaymentRequest(); // TODO detect form was changed when dupplicate
     isDupplicate: boolean = false;
     
     advanceNo: string = '';
@@ -141,6 +141,12 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             requestCurrency: form.value.currency,
             description: form.value.description,
             advanceNo: this.advanceNo,
+            id: this.selectedRequest.id,
+            userCreated: this.selectedRequest.userCreated,
+            userModified: this.selectedRequest.userModified,
+            statusPayment: this.selectedRequest.statusPayment,
+            datetimeCreated: this.selectedRequest.datetimeCreated,
+            datetimeModified: this.selectedRequest.datetimeModified
         });
         if (this.action === 'create') {
             this.checkRequestAdvancePayment(body);
@@ -204,6 +210,9 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
         if (this.action === 'update') {
             this.onUpdate.emit(this.dataRequest);
         } else {
+            //  * reset id, userCreate for create new object
+            this.dataRequest.id = "00000000-0000-0000-0000-000000000000";
+            this.dataRequest.userCreated = "";
             this.onRequest.emit(this.dataRequest);
         }
         this.existedShipmentPopup.hide();
@@ -279,6 +288,8 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             advanceType: form.value.type.value,
             requestCurrency: form.value.currency,
             description: form.value.description,
+            advanceNo: this.advanceNo,
+            statusPayment: this.selectedRequest.statusPayment,
         });
         this.onRequest.emit(body);
         // * create new request in dupplicating

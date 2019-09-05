@@ -153,7 +153,9 @@
                         <span class="m--font-danger" *ngIf="item.quantityError !== null">{{ item.quantityError }}</span>
                       </td>
                       <td>
-                        <span>{{ item.containerNo }}</span>
+                        <span *ngIf="item.containerNoError === null">{{ item.containerNo }}</span>
+                        <span class="m--font-danger"
+                          *ngIf="item.containerNoError !== null">{{ item.containerNoError }}</span>
                       </td>
                       <td>
                         <span>{{ item.sealNo }}</span>
