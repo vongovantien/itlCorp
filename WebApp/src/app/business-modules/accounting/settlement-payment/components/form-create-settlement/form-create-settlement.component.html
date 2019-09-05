@@ -1,13 +1,13 @@
 <div class="form-update-advpayment">
-    <form>
+    <form [formGroup]="form">
         <div class="row">
             <div class="col-4">
                 <div class="form-group">
                     <label class="form-control-label">
-                        Advance No:
+                        Settlement No:
                     </label>
-                    <!-- <input type="text" class="form-control m-input m-input--square" placeholder="Advance no"
-                        formControlName="advanceNo"> -->
+                    <input type="text" class="form-control m-input m-input--square" placeholder="Settlement no"
+                        formControlName="settlementNo">
                 </div>
             </div>
             <div class="col-4">
@@ -15,8 +15,8 @@
                     <label class="form-control-label">
                         Requester:
                     </label>
-                    <!-- <input type="text" class="form-control m-input m-input--square" placeholder="Requester"
-                        [value]="userLogged.id" formControlName="requester"> -->
+                    <input type="text" class="form-control m-input m-input--square" placeholder="Requester"
+                        [value]="userLogged.id" formControlName="requester" disabled>
                 </div>
             </div>
             <div class="col-4">
@@ -24,7 +24,7 @@
                     <label class="form-control-label">
                         Request Date:
                     </label>
-                    <!-- <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
                         <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                             [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
                             name="daterange" placeholder="Select request date" [autoApply]="true"
@@ -34,8 +34,35 @@
                                 <i class="la la-calendar"></i>
                             </span>
                         </span>
-                    </div> -->
+                    </div>
                 </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4">
+                <div class="form-group">
+                    <label>Payment Method</label>
+                    <input type="text" class="form-control" formControlName="paymentMethod">
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-group">
+                    <label>Settlement Amount</label>
+                    <input type="text" formControlName="amount" class="form-control">
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-group">
+                    <label>Currency</label>
+                    <input type="text" formControlName="currency" class="form-control">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group">
+                    <label>Note</label>
+                    <input type="text" class="form-control" formControlName="note"></div>
             </div>
         </div>
     </form>
