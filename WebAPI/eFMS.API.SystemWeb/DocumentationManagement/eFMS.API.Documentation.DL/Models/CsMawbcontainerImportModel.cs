@@ -7,6 +7,7 @@ namespace eFMS.API.Documentation.DL.Models
 {
     public class CsMawbcontainerImportModel: CsMawbcontainer
     {
+        public string ContainerNoError { get; set; }
         public string ContainerTypeName { get; set; }
         public string UnitOfMeasureName { get; set; }
         public string CommodityName { get; set; }
