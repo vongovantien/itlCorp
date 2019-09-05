@@ -116,6 +116,7 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                     }
                 }
+                dc.SaveChanges();
                 return new HandleState();
             }
             catch (Exception ex)
@@ -170,7 +171,7 @@ namespace eFMS.API.Documentation.DL.Services
                     if (container == null)
                     {
                         item.IsValid = false;
-                        item.ContainerTypeNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_CONTAINERTYPE_NOT_FOUND].Value;
+                        item.ContainerTypeNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_CONTAINERTYPE_NOT_FOUND, item.ContainerTypeName].Value;
                     }
                     else
                     {
@@ -259,7 +260,7 @@ namespace eFMS.API.Documentation.DL.Services
                     if (packageType == null)
                     {
                         item.IsValid = false;
-                        item.PackageTypeNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_PACKAGE_TYPE_NOT_FOUND].Value;
+                        item.PackageTypeNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_PACKAGE_TYPE_NOT_FOUND, item.PackageTypeName].Value;
                     }
                     else
                     {
@@ -276,14 +277,14 @@ namespace eFMS.API.Documentation.DL.Services
                         list.Where(x => x.ContainerTypeId == item.ContainerTypeId && x.Quantity == item.Quantity && x.ContainerNo == item.ContainerNo && x.PackageTypeId == item.PackageTypeId).ToList().ForEach(x =>
                         {
                             x.IsValid = false;
-                            item.ContainerTypeNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_DUPLICATE].Value;
+                            x.ContainerTypeNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_DUPLICATE, item.ContainerTypeName, item.Quantity.ToString(), item.ContainerNo, item.PackageTypeName].Value;
                         });
                     }
                     var existedItems = containerShipments.Where(x => x.ContainerTypeId == item.ContainerTypeId && x.Quantity == item.Quantity && x.ContainerNo == item.ContainerNo && x.PackageTypeId == item.PackageTypeId);
                     if(existedItems.Count() > 0)
                     {
                         item.IsValid = false;
-                        item.ContainerTypeNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_EXISTED].Value;
+                        item.ContainerTypeNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_EXISTED, item.ContainerTypeName, item.Quantity.ToString(), item.ContainerNo, item.PackageTypeName].Value;
                     }
                 }
                 if (!string.IsNullOrEmpty(item.CommodityName))

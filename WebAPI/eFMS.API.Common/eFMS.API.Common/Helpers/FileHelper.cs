@@ -43,7 +43,7 @@ namespace eFMS.API.Common.Helpers
         {
             try
             {
-                pathTeamplate = pathTeamplate + Template.Resources.ExcelTemplate;
+                pathTeamplate = pathTeamplate + Template.Resources.ExcelInternalTemplate;
                 string path = Path.Combine(pathTeamplate, fileName);
                 FileInfo file = new FileInfo(path);
                 var memory = new MemoryStream();
