@@ -456,7 +456,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var request = mapper.Map<List<AcctAdvanceRequest>>(model.AdvanceRequests);
                     //Lấy ra các Request cũ cần update
-                    var requestUpdate = request.Where(x => x.UserCreated != null || x.UserCreated != "").ToList();
+                    var requestUpdate = request.Where(x => x.UserCreated != null && x.UserCreated != "").ToList();
 
                     //Lấy ra các Request có cùng AdvanceNo và không tồn tại trong requestUpdate
                     var requestNeedRemove = dc.AcctAdvanceRequest.Where(x => x.AdvanceNo == advance.AdvanceNo && !requestUpdate.Contains(x)).ToList();
