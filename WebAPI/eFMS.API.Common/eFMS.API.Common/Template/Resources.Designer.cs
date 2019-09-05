@@ -63,6 +63,15 @@ namespace eFMS.API.Common.Template {
         /// <summary>
         ///   Looks up a localized string similar to \\Resources\\Files\\.
         /// </summary>
+        internal static string ExcelInternalTemplate {
+            get {
+                return ResourceManager.GetString("ExcelInternalTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to C:\\inetpub\\efms-api\\template\\.
+        /// </summary>
         internal static string ExcelTemplate {
             get {
                 return ResourceManager.GetString("ExcelTemplate", resourceCulture);
