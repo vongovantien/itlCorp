@@ -265,7 +265,7 @@ namespace eFMS.API.Documentation.DL.Services
                     else
                     {
                         item.PackageTypeId = packageType.Id;
-                        item.PackageQuantityError = null;
+                        item.PackageTypeNameError = null;
                     }
                 }
 
@@ -277,7 +277,7 @@ namespace eFMS.API.Documentation.DL.Services
                         list.Where(x => x.ContainerTypeId == item.ContainerTypeId && x.Quantity == item.Quantity && x.ContainerNo == item.ContainerNo && x.PackageTypeId == item.PackageTypeId).ToList().ForEach(x =>
                         {
                             x.IsValid = false;
-                            x.ContainerTypeNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_DUPLICATE, item.ContainerTypeName, item.Quantity.ToString(), item.ContainerNo, item.PackageTypeName].Value;
+                            x.DuplicateError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_DUPLICATE, item.ContainerTypeName, item.Quantity.ToString(), item.ContainerNo, item.PackageTypeName].Value;
                             x.ContainerNoError = item.ContainerNo;
                             x.QuantityError = x.Quantity + string.Empty;
                             x.ContainerTypeNameError = x.ContainerTypeName;
@@ -288,7 +288,7 @@ namespace eFMS.API.Documentation.DL.Services
                     if(existedItems.Count() > 0)
                     {
                         item.IsValid = false;
-                        item.ContainerTypeNameError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_EXISTED, item.ContainerTypeName, item.Quantity.ToString(), item.ContainerNo, item.PackageTypeName].Value;
+                        item.ExistedError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_EXISTED, item.ContainerTypeName, item.Quantity.ToString(), item.ContainerNo, item.PackageTypeName].Value;
                         item.ContainerNoError = item.ContainerNo;
                         item.QuantityError = item.Quantity + string.Empty;
                         item.ContainerTypeNameError = item.ContainerTypeName;

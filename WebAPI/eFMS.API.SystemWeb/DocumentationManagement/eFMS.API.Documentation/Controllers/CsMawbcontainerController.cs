@@ -142,7 +142,9 @@ namespace eFMS.API.Documentation.Controllers
                 }
                 var data = csContainerService.CheckValidContainerImport(list);
                 var totalValidRows = list.Count(x => x.IsValid == true);
-                var results = new { list, totalValidRows };
+                var duplicatedError = list.FirstOrDefault(x => x.DuplicateError != null)?.DuplicateError;
+                var existedError = list.FirstOrDefault(x => x.DuplicateError != null)?.ExistedError;
+                var results = new { list, totalValidRows, duplicatedError, existedError };
                 return Ok(results);
             }
             return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });

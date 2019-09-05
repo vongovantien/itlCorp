@@ -34,6 +34,8 @@ export class ContainerImportComponent extends PopupBase implements OnInit {
     totalValidRow: number = 0;
     totalInvalidRow: number = 0;
     isShowInvalid: boolean = true;
+    existedError: string = null;
+    duplicatedError: string = null;
 
     constructor(private operationRepo: OperationRepo,
         private _progressService: NgProgress,
@@ -69,6 +71,8 @@ export class ContainerImportComponent extends PopupBase implements OnInit {
         this.totalItems = 0;
         this.totalValidRow = 0;
         this.totalInvalidRow = 0;
+        this.duplicatedError = null;
+        this.existedError = null;
     }
     close() {
         this.reset();
@@ -138,12 +142,14 @@ export class ContainerImportComponent extends PopupBase implements OnInit {
                     this.data = response["list"];
                     this.totalItems = this.data.length;
                     this.totalValidRow = response['totalValidRows'];
+                    this.duplicatedError = response['duplicatedError'];
+                    this.existedError = response['existedError'];
                     this.totalInvalidRow = this.totalItems - this.totalValidRow;
 
                     if (this.data != null) {
                         this.getData();
                     } else {
-                        this.importedData = [];
+                        this.reset();
                     }
                 }
                 this._progressRef.complete();

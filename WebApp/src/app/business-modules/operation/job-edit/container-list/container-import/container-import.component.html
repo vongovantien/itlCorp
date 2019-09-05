@@ -73,6 +73,16 @@
           <div class="m-portlet" style="position: relative">
             <div class="m-portlet__body">
               <!--begin: Datatable of trucking-table -->
+              <div class="table-wrapper table-scrollable" *ngIf="duplicatedError !== null">
+                <span class="m--font-danger">
+                  {{ duplicatedError }}
+                </span>
+              </div>
+              <div class="table-wrapper table-scrollable" *ngIf="existedError !== null">
+                <span class="m--font-danger">
+                  {{ existedError }}
+                </span>
+              </div>
               <div class="table-wrapper table-scrollable" id="">
                 <table class="table table-striped table-brand dataTable">
                   <thead>
@@ -203,7 +213,6 @@
                 </table>
               </div>
               <!--end: Datatable of trucking-table -->
-
             </div>
           </div>
         </div>

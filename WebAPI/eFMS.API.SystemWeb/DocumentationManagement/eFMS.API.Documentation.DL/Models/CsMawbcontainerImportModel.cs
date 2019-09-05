@@ -22,5 +22,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string NwError { get; set; }
         public string CbmError { get; set; }
         public string PackageQuantityError { get; set; }
+        public string DuplicateError { get; set; }
+        public string ExistedError { get; set; }
     }
 }
