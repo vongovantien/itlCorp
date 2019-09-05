@@ -2,7 +2,7 @@
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Get Existing Charge</h5>
+                <h5 class="modal-title">Get Charge</h5>
                 <button type="button" (click)="hide()" class="close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -10,13 +10,22 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-4">
-                        <label class="font-weight-bold">Partner</label>
+                        <div class="form-group">
+                            <label class="font-weight-bold">Partner</label>
+                            <input type="text" class="form-control">
+                        </div>
                     </div>
                     <div class="col-4">
-                        <label class="font-weight-bold">Service</label>
+                        <div class="form-group">
+                            <label class="font-weight-bold">Service</label>
+                            <input type="text" class="form-control">
+                        </div>
                     </div>
                     <div class="col-4">
-                        <label class="font-weight-bold">Shipment</label>
+                        <div class="form-group">
+                            <label class="font-weight-bold">Shipment</label>
+                            <input type="text" class="form-control">
+                        </div>
                     </div>
                     <div class="col-12">
                         <div class="m--align-right">
@@ -37,6 +46,32 @@
                                 </span>
                             </button>
                         </div>
+                    </div>
+                </div>
+                <div class="row m--margin-top-20 m--marginless">
+                    <div class="table-wrapper m--margin-top-20">
+                        <table class="table table-borderless dataTable">
+                            <thead>
+                                <tr class="text-center">
+                                    <th *ngFor="let header of headers; let i = index; trackBy: trackByFn"
+                                        [class]="sortClass(header.sortable ? header.field : '')"
+                                        (click)="sortBy(header.sortable ? header.field : '')">
+                                        <span>{{header.title}}</span>
+                                        <span class="sort-indicator"></span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="tbody-group">
+                                <tr *ngIf="!isLoading">
+                                    <td colspan="100">
+                                        <div class="no-data">
+                                            <i class="flaticon-coins"></i>
+                                            <span class="no-data-text">No records found</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

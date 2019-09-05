@@ -14,6 +14,7 @@ import { SettlementFormCreateComponent } from './components/form-create-settleme
 import { SettlementListChargeComponent } from './components/list-charge-settlement/list-charge-settlement.component';
 import { SettlementPaymentManagementPopupComponent } from './components/popup/payment-management/payment-management.popup';
 import { SettlementExistingChargePopupComponent } from './components/popup/existing-charge/existing-charge.popup';
+import { SettlementFormChargePopupComponent } from './components/popup/form-charge/form-charge.popup';
 
 const routing: Routes = [
     {
@@ -33,7 +34,8 @@ const COMPONENT = [
     SettlementFormCreateComponent,
     SettlementListChargeComponent,
     SettlementPaymentManagementPopupComponent,
-    SettlementExistingChargePopupComponent 
+    SettlementExistingChargePopupComponent,
+    SettlementFormChargePopupComponent 
 ];
 
 @NgModule({
