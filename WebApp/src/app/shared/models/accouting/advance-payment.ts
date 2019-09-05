@@ -34,7 +34,7 @@ export class AdvancePayment {
 }
 
 export class AdvancePaymentRequest {
-    id?: string;
+    id: string = "00000000-0000-0000-0000-000000000000";
     description: string = '';
     customNo: string = '';
     jobId: string = '';

@@ -146,8 +146,8 @@ export class ApproveAdvancePaymentComponent extends AppPage {
                 finalize(() => { this.modalRef.hide(); this._progressRef.complete(); })
             )
             .subscribe(
-                (res: any) => {
-                    if (res.success) {
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
                         this._toastService.success(res.message, ' Deny Is Successfull');
                         this.getInfoApprove(this.advancePayment.advanceNo);
                     } else {
