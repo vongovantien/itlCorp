@@ -216,6 +216,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             this.onRequest.emit(this.dataRequest);
         }
         this.existedShipmentPopup.hide();
+        this.resetForm();
         this.hide();
     }
 

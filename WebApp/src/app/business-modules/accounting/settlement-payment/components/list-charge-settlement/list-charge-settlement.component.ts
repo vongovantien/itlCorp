@@ -2,6 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { SettlementPaymentManagementPopupComponent } from '../popup/payment-management/payment-management.popup';
 import { SettlementExistingChargePopupComponent } from '../popup/existing-charge/existing-charge.popup';
+import { SettlementFormChargePopupComponent } from '../popup/form-charge/form-charge.popup';
 
 @Component({
     selector: 'settle-payment-list-charge',
@@ -12,6 +13,7 @@ export class SettlementListChargeComponent extends AppList {
 
     @ViewChild(SettlementPaymentManagementPopupComponent, { static: false }) paymentManagementPopup: SettlementPaymentManagementPopupComponent;
     @ViewChild(SettlementExistingChargePopupComponent, { static: false }) existingChargePopup: SettlementExistingChargePopupComponent;
+    @ViewChild(SettlementFormChargePopupComponent, { static: false }) formChargePopup: SettlementFormChargePopupComponent;
 
 
     headers: CommonInterface.IHeaderTable[];
@@ -55,6 +57,10 @@ export class SettlementListChargeComponent extends AppList {
 
     showExistingCharge() {
         this.existingChargePopup.show();
+    }
+
+    showCreateCharge() {
+        this.formChargePopup.show();
     }
 }
 
