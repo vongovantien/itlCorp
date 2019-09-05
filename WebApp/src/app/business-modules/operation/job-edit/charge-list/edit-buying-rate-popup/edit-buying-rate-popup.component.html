@@ -217,11 +217,12 @@
               <div class="col-lg-4">
                 <div class="form-group">
                   <label class="form-control-label" for="">
-                    Doc no
+                    Invoice no
                   </label>
-                  <input type="text" [(ngModel)]="buyingRateChargeToEdit.docNo" [disabled]="buyingRateChargeToEdit.cdno"
-                    autocomplete="nope" class="form-control m-input m-input--square" placeholder="Enter text"
-                    name="BuyingRateChargeDocNameOps">
+                  <input type="text" [(ngModel)]="buyingRateChargeToEdit.invoiceNo"
+                    [disabled]="buyingRateChargeToEdit.cdno" autocomplete="nope"
+                    class="form-control m-input m-input--square" placeholder="Enter text"
+                    name="BuyingRateChargeInvoiceNoOps">
                 </div>
               </div>
               <div class="col-lg-4">
@@ -260,8 +261,9 @@
             <div class="row">
               <div class="col-lg-4">
                 <div class="form-group">
-                  <label>Invoice No</label>
-                  <input type="text" class="form-control" [(ngModel)]="buyingRateChargeToEdit.invoiceNo" name="invoiceNo"></div>
+                  <label>Series No</label>
+                  <input type="text" class="form-control" [(ngModel)]="buyingRateChargeToEdit.seriesNo" name="seriesNo">
+                </div>
               </div>
               <div class="col-lg-4">
                 <div class="form-group">

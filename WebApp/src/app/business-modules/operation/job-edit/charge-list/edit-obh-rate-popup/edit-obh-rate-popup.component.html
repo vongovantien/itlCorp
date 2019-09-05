@@ -197,11 +197,11 @@
               <div class="col-lg-4">
                 <div class="form-group">
                   <label class="form-control-label" for="">
-                    Doc no
+                    Invoice no
                   </label>
-                  <input type="text" [(ngModel)]="obhChargeToEdit.docNo" autocomplete="nope"
+                  <input type="text" [(ngModel)]="obhChargeToEdit.invoiceNo" autocomplete="nope"
                     [disabled]="obhChargeToEdit.cdno" class="form-control m-input m-input--square"
-                    placeholder="Enter text" name="OBHChargeDocNameEdtOps">
+                    placeholder="Enter text" name="OBHChargeInvoiceNoEdtOps">
                 </div>
               </div>
               <div class="col-lg-4">
@@ -240,8 +240,8 @@
             <div class="row">
               <div class="col-lg-4">
                 <div class="form-group">
-                  <label>Invoice No</label>
-                  <input type="text" class="form-control" [(ngModel)]="obhChargeToEdit.invoiceNo" name="invoiceNo">
+                  <label>Series No</label>
+                  <input type="text" class="form-control" [(ngModel)]="obhChargeToEdit.seriesNo" name="seriesNo">
                 </div>
               </div>
               <div class="col-lg-4">
@@ -264,9 +264,8 @@
           <!--end::Form-->
         </div>
         <div class="modal-footer m--align-center">
-          <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="
-                        editCharge('ops-edit-obh-charge-modal',editOBHChargeFormOps)"
-            [disabled]="obhChargeToEdit.cdno">
+          <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+            (click)="editCharge('ops-edit-obh-charge-modal',editOBHChargeFormOps)" [disabled]="obhChargeToEdit.cdno">
             <span>
               <i class="la la-save"></i>
               <span>

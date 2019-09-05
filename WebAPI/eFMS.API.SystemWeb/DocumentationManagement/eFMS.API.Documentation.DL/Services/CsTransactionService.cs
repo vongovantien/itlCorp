@@ -289,7 +289,6 @@ namespace eFMS.API.Documentation.DL.Services
                                 charge.UserCreated = transaction.UserCreated;
                                 charge.DatetimeCreated = DateTime.Now;
                                 charge.Hblid = item.Id;
-                                charge.DocNo = null;
                                 charge.Soano = null;
                                 charge.Soaclosed = null;
                                 charge.SoaadjustmentRequestor = null;

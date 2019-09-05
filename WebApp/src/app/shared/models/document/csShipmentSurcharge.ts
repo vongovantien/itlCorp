@@ -16,13 +16,13 @@ export class CsShipmentSurcharge {
     kickBack: Boolean = null;
     exchangeDate: Date = null;
     notes: String = null;
-    docNo: String = null;
     settlementCode: String = null;
     csidsettlement: String = null;
     csstatusSettlement: String = null;
     csdateSettlement: Date = null;
     invoiceNo: String = null;
     invoiceDate: any = null;
+    seriesNo: string = null;
     paymentRefNo: String = null;
     accountantId: String = null;
     accountantDate: Date = null;

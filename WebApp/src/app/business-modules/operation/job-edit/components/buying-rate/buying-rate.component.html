@@ -39,7 +39,7 @@
                 </th>
             </tr>
         </thead>
-        <tbody *ngIf="!!data.length else norecord" >
+        <tbody *ngIf="!!data.length else norecord">
             <tr [ngClass]="!charge.isFromShipment ? 'bg-warning' : ''"
                 *ngFor="let charge of data | filter: keyword : ['partnerName', 'nameEn', 'currency','docNo','soano']; let i = index">
                 <td class="table-actions-col">
@@ -81,9 +81,6 @@
                 </td>
                 <td>
                     {{charge.notes}}
-                </td>
-                <td>
-                    {{charge.docNo}}
                 </td>
                 <td>
                     {{charge.soano}}

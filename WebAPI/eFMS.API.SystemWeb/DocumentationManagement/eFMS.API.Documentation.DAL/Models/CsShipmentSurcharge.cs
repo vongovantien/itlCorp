@@ -22,13 +22,13 @@ namespace eFMS.API.Documentation.Service.Models
         public bool? KickBack { get; set; }
         public DateTime? ExchangeDate { get; set; }
         public string Notes { get; set; }
-        public string DocNo { get; set; }
         public string SettlementCode { get; set; }
         public string Csidsettlement { get; set; }
         public string CsstatusSettlement { get; set; }
         public DateTime? CsdateSettlement { get; set; }
         public string InvoiceNo { get; set; }
         public DateTime? InvoiceDate { get; set; }
+        public string SeriesNo { get; set; }
         public string PaymentRefNo { get; set; }
         public string AccountantId { get; set; }
         public DateTime? AccountantDate { get; set; }

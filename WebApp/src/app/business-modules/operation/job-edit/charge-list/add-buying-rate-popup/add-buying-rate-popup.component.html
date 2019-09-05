@@ -60,7 +60,7 @@
                                                     buyingRateChargeToAdd.objectBePaid==='SHIPPING'? buyingRateChargeToAdd.paymentObjectId=opsTransaction.supplierId:null;
                                                     buyingRateChargeToAdd.objectBePaid==='OTHER'? buyingRateChargeToAdd.paymentObjectId=null:null;"
                     (removed)="buyingRateChargeToAdd.objectBePaid=null;buyingRateChargeToAdd.paymentObjectId=null;"
-                   placeholder="Select filter">
+                    placeholder="Select filter">
                   </ng-select>
 
                   <div class="form-control-feedback"
@@ -167,8 +167,8 @@
                     Currency <span class="m--font-danger">(*)</span>
                   </label>
 
-                  <ng-select [allowClear]="true" [items]="lstCurrencies"
-                    [active]="currentActiveItemDefault" (selected)="buyingRateChargeToAdd.currencyId=$event.id"
+                  <ng-select [allowClear]="true" [items]="lstCurrencies" [active]="currentActiveItemDefault"
+                    (selected)="buyingRateChargeToAdd.currencyId=$event.id"
                     (removed)="buyingRateChargeToAdd.currencyId=null" placeholder="Select filter">
                   </ng-select>
 
@@ -208,11 +208,11 @@
               <div class="col-lg-4">
                 <div class="form-group">
                   <label class="form-control-label" for="">
-                    Doc no
+                    Invoice No
                   </label>
-                  <input type="text" [(ngModel)]="buyingRateChargeToAdd.docNo" autocomplete="nope"
+                  <input type="text" [(ngModel)]="buyingRateChargeToAdd.invoiceNo" autocomplete="nope"
                     class="form-control m-input m-input--square" placeholder="Enter text"
-                    name="BuyingRateChargeDocNameOps">
+                    name="BuyingRateChargeInvoiceNoOps">
                 </div>
               </div>
               <div class="col-lg-4">
@@ -244,17 +244,17 @@
             <div class="row">
               <div class="col-lg-4">
                 <div class="form-group">
-                  <label for="">Invoice No</label>
-                  <input type="text" class="form-control" [(ngModel)]="buyingRateChargeToAdd.invoiceNo" name="invoiceNo">
+                  <label for="">Series No</label>
+                  <input type="text" class="form-control" [(ngModel)]="buyingRateChargeToAdd.seriesNo" name="invoiceNo">
                 </div>
               </div>
               <div class="col-lg-4">
                 <div class="form-group">
                   <label for="">Invoice Date</label>
                   <div class="m-input-icon m-input-icon--right down">
-                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd [autoApply]="true"
-                      [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}" [(ngModel)]="invoiceDate" [singleDatePicker]="true"
-                      name="invoiceDate" readonly />
+                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                      [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}" [(ngModel)]="invoiceDate"
+                      [singleDatePicker]="true" name="invoiceDate" readonly />
                     <span class="m-input-icon__icon m-input-icon__icon--right">
                       <span>
                         <i class="la la-calendar"></i>

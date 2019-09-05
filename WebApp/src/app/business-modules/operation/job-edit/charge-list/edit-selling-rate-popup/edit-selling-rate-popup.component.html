@@ -55,7 +55,7 @@
                                                 { 'text': 'CUSTOMER','id': 'CUSTOMER' },
                                                 { 'text': 'OTHER', 'id': 'OTHER' }]"
                     [active]="[{'text':sellingRateChargeToEdit.objectBePaid,'id':sellingRateChargeToEdit.objectBePaid}]"
-                    (data)="refreshValue($event)" [disabled]="sellingRateChargeToEdit.cdno"
+                    [disabled]="sellingRateChargeToEdit.cdno"
                     (selected)="sellingRateChargeToEdit.objectBePaid=$event.id;
                                         sellingRateChargeToEdit.objectBePaid==='AGENT'? sellingRateChargeToEdit.paymentObjectId=opsTransaction.agentId:null;
                                         sellingRateChargeToEdit.objectBePaid==='CUSTOMER'? sellingRateChargeToEdit.paymentObjectId=opsTransaction.customerId:null;
@@ -171,8 +171,7 @@
                   </label>
 
                   <ng-select [allowClear]="true" [items]="lstCurrencies" [disabled]="sellingRateChargeToEdit.cdno"
-                    [active]="sellingRateChargeActive" (data)="refreshValue($event)"
-                    (selected)="sellingRateChargeToEdit.currencyId=$event.id"
+                    [active]="sellingRateChargeActive" (selected)="sellingRateChargeToEdit.currencyId=$event.id"
                     (removed)="sellingRateChargeToEdit.currencyId=null" placeholder="Select filter">
                   </ng-select>
 
@@ -213,11 +212,11 @@
               <div class="col-lg-4">
                 <div class="form-group">
                   <label class="form-control-label" for="">
-                    Doc no
+                    Invoice no
                   </label>
-                  <input type="text" [(ngModel)]="sellingRateChargeToEdit.docNo" autocomplete="nope"
+                  <input type="text" [(ngModel)]="sellingRateChargeToEdit.invoiceNo" autocomplete="nope"
                     [disabled]="sellingRateChargeToEdit.cdno" class="form-control m-input m-input--square"
-                    placeholder="Enter text" name="SellingRateChargeDocNameOps">
+                    placeholder="Enter text" name="SellingRateChargeInvoiceNoOps">
                 </div>
               </div>
               <div class="col-lg-4">

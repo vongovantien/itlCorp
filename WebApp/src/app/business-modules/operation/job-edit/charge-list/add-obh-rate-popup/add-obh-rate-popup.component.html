@@ -81,7 +81,7 @@
                   </app-combo-grid-virtual-scroll>
 
                   <div class="form-control-feedback"
-                    *ngIf="addOBHChargeFormOps.submitted && (obhChargeToAdd.payerId==null || obhChargeToAdd.receiverId === obhChargeToAdd.payerId)">
+                    *ngIf="addOBHChargeFormOps.submitted && (obhChargeToAdd.payerId==null || obhChargeToAdd.objectBePaid === obhChargeToAdd.payerId)">
                     Payer name is required and do not same with receiver!
                   </div>
 
@@ -203,9 +203,9 @@
               <div class="col-lg-4">
                 <div class="form-group">
                   <label class="form-control-label" for="">
-                    Doc no
+                    Invoice no
                   </label>
-                  <input type="text" [(ngModel)]="obhChargeToAdd.docNo" autocomplete="nope"
+                  <input type="text" [(ngModel)]="obhChargeToAdd.invoiceNo" autocomplete="nope"
                     class="form-control m-input m-input--square" placeholder="Enter text" name="OBHChargeDocNameOps">
                 </div>
               </div>
@@ -222,8 +222,8 @@
             <div class="row">
               <div class="col-lg-4">
                 <div class="form-group">
-                  <label for="">Invoice No</label>
-                  <input type="text" class="form-control" [(ngModel)]="obhChargeToAdd.invoiceNo" name="invoiceNo">
+                  <label for="">Series No</label>
+                  <input type="text" class="form-control" [(ngModel)]="obhChargeToAdd.seriesNo" name="seriesNo">
                 </div>
               </div>
               <div class="col-lg-4">

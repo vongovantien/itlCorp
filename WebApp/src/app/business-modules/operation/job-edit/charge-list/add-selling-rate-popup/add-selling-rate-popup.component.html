@@ -54,8 +54,7 @@
                   <ng-select [allowClear]="true" [items]="[
                                                 { 'text': 'AGENT', 'id': 'AGENT' },
                                                 { 'text': 'CUSTOMER','id': 'CUSTOMER' },
-                                                { 'text': 'OTHER', 'id': 'OTHER' }]" [disabled]="disabled"
-                    (data)="refreshValue($event)"
+                                                { 'text': 'OTHER', 'id': 'OTHER' }]"
                     (selected)="sellingRateChargeToAdd.objectBePaid=$event.id;
                                         sellingRateChargeToAdd.objectBePaid==='AGENT'? sellingRateChargeToAdd.paymentObjectId=opsTransaction.agentId:null;
                                         sellingRateChargeToAdd.objectBePaid==='CUSTOMER'? sellingRateChargeToAdd.paymentObjectId=opsTransaction.customerId:null;
@@ -168,8 +167,7 @@
                     Currency <span class="m--font-danger">(*)</span>
                   </label>
 
-                  <ng-select [allowClear]="true" [items]="lstCurrencies" [disabled]="disabled"
-                    (data)="refreshValue($event)" [active]="currentActiveItemDefault"
+                  <ng-select [allowClear]="true" [items]="lstCurrencies" [active]="currentActiveItemDefault"
                     (selected)="sellingRateChargeToAdd.currencyId=$event.id"
                     (removed)="sellingRateChargeToAdd.currencyId=null" placeholder="Select filter">
                   </ng-select>
@@ -211,11 +209,11 @@
               <div class="col-lg-4">
                 <div class="form-group">
                   <label class="form-control-label" for="">
-                    Doc no
+                    Invoice no
                   </label>
-                  <input type="text" [(ngModel)]="sellingRateChargeToAdd.docNo" autocomplete="nope"
+                  <input type="text" [(ngModel)]="sellingRateChargeToAdd.invoiceNo" autocomplete="nope"
                     class="form-control m-input m-input--square" placeholder="Enter text"
-                    name="SellingRateChargeDocNameOps">
+                    name="SellingRateChargeInvoiceOps">
                 </div>
               </div>
               <div class="col-lg-4">
