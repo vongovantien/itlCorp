@@ -8,6 +8,7 @@ import { AdvancePaymentFormsearchComponent } from './components/form-search-adva
 import { AdvancePayment, AdvancePaymentRequest, User } from 'src/app/shared/models';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { NgProgress } from '@ngx-progressbar/core';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-advance-payment',
@@ -34,6 +35,7 @@ export class AdvancePaymentComponent extends AppList {
         private _sortService: SortService,
         private _progressService: NgProgress,
         private _baseService: BaseService,
+        private _router: Router
     ) {
         super();
         this.requestList = this.getListAdvancePayment;
@@ -167,6 +169,18 @@ export class AdvancePaymentComponent extends AppList {
 
     getUserLogged() {
         this.userLogged = this._baseService.getUserLogin() || 'admin';
+    }
+
+    gotoDetailAdvPayment(adv: AdvancePayment) {
+        switch (adv.statusApproval) {
+            case 'New':
+            case 'Denied':
+                this._router.navigate([`home/accounting/advance-payment/${adv.id}`]);
+                break;
+            default:
+                this._router.navigate([`home/accounting/advance-payment/${adv.id}/approve`]);
+                break;
+        }
     }
 }
 

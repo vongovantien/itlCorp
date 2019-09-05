@@ -132,7 +132,7 @@ export class StatementOfAccountDetailComponent extends AppList {
             sheetName: `SOA ${soaData.soaNo}`,
             data: soaData.listCharges.map((item: any) => {
                 return [
-                    !!item['serviceDate'] ? formatDate(item['serviceDate'], 'dd/MM/yyyy', 'vi') : '-',
+                    !!item['serviceDate'] ? formatDate(item['serviceDate'], 'dd/MM/yyyy', 'en') : '-',
                     !!item['jobId'] ? item['jobId'] : '-',
                     !!item['mbl'] ? item['mbl'] : '-',
                     !!item['hbl'] ? item['hbl'] : '-',

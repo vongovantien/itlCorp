@@ -6,7 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize } from 'rxjs/operators';
-import { AdvancePayment } from 'src/app/shared/models';
+import { AdvancePayment, Currency } from 'src/app/shared/models';
 import { AdvancePaymentFormCreateComponent } from '../../advance-payment/components/form-create-advance-payment/form-create-advance-payment.component';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap';
@@ -23,13 +23,12 @@ export class ApproveAdvancePaymentComponent extends AppPage {
     @ViewChild(AdvancePaymentFormCreateComponent, { static: false }) formCreateComponent: AdvancePaymentFormCreateComponent;
     @ViewChild(AdvancePaymentListRequestComponent, { static: true }) listRequestAdvancePaymentComponent: AdvancePaymentListRequestComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDenyPopup: ConfirmPopupComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmApprovePopup: ConfirmPopupComponent;
+    @ViewChild('confirmDenyPopup', { static: false }) confirmDenyPopup: ConfirmPopupComponent;
+    @ViewChild('confirmApprovePopup', { static: false }) confirmApprovePopup: ConfirmPopupComponent;
 
-    progress: any[] = [1, 2, 3, 4, 5, 6];
     idAdvPayment: string = '';
     advancePayment: AdvancePayment;
-    approveInfo: any = {};
+    approveInfo: any = null;
     dataReport: any = null;
 
     modalRef: BsModalRef;
@@ -68,6 +67,9 @@ export class ApproveAdvancePaymentComponent extends AppPage {
                     if (!!res) {
                         this.advancePayment = new AdvancePayment(res);
 
+                        this.formCreateComponent.formCreate.disable();
+                        this.formCreateComponent.isDisabled = true;
+
                         // * wait to currecy list api
                         setTimeout(() => {
                             this.formCreateComponent.formCreate.setValue({
@@ -88,7 +90,6 @@ export class ApproveAdvancePaymentComponent extends AppPage {
                         this.listRequestAdvancePaymentComponent.advanceNo = this.advancePayment.advanceNo;
 
                         this.getInfoApprove(this.advancePayment.advanceNo);
-                        console.log(this.advancePayment);
                     }
                 },
                 () => { },
@@ -104,7 +105,6 @@ export class ApproveAdvancePaymentComponent extends AppPage {
             .subscribe(
                 (res: any) => {
                     this.approveInfo = res;
-                    console.log(res);
                 },
             );
     }
@@ -117,10 +117,13 @@ export class ApproveAdvancePaymentComponent extends AppPage {
                 finalize(() => { this._progressRef.complete(); })
             )
             .subscribe(
-                (res: any) => {
-                    if (res.success) {
+                (res: CommonInterface.IResult) => {
+                    console.log(res);
+                    if (res.status) {
                         this._toastService.success(res.message, 'Approve Is Successfull');
                         this.getInfoApprove(this.advancePayment.advanceNo);
+                    } else {
+                        this._toastService.error(res.message, '');
                     }
                 },
             );
@@ -183,4 +186,13 @@ export class ApproveAdvancePaymentComponent extends AppPage {
         this.confirmApprovePopup.hide();
         this.apporve();
     }
+
+    onChangeCurrency(currency: Currency) {
+        this.listRequestAdvancePaymentComponent.changeCurrency(currency);
+        for (const item of this.listRequestAdvancePaymentComponent.listRequestAdvancePayment) {
+            item.requestCurrency = currency.id;
+        }
+        this.listRequestAdvancePaymentComponent.currency = currency.id;
+    }
+
 }

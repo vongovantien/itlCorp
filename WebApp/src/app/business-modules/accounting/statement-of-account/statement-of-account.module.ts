@@ -1,5 +1,4 @@
-import { NgModule, LOCALE_ID } from '@angular/core';
-import { registerLocaleData } from '@angular/common';
+import { NgModule } from '@angular/core';
 import { StatementOfAccountComponent } from './statement-of-account.component';
 import { AccountReceivePayableComponent } from './account-receive-payable/account-receive-payable.component';
 import { StatementOfAccountDetailComponent } from './detail/detail-soa.component';
@@ -14,11 +13,9 @@ import { StatementOfAccountSearchComponent } from './components/search-box-soa/s
 import { StatementOfAccountAddChargeComponent } from './components/poup/add-charge/add-charge.popup';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
-import localeVi from '@angular/common/locales/vi';
 import { StatementOfAccountSummaryComponent } from './components/summary/summary-soa.component';
 import { NgProgressModule } from '@ngx-progressbar/core';
 
-registerLocaleData(localeVi, 'vi');
 const routing: Routes = [
     {
         path: "", component: StatementOfAccountComponent,
@@ -84,7 +81,6 @@ const COMPONENTS = [
     ],
     exports: [],
     providers: [
-        { provide: LOCALE_ID, useValue: 'vi' },
 
     ],
     bootstrap: [

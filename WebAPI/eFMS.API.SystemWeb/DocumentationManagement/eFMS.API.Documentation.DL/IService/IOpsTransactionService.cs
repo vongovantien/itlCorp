@@ -22,7 +22,5 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState ConvertExistedClearancesToJobs(List<OpsTransactionClearanceModel> list);
         HandleState SoftDeleteJob(Guid id);
         string CheckExist(OpsTransactionModel model);
-        List<CsMawbcontainerImportModel> CheckValidContainerImport(List<CsMawbcontainerImportModel> list);
-        HandleState Importcontainer(List<CsMawbcontainerImportModel> data);
     }
 }

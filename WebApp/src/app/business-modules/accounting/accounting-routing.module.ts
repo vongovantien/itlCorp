@@ -1,6 +1,5 @@
 import { Routes, RouterModule } from '@angular/router';
 import { AccountReceivablePayableComponent } from './account-receivable-payable/account-receivable-payable.component';
-import { SettlementPaymentComponent } from './settlement-payment/settlement-payment.component';
 import { ModuleWithProviders } from '@angular/compiler/src/core';
 
 const routes: Routes = [
@@ -14,10 +13,7 @@ const routes: Routes = [
     path: 'advance-payment', loadChildren: () => import('./advance-payment/advance-payment.module').then(m => m.AdvancePaymentModule),
   },
   {
-    path: 'settlement-payment', component: SettlementPaymentComponent, data: {
-      name: "Settlement Payment",
-      level: 2
-    }
+    path: 'settlement-payment', loadChildren: () => import('./settlement-payment/settlement-payment.module').then(m => m.SettlementPaymentModule),
   },
   {
     path: 'account-receivable-payable', component: AccountReceivablePayableComponent, data: {

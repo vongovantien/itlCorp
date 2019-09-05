@@ -68,7 +68,7 @@
                                                 </div>
                                             </td>
                                             <td class="text-underline text-primary pointer">
-                                                <a [routerLink]="[advancePayment.id]">{{advancePayment.advanceNo}}
+                                                <a  (click)="gotoDetailAdvPayment(advancePayment)">{{advancePayment.advanceNo}}
                                                 </a>
                                             </td>
                                             <td>{{advancePayment.amount | number: '.0-3'}}</td>
@@ -78,8 +78,8 @@
                                             <td>{{advancePayment.deadlinePayment | date: 'dd/MM/yyyy'}}</td>
                                             <td>{{advancePayment.datetimeModified | date: 'dd/MM/yyyy'}}</td>
                                             <td [ngSwitch]="advancePayment.statusApprovalName">
-                                                <div *ngSwitchCase="'New'" class="text-danger">
-                                                    {{advancePayment.statusApprovalName}}</div>
+                                                    <div *ngSwitchCase="'New'" class="text-danger">
+                                                        {{advancePayment.statusApprovalName}}</div>
                                                 <div *ngSwitchCase="'Done'" class="text-success">
                                                     {{advancePayment.statusApprovalName}}</div>
                                                 <div *ngSwitchCase="'Denied'" class="text-danger">

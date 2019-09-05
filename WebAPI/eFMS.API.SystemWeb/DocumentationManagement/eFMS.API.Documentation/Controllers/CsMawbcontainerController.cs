@@ -1,15 +1,22 @@
 ﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 namespace eFMS.API.Documentation.Controllers
@@ -23,11 +30,13 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICsMawbcontainerService csContainerService;
         private readonly ICurrentUser currentUser;
-        public CsMawbcontainerController(IStringLocalizer<LanguageSub> localizer, ICsMawbcontainerService service, ICurrentUser user)
+        private readonly IHostingEnvironment _hostingEnvironment;
+        public CsMawbcontainerController(IStringLocalizer<LanguageSub> localizer, ICsMawbcontainerService service, ICurrentUser user, IHostingEnvironment hostingEnvironment)
         {
             stringLocalizer = localizer;
             csContainerService = service;
             currentUser = user;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         [HttpPost]
@@ -38,6 +47,7 @@ namespace eFMS.API.Documentation.Controllers
         }
         [HttpPut]
         [Route("Update")]
+        [Authorize]
         public IActionResult Update(CsMawbcontainerEdit model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -56,6 +66,87 @@ namespace eFMS.API.Documentation.Controllers
         public List<object> GetHBContainers(Guid JobId)
         {
             return csContainerService.ListContOfHB(JobId);
-    }
+        }
+
+        /// <summary>
+        /// download file excel from server
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("downloadFileExcel")]
+        public async Task<ActionResult> DownloadExcel()
+        {
+            string fileName = Templates.Container.ExelImportFileName + Templates.ExelImportEx;
+            string templateName = _hostingEnvironment.ContentRootPath;
+            var result = await new FileHelper().ExportExcel(templateName, fileName);
+            if (result != null)
+            {
+                return result;
+            }
+            return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+        }
+
+        /// <summary>
+        /// import list container
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("Import")]
+        [Authorize]
+        public IActionResult Importcontainer([FromBody] List<CsMawbcontainerImportModel> data)
+        {
+            var result = csContainerService.Importcontainer(data);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            return Ok(new ResultHandle { Status = false, Message = result.Exception.Message });
+        }
+
+        /// <summary>
+        /// read data from file excel
+        /// </summary>
+        /// <param name="uploadedFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("UploadFile")]
+        public IActionResult UploadFileContainer(IFormFile uploadedFile)
+        {
+            var file = new FileHelper().UploadExcel(uploadedFile);
+            if (file != null)
+            {
+                ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
+                int rowCount = worksheet.Dimension.Rows;
+                int colCount = worksheet.Dimension.Columns;
+                if (rowCount < 2) return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.NOT_FOUND_DATA_EXCEL].Value });
+                List<CsMawbcontainerImportModel> list = new List<CsMawbcontainerImportModel>();
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    var container = new CsMawbcontainerImportModel
+                    {
+                        IsValid = true,
+                        ContainerTypeName = worksheet.Cells[row, 1].Value == null ? string.Empty : worksheet.Cells[row, 1].Value.ToString().Trim(),
+                        QuantityError = worksheet.Cells[row, 2].Value == null ? null : worksheet.Cells[row, 2].Value.ToString().Trim(),
+                        ContainerNo = worksheet.Cells[row, 3].Value == null ? string.Empty : worksheet.Cells[row, 3].Value.ToString().Trim(),
+                        SealNo = worksheet.Cells[row, 4].Value == null ? string.Empty : worksheet.Cells[row, 4].Value.ToString().Trim(),
+                        GwError = worksheet.Cells[row, 5].Value == null ? null : worksheet.Cells[row, 5].Value.ToString().Trim(),
+                        CbmError = worksheet.Cells[row, 6].Value == null ? null : worksheet.Cells[row, 6].Value.ToString().Trim(),
+                        NwError = worksheet.Cells[row, 7].Value == null ? null : worksheet.Cells[row, 7].Value.ToString().Trim(),
+                        PackageQuantityError = worksheet.Cells[row, 8].Value == null ? null : worksheet.Cells[row, 8].Value.ToString().Trim(),
+                        PackageTypeName = worksheet.Cells[row, 9].Value == null ? string.Empty : worksheet.Cells[row, 9].Value.ToString().Trim(),
+                        MarkNo = worksheet.Cells[row, 10].Value == null ? string.Empty : worksheet.Cells[row, 10].Value.ToString().Trim(),
+                        Description = worksheet.Cells[row, 11].Value == null ? string.Empty : worksheet.Cells[row, 11].Value.ToString().Trim(),
+                        CommodityName = worksheet.Cells[row, 12].Value == null ? string.Empty : worksheet.Cells[row, 12].Value.ToString().Trim(),
+                        UnitOfMeasureName = worksheet.Cells[row, 13].Value == null ? string.Empty : worksheet.Cells[row, 13].Value.ToString().Trim()
+                    };
+                    list.Add(container);
+                }
+                var data = csContainerService.CheckValidContainerImport(list);
+                var totalValidRows = list.Count(x => x.IsValid == true);
+                var results = new { list, totalValidRows };
+                return Ok(results);
+            }
+            return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+        }
     }
 }

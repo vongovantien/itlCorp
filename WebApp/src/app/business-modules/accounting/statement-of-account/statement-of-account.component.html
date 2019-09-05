@@ -13,14 +13,6 @@
                     </span>
                 </span>
             </button>
-            <!-- <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
-                <span>
-                    <i class="la la-upload"></i>
-                    <span>
-                        export
-                    </span>
-                </span>
-            </button> -->
         </div>
     </div>
 </div>
@@ -90,7 +82,9 @@
                                                         <span>{{soa.debitAmount | number: '.0-2'}} {{soa.currency}}</span>
                                                     </td>
                                                     <td>
-                                                        <span>{{soa.totalAmount | number: '.0-2'}} {{soa.currency}}</span>
+                                                        <span *ngIf="soa.totalAmount >= 0">{{soa.totalAmount | number: '.0-2' }} {{soa.currency}}</span>
+                                                        <span *ngIf="soa.totalAmount < 0">({{soa.totalAmount | abs | number: '.0-2' }}) {{soa.currency}}</span>
+
                                                     </td>
                                                     <td>
                                                         <span

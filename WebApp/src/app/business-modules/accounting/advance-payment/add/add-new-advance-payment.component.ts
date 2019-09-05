@@ -57,8 +57,8 @@ export class AdvancePaymentAddNewComponent extends AppPage {
                 department: this.formCreateComponent.department.value || '',
                 paymentMethod: this.formCreateComponent.paymentMethod.value.value,
                 advanceCurrency: this.formCreateComponent.currency.value.id || 'VND',
-                requestDate: formatDate(this.formCreateComponent.requestDate.value.startDate || new Date(), 'yyyy-MM-dd', 'vi'),
-                deadlinePayment: formatDate(this.formCreateComponent.deadLine.value.startDate || new Date(), 'yyyy-MM-dd', 'vi'),
+                requestDate: formatDate(this.formCreateComponent.requestDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
+                deadlinePayment: formatDate(this.formCreateComponent.deadLine.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
                 advanceNote: this.formCreateComponent.note.value || '',
             };
             this._progressRef.start();
@@ -73,7 +73,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
                             this._toastService.success(`${res.data.advanceNo + ' is added successfully'}`, 'Save Success !', { positionClass: 'toast-bottom-right' });
 
                             //  * go to detail page
-                            this._router.navigate([`home/accounting/advance-payment/${res.data.id}`]);
+                            this._router.navigate([`home/accounting/advance-payment/${res.data.id}/approve`]);
                         } else {
                             this.handleError(null, (data: any) => {
                                 this._toastService.error(data.message, data.title);
@@ -99,8 +99,8 @@ export class AdvancePaymentAddNewComponent extends AppPage {
             department: this.formCreateComponent.department.value || '',
             paymentMethod: this.formCreateComponent.paymentMethod.value.value,
             advanceCurrency: this.formCreateComponent.currency.value.id || 'VND',
-            requestDate: formatDate(this.formCreateComponent.requestDate.value.startDate || new Date(), 'yyyy-MM-dd', 'vi'),
-            deadlinePayment: formatDate(this.formCreateComponent.deadLine.value.startDate || new Date(), 'yyyy-MM-dd', 'vi'),
+            requestDate: formatDate(this.formCreateComponent.requestDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
+            deadlinePayment: formatDate(this.formCreateComponent.deadLine.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
             advanceNote: this.formCreateComponent.note.value || '',
         };
         this._progressRef.start();

@@ -26,47 +26,40 @@
                     <div class="row">
                       <div class="col-sm-4 m--margin-top-10 text-right">
                         <span class="m--font-brand m--font-bolder">
-                          Total rows:
+                          Total rows: {{ totalItems }}
                         </span>
                       </div>
                       <div class="col-sm-4 m--margin-top-10 text-right">
                         <span class="m--font-success m--font-bolder">
-                          Valid rows:
+                          Valid rows: {{ totalValidRow }}
                         </span>
                       </div>
                       <div class="col-sm-4 m--margin-top-10 text-right">
                         <span class="m--font-danger  m--font-bolder">
-                          Invalid rows:
+                          Invalid rows: {{ totalInvalidRow }}
                         </span>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div class="form-actions m--margin-top-5 m--align-right">
-                  <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                  <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)="hideInvalid()">
                     <span>
-                      <span>
+                      <span *ngIf="isShowInvalid">
                         Show invalid rows
                       </span>
-                      <span>
+                      <span *ngIf="isShowInvalid == false">
                         Show All
                       </span>
                     </span>
                   </button>
-                  <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                  <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)="import()">
                     <span>
                       <i class="la la-save"></i>
                       <span>
                         save
-                      </span>
-                    </span>
-                  </button>
-                  <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                    routerLink="/home/operation/custom-clearance">
-                    <span>
-                      <i class="la la-ban"></i>
-                      <span>
-                        close
                       </span>
                     </span>
                   </button>
@@ -85,61 +78,125 @@
                   <thead>
                     <tr>
                       <th class="sorting_asc">No</th>
-                      <th class="sorting"
-                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceNo'), 'sorting_desc': (!isDesc && sortKey == 'clearanceNo') }">
+                      <!-- <th class="sorting"
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'containerTypeName'), 'sorting_desc': (!isDesc && sortKey == 'containerTypeName') }">
                         <span>Cont Type *</span>
                       </th>
                       <th class="sorting"
-                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'type'), 'sorting_desc': (!isDesc && sortKey == 'type') }">
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'quantity'), 'sorting_desc': (!isDesc && sortKey == 'quantity') }">
                         <span>Cont Qty *</span>
                       </th>
                       <th class="sorting"
-                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceDateStr'), 'sorting_desc': (!isDesc && sortKey == 'clearanceDateStr') }">
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'containerNo'), 'sorting_desc': (!isDesc && sortKey == 'containerNo') }">
                         <span>Cont No</span>
                       </th>
                       <th class="sorting"
-                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'customerName'), 'sorting_desc': (!isDesc && sortKey == 'customerName') }">
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'sealNo'), 'sorting_desc': (!isDesc && sortKey == 'sealNo') }">
                         <span>Seal No</span>
                       </th>
                       <th class="sorting"
-                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'mblid'), 'sorting_desc': (!isDesc && sortKey == 'mblid') }">
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'gw'), 'sorting_desc': (!isDesc && sortKey == 'gw') }">
                         <span>GW</span>
                       </th>
                       <th class="sorting"
-                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'hblid'), 'sorting_desc': (!isDesc && sortKey == 'hblid') }">
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'cbm'), 'sorting_desc': (!isDesc && sortKey == 'cbm') }">
                         <span>CBM</span>
                       </th>
                       <th class="sorting"
-                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'gatewayName'), 'sorting_desc': (!isDesc && sortKey == 'gatewayName') }">
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'nw'), 'sorting_desc': (!isDesc && sortKey == 'nw') }">
                         <span>NW</span>
                       </th>
                       <th class="sorting"
-                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'grossWeightStr'), 'sorting_desc': (!isDesc && sortKey == 'grossWeightStr') }">
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'packageQuantity'), 'sorting_desc': (!isDesc && sortKey == 'packageQuantity') }">
                         <span>Package Qty</span>
                       </th>
                       <th class="sorting"
-                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'netWeightStr'), 'sorting_desc': (!isDesc && sortKey == 'netWeightStr') }">
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'packageTypeName'), 'sorting_desc': (!isDesc && sortKey == 'packageTypeName') }">
                         <span>Package Type</span>
                       </th>
                       <th class="sorting"
-                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'cbmStr'), 'sorting_desc': (!isDesc && sortKey == 'cbmStr') }">
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'markNo'), 'sorting_desc': (!isDesc && sortKey == 'markNo') }">
                         <span>Mark No</span>
                       </th>
                       <th class="sorting"
-                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'qtyContStr'), 'sorting_desc': (!isDesc && sortKey == 'qtyContStr') }">
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'description'), 'sorting_desc': (!isDesc && sortKey == 'description') }">
                         <span>Description</span>
                       </th>
                       <th class="sorting"
-                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'pcsStr'), 'sorting_desc': (!isDesc && sortKey == 'pcsStr') }">
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'commodityName'), 'sorting_desc': (!isDesc && sortKey == 'commodityName') }">
                         <span>Commodity</span>
                       </th>
                       <th class="sorting"
-                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'commodityName'), 'sorting_desc': (!isDesc && sortKey == 'commodityName') }">
+                        [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'unitOfMeasureName'), 'sorting_desc': (!isDesc && sortKey == 'unitOfMeasureName') }">
                         <span>Unit</span>
+                      </th> -->
+                      <th *ngFor="let header of headers; let i = index; trackBy: trackByFn"
+                        [class]="sortClass(header.sortable ? header.field : '')"
+                        (click)="sortBy(header.sortable ? header.field : '')">
+                        <span>{{header.title}}</span>
+                        <span class="sort-indicator"></span>
                       </th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody *ngIf="importedData.length > 0">
+                    <tr *ngFor="let item of importedData; let i = index; trackBy: trackByFn"
+                      [ngClass]="{ 'invalid-row': !item.isValid }">
+                      <td>{{ (i + this.page + 1) }}
+                      </td>
+                      <td>
+                        <span *ngIf="item.containerTypeNameError === null">{{ item.containerTypeName }}</span>
+                        <span class="m--font-danger"
+                          *ngIf="item.containerTypeNameError !== null">{{ item.containerTypeNameError }}</span>
+                      </td>
+                      <td>
+                        <span *ngIf="item.quantityError === null">{{ item.quantity }}</span>
+                        <span class="m--font-danger" *ngIf="item.quantityError !== null">{{ item.quantityError }}</span>
+                      </td>
+                      <td>
+                        <span>{{ item.containerNo }}</span>
+                      </td>
+                      <td>
+                        <span>{{ item.sealNo }}</span>
+                      </td>
+                      <td>
+                        <span *ngIf="item.gwError === null">{{ item.gw }}</span>
+                        <span class="m--font-danger" *ngIf="item.gwError !== null">{{ item.gwError }}</span>
+                      </td>
+                      <td>
+                        <span *ngIf="item.nwError === null">{{ item.nw }}</span>
+                        <span class="m--font-danger" *ngIf="item.nwError !== null">{{ item.nwError }}</span>
+                      </td>
+                      <td>
+                        <span *ngIf="item.cbmError === null">{{ item.cbm }}</span>
+                        <span class="m--font-danger" *ngIf="item.cbmError !== null">{{ item.cbmError }}</span>
+                      </td>
+                      <td>
+                        <span *ngIf="item.packageQuantityError === null">{{ item.packageQuantity }}</span>
+                        <span class="m--font-danger"
+                          *ngIf="item.packageQuantityError !== null">{{ item.packageQuantityError }}</span>
+                      </td>
+                      <td>
+                        <span *ngIf="item.packageTypeNameError === null">{{ item.packageTypeName }}</span>
+                        <span class="m--font-danger"
+                          *ngIf="item.packageTypeNameError !== null">{{ item.packageTypeNameError }}</span>
+                      </td>
+                      <td>
+                        <span>{{ item.markNo }}</span>
+                      </td>
+                      <td>
+                        <span>{{ item.description }}</span>
+                      </td>
+                      <td>
+                        <span *ngIf="item.commodityNameError === null">{{ item.commodityName }}</span>
+                        <span class="m--font-danger"
+                          *ngIf="item.commodityNameError !== null">{{ item.commodityNameError }}</span>
+                      </td>
+                      <td>
+                        <span *ngIf="item.unitOfMeasureNameError === null">{{ item.unitOfMeasureName }}</span>
+                        <span class="m--font-danger"
+                          *ngIf="item.unitOfMeasureNameError !== null">{{ item.unitOfMeasureNameError }}</span>
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -150,14 +207,6 @@
         </div>
       </div>
       <div class="modal-footer m--align-center">
-        <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-          <span>
-            <i class="la la-save"></i>
-            <span>
-              save
-            </span>
-          </span>
-        </button>
         <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" (click)="close()">
           <span>
             <i class="la la-ban"></i>
@@ -170,3 +219,4 @@
     </div>
   </div>
 </div>
+<app-upload-alert></app-upload-alert>

@@ -5,7 +5,7 @@ import { BaseService, SortService } from 'src/app/shared/services';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PopupBase } from 'src/app/popup.base';
 import { NgForm } from '@angular/forms';
-import { UnitRepo } from 'src/app/shared/repositories';
+import { UnitRepo, OperationRepo } from 'src/app/shared/repositories';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ContainerImportComponent } from './container-import/container-import.component';
 
@@ -38,7 +38,8 @@ export class ContainerListComponent extends PopupBase implements OnInit {
     private baseServices: BaseService,
     private api_menu: API_MENU,
     private sortService: SortService,
-    private _unitRepo: UnitRepo
+    private _unitRepo: UnitRepo,
+    private _operationRepo: OperationRepo,
   ) {
     super();
   }
@@ -49,7 +50,29 @@ export class ContainerListComponent extends PopupBase implements OnInit {
     this.lstContainerTemp = this.lstMasterContainers;
   }
   showImportPopup() {
-    this.popupContainerImport.show();
+    this.popupContainerImport.show({ backdrop: 'static' });
+  }
+  import(event) {
+    if (event) {
+      this.getListContainersOfJob();
+    }
+  }
+  getListContainersOfJob() {
+    this._operationRepo.getListContainersOfJob({ mblid: this.jobId })
+      .pipe(
+        catchError(this.catchError),
+        finalize(() => {
+          this.isLoading = false;
+        })
+      )
+      .subscribe(
+        (res: any) => {
+          this.lstMasterContainers = res;
+        },
+        (errors: any) => {
+        },
+        () => { }
+      );
   }
   async onSubmitContainer(form: NgForm) {
     for (let i = 0; i < this.lstMasterContainers.length; i++) {
@@ -265,8 +288,9 @@ export class ContainerListComponent extends PopupBase implements OnInit {
         [{ id: this.lstMasterContainers[index].containerTypeId, text: this.lstMasterContainers[index].containerTypeName }] : [];
       this.lstMasterContainers[index].packageTypeActive = this.lstMasterContainers[index].packageTypeId != null ?
         [{ id: this.lstMasterContainers[index].packageTypeId, text: this.lstMasterContainers[index].packageTypeName }] : [];
-      this.lstMasterContainers[index].unitOfMeasureActive = this.lstMasterContainers[index].unitOfMeasureID != null ?
-        [{ id: this.lstMasterContainers[index].unitOfMeasureID, text: this.lstMasterContainers[index].unitOfMeasureName }] : [];
+      this.lstMasterContainers[index].unitOfMeasureActive = this.lstMasterContainers[index].unitOfMeasureId != null ?
+        [{ id: this.lstMasterContainers[index].unitOfMeasureId, text: this.lstMasterContainers[index].unitOfMeasureName }] : [];
+      console.log(this.lstMasterContainers[index].unitOfMeasureActive);
       for (let i = 0; i < this.lstMasterContainers.length; i++) {
         if (i !== index) {
           this.lstMasterContainers[i].allowEdit = false;

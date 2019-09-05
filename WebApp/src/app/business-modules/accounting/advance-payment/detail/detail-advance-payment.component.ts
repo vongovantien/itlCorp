@@ -25,7 +25,7 @@ export class AdvancePaymentDetailComponent extends AppPage {
     advancePayment: AdvancePayment = null;
 
     advId: string = '';
-    actionForm: string = 'update';
+    actionList: string = 'update';
 
     dataReport: any = null;
     constructor(
@@ -68,7 +68,17 @@ export class AdvancePaymentDetailComponent extends AppPage {
             .subscribe(
                 (res: any) => {
                     this.advancePayment = new AdvancePayment(res);
+                    switch (this.advancePayment.statusApproval) {
+                        case 'New':
+                        case 'Denied':
+                            break;
+                        default:
+                            this.formCreateComponent.formCreate.disable();
+                            this.formCreateComponent.isDisabled = true;
 
+                            this.actionList = 'read';
+                            break;
+                    }
                     // * wait to currecy list api
                     setTimeout(() => {
                         this.formCreateComponent.formCreate.setValue({
@@ -88,9 +98,7 @@ export class AdvancePaymentDetailComponent extends AppPage {
 
                     this.listRequestAdvancePaymentComponent.advanceNo = this.advancePayment.advanceNo;
 
-                    if ((this.advancePayment.statusApproval !== <string>'New' && this.advancePayment.statusApproval !== <string>'Denied') || this.advancePayment.statusApproval !== <string>'Denied') {
-                        this.actionForm = 'approve';
-                    }
+                    
                 },
             );
     }
@@ -110,8 +118,8 @@ export class AdvancePaymentDetailComponent extends AppPage {
                 department: this.formCreateComponent.department.value || '',
                 paymentMethod: this.formCreateComponent.paymentMethod.value.value,
                 advanceCurrency: this.formCreateComponent.currency.value.id || 'VND',
-                requestDate: !!this.formCreateComponent.requestDate.value.startDate ? formatDate(this.formCreateComponent.requestDate.value.startDate, 'yyyy-MM-dd', 'vi') : null,
-                deadlinePayment: !!this.formCreateComponent.deadLine.value.startDate ? formatDate(this.formCreateComponent.deadLine.value.startDate, 'yyyy-MM-dd', 'vi') : null,
+                requestDate: !!this.formCreateComponent.requestDate.value.startDate ? formatDate(this.formCreateComponent.requestDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+                deadlinePayment: !!this.formCreateComponent.deadLine.value.startDate ? formatDate(this.formCreateComponent.deadLine.value.startDate, 'yyyy-MM-dd', 'en') : null,
                 advanceNote: this.formCreateComponent.note.value || '',
                 statusApproval: this.advancePayment.statusApproval,
                 advanceNo: this.advancePayment.advanceNo,
@@ -176,8 +184,8 @@ export class AdvancePaymentDetailComponent extends AppPage {
             department: this.formCreateComponent.department.value || '',
             paymentMethod: this.formCreateComponent.paymentMethod.value.value,
             advanceCurrency: this.formCreateComponent.currency.value.id || 'VND',
-            requestDate: !!this.formCreateComponent.requestDate.value.startDate ? formatDate(this.formCreateComponent.requestDate.value.startDate, 'yyyy-MM-dd', 'vi') : null,
-            deadlinePayment: !!this.formCreateComponent.deadLine.value.startDate ? formatDate(this.formCreateComponent.deadLine.value.startDate, 'yyyy-MM-dd', 'vi') : null,
+            requestDate: !!this.formCreateComponent.requestDate.value.startDate ? formatDate(this.formCreateComponent.requestDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            deadlinePayment: !!this.formCreateComponent.deadLine.value.startDate ? formatDate(this.formCreateComponent.deadLine.value.startDate, 'yyyy-MM-dd', 'en') : null,
             advanceNote: this.formCreateComponent.note.value || '',
             statusApproval: this.advancePayment.statusApproval,
             advanceNo: this.advancePayment.advanceNo,
@@ -195,7 +203,7 @@ export class AdvancePaymentDetailComponent extends AppPage {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(`${res.data.advanceNo + ' Send request successfully'}`, 'Update Success !');
-                        this._router.navigate([`home/accounting/advance-payment/${res.data.id}`]);
+                        this._router.navigate([`home/accounting/advance-payment/${res.data.id}/approve`]);
 
                     } else {
                         this.handleError((data: any) => {

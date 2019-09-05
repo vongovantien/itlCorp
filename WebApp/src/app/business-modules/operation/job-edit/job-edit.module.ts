@@ -106,7 +106,9 @@ const COMPONENTS = [
         AddMoreModalComponent,
         ContainerImportComponent
     ],
-    providers: [],
+    providers: [
+        
+    ],
     bootstrap: [
         OpsModuleBillingJobEditComponent
     ],

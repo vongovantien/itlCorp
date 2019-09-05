@@ -133,8 +133,8 @@ namespace eFMS.API.Documentation.Controllers
             if(model.Id == Guid.Empty)
             { 
                 if (csTransactionDetailService.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower()))
-            {
-                message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
+                {
+                    message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
             }
             else

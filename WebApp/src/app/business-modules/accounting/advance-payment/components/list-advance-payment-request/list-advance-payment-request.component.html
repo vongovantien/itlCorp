@@ -1,5 +1,5 @@
 <div class="list-request-advance-payment m--margin-top-20">
-    <div class="row" *ngIf="action === 'update'">
+    <div class="row" *ngIf="state === 'update'">
         <div class="col-lg-12 m--align-left">
             <button type="button" class="btn btn-success  m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
                 (click)="openPopupAdd()">
@@ -28,7 +28,7 @@
                 <table class="table table-brand table-hover dataTable">
                     <thead>
                         <tr class="text-center">
-                            <th class="m--w-50" *ngIf="action === 'update'">
+                            <th class="m--w-50" *ngIf="state === 'update'">
                                 <label class="m-checkbox">
                                     <input type="checkbox" [(ngModel)]="isCheckAll" (change)="checkUncheckAllRequest()">
                                     <span></span>
@@ -54,7 +54,7 @@
                         <ng-container
                             *ngFor="let request of listRequestAdvancePayment; let i = index; trackBy: trackByFn">
                             <tr class="text-center">
-                                <td *ngIf="action === 'update'">
+                                <td *ngIf="state === 'update'">
                                     <div class="m-checkbox-list d-flex">
                                         <label class="m-checkbox">
                                             <input type="checkbox"
@@ -72,7 +72,7 @@
                                 </td>
                                 <td class="text-primary pointer">
                                     <a class="text-underline " (click)="updateRequestPayment(request, i)"
-                                        title="Copy request advance" *ngIf="action === 'update' else notedit">
+                                        title="Copy request advance" *ngIf="state === 'update' else notedit">
                                         {{request.description}}
                                     </a>
                                     <ng-template #notedit>{{request.description}}</ng-template>
@@ -88,7 +88,7 @@
                         </ng-container>
 
                         <tr class="text-center text-black" *ngIf="!!listRequestAdvancePayment.length">
-                            <td></td>
+                            <td *ngIf="state === 'update'"></td>
                             <td></td>
                             <td></td>
                             <td></td>

@@ -402,8 +402,8 @@ export class StatementOfAccountAddnewComponent extends AppList {
                 currency: this.selectedCurrency.id,
                 customerID: this.selectedPartner.value || '',
                 dateType: this.selectedDateMode.value,
-                fromDate: formatDate(this.selectedRangeDate.startDate, 'yyyy-MM-dd', 'vi'),
-                toDate: formatDate(this.selectedRangeDate.endDate, 'yyyy-MM-dd', 'vi'),
+                fromDate: formatDate(this.selectedRangeDate.startDate, 'yyyy-MM-dd', 'en'),
+                toDate: formatDate(this.selectedRangeDate.endDate, 'yyyy-MM-dd', 'en'),
                 type: this.selectedType.value,
                 isOBH: this.selectedObh.value,
                 strCreators: this.selectedUser.map((item: any) => item.id).toString(),
@@ -515,10 +515,10 @@ export class StatementOfAccountAddnewComponent extends AppList {
 
     onChangeRangeDate(rangeDate: any) {
         if (!!rangeDate.startDate) {
-            this.updateDataSearch('fromDate', formatDate(rangeDate.startDate, 'yyyy-MM-dd', 'vi'));
+            this.updateDataSearch('fromDate', formatDate(rangeDate.startDate, 'yyyy-MM-dd', 'en'));
         }
         if (!!rangeDate.endDate) {
-            this.updateDataSearch('toDate', formatDate(rangeDate.endDate, 'yyyy-MM-dd', 'vi'));
+            this.updateDataSearch('toDate', formatDate(rangeDate.endDate, 'yyyy-MM-dd', 'en'));
         }
     }
 

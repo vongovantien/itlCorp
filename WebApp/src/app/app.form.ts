@@ -3,6 +3,10 @@ import { AbstractControl, FormControl, FormGroup, FormBuilder } from '@angular/f
 
 export abstract class AppForm extends AppPage {
 
+    requestSearch: any = null;
+    requestReset: any = null;
+    isDisabled: boolean = null;
+
     constructor() {
         super();
     }
@@ -24,6 +28,30 @@ export abstract class AppForm extends AppPage {
             control.markAsUntouched({ onlySelf: true });
             control.markAsPristine({ onlySelf: true });
         }
+    }
+
+    emailValidator(control: AbstractControl) {
+        if (control.value.match(/[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/)) {
+            return null;
+        } else {
+            return { 'invalidEmailAddress': true };
+        }
+    }
+
+    passwordValidator(control: AbstractControl) {
+        if (control.value.match(/^(?=.*\d)(?=.*[a-zA-Z!@#$%^&*])(?!.*\s).{6,100}$/)) {
+            return null;
+        } else {
+            return { 'invalidPassword': true };
+        }
+    }
+
+    search() {
+        this.requestSearch();
+    }
+
+    reset() {
+        this.requestReset();
     }
 
 }

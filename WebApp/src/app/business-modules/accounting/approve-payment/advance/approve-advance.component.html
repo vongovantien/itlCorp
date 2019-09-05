@@ -9,7 +9,7 @@
     <div class="m-portlet">
         <div class="m-form">
             <div class="m-portlet__body">
-                <adv-payment-form-create [action]="'approve'"></adv-payment-form-create>
+                <adv-payment-form-create (onChangeCurrency)="onChangeCurrency($event)"></adv-payment-form-create>
             </div>
         </div>
     </div>
@@ -17,7 +17,7 @@
         <div class="m-form">
             <div class="m-portlet__body">
                 <div>
-                    <adv-payment-list-request [action]="'approve'"> </adv-payment-list-request>
+                    <adv-payment-list-request [state]="'read'"> </adv-payment-list-request>
                 </div>
             </div>
         </div>
@@ -27,16 +27,16 @@
             <div class="m-portlet__body">
                 <div class="row list-progress-wp p-5">
                     <div class="col-12">
-                        <ul class="list-unstyled list-progress d-flex justify-content-around">
+                        <ul class="list-unstyled list-progress d-flex justify-content-around" *ngIf="!!approveInfo">
                             <li>
                                 <div class="progress-content text-center">
                                     <div class="font-weight-bolder">Requester</div>
                                     <div class="icon-check">
-                                        <i class="la la-check-circle-o"></i>
+                                        <i class="la la-check-circle-o" *ngIf="approveInfo.requesterName"></i>
                                     </div>
                                     <div class="font-weight-bold">{{approveInfo.requesterName}}</div>
-                                    <div class="font-weight-bold">Date:
-                                        {{approveInfo.requesterAprDate | date: 'HH:mm dd/MM/yyyy'}}</div>
+                                    <div class="font-weight-bold">
+                                        {{!!approveInfo.requesterAprDate ? (approveInfo.requesterAprDate | date: 'HH:mm dd/MM/yyyy') : '/.../'}}</div>
                                 </div>
                             </li>
                             <li *ngIf="!!approveInfo.leader">
@@ -51,7 +51,7 @@
                                         </ng-template>
                                     </div>
                                     <div class="font-weight-bold">Date:
-                                        {{!!approveInfo.leaderAprDate ? (approveInfo.leaderAprDate | date: 'HH:mm dd/MM/yyyy') : '/ /'}}
+                                        {{!!approveInfo.leaderAprDate ? (approveInfo.leaderAprDate | date: 'HH:mm dd/MM/yyyy') : '/.../'}}
                                     </div>
                                 </div>
                             </li>
@@ -65,8 +65,7 @@
                                         {{approveInfo.managerName}}
                                     </div>
                                     <div class="font-weight-bold">
-                                        Date:
-                                        {{!!approveInfo.managerAprDate ? (approveInfo.managerAprDate | date: 'HH:mm dd/MM/yyyy') : '/ /'}}
+                                        {{!!approveInfo.managerAprDate ? (approveInfo.managerAprDate | date: 'HH:mm dd/MM/yyyy') : '/.../'}}
                                     </div>
                                 </div>
                             </li>
@@ -79,22 +78,22 @@
                                     <div class="font-weight-bold">
                                         {{approveInfo.accountantName}}
                                     </div>
-                                    <div class="font-weight-bold">Date:
-                                        {{!!approveInfo.accountantAprDate ? (approveInfo.accountantAprDate | date: 'HH:mm dd/MM/yyyy') : '/ /'}}
+                                    <div class="font-weight-bold">
+                                        {{!!approveInfo.accountantAprDate ? (approveInfo.accountantAprDate | date: 'HH:mm dd/MM/yyyy') : '/.../'}}
                                     </div>
                                 </div>
                             </li>
-                            <li>
+                            <li >
                                 <div class="progress-content text-center">
                                     <div class="font-weight-bolder">BU HEAD</div>
-                                    <div class="icon-check">
-                                        <i class="la la-check-circle-o"></i>
+                                    <div class="icon-check" >
+                                        <i class="la la-check-circle-o" *ngIf="approveInfo.buheadAprDate"></i>
                                     </div>
                                     <div class="font-weight-bold">
                                         {{approveInfo.buHeadName}}
                                     </div>
-                                    <div class="font-weight-bold">Date:
-                                        {{!!approveInfo.buheadAprDate ? (approveInfo.buheadAprDate | date: 'HH:mm dd/MM/yyyy') : '/ /'}}
+                                    <div class="font-weight-bold">
+                                        {{!!approveInfo.buheadAprDate ? (approveInfo.buheadAprDate | date: 'HH:mm dd/MM/yyyy') : '/.../'}}
                                     </div>
                                 </div>
                             </li>
@@ -103,7 +102,7 @@
                 </div>
                 <div class="row">
                     <div class="col-12">
-                        <div class="text-center w-50 m-auto m--margin-top-20">
+                        <div class="text-center w-50 m-auto m--margin-top-20" *ngIf="!!approveInfo">
                             <button
                                 class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
                                 title="Save" (click)="showModalApprove()" *ngIf="!approveInfo.isApproved">
@@ -167,7 +166,7 @@
             <span>
                 <i class="la la-save"></i>
                 <span>
-                    Continute
+                    Continue
                 </span>
             </span>
         </button>
@@ -187,8 +186,8 @@
     <app-report-preview [data]="dataReport"></app-report-preview>
 </ng-container>
 
-<!-- <confirm-popup #confirmDenyPopup (onSubmit)="openModalDeny(modal_deny)"
-    [body]="'Do you want to deny this advance payment ?'" [labelConfirm]="'Yes'"></confirm-popup> -->
+<confirm-popup #confirmDenyPopup (onSubmit)="openModalDeny(modal_deny)"
+    [body]="'Do you want to deny this advance payment ?'" [labelConfirm]="'Yes'"></confirm-popup>
 
 <confirm-popup #confirmApprovePopup (onSubmit)="onApprove()" [body]="'Do you want to approve this advance payment?'"
     [labelConfirm]="'Yes'"></confirm-popup>

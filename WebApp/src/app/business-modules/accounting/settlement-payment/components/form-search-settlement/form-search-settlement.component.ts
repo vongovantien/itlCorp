@@ -1,17 +1,17 @@
-import { Component, Output, EventEmitter } from '@angular/core';
-import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
+import { Component, Output, EventEmitter} from '@angular/core';
 import { AppForm } from 'src/app/app.form';
+import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 import { User } from 'src/app/shared/models';
 import { BaseService } from 'src/app/shared/services';
 import { formatDate } from '@angular/common';
 
 @Component({
-    selector: 'adv-payment-form-search',
-    templateUrl: './form-search-advance-payment.component.html'
+    selector: 'settle-payment-form-search',
+    templateUrl: './form-search-settlement.component.html'
 })
 
-export class AdvancePaymentFormsearchComponent extends AppForm {
-    @Output() onSearch: EventEmitter<ISearchAdvancePayment> = new EventEmitter<ISearchAdvancePayment>();
+export class SettlementFormSearchComponent extends AppForm {
+    @Output() onSearch: EventEmitter<ISearchSettlePayment> = new EventEmitter<ISearchSettlePayment>();
 
     formSearch: FormGroup;
     referenceNo: AbstractControl;
@@ -33,6 +33,7 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
 
     ) {
         super();
+        this.requestSearch = this.onSubmit;
     }
 
     ngOnInit() {
@@ -46,7 +47,7 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
             //     Validators.pattern(/^[\w '_"/*\\\.,-]*$/),
             // ])],
             referenceNo: [],
-            requester: [{ value: null, disabled: true }],
+            requester: [],
             requestDate: [],
             modifiedDate: [],
             statusApproval: [],
@@ -72,7 +73,7 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
     }
 
     onSubmit() {
-        const body: ISearchAdvancePayment = {
+        const body: ISearchSettlePayment = {
             referenceNos: !!this.referenceNo.value ? this.referenceNo.value.trim().replace(/(?:\r\n|\r|\n|\\n|\\r)/g, ',').trim().split(',').map((item: any) => item.trim()) : null,
             advanceModifiedDateFrom: !!this.modifiedDate.value && !!this.modifiedDate.value.startDate ? formatDate(this.modifiedDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             advanceModifiedDateTo: !!this.modifiedDate.value && !!this.modifiedDate.value.endDate ? formatDate(this.modifiedDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
@@ -94,12 +95,11 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
     getStatusApproval(): CommonInterface.ICommonTitleValue[] {
         return [
             { title: 'New', value: 'New' },
-            { title: 'Request Approval', value: 'RequestApproval'},
             { title: 'Leader Approved', value: 'LeaderApproved' },
-            { title: 'Department Manager Approved', value: 'DepartmentManagerApproved' },
-            { title: 'Accountant Manager Approved', value: 'AccountantManagerApproved' },
-            { title: 'Done ', value: 'Done' },
-            { title: 'Denied  ', value: 'Denied' },
+            { title: 'Department Manager Approved', value: 'New' },
+            { title: 'Accountant Manager Approved', value: 'New' },
+            { title: 'Done ', value: 'New' },
+            { title: 'Denied  ', value: 'New' },
         ];
     }
 
@@ -133,9 +133,13 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
 
         this.onSearch.emit(<any>{});
     }
+
+    onReset() {
+        console.log("Reseting...");
+    }
 }
 
-interface ISearchAdvancePayment {
+interface ISearchSettlePayment {
     referenceNos: string[];
     requester: string;
     requestDateFrom: string;

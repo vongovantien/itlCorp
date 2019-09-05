@@ -17,5 +17,9 @@ namespace eFMS.API.Documentation.DL.Models
         public string PackageTypeNameError { get; set; }
         public string CommodityNameError { get; set; }
         public string UnitOfMeasureNameError { get; set; }
+        public string GwError { get; set; }
+        public string NwError { get; set; }
+        public string CbmError { get; set; }
+        public string PackageQuantityError { get; set; }
     }
 }
