@@ -6,12 +6,14 @@ import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { PaginationModule, AccordionModule } from 'ngx-bootstrap';
+import { PaginationModule, AccordionModule, ModalModule } from 'ngx-bootstrap';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { SettlementPaymentAddNewComponent } from './add/add-settlement-payment.component';
 import { SettlementFormCreateComponent } from './components/form-create-settlement/form-create-settlement.component';
 import { SettlementListChargeComponent } from './components/list-charge-settlement/list-charge-settlement.component';
+import { SettlementPaymentManagementPopupComponent } from './components/popup/payment-management/payment-management.popup';
+import { SettlementExistingChargePopupComponent } from './components/popup/existing-charge/existing-charge.popup';
 
 const routing: Routes = [
     {
@@ -29,7 +31,9 @@ const routing: Routes = [
 const COMPONENT = [
     SettlementFormSearchComponent,
     SettlementFormCreateComponent,
-    SettlementListChargeComponent
+    SettlementListChargeComponent,
+    SettlementPaymentManagementPopupComponent,
+    SettlementExistingChargePopupComponent 
 ];
 
 @NgModule({
@@ -41,6 +45,7 @@ const COMPONENT = [
         PaginationModule.forRoot(),
         PerfectScrollbarModule,
         ReactiveFormsModule,
+        ModalModule.forRoot(),
         NgProgressModule,
         RouterModule.forChild(routing),
         AccordionModule.forRoot(),

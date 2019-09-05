@@ -1,0 +1,101 @@
+<div class="modal payment-management-popup" role="dialog" bsModal #popup="bs-modal" aria-hidden="true">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Payment Management</h5>
+                <button type="button" (click)="hide()" class="close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-3">
+                        <div>
+                            <span class="font-weight-bold">Job ID:</span>
+                            {{data.jobId}}
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div>
+                            <span class="font-weight-bold">HBL:</span>
+                            {{data.hbl}}
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div>
+                            <span class="font-weight-bold">MBL:</span>
+                            {{data.mbl}}
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div>
+                            <span class="font-weight-bold">Total Shipment:</span>
+                            {{data.totalShipment | number: '.0-2'}}
+                        </div>
+                        <div>
+                            <span class="font-weight-bold">Total Advance:</span>
+                            {{data.totalAmount | number: '.0-2'}}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="table-wrapper">
+                            <table class="table table-borderless dataTable">
+                                <thead>
+                                    <tr>
+                                        <th *ngFor="let header of headerAdvance; let i = index; trackBy: trackByFn"
+                                            [class]="sortClass(header.sortable ? header.field : '')"
+                                            (click)="sortBy(header.sortable ? header.field : '')">
+                                            <span>{{header.title}}</span>
+                                            <span class="sort-indicator"></span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="tbody-group">
+                                    <tr *ngIf="!isLoading">
+                                        <td colspan="100">
+                                            <div class="no-data">
+                                                <i class="flaticon-coins"></i>
+                                                <span class="no-data-text">No records found</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="table-wrapper">
+                            <table class="table table-borderless dataTable">
+                                <thead>
+                                    <tr>
+                                        <th *ngFor="let header of headerSettlement; let i = index; trackBy: trackByFn"
+                                            [class]="sortClass(header.sortable ? header.field : '')"
+                                            (click)="sortBy(header.sortable ? header.field : '')">
+                                            <span>{{header.title}}</span>
+                                            <span class="sort-indicator"></span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="tbody-group">
+                                    <tr *ngIf="!isLoading">
+                                        <td colspan="100">
+                                            <div class="no-data">
+                                                <i class="flaticon-coins"></i>
+                                                <span class="no-data-text">No records found</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer m--align-right">
+                    Balance: {{0}} VND
+                </div>
+            </div>
+        </div>
+    </div>
