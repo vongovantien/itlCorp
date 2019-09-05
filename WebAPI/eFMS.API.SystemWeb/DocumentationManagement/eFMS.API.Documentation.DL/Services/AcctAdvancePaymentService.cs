@@ -478,12 +478,16 @@ namespace eFMS.API.Documentation.DL.Services
                         dc.AcctAdvanceRequest.AddRange(requestNew);
                     }
 
-                    //Cập nhật những request cũ cần update
-                    requestUpdate.ForEach(req =>
+                    if (requestUpdate != null && requestUpdate.Count > 0)
                     {
-                        req.DatetimeModified = DateTime.Now;
-                        req.UserModified = userCurrent;
-                    });
+                        //Cập nhật những request cũ cần update
+                        requestUpdate.ForEach(req =>
+                        {
+                            req.DatetimeModified = DateTime.Now;
+                            req.UserModified = userCurrent;
+                        });
+                        dc.AcctAdvanceRequest.UpdateRange(requestUpdate);
+                    }
                 }
                 dc.SaveChanges();
                 return new HandleState();
@@ -1495,7 +1499,7 @@ namespace eFMS.API.Documentation.DL.Services
             subject = subject.Replace("[RequesterName]", requesterName);
             string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [RequesterName],</b></i></p><p>You have an Advance Payment is approved at <b>[ApprovedDate]</b> as below info:</p><p><i>Anh/ Chị có một yêu cầu tạm ứng đã được phê duyệt vào lúc <b>[ApprovedDate]</b> với thông tin như sau:</i></p><ul><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNo]</b></li><li>Advance Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencyAdvance]</b><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li></ul><p>You can click here to check more detail: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Detail Advance Request</a></span></p><p><i>Anh/ Chị có thể chọn vào đây để biết thêm thông tin chi tiết: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Chi tiết tạm ứng</a></span></i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='{0}'/></p></div>", logoeFMSBase64());
             body = body.Replace("[RequesterName]", requesterName);
-            body = body.Replace("[ApprovedDate]", approvedDate.ToString("HH:MM - dd/MM/yyyy"));
+            body = body.Replace("[ApprovedDate]", approvedDate.ToString("HH:mm - dd/MM/yyyy"));
             body = body.Replace("[AdvanceNo]", advanceNo);
             body = body.Replace("[TotalAmount]", String.Format("{0:n}", totalAmount));
             body = body.Replace("[CurrencyAdvance]", advance.AdvanceCurrency);
@@ -1550,7 +1554,7 @@ namespace eFMS.API.Documentation.DL.Services
             subject = subject.Replace("[RequesterName]", requesterName);
             string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [RequesterName],</b></i></p><p>You have an Advance Payment is denied at <b>[DeniedDate]</b> by as below info:</p><p><i>Anh/ Chị có một yêu cầu tạm ứng đã bị từ chối vào lúc <b>[DeniedDate]</b> by với thông tin như sau:</i></p><ul><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNo]</b></li><li>Advance Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencyAdvance]</b><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li><li>Comment/ <i>Lý do từ chối</i> : <b>[Comment]</b></li></ul><p>You click here to recheck detail: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Detail Advance Request</a></span></p><p><i>Anh/ Chị chọn vào đây để kiểm tra lại thông tin chi tiết: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Chi tiết tạm ứng</a></span></i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='{0}'/></p></div>", logoeFMSBase64());
             body = body.Replace("[RequesterName]", requesterName);
-            body = body.Replace("[DeniedDate]", DeniedDate.ToString("HH:MM - dd/MM/yyyy"));
+            body = body.Replace("[DeniedDate]", DeniedDate.ToString("HH:mm - dd/MM/yyyy"));
             body = body.Replace("[AdvanceNo]", advanceNo);
             body = body.Replace("[TotalAmount]", String.Format("{0:n}", totalAmount));
             body = body.Replace("[CurrencyAdvance]", advance.AdvanceCurrency);
