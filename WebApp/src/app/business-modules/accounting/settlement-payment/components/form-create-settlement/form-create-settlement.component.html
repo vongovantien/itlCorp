@@ -54,7 +54,9 @@
             <div class="col-4">
                 <div class="form-group">
                     <label>Currency</label>
-                    <input type="text" formControlName="currency" class="form-control">
+                    <select formControlName="currency" class="form-control">
+                        <option *ngFor="let currency of currencyList" [ngValue]="currency">{{currency.id}}</option>
+                    </select>
                 </div>
             </div>
         </div>
