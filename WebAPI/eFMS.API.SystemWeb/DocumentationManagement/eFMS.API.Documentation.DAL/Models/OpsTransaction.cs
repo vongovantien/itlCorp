@@ -37,6 +37,7 @@ namespace eFMS.API.Documentation.Service.Models
         public int? SumPackages { get; set; }
         public short? PackageTypeId { get; set; }
         public string CurrentStatus { get; set; }
+        public bool? IsLocked { get; set; }
         public string UserCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? CreatedDate { get; set; }

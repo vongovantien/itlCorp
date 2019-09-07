@@ -479,5 +479,16 @@
             <param name="list"></param>
             <returns></returns>
         </member>
+        <member name="T:eFMS.API.Documentation.Controllers.ShipmentController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.#ctor(eFMS.API.Documentation.DL.IService.IShipmentService)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="service"></param>
+        </member>
     </members>
 </doc>

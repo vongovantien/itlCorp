@@ -29,6 +29,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string InvoiceNo { get; set; }
         public DateTime? InvoiceDate { get; set; }
         public string SeriesNo { get; set; }
+        public string PaymentRequestType { get; set; }
         public string PaymentRefNo { get; set; }
         public string AccountantId { get; set; }
         public DateTime? AccountantDate { get; set; }

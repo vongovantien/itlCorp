@@ -50,6 +50,7 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddTransient<IOpsTransactionService, OpsTransactionService>();
             services.AddTransient<IAcctSOAService, AcctSOAService>();
             services.AddTransient<IAcctAdvancePaymentService, AcctAdvancePaymentService>();
+            services.AddTransient<IShipmentService, ShipmentService>();
         }
         public static IServiceCollection AddAuthorize(this IServiceCollection services, IConfiguration configuration)
         {

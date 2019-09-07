@@ -311,5 +311,28 @@ namespace eFMS.API.Catalogue.DL.Services
             }
         }
 
+        public IQueryable<CatChargeModel> GetSettlePaymentCharges(string keySearch, bool? inActive,int? size)
+        {
+            IQueryable<CatChargeModel> list = null;
+            if(size != null)
+            {
+                int pageSize = (int)size;
+                list = Paging(x => x.Type != "DEBIT" && (x.Inactive == inActive || inActive == null)
+                                                     && (x.Code.IndexOf(keySearch ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                                            || x.ChargeNameEn.IndexOf(keySearch ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                                            || x.ChargeNameVn.IndexOf(keySearch ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                                            , 0, pageSize);
+            }
+            else
+            {
+                list = Get(x => x.Type != "DEBIT" && (x.Inactive == inActive || inActive == null)
+                                                  && (x.Code.IndexOf(keySearch ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                                            || x.ChargeNameEn.IndexOf(keySearch ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                                            || x.ChargeNameVn.IndexOf(keySearch ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                                            );
+            }
+
+            return list;
+        }
     }
 }

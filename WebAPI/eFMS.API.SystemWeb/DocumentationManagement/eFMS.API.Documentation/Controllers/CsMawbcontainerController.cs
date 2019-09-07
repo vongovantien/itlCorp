@@ -143,7 +143,7 @@ namespace eFMS.API.Documentation.Controllers
                 var data = csContainerService.CheckValidContainerImport(list);
                 var totalValidRows = list.Count(x => x.IsValid == true);
                 var duplicatedError = list.FirstOrDefault(x => x.DuplicateError != null)?.DuplicateError;
-                var existedError = list.FirstOrDefault(x => x.DuplicateError != null)?.ExistedError;
+                var existedError = list.FirstOrDefault(x => x.ExistedError != null)?.ExistedError;
                 var results = new { list, totalValidRows, duplicatedError, existedError };
                 return Ok(results);
             }
