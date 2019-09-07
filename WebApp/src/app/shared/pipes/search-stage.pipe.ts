@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({ name: 'searchStage', pure: false })
+@Pipe({ name: 'searchStage' })
 export class SearchStage implements PipeTransform {
     transform(sources: any[], args: RegExp): any {
         const searchText = new RegExp(args, 'ig');

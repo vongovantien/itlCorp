@@ -68,7 +68,7 @@
                                                 </div>
                                             </td>
                                             <td class="text-underline text-primary pointer">
-                                                <a  (click)="gotoDetailAdvPayment(advancePayment)">{{advancePayment.advanceNo}}
+                                                <a (click)="gotoDetailAdvPayment(advancePayment)">{{advancePayment.advanceNo}}
                                                 </a>
                                             </td>
                                             <td>{{advancePayment.amount | number: '.0-3'}}</td>
@@ -78,8 +78,8 @@
                                             <td>{{advancePayment.deadlinePayment | date: 'dd/MM/yyyy'}}</td>
                                             <td>{{advancePayment.datetimeModified | date: 'dd/MM/yyyy'}}</td>
                                             <td [ngSwitch]="advancePayment.statusApprovalName">
-                                                    <div *ngSwitchCase="'New'" class="text-danger">
-                                                        {{advancePayment.statusApprovalName}}</div>
+                                                <div *ngSwitchCase="'New'" class="text-danger">
+                                                    {{advancePayment.statusApprovalName}}</div>
                                                 <div *ngSwitchCase="'Done'" class="text-success">
                                                     {{advancePayment.statusApprovalName}}</div>
                                                 <div *ngSwitchCase="'Denied'" class="text-danger">
@@ -89,7 +89,8 @@
                                                 </div>
                                             </td>
                                             <td [ngSwitch]="advancePayment.advanceStatusPayment">
-                                                <ng-container *ngIf="advancePayment.statusApproval === 'Done' else empty">
+                                                <ng-container
+                                                    *ngIf="advancePayment.statusApproval === 'Done' else empty">
                                                     <div class="text-success" *ngSwitchCase="'Settled'">
                                                         {{advancePayment.advanceStatusPayment}}
                                                     </div>
@@ -131,18 +132,22 @@
                                                                         <td>{{request.amount | number :'.0-2'}}</td>
                                                                         <td>{{request.requestCurrency}}</td>
                                                                         <td [ngSwitch]="request.statusPayment">
-                                                                            <div class="text-success"
-                                                                                *ngSwitchCase="'Settled'">
-                                                                                {{request.statusPayment}}
-                                                                            </div>
-                                                                            <div class="text-danger"
-                                                                                *ngSwitchCase="'NotSettled'">
-                                                                                Not Settled
-                                                                            </div>
-                                                                            <div class="text-danger"
-                                                                                *ngSwitchCase="'PartialSettlement'">
-                                                                                Partial Settlement
-                                                                            </div>
+                                                                            <ng-container
+                                                                                *ngIf="advancePayment.statusApproval === 'Done' else empty">
+                                                                                <div class="text-success"
+                                                                                    *ngSwitchCase="'Settled'">
+                                                                                    {{request.statusPayment}}
+                                                                                </div>
+                                                                                <div class="text-danger"
+                                                                                    *ngSwitchCase="'NotSettled'">
+                                                                                    Not Settled
+                                                                                </div>
+                                                                                <div class="text-danger"
+                                                                                    *ngSwitchCase="'PartialSettlement'">
+                                                                                    Partial Settlement
+                                                                                </div>
+                                                                            </ng-container>
+                                                                            <ng-template #empty>-</ng-template>
                                                                         </td>
                                                                     </tr>
                                                                 </ng-container>

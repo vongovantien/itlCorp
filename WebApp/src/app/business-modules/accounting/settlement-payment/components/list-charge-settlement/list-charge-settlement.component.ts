@@ -6,7 +6,8 @@ import { SettlementFormChargePopupComponent } from '../popup/form-charge/form-ch
 
 @Component({
     selector: 'settle-payment-list-charge',
-    templateUrl: './list-charge-settlement.component.html'
+    templateUrl: './list-charge-settlement.component.html',
+    styleUrls: ['./list-charge-settlement.component.scss']
 })
 
 export class SettlementListChargeComponent extends AppList {
@@ -25,20 +26,20 @@ export class SettlementListChargeComponent extends AppList {
 
     ngOnInit() {
         this.headers = [
-            { title: 'Charge Name', field: 'jobId', sortable: true },
-            { title: 'Qty', field: 'jobId', sortable: true },
-            { title: 'Unit Price', field: 'jobId', sortable: true },
-            { title: 'Currency', field: 'jobId', sortable: true },
-            { title: 'VAT', field: 'jobId', sortable: true },
-            { title: 'Amount', field: 'jobId', sortable: true },
-            { title: 'Payer', field: 'jobId', sortable: true },
-            { title: 'OBH Partner', field: 'jobId', sortable: true },
-            { title: 'Invoice No', field: 'jobId', sortable: true },
-            { title: 'Series No', field: 'jobId', sortable: true },
-            { title: 'Inv Date', field: 'jobId', sortable: true },
-            { title: 'Custom No', field: 'jobId', sortable: true },
-            { title: 'Cont No', field: 'jobId', sortable: true },
-            { title: 'Note', field: 'jobId', sortable: true },
+            { title: 'Charge Name', field: 'jobId', },
+            { title: 'Qty', field: 'jobId', },
+            { title: 'Unit Price', field: 'jobId', },
+            { title: 'Currency', field: 'jobId', },
+            { title: 'VAT', field: 'jobId', },
+            { title: 'Amount', field: 'jobId', },
+            { title: 'Payer', field: 'jobId', },
+            { title: 'OBH Partner', field: 'jobId', },
+            { title: 'Invoice No', field: 'jobId', },
+            { title: 'Series No', field: 'jobId', },
+            { title: 'Inv Date', field: 'jobId', },
+            { title: 'Custom No', field: 'jobId', },
+            { title: 'Cont No', field: 'jobId', },
+            { title: 'Note', field: 'jobId', },
         ];
     }
 

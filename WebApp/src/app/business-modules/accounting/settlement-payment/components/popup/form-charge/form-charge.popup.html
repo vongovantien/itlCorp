@@ -14,7 +14,48 @@
                             <div class="col-4">
                                 <div class="form-group">
                                     <label for="">Charge Name <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control">
+
+                                    <!-- auto complete -->
+                                    <div (clickOutside)="isShow = false">
+                                        <input name="keyword"
+                                            class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                            placeholder="Input keyword" (click)="isShow = !isShow" [(ngModel)]="keyword"
+                                            (ngModelChange)="onSearchAutoComplete($event)">
+                                        <div class="dropdown e--combogrid combogrid-autocomplete" *ngIf="isShow">
+                                            <div class="dropdown-menu e--combogrid-content">
+                                                <div class="tabel-wrapper table-fixed">
+                                                    <div class="table-head-fixed">
+                                                        <div class="table-header">
+                                                            <table class="table table-hover">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Charge Code</th>
+                                                                        <th>Charge Name EN </th>
+                                                                        <th>Charge Name VN</th>
+                                                                    </tr>
+                                                                </thead>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-body-scroll">
+                                                        <table class="table table-hover">
+                                                            <tbody>
+                                                                <ng-container
+                                                                    *ngFor="let charge of $charges | async; let i = index; trackBy: trackByFn">
+                                                                    <tr class="data-row " (click)="selectCharge(charge)"
+                                                                        [class.data-selected]="charge === selectedCharge">
+                                                                        <td>{{charge.code}}</td>
+                                                                        <td>{{charge.chargeNameEn}}</td>
+                                                                        <td>{{charge.chargeNameVn}}</td>
+                                                                    </tr>
+                                                                </ng-container>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-4">
@@ -52,7 +93,6 @@
                                     <label for="">Unit Price <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control">
                                 </div>
-
                             </div>
                             <div class="col-4">
                                 <div class="row">

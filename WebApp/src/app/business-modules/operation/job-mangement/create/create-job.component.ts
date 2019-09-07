@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
-import moment from "moment/moment";
 import { BaseService } from "src/app/shared/services/base.service";
 import { API_MENU } from "src/constants/api-menu.const";
 import { OpsTransaction } from "src/app/shared/models/document/OpsTransaction.model";

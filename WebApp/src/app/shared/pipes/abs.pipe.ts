@@ -1,12 +1,10 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-    name: 'abs'
+    name: 'abs',
 })
 export class AbsPipe implements PipeTransform {
-
     transform(input: any): any {
-
         if (isNaN (input) && !isFinite(input)) {
             return 'NaN';
         }
