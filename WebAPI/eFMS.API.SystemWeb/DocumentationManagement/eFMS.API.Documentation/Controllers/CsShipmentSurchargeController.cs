@@ -62,7 +62,6 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="Id"></param>
         /// <param name="partnerID"></param>
         /// <param name="IsHouseBillID"></param>
-        /// <param name="isAddCDNote"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("GroupByListHB")]
@@ -70,6 +69,18 @@ namespace eFMS.API.Documentation.Controllers
         {
 
             return csShipmentSurchargeService.GroupChargeByHB(Id, partnerID,IsHouseBillID);
+        }
+
+        /// <summary>
+        /// get surcharge by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetBy")]
+        public IActionResult GetBy(Guid id)
+        {
+            var result = csShipmentSurchargeService.Get(x => x.Id == id);
+            return Ok(result);
         }
 
         /// <summary>

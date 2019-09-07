@@ -277,7 +277,13 @@
             <param name="Id"></param>
             <param name="partnerID"></param>
             <param name="IsHouseBillID"></param>
-            <param name="isAddCDNote"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetBy(System.Guid)">
+            <summary>
+            get surcharge by id
+            </summary>
+            <param name="id"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetPartners(System.Guid,System.Boolean)">
