@@ -38,31 +38,42 @@ namespace eFMS.API.Documentation.DL.Services
             var request = dc.AcctAdvanceRequest;
             var user = dc.SysUser;
 
+            List<string> refNo = new List<string>();
+            if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
+            {
+                refNo = (from ad in advance
+                         join re in request on ad.AdvanceNo equals re.AdvanceNo into re2
+                         from re in re2.DefaultIfEmpty()
+                         where
+                         (
+                             criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ?
+                             (
+                                 (
+                                        (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.AdvanceNo) : 1 == 1)
+                                     || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.Hbl) : 1 == 1)
+                                     || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.Mbl) : 1 == 1)
+                                     || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.CustomNo) : 1 == 1)
+                                     || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.JobId) : 1 == 1)
+                                 )
+                             )
+                             :
+                             (
+                                 1 == 1
+                             )
+                          )
+                         select ad.AdvanceNo).ToList();
+            }
+
             var data = from ad in advance
                        join u in user on ad.Requester equals u.Id into u2
                        from u in u2.DefaultIfEmpty()
                        join re in request on ad.AdvanceNo equals re.AdvanceNo into re2
                        from re in re2.DefaultIfEmpty()
                        where
-                        (
-                            criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ?
-                            (
-                                (
-                                       (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.AdvanceNo) : 1 == 1)
-                                    || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.Hbl) : 1 == 1)
-                                    || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.Mbl) : 1 == 1)
-                                    || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.CustomNo) : 1 == 1)
-                                    || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.JobId) : 1 == 1)
-                                )
-                            )
-                            :
-                            (
-                                1 == 1
-                            )
+                         (
+                            criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ? refNo.Contains(ad.AdvanceNo) : 1 == 1
                          )
-
                          &&
-
                          (
                             !string.IsNullOrEmpty(criteria.Requester) ?
                                 ad.Requester == criteria.Requester
@@ -172,8 +183,9 @@ namespace eFMS.API.Documentation.DL.Services
                 StatusApproval = s.Key.StatusApproval,
                 AdvanceStatusPayment = s.Key.AdvanceStatusPayment,
                 PaymentMethod = s.Key.PaymentMethod,
+                PaymentMethodName = CustomData.PaymentMethod.Where(x => x.Value == s.Key.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
                 Amount = s.Sum(su => su.Amount),
-                StatusApprovalName = CustomData.StatusApproveAdvance.Where(x=>x.Value == s.Key.StatusApproval).Select(x=>x.DisplayName).FirstOrDefault()
+                StatusApprovalName = CustomData.StatusApproveAdvance.Where(x => x.Value == s.Key.StatusApproval).Select(x => x.DisplayName).FirstOrDefault()
             }
             ).OrderByDescending(orb => orb.DatetimeModified);
 
@@ -986,7 +998,8 @@ namespace eFMS.API.Documentation.DL.Services
                 if (!string.IsNullOrEmpty(approve.AdvanceNo))
                 {
                     var advance = dc.AcctAdvancePayment.Where(x => x.AdvanceNo == approve.AdvanceNo).FirstOrDefault();
-                    if(advance.StatusApproval != "New" && advance.StatusApproval != "RequestApproval" && advance.StatusApproval != "Denied" && advance.StatusApproval != "Done")
+                    //&& advance.StatusApproval != "RequestApproval"
+                    if (advance.StatusApproval != "New" && advance.StatusApproval != "Denied" && advance.StatusApproval != "Done")
                     {
                         return new HandleState("Awaiting Approval");
                     }
@@ -1014,7 +1027,7 @@ namespace eFMS.API.Documentation.DL.Services
                     checkExistsApproveByAdvanceNo.RequesterAprDate = DateTime.Now;
                     checkExistsApproveByAdvanceNo.UserModified = userCurrent;
                     checkExistsApproveByAdvanceNo.DateModified = DateTime.Now;
-                    dc.AcctApproveAdvance.Update(checkExistsApproveByAdvanceNo);                   
+                    dc.AcctApproveAdvance.Update(checkExistsApproveByAdvanceNo);
                 }
                 dc.SaveChanges();
 
@@ -1124,7 +1137,7 @@ namespace eFMS.API.Documentation.DL.Services
                     else
                     {
                         result = new HandleState("Not found Requester or Requester not approve");
-                    }                   
+                    }
                 }
 
                 //Accountant Approve
@@ -1150,7 +1163,7 @@ namespace eFMS.API.Documentation.DL.Services
                     else
                     {
                         result = new HandleState("Not found Manager or Manager not approve");
-                    }                    
+                    }
                 }
             }
             else //Trường hợp có leader
@@ -1186,7 +1199,7 @@ namespace eFMS.API.Documentation.DL.Services
                     else
                     {
                         result = new HandleState("Not found Requester or Requester not approve");
-                    }                    
+                    }
                 }
 
                 //Manager Department Approve
@@ -1222,7 +1235,7 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         result = new HandleState("Not found Leader or Leader not approve");
                     }
-                    
+
                 }
 
                 //Accountant Approve
@@ -1285,7 +1298,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     advance.StatusApproval = "LeaderApproved";
                     approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Approve của Leader
-                    
+
                     //Lấy email của Department Manager
                     userAprNext = GetManagerIdOfUser(userCurrent);
                     var userAprNextId = GetEmployeeIdOfUser(userAprNext);
@@ -1347,7 +1360,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             var approve = dc.AcctApproveAdvance.Where(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
             if (approve == null) return new HandleState("Not Found Approve Advance by advanceNo " + advance.AdvanceNo);
-            
+
             //Lấy ra dept code của userApprove dựa vào userApprove
             var deptCodeOfUser = GetInfoDeptOfUser(userCurrent).Code;
 
@@ -1385,7 +1398,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 dc.SaveChanges();
             }
-            
+
             //Send mail denied approval
             var sendMailResult = SendMailDeniedApproval(advance.AdvanceNo, comment, DateTime.Now);
             return sendMailResult ? new HandleState() : new HandleState("Send Mail Denie Approval Fail");
@@ -1513,7 +1526,8 @@ namespace eFMS.API.Documentation.DL.Services
                 emailRequester
             };
             List<string> attachments = null;
-            List<string> emailCCs = new List<string> {
+            List<string> emailCCs = new List<string>
+            {
                 //Không cần email cc
             };
 
@@ -1643,7 +1657,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var approveAdvance = dc.AcctApproveAdvance.Where(x => x.AdvanceNo == advanceNo && x.IsDeputy == false).FirstOrDefault();
-            var aprAdvanceMap = new AcctApproveAdvanceModel();           
+            var aprAdvanceMap = new AcctApproveAdvanceModel();
 
             if (approveAdvance != null)
             {

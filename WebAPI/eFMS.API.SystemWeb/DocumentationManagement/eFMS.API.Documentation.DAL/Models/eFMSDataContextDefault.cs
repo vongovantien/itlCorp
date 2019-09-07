@@ -87,13 +87,13 @@ namespace eFMS.API.Documentation.Service.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=192.168.7.31; Database=eFMSTest; User ID=sa; Password=P@ssw0rd");
+                optionsBuilder.UseSqlServer("Server=192.168.7.31;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
             modelBuilder.Entity<AcctAdvancePayment>(entity =>
             {
@@ -1833,6 +1833,16 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.ContainerType)
+                    .WithMany(p => p.CsMawbcontainerContainerType)
+                    .HasForeignKey(d => d.ContainerTypeId)
+                    .HasConstraintName("FK_csMAWBContainer_catUnit1");
+
+                entity.HasOne(d => d.UnitOfMeasure)
+                    .WithMany(p => p.CsMawbcontainerUnitOfMeasure)
+                    .HasForeignKey(d => d.UnitOfMeasureId)
+                    .HasConstraintName("FK_csMAWBContainer_catUnit");
             });
 
             modelBuilder.Entity<CsShipmentHawbdetail>(entity =>
@@ -2102,6 +2112,10 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.ChiefAccountantStatus)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.ClearanceNo).HasMaxLength(100);
+
+                entity.Property(e => e.ContNo).HasMaxLength(200);
 
                 entity.Property(e => e.CreditNo)
                     .HasMaxLength(50)
