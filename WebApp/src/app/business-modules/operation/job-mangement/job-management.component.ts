@@ -83,9 +83,8 @@ export class JobManagementComponent extends AppList implements OnInit {
             { title: 'Source', field: 'source', sortable: true },
             { title: 'Note', field: 'note', sortable: true },
         ];
-        const today = new Date();
-        this.dataSearch.serviceDateFrom = new Date(today.getFullYear(), today.getMonth(), 1);
-        this.dataSearch.serviceDateTo = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        this.dataSearch.serviceDateFrom = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+        this.dataSearch.serviceDateTo = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
         this.getShipments(this.dataSearch);
     }
 

@@ -102,9 +102,10 @@ const COMPONENTS = [
         EditObhRatePopupComponent,
 
         PlSheetPopupComponent,
-        ...COMPONENTS,
         AddMoreModalComponent,
-        ContainerImportComponent
+        ContainerImportComponent,
+        ...COMPONENTS,
+
     ],
     providers: [
         
