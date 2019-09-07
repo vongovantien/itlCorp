@@ -7,5 +7,10 @@ namespace eFMS.API.Documentation.DL.Models
 {
     public class AcctSettlementPaymentResult : AcctSettlementPayment
     {
+        public decimal? Amount { get; set; }
+        public string RequesterName { get; set; }
+        public string PaymentMethodName { get; set; }        
+        public string StatusApprovalName { get; set; }
+        public string ChargeCurrency { get; set; }
     }
 }

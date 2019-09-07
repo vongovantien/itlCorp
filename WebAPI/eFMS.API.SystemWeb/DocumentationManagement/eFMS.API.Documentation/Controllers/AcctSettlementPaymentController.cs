@@ -2,10 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using eFMS.API.Common;
+using eFMS.API.Common.Globals;
+using eFMS.API.Common.NoSql;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -52,6 +58,42 @@ namespace eFMS.API.Documentation.Controllers
         {
             var data = acctSettlementPaymentService.Paging(criteria, pageNumber, pageSize, out int totalItems);
             var result = new { data, totalItems, pageNumber, pageSize };
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Get list shipment of settlement payment
+        /// </summary>
+        /// <param name="settlementNo">settlement that want to retrieve Settlement Payment</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetShipmentOfSettlements")]
+        public IActionResult GetShipmentOfSettlements(string settlementNo)
+        {
+            var data = acctSettlementPaymentService.GetShipmentOfSettlements(settlementNo);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// delete an settlement payment existed item
+        /// </summary>
+        /// <param name="settlementNo">settlementNo of existed item that want to delete</param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpDelete]
+        [Route("Delete")]
+        public IActionResult Delete(string settlementNo)
+        {
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
+
+            HandleState hs = acctSettlementPaymentService.DeleteSettlementPayment(settlementNo);
+
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return Ok(result);
+            }
             return Ok(result);
         }
 

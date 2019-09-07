@@ -2113,6 +2113,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.ClearanceNo).HasMaxLength(100);
+
+                entity.Property(e => e.ContNo).HasMaxLength(200);
+
                 entity.Property(e => e.CreditNo)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -2148,8 +2152,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.DebitNo)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.Property(e => e.DocNo).HasMaxLength(500);
 
                 entity.Property(e => e.ExchangeDate).HasColumnType("datetime");
 
@@ -2188,7 +2190,13 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.PaymentRequestType)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Quantity).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.SeriesNo).HasMaxLength(50);
 
                 entity.Property(e => e.SettlementCode)
                     .HasMaxLength(50)
@@ -2432,6 +2440,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.InvoiceNo).HasMaxLength(1600);
+
+                entity.Property(e => e.IsLocked).HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.JobNo)
                     .HasMaxLength(50)
@@ -2887,6 +2897,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.InvoiceNo).HasMaxLength(200);
+
+                entity.Property(e => e.IsLocked).HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.JobNo)
                     .HasMaxLength(50)
