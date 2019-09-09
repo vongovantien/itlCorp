@@ -1,8 +1,10 @@
 ﻿using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.DL.Models.SettlementPayment;
 using eFMS.API.Documentation.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
+using System;
 using System.Collections.Generic;
 
 namespace eFMS.API.Documentation.DL.IService
@@ -14,5 +16,9 @@ namespace eFMS.API.Documentation.DL.IService
         List<ShipmentOfSettlementResult> GetShipmentOfSettlements(string settlementNo);
 
         HandleState DeleteSettlementPayment(string settlementNo);
+
+        AcctSettlementPaymentModel GetSettlementPaymentById(Guid idSettlement);
+
+        List<ShipmentSettlement> GetListShipmentSettlementBySettlementNo(string settlementNo);
     }
 }

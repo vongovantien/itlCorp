@@ -153,11 +153,11 @@
             <param name="pageSize">number items per page</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.AcctSettlementPaymentController.GetShipmentOfSettlements(System.String)">
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSettlementPaymentController.GetShipmentOfSettlementList(System.String)">
             <summary>
-            Get list shipment of settlement payment
+            Get list shipment of settlement payment list by settlementNo
             </summary>
-            <param name="settlementNo">settlement that want to retrieve Settlement Payment</param>
+            <param name="settlementNo">settlementNo that want to retrieve Settlement Payment</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.AcctSettlementPaymentController.Delete(System.String)">
@@ -165,6 +165,20 @@
             delete an settlement payment existed item
             </summary>
             <param name="settlementNo">settlementNo of existed item that want to delete</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSettlementPaymentController.GetSettlementPaymentById(System.Guid)">
+            <summary>
+            Get settlement payment by settlementId
+            </summary>
+            <param name="settlementId">settlementId that want to retrieve Settlement Payment</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSettlementPaymentController.GetShipmentsSettlementBySettlementNo(System.String)">
+            <summary>
+            Get list shipment settlement by settlementNo
+            </summary>
+            <param name="settlementNo">settlementNo that want to retrieve Settlement Payment</param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Documentation.Controllers.AcctSOAController">

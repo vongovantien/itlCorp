@@ -62,13 +62,13 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
-        /// Get list shipment of settlement payment
+        /// Get list shipment of settlement payment list by settlementNo
         /// </summary>
-        /// <param name="settlementNo">settlement that want to retrieve Settlement Payment</param>
+        /// <param name="settlementNo">settlementNo that want to retrieve Settlement Payment</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("GetShipmentOfSettlements")]
-        public IActionResult GetShipmentOfSettlements(string settlementNo)
+        [Route("GetShipmentOfSettlementListBySettlementNo")]
+        public IActionResult GetShipmentOfSettlementList(string settlementNo)
         {
             var data = acctSettlementPaymentService.GetShipmentOfSettlements(settlementNo);
             return Ok(data);
@@ -95,6 +95,32 @@ namespace eFMS.API.Documentation.Controllers
                 return Ok(result);
             }
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Get settlement payment by settlementId
+        /// </summary>
+        /// <param name="settlementId">settlementId that want to retrieve Settlement Payment</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetSettlementPaymentById")]
+        public IActionResult GetSettlementPaymentById(Guid settlementId)
+        {
+            var data = acctSettlementPaymentService.GetSettlementPaymentById(settlementId);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Get list shipment settlement by settlementNo
+        /// </summary>
+        /// <param name="settlementNo">settlementNo that want to retrieve Settlement Payment</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetShipmentsSettlementBySettlementNo")]
+        public IActionResult GetShipmentsSettlementBySettlementNo(string settlementNo)
+        {
+            var data = acctSettlementPaymentService.GetListShipmentSettlementBySettlementNo(settlementNo);
+            return Ok(data);
         }
 
     }
