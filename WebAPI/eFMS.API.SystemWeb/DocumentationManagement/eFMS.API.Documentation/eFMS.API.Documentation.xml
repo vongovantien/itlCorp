@@ -265,6 +265,75 @@
             <param name="currencyLocal">currencyLocal that want to retrieve SOA</param>
             <returns></returns>
         </member>
+        <member name="T:eFMS.API.Documentation.Controllers.CsManifestController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsManifestController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.LanguageSub},eFMS.API.Documentation.DL.IService.ICsManifestService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+            <summary>
+            constructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="service"></param>
+            <param name="user"></param>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsManifestController.Get(System.Guid)">
+            <summary>
+            get manifest by jobId
+            </summary>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsManifestController.AddOrUpdateManifest(eFMS.API.Documentation.DL.Models.CsManifestEditModel)">
+            <summary>
+            add/ update manifest
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsManifestController.PreviewFCLManifest(eFMS.API.Documentation.DL.Models.ManifestReportModel)">
+            <summary>
+            preview manifest
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.Documentation.Controllers.CsMawbcontainerController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsMawbcontainerController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.LanguageSub},eFMS.API.Documentation.DL.IService.ICsMawbcontainerService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+            <summary>
+            constructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="service"></param>
+            <param name="user"></param>
+            <param name="hostingEnvironment"></param>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsMawbcontainerController.Query(eFMS.API.Documentation.DL.Models.Criteria.CsMawbcontainerCriteria)">
+            <summary>
+            get container by criteria
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsMawbcontainerController.Update(eFMS.API.Documentation.DL.Models.CsMawbcontainerEdit)">
+            <summary>
+            update container
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsMawbcontainerController.GetHBContainers(System.Guid)">
+            <summary>
+            get list containers by jobId
+            </summary>
+            <param name="JobId"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsMawbcontainerController.DownloadExcel">
             <summary>
             download file excel from server

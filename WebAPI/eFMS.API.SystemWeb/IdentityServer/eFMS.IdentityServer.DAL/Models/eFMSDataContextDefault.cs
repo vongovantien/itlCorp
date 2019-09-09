@@ -26,6 +26,7 @@ namespace eFMS.IdentityServer.Service.Models
         public virtual DbSet<SysRolePermission> SysRolePermission { get; set; }
         public virtual DbSet<SysUser> SysUser { get; set; }
         public virtual DbSet<SysUserGroup> SysUserGroup { get; set; }
+        public virtual DbSet<SysUserLog> SysUserLog { get; set; }
         public virtual DbSet<SysUserRole> SysUserRole { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -100,6 +101,11 @@ namespace eFMS.IdentityServer.Service.Models
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.Logo).HasColumnType("image");
+
+                entity.Property(e => e.ManagerId)
+                    .HasColumnName("ManagerID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Taxcode)
                     .HasMaxLength(50)
@@ -197,6 +203,11 @@ namespace eFMS.IdentityServer.Service.Models
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.Logo).HasColumnType("image");
+
+                entity.Property(e => e.ManagerId)
+                    .HasColumnName("ManagerID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Notes).HasMaxLength(4000);
 
@@ -634,6 +645,31 @@ namespace eFMS.IdentityServer.Service.Models
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_sysUserGroup_sysUser");
+            });
+
+            modelBuilder.Entity<SysUserLog>(entity =>
+            {
+                entity.ToTable("sysUserLog");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.ComputerName).HasMaxLength(1600);
+
+                entity.Property(e => e.Ip)
+                    .HasColumnName("IP")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.LoggedInOn).HasColumnType("datetime");
+
+                entity.Property(e => e.LoggedOffOn).HasColumnType("datetime");
+
+                entity.Property(e => e.UserId)
+                    .HasColumnName("UserID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.WorkPlaceId).HasColumnName("WorkPlaceID");
             });
 
             modelBuilder.Entity<SysUserRole>(entity =>

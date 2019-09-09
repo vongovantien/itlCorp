@@ -26,9 +26,12 @@ namespace eFMS.IdentityServer
         {
             var subjectId = context.Subject.GetSubjectId();
             var user = authenUserService.GetUserById(subjectId);
-            var userInfo = new SysUserLogModel();
-            userInfo.LoggedInOn = DateTime.Now;
-            userInfo.UserId = user.Id;
+            var userInfo = new SysUserLogModel
+            {
+                LoggedInOn = DateTime.Now,
+                UserId = user.Id,
+                WorkPlaceId = user.WorkPlaceId
+            };
             userLogService.Add(userInfo);
 
             var claims = new List<Claim>

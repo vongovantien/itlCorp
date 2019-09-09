@@ -17,6 +17,7 @@ namespace eFMS.API.Operation.DL.Common
         public static readonly string Overdue = "Overdued";
         public static readonly string Pending = "Pending";
         public static readonly string Deleted = "Deleted";
+        public static readonly string Finish = "Finish";
 
         public const string Insert = "Insert";
         public const string Update = "Update";
