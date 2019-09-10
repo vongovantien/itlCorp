@@ -31,19 +31,21 @@ export class SettlementPaymentComponent extends AppList {
         this.requestList = this.getListSettlePayment;
         // this.requestSort = this.sortAdvancePayment;
         this._progressRef = this._progressService.ref();
+        this.requestSort = this.sortLocal;
     }
 
     ngOnInit() {
         this.headers = [
-            { title: 'Settlemenent No', field: 'settlementNo' },
-            { title: 'Amount', field: 'settlementNo' },
-            { title: 'Currency', field: 'settlementNo' },
-            { title: 'Request Date', field: 'settlementNo' },
-            { title: 'Advance Date', field: 'settlementNo' },
-            { title: 'Advance No', field: 'settlementNo' },
-            { title: 'Status Approval', field: 'settlementNo' },
-            { title: 'Status Payment', field: 'settlementNo' },
-            { title: 'Description', field: 'settlementNo' },
+            { title: '', field: '' },
+            { title: 'Settlemenent No', field: 'settlementNo',sortable: true },
+
+            { title: 'Amount', field: 'amount' , sortable: true },
+            { title: 'Currency', field: 'chargeCurrency' , sortable: true },
+            { title: 'Requester', field: 'requester' , sortable: true },
+            { title: 'Request Date', field: 'requestDate' , sortable: true },
+            { title: 'Status Approval', field: 'statusApproval', sortable: true },
+            { title: 'Payment method', field: 'paymentMethod',sortable: true },
+            { title: 'Description', field: 'note',sortable: true },
         ];
         this.getUserLogged();
         this.getListSettlePayment();
@@ -84,9 +86,15 @@ export class SettlementPaymentComponent extends AppList {
                 (res: any) => {
                     console.log(res);
                     this.totalItems = res.totalItems || 0;
+                    this.settlements = res.data;
                 },
             );
 
+    }
+
+
+    sortLocal(sort: string): void {
+        this.settlements = this._sortService.sort(this.settlements, sort, this.order);
     }
 
 
