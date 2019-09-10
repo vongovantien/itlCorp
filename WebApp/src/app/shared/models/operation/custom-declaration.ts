@@ -37,6 +37,7 @@ export class CustomDeclaration {
     customerName: string = '';
     importCountryName: string = '';
     exportCountryName: string = '';
+    convertTime: Date = null;
 
     constructor(object?: any) {
         const self = this;

@@ -34,7 +34,9 @@ namespace eFMS.API.Documentation.DL.Services
                                         Id = x.Id,
                                         JobId = x.JobNo,
                                         HBL = x.Hwbno,
-                                        MBL = x.Mblno
+                                        MBL = x.Mblno,
+                                        CustomerId = x.CustomerId,
+                                        HBLID = x.Hblid
                                     });
             var transactions = csRepository.Get(x => x.IsLocked == false);
             var shipmentsDocumention = transactions.Join(detailRepository.Get(), x => x.Id, y => y.JobId, (x, y) => new { x, y }).Select(x => new Shipments
@@ -43,6 +45,8 @@ namespace eFMS.API.Documentation.DL.Services
                 JobId = x.x.JobNo,
                 HBL = x.y.Hwbno,
                 MBL = x.y.Mawb,
+                CustomerId = x.y.CustomerId,
+                HBLID = x.y.Id
             });
             var shipments = shipmentsOperation.Union(shipmentsDocumention);
             return shipments;
