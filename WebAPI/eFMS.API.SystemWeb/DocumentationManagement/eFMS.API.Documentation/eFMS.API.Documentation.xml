@@ -601,5 +601,11 @@
             </summary>
             <param name="service"></param>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetShipmentNotLocked">
+            <summary>
+            get list of shipment available
+            </summary>
+            <returns></returns>
+        </member>
     </members>
 </doc>
