@@ -2,8 +2,8 @@
     <div class="row">
         <div class="col-lg-12 m--align-left d-flex align-items-center justify-content-between">
             <div class="">
-                <button type="button"
-                    class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10" (click)="showCreateCharge()">
+                <button type="button" class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                    (click)="showCreateCharge()">
                     <span>
                         <i class="la la-plus"></i>
                         <span>
@@ -12,7 +12,8 @@
                     </span>
                 </button>
                 <button type="button"
-                    class="btn btn-warning m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10" (click)="showExistingCharge()">
+                    class="btn btn-warning m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                    (click)="showExistingCharge()">
                     <span>
                         <i class="la la-plus"></i>
                         <span>
@@ -43,81 +44,8 @@
             <div class="shipment-list-wrapper">
                 <accordion [isAnimated]="true">
                     <accordion-group *ngFor="let item of items">
-                        <div class="row align-items-center" accordion-heading>
-                            <div class="col">
-                                <div class="d-flex">
-                                    <a class="m--margin-right-10">
-                                        <i class="la la-angle-double-down"></i>
-                                    </a>
-                                    <label class="m-checkbox">
-                                        <input type="checkbox" [(ngModel)]="isCheckAll"
-                                            (change)="checkUncheckAllRequest()">
-                                        <span></span>
-                                    </label>
-                                    <a>
-                                        <i class="la la-file-text"></i>
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="d-flex">
-                                    <span class="font-weight-bold">Job:</span>
-                                    &nbsp;
-                                    xxxxxxxxxx
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="d-flex">
-                                    <span class="font-weight-bold">HBL:</span>
-                                    &nbsp;
-                                    xxxxxxxxxx
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="d-flex">
-                                    <span class="font-weight-bold">MBL:</span>
-                                    &nbsp;
-                                    xxxxxxxxxx
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="d-flex">
-                                    <span class="font-weight-bold">Total Amount:</span>
-                                    &nbsp;
-                                    xxxxxxxxxx
-                                </div>
-                            </div>
-                            <div class="col">
-                                <a (click)="showPaymentManagement($event)" class="text-underline text-primary">Payment
-                                    Management</a>
-                            </div>
-                        </div>
-                        <div class="table-wrapper">
-                            <table class="table table-brand table-hover dataTable">
-                                <thead>
-                                    <tr class="text-center">
-                                        <th class="m--w-50">
-                                        </th>
-                                        <th *ngFor="let header of headers; let i = index; trackBy: trackByFn"
-                                            [class]="sortClass(header.sortable ? header.field : '')"
-                                            (click)="sortBy(header.sortable ? header.field : '')">
-                                            <span>{{header.title}}</span>
-                                            <span class="sort-indicator"></span>
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody class="tbody-group">
-                                    <tr *ngIf="!isLoading">
-                                        <td colspan="100">
-                                            <div class="no-data">
-                                                <i class="flaticon-coins"></i>
-                                                <span class="no-data-text">No records found</span>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                        <shipment-item accordion-heading></shipment-item>
+                        <table-surcharge-settlement></table-surcharge-settlement>
                     </accordion-group>
                 </accordion>
             </div>
@@ -125,8 +53,8 @@
     </div>
 </div>
 
-<payment-management-popup></payment-management-popup>
+<!-- <payment-management-popup></payment-management-popup> -->
 
 <existing-charge-popup></existing-charge-popup>
 
-<form-charge-popup></form-charge-popup>
+<form-charge-popup (onRequest)="onRequestSurcharge($event)"></form-charge-popup>

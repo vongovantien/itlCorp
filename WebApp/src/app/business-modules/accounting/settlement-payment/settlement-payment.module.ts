@@ -16,6 +16,8 @@ import { SettlementPaymentManagementPopupComponent } from './components/popup/pa
 import { SettlementExistingChargePopupComponent } from './components/popup/existing-charge/existing-charge.popup';
 import { SettlementFormChargePopupComponent } from './components/popup/form-charge/form-charge.popup';
 import { NgxCurrencyModule } from 'ngx-currency';
+import { SettlementShipmentItemComponent } from './components/shipment-item/shipment-item.component';
+import { SettlementTableSurchargeComponent } from './components/table-surcharge/table-surcharge.component';
 
 const routing: Routes = [
     {
@@ -36,7 +38,9 @@ const COMPONENT = [
     SettlementListChargeComponent,
     SettlementPaymentManagementPopupComponent,
     SettlementExistingChargePopupComponent,
-    SettlementFormChargePopupComponent 
+    SettlementFormChargePopupComponent,
+    SettlementShipmentItemComponent,
+    SettlementTableSurchargeComponent 
 ];
 
 const customCurrencyMaskConfig = {
