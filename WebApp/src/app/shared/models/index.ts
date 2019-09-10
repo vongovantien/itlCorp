@@ -9,6 +9,8 @@ export * from './operation/custom-declaration';
 export * from './accouting/advance-payment';
 export * from './operation/shipment';
 export * from './document/csShipmentSurcharge';
+export * from './accouting/settlement-payment';
+
 
 
 

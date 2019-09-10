@@ -167,6 +167,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
             this.updateDefaultValue(data);
         } catch (error) { }
     }
+    
 
     updateDefaultValue(dataSearch: SOASearchCharge) {
         this.selectedType = this.types.filter((i: any) => i.text === dataSearch.type)[0];

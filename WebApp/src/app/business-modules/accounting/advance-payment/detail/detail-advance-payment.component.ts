@@ -135,6 +135,8 @@ export class AdvancePaymentDetailComponent extends AppPage {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(`${res.data.advanceNo + ' is update successfully'}`, 'Update Success !');
+                            this.getDetail(this.advId);
+
                         } else {
                             this.handleError((data: any) => {
                                 this._toastService.error(data.message, data.title);

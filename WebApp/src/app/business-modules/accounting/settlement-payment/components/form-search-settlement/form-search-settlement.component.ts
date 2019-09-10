@@ -19,7 +19,6 @@ export class SettlementFormSearchComponent extends AppForm {
     requestDate: AbstractControl;
     modifiedDate: AbstractControl;
     statusApproval: AbstractControl;
-    statusPayment: AbstractControl;
     paymentMethod: AbstractControl;
 
     statusApprovals: CommonInterface.ICommonTitleValue[];
@@ -51,7 +50,6 @@ export class SettlementFormSearchComponent extends AppForm {
             requestDate: [],
             modifiedDate: [],
             statusApproval: [],
-            statusPayment: [],
             paymentMethod: []
         });
 
@@ -60,7 +58,6 @@ export class SettlementFormSearchComponent extends AppForm {
         this.requestDate = this.formSearch.controls['requestDate'];
         this.modifiedDate = this.formSearch.controls['modifiedDate'];
         this.statusApproval = this.formSearch.controls['statusApproval'];
-        this.statusPayment = this.formSearch.controls['statusPayment'];
         this.paymentMethod = this.formSearch.controls['paymentMethod'];
     }
 
@@ -81,7 +78,6 @@ export class SettlementFormSearchComponent extends AppForm {
             requestDateTo: !!this.requestDate.value && !!this.requestDate.value.endDate ? formatDate(this.requestDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             paymentMethod: !!this.paymentMethod.value ? this.paymentMethod.value.value : 'All',
             statusApproval: !!this.statusApproval.value ? this.statusApproval.value.value : 'All',
-            statusPayment: !!this.statusPayment.value ? this.statusPayment.value.value : 'All',
             requester: this.userLogged.id
         };
         this.onSearch.emit(body);
@@ -129,13 +125,8 @@ export class SettlementFormSearchComponent extends AppForm {
         this.resetFormControl(this.referenceNo);
         this.resetFormControl(this.paymentMethod);
         this.resetFormControl(this.statusApproval);
-        this.resetFormControl(this.statusPayment);
 
         this.onSearch.emit(<any>{});
-    }
-
-    onReset() {
-        console.log("Reseting...");
     }
 }
 
@@ -148,5 +139,4 @@ interface ISearchSettlePayment {
     advanceModifiedDateTo: string;
     paymentMethod: string;
     statusApproval: string;
-    statusPayment: string;
 }

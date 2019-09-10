@@ -190,6 +190,39 @@ export class AccoutingRepo {
             );
     }
 
+    getShipmentNotLocked() {
+        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/Shipment/GetShipmentNotLocked`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getSettlePaymentCharges(keyword: string, size: number = 10) {
+        return this._api.get(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatCharge/SettlePaymentCharges`, {
+            keySearch: keyword,
+            inActive: false,
+            size: size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    addShipmentSurCharge(body: any = {}) {
+        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/CsShipmentSurcharge/Add`, body)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    getListSettlementPayment(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSettlementPayment/paging`, body, {
+            pageNumber: '' + page,
+            pageSize: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+
 
 
 }

@@ -30,11 +30,11 @@
                         </div>
                         <div class="col-12">
                             <div class="form-group">
-                                <label for="">Status Payment</label>
-                                <select class="form-control" formControlName="statusPayment">
+                                <label for="">Payment Method</label>
+                                <select class="form-control" formControlName="paymentMethod">
                                     <option [ngValue]="null">All</option>
-                                    <option *ngFor="let status of statusPayments; let i = index" [ngValue]="status">
-                                        {{status.title}}</option>
+                                    <option *ngFor="let method of paymentMethods" [ngValue]="method">{{method.title}}
+                                    </option>
                                 </select>
                             </div>
                         </div>
@@ -59,7 +59,7 @@
                         </div>
                         <div class="col-12">
                             <div class="form-group">
-                                <label for="">Modified Date</label>
+                                <label for="">Advance Date</label>
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [maxDate]="maxDate" name="daterange"
@@ -70,16 +70,6 @@
                                         </span>
                                     </span>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="form-group">
-                                <label for="">Payment Method</label>
-                                <select class="form-control" formControlName="paymentMethod">
-                                    <option [ngValue]="null">All</option>
-                                    <option *ngFor="let method of paymentMethods" [ngValue]="method">{{method.title}}
-                                    </option>
-                                </select>
                             </div>
                         </div>
                     </div>

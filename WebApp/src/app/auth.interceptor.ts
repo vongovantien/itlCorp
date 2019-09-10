@@ -22,7 +22,7 @@ export class AuthInterceptor implements HttpInterceptor {
                     errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
                     title = error.statusText;
                 } else {
-                    errorMessage = `Error: ${error.error.message}`;
+                    errorMessage = `Error: ${error.message}`;
                     title = error.statusText;
                 }
                 this._toastService.error(errorMessage, title);

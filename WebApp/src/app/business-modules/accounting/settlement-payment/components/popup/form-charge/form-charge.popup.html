@@ -9,18 +9,21 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <form action="" class="col-12">
+                    <form action="" class="col-12" [formGroup]="form">
                         <div class="row">
                             <div class="col-4">
                                 <div class="form-group">
-                                    <label for="">Charge Name <span class="text-danger">*</span></label>
-
+                                    <label for="">Charge Name
+                                        <span class="text-danger">*</span>
+                                        <span class="text-primary m--margin-left-10"
+                                            *ngIf="!!selectedCharge">{{selectedCharge.code}}</span>
+                                    </label>
                                     <!-- auto complete -->
                                     <div (clickOutside)="isShow = false">
                                         <input name="keyword"
                                             class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                            placeholder="Input keyword" (click)="isShow = !isShow" [(ngModel)]="keyword"
-                                            (ngModelChange)="onSearchAutoComplete($event)">
+                                            placeholder="Input keyword" (click)="isShow = !isShow"
+                                            formControlName="chargeName" (ngModelChange)="onSearchAutoComplete($event)">
                                         <div class="dropdown e--combogrid combogrid-autocomplete" *ngIf="isShow">
                                             <div class="dropdown-menu e--combogrid-content">
                                                 <div class="tabel-wrapper table-fixed">
@@ -41,14 +44,23 @@
                                                         <table class="table table-hover">
                                                             <tbody>
                                                                 <ng-container
-                                                                    *ngFor="let charge of $charges | async; let i = index; trackBy: trackByFn">
+                                                                    *ngFor="let charge of charges; let i = index; trackBy: trackByFn">
                                                                     <tr class="data-row " (click)="selectCharge(charge)"
-                                                                        [class.data-selected]="charge === selectedCharge">
+                                                                        [class.data-selected]="!!selectedCharge && charge.code === selectedCharge.code">
                                                                         <td>{{charge.code}}</td>
                                                                         <td>{{charge.chargeNameEn}}</td>
                                                                         <td>{{charge.chargeNameVn}}</td>
                                                                     </tr>
                                                                 </ng-container>
+                                                                <tr *ngIf="!charges.length">
+                                                                    <td colspan="100">
+                                                                        <div class="no-data">
+                                                                            <i class="flaticon-coins"></i>
+                                                                            <span class="no-data-text">No records
+                                                                                found</span>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
                                                             </tbody>
                                                         </table>
                                                     </div>
@@ -61,13 +73,23 @@
                             <div class="col-4">
                                 <div class="form-group">
                                     <label for="">Shipment <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control">
+                                    <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedShipment"
+                                        [height]="150" (itemSelected)="onSelectDataFormInfo($event, 'shipment')"
+                                        [dataSources]="configShipment.dataSource"
+                                        [displayFields]="configShipment.displayFields"
+                                        [selectedDisplayFields]="configShipment.selectedDisplayFields">
+                                    </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
                             <div class="col-4">
                                 <div class="form-group">
-                                    <label for="">Partner <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control">
+                                    <label for="">Payer <span class="text-danger">*</span></label>
+                                    <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPayer"
+                                        (itemSelected)="onSelectDataFormInfo($event, 'payer')"
+                                        [selectedDisplayFields]="configPartner.selectedDisplayFields"
+                                        [dataSources]="configPartner.dataSource"
+                                        [displayFields]="configPartner.displayFields" [height]="200">
+                                    </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
                         </div>
@@ -77,13 +99,18 @@
                                     <div class="col-6">
                                         <div class="form-group">
                                             <label for="">Qty <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control">
+                                            <input type="text" class="form-control" formControlName="qty"
+                                                placeholder="Quantity" (ngModelChange)="calculateTotalAmount()">
                                         </div>
                                     </div>
                                     <div class="col-6">
                                         <div class="form-group">
                                             <label for="">Unit <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control">
+                                            <select class="form-control" formControlName="unit">
+                                                <option [ngValue]="null">Select Unit</option>
+                                                <option *ngFor="let unit of units; trackBy: trackByFn" [ngValue]="unit">
+                                                    {{unit.code}}</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -91,7 +118,8 @@
                             <div class="col-4">
                                 <div class="form-group">
                                     <label for="">Unit Price <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control">
+                                    <input type="text" class="form-control" formControlName="price"
+                                        placeholder="Unit Price" (ngModelChange)="calculateTotalAmount()">
                                 </div>
                             </div>
                             <div class="col-4">
@@ -99,12 +127,16 @@
                                     <div class="col-6">
                                         <div class="form-group">
                                             <label for="">Currency</label>
-                                            <input type="text" class="form-control"></div>
+                                            <input type="text" class="form-control" value="VND" disabled
+                                                formControlName="currency">
+                                        </div>
                                     </div>
                                     <div class="col-6">
                                         <div class="form-group">
                                             <label for="">VAT <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control"></div>
+                                            <input type="text" class="form-control" formControlName="vat"
+                                                placeholder="VAT" (ngModelChange)="calculateTotalAmount()">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -113,24 +145,31 @@
                             <div class="col-4">
                                 <div class="form-group">
                                     <label for="">Amount</label>
-                                    <input type="text" class="form-control">
+                                    <input currencyMask type="text" class="form-control" formControlName="amount"
+                                        placeholder="Amount" disabled>
                                 </div>
                             </div>
                             <div class="col-4 d-flex justify-content-center align-items-end">
                                 <div class="d-flex">
-                                    <label class="switch">
-                                        <input type="checkbox">
-                                        <span class="slider round"></span>
-                                    </label>
-                                    <div class="d-flex align-items-center m--margin-left-10 font-weight-bold">
+                                    <label class="m-checkbox m-checkbox--bold "
+                                        [class.m-checkbox--disabled]="isDisabledOBH">
+                                        <input type="checkbox" formControlName="isOBH"
+                                            (change)="onChangeOBHPartnerCheckBox()">
                                         OBH for Customer
-                                    </div>
+                                        <span></span>
+                                    </label>
                                 </div>
                             </div>
                             <div class="col-4">
                                 <div class="form-group">
                                     <label for="">OBH Partner</label>
-                                    <input type="text" class="form-control">
+                                    <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedOBHPartner"
+                                        #OBHPartnerComponent (itemSelected)="onSelectDataFormInfo($event, 'obh')"
+                                        [selectedDisplayFields]="configPartner.selectedDisplayFields"
+                                        [dataSources]="configPartner.dataSource"
+                                        [displayFields]="configPartner.displayFields" [height]="200"
+                                        [disabled]="isDisabledOBHPartner">
+                                    </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
                         </div>
@@ -140,12 +179,18 @@
                                     <div class="col-6">
                                         <div class="form-group">
                                             <label for="">Type</label>
-                                            <input type="text" class="form-control"></div>
+                                            <select class="form-control" formControlName="type">
+                                                <option *ngFor="let type of types; trackBy: trackByFn" [ngValue]="type">
+                                                    {{type.title}}</option>
+                                            </select>
+                                        </div>
                                     </div>
                                     <div class="col-6">
                                         <div class="form-group">
                                             <label for="">Invoice No <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control"></div>
+                                            <input type="text" class="form-control" formControlName="invoiceNo"
+                                                placeholder="Invoice No">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -154,19 +199,39 @@
                                     <div class="col-6">
                                         <div class="form-group">
                                             <label for="">Series No <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control"></div>
+                                            <input type="text" class="form-control" formControlName="serieNo"
+                                                placeholder="Serie No">
+                                        </div>
                                     </div>
                                     <div class="col-6">
                                         <div class="form-group">
                                             <label for="">Invoice Date <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control"></div>
+                                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                                <input type="text" class="form-control m-input m-input--square"
+                                                    ngxDaterangepickerMd
+                                                    [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                                    [maxDate]="maxDate" name="daterange" readonly [autoApply]="true"
+                                                    [singleDatePicker]="true" formControlName="invoiceDate"
+                                                    [placeholder]="'Select Invoice Date'" />
+                                                <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                    <span>
+                                                        <i class="la la-calendar"></i>
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-4">
                                 <div class="form-group">
                                     <label for="">Custom No</label>
-                                    <input type="text" class="form-control">
+                                    <select class="form-control" name="type" formControlName="customNo">
+                                        <option [ngValue]="null" disabled>Choose CustomNo</option>
+                                        <option
+                                            *ngFor="let customDeclaration of customDeclarations; let i = index; trackBy: trackByFn"
+                                            [ngValue]="customDeclaration">{{customDeclaration.clearanceNo}}</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -174,13 +239,14 @@
                             <div class="col-4">
                                 <div class="form-group">
                                     <label for="">Cont No</label>
-                                    <input type="text" class="form-control">
+                                    <input type="text" class="form-control" formControlName="contNo"
+                                        placeholder="Cont No">
                                 </div>
                             </div>
                             <div class="col-8">
                                 <div class="form-group">
                                     <label for="">Note</label>
-                                    <input type="text" class="form-control">
+                                    <input type="text" class="form-control" formControlName="note" placeholder="Note">
                                 </div>
                             </div>
                         </div>
@@ -193,7 +259,7 @@
                         <div class="m--align-center m--margin-top-20">
                             <button
                                 class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                title="Save">
+                                title="Save" (click)="submit()">
                                 <span>
                                     <i class="la la-save"></i>
                                     <span>
