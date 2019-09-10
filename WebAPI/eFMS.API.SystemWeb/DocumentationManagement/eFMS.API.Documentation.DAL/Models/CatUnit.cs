@@ -5,6 +5,10 @@ namespace eFMS.API.Documentation.Service.Models
 {
     public partial class CatUnit
     {
+        public CatUnit()
+        {
+        }
+
         public short Id { get; set; }
         public string Code { get; set; }
         public string UnitNameVn { get; set; }
@@ -18,5 +22,8 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
+
+        public virtual ICollection<CsMawbcontainer> CsMawbcontainerContainerType { get; set; }
+        public virtual ICollection<CsMawbcontainer> CsMawbcontainerUnitOfMeasure { get; set; }
     }
 }

@@ -8,7 +8,6 @@ namespace eFMS.API.Catalogue.Service.ViewModels
     {
         public string Username { get; set; }
         public string Password { get; set; }
-        public short UserGroupID { get; set; }
         public string UserGroupCode { get; set; }
         public string UserGroupName { get; set; }
         public Guid WorkPlaceID { get; set; }

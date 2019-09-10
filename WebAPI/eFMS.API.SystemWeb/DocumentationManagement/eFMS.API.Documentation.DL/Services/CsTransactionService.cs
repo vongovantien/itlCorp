@@ -37,7 +37,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var transaction = mapper.Map<CsTransaction>(model);
                 transaction.Id = Guid.NewGuid();
                 int countNumberJob = dc.CsTransaction.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
-                transaction.JobNo = GenerateID.GenerateJobID("SEF", countNumberJob);
+                transaction.JobNo = GenerateID.GenerateJobID(Constants.SEF_SHIPMENT, countNumberJob);
                 //transaction.UserCreated = "01";
                 transaction.CreatedDate = transaction.ModifiedDate= DateTime.Now;
                 transaction.Inactive = false;
@@ -207,7 +207,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var transaction = mapper.Map<CsTransaction>(model);
                 transaction.Id = Guid.NewGuid();
                 int countNumberJob = dc.CsTransaction.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
-                transaction.JobNo = GenerateID.GenerateJobID("SEF", countNumberJob);
+                transaction.JobNo = GenerateID.GenerateJobID(Constants.SEF_SHIPMENT, countNumberJob);
                 //transaction.UserCreated = "01";
                 transaction.CreatedDate = transaction.ModifiedDate = DateTime.Now;
                 transaction.UserModified = model.UserCreated;
@@ -252,7 +252,8 @@ namespace eFMS.API.Documentation.DL.Services
 
                     if(dc.CsTransactionDetail.Any(x => x.Hwbno.IndexOf(generatePrefixHouse, StringComparison.OrdinalIgnoreCase) >= 0))
                     {
-                        generatePrefixHouse = "HBL" + GenerateID.GeneratePrefixHousbillNo();
+                        generatePrefixHouse = Constants.SEF_HBL
+                            + GenerateID.GeneratePrefixHousbillNo();
                     }
                     foreach (var item in detailTrans)
                     {

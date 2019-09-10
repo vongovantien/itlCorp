@@ -15,6 +15,9 @@ using SystemManagementAPI.Infrastructure.Middlewares;
 
 namespace eFMS.API.Documentation.Controllers
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
@@ -24,6 +27,13 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICsManifestService manifestService;
         private readonly ICurrentUser currentUser;
+
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="localizer"></param>
+        /// <param name="service"></param>
+        /// <param name="user"></param>
         public CsManifestController(IStringLocalizer<LanguageSub> localizer, ICsManifestService service, ICurrentUser user)
         {
             stringLocalizer = localizer;
@@ -31,6 +41,11 @@ namespace eFMS.API.Documentation.Controllers
             currentUser = user;
         }
 
+        /// <summary>
+        /// get manifest by jobId
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Get(Guid jobId)
         {
@@ -38,6 +53,11 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// add/ update manifest
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("AddOrUpdateManifest")]
         [Authorize]
@@ -56,6 +76,11 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// preview manifest
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("PreviewFCLManifest")]
         public IActionResult PreviewFCLManifest(ManifestReportModel model)

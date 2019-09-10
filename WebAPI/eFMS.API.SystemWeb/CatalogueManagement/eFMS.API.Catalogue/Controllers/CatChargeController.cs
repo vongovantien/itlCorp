@@ -84,6 +84,20 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         /// <summary>
+        /// get settle payment charges
+        /// </summary>
+        /// <param name="keySearch"></param>
+        /// <param name="inActive"></param>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        [HttpGet("SettlePaymentCharges")]
+        public IActionResult GetSettlePaymentCharges(string keySearch, bool? inActive, int? size)
+        {
+            var results = catChargeService.GetSettlePaymentCharges(keySearch,inActive, size);
+            return Ok(results);
+        }
+
+        /// <summary>
         /// get all charges
         /// </summary>
         /// <returns></returns>

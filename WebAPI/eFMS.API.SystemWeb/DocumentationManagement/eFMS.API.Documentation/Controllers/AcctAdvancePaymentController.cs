@@ -359,7 +359,8 @@ namespace eFMS.API.Documentation.Controllers
             HandleState hs;
             if (string.IsNullOrEmpty(model.AdvanceNo))//Insert Advance Payment
             {
-                model.StatusApproval = "RequestApproval";
+                //Change request: Bỏ status RequestApproval
+                //model.StatusApproval = "RequestApproval";
                 hs = acctAdvancePaymentService.AddAdvancePayment(model);
             }
             else //Update Advance Payment
@@ -369,7 +370,8 @@ namespace eFMS.API.Documentation.Controllers
                     ResultHandle _result = new ResultHandle { Status = false, Message = "Only allowed to edit the advance payment status is New or Deny" };
                     return BadRequest(_result);
                 }
-                model.StatusApproval = "RequestApproval";
+                //Change request: Bỏ status RequestApproval
+                //model.StatusApproval = "RequestApproval";
                 hs = acctAdvancePaymentService.UpdateAdvancePayment(model);
             }
 

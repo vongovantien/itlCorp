@@ -1,0 +1,14 @@
+﻿using System;
+
+namespace eFMS.API.Documentation.DL.Models
+{
+    public class ShipmentOfSettlementResult
+    {
+        public string JobId { get; set; }
+        public string MBL { get; set; }
+        public string HBL { get; set; }
+        public decimal Amount { get; set; }
+        public string ChargeCurrency { get; set; }
+        public string SettlementCurrency { get; set; }
+    }
+}

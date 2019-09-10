@@ -21,6 +21,9 @@ using SystemManagementAPI.Infrastructure.Middlewares;
 
 namespace eFMS.API.Documentation.Controllers
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
@@ -31,6 +34,14 @@ namespace eFMS.API.Documentation.Controllers
         private readonly ICsMawbcontainerService csContainerService;
         private readonly ICurrentUser currentUser;
         private readonly IHostingEnvironment _hostingEnvironment;
+
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="localizer"></param>
+        /// <param name="service"></param>
+        /// <param name="user"></param>
+        /// <param name="hostingEnvironment"></param>
         public CsMawbcontainerController(IStringLocalizer<LanguageSub> localizer, ICsMawbcontainerService service, ICurrentUser user, IHostingEnvironment hostingEnvironment)
         {
             stringLocalizer = localizer;
@@ -39,12 +50,23 @@ namespace eFMS.API.Documentation.Controllers
             _hostingEnvironment = hostingEnvironment;
         }
 
+        /// <summary>
+        /// get container by criteria
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Query")]
         public IActionResult Query(CsMawbcontainerCriteria criteria)
         {
             return Ok(csContainerService.Query(criteria));
         }
+
+        /// <summary>
+        /// update container
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPut]
         [Route("Update")]
         public IActionResult Update(CsMawbcontainerEdit model)
@@ -60,6 +82,11 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// get list containers by jobId
+        /// </summary>
+        /// <param name="JobId"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("GetHBConts")]
         public List<object> GetHBContainers(Guid JobId)
@@ -143,7 +170,7 @@ namespace eFMS.API.Documentation.Controllers
                 var data = csContainerService.CheckValidContainerImport(list);
                 var totalValidRows = list.Count(x => x.IsValid == true);
                 var duplicatedError = list.FirstOrDefault(x => x.DuplicateError != null)?.DuplicateError;
-                var existedError = list.FirstOrDefault(x => x.DuplicateError != null)?.ExistedError;
+                var existedError = list.FirstOrDefault(x => x.ExistedError != null)?.ExistedError;
                 var results = new { list, totalValidRows, duplicatedError, existedError };
                 return Ok(results);
             }

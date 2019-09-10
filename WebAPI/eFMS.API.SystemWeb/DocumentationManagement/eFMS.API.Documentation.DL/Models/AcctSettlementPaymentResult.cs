@@ -5,12 +5,12 @@ using System.Text;
 
 namespace eFMS.API.Documentation.DL.Models
 {
-    public class AcctAdvancePaymentResult : AcctAdvancePayment
+    public class AcctSettlementPaymentResult : AcctSettlementPayment
     {
-        public string RequesterName { get; set; }
-        public string AdvanceStatusPayment { get; set; }
         public decimal? Amount { get; set; }
+        public string RequesterName { get; set; }
+        public string PaymentMethodName { get; set; }        
         public string StatusApprovalName { get; set; }
-        public string PaymentMethodName { get; set; }
+        public string ChargeCurrency { get; set; }
     }
 }

@@ -202,10 +202,10 @@ export class StageManagementComponent {
             this.searchObject.stageNameEn = this.search_key.trim() == "" ? "" : this.search_key.trim();
             this.searchObject.stageNameVn = this.search_key.trim() == "" ? "" : this.search_key.trim();
         }
-        if (this.selected_filter == "Stage ID") {
-            this.searchObject.condition = "AND";
-            this.searchObject.id = (this.search_key.trim() == "" || isNaN(Number(this.search_key)) ? 0 : parseInt(this.search_key));
-        }
+        // if (this.selected_filter == "Stage ID") {
+        //     this.searchObject.condition = "AND";
+        //     this.searchObject.id = (this.search_key.trim() == "" || isNaN(Number(this.search_key)) ? 0 : parseInt(this.search_key));
+        // }
         if (this.selected_filter == "Department") {
             this.searchObject.condition = "AND";
             this.searchObject.departmentName = this.search_key.trim() == "" ? "" : this.search_key.trim();
@@ -285,14 +285,15 @@ export class StageManagementComponent {
     sort(property: any) {
         this.sortKey = property;
         this.isDesc = !this.isDesc;
-        if (property === 'deptName') {
-            this.ListStages = this.sortService.sort(this.ListStages, property, this.isDesc);
-        } else {
-            const temp = this.ListStages.map(x => Object.assign({}, x));
-            this.ListStages = this.sortService.sort(this.ListStages.map(x => Object.assign({}, x.stage)), property, this.isDesc);
-            const getDept = this.getDepartmentname;
-            this.ListStages = this.ListStages.map(x => ({ stage: x, deptName: getDept(x.id, temp) }));
-        }
+        // if (property === 'deptName') {
+        //     this.ListStages = this.sortService.sort(this.ListStages, property, this.isDesc);
+        // } else {
+        //     const temp = this.ListStages.map(x => Object.assign({}, x));
+        //     this.ListStages = this.sortService.sort(this.ListStages.map(x => Object.assign({}, x.stage)), property, this.isDesc);
+        //     const getDept = this.getDepartmentname;
+        //     this.ListStages = this.ListStages.map(x => ({ stage: x, deptName: getDept(x.id, temp) }));
+        // }
+        this.ListStages = this.sortService.sort(this.ListStages, property, this.isDesc);
     }
 
     getDepartmentname(stageId, ListStages: any[]) {

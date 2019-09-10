@@ -130,51 +130,8 @@ namespace eFMS.API.Documentation.DL.Services
                 var stt = DataContext.Update(cdNote, x => x.Id == cdNote.Id);
                 if (stt.Success)
                 {
-                    //var chargesOfCDNote = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Cdno == cdNote.Code).ToList(); ---to continue
-                    //var chargesOfCDNote = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code).ToList();
-                    //foreach (var item in chargesOfCDNote)
-                    //{
-                    //    item.CreditNo = null;
-                    //    item.DebitNo = null;
-                    //}
                     foreach (var item in model.listShipmentSurcharge)
                     {
-                        //var charge = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.FirstOrDefault(x => x.Id == item.Id);
-                        //if (charge != null)
-                        //{
-                        //    //charge.Cdno = cdNote.Code; -- to continue
-                        //    //if (charge.Type == "BUY")
-                        //    //{
-                        //    //    charge.CreditNo = cdNote.Code;
-                        //    //}
-                        //    //else if (charge.Type == "SELL")
-                        //    //{
-                        //    //    charge.DebitNo = cdNote.Code;
-                        //    //}
-                        //    //else
-                        //    //{
-                        //    //    if (model.PartnerId == charge.PaymentObjectId)
-                        //    //    {
-                        //    //        charge.DebitNo = cdNote.Code;
-                        //    //        if(item.CreditNo != null)
-                        //    //        {
-                        //    //            charge.CreditNo = item.CreditNo;
-                        //    //        }
-                        //    //    }
-                        //    //    if (model.PartnerId == charge.PayerId)
-                        //    //    {
-                        //    //        charge.CreditNo = cdNote.Code;
-                        //    //        if(item.DebitNo != null)
-                        //    //        {
-                        //    //            charge.DebitNo = item.DebitNo;
-                        //    //        }
-                        //    //    }
-                        //    //}
-                        //    charge.Cdclosed = true;
-                        //    charge.DatetimeModified = DateTime.Now;
-                        //    charge.UserModified = currentUser.UserID; // need update in the future 
-                        //    ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Update(charge);
-                        //}
                         item.Cdclosed = true;
                         item.DatetimeModified = DateTime.Now;
                         item.UserModified = currentUser.UserID; // need update in the future 
@@ -233,11 +190,6 @@ namespace eFMS.API.Documentation.DL.Services
                                     var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PaymentObjectId).FirstOrDefault();
                                     if (partner != null) listPartners.Add(partner);
                                 }
-                                //if (c.ReceiverId != null)
-                                //{
-                                //    var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.ReceiverId).FirstOrDefault();
-                                //    if (partner != null) listPartners.Add(partner);
-                                //}
                                 if (c.PayerId != null)
                                 {
                                     var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PayerId).FirstOrDefault();
@@ -260,11 +212,6 @@ namespace eFMS.API.Documentation.DL.Services
                             var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PaymentObjectId).FirstOrDefault();
                             if (partner != null) listPartners.Add(partner);
                         }
-                        //if (c.ReceiverId != null)
-                        //{
-                        //    var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.ReceiverId).FirstOrDefault();
-                        //    if (partner != null) listPartners.Add(partner);
-                        //}
                         if (c.PayerId != null)
                         {
                             var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PayerId).FirstOrDefault();
@@ -316,9 +263,6 @@ namespace eFMS.API.Documentation.DL.Services
 
                          join partner in ((eFMSDataContext)DataContext.DC).CatPartner on charge.PaymentObjectId equals partner.Id into partnerGroup
                          from p in partnerGroup.DefaultIfEmpty()
-
-                         //join receiver in ((eFMSDataContext)DataContext.DC).CatPartner on charge.ReceiverId equals receiver.Id into receiverGroup
-                         //from r in receiverGroup.DefaultIfEmpty()
 
                          join payer in ((eFMSDataContext)DataContext.DC).CatPartner on charge.PayerId equals payer.Id into payerGroup
                          from pay in payerGroup.DefaultIfEmpty()
