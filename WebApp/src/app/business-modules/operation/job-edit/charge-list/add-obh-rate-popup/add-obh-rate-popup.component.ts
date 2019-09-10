@@ -26,7 +26,7 @@ export class AddObhRatePopupComponent extends PopupBase implements OnInit {
     lstCurrencies: any[] = [];
 
     invoiceDate: any;
-    
+
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU) {
         super();
@@ -52,7 +52,7 @@ export class AddObhRatePopupComponent extends PopupBase implements OnInit {
             this.isDisplay = true;
         }, 50);
     }
-    
+
     calculateTotalEachOBH(isEdit: boolean = false) {
         let total = 0;
         if (this.obhChargeToAdd.vatrate >= 0) {
@@ -62,7 +62,7 @@ export class AddObhRatePopupComponent extends PopupBase implements OnInit {
         }
         this.obhChargeToAdd.total = Number(total.toFixed(2));
     }
-    
+
     saveNewCharge(id_form: string, form: NgForm, isContinue: boolean) {
         setTimeout(async () => {
             const error = $('#' + id_form).find('div.has-danger');
@@ -77,11 +77,11 @@ export class AddObhRatePopupComponent extends PopupBase implements OnInit {
                 const res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.obhChargeToAdd);
                 if (res.status) {
                     form.onReset();
-                    this.resetDisplay();
+                    // this.resetDisplay();
                     this.outputAddOBH.emit(true);
                     this.obhChargeToAdd = new CsShipmentSurcharge();
                     this.currentActiveItemDefault = [];
-                   
+
                     if (!isContinue) {
                         this.hide();
                     }
@@ -113,7 +113,7 @@ export class AddObhRatePopupComponent extends PopupBase implements OnInit {
             this.lstCurrencies = prepareNg2SelectData(res, "id", "id");
         });
     }
-    
+
     public typed(value: any): void {
         console.log('New search input: ', value);
     }

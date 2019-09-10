@@ -1,5 +1,5 @@
 export class CustomClearance {
-    constructor(){}
+    constructor() { }
     id: number = 0;
     idfromEcus: number;
     jobNo: string;
@@ -36,4 +36,5 @@ export class CustomClearance {
     exportCountryName: string;
     gatewayName: string;
     cargoType: string;
+    convertTime: Date = null;
 }

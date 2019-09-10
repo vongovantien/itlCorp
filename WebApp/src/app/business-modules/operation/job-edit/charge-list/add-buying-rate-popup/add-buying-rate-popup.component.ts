@@ -26,6 +26,7 @@ export class AddBuyingRatePopupComponent extends PopupBase implements OnInit, On
     lstUnits: any[] = [];
     lstCurrencies: any[] = [];
     currentActiveItemDefault: { id: null, text: null }[] = [];
+    currentSelectedCharge: string = null;
 
     invoiceDate: any;
     constructor(
@@ -64,7 +65,8 @@ export class AddBuyingRatePopupComponent extends PopupBase implements OnInit, On
         form.onReset();
         this.currentActiveItemDefault = [];
         this.buyingRateChargeToAdd = new CsShipmentSurcharge();
-        this.resetDisplay();
+        this.currentSelectedCharge = null;
+        // this.resetDisplay();
         this.hide();
     }
 
@@ -91,12 +93,12 @@ export class AddBuyingRatePopupComponent extends PopupBase implements OnInit, On
                 }
                 const res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.buyingRateChargeToAdd);
                 if (res.status) {
+                    this.currentSelectedCharge = null;
                     form.onReset();
                     this.outputAddBuying.emit(true);
-                    this.resetDisplay();
                     this.buyingRateChargeToAdd = new CsShipmentSurcharge();
                     this.currentActiveItemDefault = [];
-                  
+
                     if (!isContinue) {
                         this.hide();
                     }
@@ -135,5 +137,5 @@ export class AddBuyingRatePopupComponent extends PopupBase implements OnInit, On
             this.lstCurrencies = prepareNg2SelectData(res, "id", "id");
         });
     }
- 
+
 }

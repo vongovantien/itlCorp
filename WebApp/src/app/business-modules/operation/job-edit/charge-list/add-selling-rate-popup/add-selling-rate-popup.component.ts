@@ -51,11 +51,11 @@ export class AddSellingRatePopupComponent extends PopupBase implements OnInit {
                 const res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.sellingRateChargeToAdd);
                 if (res.status) {
                     form.onReset();
-                    this.resetDisplay();
+                    // this.resetDisplay();
                     this.sellingRateChargeToAdd = new CsShipmentSurcharge();
                     this.currentActiveItemDefault = [];
                     this.outputAddSelling.emit(true);
-                   
+
                     if (!isContinue) {
                         this.hide();
                     }

@@ -12,7 +12,7 @@
           </button>
         </div>
 
-        <div class="modal-body" *ngIf="isDisplay">
+        <div class="modal-body">
           <div class="m-form m-form--state">
             <div class="row">
               <div class="col-lg-4">
@@ -21,7 +21,7 @@
                   <label class="form-control-label" for="" #selectedBuyingChargeCode>
                     Charge <span class="m--font-danger">(*)</span>
                     <small class="m--margin-left-5 m--font-primary"> &nbsp;
-                      {{selectedBuyingChargeCode.value==null?'':selectedBuyingChargeCode.value}}
+                      {{currentSelectedCharge}}
                     </small>
                   </label>
                   <app-combo-grid-virtual-scroll
@@ -30,6 +30,7 @@
                                             buyingRateChargeToAdd.unitPrice=$event.charge.unitPrice;
                                             buyingRateChargeToAdd.vatrate=$event.charge.vatrate;
                                             selectedBuyingChargeCode.value=$event.charge.code;
+                                            currentSelectedCharge=$event.charge.code;
                                             buyingRateChargeToAdd.currencyId = $event.currency;
                                             currentActiveItemDefault=[{ id: $event.currency, text: $event.currency }];
                                             buyingRateChargeToAdd.currencyId=$event.currency;

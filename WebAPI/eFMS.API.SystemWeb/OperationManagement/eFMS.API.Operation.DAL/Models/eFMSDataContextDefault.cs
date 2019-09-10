@@ -103,6 +103,8 @@ namespace eFMS.API.Operation.Service.Models
                     .HasMaxLength(25)
                     .IsUnicode(false);
 
+                entity.Property(e => e.ConvertTime).HasColumnType("datetime");
+
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
@@ -290,6 +292,8 @@ namespace eFMS.API.Operation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.InvoiceNo).HasMaxLength(200);
+
+                entity.Property(e => e.IsLocked).HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.JobNo)
                     .HasMaxLength(50)

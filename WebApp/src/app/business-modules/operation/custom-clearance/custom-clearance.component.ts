@@ -113,8 +113,10 @@ export class CustomClearanceComponent extends AppList {
     }
 
     getDataFromEcus() {
+        this._progressRef.start();
         this._cdNoteRepo.importCustomClearanceFromEcus()
-            .pipe(catchError(this.catchError))
+            .pipe(catchError(this.catchError),
+                finalize(() => { this.isLoading = false; this._progressRef.complete(); }))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     this._toastrService.success(res.message, '');
