@@ -284,6 +284,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
 
                 var clearance = mapper.Map<CustomsDeclaration>(model.CustomsDeclaration);
+                clearance.ConvertTime = DateTime.Now;
                 if (clearance.Id > 0)
                 {
                     clearance.DatetimeModified = DateTime.Now;
@@ -365,6 +366,7 @@ namespace eFMS.API.Documentation.DL.Services
                         item.CustomsDeclaration.JobNo = item.OpsTransaction.JobNo;
                         item.CustomsDeclaration.UserModified = currentUser.UserID;
                         item.CustomsDeclaration.DatetimeModified = DateTime.Now;
+                        item.CustomsDeclaration.ConvertTime = DateTime.Now;
                         var clearance = mapper.Map<CustomsDeclaration>(item.CustomsDeclaration);
                         ((eFMSDataContext)DataContext.DC).CustomsDeclaration.Update(clearance);
                         i = i + 1;
