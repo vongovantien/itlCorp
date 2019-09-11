@@ -42,12 +42,63 @@
     <div class="row m--margin-top-20">
         <div class="col-12">
             <div class="shipment-list-wrapper">
-                <accordion [isAnimated]="true">
-                    <accordion-group *ngFor="let item of items">
+                <!-- <accordion [isAnimated]="true">
+                    <accordion-group *ngFor="let item of groupShipments">
                         <shipment-item accordion-heading></shipment-item>
                         <table-surcharge-settlement></table-surcharge-settlement>
                     </accordion-group>
-                </accordion>
+                </accordion> -->
+                <div class="table-wrapper">
+                    <table class="table table-brand table-hover dataTable">
+                        <thead>
+                            <tr class="text-center">
+                                <th class="m--w-50">
+                                </th>
+                                <th *ngFor="let header of headers; let i = index; trackBy: trackByFn"
+                                    [class]="sortClass(header.sortable ? header.field : '')"
+                                    (click)="sortBy(header.sortable ? header.field : '')">
+                                    <span>{{header.title}}</span>
+                                    <span class="sort-indicator"></span>
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody class="tbody-group">
+                            <ng-container *ngFor="let surcharge of surcharges; let i = index; trackBy: trackByFn">
+                                <tr class="text-center">
+                                    <td></td>
+                                    <td>{{surcharge.jobId}}</td>
+                                    <td>{{surcharge.hbl}}</td>
+                                    <td>{{surcharge.mbl}}</td>
+                                    <td class="text-underline text-primary pointer" (click)="openSurchargeDetail(surcharge, i)">{{surcharge.chargeName}}</td>
+                                    <td>{{surcharge.quantity}}</td>
+                                    <td>{{surcharge.unitName}}</td>
+                                    <td>{{surcharge.unitPrice}}</td>
+                                    <td>{{surcharge.currency}}</td>
+                                    <td>{{surcharge.vatRate}}</td>
+                                    <td>{{surcharge.amount | number: '.0-2'}}</td>
+                                    <td>{{surcharge.payer}}</td>
+                                    <td>{{surcharge.obhPartner}}</td>
+                                    <td>{{surcharge.invoiceNo}}</td>
+                                    <td>{{surcharge.seriesNo}}</td>
+                                    <td>{{surcharge.invoiceDate | date: 'dd/MM/yyyy'}}</td>
+                                    <td>{{surcharge.customNo}}</td>
+                                    <td>{{surcharge.contNo}}</td>
+                                    <td>{{surcharge.note}}</td>
+                                    <td class="text-underline text-primary pointer">Payment Management</td>
+                                </tr>
+                            </ng-container>
+                            <tr *ngIf="!isLoading && !surcharges.length">
+                                <td colspan="100">
+                                    <div class="no-data">
+                                        <i class="flaticon-coins"></i>
+                                        <span class="no-data-text">No records found</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -57,4 +108,4 @@
 
 <existing-charge-popup></existing-charge-popup>
 
-<form-charge-popup (onRequest)="onRequestSurcharge($event)"></form-charge-popup>
+<form-charge-popup (onRequest)="onRequestSurcharge($event)" [state]="stateFormCharge" [(onUpdate)]="selectedSurcharge" (onUpdateChange)="onUpdateRequestSurcharge($event)"></form-charge-popup>
