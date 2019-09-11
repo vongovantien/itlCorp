@@ -1,9 +1,9 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { SystemRepo, AccoutingRepo, OperationRepo } from 'src/app/shared/repositories';
 import { takeUntil, debounceTime, switchMap, skip, distinctUntilChanged, catchError, map } from 'rxjs/operators';
-import { BehaviorSubject, Observable, pipe } from 'rxjs';
-import { Currency, CustomDeclaration, CsShipmentSurcharge } from 'src/app/shared/models';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { Currency, CustomDeclaration } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
 import { DataService } from 'src/app/shared/services';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
@@ -16,6 +16,7 @@ import { formatDate } from '@angular/common';
 })
 
 export class SettlementFormChargePopupComponent extends PopupBase {
+    @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
 
     isShow: boolean = false;
     term$ = new BehaviorSubject<string>('');
@@ -353,6 +354,8 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         console.log(body);
 
         // TODO EMIT (UPDATE, COPY, CREATE) TO LIST SURCHARGE.
+
+        this.onRequest.emit(body);
         // this._accoutingRepo.addShipmentSurCharge(body)
         //     .pipe()
         //     .subscribe(
