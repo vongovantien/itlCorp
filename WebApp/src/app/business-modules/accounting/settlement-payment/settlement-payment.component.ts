@@ -60,7 +60,7 @@ export class SettlementPaymentComponent extends AppList {
             { title: 'MBL', field: 'mbl', sortable: true },
             { title: 'HBL', field: 'hbl', sortable: true },
             { title: 'Amount', field: 'amount', sortable: true },
-            { title: 'Currentcy', field: 'chargeCurrency', sortable: true }
+            { title: 'Currency', field: 'chargeCurrency', sortable: true }
         ];
         this.getUserLogged();
         this.getListSettlePayment();
