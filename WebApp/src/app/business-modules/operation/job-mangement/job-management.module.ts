@@ -36,7 +36,6 @@ const routing: Routes = [
 
 ];
 
-
 const LIB = [
     NgxDaterangepickerMd,
     SelectModule,

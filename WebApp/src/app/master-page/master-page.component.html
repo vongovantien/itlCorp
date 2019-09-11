@@ -1,13 +1,9 @@
-<!-- begin:: Page -->
 <app-header id="m_header" class="m-grid__item m-header " m-minimize-offset="200" m-minimize-mobile-offset="200" [Page_Info]="Component_name"></app-header>
-<!-- begin::Body -->
 <div class="m-grid__item m-grid__item--fluid m-grid m-grid--ver-desktop m-grid--desktop m-body">
-  <!-- BEGIN: Left Aside -->
   <button class="m-aside-left-close  m-aside-left-close--skin-dark " id="m_aside_left_close_btn">
       <i class="la la-close"></i>
   </button>
   <app-page-sidebar id="m_aside_left" class="m-grid__item	m-aside-left  m-aside-left--skin-dark" (Page_Information)="MenuChanged($event)"></app-page-sidebar>
-  <!-- END: Left Aside -->
   
   <div class="m-grid__item m-grid__item--fluid m-wrapper">
     <router-outlet></router-outlet>
@@ -52,4 +48,5 @@
         </div>
     </div>
 </div>
+
 <!--end::logout-modal-->

@@ -57,7 +57,7 @@ namespace eFMS.API.Documentation.DL.Services
                 model.CurrentStatus = TermData.Processing;
             }
             int countNumberJob = ((eFMSDataContext)DataContext.DC).OpsTransaction.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
-            model.JobNo = GenerateID.GenerateOPSJobID("LOG", countNumberJob);
+            model.JobNo = GenerateID.GenerateOPSJobID(Constants.OPS_SHIPMENT, countNumberJob);
             var entity = mapper.Map<OpsTransaction>(model);
             return DataContext.Add(entity);
         }
@@ -269,7 +269,7 @@ namespace eFMS.API.Documentation.DL.Services
                     model.OpsTransaction.ModifiedDate = DateTime.Now;
                     model.OpsTransaction.UserModified = currentUser.UserID;
                     int countNumberJob = ((eFMSDataContext)DataContext.DC).OpsTransaction.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
-                    model.OpsTransaction.JobNo = GenerateID.GenerateOPSJobID("LOG", countNumberJob);
+                    model.OpsTransaction.JobNo = GenerateID.GenerateOPSJobID(Constants.OPS_SHIPMENT, countNumberJob);
                     var dayStatus = (int)(model.OpsTransaction.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
                     if (dayStatus > 0)
                     {
@@ -284,6 +284,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
 
                 var clearance = mapper.Map<CustomsDeclaration>(model.CustomsDeclaration);
+                clearance.ConvertTime = DateTime.Now;
                 if (clearance.Id > 0)
                 {
                     clearance.DatetimeModified = DateTime.Now;
@@ -296,7 +297,7 @@ namespace eFMS.API.Documentation.DL.Services
                     clearance.DatetimeCreated = DateTime.Now;
                     clearance.DatetimeModified = DateTime.Now;
                     clearance.UserCreated = model.CustomsDeclaration.UserModified = currentUser.UserID;
-                    clearance.Source = "eFMS";
+                    clearance.Source = Constants.CLEARANCE_FROM_EFMS;
                     clearance.JobNo = model.OpsTransaction.JobNo;
                     ((eFMSDataContext)DataContext.DC).CustomsDeclaration.Add(clearance);
                 }
@@ -349,7 +350,7 @@ namespace eFMS.API.Documentation.DL.Services
                         item.OpsTransaction.ModifiedDate = DateTime.Now;
                         item.OpsTransaction.UserModified = currentUser.UserID;
                         int countNumberJob = ((eFMSDataContext)DataContext.DC).OpsTransaction.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
-                        item.OpsTransaction.JobNo = GenerateID.GenerateOPSJobID("LOG", (countNumberJob + i));
+                        item.OpsTransaction.JobNo = GenerateID.GenerateOPSJobID(Constants.OPS_SHIPMENT, (countNumberJob + i));
                         var dayStatus = (int)(item.OpsTransaction.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
                         if (dayStatus > 0)
                         {
@@ -365,6 +366,7 @@ namespace eFMS.API.Documentation.DL.Services
                         item.CustomsDeclaration.JobNo = item.OpsTransaction.JobNo;
                         item.CustomsDeclaration.UserModified = currentUser.UserID;
                         item.CustomsDeclaration.DatetimeModified = DateTime.Now;
+                        item.CustomsDeclaration.ConvertTime = DateTime.Now;
                         var clearance = mapper.Map<CustomsDeclaration>(item.CustomsDeclaration);
                         ((eFMSDataContext)DataContext.DC).CustomsDeclaration.Update(clearance);
                         i = i + 1;

@@ -1,0 +1,26 @@
+<div class="table-wrapper">
+    <table class="table table-brand table-hover dataTable">
+        <thead>
+            <tr class="text-center">
+                <th class="m--w-50">
+                </th>
+                <th *ngFor="let header of headers; let i = index; trackBy: trackByFn"
+                    [class]="sortClass(header.sortable ? header.field : '')"
+                    (click)="sortBy(header.sortable ? header.field : '')">
+                    <span>{{header.title}}</span>
+                    <span class="sort-indicator"></span>
+                </th>
+            </tr>
+        </thead>
+        <tbody class="tbody-group">
+            <tr *ngIf="!isLoading">
+                <td colspan="100">
+                    <div class="no-data">
+                        <i class="flaticon-coins"></i>
+                        <span class="no-data-text">No records found</span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

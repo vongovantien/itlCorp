@@ -30,6 +30,10 @@ namespace eFMS.API.Documentation.Controllers
             shipmentService = service;
         }
 
+        /// <summary>
+        /// get list of shipment available
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("GetShipmentNotLocked")]
         public IActionResult GetShipmentNotLocked()
         {

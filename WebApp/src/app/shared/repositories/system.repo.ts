@@ -92,5 +92,14 @@ export class SystemRepo {
                 map((data: any) => data)
             );
     }
+
+    getUnit(data?: any) {
+        return this._api.post(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatUnit/Query`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
+    }
 }
 

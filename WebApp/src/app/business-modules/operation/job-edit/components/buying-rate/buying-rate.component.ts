@@ -89,7 +89,6 @@ export class JobManagementBuyingRateComponent extends AppList {
 
     onSaveNewBuyingRate(event) {
         if (event === true) {
-            this.addBuyingRatePopup.hide();
             this.onChange.emit(event);
         }
     }

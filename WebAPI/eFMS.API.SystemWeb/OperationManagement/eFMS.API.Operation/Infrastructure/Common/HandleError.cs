@@ -10,9 +10,9 @@ namespace eFMS.API.Operation.Infrastructure.Common
         public static string GetMessage(HandleState hs, Crud crud)
         {
             string message = string.Empty;
-            if(hs.Exception != null)
+            if(hs.Message != null)
             {
-                message = hs.Exception.Message;
+                message = hs.Message.ToString();
             }
             if (hs.Exception != null)
             {

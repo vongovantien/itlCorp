@@ -18,6 +18,7 @@ namespace eFMS.API.Operation.Infrastructure
             CreateMap<SetEcusconnection, SetEcusConnectionModel>();
             CreateMap<CustomsDeclaration, CustomsDeclarationModel>();
             CreateMap<CustomsDeclarationModel, CustomsDeclaration>();
+            CreateMap<sp_GetCustomDeclaration, CustomsDeclarationModel>();
         }
     }
 }

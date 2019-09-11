@@ -45,6 +45,7 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<CsMawbcontainerImportModel, CsMawbcontainer>();
 
             CreateMap<AcctApproveAdvance, AcctApproveAdvanceModel>();
+            CreateMap<spc_GetSurchargeByHouseBill, CsShipmentSurchargeDetailsModel>();
         }
     }
 }

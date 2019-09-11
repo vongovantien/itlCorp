@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import moment from 'moment/moment';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import * as shipmentHelper from 'src/helper/shipment.helper';
 import { BaseService } from 'src/app/shared/services/base.service';
@@ -10,7 +9,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { NgForm } from '@angular/forms';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
-import { SortService } from 'src/app/shared/services/sort.service';
 
 import { ChargeConstants } from 'src/constants/charge.const';
 import { ContainerListComponent } from './container-list/container-list.component';
@@ -115,7 +113,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         private _unitRepo: UnitRepo,
         private _operationRepo: OperationRepo,
         private _data: DataService,
-        ) {
+    ) {
         super();
     }
 
@@ -146,8 +144,9 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                 await this.getShipmentDetails(params.id);
                 this.getListContainersOfJob();
                 if (this.opsTransaction != null) {
-                    this.serviceDate = (this.opsTransaction.serviceDate !== null) ? { startDate: moment(this.opsTransaction.serviceDate), endDate: moment(this.opsTransaction.serviceDate) } : null;
-                    this.finishDate = this.opsTransaction.finishDate != null ? { startDate: moment(this.opsTransaction.finishDate), endDate: moment(this.opsTransaction.finishDate) } : null;
+                    this.getSurCharges('BUY');
+                    this.serviceDate = (this.opsTransaction.serviceDate !== null) ? { startDate: new Date(this.opsTransaction.serviceDate), endDate: new Date(this.opsTransaction.serviceDate) } : null;
+                    this.finishDate = this.opsTransaction.finishDate != null ? { startDate: new Date(this.opsTransaction.finishDate), endDate: new Date(this.opsTransaction.finishDate) } : null;
                     let index = this.productServices.findIndex(x => x.id === this.opsTransaction.productService);
                     if (index > -1) { this.productServiceActive = [this.productServices[index]]; }
                     index = this.serviceModes.findIndex(x => x.id === this.opsTransaction.serviceMode);
@@ -157,7 +156,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                     index = this.packageTypes.findIndex(x => x.id === this.opsTransaction.packageTypeId);
                     if (index > -1) { this.packagesUnitActive = [this.packageTypes[index]]; }
                     // this.getAllSurCharges();
-                    this.getSurCharges('BUY');
                     // this.getShipmentContainer();
                     this.getCustomClearances();
                 } else {
@@ -544,9 +542,9 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             case 'selling':
                 this.getSurCharges('SELL');
                 break;
-            case 'obh' :
+            case 'obh':
                 this.getSurCharges('OBH');
-            break;
+                break;
             default:
                 this.getSurCharges('BUY');
                 break;

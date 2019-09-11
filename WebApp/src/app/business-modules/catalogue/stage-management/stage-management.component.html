@@ -17,7 +17,7 @@
                 </span>
             </button>
             <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                [routerLink]="['/home/catalogue/stage-management/stage-import']" >
+                [routerLink]="['/home/catalogue/stage-management/stage-import']">
                 <span>
                     <i class="la la-download"></i>
                     <span>
@@ -115,11 +115,11 @@
                     <thead>
                         <tr>
                             <th>Actions</th>
-                            <th class="sorting"
+                            <!-- <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'id'), 'sorting_desc': (!isDesc && sortKey == 'id') }"
                                 (click)="sort('id')">
                                 <span>Stage ID</span>
-                            </th>
+                            </th> -->
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'deptName'), 'sorting_desc': (!isDesc && sortKey == 'deptName') }"
                                 (click)="sort('deptName')">
@@ -175,9 +175,9 @@
                                         </button>
                                     </div>
                                 </td>
-                                <td>
+                                <!-- <td>
                                     <span>{{stage.id}}</span>
-                                </td>
+                                </td> -->
                                 <td>
                                     <span>{{stage.deptName}}</span>
                                 </td>

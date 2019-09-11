@@ -110,13 +110,14 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             description: data.description,
             amount: data.amount,
             note: data.requestNote,
-            customNo: !!data.customNo ? this.initCD.filter((item: CustomDeclaration) => item.clearanceNo === data.customNo)[0] : null,
+            customNo: !!data.customNo ? (this.initCD.filter((item: CustomDeclaration) => item.clearanceNo === data.customNo).length ? this.initCD.filter((item: CustomDeclaration) => item.clearanceNo === data.customNo)[0] : null) : null,
             type: this.types.filter((type: any) => type.value.toLowerCase() === data.advanceType.toLowerCase())[0],
             currency: data.requestCurrency
         });
 
         this.selectedShipmentData = <OperationInteface.IShipment>{ hbl: data.hbl, jobId: data.jobId, mbl: data.mbl};
         this.selectedShipment = { field: 'jobId', value: data.jobId };
+        
 
         this.advanceNo = data.advanceNo;
 
