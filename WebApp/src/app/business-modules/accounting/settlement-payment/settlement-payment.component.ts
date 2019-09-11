@@ -7,6 +7,9 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { Router } from '@angular/router';
 import { catchError, finalize, map, } from 'rxjs/operators';
 import { AdvancePayment, User, SettlementPayment } from 'src/app/shared/models';
+import { CustomDeclaration } from 'src/app/shared/models';
+
+
 
 @Component({
     selector: 'app-settlement-payment',
@@ -17,6 +20,10 @@ export class SettlementPaymentComponent extends AppList {
     headers: CommonInterface.IHeaderTable[];
     settlements: any[] = [];
     dataSearch: any = {};
+    customClearances: any[] = [];
+    headerCustomClearance: CommonInterface.IHeaderTable[];
+
+
 
     userLogged: User;
     constructor(
@@ -47,9 +54,39 @@ export class SettlementPaymentComponent extends AppList {
             { title: 'Payment method', field: 'paymentMethod',sortable: true },
             { title: 'Description', field: 'note',sortable: true },
         ];
+
+        this.headerCustomClearance = [
+            { title: 'JobID', field: 'jobId', sortable: true },
+            { title: 'MBL', field: 'mbl', sortable: true },
+            { title: 'HBL', field: 'hbl', sortable: true },
+            { title: 'Amount', field: 'amount', sortable: true },
+            { title: 'Currentcy', field: 'chargeCurrency', sortable: true }
+        ];
         this.getUserLogged();
         this.getListSettlePayment();
 
+    }
+
+    showCustomClearance(settlementNo: string, indexsSettle: number) {
+        if (!!this.settlements[indexsSettle].settleRequests.length) {
+            this.customClearances = this.settlements[indexsSettle].settleRequests;
+        }
+        else {
+            this._progressRef.start();
+            this._accoutingRepo.getShipmentOfSettlements(settlementNo)
+                .pipe(
+                    catchError(this.catchError),
+                    finalize(() => this._progressRef.complete())
+                ).subscribe(
+                    (res: CustomDeclaration[]) => {
+                        if (!!res) {
+                            this.customClearances = res;
+                            this.settlements[indexsSettle].settleRequests = res;
+                        }
+                    },
+                );
+        }
+         
     }
 
     getUserLogged() {
@@ -67,6 +104,28 @@ export class SettlementPaymentComponent extends AppList {
     onSearchSettlement(data: any) {
         this.dataSearch = data;
         this.getListSettlePayment(this.dataSearch);
+    }
+
+    
+    sortByCustomClearance(sort: string): void {
+        if (!!sort) {
+            this.setSortBy(sort, this.sort !== sort ? true : !this.order);
+            if (typeof (this.requestSort) === 'function') {
+                this.customClearances = this._sortService.sort(this.customClearances, this.sort, this.order);
+            }
+        }
+    }
+
+    sortClassCustomClearance(sort: string): string {
+        if (!!sort) {
+            let classes = 'sortable ';
+            if (this.sort === sort) {
+                classes += ('sort-' + (this.order ? 'asc' : 'desc') + ' ');
+            }
+
+            return classes;
+        }
+        return '';
     }
 
     getListSettlePayment(dataSearch?: any) {
@@ -89,8 +148,8 @@ export class SettlementPaymentComponent extends AppList {
                     this.settlements = res.data;
                 },
             );
-
     }
+
 
 
     sortLocal(sort: string): void {

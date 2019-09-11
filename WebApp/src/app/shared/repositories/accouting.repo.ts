@@ -222,7 +222,9 @@ export class AccoutingRepo {
         );
     }
 
-
-
-
+    getShipmentOfSettlements(settlementNo: string) {
+        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSettlementPayment/GetShipmentOfSettlements`, { settlementNo: settlementNo }).pipe(
+            map((data: any) => data)
+        );
+    }
 }
