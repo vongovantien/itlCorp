@@ -113,7 +113,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         private _unitRepo: UnitRepo,
         private _operationRepo: OperationRepo,
         private _data: DataService,
-        ) {
+    ) {
         super();
     }
 
@@ -144,6 +144,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                 await this.getShipmentDetails(params.id);
                 this.getListContainersOfJob();
                 if (this.opsTransaction != null) {
+                    this.getSurCharges('BUY');
                     this.serviceDate = (this.opsTransaction.serviceDate !== null) ? { startDate: new Date(this.opsTransaction.serviceDate), endDate: new Date(this.opsTransaction.serviceDate) } : null;
                     this.finishDate = this.opsTransaction.finishDate != null ? { startDate: new Date(this.opsTransaction.finishDate), endDate: new Date(this.opsTransaction.finishDate) } : null;
                     let index = this.productServices.findIndex(x => x.id === this.opsTransaction.productService);
@@ -155,7 +156,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                     index = this.packageTypes.findIndex(x => x.id === this.opsTransaction.packageTypeId);
                     if (index > -1) { this.packagesUnitActive = [this.packageTypes[index]]; }
                     // this.getAllSurCharges();
-                    this.getSurCharges('BUY');
                     // this.getShipmentContainer();
                     this.getCustomClearances();
                 } else {
@@ -542,9 +542,9 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             case 'selling':
                 this.getSurCharges('SELL');
                 break;
-            case 'obh' :
+            case 'obh':
                 this.getSurCharges('OBH');
-            break;
+                break;
             default:
                 this.getSurCharges('BUY');
                 break;

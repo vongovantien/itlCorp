@@ -275,6 +275,9 @@ namespace eFMS.API.Documentation.DL.Services
             foreach (var item in query)
             {
                 var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item);
+                charge.Currency = item.CurrencyCode;
+                charge.Unit = item.UnitNameEn;
+                charge.NameEn = item.ChargeNameEn;
                 if (charge.ExchangeDate != null)
                 {
                     var exchangeCurrencyToVND = exchangRates.Where(x => (x.DatetimeCreated.Value.Date == charge.ExchangeDate.Value.Date

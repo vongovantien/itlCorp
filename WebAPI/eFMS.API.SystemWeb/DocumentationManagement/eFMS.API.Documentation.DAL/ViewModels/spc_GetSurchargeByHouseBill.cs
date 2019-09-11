@@ -69,5 +69,6 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string PartnerName { get; set; }
         public string ReceiverName { get; set; }
         public string PayerName { get; set; }
+        public string CurrencyCode { get; set; }
     }
 }
