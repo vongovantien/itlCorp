@@ -8,6 +8,7 @@ using eFMS.API.Common.NoSql;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.DL.Models.SettlementPayment;
 using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
@@ -67,8 +68,8 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="settlementNo">settlementNo that want to retrieve Settlement Payment</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("GetShipmentOfSettlementListBySettlementNo")]
-        public IActionResult GetShipmentOfSettlementList(string settlementNo)
+        [Route("GetShipmentOfSettlements")]
+        public IActionResult GetShipmentOfSettlements(string settlementNo)
         {
             var data = acctSettlementPaymentService.GetShipmentOfSettlements(settlementNo);
             return Ok(data);
@@ -97,6 +98,20 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        [HttpGet]
+        [Route("GetDetailSettlementPaymentById")]
+        public IActionResult GetDetailSettlementPaymentById(Guid settlementId)
+        {
+            var settlement = acctSettlementPaymentService.GetSettlementPaymentById(settlementId);
+            List<ShipmentSettlement> chargeGrpSettlement = new List<ShipmentSettlement>();
+            if (settlement != null)
+            {
+                chargeGrpSettlement = acctSettlementPaymentService.GetListShipmentSettlementBySettlementNo(settlement.SettlementNo);
+            }
+            var data = new { settlement = settlement, chargeGrpSettlement = chargeGrpSettlement };
+            return Ok(data);
+        }
+
         /// <summary>
         /// Get settlement payment by settlementId
         /// </summary>
@@ -123,5 +138,73 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// Get Payment Management By Shipment
+        /// </summary>
+        /// <param name="JobId"></param>
+        /// <param name="MBL"></param>
+        /// <param name="HBL"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetPaymentManagementByShipment")]
+        public IActionResult GetPaymentManagementByShipment(string JobId, string MBL, string HBL)
+        {
+            var advancePayment = acctSettlementPaymentService.GetAdvancePaymentMngts(JobId, MBL, HBL);
+            var settlementPayment = acctSettlementPaymentService.GetSettlementPaymentMngts(JobId, MBL, HBL);
+
+            //Lấy ra list các currency của cả 2 (không trùng currency)
+            List<string> currencies = new List<string>();
+            if(advancePayment.Count > 0)
+            {
+                var advance = advancePayment.Where(x => !currencies.Contains(x.AdvanceCurrency));
+                foreach (var item in advance)
+                {
+                    currencies.Add(item.AdvanceCurrency);
+                }
+            }
+
+            if(settlementPayment.Count > 0)
+            {
+                var settle = settlementPayment.Where(x => !currencies.Contains(x.SettlementCurrency));
+                foreach(var item in settle)
+                {
+                    currencies.Add(item.SettlementCurrency);
+                }
+            }
+
+            var totalAdvance = "";
+            var totalSettlement = "";
+            var balance = "";
+            if (currencies.Count > 0)
+            {
+                foreach (var currency in currencies)
+                {
+                    decimal totalAdv = Math.Round(advancePayment.Where(x => x.AdvanceCurrency == currency).Sum(su => su.TotalAmount), 2);
+                    decimal totalSet = Math.Round(settlementPayment.Where(x => x.SettlementCurrency == currency).Sum(su => su.TotalAmount), 2);
+                    decimal bal = (totalAdv - totalSet);
+                    totalAdvance += string.Format("{0:n}", totalAdv) + " " + currency + " | ";
+                    totalSettlement += string.Format("{0:n}", totalSet) + " " + currency + " | ";
+                    balance += (bal < 0 ? "(" + string.Format("{0:n}", Math.Abs(bal)) + ")" : string.Format("{0:n}", bal) + "") + " " + currency + " | ";
+                }
+                totalAdvance = (totalAdvance += ")").Replace(" | )", "");
+                totalSettlement = (totalSettlement += ")").Replace(" | )", "");
+                balance = (balance += ")").Replace(" | )", "");
+            }
+
+            var result = new
+            {
+                jobId = JobId,
+                mbl = MBL,
+                hbl = HBL,
+                totalAdvance = totalAdvance,
+                totalSettlement = totalSettlement,
+                balance = balance,
+                AdvancePayment = advancePayment,
+                SettlementPayment = settlementPayment
+            };
+            return Ok(result);
+        }
+
+        
     }
 }

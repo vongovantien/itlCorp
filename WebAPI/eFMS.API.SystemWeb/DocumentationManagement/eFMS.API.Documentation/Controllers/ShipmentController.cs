@@ -36,5 +36,12 @@ namespace eFMS.API.Documentation.Controllers
             var list = shipmentService.GetShipmentNotLocked();
             return Ok(list);
         }
+
+        [HttpGet("GetShipmentsCreditPayer")]
+        public IActionResult GetShipmentsCreditPayer()
+        {
+            var data = shipmentService.GetShipmentsCreditPayer();
+            return Ok(data);
+        }
     }
 }

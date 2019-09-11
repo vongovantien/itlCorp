@@ -20,5 +20,13 @@ namespace eFMS.API.Documentation.DL.IService
         AcctSettlementPaymentModel GetSettlementPaymentById(Guid idSettlement);
 
         List<ShipmentSettlement> GetListShipmentSettlementBySettlementNo(string settlementNo);
+
+        List<AdvancePaymentMngt> GetAdvancePaymentMngts(string JobId, string MBL, string HBL);
+
+        List<SettlementPaymentMngt> GetSettlementPaymentMngts(string JobId, string MBL, string HBL);
+
+        List<Shipments> GetShipmentsCreditPayer();
+
+
     }
 }

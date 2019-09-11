@@ -8,8 +8,8 @@ namespace eFMS.API.Documentation.DL.Models.SettlementPayment
     {
         public string AdvanceNo { get; set; }
         public string Description { get; set; }
-        public decimal? TotalAmount { get; set; }
-        public string CurrencyAdvance { get; set; }
+        public decimal TotalAmount { get; set; }
+        public string AdvanceCurrency { get; set; }
         public DateTime? AdvanceDate { get; set; }
         public List<ChargeAdvancePaymentMngt> ChargeAdvancePaymentMngts { get; set; }
     }
@@ -18,7 +18,7 @@ namespace eFMS.API.Documentation.DL.Models.SettlementPayment
     {
         public string AdvanceNo { get; set; }
         public string Description { get; set; }
-        public decimal? TotalAmount { get; set; }
-        public string CurrencyAdvance { get; set; }
+        public decimal TotalAmount { get; set; }
+        public string AdvanceCurrency { get; set; }
     }
 }

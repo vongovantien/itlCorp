@@ -27,6 +27,7 @@ namespace eFMS.API.Documentation.DL.Services
             webUrl = url;
         }
 
+        #region --- List Settlement Payment ---
         public List<AcctSettlementPaymentResult> Paging(AcctSettlementPaymentCriteria criteria, int page, int size, out int rowsCount)
         {
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
@@ -229,6 +230,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             return data.ToList();
         }
+        #endregion --- List Settlement Payment ---
 
         public HandleState DeleteSettlementPayment(string settlementNo)
         {
@@ -266,6 +268,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
+        #region ---Detail Settlement Payment---
         public AcctSettlementPaymentModel GetSettlementPaymentById(Guid idSettlement)
         {
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
@@ -395,8 +398,9 @@ namespace eFMS.API.Documentation.DL.Services
 
             return data.ToList();
         }
-        
-        
+        #endregion ---Detail Settlement Payment---
+
+        #region ---Payment Management---
         public List<AdvancePaymentMngt> GetAdvancePaymentMngts(string JobId, string MBL, string HBL)
         {
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
@@ -406,18 +410,22 @@ namespace eFMS.API.Documentation.DL.Services
             var data = from req in request
                        join ad in advance on req.AdvanceNo equals ad.AdvanceNo into ad2
                        from ad in ad2.DefaultIfEmpty()
-                       where ad.StatusApproval == "Done"
+                       where 
+                            ad.StatusApproval == "Done" 
+                       &&   req.JobId == JobId 
+                       &&   req.Mbl == MBL 
+                       &&   req.Hbl == HBL
                        select new AdvancePaymentMngt {
                            AdvanceNo = ad.AdvanceNo,
-                           TotalAmount = req.Amount,
-                           CurrencyAdvance = ad.AdvanceCurrency,
-                           AdvanceDate = ad.DatetimeModified
+                           TotalAmount = req.Amount.Value,
+                           AdvanceCurrency = ad.AdvanceCurrency,
+                           AdvanceDate = ad.DatetimeCreated
                        };
-            data = data.GroupBy(x => new { x.AdvanceNo, x.CurrencyAdvance, x.AdvanceDate })
+            data = data.GroupBy(x => new { x.AdvanceNo, x.AdvanceCurrency, x.AdvanceDate })
                 .Select(s=> new AdvancePaymentMngt {
                     AdvanceNo = s.Key.AdvanceNo,
                     TotalAmount = s.Sum(su => su.TotalAmount),
-                    CurrencyAdvance = s.Key.CurrencyAdvance,
+                    AdvanceCurrency = s.Key.AdvanceCurrency,
                     AdvanceDate = s.Key.AdvanceDate
                 });
 
@@ -428,14 +436,148 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     AdvanceNo = item.AdvanceNo,
                     TotalAmount = item.TotalAmount,
-                    CurrencyAdvance = item.CurrencyAdvance,
+                    AdvanceCurrency = item.AdvanceCurrency,
                     AdvanceDate = item.AdvanceDate,
-                    ChargeAdvancePaymentMngts = request.Where(x=>x.AdvanceNo == item.AdvanceNo).Select(x=>new ChargeAdvancePaymentMngt { AdvanceNo = x.AdvanceNo, TotalAmount = x.Amount, CurrencyAdvance = x.RequestCurrency, Description = x.Description }).ToList()
+                    ChargeAdvancePaymentMngts = request.Where(x => x.AdvanceNo == item.AdvanceNo && x.JobId == JobId && x.Mbl == MBL && x.Hbl == HBL).Select(x=>new ChargeAdvancePaymentMngt { AdvanceNo = x.AdvanceNo, TotalAmount = x.Amount.Value, AdvanceCurrency = x.RequestCurrency, Description = x.Description }).ToList()
                 });
             }
             return dataResult;
         }
 
+        public List<SettlementPaymentMngt> GetSettlementPaymentMngts(string JobId, string MBL, string HBL)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var settlement = dc.AcctSettlementPayment;
+            var surcharge = dc.CsShipmentSurcharge;
+            var charge = dc.CatCharge;
+            var payee = dc.CatPartner;
+            var payer = dc.CatPartner;
+            var opsTrans = dc.OpsTransaction;
+            var csTransD = dc.CsTransactionDetail;
+            var csTrans = dc.CsTransaction;
+            //Lấy danh sách Currency Exchange của ngày hiện tại
+            var currencyExchange = dc.CatCurrencyExchange.Where(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+
+            //Chỉ lấy ra những settlement có status là done
+            var data = from settle in settlement
+                       join sur in surcharge on settle.SettlementNo equals sur.SettlementCode into sur2
+                       from sur in sur2.DefaultIfEmpty()
+                       join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
+                       from pae in pae2.DefaultIfEmpty()
+                       join opst in opsTrans on sur.Hblid equals opst.Hblid into opst2
+                       from opst in opst2.DefaultIfEmpty()
+                       join cstd in csTransD on sur.Hblid equals cstd.Id into cstd2
+                       from cstd in cstd2.DefaultIfEmpty()
+                       join cst in csTrans on cstd.JobId equals cst.Id into cst2
+                       from cst in cst2.DefaultIfEmpty()
+                       where
+                                settle.StatusApproval == "Done"
+                            && (opst.JobNo == null ? cst.JobNo : opst.JobNo) == JobId
+                            && (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno) == HBL
+                            && (opst.Mblno == null ? cstd.Mawb : opst.Mblno) == MBL
+                       select new SettlementPaymentMngt
+                       {
+                           SettlementNo = settle.SettlementNo,
+                           TotalAmount = sur.Total,
+                           SettlementCurrency = settle.SettlementCurrency,
+                           ChargeCurrency = sur.CurrencyId,
+                           SettlementDate = settle.DatetimeCreated
+                       };
+
+            data = data.GroupBy(x => new { x.SettlementNo, x.SettlementCurrency, x.SettlementDate })
+                .Select(s => new SettlementPaymentMngt
+                {
+                    SettlementNo = s.Key.SettlementNo,
+                    TotalAmount = s.Sum(su => su.TotalAmount * GetRateCurrencyExchange(currencyExchange, su.ChargeCurrency, su.SettlementCurrency)),
+                    SettlementCurrency = s.Key.SettlementCurrency,
+                    SettlementDate = s.Key.SettlementDate
+                });
+
+            var dataResult = new List<SettlementPaymentMngt>();
+            foreach (var item in data)
+            {
+                dataResult.Add(new SettlementPaymentMngt
+                {
+                    SettlementNo = item.SettlementNo,
+                    TotalAmount = item.TotalAmount,
+                    SettlementCurrency = item.SettlementCurrency,
+                    SettlementDate = item.SettlementDate,
+                    ChargeSettlementPaymentMngts =
+                      (from sur in surcharge
+                       join cc in charge on sur.ChargeId equals cc.Id into cc2
+                       from cc in cc2.DefaultIfEmpty()
+                       join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
+                       from pae in pae2.DefaultIfEmpty()
+                       join par in payer on sur.PayerId equals par.Id into par2
+                       from par in par2.DefaultIfEmpty()
+                       join opst in opsTrans on sur.Hblid equals opst.Hblid into opst2
+                       from opst in opst2.DefaultIfEmpty()
+                       join cstd in csTransD on sur.Hblid equals cstd.Id into cstd2
+                       from cstd in cstd2.DefaultIfEmpty()
+                       join cst in csTrans on cstd.JobId equals cst.Id into cst2
+                       from cst in cst2.DefaultIfEmpty()
+                       where
+                            sur.SettlementCode == item.SettlementNo
+                        && (opst.JobNo == null ? cst.JobNo : opst.JobNo) == JobId
+                        && (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno) == HBL
+                        && (opst.Mblno == null ? cstd.Mawb : opst.Mblno) == MBL
+                       select new ChargeSettlementPaymentMngt {
+                           SettlementNo = item.SettlementNo,
+                           ChargeName = cc.ChargeNameEn,
+                           TotalAmount = sur.Total,
+                           SettlementCurrency = sur.CurrencyId,
+                           OBHPartner = pae.ShortName,
+                           Payer = par.ShortName
+                       }).ToList()
+                });
+            }
+            return dataResult;
+        }
+        #endregion ---Payment Management---
+
+        #region -- Get Exists Charge --
+        public List<Shipments> GetShipmentsCreditPayer()
+        {
+            //Chỉ lấy ra những phí Credit(BUY) & Payer
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var surcharge = dc.CsShipmentSurcharge;
+            var opsTrans = dc.OpsTransaction.Where(x => x.CurrentStatus != "Canceled");
+            var csTrans = dc.CsTransaction;
+            var csTransDe = dc.CsTransactionDetail;
+            var data = from sur in surcharge
+                       join opst in opsTrans on sur.Hblid equals opst.Hblid into opst2
+                       from opst in opst2.DefaultIfEmpty()
+                       join cstd in csTransDe on sur.Hblid equals cstd.Id into cstd2
+                       from cstd in cstd2.DefaultIfEmpty()
+                       join cst in csTrans on cstd.JobId equals cst.Id into cst2
+                       from cst in cst2.DefaultIfEmpty()
+                       where
+                        (
+                                sur.Type == "BUY"
+                            ||
+                                (sur.PayerId != null && sur.CreditNo != null)
+                        )
+                        && (opst.JobNo == null ? cst.JobNo : opst.JobNo) != null
+                        && (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno) != null
+                        && (opst.Mblno == null ? cstd.Mawb : opst.Mblno) != null
+                       select new Shipments {
+                           //Id = sur.Id,
+                           JobId = (opst.JobNo == null ? cst.JobNo : opst.JobNo),
+                           HBL = (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno),
+                           MBL = (opst.Mblno == null ? cstd.Mawb : opst.Mblno)
+                       };
+
+            var dataResult = data.GroupBy(x => new { x.JobId, x.HBL, x.MBL }).Select(s => new Shipments {
+                
+                JobId = s.Key.JobId,
+                HBL = s.Key.HBL,
+                MBL = s.Key.MBL
+            });
+            return dataResult.ToList();
+        }
+
+
+        #endregion -- Get Exists Charge --
         #region ----Method Private----
         private string CreateSettlementNo(eFMSDataContext dc)
         {

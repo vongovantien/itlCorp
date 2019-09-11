@@ -153,7 +153,7 @@
             <param name="pageSize">number items per page</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.AcctSettlementPaymentController.GetShipmentOfSettlementList(System.String)">
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSettlementPaymentController.GetShipmentOfSettlements(System.String)">
             <summary>
             Get list shipment of settlement payment list by settlementNo
             </summary>
@@ -179,6 +179,15 @@
             Get list shipment settlement by settlementNo
             </summary>
             <param name="settlementNo">settlementNo that want to retrieve Settlement Payment</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSettlementPaymentController.GetPaymentManagementByShipment(System.String,System.String,System.String)">
+            <summary>
+            Get Payment Management By Shipment
+            </summary>
+            <param name="JobId"></param>
+            <param name="MBL"></param>
+            <param name="HBL"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Documentation.Controllers.AcctSOAController">

@@ -9,8 +9,22 @@ namespace eFMS.API.Documentation.DL.Models.SettlementPayment
         public string SettlementNo { get; set; }
         public string ChargeName { get; set; }
         public decimal TotalAmount { get; set; }
-        public string CurrencySettlement { get; set; }
+        public string SettlementCurrency { get; set; }
+        public string ChargeCurrency { get; set; }
         public DateTime? SettlementDate { get; set; }
         public string OBHPartner { get; set; }
+        public string Payer { get; set; }
+
+        public List<ChargeSettlementPaymentMngt> ChargeSettlementPaymentMngts { get; set; }
+    }
+
+    public class ChargeSettlementPaymentMngt
+    {
+        public string SettlementNo { get; set; }
+        public string ChargeName { get; set; }
+        public decimal TotalAmount { get; set; }
+        public string SettlementCurrency { get; set; }
+        public string OBHPartner { get; set; }
+        public string Payer { get; set; }
     }
 }
