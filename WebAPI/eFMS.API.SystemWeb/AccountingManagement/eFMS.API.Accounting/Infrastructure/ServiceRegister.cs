@@ -39,8 +39,9 @@ namespace eFMS.API.Accounting.Infrastructure
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddTransient<IAcctAdvancePaymentService, AcctAdvancePaymentService>();
             services.AddTransient<IOpsTransactionService, OpsTransactionService>();
-
-
+            services.AddTransient<IAcctCDNoteServices, AcctCDNoteServices>();
+            services.AddTransient<IAcctSettlementPaymentService, AcctSettlementPaymentService>();
+            services.AddTransient<IAcctSOAService, AcctSOAService>();
 
             services.AddTransient<ICurrentUser, CurrentUser>();
         }

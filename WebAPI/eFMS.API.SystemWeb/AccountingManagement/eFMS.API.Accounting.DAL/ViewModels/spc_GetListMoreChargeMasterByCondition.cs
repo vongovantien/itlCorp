@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace eFMS.API.Accounting.DL.Models
+namespace eFMS.API.Accounting.Service.ViewModels
 {
-    public class ChargeShipmentModel
+    public class spc_GetListMoreChargeMasterByCondition
     {
         public Guid ID { get; set; }
         public string ChargeCode { get; set; }
@@ -24,7 +24,6 @@ namespace eFMS.API.Accounting.DL.Models
         public decimal AmountCreditLocal { get; set; }
         public decimal AmountDebitUSD { get; set; }
         public decimal AmountCreditUSD { get; set; }
-
         public string SOANo { get; set; }
         public decimal Quantity { get; set; }
         public string Unit { get; set; }
