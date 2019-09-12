@@ -74,17 +74,17 @@
                                     <td>{{surcharge.quantity}}</td>
                                     <td>{{surcharge.unitName}}</td>
                                     <td>{{surcharge.unitPrice}}</td>
-                                    <td>{{surcharge.currency}}</td>
-                                    <td>{{surcharge.vatRate}}</td>
-                                    <td>{{surcharge.amount | number: '.0-2'}}</td>
+                                    <td>{{surcharge.currencyId}}</td>
+                                    <td>{{surcharge.vatrate}}</td>
+                                    <td>{{surcharge.total | number: '.0-2'}}</td>
                                     <td>{{surcharge.payer}}</td>
-                                    <td>{{surcharge.obhPartner}}</td>
+                                    <td>{{surcharge.obhPartnerName}}</td>
                                     <td>{{surcharge.invoiceNo}}</td>
                                     <td>{{surcharge.seriesNo}}</td>
                                     <td>{{surcharge.invoiceDate | date: 'dd/MM/yyyy'}}</td>
-                                    <td>{{surcharge.customNo}}</td>
+                                    <td>{{surcharge.clearanceNo}}</td>
                                     <td>{{surcharge.contNo}}</td>
-                                    <td>{{surcharge.note}}</td>
+                                    <td>{{surcharge.notes}}</td>
                                     <td class="text-underline text-primary pointer">Payment Management</td>
                                 </tr>
                             </ng-container>
@@ -106,6 +106,6 @@
 
 <!-- <payment-management-popup></payment-management-popup> -->
 
-<existing-charge-popup></existing-charge-popup>
+<existing-charge-popup (onRequest)="onRequestSurcharge($event, 'existing')"></existing-charge-popup>
 
-<form-charge-popup (onRequest)="onRequestSurcharge($event)" [state]="stateFormCharge" [(onUpdate)]="selectedSurcharge" (onUpdateChange)="onUpdateRequestSurcharge($event)"></form-charge-popup>
+<form-charge-popup (onRequest)="onRequestSurcharge($event , 'new')" [state]="stateFormCharge" [(onUpdate)]="selectedSurcharge" (onUpdateChange)="onUpdateRequestSurcharge($event)"></form-charge-popup>

@@ -13,55 +13,109 @@
                         <div class="form-group">
                             <label class="font-weight-bold">Partner</label>
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPartner"
-                                (itemSelected)="onSelectDataFormInfo($event, 'partner')" [selectedDisplayFields]="configPartner.selectedDisplayFields"
-                                [dataSources]="configPartner.dataSource" [displayFields]="configPartner.displayFields" [height]="200">
+                                (itemSelected)="onSelectDataFormInfo($event, 'partner')"
+                                [selectedDisplayFields]="configPartner.selectedDisplayFields"
+                                [dataSources]="configPartner.dataSource" [displayFields]="configPartner.displayFields"
+                                [height]="200">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
                     <div class="col-4">
                         <div class="form-group">
                             <label class="font-weight-bold">Service</label>
-                            <input type="text" class="form-control">
+                            <app-multiple-select [source]="services" [active]="selectedServices"
+                                (onChange)="onSelectDataFormInfo($event,'service')" [placeHolder]="'Select Service'">
+                            </app-multiple-select>
                         </div>
                     </div>
                     <div class="col-4">
                         <div class="form-group">
                             <label class="font-weight-bold">Shipment</label>
-                            <input type="text" class="form-control">
+                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedShipment" [height]="150"
+                                (itemSelected)="onSelectDataFormInfo($event, 'shipment')"
+                                [dataSources]="configShipment.dataSource" [displayFields]="configShipment.displayFields"
+                                [selectedDisplayFields]="configShipment.selectedDisplayFields">
+                            </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
                     <div class="col-12 form-actions">
                         <div class="m--align-right">
-                            <app-default-button [buttonSetting]="searchlButtonSetting" (onClick)="searchCharge()">
+                            <app-default-button [buttonSetting]="searchlButtonSetting" (onClick)="searchCharge()"
+                                [disabled]="!selectedShipmentData">
                             </app-default-button>
-                            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="reset()"></app-default-button>
+                            <app-default-button [buttonSetting]="resetButtonSetting" (onClick)="reset()"
+                                class="m--margin-left-10">
+                            </app-default-button>
                         </div>
                     </div>
                 </div>
                 <div class="row m--margin-top-20 m--marginless">
                     <div class="table-wrapper m--margin-top-20">
-                        <table class="table table-borderless dataTable">
+                        <table class="table table-brand dataTable table-striped">
                             <thead>
-                                <tr class="text-center">
-                                    <th *ngFor="let header of headers; let i = index; trackBy: trackByFn"
-                                        [class]="sortClass(header.sortable ? header.field : '')"
-                                        (click)="sortBy(header.sortable ? header.field : '')">
-                                        <span>{{header.title}}</span>
-                                        <span class="sort-indicator"></span>
+                                <tr app-table-header [headers]="headers" class="text-center" (onClick)="sortSurcharge($event)">
+                                    <th>
+                                        <label class="m-checkbox">
+                                            <input type="checkbox" [(ngModel)]="isCheckAll"
+                                                (change)="checkUncheckAllCharge()">
+                                            <span></span>
+                                        </label>
                                     </th>
                                 </tr>
                             </thead>
                             <tbody class="tbody-group">
-                                <tr *ngIf="!isLoading">
-                                    <td colspan="100">
-                                        <div class="no-data">
-                                            <i class="flaticon-coins"></i>
-                                            <span class="no-data-text">No records found</span>
-                                        </div>
-                                    </td>
-                                </tr>
+                                <ng-container *ngFor="let charge of charges; let i = index; trackBy:trackByFn">
+                                    <tr class="text-center">
+                                        <td class="table-actions-col">
+                                            <div class="table-actions">
+                                                <label class="m-checkbox" *ngIf="!charge.settlementCode">
+                                                    <input type="checkbox" (change)="onChangeCheckBoxCharge()"
+                                                        value="{{charge}}" [(ngModel)]="charge.isSelected">
+                                                    <span></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td>{{charge.chargeName}}</td>
+                                        <td>{{charge.quantity}}</td>
+                                        <td>{{charge.unitName}}</td>
+                                        <td>{{charge.unitPrice}}</td>
+                                        <td>{{charge.currencyId}}</td>
+                                        <td>{{charge.vatrate}}</td>
+                                        <td>{{charge.total}}</td>
+                                        <td>{{charge.settlementCode}}</td>
+                                    </tr>
+                                </ng-container>
+                                <tr *ngIf="!isLoading && !charges.length" app-table-none-record [colspan]="headers.length + 1"></tr>
+                                <tr *ngIf="isLoading" app-table-row-loading></tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="m--align-center m--margin-top-20">
+                            <button
+                                class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                                title="Save" (click)="submit()">
+                                <span>
+                                    <i class="la la-save"></i>
+                                    <span>
+                                        Add Charge
+                                    </span>
+                                </span>
+                            </button>
+                            <button class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" title="Cancel"
+                                (click)="closePopup()">
+                                <span>
+                                    <i class="la la-ban"></i>
+                                    <span>
+                                        Cancel
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

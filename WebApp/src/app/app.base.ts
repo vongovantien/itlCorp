@@ -39,13 +39,12 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
     cancelButtonSetting: ButtonModalSetting = {
         buttonAttribute: {
             type: 'button',
-            titleButton: "Reset",
+            titleButton: "Cancel",
             classStyle: "btn btn-default m-btn--square m-btn--icon m-btn--uppercase",
-            icon: "la la-refresh"
+            icon: "la la-ban"
         },
-        typeButton: ButtonType.reset,
+        typeButton: ButtonType.cancel,
     };
-
 
     searchlButtonSetting: ButtonModalSetting = {
         buttonAttribute: {

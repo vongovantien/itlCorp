@@ -53,7 +53,7 @@ export class SettlementListChargeComponent extends AppList {
         ];
 
         this.surcharges = [
-            { jobId: 'SE123321', hbl: '321123', mbl: '100011', chargeName: 'Phi nhien lieu', chargeId: '62cb1fb8-467e-49a2-b4d6-006e7e8a2a5b', typeCharge: 'CREDIT', quantity: 2, unitName: 'Tạ', unitId: 111, unitPrice: 232000, currency: 'VND', vatRate: 10, amount: 4200000, payer: 'ITL', obhPartner: 'FTL', invoiceNo: 'INVXXX', seriesNo: 'SERNOXXX', invoiceDate: '10/09/2019', customNo: '102815969911', contNo: 10, note: 'note', isFromShipment: false }
+            { jobId: 'SE123321', hbl: '321123', mbl: '100011', chargeName: 'Phi nhien lieu', chargeId: '62cb1fb8-467e-49a2-b4d6-006e7e8a2a5b', typeCharge: 'CREDIT', quantity: 2, unitName: 'Tạ', unitId: 111, unitPrice: 232000, currencyId: 'VND', vatrate: 10, total: 4200000, payer: 'ITL', obhPartnerName: 'FTL', invoiceNo: 'INVXXX', seriesNo: 'SERNOXXX', invoiceDate: '10/09/2019', clearanceNo: '102815969911', contNo: 10, notes: 'note', isFromShipment: false }
         ];
 
         this.selectedSurcharge = this.surcharges[0];
@@ -68,8 +68,11 @@ export class SettlementListChargeComponent extends AppList {
         this.formChargePopup.show();
     }
 
-    onRequestSurcharge(surcharge: any) {
-        this.surcharges.push(surcharge);
+    onRequestSurcharge(surcharge: any, type: string) {
+        console.log("request new charge from " + type, surcharge);
+        this.surcharges.push(...surcharge);
+
+        console.log(this.surcharges);
     }
 
     onUpdateRequestSurcharge(surcharge: any) {

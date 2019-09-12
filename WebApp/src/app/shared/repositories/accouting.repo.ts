@@ -227,4 +227,16 @@ export class AccoutingRepo {
             map((data: any) => data)
         );
     }
+
+    getShipmentByPartnerOrService(partnerId: string, services: string[]) {
+        return this._api.get(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/Shipment/GetShipmentsCreditPayer`, { partner: partnerId, productServices: services}).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getExistingCharge(jobId: string, hbl: string, mbl: string) {
+        return this._api.get(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/GetExistsCharge`, { jobId: jobId, HBL: hbl, MBL: mbl }).pipe(
+            map((data: any) => data)
+        );
+    }
 }
