@@ -22,5 +22,6 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState ConvertExistedClearancesToJobs(List<OpsTransactionClearanceModel> list);
         HandleState SoftDeleteJob(Guid id);
         string CheckExist(OpsTransactionModel model);
+        Crystal PreviewFormPLsheet(Guid id, string currency);
     }
 }

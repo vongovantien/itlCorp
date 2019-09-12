@@ -423,5 +423,111 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return null;
         }
+
+        public Crystal PreviewFormPLsheet(Guid id, string currency)
+        {
+            Crystal result = null;
+            var parameter = new FormPLsheetReportParameter
+            {
+                Contact = "Contact",
+                CompanyName = "CompanyName",
+                CompanyDescription = "CompanyDescription",
+                CompanyAddress1 = "CompanyAddress1",
+                CompanyAddress2 = "CompanyAddress2",
+                Website = "Website",
+                CurrDecimalNo = 2,
+                DecimalNo = 2,
+                HBLList = "HBLList"
+            };
+
+            result = new Crystal
+            {
+                ReportName = "FormPLsheet.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            var form = new FormPLsheetReport {
+                COSTING = "COSTING Test",
+                TransID = "TransID",
+                TransDate = DateTime.Now,
+                HWBNO = "HWBNO test",
+                MAWB = "MAWB test",
+                PartnerName = "PartnerName",
+                ContactName = "ContactName",
+                ShipmentType = "ShipmentType",
+                NominationParty = "NominationParty",
+                Nominated = true,
+                POL = "POL",
+                POD = "POD",
+                Commodity = "Commodity",
+                Volumne = "Volumne",
+                Carrier = "Carrier",
+                Agent = "Agent",
+                ATTN = "ATTN",
+                Consignee = "Consignee",
+                ContainerNo = "ContainerNo",
+                OceanVessel = "OceanVessel",
+                LocalVessel = "LocalVessel",
+                FlightNo = "FlightNo",
+                SeaImpVoy = "SeaImpVoy",
+                LoadingDate = DateTime.Now.ToString(),
+                ArrivalDate = DateTime.Now.ToString(),
+                FreightCustomer = "FreightCustomer",
+                FreightColoader = 128,
+                PayableAccount = "PayableAccount",
+                Description = "Description",
+                Curr = "Curr",
+                VAT = 12,
+                VATAmount = 12,
+                Cost = 123,
+                Revenue = 10,
+                Exchange = 13,
+                VNDExchange = 12,
+                Paid = true,
+                DatePaid = DateTime.Now,
+                Docs = "Docs",
+                Notes = "Notes",
+                InputData = "InputData",
+                SalesProfit = 123,
+                Quantity = 12,
+                UnitPrice = 12,
+                Unit = "Unit",
+                LastRevised = "LastRevised",
+                OBH = true,
+                ExtRateVND = 34,
+                KBck = true,
+                NoInv = true,
+                Approvedby = "Approvedby",
+                ApproveDate = DateTime.Now,
+                SalesCurr = "SalesCurr",
+                GW = 12,
+                MCW = 13,
+                HCW = 12,
+                PaymentTerm = "PaymentTerm",
+                DetailNotes = "DetailNotes",
+                ExpressNotes = "ExpressNotes",
+                InvoiceNo = "InvoiceNo",
+                CodeVender = "CodeVender",
+                CodeCus = "CodeCus",
+                Freight = true,
+                Collect = true,
+                FreightPayableAt = "FreightPayableAt",
+                PaymentTime = 1,
+                PaymentTimeCus = 1,
+                Noofpieces = 12,
+                UnitPieaces = "UnitPieaces",
+                TpyeofService  = "TpyeofService",
+                ShipmentSource = "ShipmentSource",
+                RealCost = true
+            };
+            var dataSource = new List<FormPLsheetReport>
+            {
+                form
+            };
+            result.AddDataSource(dataSource);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameter);
+            return result;
+        }
     }
 }

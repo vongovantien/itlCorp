@@ -25,6 +25,7 @@ export class PlSheetPopupComponent extends PopupBase {
     }
 
     getCurrency() {
+        console.log('get currency popup PL');
         this._dataService.getDataByKey('lstCurrencies').pipe(
             takeUntil(this.ngUnsubscribe),
             map((data: any) => {
@@ -35,7 +36,7 @@ export class PlSheetPopupComponent extends PopupBase {
         )
             .subscribe((data: any) => {
                 this.currencyList = data || [];
-                this.selectedCurrency = this.currencyList.filter( (item: any) => item.id === 'VND')[0];
+                this.selectedCurrency = this.currencyList.filter((item: any) => item.id === 'VND')[0];
             });
     }
 }
