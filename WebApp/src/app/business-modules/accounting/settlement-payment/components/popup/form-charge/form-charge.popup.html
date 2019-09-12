@@ -150,7 +150,7 @@
                                 </div>
                             </div>
                             <div class="col-4 d-flex justify-content-center align-items-end">
-                                <div class="d-flex">
+                                <div class="d-flex" *ngIf="state === 'create'">
                                     <label class="m-checkbox m-checkbox--bold "
                                         [class.m-checkbox--disabled]="isDisabledOBH">
                                         <input type="checkbox" formControlName="isOBH"
@@ -162,7 +162,9 @@
                             </div>
                             <div class="col-4">
                                 <div class="form-group">
-                                    <label for="">OBH Partner</label>
+                                    <label for="">OBH Partner
+                                        <span class="text-danger" *ngIf="!!selectedCharge && selectedCharge.type === 'OBH'">*</span>
+                                    </label>
                                     <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedOBHPartner"
                                         #OBHPartnerComponent (itemSelected)="onSelectDataFormInfo($event, 'obh')"
                                         [selectedDisplayFields]="configPartner.selectedDisplayFields"
@@ -259,11 +261,12 @@
                         <div class="m--align-center m--margin-top-20">
                             <button
                                 class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                title="Save" (click)="submit()">
+                                title="Save" (click)="submit()"
+                                [disabled]="!form.valid || !selectedShipment.value || !selectedPayer.value || (selectedCharge.type === 'OBH' && !selectedOBHPartner.value)">
                                 <span>
                                     <i class="la la-save"></i>
                                     <span>
-                                        Add
+                                        {{state === 'update' ? 'Update' : 'Add'}}
                                     </span>
                                 </span>
                             </button>
@@ -273,7 +276,7 @@
                                 <span>
                                     <i class="la la-download"></i>
                                     <span>
-                                        Add & Continue
+                                        {{state === 'Add & Continue' ? 'Update' : 'Update & Continue'}}
                                     </span>
                                 </span>
                             </button>
