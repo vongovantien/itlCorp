@@ -21,6 +21,8 @@ using System.IO;
 using System.Reflection;
 using System;
 using eFMS.API.Accounting.Service.Contexts;
+using eFMS.API.Accounting.DL.IService;
+using eFMS.API.Accounting.DL.Services;
 
 namespace eFMS.API.Accounting.Infrastructure
 {
@@ -35,6 +37,10 @@ namespace eFMS.API.Accounting.Infrastructure
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            services.AddTransient<IAcctAdvancePaymentService, AcctAdvancePaymentService>();
+            services.AddTransient<IOpsTransactionService, OpsTransactionService>();
+
+
 
             services.AddTransient<ICurrentUser, CurrentUser>();
         }
