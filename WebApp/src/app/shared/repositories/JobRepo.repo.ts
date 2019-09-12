@@ -42,4 +42,7 @@ export class JobRepo {
         return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/OpsTransaction/Add`, body);
     }
     //#endregion
+
+    previewPL() {
+    }
 }

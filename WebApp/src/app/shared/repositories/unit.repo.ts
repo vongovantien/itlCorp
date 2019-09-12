@@ -40,4 +40,13 @@ export class UnitRepo {
         //     })
         // );
     }
+
+    getCurrency() {
+        return this._api.get(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatCurrency/getAll`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
+    }
 }
