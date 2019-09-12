@@ -1,0 +1,7 @@
+<ng-content select="th"></ng-content>
+
+<th *ngFor="let header of headers; let i = index; trackBy: trackByFn"
+    [class]="sortClass(header.sortable ? header.field : '')" (click)="sortBy(header.sortable ? header.field : '')">
+    <span>{{header.title}}</span>
+    <span class="sort-indicator"></span>
+</th>
