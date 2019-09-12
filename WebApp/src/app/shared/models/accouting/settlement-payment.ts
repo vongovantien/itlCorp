@@ -16,6 +16,9 @@ export class SettlementPayment {
     statusApprovalName: string = '';
     userCreated: string = '';
     userModified: string = '';
+    settleRequests: SettleRequestsPayment[] = [];
+
+
 
     constructor(object?: any) {
         const self = this;
@@ -25,5 +28,18 @@ export class SettlementPayment {
             }
         }
     }
+
+
+
 }
 
+export class SettleRequestsPayment {
+
+    id: string = "00000000-0000-0000-0000-000000000000";
+    jobId: string = '';
+    hbl: string = '';
+    mbl: string = '';
+    amount: number = 0;
+    settlementCurrency: string = '';
+
+}
