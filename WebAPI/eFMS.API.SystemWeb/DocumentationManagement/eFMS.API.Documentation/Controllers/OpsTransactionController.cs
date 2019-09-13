@@ -226,9 +226,9 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("PreviewFormPLsheet")]
-        public IActionResult PreviewFormPLsheet(Guid id, string currency)
+        public IActionResult PreviewFormPLsheet(Guid jobId, string currency)
         {
-            var result = transactionService.PreviewFormPLsheet(id, currency);
+            var result = transactionService.PreviewFormPLsheet(jobId, currency);
             return Ok(result);
         }
     }

@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
-import { DataService } from 'src/app/shared/services';
 import { Currency } from 'src/app/shared/models';
 import { map, takeUntil, catchError, finalize } from 'rxjs/operators';
-import { CatalogueRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, JobRepo } from 'src/app/shared/repositories';
+import { ReportPreviewComponent } from 'src/app/shared/common';
+import { NgProgress } from '@ngx-progressbar/core';
 
 @Component({
     selector: 'pl-sheet-popup',
@@ -11,16 +12,19 @@ import { CatalogueRepo } from 'src/app/shared/repositories';
 })
 
 export class PlSheetPopupComponent extends PopupBase {
-
+    @Input() jobId: string;
+    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     selectedCurrency: Currency;
     currencyList: Currency[];
     dataReport: any = null;
 
     constructor(
-        private _dataService: DataService,
-        private _catalogueRepo: CatalogueRepo
+        private _catalogueRepo: CatalogueRepo,
+        private _jobRepo: JobRepo,
+        private _progressService: NgProgress
     ) {
         super();
+        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
@@ -40,22 +44,22 @@ export class PlSheetPopupComponent extends PopupBase {
                 },
             );
     }
-    previewAdvPayment() {
+    previewPL() {
         this._progressRef.start();
-        // this._accoutingRepo.previewAdvancePayment(this.advId)
-        //     .pipe(
-        //         catchError(this.catchError),
-        //         finalize(() => this._progressRef.complete())
-        //     )
-        //     .subscribe(
-        //         (res: any) => {
-        //             this.dataReport = res;
-        //             setTimeout(() => {
-        //                 this.previewPopup.frm.nativeElement.submit();
-        //                 this.previewPopup.show();
-        //             }, 1000);
+        this._jobRepo.previewPL(this.jobId, this.selectedCurrency.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    setTimeout(() => {
+                        this.previewPopup.frm.nativeElement.submit();
+                        this.previewPopup.show();
+                    }, 1000);
 
-        //         },
-        //     );
+                },
+            );
     }
 }

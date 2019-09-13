@@ -29,8 +29,12 @@ namespace eFMS.API.Documentation.DL.Services
         //private ISysUserApiService sysUserApi;
         private readonly ICurrentUser currentUser;
         private readonly IStringLocalizer stringLocalizer;
+        private readonly ICsShipmentSurchargeService surchargeService;
+        private readonly IContextBase<CatPartner> partnerRepository;
+        private readonly IContextBase<SysUser> userRepository;
 
-        public OpsTransactionService(IContextBase<OpsTransaction> repository, IMapper mapper, ICurrentUser user, IStringLocalizer<LanguageSub> localizer) : base(repository, mapper)
+
+        public OpsTransactionService(IContextBase<OpsTransaction> repository, IMapper mapper, ICurrentUser user, IStringLocalizer<LanguageSub> localizer, ICsShipmentSurchargeService surcharge, IContextBase<CatPartner> partner, IContextBase<SysUser> userRepo) : base(repository, mapper)
         {
             //catStageApi = stageApi;
             //catplaceApi = placeApi;
@@ -38,6 +42,9 @@ namespace eFMS.API.Documentation.DL.Services
             //sysUserApi = userApi;
             currentUser = user;
             stringLocalizer = localizer;
+            surchargeService = surcharge;
+            partnerRepository = partner;
+            userRepository = userRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -426,6 +433,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         public Crystal PreviewFormPLsheet(Guid id, string currency)
         {
+            var shipment = DataContext.First(x => x.Id == id);
             Crystal result = null;
             var parameter = new FormPLsheetReportParameter
             {
@@ -437,7 +445,7 @@ namespace eFMS.API.Documentation.DL.Services
                 Website = "Website",
                 CurrDecimalNo = 2,
                 DecimalNo = 2,
-                HBLList = "HBLList"
+                HBLList = shipment.Hwbno
             };
 
             result = new Crystal
@@ -446,85 +454,94 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
-            var form = new FormPLsheetReport {
-                COSTING = "COSTING Test",
-                TransID = "TransID",
-                TransDate = DateTime.Now,
-                HWBNO = "HWBNO test",
-                MAWB = "MAWB test",
-                PartnerName = "PartnerName",
-                ContactName = "ContactName",
-                ShipmentType = "ShipmentType",
-                NominationParty = "NominationParty",
-                Nominated = true,
-                POL = "POL",
-                POD = "POD",
-                Commodity = "Commodity",
-                Volumne = "Volumne",
-                Carrier = "Carrier",
-                Agent = "Agent",
-                ATTN = "ATTN",
-                Consignee = "Consignee",
-                ContainerNo = "ContainerNo",
-                OceanVessel = "OceanVessel",
-                LocalVessel = "LocalVessel",
-                FlightNo = "FlightNo",
-                SeaImpVoy = "SeaImpVoy",
-                LoadingDate = DateTime.Now.ToString(),
-                ArrivalDate = DateTime.Now.ToString(),
-                FreightCustomer = "FreightCustomer",
-                FreightColoader = 128,
-                PayableAccount = "PayableAccount",
-                Description = "Description",
-                Curr = "Curr",
-                VAT = 12,
-                VATAmount = 12,
-                Cost = 123,
-                Revenue = 10,
-                Exchange = 13,
-                VNDExchange = 12,
-                Paid = true,
-                DatePaid = DateTime.Now,
-                Docs = "Docs",
-                Notes = "Notes",
-                InputData = "InputData",
-                SalesProfit = 123,
-                Quantity = 12,
-                UnitPrice = 12,
-                Unit = "Unit",
-                LastRevised = "LastRevised",
-                OBH = true,
-                ExtRateVND = 34,
-                KBck = true,
-                NoInv = true,
-                Approvedby = "Approvedby",
-                ApproveDate = DateTime.Now,
-                SalesCurr = "SalesCurr",
-                GW = 12,
-                MCW = 13,
-                HCW = 12,
-                PaymentTerm = "PaymentTerm",
-                DetailNotes = "DetailNotes",
-                ExpressNotes = "ExpressNotes",
-                InvoiceNo = "InvoiceNo",
-                CodeVender = "CodeVender",
-                CodeCus = "CodeCus",
-                Freight = true,
-                Collect = true,
-                FreightPayableAt = "FreightPayableAt",
-                PaymentTime = 1,
-                PaymentTimeCus = 1,
-                Noofpieces = 12,
-                UnitPieaces = "UnitPieaces",
-                TpyeofService  = "TpyeofService",
-                ShipmentSource = "ShipmentSource",
-                RealCost = true
-            };
-            var dataSource = new List<FormPLsheetReport>
+            var dataSources = new List<FormPLsheetReport>{};
+            var agent = partnerRepository.Get(x => x.Id == shipment.AgentId).FirstOrDefault();
+            var supplier = partnerRepository.Get(x => x.Id == shipment.SupplierId).FirstOrDefault();
+            var surcharges = surchargeService.GetByHB(shipment.Hblid);
+            var user = userRepository.Get(x => x.Id == shipment.SalemanId).FirstOrDefault();
+            if(surcharges != null)
             {
-                form
-            };
-            result.AddDataSource(dataSource);
+                foreach(var item in surcharges)
+                {
+                    var surchargeRpt = new FormPLsheetReport
+                    {
+                        COSTING = "COSTING Test",
+                        TransID = shipment.JobNo,
+                        TransDate = DateTime.Now,
+                        HWBNO = shipment.Hwbno,
+                        MAWB = shipment.Mblno,
+                        PartnerName = "PartnerName",
+                        ContactName = user?.Username,
+                        ShipmentType = "Logistics",
+                        NominationParty = string.Empty,
+                        Nominated = true,
+                        POL = "POL",
+                        POD = "POD",
+                        Commodity = "Commodity",
+                        Volumne = "Volumne",
+                        Carrier = supplier.PartnerNameEn,
+                        Agent = agent?.PartnerNameEn,
+                        //ATTN = "ATTN",//Shipper
+                        //Consignee = "Consignee",
+                        ContainerNo = "ContainerNo",
+                        OceanVessel = string.Empty,
+                        LocalVessel = string.Empty,
+                        FlightNo = string.Empty,
+                        SeaImpVoy = "SeaImpVoy",
+                        LoadingDate = DateTime.Now.ToString(),
+                        ArrivalDate = DateTime.Now.ToString(),
+                        FreightCustomer = "FreightCustomer",
+                        FreightColoader = 128,
+                        PayableAccount = "PayableAccount",
+                        Description = "Description",
+                        Curr = "Curr",
+                        VAT = 12,
+                        VATAmount = 12,
+                        Cost = 123,
+                        Revenue = 10,
+                        Exchange = 13,
+                        VNDExchange = 12,
+                        Paid = true,
+                        DatePaid = DateTime.Now,
+                        Docs = "Docs",
+                        Notes = "Notes",
+                        InputData = "InputData",
+                        SalesProfit = 123,
+                        Quantity = 12,
+                        UnitPrice = 12,
+                        Unit = "Unit",
+                        LastRevised = "LastRevised",
+                        OBH = true,
+                        ExtRateVND = 34,
+                        KBck = true,
+                        NoInv = true,
+                        Approvedby = "Approvedby",
+                        ApproveDate = DateTime.Now,
+                        SalesCurr = "VND",
+                        GW = 12,
+                        MCW = 13,
+                        HCW = 12,
+                        PaymentTerm = "PaymentTerm",
+                        DetailNotes = "DetailNotes",
+                        ExpressNotes = "ExpressNotes",
+                        InvoiceNo = "InvoiceNo",
+                        CodeVender = "CodeVender",
+                        CodeCus = "CodeCus",
+                        Freight = true,
+                        Collect = true,
+                        FreightPayableAt = "FreightPayableAt",
+                        PaymentTime = 1,
+                        PaymentTimeCus = 1,
+                        Noofpieces = 12,
+                        UnitPieaces = "UnitPieaces",
+                        TpyeofService = "TpyeofService",
+                        ShipmentSource = "FREE-HAND",
+                        RealCost = true
+                    };
+                    dataSources.Add(surchargeRpt);
+                }
+            }
+            result.AddDataSource(dataSources);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
             return result;
