@@ -2,24 +2,40 @@
     <table class="table table-brand table-hover dataTable">
         <thead>
             <tr class="text-center">
-                <th class="m--w-50">
-                </th>
-                <th *ngFor="let header of headers; let i = index; trackBy: trackByFn"
-                    [class]="sortClass(header.sortable ? header.field : '')"
-                    (click)="sortBy(header.sortable ? header.field : '')">
-                    <span>{{header.title}}</span>
-                    <span class="sort-indicator"></span>
-                </th>
+            <tr app-table-header [headers]="headers" class="text-center" (onClick)="sortSurcharge($event)">
+                <th class="first">   </th>
             </tr>
         </thead>
         <tbody class="tbody-group">
-            <tr *ngIf="!isLoading">
-                <td colspan="100">
-                    <div class="no-data">
-                        <i class="flaticon-coins"></i>
-                        <span class="no-data-text">No records found</span>
-                    </div>
-                </td>
+            <ng-container *ngFor="let surcharge of data.chargeSettlements; let i = index; trackBy: trackByFn">
+                <tr class="text-center">
+                    <td class="table-actions-col">
+                        <label class="m-checkbox">
+                            <input type="checkbox" (change)="onChangeCheckBoxCharge()" value="{{surcharge}}"
+                                [(ngModel)]="surcharge.isSelected">
+                            <span></span>
+                        </label>
+                    </td>
+                    <td class="text-primary pointer" (click)="openSurchargeDetail(surcharge, i)" [class.text-underline]="!surcharge.isFromShipment">
+                        {{surcharge.chargeName}}
+                    </td>
+                    <td>{{surcharge.quantity}}</td>
+                    <td>{{surcharge.unitName}}</td>
+                    <td>{{surcharge.unitPrice | number: '.0-3'}}</td>
+                    <td>{{surcharge.currencyId}}</td>
+                    <td>{{surcharge.vatrate}}</td>
+                    <td>{{surcharge.total | number: '.0-3'}}</td>
+                    <td>{{surcharge.payer}}</td>
+                    <td>{{surcharge.obhPartnerName}}</td>
+                    <td>{{surcharge.invoiceNo}}</td>
+                    <td>{{surcharge.seriesNo}}</td>
+                    <td>{{surcharge.invoiceDate | date: 'dd/MM/yyyy'}}</td>
+                    <td>{{surcharge.clearanceNo}}</td>
+                    <td>{{surcharge.contNo}}</td>
+                    <td>{{surcharge.notes}}</td>
+                </tr>
+            </ng-container>
+            <tr *ngIf="!data || !data.chargeSettlements.length" app-table-none-record [colspan]="headers.length + 2">
             </tr>
         </tbody>
     </table>

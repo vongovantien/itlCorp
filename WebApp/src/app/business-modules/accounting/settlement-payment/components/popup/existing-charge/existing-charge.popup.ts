@@ -6,6 +6,8 @@ import { DataService, SortService } from 'src/app/shared/services';
 import { SystemRepo, OperationRepo, AccoutingRepo } from 'src/app/shared/repositories';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
+import { Surcharge } from 'src/app/shared/models';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'existing-charge-popup',
@@ -39,8 +41,8 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     initService: any[] = [];
     selectedServices: any[] = [];
 
-    charges: ICharge[] = [];
-    selectedCharge: ICharge[] = [];
+    charges: Surcharge[] = [];
+    selectedCharge: Surcharge[] = [];
 
     resetButtonSetting: ButtonModalSetting = {
         buttonAttribute: Object.assign(this.cancelButtonSetting.buttonAttribute, { titleButton: 'reset', icon: 'la la-refresh' }),
@@ -53,7 +55,8 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         private _sysRepo: SystemRepo,
         private _operationRepo: OperationRepo,
         private _accoutingRepo: AccoutingRepo,
-        private _sortService: SortService
+        private _sortService: SortService,
+        private _toastService: ToastrService
     ) {
         super();
     }
@@ -113,8 +116,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                 (data: CommonInterface.ICommonShipmentData) => {
                     this.initService = data.productServices;
                     this.services = (data.productServices || []).map((item: CommonInterface.IValueDisplay) => ({ id: item.value, text: item.displayName }));
-                    this.selectedServices =  this.services;
-                    console.log(this.services);
+                    this.selectedServices = this.services;
                 }
             );
     }
@@ -165,6 +167,8 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                         this.selectedShipment = { field: 'jobId', value: this.configShipment.dataSource[0].jobId };
                         this.selectedShipmentData = this.configShipment.dataSource[0];
                     }
+
+                    this.isCheckAll = false;
                 }
             );
     }
@@ -174,6 +178,8 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             return;
         } else {
             this.isLoading = true;
+            this.isCheckAll = false;
+
             this._accoutingRepo.getExistingCharge(this.selectedShipmentData.jobId, this.selectedShipmentData.hbl, this.selectedShipmentData.mbl)
                 .pipe(catchError(this.catchError), finalize(() => this.isLoading = false))
                 .subscribe(
@@ -187,14 +193,15 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     reset() {
         this.resetShipment();
         this.resetPartner();
-      
+        this.isCheckAll = false;
+
         this.charges = [];
         this.selectedServices = (this.initService || []).map((item: CommonInterface.IValueDisplay) => ({ id: item.value, text: item.displayName }));
 
     }
 
     onChangeCheckBoxCharge() {
-        this.isCheckAll = this.charges.every((item: ICharge) => item.isSelected);
+        this.isCheckAll = this.charges.every((item: Surcharge) => item.isSelected);
     }
 
     checkUncheckAllCharge() {
@@ -221,6 +228,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     closePopup() {
         this.charges = [];
         this.selectedServices = (this.initService || []).map((item: CommonInterface.IValueDisplay) => ({ id: item.value, text: item.displayName }));
+        this.isCheckAll = false;
 
         this.resetShipment();
         this.resetPartner();
@@ -228,8 +236,12 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     }
 
     submit() {
-        this.selectedCharge = this.charges.filter((charge: ICharge) => charge.isSelected && !charge.settlementCode);
+        this.selectedCharge = this.charges
+            .filter((charge: Surcharge) => charge.isSelected && !charge.settlementCode)
+            .map((surcharge: Surcharge) => new Surcharge(surcharge));
+            
         if (!this.selectedCharge.length) {
+            this._toastService.warning(`Don't have any charges in this period, Please check it again! `, '', { positionClass: 'toast-bottom-right' });
             return;
         } else {
             this.onRequest.emit(this.selectedCharge);
@@ -238,41 +250,3 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     }
 }
 
-interface ICharge {
-    cdclosed: any;
-    chargeId: string;
-    chargeName: string;
-    clearanceNo: string;
-    contNo: string;
-    creditNo: string;
-    currencyId: string;
-    debitNo: string;
-    hbl: string;
-    hblid: string;
-    id: string;
-    invoiceDate: string;
-    invoiceNo: string;
-    isFromShipment: boolean;
-    jobId: string;
-    mbl: string;
-    notes: string;
-    obhPartnerName: string;
-    objectBePaid: string;
-    paySoano: string;
-    payer: string;
-    payerId: string;
-    paymentObjectId: string;
-    paymentRequestType: string;
-    quantity: number;
-    seriesNo: string;
-    settlementCode: string;
-    soaclosed: string;
-    soano: string;
-    total: number;
-    type: string;
-    unitId: number;
-    unitName: string;
-    unitPrice: number;
-    vatrate: number;
-    isSelected: boolean;
-}

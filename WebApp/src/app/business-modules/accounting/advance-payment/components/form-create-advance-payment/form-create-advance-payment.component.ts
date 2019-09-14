@@ -86,6 +86,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
                 map((data: any) => data.startDate)
             )
             .subscribe((value: any) => {
+                console.log(value);
                 this.maxDateDeadLine = value;
                 setTimeout(() => {
                     this.deadLine.setValue({
@@ -110,6 +111,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
 
     }
 
+    
     getMethod(): CommonInterface.ICommonTitleValue[] {
         return [
             { title: 'Cash', value: 'Cash' },

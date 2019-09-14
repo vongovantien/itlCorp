@@ -1,20 +1,22 @@
-import { Component, ViewChild, ContentChild } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { AppList } from 'src/app/app.list';
-import { SettlementPaymentManagementPopupComponent } from '../popup/payment-management/payment-management.popup';
 
 @Component({
     selector: 'shipment-item',
-    templateUrl: './shipment-item.component.html'
+    templateUrl: './shipment-item.component.html',
+    styleUrls: ['./shipment-item.component.scss']
 })
 
 export class SettlementShipmentItemComponent extends AppList {
 
-    @ViewChild(SettlementPaymentManagementPopupComponent, { static: false }) paymentManagementPopup: SettlementPaymentManagementPopupComponent;
-    @ContentChild("data", { static: false }) table: any;
-
+    @Output() onCheck: EventEmitter<any> = new EventEmitter<any>();
+    @Output() onClick: EventEmitter<any> = new EventEmitter<any>();
+    @Input() data: any = null;
     headers: CommonInterface.IHeaderTable[];
 
-    constructor() {
+    initCheckbox: boolean = false;
+    constructor(
+    ) {
         super();
     }
 
@@ -37,16 +39,23 @@ export class SettlementShipmentItemComponent extends AppList {
         ];
     }
 
-    showPaymentManagement($event: Event): boolean {
-        // * prevent collapse/expand within accordion-heading
+    showPaymentManagement($event: Event, data: any): any {
+        this.onClick.emit($event);
+    }
+
+    checkUncheckAllRequest($event: Event) {
+        /* 
+         * prevent collapse/expand within accordion-head
+         */
         $event.stopPropagation();
         $event.preventDefault();
 
-        this.paymentManagementPopup.show();
+        this.initCheckbox = !this.initCheckbox;
+        this.isCheckAll = this.initCheckbox;
+        this.onCheck.emit(this.isCheckAll);
+
         return false;
-    }
-
-    checkUncheckAllRequest() {
 
     }
+
 }
