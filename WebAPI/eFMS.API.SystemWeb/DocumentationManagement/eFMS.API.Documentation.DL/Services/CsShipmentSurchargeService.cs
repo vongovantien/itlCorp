@@ -30,8 +30,8 @@ namespace eFMS.API.Documentation.DL.Services
             model.Id = Guid.NewGuid();
             model.ExchangeDate = DateTime.Now;
             model.DatetimeCreated = DateTime.Now;
-            var entity = mapper.Map<CsShipmentSurcharge>(model);
-            var result = DataContext.Add(entity);
+            //var entity = mapper.Map<CsShipmentSurcharge>(model);
+            var result = this.Add(model);
             return result;
         }
 
