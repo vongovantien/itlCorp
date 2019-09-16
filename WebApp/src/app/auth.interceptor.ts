@@ -3,6 +3,7 @@ import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
+import { CustomError } from './shared/models/custom-error.model';
 
 @Injectable({
     providedIn: 'root'
@@ -15,11 +16,13 @@ export class AuthInterceptor implements HttpInterceptor {
 
         return next.handle(authReq).pipe(
             catchError((error: HttpErrorResponse) => {
-                console.log('Error ..................................');
                 let errorMessage = '';
                 let title = '';
                 if (error.error instanceof ErrorEvent) {
                     errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+                    title = error.statusText;
+                } else if (error.error != null) {
+                    errorMessage = `Error: ${error.error.message}`;
                     title = error.statusText;
                 } else {
                     errorMessage = `Error: ${error.message}`;
