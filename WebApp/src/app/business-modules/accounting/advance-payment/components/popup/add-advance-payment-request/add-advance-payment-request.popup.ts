@@ -117,7 +117,6 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
 
         this.selectedShipmentData = <OperationInteface.IShipment>{ hbl: data.hbl, jobId: data.jobId, mbl: data.mbl};
         this.selectedShipment = { field: 'jobId', value: data.jobId };
-        
 
         this.advanceNo = data.advanceNo;
 

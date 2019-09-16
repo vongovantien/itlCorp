@@ -87,23 +87,31 @@ export class SettlementListChargeComponent extends AppList {
     }
 
     onUpdateRequestSurcharge(surcharge: any) {
+        // * SWITCH UI TO LIST
+        this.type = 'LIST';
         this.surcharges[this.selectedIndexSurcharge] = surcharge;
+        console.log("list surcharge hiện tại", this.surcharges);
     }
 
     openSurchargeDetail(surcharge: Surcharge, index?: number) {
         // * CHECK SURCHARGE IS FROM SHIPMENT.
         if (surcharge.isFromShipment) {
             return;
-        } else {
-            this.selectedSurcharge = surcharge;
+        } else if (this.type === 'LIST') {
             this.selectedIndexSurcharge = index;
-            this.stateFormCharge = 'update';
-
-            this.formChargePopup.initFormUpdate(this.selectedSurcharge);
-            this.formChargePopup.calculateTotalAmount();
-
-            this.formChargePopup.show();
+        } else {
+            const indexSurcharge: number = this.surcharges.findIndex(item => item.id === surcharge.id);
+            if (indexSurcharge !== - 1) {
+                this.selectedIndexSurcharge = indexSurcharge;
+            }
         }
+        this.selectedSurcharge = surcharge;
+        this.stateFormCharge = 'update';
+
+        this.formChargePopup.initFormUpdate(this.selectedSurcharge);
+        this.formChargePopup.calculateTotalAmount();
+
+        this.formChargePopup.show();
     }
 
     changeCurrency(currency: Currency) {

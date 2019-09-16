@@ -43,6 +43,15 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         selectedDisplayFields: [],
     };
 
+
+    configPayer: CommonInterface.IComboGirdConfig = {
+        placeholder: 'Please select',
+        displayFields: [],
+        dataSource: [],
+        selectedDisplayFields: [],
+    };
+
+
     selectedPayer: Partial<CommonInterface.IComboGridData> = {};
     selectedPayerData: any;
     selectedOBHPartner: Partial<CommonInterface.IComboGridData> = {};
@@ -112,31 +121,31 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             chargeName: ['', Validators.compose([
                 Validators.required
             ])],
-            qty: [10, Validators.compose([
+            qty: [, Validators.compose([
                 Validators.required
             ])],
-            price: [20000, Validators.compose([
+            price: [, Validators.compose([
                 Validators.required
             ])],
-            vat: [10, Validators.compose([
+            vat: [, Validators.compose([
                 Validators.required
             ])],
             amount: [],
-            invoiceNo: ['invoice No', Validators.compose([
+            invoiceNo: [, Validators.compose([
                 Validators.required
             ])],
-            invoiceDate: [, Validators.compose([
+            invoiceDate: [null, Validators.compose([
                 Validators.required
             ])],
-            contNo: ['cont No'],
-            note: ['note nè'],
+            contNo: [],
+            note: [],
             currency: [],
             customNo: [],
             type: [],
-            unit: [Validators.compose([
+            unit: [null , Validators.compose([
                 Validators.required
             ])],
-            serieNo: ['serie no', Validators.compose([
+            serieNo: [, Validators.compose([
                 Validators.required
             ])],
             isOBH: []
@@ -158,7 +167,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         this.isOBH = this.form.controls['isOBH'];
     }
 
-    initFormUpdate(data: Surcharge) {
+    initFormUpdate(data: any) {
         console.log("dataUpdate", data);
         this.form.setValue({
             customNo: !!data.clearanceNo ? (this.initCD.filter((item: CustomDeclaration) => item.clearanceNo === data.clearanceNo).length ? this.initCD.filter((item: CustomDeclaration) => item.clearanceNo === data.clearanceNo)[0] : null) : null,
@@ -174,7 +183,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             type: this.types[2],
             unit: this.units.filter(unit => unit.id === data.unitId)[0],
             serieNo: data.seriesNo,
-            invoiceDate: new Date(data.invoiceDate) || null,
+            invoiceDate: !!data.invoiceDate ? { startDate: new Date(data.invoiceDate), endDate: new Date(data.invoiceDate) } : null,
             isOBH: false
 
         });
@@ -183,7 +192,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         this.selectedCharge.id = data.chargeId || '';
         this.selectedCharge.chargeNameVn = data.chargeName || '';
         this.selectedCharge.code = data.chargeCode;
-        this.selectedCharge.type = data.type === 'BUY' ? 'CREDIT' : 'OBH';
+        this.selectedCharge.type = data.type === 'OBH' ? 'OBH' : 'CREDIT';
 
         if (this.selectedCharge.type !== 'OBH') {
             this.resetOBHPartner();
@@ -193,13 +202,23 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             this.isDisabledOBH = true;
             this.isDisabledOBHPartner = true;
 
+            this.selectedPayer = { field: 'id', value: data.paymentObjectId };
+
         } else {
             this.isOBH.enable();
             this.isOBH.setValue(false);
             this.isDisabledOBH = false;
             this.isDisabledOBHPartner = false;
 
+            this.selectedOBHPartner = { field: 'id', value: data.paymentObjectId };
+            this.selectedPayer = { field: 'id', value: data.payerId };
+
+
         }
+
+        this.selectedShipmentData = <OperationInteface.IShipment>{ hbl: data.hbl, jobId: data.jobId, mbl: data.mbl };
+        this.selectedShipment = { field: 'jobId', value: data.jobId };
+
 
         console.log(this.selectedCharge.type);
     }
@@ -266,7 +285,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
                 }
                 break;
             case 'payer':
-                this.selectedPayer = { field: data.partnerNameEn, value: data.partnerNameEn };
+                this.selectedPayer = { field: data.partnerNameEn, value: data.id };
                 this.selectedPayerData = data;
                 break;
             case 'obh':
@@ -331,6 +350,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             { field: 'partnerNameVn', label: 'Customer Name' },
         ];
         this.configPartner.selectedDisplayFields = ['partnerNameEn'];
+
     }
 
     getUnit() {
@@ -398,7 +418,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         if (!!this.selectedCharge && this.selectedCharge.type === 'CREDIT') {
             const dataChargeCredit = {
                 objectBePaid: 'OTHER',
-                paymentObjectID: this.selectedPayerData.id,
+                paymentObjectID: this.selectedPayer.value,
                 payerId: null,
             };
 
@@ -406,8 +426,8 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         }
         if (this.selectedCharge.type === 'OBH') {
             const dataChargeOBH = {
-                payerID: this.selectedPayerData.id,
-                paymentObjectID: this.selectedOBHData.id,
+                payerID: this.selectedPayer.value,
+                paymentObjectID: this.selectedOBHPartner.value,
                 objectBePaid: null,
             };
             Object.assign(body, dataChargeOBH);
@@ -422,7 +442,6 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         } else {
             this.onRequest.emit(body);
         }
-
     }
 
     updateToContinue() {
@@ -437,9 +456,9 @@ export class SettlementFormChargePopupComponent extends PopupBase {
 
     saveCharge() {
         this.submit();
+        this.resetForm();
         this.hide();
     }
-
 
     calculateTotalAmount() {
         let total = 0;
@@ -476,7 +495,13 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     }
 
     resetForm() {
-        this.form.reset();
+        // this.form.reset();
+        Object.keys(this.form.controls).forEach((name) => {
+            if (name === 'currency') {
+                return;
+            }
+            this.resetFormControl(this.form.controls[name]);
+        });
         this.selectedCharge = {};
         this.selectedShipment = {};
         this.selectedOBHPartner = {};
@@ -497,6 +522,14 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         this.isDisabledOBHPartner = true;
         this.customNo.setValue(null);
         this.type.setValue(this.types[2]);
+
+        Object.keys(this.form.controls).forEach((controlName: string) => {
+            const imutableControls: String[] = ['invoiceNo', 'serieNo', 'invoiceDate', 'currency', 'type'];
+            if (imutableControls.includes(controlName)) {
+                return;
+            }
+            this.resetFormControl(this.form.controls[controlName]);
+        });
 
     }
 

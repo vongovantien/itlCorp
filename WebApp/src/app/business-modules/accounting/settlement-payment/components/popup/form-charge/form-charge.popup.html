@@ -107,7 +107,7 @@
                                         <div class="form-group">
                                             <label for="">Unit <span class="text-danger">*</span></label>
                                             <select class="form-control" formControlName="unit">
-                                                <option [ngValue]="null">Select Unit</option>
+                                                <option [ngValue]="null" disabled>Select Unit</option>
                                                 <option *ngFor="let unit of units; trackBy: trackByFn" [ngValue]="unit">
                                                     {{unit.code}}</option>
                                             </select>
