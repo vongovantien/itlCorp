@@ -60,7 +60,6 @@
                                                     buyingRateChargeToAdd.objectBePaid==='AGENT'? buyingRateChargeToAdd.paymentObjectId=opsTransaction.agentId:null;
                                                     buyingRateChargeToAdd.objectBePaid==='SHIPPING'? buyingRateChargeToAdd.paymentObjectId=opsTransaction.supplierId:null;
                                                     buyingRateChargeToAdd.objectBePaid==='OTHER'? buyingRateChargeToAdd.paymentObjectId=null:null;"
-                    [active]="[{'text':buyingRateChargeToAdd.objectBePaid,'id':buyingRateChargeToAdd.objectBePaid}]"
                     (removed)="buyingRateChargeToAdd.objectBePaid=null;buyingRateChargeToAdd.paymentObjectId=null;"
                     placeholder="Select filter">
                   </ng-select>

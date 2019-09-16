@@ -27,7 +27,6 @@ export class AddBuyingRatePopupComponent extends PopupBase implements OnInit, On
     lstCurrencies: any[] = [];
     currentActiveItemDefault: { id: null, text: null }[] = [];
     currentSelectedCharge: string = null;
-    objectBePaidActive = any[] = []
 
     invoiceDate: any;
     constructor(
