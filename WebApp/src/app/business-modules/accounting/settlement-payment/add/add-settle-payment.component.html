@@ -9,7 +9,7 @@
     <div class="m-portlet">
         <div class="m-form">
             <div class="m-portlet__body">
-                <settle-payment-form-create></settle-payment-form-create>
+                <settle-payment-form-create  (onChangeCurrency)="onChangeCurrency($event)"></settle-payment-form-create>
             </div>
         </div>
     </div>
@@ -21,7 +21,7 @@
                     <div class="col-12">
                         <div class="m--align-center m--margin-top-20">
                             <button class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10" title="Save"
-                                >
+                                (click)="saveSettlement()">
                                 <span>
                                     <i class="la la-save"></i>
                                     <span>

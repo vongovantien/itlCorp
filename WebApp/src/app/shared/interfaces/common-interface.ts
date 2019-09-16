@@ -33,6 +33,17 @@ namespace CommonInterface {
         title: string;
         data?: any;
     }
+
+    export interface ICommonShipmentData {
+        productServices: IValueDisplay[];
+        serviceModes: IValueDisplay[];
+        shipmentModes: IValueDisplay[];
+    }
+
+    export interface IValueDisplay {
+        value: string;
+        displayName: string;
+    }
 }
 
 

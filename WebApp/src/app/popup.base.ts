@@ -25,6 +25,7 @@ export abstract class PopupBase extends AppPage {
  
     constructor() {
         super();
+
     }
 
     // * fn set options

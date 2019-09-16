@@ -12,6 +12,8 @@ export class DefaultButtonComponent implements OnInit {
     @Output() onClick: EventEmitter<any> = new EventEmitter<any>();
     @Input() buttonSetting: ButtonModalSetting;
     @Input() dataTarget: string;
+    @Input() disabled: boolean = false;
+    
     isAdd: boolean = false;
     isEdit: boolean = false;
     isDelete: boolean = false;

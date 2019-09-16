@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { AccoutingRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
@@ -6,10 +6,8 @@ import { SortService, BaseService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Router } from '@angular/router';
 import { catchError, finalize, map, } from 'rxjs/operators';
-import { AdvancePayment, User, SettlementPayment } from 'src/app/shared/models';
-import { CustomDeclaration } from 'src/app/shared/models';
-
-
+import { User, SettlementPayment } from 'src/app/shared/models';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 @Component({
     selector: 'app-settlement-payment',
@@ -17,13 +15,16 @@ import { CustomDeclaration } from 'src/app/shared/models';
 })
 export class SettlementPaymentComponent extends AppList {
 
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+
     headers: CommonInterface.IHeaderTable[];
-    settlements: any[] = [];
+    settlements: SettlementPayment[] = [];
+    selectedSettlement: SettlementPayment;
+
     dataSearch: any = {};
+
     customClearances: any[] = [];
     headerCustomClearance: CommonInterface.IHeaderTable[];
-
-
 
     userLogged: User;
     constructor(
@@ -44,15 +45,15 @@ export class SettlementPaymentComponent extends AppList {
     ngOnInit() {
         this.headers = [
             { title: '', field: '' },
-            { title: 'Settlemenent No', field: 'settlementNo',sortable: true },
+            { title: 'Settlemenent No', field: 'settlementNo', sortable: true },
 
-            { title: 'Amount', field: 'amount' , sortable: true },
-            { title: 'Currency', field: 'chargeCurrency' , sortable: true },
-            { title: 'Requester', field: 'requester' , sortable: true },
-            { title: 'Request Date', field: 'requestDate' , sortable: true },
+            { title: 'Amount', field: 'amount', sortable: true },
+            { title: 'Currency', field: 'chargeCurrency', sortable: true },
+            { title: 'Requester', field: 'requester', sortable: true },
+            { title: 'Request Date', field: 'requestDate', sortable: true },
             { title: 'Status Approval', field: 'statusApproval', sortable: true },
-            { title: 'Payment method', field: 'paymentMethod',sortable: true },
-            { title: 'Description', field: 'note',sortable: true },
+            { title: 'Payment method', field: 'paymentMethod', sortable: true },
+            { title: 'Description', field: 'note', sortable: true },
         ];
 
         this.headerCustomClearance = [
@@ -70,15 +71,14 @@ export class SettlementPaymentComponent extends AppList {
     showCustomClearance(settlementNo: string, indexsSettle: number) {
         if (!!this.settlements[indexsSettle].settleRequests.length) {
             this.customClearances = this.settlements[indexsSettle].settleRequests;
-        }
-        else {
+        } else {
             this._progressRef.start();
             this._accoutingRepo.getShipmentOfSettlements(settlementNo)
                 .pipe(
                     catchError(this.catchError),
                     finalize(() => this._progressRef.complete())
                 ).subscribe(
-                    (res: CustomDeclaration[]) => {
+                    (res: any[]) => {
                         if (!!res) {
                             this.customClearances = res;
                             this.settlements[indexsSettle].settleRequests = res;
@@ -86,7 +86,7 @@ export class SettlementPaymentComponent extends AppList {
                     },
                 );
         }
-         
+
     }
 
     getUserLogged() {
@@ -106,7 +106,7 @@ export class SettlementPaymentComponent extends AppList {
         this.getListSettlePayment(this.dataSearch);
     }
 
-    
+
     sortByCustomClearance(sort: string): void {
         if (!!sort) {
             this.setSortBy(sort, this.sort !== sort ? true : !this.order);
@@ -143,14 +143,40 @@ export class SettlementPaymentComponent extends AppList {
                 })
             ).subscribe(
                 (res: any) => {
-                    console.log(res);
                     this.totalItems = res.totalItems || 0;
                     this.settlements = res.data;
                 },
             );
     }
 
+    showDeletePopup(settlement: SettlementPayment) {
+        this.selectedSettlement = settlement;
+        this.confirmDeletePopup.show();
+    }
 
+    onDeleteSettlemenPayment() {
+        this.confirmDeletePopup.hide();
+        this.deleteSettlement(this.selectedSettlement.settlementNo);
+    }
+
+    deleteSettlement(settlementNo: string) {
+        this.isLoading = true;
+        this._progressRef.start();
+        this._accoutingRepo.deleteSettlement(settlementNo)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message, '');
+                        this.getListSettlePayment();
+                    } else {
+                        this._toastService.error(res.message || 'Có lỗi xảy ra', '');
+                    }
+                },
+            );
+    }
 
     sortLocal(sort: string): void {
         this.settlements = this._sortService.sort(this.settlements, sort, this.order);
