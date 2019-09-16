@@ -20,7 +20,7 @@ export class SettlementListChargeComponent extends AppList {
     @Input() type: string = 'LIST';
 
     @ViewChild(SettlementExistingChargePopupComponent, { static: true }) existingChargePopup: SettlementExistingChargePopupComponent;
-    @ViewChild(SettlementFormChargePopupComponent, { static: true }) formChargePopup: SettlementFormChargePopupComponent;
+    @ViewChild(SettlementFormChargePopupComponent, { static: false }) formChargePopup: SettlementFormChargePopupComponent;
     @ViewChild(SettlementPaymentManagementPopupComponent, { static: false }) paymentManagementPopup: SettlementPaymentManagementPopupComponent;
 
     @ViewChildren('tableSurcharge') tableSurchargeComponent: QueryList<SettlementTableSurchargeComponent>;
@@ -36,6 +36,7 @@ export class SettlementListChargeComponent extends AppList {
     stateFormCharge: string = 'create';
 
     openAllCharge: BehaviorSubject<boolean> = new BehaviorSubject(false);
+    settlementCode: string = '';
 
     constructor(
         private _sortService: SortService,
@@ -74,7 +75,9 @@ export class SettlementListChargeComponent extends AppList {
     }
 
     showCreateCharge() {
+        this.formChargePopup.settlementCode = this.settlementCode;
         this.stateFormCharge = 'create';
+        this.formChargePopup.action = 'create';
         this.formChargePopup.show();
     }
 
@@ -83,17 +86,17 @@ export class SettlementListChargeComponent extends AppList {
 
         // * SWITCH UI TO LIST
         this.type = 'LIST';
-        console.log("list surcharge hiện tại", this.surcharges);
     }
 
     onUpdateRequestSurcharge(surcharge: any) {
         // * SWITCH UI TO LIST
         this.type = 'LIST';
         this.surcharges[this.selectedIndexSurcharge] = surcharge;
-        console.log("list surcharge hiện tại", this.surcharges);
+
+        console.log(this.surcharges);
     }
 
-    openSurchargeDetail(surcharge: Surcharge, index?: number) {
+    openSurchargeDetail(surcharge: Surcharge, index?: number, action?: string) {
         // * CHECK SURCHARGE IS FROM SHIPMENT.
         if (surcharge.isFromShipment) {
             return;
@@ -108,6 +111,8 @@ export class SettlementListChargeComponent extends AppList {
         this.selectedSurcharge = surcharge;
         this.stateFormCharge = 'update';
 
+        this.formChargePopup.action = action;
+        this.formChargePopup.settlementCode = this.selectedSurcharge.settlementCode;
         this.formChargePopup.initFormUpdate(this.selectedSurcharge);
         this.formChargePopup.calculateTotalAmount();
 
@@ -185,7 +190,9 @@ export class SettlementListChargeComponent extends AppList {
 
     checkUncheckAllCharge() {
         for (const charge of this.surcharges) {
-            charge.isSelected = this.isCheckAll;
+            if (!charge.isFromShipment) {
+                charge.isSelected = this.isCheckAll;
+            }
         }
     }
 
@@ -196,6 +203,11 @@ export class SettlementListChargeComponent extends AppList {
     showPaymentManagement(surcharge: Surcharge) {
         this.paymentManagementPopup.getDataPaymentManagement(surcharge.jobId, surcharge.hbl, surcharge.mbl);
         this.paymentManagementPopup.show();
+    }
+
+    openCopySurcharge(surcharge: Surcharge) {
+        this.formChargePopup.selectedSurcharge = surcharge;
+        this.openSurchargeDetail(surcharge, null, 'copy');
     }
 }
 

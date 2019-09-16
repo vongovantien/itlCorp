@@ -17,11 +17,11 @@ import { formatDate } from '@angular/common';
 
 export class SettlementPaymentDetailComponent extends AppPage {
 
-    @ViewChild(SettlementListChargeComponent, { static: true }) requestSurchargeListComponent: SettlementListChargeComponent;
-    @ViewChild(SettlementFormCreateComponent, { static: true }) formCreateSurcharge: SettlementFormCreateComponent;
+    @ViewChild(SettlementListChargeComponent, { static: false }) requestSurchargeListComponent: SettlementListChargeComponent;
+    @ViewChild(SettlementFormCreateComponent, { static: false }) formCreateSurcharge: SettlementFormCreateComponent;
 
     settlementId: string = '';
-
+    settlementCode: string = '';
     settlementPayment: ISettlementPaymentData;
 
     TYPELISTCHARGE: string = 'GROUP';
@@ -121,6 +121,8 @@ export class SettlementPaymentDetailComponent extends AppPage {
                     this.requestSurchargeListComponent.surcharges = this.settlementPayment.chargeNoGrpSettlement;
                     this.requestSurchargeListComponent.groupShipments = this.settlementPayment.chargeGrpSettlement;
 
+                    this.requestSurchargeListComponent.settlementCode = this.settlementPayment.settlement.settlementNo;
+                    
                     // *SWITCH UI TO GROUP LIST SHIPMENT
                     this.requestSurchargeListComponent.type = 'GROUP'; // ? LIST
 

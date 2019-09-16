@@ -3,20 +3,31 @@
         <thead>
             <tr class="text-center">
             <tr app-table-header [headers]="headers" class="text-center" (onClick)="sortSurcharge($event)">
-                <th class="first">   </th>
+                <th class="first"> </th>
             </tr>
         </thead>
         <tbody class="tbody-group">
             <ng-container *ngFor="let surcharge of data.chargeSettlements; let i = index; trackBy: trackByFn">
                 <tr class="text-center">
                     <td class="table-actions-col">
-                        <label class="m-checkbox">
-                            <input type="checkbox" (change)="onChangeCheckBoxCharge()" value="{{surcharge}}"
-                                [(ngModel)]="surcharge.isSelected">
-                            <span></span>
-                        </label>
+                        <div class="m-checkbox-list d-flex">
+                            <label class="m-checkbox">
+                                <input type="checkbox" (change)="onChangeCheckBoxCharge()" value="{{surcharge}}"
+                                    [(ngModel)]="surcharge.isSelected">
+                                <span></span>
+                            </label>
+                            <ng-container *ngIf="!surcharge.isFromShipment">
+                                <span>
+                                    <a (click)="copySurcharge(surcharge)" title="Copy {{surcharge.chargeName}}"
+                                        class="pointer">
+                                        <i class="la la-copy"></i>
+                                    </a>
+                                </span>
+                            </ng-container>
+                        </div>
                     </td>
-                    <td class="text-primary pointer" (click)="openSurchargeDetail(surcharge, i)" [class.text-underline]="!surcharge.isFromShipment">
+                    <td class="text-primary pointer" (click)="openSurchargeDetail(surcharge, i)"
+                        [class.text-underline]="!surcharge.isFromShipment">
                         {{surcharge.chargeName}}
                     </td>
                     <td>{{surcharge.quantity}}</td>

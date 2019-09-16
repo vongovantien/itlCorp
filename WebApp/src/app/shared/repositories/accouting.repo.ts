@@ -272,6 +272,14 @@ export class AccoutingRepo {
         );
     }
 
+    checkDuplicateShipmentSettlement(body: any = {}) {
+        return this._api.post(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/CheckDuplicateShipmentSettlement`, body)
+            .pipe(
+                map((data: any) => data)
+            );
+
+    }
+
 }
 
 

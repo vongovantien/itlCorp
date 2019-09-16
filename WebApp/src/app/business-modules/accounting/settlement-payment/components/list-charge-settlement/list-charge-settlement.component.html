@@ -46,13 +46,14 @@
                 <ng-container *ngIf="type === 'GROUP'">
                     <accordion [isAnimated]="true">
                         <accordion-group *ngFor="let item of groupShipments; let i = index; trackBy: trackByFn"
-                            [isOpen]="openAllCharge">
+                            [isOpen]="openAllCharge" class="m--margin-bottom-20">
                             <shipment-item #headingShipmentGroup accordion-heading [data]="item"
                                 (onClick)="onClickHeadingShipment($event)"
                                 (onCheck)="onCheckBoxShipmentItemInGroupShipment($event, i)"></shipment-item>
                             <table-surcharge-settlement [data]="item" #tableSurcharge
                                 (onChangeCheckBox)="onChangeCheckBoxSurChargeListInGroupShipment($event, i)"
-                                (onClickSurcharge)="openSurchargeDetail($event)">
+                                (onClickSurcharge)="openSurchargeDetail($event)"
+                                (onClickCopySurcharge)="openCopySurcharge($event)">
                             </table-surcharge-settlement>
                         </accordion-group>
                     </accordion>
@@ -65,8 +66,7 @@
                         </table>
                     </div>
                 </ng-container>
-
-                <div class="table-wrapper" *ngIf="type === 'LIST'">
+                <div class="table-wrapper table-scrollable" *ngIf="type === 'LIST'">
                     <table class="table table-brand table-hover dataTable table-striped">
                         <thead>
                             <tr app-table-header [headers]="headers" class="text-center"
@@ -91,12 +91,20 @@
                                                     value="{{surcharge}}" [(ngModel)]="surcharge.isSelected">
                                                 <span></span>
                                             </label>
+                                            <ng-container *ngIf="!surcharge.isFromShipment">
+                                                <span>
+                                                    <a (click)="openCopySurcharge(surcharge)" title="Copy"
+                                                        class="pointer">
+                                                        <i class="la la-copy"></i>
+                                                    </a>
+                                                </span>
+                                            </ng-container>
                                         </div>
                                     </td>
                                     <td>{{surcharge.jobId}}</td>
                                     <td>{{surcharge.hbl}}</td>
                                     <td>{{surcharge.mbl}}</td>
-                                    <td class="text-primary pointer" (click)="openSurchargeDetail(surcharge, i)"
+                                    <td class="text-primary pointer" (click)="openSurchargeDetail(surcharge, i, 'update')"
                                         [class.text-underline]="!surcharge.isFromShipment">
                                         {{surcharge.chargeName}}
                                     </td>
@@ -114,7 +122,8 @@
                                     <td>{{surcharge.clearanceNo}}</td>
                                     <td>{{surcharge.contNo}}</td>
                                     <td>{{surcharge.notes}}</td>
-                                    <td class="text-underline text-primary pointer" (click)="showPaymentManagement(surcharge)">Payment Management</td>
+                                    <td class="text-underline text-primary pointer"
+                                        (click)="showPaymentManagement(surcharge)">Payment Management</td>
                                 </tr>
                             </ng-container>
                             <tr *ngIf="!isLoading && !surcharges.length" app-table-none-record
@@ -132,4 +141,4 @@
 <existing-charge-popup (onRequest)="onRequestSurcharge($event, 'existing')"></existing-charge-popup>
 
 <form-charge-popup (onRequest)="onRequestSurcharge($event , 'new')" [state]="stateFormCharge"
-    [(onUpdate)]="selectedSurcharge" (onUpdateChange)="onUpdateRequestSurcharge($event)"></form-charge-popup>
+    (onUpdateChange)="onUpdateRequestSurcharge($event)"></form-charge-popup>

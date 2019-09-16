@@ -8,6 +8,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import { DataService } from 'src/app/shared/services';
 import { FormGroup, AbstractControl, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { formatDate } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'form-charge-popup',
@@ -20,7 +21,6 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     @Output() onUpdateChange: EventEmitter<any> = new EventEmitter<any>();
 
     @Input() state: string = 'create';
-    @Input() onUpdate: any = null;
 
     isShow: boolean = false;
     term$ = new BehaviorSubject<string>('');
@@ -43,7 +43,6 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         selectedDisplayFields: [],
     };
 
-
     configPayer: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
         displayFields: [],
@@ -63,7 +62,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     types: CommonInterface.ICommonTitleValue[];
 
     customDeclarations: CustomDeclaration[];
-    initCD: CustomDeclaration[]; // * for filter cd note.
+    initCD: CustomDeclaration[] = []; // * for filter cd note.
 
     form: FormGroup;
     chargeName: AbstractControl;
@@ -84,6 +83,13 @@ export class SettlementFormChargePopupComponent extends PopupBase {
 
     isDisabledOBH: boolean = true;
     isDisabledOBHPartner: boolean = true;
+    isDupplicate: boolean = false;
+    isContinue: boolean = false;
+
+    action: string = 'create';
+    selectedSurcharge: any;
+
+    settlementCode: string = '';
 
     constructor(
         private _systemRepo: SystemRepo,
@@ -91,7 +97,8 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         private _dataService: DataService,
         private _sysRepo: SystemRepo,
         private _operationRepo: OperationRepo,
-        private _fb: FormBuilder
+        private _fb: FormBuilder,
+        private _toastService: ToastrService
     ) {
         super();
     }
@@ -131,23 +138,17 @@ export class SettlementFormChargePopupComponent extends PopupBase {
                 Validators.required
             ])],
             amount: [],
-            invoiceNo: [, Validators.compose([
-                Validators.required
-            ])],
-            invoiceDate: [null, Validators.compose([
-                Validators.required
-            ])],
+            invoiceNo: [],
+            invoiceDate: [null],
             contNo: [],
             note: [],
             currency: [],
             customNo: [],
             type: [],
-            unit: [null , Validators.compose([
+            unit: [null, Validators.compose([
                 Validators.required
             ])],
-            serieNo: [, Validators.compose([
-                Validators.required
-            ])],
+            serieNo: [],
             isOBH: []
         });
         this.chargeName = this.form.controls['chargeName'];
@@ -168,9 +169,10 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     }
 
     initFormUpdate(data: any) {
-        console.log("dataUpdate", data);
+        this.selectedSurcharge = data;
+
         this.form.setValue({
-            customNo: !!data.clearanceNo ? (this.initCD.filter((item: CustomDeclaration) => item.clearanceNo === data.clearanceNo).length ? this.initCD.filter((item: CustomDeclaration) => item.clearanceNo === data.clearanceNo)[0] : null) : null,
+            customNo: !!data.customNo ? (this.initCD.filter((item: CustomDeclaration) => item.clearanceNo === data.customNo).length ? this.initCD.filter((item: CustomDeclaration) => item.clearanceNo === data.customNo)[0] : null) : null,
             chargeName: data.chargeName || '',
             qty: data.quantity,
             price: data.unitPrice,
@@ -185,8 +187,8 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             serieNo: data.seriesNo,
             invoiceDate: !!data.invoiceDate ? { startDate: new Date(data.invoiceDate), endDate: new Date(data.invoiceDate) } : null,
             isOBH: false
-
         });
+
         // * UPDATE CHARGE IN AUTOCOMPLETE
         this.selectedCharge = {};
         this.selectedCharge.id = data.chargeId || '';
@@ -212,15 +214,11 @@ export class SettlementFormChargePopupComponent extends PopupBase {
 
             this.selectedOBHPartner = { field: 'id', value: data.paymentObjectId };
             this.selectedPayer = { field: 'id', value: data.payerId };
-
-
         }
 
-        this.selectedShipmentData = <OperationInteface.IShipment>{ hbl: data.hbl, jobId: data.jobId, mbl: data.mbl };
+        this.selectedShipmentData = <OperationInteface.IShipment>{ hbl: data.hbl, jobId: data.jobId, mbl: data.mbl, hblid: data.hblid };
         this.selectedShipment = { field: 'jobId', value: data.jobId };
 
-
-        console.log(this.selectedCharge.type);
     }
 
     onSearchAutoComplete(keyword: string) {
@@ -268,7 +266,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         console.log("data", data);
         switch (type) {
             case 'shipment':
-                this.selectedShipment = { field: data.jobId, value: data.hbl };
+                this.selectedShipment = { field: 'jobId', value: data.hbl };
                 this.selectedShipmentData = data;
 
                 // get CD with shipmentData
@@ -404,50 +402,60 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             total: this.form.value.amount,
             notes: this.form.value.note,
             invoiceNo: this.form.value.invoiceNo,
-            invoiceDate: formatDate(this.form.value.invoiceDate.startDate, 'yyyy-MM-dd', 'en'),
+            invoiceDate: !!this.form.value.invoiceDate ? formatDate(this.form.value.invoiceDate.startDate, 'yyyy-MM-dd', 'en') : null,
             seriesNo: this.form.value.serieNo,
             paymentRequestType: this.form.value.type.value,
             isFromShipment: false,
             contNo: this.form.value.contNo,
-            customNo: !!this.form.value.customNo ? this.form.value.customNo.clearanceNo : null,
+            clearanceNo: !!this.form.value.customNo ? this.form.value.customNo.clearanceNo : null,
             jobId: !!this.selectedShipmentData ? this.selectedShipmentData.jobId : null,
             hbl: !!this.selectedShipmentData ? this.selectedShipmentData.hbl : null,
-            mbl: !!this.selectedShipmentData ? this.selectedShipmentData.mbl : null
+            mbl: !!this.selectedShipmentData ? this.selectedShipmentData.mbl : null,
+            settlementCode: this.settlementCode,
         });
 
         if (!!this.selectedCharge && this.selectedCharge.type === 'CREDIT') {
             const dataChargeCredit = {
                 objectBePaid: 'OTHER',
-                paymentObjectID: this.selectedPayer.value,
+                paymentObjectId: this.selectedPayer.value,
                 payerId: null,
             };
-
             Object.assign(body, dataChargeCredit);
         }
         if (this.selectedCharge.type === 'OBH') {
             const dataChargeOBH = {
-                payerID: this.selectedPayer.value,
-                paymentObjectID: this.selectedOBHPartner.value,
+                payerId: this.selectedPayer.value,
+                paymentObjectId: this.selectedOBHPartner.value,
                 objectBePaid: null,
             };
             Object.assign(body, dataChargeOBH);
         }
-        console.log(body);
 
         // TODO EMIT (UPDATE, COPY, CREATE) TO LIST SURCHARGE.
 
         if (this.state === 'update') {
-            this.onUpdate = body;
-            this.onUpdateChange.emit(body);
+            if (this.action === 'copy') {
+                if (this.detectDuplicate(this.selectedSurcharge, body)) {
+                    this.isDupplicate = true;
+                    this._toastService.warning('Charge has already existed!', 'Warning');
+                } else {
+                    this.isDupplicate = false;
+                    this.checkValidateSurcharge(body);
+                }
+            } else { // ? else => update normaly.
+                this.checkValidateSurcharge(body);
+                // this.onRequest.emit(body);
+            }
+            // ? else => create normaly.
         } else {
-            this.onRequest.emit(body);
+            this.checkValidateSurcharge(body);
         }
     }
 
     updateToContinue() {
+        this.isContinue = true;
         this.submit();
-        this.resetFormToContinue();
-        this.hide();
+
 
         setTimeout(() => {
             this.show();
@@ -456,8 +464,6 @@ export class SettlementFormChargePopupComponent extends PopupBase {
 
     saveCharge() {
         this.submit();
-        this.resetForm();
-        this.hide();
     }
 
     calculateTotalAmount() {
@@ -533,6 +539,51 @@ export class SettlementFormChargePopupComponent extends PopupBase {
 
     }
 
+    checkValidateSurcharge(body: any) {
+        console.log("body to validate", body);
+
+        const bodyToValidate: IShipmentValidate = {
+            settlementNo: this.settlementCode || null,
+            chargeID: body.chargeId,
+            typeCharge: body.type,
+            hblid: body.hblid,
+            partner: body.paymentObjectId || body.payerId,
+            customNo: body.clearanceNo,
+            invoiceNo: body.invoiceNo,
+            contNo: body.contNo
+        };
+
+        console.log("body to validate", bodyToValidate);
+
+        this._accoutingRepo.checkDuplicateShipmentSettlement(bodyToValidate)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    console.log(res.status)
+                    if (!res.status) {
+                        if (this.action === 'update') {
+                            this.onUpdateChange.emit(body);
+                        } else {
+                            this.onRequest.emit(body);
+                        }
+
+                        if (this.isContinue) {
+                            this.resetFormToContinue();
+                        } else {
+                            this.resetForm();
+                        }
+                        this.hide();
+                    } else {
+                        this._toastService.warning(res.message);
+                    }
+                }
+            );
+    }
+
+    detectDuplicate(surchargeInit: Surcharge, data: Surcharge): boolean {
+        return true;
+    }
+
     resetFormControl(control: FormControl | AbstractControl) {
         if (!!control && control instanceof FormControl) {
             control.setValue(null);
@@ -546,4 +597,15 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         this.resetForm();
     }
 
+}
+
+interface IShipmentValidate {
+    settlementNo: string;
+    chargeID: string;
+    typeCharge: string;
+    hblid: string;
+    partner: string;
+    customNo: string;
+    invoiceNo: string;
+    contNo: string;
 }
