@@ -27,66 +27,60 @@
                             {{data.mbl}}
                         </div>
                     </div>
-                    <div class="col-3">
-                        <div>
-                            <span class="font-weight-bold">Total Shipment:</span>
-                            {{data.totalShipment | number: '.0-2'}}
-                        </div>
-                        <div>
-                            <span class="font-weight-bold">Total Advance:</span>
-                            {{data.totalAmount | number: '.0-2'}}
-                        </div>
-                    </div>
+
                 </div>
-                <div class="row">
+                <div class="row m--margin-top-20">
                     <div class="col-12">
+                        <div class="m--align-right" *ngIf="!!data.advancePayment.length">
+                            <span class="font-weight-bold">Total Advance:</span>
+                            {{data.totalAdvance}}
+                        </div>
                         <div class="table-wrapper">
-                            <table class="table table-borderless dataTable">
+                            <table class="table dataTable table-brand">
                                 <thead>
-                                    <tr>
-                                        <th *ngFor="let header of headerAdvance; let i = index; trackBy: trackByFn"
-                                            [class]="sortClass(header.sortable ? header.field : '')"
-                                            (click)="sortBy(header.sortable ? header.field : '')">
-                                            <span>{{header.title}}</span>
-                                            <span class="sort-indicator"></span>
-                                        </th>
-                                    </tr>
+                                    <tr app-table-header [headers]="headerAdvance" class="text-center"
+                                        (onClick)="sortAdvancePayment($event)"></tr>
                                 </thead>
                                 <tbody class="tbody-group">
-                                    <tr *ngIf="!isLoading">
-                                        <td colspan="100">
-                                            <div class="no-data">
-                                                <i class="flaticon-coins"></i>
-                                                <span class="no-data-text">No records found</span>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    <tr *ngIf="!data.advancePayment.length" app-table-none-record
+                                        [colspan]="headerAdvance.length"></tr>
+                                    <ng-container *ngIf="!!data.advancePayment.length">
+                                        <tr *ngFor="let advance of data.advancePayment; trackBy: trackByFn">
+                                            <td>{{advance.advanceNo}}</td>
+                                            <td>{{advance.description}}</td>
+                                            <td>{{advance.totalAmount | number: '.0-3'}}</td>
+                                            <td>{{advance.advanceCurrency}}</td>
+                                            <td>{{advance.advanceDate | date: 'dd/MM/yyyy'}}</td>
+                                        </tr>
+                                    </ng-container>
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                    <div class="col-12">
+                    <div class="col-12 m--margin-top-50">
+                        <div class="m--align-right" *ngIf="!!data.settlementPayment.length">
+                            <span class="font-weight-bold">Total Settlement:</span>
+                            {{data.totalSettlement}}
+                        </div>
                         <div class="table-wrapper">
-                            <table class="table table-borderless dataTable">
+                            <table class="table table-brand dataTable">
                                 <thead>
-                                    <tr>
-                                        <th *ngFor="let header of headerSettlement; let i = index; trackBy: trackByFn"
-                                            [class]="sortClass(header.sortable ? header.field : '')"
-                                            (click)="sortBy(header.sortable ? header.field : '')">
-                                            <span>{{header.title}}</span>
-                                            <span class="sort-indicator"></span>
-                                        </th>
-                                    </tr>
+                                    <tr app-table-header [headers]="headerSettlement" class="text-center"
+                                        (onClick)="sortSettlementPayment($event)"></tr>
                                 </thead>
                                 <tbody class="tbody-group">
-                                    <tr *ngIf="!isLoading">
-                                        <td colspan="100">
-                                            <div class="no-data">
-                                                <i class="flaticon-coins"></i>
-                                                <span class="no-data-text">No records found</span>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    <tr *ngIf="!data.settlementPayment.length" app-table-none-record
+                                        [colspan]="headerSettlement.length"></tr>
+                                    <ng-container *ngIf="!!data.settlementPayment.length">
+                                        <tr *ngFor="let settlement of data.settlementPayment; trackBy: trackByFn">
+                                            <td>{{settlement.settlementNo}}</td>
+                                            <td>{{settlement.chargeName}}</td>
+                                            <td>{{settlement.amount | number: '.0-3'}}</td>
+                                            <td>{{settlement.currency}}</td>
+                                            <td>{{settlement.settlementDate | date: 'dd/MM/yyyy'}}</td>
+                                            <td>{{settlement.obhPartner}}</td>
+                                        </tr>
+                                    </ng-container>
                                 </tbody>
                             </table>
                         </div>
@@ -94,7 +88,7 @@
 
                 </div>
                 <div class="modal-footer m--align-right">
-                    Balance: {{0}} VND
+                    <span class="font-weight-bold"> Balance: {{data.balance}} </span>
                 </div>
             </div>
         </div>

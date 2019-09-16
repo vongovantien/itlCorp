@@ -122,10 +122,12 @@ export class SettlementListChargeComponent extends AppList {
         return item.shipment.jobId;
     }
 
-    onClickHeadingShipment($event: Event): boolean {
+    onClickHeadingShipment(data: any): boolean {
         // * prevent collapse/expand within accordion-heading
-        $event.stopPropagation();
-        $event.preventDefault();
+        data.event.stopPropagation();
+        data.event.preventDefault();
+
+        this.paymentManagementPopup.getDataPaymentManagement(data.data.jobId, data.data.hbl, data.data.mbl);
         this.paymentManagementPopup.show();
         return false;
     }
@@ -189,6 +191,11 @@ export class SettlementListChargeComponent extends AppList {
 
     onChangeCheckBoxCharge() {
         this.isCheckAll = this.surcharges.every((item: Surcharge) => item.isSelected);
+    }
+
+    showPaymentManagement(surcharge: Surcharge) {
+        this.paymentManagementPopup.getDataPaymentManagement(surcharge.jobId, surcharge.hbl, surcharge.mbl);
+        this.paymentManagementPopup.show();
     }
 }
 

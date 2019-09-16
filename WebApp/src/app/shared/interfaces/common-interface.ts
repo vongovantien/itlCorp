@@ -44,6 +44,11 @@ namespace CommonInterface {
         value: string;
         displayName: string;
     }
+
+    export interface ISortData {
+        sortField: string;
+        order: boolean;
+    }
 }
 
 

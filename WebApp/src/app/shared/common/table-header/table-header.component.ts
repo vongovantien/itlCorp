@@ -19,6 +19,6 @@ export class TableHeaderComponent extends AppList {
     ngOnInit() { }
 
     sortHeader() {
-        this.onClick.emit({ sortField: this.sort, order: this.order});
+        this.onClick.emit(<CommonInterface.ISortData>{ sortField: this.sort, order: this.order});
     }
 }

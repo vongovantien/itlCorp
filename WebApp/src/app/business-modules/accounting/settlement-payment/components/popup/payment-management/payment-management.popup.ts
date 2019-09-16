@@ -1,6 +1,9 @@
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
-import { AdvancePayment } from 'src/app/shared/models';
+import { AccoutingRepo } from 'src/app/shared/repositories';
+import { NgProgress } from '@ngx-progressbar/core';
+import { catchError, finalize } from 'rxjs/operators';
+import { SortService } from 'src/app/shared/services';
 
 @Component({
     selector: 'payment-management-popup',
@@ -12,18 +15,25 @@ export class SettlementPaymentManagementPopupComponent extends PopupBase {
     headerAdvance: CommonInterface.IHeaderTable[];
     headerSettlement: CommonInterface.IHeaderTable[];
 
-    data: any = null;
-    constructor() {
+    data: IPaymentManagement = null;
+
+    constructor(
+        private _accountingRepo: AccoutingRepo,
+        private _progressService: NgProgress,
+        private _sortService: SortService
+    ) {
         super();
+
+        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
         this.headerAdvance = [
-            { title: 'Advance No', field: 'AdvanceNo', sortable: true },
-            { title: 'Description', field: 'AdvanceNo', sortable: true },
-            { title: 'Total Amount', field: 'AdvanceNo', sortable: true },
-            { title: 'Currency', field: 'AdvanceNo', sortable: true },
-            { title: 'Advance Date', field: 'AdvanceNo', sortable: true },
+            { title: 'Advance No', field: 'advanceNo', sortable: true },
+            { title: 'Description', field: 'description', sortable: true },
+            { title: 'Total Amount', field: 'totalAmount', sortable: true },
+            { title: 'Currency', field: 'currency', sortable: true },
+            { title: 'Advance Date', field: 'advanceDate', sortable: true },
         ];
 
         this.headerSettlement = [
@@ -36,21 +46,46 @@ export class SettlementPaymentManagementPopupComponent extends PopupBase {
         ];
 
         this.data = {
-            jobId: 'SE32423424',
-            hbl: '32123131',
-            mbl: '1231312',
-            totalShipment: 42125000,
-            totalAmount: 42125000,
-            advancePayment: [
-                new AdvancePayment()
-            ],
+            jobId: '',
+            hbl: '',
+            mbl: '',
+            balance: '',
+            totalSettlement: '',
+            totalAdvance: '',
+            advancePayment: [],
             settlementPayment: []
         };
     }
 
-    ngOnChanges() {
-
+    getDataPaymentManagement(jobId: string, hbl: string, mbl: string) {
+        this._progressRef.start();
+        this._accountingRepo.getPaymentManagement(jobId, mbl, hbl)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (response: IPaymentManagement) => {
+                    this.data = response;
+                }
+            );
     }
 
-    
+    sortAdvancePayment(dataSort: CommonInterface.ISortData) {
+        this.data.advancePayment = this._sortService.sort(this.data.advancePayment, dataSort.sortField, dataSort.order);
+    }
+
+    sortSettlementPayment(dataSort: CommonInterface.ISortData) {
+        this.data.settlementPayment = this._sortService.sort(this.data.settlementPayment, dataSort.sortField, dataSort.order);
+    }
+
+
+}
+
+interface IPaymentManagement {
+    jobId: string;
+    hbl: string;
+    mbl: string;
+    balance: string;
+    totalAdvance: string;
+    totalSettlement: string;
+    settlementPayment: any[];
+    advancePayment: any[];
 }
