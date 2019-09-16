@@ -5,6 +5,8 @@ import { map, takeUntil, catchError, finalize } from 'rxjs/operators';
 import { CatalogueRepo, JobRepo } from 'src/app/shared/repositories';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 import { NgProgress } from '@ngx-progressbar/core';
+import { Crystal } from 'src/app/shared/models/report/crystal.model';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'pl-sheet-popup',
@@ -21,7 +23,8 @@ export class PlSheetPopupComponent extends PopupBase {
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _jobRepo: JobRepo,
-        private _progressService: NgProgress
+        private _progressService: NgProgress,
+        private _toastService: ToastrService
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -52,7 +55,11 @@ export class PlSheetPopupComponent extends PopupBase {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (res: any) => {
+                (res: Crystal) => {
+                    if (res.dataSource.length === 0) {
+                        this._toastService.error("This shipment must have to one at least charge to show report", '', { positionClass: 'toast-bottom-right' });
+                        return;
+                    }
                     this.dataReport = res;
                     setTimeout(() => {
                         this.previewPopup.frm.nativeElement.submit();

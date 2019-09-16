@@ -59,9 +59,9 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string Approvedby { get; set; }	
         public DateTime ApproveDate { get; set; }
         public string SalesCurr { get; set; }
-        public decimal GW { get; set; }
+        public decimal? GW { get; set; }
         public decimal MCW { get; set; }
-        public decimal HCW { get; set; }
+        public decimal? HCW { get; set; }
         public string PaymentTerm { get; set; }
         public string DetailNotes { get; set; }
         public string ExpressNotes { get; set; }

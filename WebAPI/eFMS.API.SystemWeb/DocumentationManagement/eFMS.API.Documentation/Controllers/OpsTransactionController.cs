@@ -219,13 +219,15 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
-        
+
         /// <summary>
         /// preview Form PL sheet
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="jobId"></param>
+        /// <param name="currency"></param>
         /// <returns></returns>
         [HttpGet("PreviewFormPLsheet")]
+        [Authorize]
         public IActionResult PreviewFormPLsheet(Guid jobId, string currency)
         {
             var result = transactionService.PreviewFormPLsheet(jobId, currency);

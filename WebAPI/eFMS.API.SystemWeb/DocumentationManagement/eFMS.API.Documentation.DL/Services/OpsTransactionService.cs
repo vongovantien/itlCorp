@@ -32,9 +32,19 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly ICsShipmentSurchargeService surchargeService;
         private readonly IContextBase<CatPartner> partnerRepository;
         private readonly IContextBase<SysUser> userRepository;
+        private readonly IContextBase<CatUnit> unitRepository;
+        private readonly IContextBase<CatPlace> placeRepository;
 
 
-        public OpsTransactionService(IContextBase<OpsTransaction> repository, IMapper mapper, ICurrentUser user, IStringLocalizer<LanguageSub> localizer, ICsShipmentSurchargeService surcharge, IContextBase<CatPartner> partner, IContextBase<SysUser> userRepo) : base(repository, mapper)
+        public OpsTransactionService(IContextBase<OpsTransaction> repository, 
+            IMapper mapper, 
+            ICurrentUser user, 
+            IStringLocalizer<LanguageSub> localizer, 
+            ICsShipmentSurchargeService surcharge, 
+            IContextBase<CatPartner> partner, 
+            IContextBase<SysUser> userRepo,
+            IContextBase<CatUnit> unitRepo,
+            IContextBase<CatPlace> placeRepo) : base(repository, mapper)
         {
             //catStageApi = stageApi;
             //catplaceApi = placeApi;
@@ -45,6 +55,8 @@ namespace eFMS.API.Documentation.DL.Services
             surchargeService = surcharge;
             partnerRepository = partner;
             userRepository = userRepo;
+            unitRepository = unitRepo;
+            placeRepository = placeRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -437,7 +449,7 @@ namespace eFMS.API.Documentation.DL.Services
             Crystal result = null;
             var parameter = new FormPLsheetReportParameter
             {
-                Contact = "Contact",
+                Contact = currentUser.UserName,
                 CompanyName = "CompanyName",
                 CompanyDescription = "CompanyDescription",
                 CompanyAddress1 = "CompanyAddress1",
@@ -459,15 +471,39 @@ namespace eFMS.API.Documentation.DL.Services
             var supplier = partnerRepository.Get(x => x.Id == shipment.SupplierId).FirstOrDefault();
             var surcharges = surchargeService.GetByHB(shipment.Hblid);
             var user = userRepository.Get(x => x.Id == shipment.SalemanId).FirstOrDefault();
+            var units = unitRepository.Get();
+            var polName = placeRepository.Get(x => x.Id == shipment.Pol).FirstOrDefault()?.NameEn;
+            var podName = placeRepository.Get(x => x.Id == shipment.Pod).FirstOrDefault()?.NameEn;
             if(surcharges != null)
             {
                 foreach(var item in surcharges)
                 {
+                    var unitCode = units.FirstOrDefault(x => x.Id == item.UnitId)?.Code;
+                    bool isOBH = false;
+                    decimal cost = 0;
+                    decimal revenue = 0;
+                    decimal saleProfit = 0;
+                    string partnerName = string.Empty;
+                    if (item.Type == "OBH")
+                    {
+                        isOBH = true;
+                        partnerName = item.PayerName;
+                    }
+                    if(item.Type == "BUY")
+                    {
+                        cost = item.Total;
+                    }
+                    if(item.Type == "SELL")
+                    {
+                        revenue = item.Total;
+                    }
+                    saleProfit = cost + revenue;
+
                     var surchargeRpt = new FormPLsheetReport
                     {
                         COSTING = "COSTING Test",
                         TransID = shipment.JobNo,
-                        TransDate = DateTime.Now,
+                        TransDate = (DateTime)shipment.CreatedDate,
                         HWBNO = shipment.Hwbno,
                         MAWB = shipment.Mblno,
                         PartnerName = "PartnerName",
@@ -475,53 +511,51 @@ namespace eFMS.API.Documentation.DL.Services
                         ShipmentType = "Logistics",
                         NominationParty = string.Empty,
                         Nominated = true,
-                        POL = "POL",
-                        POD = "POD",
-                        Commodity = "Commodity",
-                        Volumne = "Volumne",
+                        POL = polName,
+                        POD = podName,
+                        Commodity = string.Empty,
+                        Volumne = string.Empty,
                         Carrier = supplier.PartnerNameEn,
                         Agent = agent?.PartnerNameEn,
-                        //ATTN = "ATTN",//Shipper
-                        //Consignee = "Consignee",
-                        ContainerNo = "ContainerNo",
+                        ContainerNo = item.ContNo,
                         OceanVessel = string.Empty,
                         LocalVessel = string.Empty,
-                        FlightNo = string.Empty,
-                        SeaImpVoy = "SeaImpVoy",
-                        LoadingDate = DateTime.Now.ToString(),
-                        ArrivalDate = DateTime.Now.ToString(),
+                        FlightNo = shipment.FlightVessel,
+                        SeaImpVoy = string.Empty,
+                        LoadingDate = ((DateTime)shipment.ServiceDate).ToString("dd' 'MMM' 'yyyy"),
+                        ArrivalDate = shipment.FinishDate!= null?((DateTime)shipment.FinishDate).ToString("dd' 'MM' 'yyyy"): null,
                         FreightCustomer = "FreightCustomer",
                         FreightColoader = 128,
-                        PayableAccount = "PayableAccount",
-                        Description = "Description",
-                        Curr = "Curr",
-                        VAT = 12,
+                        PayableAccount = item.PartnerName,
+                        Description = item.ChargeNameEn,
+                        Curr = item.CurrencyId,
+                        VAT = (decimal)item.Vatrate,
                         VATAmount = 12,
-                        Cost = 123,
-                        Revenue = 10,
+                        Cost = cost,
+                        Revenue = revenue,
                         Exchange = 13,
                         VNDExchange = 12,
                         Paid = true,
                         DatePaid = DateTime.Now,
-                        Docs = "Docs",
-                        Notes = "Notes",
+                        Docs = item.InvoiceNo,
+                        Notes = item.Notes,
                         InputData = "InputData",
-                        SalesProfit = 123,
-                        Quantity = 12,
-                        UnitPrice = 12,
-                        Unit = "Unit",
-                        LastRevised = "LastRevised",
-                        OBH = true,
+                        SalesProfit = saleProfit,
+                        Quantity = item.Quantity,
+                        UnitPrice = (decimal)item.UnitPrice,
+                        Unit = unitCode,
+                        LastRevised = string.Empty,
+                        OBH = isOBH,
                         ExtRateVND = 34,
                         KBck = true,
                         NoInv = true,
                         Approvedby = "Approvedby",
                         ApproveDate = DateTime.Now,
-                        SalesCurr = "VND",
-                        GW = 12,
+                        SalesCurr = currency,
+                        GW = shipment.SumGrossWeight ?? 0,
                         MCW = 13,
-                        HCW = 12,
-                        PaymentTerm = "PaymentTerm",
+                        HCW = shipment.SumChargeWeight ?? 0,
+                        PaymentTerm = string.Empty,
                         DetailNotes = "DetailNotes",
                         ExpressNotes = "ExpressNotes",
                         InvoiceNo = "InvoiceNo",
@@ -544,6 +578,7 @@ namespace eFMS.API.Documentation.DL.Services
             result.AddDataSource(dataSources);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
+
             return result;
         }
     }

@@ -7,7 +7,6 @@ using IdentityServer4.Models;
 using IdentityServer4.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -17,15 +16,18 @@ namespace eFMS.IdentityServer
     {
         readonly IAuthenUserService authenUserService;
         protected ISysUserLogService userLogService;
-        public ProfileService(IAuthenUserService service,ISysUserLogService _userLogService)
+        readonly ISysEmployeeService employeeService;
+        public ProfileService(IAuthenUserService service,ISysUserLogService logService, ISysEmployeeService emService)
         {
             authenUserService = service;
-            userLogService = _userLogService;
+            userLogService = logService;
+            employeeService = emService;
         }
         public async Task GetProfileDataAsync(ProfileDataRequestContext context)
         {
             var subjectId = context.Subject.GetSubjectId();
             var user = authenUserService.GetUserById(subjectId);
+            var employee = employeeService.First(x => x.Id == user.EmployeeId);
             var userInfo = new SysUserLogModel
             {
                 LoggedInOn = DateTime.Now,
@@ -40,7 +42,9 @@ namespace eFMS.IdentityServer
                     new Claim(JwtClaimTypes.Email, user.Email),                   
                     new Claim(JwtClaimTypes.PreferredUserName,user.Username),
                     new Claim(JwtClaimTypes.PhoneNumber,user.Tel??""),
-                    new Claim("workplaceId",user.WorkPlaceId.ToString()??"")
+                    new Claim("workplaceId",user.WorkPlaceId.ToString()??""),
+                    new Claim("userName", user.Username),
+                    new Claim("employeeId", employee.Id)
                 };
 
             context.IssuedClaims = claims;
