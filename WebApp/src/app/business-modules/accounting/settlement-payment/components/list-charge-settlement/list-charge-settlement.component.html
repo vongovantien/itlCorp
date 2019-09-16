@@ -114,7 +114,7 @@
                                     <td>{{surcharge.clearanceNo}}</td>
                                     <td>{{surcharge.contNo}}</td>
                                     <td>{{surcharge.notes}}</td>
-                                    <td class="text-underline text-primary pointer">Payment Management</td>
+                                    <td class="text-underline text-primary pointer" (click)="showPaymentManagement(surcharge)">Payment Management</td>
                                 </tr>
                             </ng-container>
                             <tr *ngIf="!isLoading && !surcharges.length" app-table-none-record

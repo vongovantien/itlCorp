@@ -265,7 +265,13 @@ export class AccoutingRepo {
                 map((data: any) => data)
             );
     }
-    
+
+    getPaymentManagement(jobId: string, mbl: string, hbl: string) {
+        return this._api.get(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/GetPaymentManagementByShipment`, { JobId: jobId, mbl: mbl, hbl: hbl }).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }
 
 

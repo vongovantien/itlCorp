@@ -87,23 +87,31 @@ export class SettlementListChargeComponent extends AppList {
     }
 
     onUpdateRequestSurcharge(surcharge: any) {
+        // * SWITCH UI TO LIST
+        this.type = 'LIST';
         this.surcharges[this.selectedIndexSurcharge] = surcharge;
+        console.log("list surcharge hiện tại", this.surcharges);
     }
 
     openSurchargeDetail(surcharge: Surcharge, index?: number) {
         // * CHECK SURCHARGE IS FROM SHIPMENT.
         if (surcharge.isFromShipment) {
             return;
-        } else {
-            this.selectedSurcharge = surcharge;
+        } else if (this.type === 'LIST') {
             this.selectedIndexSurcharge = index;
-            this.stateFormCharge = 'update';
-
-            this.formChargePopup.initFormUpdate(this.selectedSurcharge);
-            this.formChargePopup.calculateTotalAmount();
-
-            this.formChargePopup.show();
+        } else {
+            const indexSurcharge: number = this.surcharges.findIndex(item => item.id === surcharge.id);
+            if (indexSurcharge !== - 1) {
+                this.selectedIndexSurcharge = indexSurcharge;
+            }
         }
+        this.selectedSurcharge = surcharge;
+        this.stateFormCharge = 'update';
+
+        this.formChargePopup.initFormUpdate(this.selectedSurcharge);
+        this.formChargePopup.calculateTotalAmount();
+
+        this.formChargePopup.show();
     }
 
     changeCurrency(currency: Currency) {
@@ -114,10 +122,12 @@ export class SettlementListChargeComponent extends AppList {
         return item.shipment.jobId;
     }
 
-    onClickHeadingShipment($event: Event): boolean {
+    onClickHeadingShipment(data: any): boolean {
         // * prevent collapse/expand within accordion-heading
-        $event.stopPropagation();
-        $event.preventDefault();
+        data.event.stopPropagation();
+        data.event.preventDefault();
+
+        this.paymentManagementPopup.getDataPaymentManagement(data.data.jobId, data.data.hbl, data.data.mbl);
         this.paymentManagementPopup.show();
         return false;
     }
@@ -181,6 +191,11 @@ export class SettlementListChargeComponent extends AppList {
 
     onChangeCheckBoxCharge() {
         this.isCheckAll = this.surcharges.every((item: Surcharge) => item.isSelected);
+    }
+
+    showPaymentManagement(surcharge: Surcharge) {
+        this.paymentManagementPopup.getDataPaymentManagement(surcharge.jobId, surcharge.hbl, surcharge.mbl);
+        this.paymentManagementPopup.show();
     }
 }
 

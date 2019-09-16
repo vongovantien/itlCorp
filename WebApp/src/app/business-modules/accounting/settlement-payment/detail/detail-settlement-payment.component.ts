@@ -52,6 +52,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
     }
 
     updateSettlement() {
+        this._progressRef.start();
         const body: any = {
             settlement: {
                 id: this.settlementPayment.settlement.id,
@@ -69,10 +70,9 @@ export class SettlementPaymentDetailComponent extends AppPage {
         };
 
         this._accoutingRepo.updateSettlementPayment(body)
-            .pipe(catchError(this.catchError))
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {
-                    console.log(res);
                     if (res.status) {
                         this._toastService.success(res.message);
                         this.getDetailSettlement(this.settlementId);

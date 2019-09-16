@@ -4,7 +4,6 @@ import { AppList } from 'src/app/app.list';
 @Component({
     selector: 'shipment-item',
     templateUrl: './shipment-item.component.html',
-    styleUrls: ['./shipment-item.component.scss']
 })
 
 export class SettlementShipmentItemComponent extends AppList {
@@ -40,7 +39,7 @@ export class SettlementShipmentItemComponent extends AppList {
     }
 
     showPaymentManagement($event: Event, data: any): any {
-        this.onClick.emit($event);
+        this.onClick.emit({event: $event, data: data});
     }
 
     checkUncheckAllRequest($event: Event) {
