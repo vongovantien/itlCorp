@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { JobRepo, SystemRepo, CDNoteRepo, AccoutingRepo, UnitRepo, CustomDeclarationRepo } from '.';
 import { OperationRepo } from './operation.repo';
+import { CatalogueRepo } from './catalogue.repo';
 
 @NgModule({
     providers: [
@@ -10,7 +11,8 @@ import { OperationRepo } from './operation.repo';
         AccoutingRepo,
         UnitRepo,
         OperationRepo,
-        CustomDeclarationRepo
+        CustomDeclarationRepo,
+        CatalogueRepo
     ],
 })
 export class RepositoryModule {

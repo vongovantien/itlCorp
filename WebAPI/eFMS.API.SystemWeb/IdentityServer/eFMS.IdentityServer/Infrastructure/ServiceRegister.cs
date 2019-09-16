@@ -25,6 +25,7 @@ namespace eFMS.IdentityServer.Infrastructure
             services.AddTransient<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>();
             services.AddTransient<IProfileService, ProfileService>();
             services.AddTransient<ISysUserLogService, SysUserLogService>();
+            services.AddTransient<ISysEmployeeService, SysEmployeeService>();
         }
         public static IServiceCollection AddConfigureSetting(this IServiceCollection service, IConfiguration configuration)
         {

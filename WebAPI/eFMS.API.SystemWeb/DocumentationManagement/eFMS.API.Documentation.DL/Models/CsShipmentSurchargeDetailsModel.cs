@@ -9,6 +9,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string PartnerName { get; set; }
         public string NameEn { get; set; }
         public string ReceiverName { get; set; }
+        public string ChargeNameEn { get; set; }
         public string PayerName { get; set; }
         public string Unit { get; set; }
         public string Currency { get; set; }

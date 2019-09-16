@@ -15,11 +15,13 @@ export class AuthInterceptor implements HttpInterceptor {
 
         return next.handle(authReq).pipe(
             catchError((error: HttpErrorResponse) => {
-                console.log('Error ..................................');
                 let errorMessage = '';
                 let title = '';
                 if (error.error instanceof ErrorEvent) {
                     errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+                    title = error.statusText;
+                } else if (error.error != null) {
+                    errorMessage = `Error: ${error.error.message}`;
                     title = error.statusText;
                 } else {
                     errorMessage = `Error: ${error.message}`;
