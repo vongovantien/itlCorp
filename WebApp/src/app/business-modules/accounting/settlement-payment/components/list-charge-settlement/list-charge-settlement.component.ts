@@ -17,7 +17,6 @@ import { ToastrService } from 'ngx-toastr';
 
 export class SettlementListChargeComponent extends AppList {
 
-    @Input() type: string = 'LIST';
 
     @ViewChild(SettlementExistingChargePopupComponent, { static: true }) existingChargePopup: SettlementExistingChargePopupComponent;
     @ViewChild(SettlementFormChargePopupComponent, { static: false }) formChargePopup: SettlementFormChargePopupComponent;
@@ -37,6 +36,9 @@ export class SettlementListChargeComponent extends AppList {
 
     openAllCharge: BehaviorSubject<boolean> = new BehaviorSubject(false);
     settlementCode: string = '';
+
+    TYPE: string = 'LIST';
+    STATE: string = 'WRITE';  // * list'state READ/WRITE
 
     constructor(
         private _sortService: SortService,
@@ -81,42 +83,41 @@ export class SettlementListChargeComponent extends AppList {
         this.formChargePopup.show();
     }
 
-    onRequestSurcharge(surcharge: any, type: string) {
+    onRequestSurcharge(surcharge: any) {
         this.surcharges.push(...surcharge);
-
-        // * SWITCH UI TO LIST
-        this.type = 'LIST';
+        this.TYPE = 'LIST'; // * SWITCH UI TO LIST
     }
 
     onUpdateRequestSurcharge(surcharge: any) {
-        // * SWITCH UI TO LIST
-        this.type = 'LIST';
+        this.TYPE = 'LIST'; // * SWITCH UI TO LIST
         this.surcharges[this.selectedIndexSurcharge] = surcharge;
-
-        console.log(this.surcharges);
     }
 
     openSurchargeDetail(surcharge: Surcharge, index?: number, action?: string) {
-        // * CHECK SURCHARGE IS FROM SHIPMENT.
-        if (surcharge.isFromShipment) {
+        if (this.STATE !== 'WRITE') {
             return;
-        } else if (this.type === 'LIST') {
-            this.selectedIndexSurcharge = index;
         } else {
-            const indexSurcharge: number = this.surcharges.findIndex(item => item.id === surcharge.id);
-            if (indexSurcharge !== - 1) {
-                this.selectedIndexSurcharge = indexSurcharge;
+            // * CHECK SURCHARGE IS FROM SHIPMENT.
+            if (surcharge.isFromShipment) {
+                return;
+            } else if (this.TYPE === 'LIST') {
+                this.selectedIndexSurcharge = index;
+            } else {
+                const indexSurcharge: number = this.surcharges.findIndex(item => item.id === surcharge.id);
+                if (indexSurcharge !== - 1) {
+                    this.selectedIndexSurcharge = indexSurcharge;
+                }
             }
+            this.selectedSurcharge = surcharge;
+            this.stateFormCharge = 'update';
+
+            this.formChargePopup.action = action;
+            this.formChargePopup.settlementCode = this.selectedSurcharge.settlementCode;
+            this.formChargePopup.initFormUpdate(this.selectedSurcharge);
+            this.formChargePopup.calculateTotalAmount();
+
+            this.formChargePopup.show();
         }
-        this.selectedSurcharge = surcharge;
-        this.stateFormCharge = 'update';
-
-        this.formChargePopup.action = action;
-        this.formChargePopup.settlementCode = this.selectedSurcharge.settlementCode;
-        this.formChargePopup.initFormUpdate(this.selectedSurcharge);
-        this.formChargePopup.calculateTotalAmount();
-
-        this.formChargePopup.show();
     }
 
     changeCurrency(currency: Currency) {
@@ -153,7 +154,7 @@ export class SettlementListChargeComponent extends AppList {
     }
 
     deleteShipmentItem() {
-        if (this.type === 'GROUP') {
+        if (this.TYPE === 'GROUP') {
             this.surcharges = [];
             const lastGroupShipment: any[] = this.groupShipments.filter((groupItem: any) => !groupItem.isSelected);
 

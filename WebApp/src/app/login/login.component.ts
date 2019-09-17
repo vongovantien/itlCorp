@@ -88,8 +88,8 @@ export class LoginComponent implements OnInit, AfterViewInit, AfterViewChecked {
                     this.baseService.spinnerHide();
                 }
             }).catch((err) => {
-                this.toastr.error(err.error.error_description, "", { positionClass: 'toast-bottom-right' });
                 this.baseService.spinnerHide();
+                this.toastr.error(err.error.error_description, "", { positionClass: 'toast-bottom-right' });
             });
         }
     }

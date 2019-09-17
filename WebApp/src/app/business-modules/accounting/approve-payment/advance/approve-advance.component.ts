@@ -15,7 +15,7 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 @Component({
     selector: 'app-approve-advance',
     templateUrl: './approve-advance.component.html',
-    styleUrls: ['./approve-advance.component.scss']
+    styleUrls: ['../approve-advance.component.scss']
 })
 
 export class ApproveAdvancePaymentComponent extends AppPage {

@@ -240,7 +240,6 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         )
 
     selectCharge(charge: any) {
-        console.log("selected charge", charge.type);
         this.isShow = false;
         this.chargeName.setValue(charge.chargeNameVn);
         this.selectedCharge = charge;
@@ -263,7 +262,6 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     }
 
     onSelectDataFormInfo(data: any, type: string) {
-        console.log("data", data);
         switch (type) {
             case 'shipment':
                 this.selectedShipment = { field: 'jobId', value: data.hbl };
@@ -581,7 +579,26 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     }
 
     detectDuplicate(surchargeInit: Surcharge, data: Surcharge): boolean {
-        return true;
+        if (this.isSameSipment(surchargeInit, data)) {
+            if (this.isSamePartner(surchargeInit, data)) {
+                return surchargeInit.invoiceNo === data.invoiceNo
+                    && surchargeInit.contNo === data.contNo
+                    && surchargeInit.clearanceNo === data.clearanceNo
+                    && surchargeInit.chargeCode === data.chargeCode;
+            } else {
+                return false;
+            }
+        } return false;
+    }
+
+    isSameSipment(initShipment: any, currentShipment: any): boolean {
+        if (initShipment.hblid === currentShipment.hblid) {
+            return true;
+        } return false;
+    }
+
+    isSamePartner(initPartner: any, currenctPartner: any) {
+        return initPartner.payerId === currenctPartner.payerId && initPartner.paymentObjectId === currenctPartner.paymentObjectId;
     }
 
     resetFormControl(control: FormControl | AbstractControl) {
