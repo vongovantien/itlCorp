@@ -18,7 +18,6 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap';
 @Component({
     selector: 'app-approve-settlement',
     templateUrl: './approve.settlement.component.html',
-    styleUrls: ['../approve-advance.component.scss']
 
 })
 
