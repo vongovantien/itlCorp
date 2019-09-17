@@ -136,7 +136,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.AcctSettlementPaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.LanguageSub},eFMS.API.Documentation.DL.IService.IAcctSettlementPaymentService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSettlementPaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.LanguageSub},eFMS.API.Documentation.DL.IService.IAcctSettlementPaymentService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Documentation.DL.IService.ICsShipmentSurchargeService,AutoMapper.IMapper)">
             <summary>
             Contructor
             </summary>
@@ -167,18 +167,11 @@
             <param name="settlementNo">settlementNo of existed item that want to delete</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.AcctSettlementPaymentController.GetSettlementPaymentById(System.Guid)">
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSettlementPaymentController.GetDetailSettlementPaymentById(System.Guid)">
             <summary>
-            Get settlement payment by settlementId
+            Get details settlement payment by settlementId
             </summary>
-            <param name="settlementId">settlementId that want to retrieve Settlement Payment</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Documentation.Controllers.AcctSettlementPaymentController.GetShipmentsSettlementBySettlementNo(System.String)">
-            <summary>
-            Get list shipment settlement by settlementNo
-            </summary>
-            <param name="settlementNo">settlementNo that want to retrieve Settlement Payment</param>
+            <param name="settlementId"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.AcctSettlementPaymentController.GetPaymentManagementByShipment(System.String,System.String,System.String)">
@@ -188,6 +181,58 @@
             <param name="JobId"></param>
             <param name="MBL"></param>
             <param name="HBL"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSettlementPaymentController.GetExistsCharge(System.String,System.String,System.String)">
+            <summary>
+            Get exists charge by shipment
+            </summary>
+            <param name="JobId"></param>
+            <param name="HBL"></param>
+            <param name="MBL"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSettlementPaymentController.Add(eFMS.API.Documentation.DL.Models.SettlementPayment.CreateUpdateSettlementModel)">
+            <summary>
+            add new settlement payment
+            </summary>
+            <param name="model">object to add</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSettlementPaymentController.Update(eFMS.API.Documentation.DL.Models.SettlementPayment.CreateUpdateSettlementModel)">
+            <summary>
+            Update Settlement Payment
+            </summary>
+            <param name="model">object to update</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSettlementPaymentController.SaveAndSendRequest(eFMS.API.Documentation.DL.Models.SettlementPayment.CreateUpdateSettlementModel)">
+            <summary>
+            Save and Send Request
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSettlementPaymentController.UpdateApprove(System.Guid)">
+            <summary>
+            Update Approve Settlement
+            </summary>
+            <param name="settlementId">settlementId that want to retrieve Update Approve</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSettlementPaymentController.DeniedApprove(System.Guid,System.String)">
+            <summary>
+            Denie Approve Settlement
+            </summary>
+            <param name="settlementId">settlementId that want to retrieve Denie Approve</param>
+            <param name="comment">comment reason that want to retrieve Denie Approve</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSettlementPaymentController.GetInfoApproveSettlementBySettlementNo(System.String)">
+            <summary>
+            Get information approve settlement by settlementNo
+            </summary>
+            <param name="settlementNo">settlementNo that want to retrieve approve settlement</param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Documentation.Controllers.AcctSOAController">

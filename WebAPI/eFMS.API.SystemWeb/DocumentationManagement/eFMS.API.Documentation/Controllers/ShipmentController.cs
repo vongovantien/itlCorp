@@ -42,9 +42,9 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [HttpGet("GetShipmentsCreditPayer")]
-        public IActionResult GetShipmentsCreditPayer()
+        public IActionResult GetShipmentsCreditPayer(string partner, List<string> productServices)
         {
-            var data = shipmentService.GetShipmentsCreditPayer();
+            var data = shipmentService.GetShipmentsCreditPayer(partner, productServices);
             return Ok(data);
         }
     }

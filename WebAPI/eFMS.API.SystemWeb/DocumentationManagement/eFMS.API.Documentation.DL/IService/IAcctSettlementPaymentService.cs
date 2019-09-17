@@ -1,4 +1,5 @@
-﻿using eFMS.API.Documentation.DL.Models;
+﻿using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Models.SettlementPayment;
 using eFMS.API.Documentation.Service.Models;
@@ -25,8 +26,24 @@ namespace eFMS.API.Documentation.DL.IService
 
         List<SettlementPaymentMngt> GetSettlementPaymentMngts(string JobId, string MBL, string HBL);
 
-        List<Shipments> GetShipmentsCreditPayer();
+        List<ShipmentChargeSettlement> GetExistsCharge(string JobId, string HBL, string MBL);
 
+        List<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo);
 
+        bool CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria);
+
+        HandleState AddSettlementPayment(CreateUpdateSettlementModel model);
+
+        HandleState UpdateSettlementPayment(CreateUpdateSettlementModel model);
+
+        HandleState InsertOrUpdateApprovalSettlement(AcctApproveSettlementModel settlement);
+
+        HandleState UpdateApproval(Guid settlementId);
+
+        HandleState DeniedApprove(Guid settlementId, string comment);
+
+        AcctApproveSettlementModel GetInfoApproveSettlementBySettlementNo(string settlementNo);
+
+        Crystal Preview(string settlementNo);
     }
 }

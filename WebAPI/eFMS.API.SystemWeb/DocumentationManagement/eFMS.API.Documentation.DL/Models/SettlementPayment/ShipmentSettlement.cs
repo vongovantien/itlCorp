@@ -12,6 +12,6 @@ namespace eFMS.API.Documentation.DL.Models.SettlementPayment
         public string MBL { get; set; }
         public decimal TotalAmount { get; set; }
         public string CurrencyShipment { get; set; }
-        public List<ChargeSettlement> ChargeSettlements { get; set; }
+        public List<ShipmentChargeSettlement> ChargeSettlements { get; set; }
     }
 }

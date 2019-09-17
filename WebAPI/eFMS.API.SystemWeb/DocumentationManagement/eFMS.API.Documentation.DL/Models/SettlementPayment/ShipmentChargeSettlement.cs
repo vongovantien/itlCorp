@@ -10,22 +10,37 @@ namespace eFMS.API.Documentation.DL.Models.SettlementPayment
         public string JobId { get; set; }
         public string HBL { get; set; }
         public string MBL { get; set; }
-        public string SettlementNo { get; set; }
+        public string ChargeCode { get; set; }
+        public Guid Hblid { get; set; }
+        public string Type { get; set; }
         public Guid ChargeId { get; set; }
+        public string ChargeName { get; set; }
         public decimal Quantity { get; set; }
-        public int UnitID { get; set; }
+        public short UnitId { get; set; }
+        public string UnitName { get; set; }
         public decimal? UnitPrice { get; set; }
-        public string Currency { get; set; }
-        public decimal? VATRate { get; set; }
-        public decimal Amount { get; set; }
-        public string PayerID { get; set; }
-        public string PaymentObjectID { get; set; }
+        public string CurrencyId { get; set; }
+        public decimal? Vatrate { get; set; }
+        public decimal Total { get; set; }
+        public string PayerId { get; set; }
+        public string Payer { get; set; }
+        public string ObjectBePaid { get; set; }
+        public string PaymentObjectId { get; set; }
+        public string OBHPartnerName { get; set; }
+        public string Notes { get; set; }
+        public string SettlementCode { get; set; }
         public string InvoiceNo { get; set; }
-        public string SeriesNo { get; set; }
         public DateTime? InvoiceDate { get; set; }
-        public string CustomNo { get; set; }
+        public string SeriesNo { get; set; }
+        public string PaymentRequestType { get; set; }
+        public string ClearanceNo { get; set; }
         public string ContNo { get; set; }
-        public string Note { get; set; }
-        public bool IsFromShipment { get; set; }
+        public bool? Soaclosed { get; set; }
+        public bool? Cdclosed { get; set; }
+        public string CreditNo { get; set; }
+        public string DebitNo { get; set; }
+        public string Soano { get; set; }
+        public bool? IsFromShipment { get; set; }
+        public string PaySoano { get; set; }
     }
 }

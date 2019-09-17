@@ -1,0 +1,9 @@
+SettlementNo	String	11	
+JobId	String	255	
+HBL	String	255	
+MBL	String	255	
+Description	String	255	
+Amount	Number		
+InvoiceNo	String	255	
+Note	String	255	
+Debt	Boolean		
