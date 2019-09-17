@@ -109,6 +109,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         this.getPartner();
         this.getUnit();
         this.getType();
+        this.getCustomNo();
 
         // * Search autocomplete surcharge.
         this.term$.pipe(
@@ -170,9 +171,8 @@ export class SettlementFormChargePopupComponent extends PopupBase {
 
     initFormUpdate(data: any) {
         this.selectedSurcharge = data;
-
         this.form.setValue({
-            customNo: !!data.customNo ? (this.initCD.filter((item: CustomDeclaration) => item.clearanceNo === data.customNo).length ? this.initCD.filter((item: CustomDeclaration) => item.clearanceNo === data.customNo)[0] : null) : null,
+            customNo: !!data.clearanceNo ? (this.initCD.filter((item: CustomDeclaration) => item.clearanceNo === data.clearanceNo).length ? this.initCD.filter((item: CustomDeclaration) => item.clearanceNo === data.clearanceNo)[0] : null) : null,
             chargeName: data.chargeName || '',
             qty: data.quantity,
             price: data.unitPrice,
@@ -199,7 +199,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         if (this.selectedCharge.type !== 'OBH') {
             this.resetOBHPartner();
 
-            // * disabled checkbox obh, OBH Partner.
+            // * DISABLED CHECKBOX OBH, OBH PARTNER.
             this.isOBH.disable();
             this.isDisabledOBH = true;
             this.isDisabledOBHPartner = true;
@@ -219,6 +219,17 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         this.selectedShipmentData = <OperationInteface.IShipment>{ hbl: data.hbl, jobId: data.jobId, mbl: data.mbl, hblid: data.hblid };
         this.selectedShipment = { field: 'jobId', value: data.jobId };
 
+
+        this.customDeclarations = this.filterCDByShipment(this.selectedShipmentData);
+        if (this.customDeclarations.length === 1) {
+            this.customNo.setValue(this.customDeclarations[0]);
+        }
+    }
+
+    filterCDByShipment(shipment: OperationInteface.IShipment): CustomDeclaration[] {
+        return this.initCD.filter((item: CustomDeclaration) => {
+            return (item.jobNo === shipment.jobId);
+        });
     }
 
     onSearchAutoComplete(keyword: string) {
@@ -238,6 +249,19 @@ export class SettlementFormChargePopupComponent extends PopupBase {
                 callBack(...args).pipe(takeUntil(source$.pipe(skip(1))))
             )
         )
+
+    getCustomNo() {
+        this._accoutingRepo.getListCustomsDeclaration()
+            .pipe(
+                catchError(this.catchError),
+                map((response: any[]) => response.map((item: CustomDeclaration) => new CustomDeclaration(item))),
+            )
+            .subscribe(
+                (res: any) => {
+                    this.initCD = res || [];
+                },
+            );
+    }
 
     selectCharge(charge: any) {
         this.isShow = false;
@@ -268,7 +292,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
                 this.selectedShipmentData = data;
 
                 // get CD with shipmentData
-                this.getCustomNo(this.selectedShipmentData.jobId);
+                this.getCustomNoByJob(this.selectedShipmentData.jobId);
 
                 // if OBH checkbox
                 if (this.isOBH.value) {
@@ -285,7 +309,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
                 this.selectedPayerData = data;
                 break;
             case 'obh':
-                this.selectedOBHPartner = { field: data.partnerNameEn, value: data.partnerNameEn };
+                this.selectedOBHPartner = { field: data.partnerNameEn, value: data.id };
                 this.selectedOBHData = data;
                 break;
             default:
@@ -369,7 +393,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         this.type.setValue(this.types[2]);
     }
 
-    getCustomNo(jobNo: string) {
+    getCustomNoByJob(jobNo: string) {
         this._operationRepo.getCustomDeclaration(jobNo)
             .pipe(
                 catchError(this.catchError),
@@ -383,7 +407,6 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     }
 
     submit() {
-        console.log(this.form.value);
         const body = new Surcharge({
             // id: null,
             hblid: this.selectedShipmentData.hblid,
@@ -538,8 +561,6 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     }
 
     checkValidateSurcharge(body: any) {
-        console.log("body to validate", body);
-
         const bodyToValidate: IShipmentValidate = {
             settlementNo: this.settlementCode || null,
             chargeID: body.chargeId,
@@ -551,13 +572,10 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             contNo: body.contNo
         };
 
-        console.log("body to validate", bodyToValidate);
-
         this._accoutingRepo.checkDuplicateShipmentSettlement(bodyToValidate)
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: CommonInterface.IResult) => {
-                    console.log(res.status)
                     if (!res.status) {
                         if (this.action === 'update') {
                             this.onUpdateChange.emit(body);
