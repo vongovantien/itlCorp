@@ -229,57 +229,57 @@ export class AccoutingRepo {
     }
 
     getShipmentByPartnerOrService(partnerId: string, services: string[]) {
-        return this._api.get(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/Shipment/GetShipmentsCreditPayer`, { partner: partnerId, productServices: services }).pipe(
+        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/Shipment/GetShipmentsCreditPayer`, { partner: partnerId, productServices: services }).pipe(
             map((data: any) => data)
         );
     }
 
     getExistingCharge(jobId: string, hbl: string, mbl: string) {
-        return this._api.get(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/GetExistsCharge`, { jobId: jobId, HBL: hbl, MBL: mbl }).pipe(
+        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSettlementPayment/GetExistsCharge`, { jobId: jobId, HBL: hbl, MBL: mbl }).pipe(
             map((data: any) => data)
         );
     }
 
     addNewSettlement(body: any = {}) {
-        return this._api.post(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/Add`, body)
+        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSettlementPayment/Add`, body)
             .pipe(
                 map((data: any) => data)
             );
     }
 
     getDetailSettlementPayment(settlementId: string) {
-        return this._api.get(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/GetDetailSettlementPaymentById`, { settlementId: settlementId }).pipe(
+        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSettlementPayment/GetDetailSettlementPaymentById`, { settlementId: settlementId }).pipe(
             map((data: any) => data)
         );
     }
 
     updateSettlementPayment(body: any = {}) {
-        return this._api.put(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/Update`, body).pipe(
+        return this._api.put(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSettlementPayment/Update`, body).pipe(
             map((data: any) => data)
         );
     }
 
     saveAndSendRequestSettlemntPayment(body: any = {}) {
-        return this._api.post(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/SaveAndSendRequest`, body).pipe(
+        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSettlementPayment/SaveAndSendRequest`, body).pipe(
             map((data: any) => data)
         );
     }
 
     deleteSettlement(settlementNo: string) {
-        return this._api.delete(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/delete`, { settlementNo: settlementNo })
+        return this._api.delete(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSettlementPayment/delete`, { settlementNo: settlementNo })
             .pipe(
                 map((data: any) => data)
             );
     }
 
     getPaymentManagement(jobId: string, mbl: string, hbl: string) {
-        return this._api.get(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/GetPaymentManagementByShipment`, { JobId: jobId, mbl: mbl, hbl: hbl }).pipe(
+        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSettlementPayment/GetPaymentManagementByShipment`, { JobId: jobId, mbl: mbl, hbl: hbl }).pipe(
             map((data: any) => data)
         );
     }
 
     checkDuplicateShipmentSettlement(body: any = {}) {
-        return this._api.post(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/CheckDuplicateShipmentSettlement`, body)
+        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSettlementPayment/CheckDuplicateShipmentSettlement`, body)
             .pipe(
                 map((data: any) => data)
             );
@@ -287,27 +287,27 @@ export class AccoutingRepo {
     }
 
     getInfoApproveSettlement(settlementNo: string) {
-        return this._api.get(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/GetInfoApproveSettlementBySettlementNo`, { settlementNo: settlementNo }).pipe(
+        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSettlementPayment/GetInfoApproveSettlementBySettlementNo`, { settlementNo: settlementNo }).pipe(
             map((data: any) => data)
         );
     }
 
     approveSettlementPayment(settlementId: string) {
-        return this._api.post(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/UpdateApprove`, {}, { settlementId: settlementId })
+        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSettlementPayment/UpdateApprove`, {}, { settlementId: settlementId })
             .pipe(
                 map((data: any) => data)
             );
     }
 
     deniedApproveSettlement(settlementId: string, comment: string) {
-        return this._api.post(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/DeniedApprove`, {}, { settlementId: settlementId, comment: comment })
+        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSettlementPayment/DeniedApprove`, {}, { settlementId: settlementId, comment: comment })
             .pipe(
                 map((data: any) => data)
             );
     }
 
     previewSettlementPayment(settlementNo: any) {
-        return this._api.post(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/Preview`, null, { settlementNo: settlementNo }).pipe(
+        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSettlementPayment/Preview`, null, { settlementNo: settlementNo }).pipe(
             map((data: any) => data)
         );
     }
