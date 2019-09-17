@@ -5,11 +5,11 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Add OBH charge</h5>
-          <button type="button" class="close" aria-label="Close" (click)="close(addOBHChargeFormOps)">
+          <button type="button" class="close" aria-label="Close" (click)="close(addOBHChargeFormOps); hide()">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body" *ngIf="isDisplay">
+        <div class="modal-body">
           <!--begin::Form-->
           <div class="m-form m-form--state">
             <div class="row">
@@ -18,8 +18,7 @@
                   [ngClass]="{ 'm-form__group has-danger': addOBHChargeFormOps.submitted && obhChargeToAdd.chargeId==null}">
                   <label class="form-control-label" for="" #selectedOBHChargeCode>
                     Charge <span class="m--font-danger">(*)</span>
-                    <small
-                      class="m--margin-left-5 m--font-primary">{{selectedOBHChargeCode.value==null?'':selectedOBHChargeCode.value}}&nbsp;</small>
+                    <small class="m--margin-left-5 m--font-primary">{{currentSelectedCharge}}&nbsp;</small>
                   </label>
 
                   <app-combo-grid-virtual-scroll
@@ -29,6 +28,7 @@
                                               obhChargeToAdd.vatrate = $event.charge.vatrate;
                                               selectedOBHChargeCode.value=$event.charge.code;
                                               obhChargeToAdd.currencyId=$event.currency;
+                                              currentSelectedCharge=$event.charge.code;
                                               currentActiveItemDefault=[{ id: $event.currency, text: $event.currency }];
                                               calculateTotalEachOBH()"
                     [selectedDisplayFields]="['charge.chargeNameEn']" [dataSources]="lstOBHChargesComboBox"
@@ -265,7 +265,7 @@
             </span>
           </button>
           <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-            (click)="close(addOBHChargeFormOps)">
+            (click)="close(addOBHChargeFormOps); hide()">
             <span>
               <i class="la la-ban"></i>
               <span>

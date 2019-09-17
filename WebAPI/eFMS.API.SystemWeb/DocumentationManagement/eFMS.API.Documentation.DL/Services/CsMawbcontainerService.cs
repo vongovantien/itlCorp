@@ -13,6 +13,7 @@ using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,10 +24,17 @@ namespace eFMS.API.Documentation.DL.Services
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
-        public CsMawbcontainerService(IContextBase<CsMawbcontainer> repository, IMapper mapper, ICurrentUser user, IStringLocalizer<LanguageSub> localize) : base(repository, mapper)
+        private readonly IContextBase<OpsTransaction> opsTransRepository;
+        private readonly IContextBase<CsTransaction> csTransRepository;
+        public CsMawbcontainerService(IContextBase<CsMawbcontainer> repository, 
+            IContextBase<OpsTransaction> opsTransRepo,
+            IContextBase<CsTransaction> csTransRepo,
+            IMapper mapper, ICurrentUser user, IStringLocalizer<LanguageSub> localize) : base(repository, mapper)
         {
             stringLocalizer = localize;
             currentUser = user;
+            opsTransRepository = opsTransRepo;
+            csTransRepository = csTransRepo;
         }
 
         public List<object> ListContOfHB(Guid JobId)
@@ -80,43 +88,111 @@ namespace eFMS.API.Documentation.DL.Services
 
         public HandleState Update(List<CsMawbcontainerModel> list, Guid? masterId, Guid? housebillId)
         {
-            List<CsMawbcontainer> oldList = null;
             try
             {
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-                if (masterId != null)
+                using(var trans = DataContext.DC.Database.BeginTransaction())
                 {
-                    oldList = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Mblid == masterId).ToList();
-                    foreach (var item in oldList)
+                    try
                     {
-                        if (list.FirstOrDefault(x => x.Id == item.Id) == null)
+                        if (masterId != null)
                         {
-                            dc.CsMawbcontainer.Remove(item);
+                            List<CsMawbcontainer> oldList = null;
+                            oldList = DataContext.Where(x => x.Mblid == masterId).ToList();
+                            foreach (var item in oldList)
+                            {
+                                if (list.FirstOrDefault(x => x.Id == item.Id) == null)
+                                {
+                                    DataContext.Delete(x => x.Id == item.Id, false);
+                                }
+                            }
+
+                            if (housebillId != null)
+                            {
+                                List<CsMawbcontainer> oldHouseList = null;
+                                oldHouseList = DataContext.Where(x => x.Hblid == housebillId && x.Mblid == masterId).ToList();
+                                foreach (var item in oldHouseList)
+                                {
+                                    if (list.FirstOrDefault(x => x.Id == item.Id) == null)
+                                    {
+                                        DataContext.Delete(x => x.Id == item.Id, false);
+                                    }
+                                }
+                            }
                         }
-                    }
-                    //dc.SaveChanges();
-                }
-                foreach (var item in list)
-                {
-                    if (item.Id == Guid.Empty)
-                    {
-                        item.Id = Guid.NewGuid();
-                        item.UserModified = currentUser.UserID;
-                        item.Mblid = (Guid)masterId;
-                        item.DatetimeModified = DateTime.Now;
-                        var hs = Add(item);
-                    }
-                    else
-                    {
-                        if (((eFMSDataContext)DataContext.DC).CsMawbcontainer.Count(x => x.Id == item.Id) == 1)
+                        Hashtable ht = new Hashtable();
+                        int sumCont = 0;decimal sumGW = 0; decimal sumNW = 0; decimal sumCW = 0; decimal sumCBM = 0; int sumPackages = 0;
+                        foreach (var item in list)
                         {
-                            item.UserModified = currentUser.UserID;
-                            item.DatetimeModified = DateTime.Now;
-                            var hs = Update(item, x => x.Id == item.Id);
+                            sumCont = sumCont + (int)item.Quantity;
+                            sumGW = sumGW + item.Gw != null?(long)item.Gw: 0;
+                            sumNW = sumNW + item.Nw != null?(long)item.Nw: 0;
+                            sumCW = sumCW + item.ChargeAbleWeight != null?(long)item.ChargeAbleWeight: 0;
+                            sumCBM = sumCBM + item.Cbm != null? (long)item.Cbm: 0;
+                            sumPackages = sumPackages + item.PackageQuantity != null? (int)item.PackageQuantity: 0;
+                            if (ht.ContainsKey(item.ContainerTypeName))
+                            {
+                                var sumContDes = Convert.ToInt32(ht[item.ContainerTypeName]) + item.Quantity;
+                                ht[item.ContainerTypeName] = sumContDes;
+                            }
+                            else
+                            {
+                                ht.Add(item.ContainerTypeName, item.Quantity);
+                            }
+                            if (item.Id == Guid.Empty)
+                            {
+                                item.Id = Guid.NewGuid();
+                                item.UserModified = "admin";//currentUser.UserID;
+                                item.Mblid = (Guid)masterId;
+                                item.DatetimeModified = DateTime.Now;
+                                var hs = Add(item, false);
+                            }
+                            else
+                            {
+                                if (DataContext.Count(x => x.Id == item.Id) == 1)
+                                {
+                                    item.UserModified = "admin";//currentUser.UserID;
+                                    item.DatetimeModified = DateTime.Now;
+                                    var hs = Update(item, x => x.Id == item.Id, false);
+                                }
+                            }
                         }
+                        if(ht.Count > 0)
+                        {
+                            var containerDes = string.Empty;
+                            ICollection keys = ht.Keys;
+                            foreach (var key in keys)
+                            {
+                                containerDes = containerDes + ht[key] + "x" + key + "; ";
+                            }
+                            containerDes = containerDes.Substring(0, containerDes.Length - 2);
+                            var opstrans = opsTransRepository.First(x => x.Id == masterId);
+
+                            opstrans.SumCbm = sumCBM != 0? (decimal?)sumCBM: null;
+                            opstrans.SumChargeWeight = sumCW != 0 ? (decimal?)sumCW : null;
+                            opstrans.SumGrossWeight = sumGW != 0 ? (decimal?)sumGW : null;
+                            opstrans.SumNetWeight = sumNW != 0 ? (decimal?)sumNW : null;
+                            opstrans.SumPackages = sumPackages != 0 ? (int?)sumPackages : null;
+                            opstrans.SumContainers = sumCont != 0 ? (int?)sumCont : null ;
+                            opstrans.ContainerDescription = containerDes;
+                            opstrans.ModifiedDate = DateTime.Now;
+                            opstrans.UserModified = "admin";// currentUser.UserID;
+                            opsTransRepository.Update(opstrans, x => x.Id == masterId, false);
+                        }
+                        DataContext.SubmitChanges();
+                        opsTransRepository.SubmitChanges();
+                        trans.Commit();
                     }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        return new HandleState(ex.Message);
+                    }
+                    finally
+                    {
+                        trans.Dispose();
+                    }
+                    
                 }
-                dc.SaveChanges();
                 return new HandleState();
             }
             catch (Exception ex)

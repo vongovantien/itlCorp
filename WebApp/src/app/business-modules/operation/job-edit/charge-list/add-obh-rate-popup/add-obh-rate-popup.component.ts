@@ -19,11 +19,11 @@ export class AddObhRatePopupComponent extends PopupBase implements OnInit {
 
     currentActiveItemDefault: { id: null, text: null }[] = [];
     obhChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
-    isDisplay: boolean = true;
     lstOBHChargesComboBox: any[] = [];
     lstPartners: any[] = [];
     lstUnits: any[] = [];
     lstCurrencies: any[] = [];
+    currentSelectedCharge: string = null;
 
     invoiceDate: any;
 
@@ -40,19 +40,11 @@ export class AddObhRatePopupComponent extends PopupBase implements OnInit {
 
     close(form: NgForm) {
         form.onReset();
-        this.currentActiveItemDefault = [];
         this.obhChargeToAdd = new CsShipmentSurcharge();
-        this.resetDisplay();
-        this.hide();
+        this.currentActiveItemDefault = [];
+        this.currentSelectedCharge = null;
+        // this.hide();
     }
-
-    resetDisplay() {
-        this.isDisplay = false;
-        setTimeout(() => {
-            this.isDisplay = true;
-        }, 50);
-    }
-
     calculateTotalEachOBH(isEdit: boolean = false) {
         let total = 0;
         if (this.obhChargeToAdd.vatrate >= 0) {
@@ -76,11 +68,8 @@ export class AddObhRatePopupComponent extends PopupBase implements OnInit {
                 }
                 const res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.obhChargeToAdd);
                 if (res.status) {
-                    form.onReset();
-                    // this.resetDisplay();
+                    this.close(form);
                     this.outputAddOBH.emit(true);
-                    this.obhChargeToAdd = new CsShipmentSurcharge();
-                    this.currentActiveItemDefault = [];
 
                     if (!isContinue) {
                         this.hide();
