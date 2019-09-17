@@ -17,10 +17,9 @@ import { ToastrService } from 'ngx-toastr';
 
 export class SettlementListChargeComponent extends AppList {
 
-    @Input() type: string = 'LIST';
 
     @ViewChild(SettlementExistingChargePopupComponent, { static: true }) existingChargePopup: SettlementExistingChargePopupComponent;
-    @ViewChild(SettlementFormChargePopupComponent, { static: true }) formChargePopup: SettlementFormChargePopupComponent;
+    @ViewChild(SettlementFormChargePopupComponent, { static: false }) formChargePopup: SettlementFormChargePopupComponent;
     @ViewChild(SettlementPaymentManagementPopupComponent, { static: false }) paymentManagementPopup: SettlementPaymentManagementPopupComponent;
 
     @ViewChildren('tableSurcharge') tableSurchargeComponent: QueryList<SettlementTableSurchargeComponent>;
@@ -36,6 +35,10 @@ export class SettlementListChargeComponent extends AppList {
     stateFormCharge: string = 'create';
 
     openAllCharge: BehaviorSubject<boolean> = new BehaviorSubject(false);
+    settlementCode: string = '';
+
+    TYPE: string = 'LIST';
+    STATE: string = 'WRITE';  // * list'state READ/WRITE
 
     constructor(
         private _sortService: SortService,
@@ -74,44 +77,47 @@ export class SettlementListChargeComponent extends AppList {
     }
 
     showCreateCharge() {
+        this.formChargePopup.settlementCode = this.settlementCode;
         this.stateFormCharge = 'create';
+        this.formChargePopup.action = 'create';
         this.formChargePopup.show();
     }
 
-    onRequestSurcharge(surcharge: any, type: string) {
+    onRequestSurcharge(surcharge: any) {
         this.surcharges.push(...surcharge);
-
-        // * SWITCH UI TO LIST
-        this.type = 'LIST';
-        console.log("list surcharge hiện tại", this.surcharges);
+        this.TYPE = 'LIST'; // * SWITCH UI TO LIST
     }
 
     onUpdateRequestSurcharge(surcharge: any) {
-        // * SWITCH UI TO LIST
-        this.type = 'LIST';
+        this.TYPE = 'LIST'; // * SWITCH UI TO LIST
         this.surcharges[this.selectedIndexSurcharge] = surcharge;
-        console.log("list surcharge hiện tại", this.surcharges);
     }
 
-    openSurchargeDetail(surcharge: Surcharge, index?: number) {
-        // * CHECK SURCHARGE IS FROM SHIPMENT.
-        if (surcharge.isFromShipment) {
+    openSurchargeDetail(surcharge: Surcharge, index?: number, action?: string) {
+        if (this.STATE !== 'WRITE') {
             return;
-        } else if (this.type === 'LIST') {
-            this.selectedIndexSurcharge = index;
         } else {
-            const indexSurcharge: number = this.surcharges.findIndex(item => item.id === surcharge.id);
-            if (indexSurcharge !== - 1) {
-                this.selectedIndexSurcharge = indexSurcharge;
+            // * CHECK SURCHARGE IS FROM SHIPMENT.
+            if (surcharge.isFromShipment) {
+                return;
+            } else if (this.TYPE === 'LIST') {
+                this.selectedIndexSurcharge = index;
+            } else {
+                const indexSurcharge: number = this.surcharges.findIndex(item => item.id === surcharge.id);
+                if (indexSurcharge !== - 1) {
+                    this.selectedIndexSurcharge = indexSurcharge;
+                }
             }
+            this.selectedSurcharge = surcharge;
+            this.stateFormCharge = 'update';
+
+            this.formChargePopup.action = action;
+            this.formChargePopup.settlementCode = this.selectedSurcharge.settlementCode;
+            this.formChargePopup.initFormUpdate(this.selectedSurcharge);
+            this.formChargePopup.calculateTotalAmount();
+
+            this.formChargePopup.show();
         }
-        this.selectedSurcharge = surcharge;
-        this.stateFormCharge = 'update';
-
-        this.formChargePopup.initFormUpdate(this.selectedSurcharge);
-        this.formChargePopup.calculateTotalAmount();
-
-        this.formChargePopup.show();
     }
 
     changeCurrency(currency: Currency) {
@@ -148,7 +154,7 @@ export class SettlementListChargeComponent extends AppList {
     }
 
     deleteShipmentItem() {
-        if (this.type === 'GROUP') {
+        if (this.TYPE === 'GROUP') {
             this.surcharges = [];
             const lastGroupShipment: any[] = this.groupShipments.filter((groupItem: any) => !groupItem.isSelected);
 
@@ -185,7 +191,9 @@ export class SettlementListChargeComponent extends AppList {
 
     checkUncheckAllCharge() {
         for (const charge of this.surcharges) {
-            charge.isSelected = this.isCheckAll;
+            if (!charge.isFromShipment) {
+                charge.isSelected = this.isCheckAll;
+            }
         }
     }
 
@@ -196,6 +204,11 @@ export class SettlementListChargeComponent extends AppList {
     showPaymentManagement(surcharge: Surcharge) {
         this.paymentManagementPopup.getDataPaymentManagement(surcharge.jobId, surcharge.hbl, surcharge.mbl);
         this.paymentManagementPopup.show();
+    }
+
+    openCopySurcharge(surcharge: Surcharge) {
+        this.formChargePopup.selectedSurcharge = surcharge;
+        this.openSurchargeDetail(surcharge, null, 'copy');
     }
 }
 

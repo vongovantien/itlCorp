@@ -182,5 +182,18 @@ export class SettlementPaymentComponent extends AppList {
         this.settlements = this._sortService.sort(this.settlements, sort, this.order);
     }
 
+    gotoDetailSettlement(settlement: SettlementPayment) {
+        switch (settlement.statusApproval) {
+            case 'New':
+            case 'Denied':
+                this._router.navigate([`home/accounting/settlement-payment/${settlement.id}`]);
+                break;
+            default:
+                this._router.navigate([`home/accounting/settlement-payment/${settlement.id}/approve`]);
+                break;
+        }
+
+    }
+
 
 }

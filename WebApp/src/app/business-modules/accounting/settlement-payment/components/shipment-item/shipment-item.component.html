@@ -1,5 +1,5 @@
 <div class="row align-items-center" *ngIf="!!data">
-    <div class="col">
+    <div class="col-1">
         <div class="d-flex">
             <a class="m--margin-right-10">
                 <i class="la la-angle-double-down"></i>
@@ -10,37 +10,37 @@
                     <span></span>
                 </label>
             </a>
-            <a>
+            <!-- <a>
                 <i class="la la-file-text"></i>
-            </a>
+            </a> -->
         </div>
     </div>
     <div class="col">
         <div class="d-flex">
             <span class="font-weight-bold">Job:</span>
             &nbsp;
-            {{data.jobId}}
+            <span> {{data.jobId}} </span>
         </div>
     </div>
     <div class="col">
         <div class="d-flex">
             <span class="font-weight-bold">HBL:</span>
             &nbsp;
-            {{data.hbl}}
+            <span> {{data.hbl}} </span>
         </div>
     </div>
     <div class="col">
         <div class="d-flex">
             <span class="font-weight-bold">MBL:</span>
             &nbsp;
-            {{data.mbl}}
+            <span> {{data.mbl}} </span>
         </div>
     </div>
     <div class="col">
-        <div class="d-flex">
+        <div class="d-flex align-items-center">
             <span class="font-weight-bold">Total Amount:</span>
             &nbsp;
-            {{data.totalAmount | number: '.0-3'}}
+            <span> {{data.totalAmount | number: '.0-3'}} </span>
             &nbsp;
             <span> {{ data.currencyShipment | uppercase }} </span>
         </div>

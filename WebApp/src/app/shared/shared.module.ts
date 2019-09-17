@@ -14,7 +14,7 @@ import { SearchStage, FilterPipe, NegativeNumberePipe, EqualErrorPipe, AbsPipe }
 import { InfoPopupComponent, ConfirmPopupComponent } from "./common/popup";
 import { DecimalNumberGreaterThan0Directive, StyleCellDirective, AutofocusDirective, TwoDigitDecimaNumberDirective, ThreeDigitDecimaNumberDirective, IntergerInputDirective, SpecialCharacterDirective, EcusSpecicalCharacterAllowSpaceDirective, EcusSpecicalCharacterNoSpaceDirective, ClickOutSideDirective } from "./directives";
 
-import { PaginationComponent, TableLayoutComponent, InputTableLayoutComponent, BreadcrumbComponent, DefaultButtonComponent, DeleteConfirmModalComponent, SearchOptionsComponent, InputFormComponent, TableDetailComponent, CloseModalButtonComponent, ReportPreviewComponent, ComboGridVirtualScrollComponent, CfBeforeLeaveModalComponent, AppMultipleSelectComponent, TableNoneRecordComponent, TableHeaderComponent, TableRowLoadingComponent } from "./common";
+import { PaginationComponent, TableLayoutComponent, InputTableLayoutComponent, BreadcrumbComponent, DefaultButtonComponent, DeleteConfirmModalComponent, SearchOptionsComponent, InputFormComponent, TableDetailComponent, CloseModalButtonComponent, ReportPreviewComponent, ComboGridVirtualScrollComponent, CfBeforeLeaveModalComponent, AppMultipleSelectComponent, TableNoneRecordComponent, TableHeaderComponent, TableRowLoadingComponent, SubHeaderComponent } from "./common";
 import { CollapseModule } from "ngx-bootstrap/collapse";
 import { UploadAlertComponent } from './common/popup/upload-alert/upload-alert.component';
 
@@ -40,6 +40,7 @@ const APP_POPUP = [
 ];
 
 const APP_COMPONENTS = [
+  SubHeaderComponent,
   TableLayoutComponent,
   InputTableLayoutComponent,
   BreadcrumbComponent,

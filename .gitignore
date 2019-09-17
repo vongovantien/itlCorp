@@ -329,3 +329,16 @@ bin
 /WebAPI/eFMS.API.SystemWeb/AccountingManagement/eFMS.API.Accounting.DAL/obj
 /WebAPI/eFMS.API.SystemWeb/AccountingManagement/eFMS.API.Accounting.DL/obj
 /WebAPI/eFMS.API.SystemWeb/AccountingManagement/.vs
+/eFMS.ReportData/.vs/config/applicationhost.config
+/eFMS.ReportData/.vs/eFMS.ReportData/DesignTimeBuild/.dtbcache
+/eFMS.ReportData/.vs/eFMS.ReportData/v15/.suo
+/eFMS.ReportData/.vs/eFMS.ReportData/v15/Server/sqlite3/db.lock
+/eFMS.ReportData/.vs/eFMS.ReportData/v15/Server/sqlite3/storage.ide
+/eFMS.ReportData/.vs/eFMS.ReportData/v15/Server/sqlite3/storage.ide-shm
+/eFMS.ReportData/.vs/eFMS.ReportData/v15/Server/sqlite3/storage.ide-wal
+/eFMS.ReportData/eFMS.ReportData.Extension/obj/Debug/TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+/eFMS.ReportData/eFMS.ReportData.Extension/obj/Debug/TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+/eFMS.ReportData/eFMS.ReportData.Extension/obj/Debug/TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+/eFMS.ReportData/eFMS.ReportData.Extension/obj/Debug/eFMS.ReportData.Extension.csproj.CoreCompileInputs.cache
+/eFMS.ReportData/eFMS.ReportData.Extension/obj/Debug/eFMS.ReportData.Extension.csprojAssemblyReference.cache
+/eFMS.ReportData/eFMS.ReportData/eFMS.ReportData.csproj.user

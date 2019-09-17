@@ -13,6 +13,7 @@ export class SettlementTableSurchargeComponent extends AppList {
     @Input() data: ISettlementGroup = null;
     @Output() onChangeCheckBox: EventEmitter<any> = new EventEmitter<any>();
     @Output() onClickSurcharge: EventEmitter<any> = new EventEmitter<any>();
+    @Output() onClickCopySurcharge: EventEmitter<any> = new EventEmitter<any>();
 
     headers: CommonInterface.IHeaderTable[];
 
@@ -28,17 +29,17 @@ export class SettlementTableSurchargeComponent extends AppList {
             { title: 'Qty', field: 'quantity', sortable: true },
             { title: 'Unit', field: 'unitName', sortable: true },
             { title: 'Unit Price', field: 'unitPrice', sortable: true },
-            { title: 'Currency', field: 'currency', sortable: true },
-            { title: 'VAT', field: 'vatRate', sortable: true },
+            { title: 'Currency', field: 'currencyId', sortable: true },
+            { title: 'VAT', field: 'vatrate', sortable: true },
             { title: 'Amount', field: 'amount', sortable: true },
             { title: 'Payer', field: 'payer', sortable: true },
-            { title: 'OBH Partner', field: 'obhPartner', sortable: true },
+            { title: 'OBH Partner', field: 'obhPartnerName', sortable: true },
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Series No', field: 'seriesNo', sortable: true },
             { title: 'Inv Date', field: 'invoiceDate', sortable: true },
             { title: 'Custom No', field: 'clearanceNo', sortable: true },
             { title: 'Cont No', field: 'contNo', sortable: true },
-            { title: 'Note', field: 'note', sortable: true },
+            { title: 'Note', field: 'notes', sortable: true },
         ];
     }
 
@@ -63,6 +64,10 @@ export class SettlementTableSurchargeComponent extends AppList {
     onChangeCheckBoxCharge() {
         this.isCheckAll = this.data.chargeSettlements.every((surcharge: Surcharge) => surcharge.isSelected);
         this.onChangeCheckBox.emit(this.isCheckAll);
+    }
+
+    copySurcharge(surcharge: Surcharge) {
+        this.onClickCopySurcharge.emit(surcharge);
     }
 }
 

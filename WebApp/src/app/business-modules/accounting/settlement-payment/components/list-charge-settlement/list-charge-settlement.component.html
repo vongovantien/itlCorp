@@ -1,35 +1,38 @@
 <div class="list-charge-settlement-payment m--margin-top-20">
     <div class="row">
         <div class="col-lg-12 m--align-left d-flex align-items-center justify-content-between">
-            <div class="">
-                <button type="button" class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                    (click)="showCreateCharge()">
-                    <span>
-                        <i class="la la-plus"></i>
+            <div>
+                <ng-container *ngIf="STATE === 'WRITE'">
+                    <button type="button"
+                        class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                        (click)="showCreateCharge()">
                         <span>
-                            Add charge
+                            <i class="la la-plus"></i>
+                            <span>
+                                Add charge
+                            </span>
                         </span>
-                    </span>
-                </button>
-                <button type="button"
-                    class="btn btn-warning m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                    (click)="showExistingCharge()">
-                    <span>
-                        <i class="la la-plus"></i>
+                    </button>
+                    <button type="button"
+                        class="btn btn-warning m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                        (click)="showExistingCharge()">
                         <span>
-                            Get Existing Charge
+                            <i class="la la-plus"></i>
+                            <span>
+                                Get Existing Charge
+                            </span>
                         </span>
-                    </span>
-                </button>
-                <button type="button" class="btn btn-danger  m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="deleteShipmentItem()">
-                    <span>
-                        <i class="la la-trash"></i>
+                    </button>
+                    <button type="button" class="btn btn-danger  m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="deleteShipmentItem()">
                         <span>
-                            Delete
+                            <i class="la la-trash"></i>
+                            <span>
+                                Delete
+                            </span>
                         </span>
-                    </span>
-                </button>
+                    </button>
+                </ng-container>
             </div>
             <div class="m-checkbox-list">
                 <label class="m-checkbox">
@@ -43,16 +46,17 @@
     <div class="row m--margin-top-20">
         <div class="col-12">
             <div class="shipment-list-wrapper">
-                <ng-container *ngIf="type === 'GROUP'">
+                <ng-container *ngIf="TYPE === 'GROUP'">
                     <accordion [isAnimated]="true">
                         <accordion-group *ngFor="let item of groupShipments; let i = index; trackBy: trackByFn"
-                            [isOpen]="openAllCharge">
+                            [isOpen]="openAllCharge" class="m--margin-bottom-20">
                             <shipment-item #headingShipmentGroup accordion-heading [data]="item"
                                 (onClick)="onClickHeadingShipment($event)"
                                 (onCheck)="onCheckBoxShipmentItemInGroupShipment($event, i)"></shipment-item>
                             <table-surcharge-settlement [data]="item" #tableSurcharge
                                 (onChangeCheckBox)="onChangeCheckBoxSurChargeListInGroupShipment($event, i)"
-                                (onClickSurcharge)="openSurchargeDetail($event)">
+                                (onClickSurcharge)="openSurchargeDetail($event,null,'update')"
+                                (onClickCopySurcharge)="openCopySurcharge($event)">
                             </table-surcharge-settlement>
                         </accordion-group>
                     </accordion>
@@ -65,8 +69,7 @@
                         </table>
                     </div>
                 </ng-container>
-
-                <div class="table-wrapper" *ngIf="type === 'LIST'">
+                <div class="table-wrapper table-scrollable" *ngIf="TYPE === 'LIST'">
                     <table class="table table-brand table-hover dataTable table-striped">
                         <thead>
                             <tr app-table-header [headers]="headers" class="text-center"
@@ -91,12 +94,21 @@
                                                     value="{{surcharge}}" [(ngModel)]="surcharge.isSelected">
                                                 <span></span>
                                             </label>
+                                            <ng-container *ngIf="!surcharge.isFromShipment">
+                                                <span>
+                                                    <a (click)="openCopySurcharge(surcharge)" title="Copy"
+                                                        class="pointer">
+                                                        <i class="la la-copy"></i>
+                                                    </a>
+                                                </span>
+                                            </ng-container>
                                         </div>
                                     </td>
                                     <td>{{surcharge.jobId}}</td>
                                     <td>{{surcharge.hbl}}</td>
                                     <td>{{surcharge.mbl}}</td>
-                                    <td class="text-primary pointer" (click)="openSurchargeDetail(surcharge, i)"
+                                    <td class="text-primary pointer"
+                                        (click)="openSurchargeDetail(surcharge, i, 'update')"
                                         [class.text-underline]="!surcharge.isFromShipment">
                                         {{surcharge.chargeName}}
                                     </td>
@@ -114,7 +126,8 @@
                                     <td>{{surcharge.clearanceNo}}</td>
                                     <td>{{surcharge.contNo}}</td>
                                     <td>{{surcharge.notes}}</td>
-                                    <td class="text-underline text-primary pointer" (click)="showPaymentManagement(surcharge)">Payment Management</td>
+                                    <td class="text-underline text-primary pointer"
+                                        (click)="showPaymentManagement(surcharge)">Payment Management</td>
                                 </tr>
                             </ng-container>
                             <tr *ngIf="!isLoading && !surcharges.length" app-table-none-record
@@ -129,7 +142,7 @@
 
 <payment-management-popup></payment-management-popup>
 
-<existing-charge-popup (onRequest)="onRequestSurcharge($event, 'existing')"></existing-charge-popup>
+<existing-charge-popup (onRequest)="onRequestSurcharge($event)"></existing-charge-popup>
 
-<form-charge-popup (onRequest)="onRequestSurcharge($event , 'new')" [state]="stateFormCharge"
-    [(onUpdate)]="selectedSurcharge" (onUpdateChange)="onUpdateRequestSurcharge($event)"></form-charge-popup>
+<form-charge-popup (onRequest)="onRequestSurcharge($event)" [state]="stateFormCharge"
+    (onUpdateChange)="onUpdateRequestSurcharge($event)"></form-charge-popup>

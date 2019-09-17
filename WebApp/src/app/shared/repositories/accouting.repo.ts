@@ -259,6 +259,12 @@ export class AccoutingRepo {
         );
     }
 
+    saveAndSendRequestSettlemntPayment(body: any = {}) {
+        return this._api.post(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/SaveAndSendRequest`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
     deleteSettlement(settlementNo: string) {
         return this._api.delete(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/delete`, { settlementNo: settlementNo })
             .pipe(
@@ -268,6 +274,40 @@ export class AccoutingRepo {
 
     getPaymentManagement(jobId: string, mbl: string, hbl: string) {
         return this._api.get(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/GetPaymentManagementByShipment`, { JobId: jobId, mbl: mbl, hbl: hbl }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkDuplicateShipmentSettlement(body: any = {}) {
+        return this._api.post(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/CheckDuplicateShipmentSettlement`, body)
+            .pipe(
+                map((data: any) => data)
+            );
+
+    }
+
+    getInfoApproveSettlement(settlementNo: string) {
+        return this._api.get(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/GetInfoApproveSettlementBySettlementNo`, { settlementNo: settlementNo }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    approveSettlementPayment(settlementId: string) {
+        return this._api.post(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/UpdateApprove`, {}, { settlementId: settlementId })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    deniedApproveSettlement(settlementId: string, comment: string) {
+        return this._api.post(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/DeniedApprove`, {}, { settlementId: settlementId, comment: comment })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    previewSettlementPayment(settlementNo: any) {
+        return this._api.post(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/Preview`, null, { settlementNo: settlementNo }).pipe(
             map((data: any) => data)
         );
     }

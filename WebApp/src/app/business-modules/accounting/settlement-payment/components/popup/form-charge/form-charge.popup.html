@@ -9,7 +9,7 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <form action="" class="col-12" [formGroup]="form">
+                    <form class="col-12" [formGroup]="form">
                         <div class="row">
                             <div class="col-4">
                                 <div class="form-group">
@@ -163,7 +163,8 @@
                             <div class="col-4">
                                 <div class="form-group">
                                     <label for="">OBH Partner
-                                        <span class="text-danger" *ngIf="!!selectedCharge && selectedCharge.type === 'OBH'">*</span>
+                                        <span class="text-danger"
+                                            *ngIf="!!selectedCharge && selectedCharge.type === 'OBH'">*</span>
                                     </label>
                                     <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedOBHPartner"
                                         #OBHPartnerComponent (itemSelected)="onSelectDataFormInfo($event, 'obh')"
@@ -189,7 +190,7 @@
                                     </div>
                                     <div class="col-6">
                                         <div class="form-group">
-                                            <label for="">Invoice No <span class="text-danger">*</span></label>
+                                            <label for="">Invoice No</label>
                                             <input type="text" class="form-control" formControlName="invoiceNo"
                                                 placeholder="Invoice No">
                                         </div>
@@ -200,14 +201,14 @@
                                 <div class="row">
                                     <div class="col-6">
                                         <div class="form-group">
-                                            <label for="">Series No <span class="text-danger">*</span></label>
+                                            <label for="">Series No</label>
                                             <input type="text" class="form-control" formControlName="serieNo"
                                                 placeholder="Serie No">
                                         </div>
                                     </div>
                                     <div class="col-6">
                                         <div class="form-group">
-                                            <label for="">Invoice Date <span class="text-danger">*</span></label>
+                                            <label for="">Invoice Date</label>
                                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                                 <input type="text" class="form-control m-input m-input--square"
                                                     ngxDaterangepickerMd

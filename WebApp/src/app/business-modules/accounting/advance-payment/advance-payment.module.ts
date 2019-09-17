@@ -16,6 +16,8 @@ import { AdvancePaymentDetailComponent } from './detail/detail-advance-payment.c
 import { ApproveAdvancePaymentComponent } from '../approve-payment/advance/approve-advance.component';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgxCurrencyModule } from "ngx-currency";
+import { ProcessApporveComponent } from '../approve-payment/components/process-approve/process-approve.component';
+import { ShareApprovePaymentModule } from '../approve-payment/components/share-approve-payment.module';
 const routing: Routes = [
     {
         path: "", component: AdvancePaymentComponent, pathMatch: 'full',
@@ -67,7 +69,8 @@ const customCurrencyMaskConfig = {
         RouterModule.forChild(routing),
         ReactiveFormsModule,
         NgProgressModule,
-        NgxCurrencyModule.forRoot(customCurrencyMaskConfig)
+        NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
+        ShareApprovePaymentModule
     ],
     declarations: [
         AdvancePaymentComponent,

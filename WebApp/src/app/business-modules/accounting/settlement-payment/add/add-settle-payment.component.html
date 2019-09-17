@@ -1,10 +1,4 @@
-<div class="m-subheader">
-    <div class="d-flex align-items-center">
-        <div class="mr-auto">
-            <app-breadcrumb></app-breadcrumb>
-        </div>
-    </div>
-</div>
+<app-sub-header></app-sub-header>
 <div class="m-content">
     <div class="m-portlet">
         <div class="m-form">
@@ -16,7 +10,9 @@
     <div class="m-portlet">
         <div class="m-form">
             <div class="m-portlet__body">
+
                 <settle-payment-list-charge></settle-payment-list-charge>
+                
                 <div class="row">   
                     <div class="col-12">
                         <div class="m--align-center m--margin-top-20">
@@ -30,7 +26,7 @@
                                 </span>
                             </button>
                             <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                title="Save & Send Request" >
+                                title="Save & Send Request" (click)="saveAndSendRequest()">
                                 <span>
                                     <i class="la la-download"></i>
                                     <span>

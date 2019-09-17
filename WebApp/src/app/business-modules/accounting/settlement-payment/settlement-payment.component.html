@@ -1,32 +1,29 @@
 <div class="advance-payment-page">
-    <div class="m-subheader">
-        <div class="d-flex align-items-center">
-            <div class="mr-auto">
-                <app-breadcrumb></app-breadcrumb>
-            </div>
-            <div class="c-button-actions">
-                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                    [routerLink]="'/home/accounting/settlement-payment/new'">
+    <app-sub-header>
+        <div class="c-button-actions">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                [routerLink]="'/home/accounting/settlement-payment/new'">
+                <span>
+                    <i class="la la-plus"></i>
                     <span>
-                        <i class="la la-plus"></i>
-                        <span>
-                            add new
-                        </span>
+                        add new
                     </span>
-                </button>
-                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                </span>
+            </button>
+            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-upload"></i>
                     <span>
-                        <i class="la la-upload"></i>
-                        <span>
-                            export
-                        </span>
+                        export
                     </span>
-                </button>
-            </div>
+                </span>
+            </button>
         </div>
-    </div>
+    </app-sub-header>
     <div class="m-content">
+        
         <settle-payment-form-search (onSearch)="onSearchSettlement($event)"></settle-payment-form-search>
+
         <div class="m-portlet">
             <div class="m-form">
                 <div class="m-portlet__body">
@@ -51,7 +48,6 @@
                                         <tr class="text-center">
                                             <td>
                                                 <div class="m-checkbox-list d-flex align-items-center">
-
                                                     <button
                                                         class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed"
                                                         data-toggle="collapse"
@@ -79,7 +75,7 @@
                                                 </div>
                                             </td>
                                             <td class="text-underline text-primary pointer">
-                                                <a [routerLink]="[settlePayment.id]">{{settlePayment.settlementNo}}
+                                                <a (click)="gotoDetailSettlement(settlePayment)">{{settlePayment.settlementNo}}
                                                 </a>
                                             </td>
                                             <td>{{settlePayment.amount | number: '.0-3'}}</td>

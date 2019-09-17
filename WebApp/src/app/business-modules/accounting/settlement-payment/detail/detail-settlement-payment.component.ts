@@ -9,6 +9,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { catchError, finalize } from 'rxjs/operators';
 import { formatDate } from '@angular/common';
+import { ReportPreviewComponent } from 'src/app/shared/common';
 
 @Component({
     selector: 'app-settlement-payment-detail',
@@ -17,14 +18,17 @@ import { formatDate } from '@angular/common';
 
 export class SettlementPaymentDetailComponent extends AppPage {
 
-    @ViewChild(SettlementListChargeComponent, { static: true }) requestSurchargeListComponent: SettlementListChargeComponent;
-    @ViewChild(SettlementFormCreateComponent, { static: true }) formCreateSurcharge: SettlementFormCreateComponent;
+    @ViewChild(SettlementListChargeComponent, { static: false }) requestSurchargeListComponent: SettlementListChargeComponent;
+    @ViewChild(SettlementFormCreateComponent, { static: false }) formCreateSurcharge: SettlementFormCreateComponent;
+    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
+
 
     settlementId: string = '';
-
+    settlementCode: string = '';
     settlementPayment: ISettlementPaymentData;
 
-    TYPELISTCHARGE: string = 'GROUP';
+    dataReport: any = null;
+
     constructor(
         private _activedRouter: ActivatedRoute,
         private _accoutingRepo: AccoutingRepo,
@@ -91,19 +95,17 @@ export class SettlementPaymentDetailComponent extends AppPage {
             .subscribe(
                 (res: any) => {
                     this.settlementPayment = res;
-                    // console.log(this.settlementPayment);
-                    // this.advancePayment = new AdvancePayment(res);
-                    // switch (this.advancePayment.statusApproval) {
-                    //     case 'New':
-                    //     case 'Denied':
-                    //         break;
-                    //     default:
-                    //         this.formCreateComponent.formCreate.disable();
-                    //         this.formCreateComponent.isDisabled = true;
+                    switch (this.settlementPayment.settlement.statusApproval) {
+                        case 'New':
+                        case 'Denied':
+                            break;
+                        default:
+                            this.formCreateSurcharge.form.disable();
+                            this.formCreateSurcharge.isDisabled = true;
 
-                    //         this.actionList = 'read';
-                    //         break;
-                    // }
+                            this.requestSurchargeListComponent.STATE = 'READ';
+                            break;
+                    }
 
                     // * wait to currecy list api
                     setTimeout(() => {
@@ -121,8 +123,10 @@ export class SettlementPaymentDetailComponent extends AppPage {
                     this.requestSurchargeListComponent.surcharges = this.settlementPayment.chargeNoGrpSettlement;
                     this.requestSurchargeListComponent.groupShipments = this.settlementPayment.chargeGrpSettlement;
 
+                    this.requestSurchargeListComponent.settlementCode = this.settlementPayment.settlement.settlementNo;
+
                     // *SWITCH UI TO GROUP LIST SHIPMENT
-                    this.requestSurchargeListComponent.type = 'GROUP'; // ? LIST
+                    this.requestSurchargeListComponent.TYPE = 'GROUP'; // ? LIST
 
                     if (this.requestSurchargeListComponent.groupShipments.length) {
                         this.requestSurchargeListComponent.openAllCharge.next(true);
@@ -131,9 +135,58 @@ export class SettlementPaymentDetailComponent extends AppPage {
                 },
             );
     }
+
+    saveAndSendRequest() {
+        this._progressRef.start();
+        const body: any = {
+            settlement: {
+                id: this.settlementPayment.settlement.id,
+                settlementNo: this.formCreateSurcharge.settlementNo.value,
+                requester: this.formCreateSurcharge.requester.value,
+                requestDate: formatDate(this.formCreateSurcharge.requestDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
+                paymentMethod: this.formCreateSurcharge.paymentMethod.value.value,
+                settlementCurrency: this.formCreateSurcharge.currency.value.id,
+                note: this.formCreateSurcharge.note.value,
+                userCreated: this.settlementPayment.settlement.userCreated,
+                datetimeCreated: this.settlementPayment.settlement.datetimeCreated,
+                statusApproval: this.settlementPayment.settlement.statusApproval
+            },
+            shipmentCharge: this.requestSurchargeListComponent.surcharges || []
+        };
+
+        this._accoutingRepo.saveAndSendRequestSettlemntPayment(body)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(`${res.data.settlement.settlementNo}`, ' Send request successfully');
+
+                        this._router.navigate([`home/accounting/settlement-payment/${res.data.settlement.id}/approve`]);
+                       
+                    }
+                }
+            );
+    }
+
+    preview() {
+        this._accoutingRepo.previewSettlementPayment(this.settlementPayment.settlement.settlementNo)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    setTimeout(() => {
+                        this.previewPopup.show();
+                    }, 1000);
+
+                },
+            );
+    }
 }
 
-interface ISettlementPaymentData {
+export interface ISettlementPaymentData {
     chargeGrpSettlement: any;
     chargeNoGrpSettlement: Surcharge[],
     settlement: any;

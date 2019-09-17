@@ -1,7 +1,7 @@
 import { HeaderComponent } from "./master-page/header/header.component";
 import { FooterComponent } from "./master-page/footer/footer.component";
 import { PageSidebarComponent } from "./master-page/page-sidebar/page-sidebar.component";
-import { SubheaderComponent } from "./master-page/subheader/subheader.component";
+// import { SubheaderComponent } from "./master-page/subheader/subheader.component";
 import { BrowserModule } from "@angular/platform-browser";
 import { NgModule } from "@angular/core";
 import { AppComponent } from "./app.component";
@@ -25,7 +25,6 @@ import { NgxSpinnerModule } from "ngx-spinner";
 import { DashboardComponent } from "./dashboard/dashboard.component";
 import { HighchartsChartModule } from "highcharts-angular";
 import { NgxDaterangepickerMd } from "ngx-daterangepicker-material";
-import { ScrollingModule } from "@angular/cdk/scrolling";
 import { AuthInterceptor } from "./auth.interceptor";
 import { GlobalState } from "./global-state";
 import { NgProgressModule } from "@ngx-progressbar/core";
@@ -43,7 +42,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         HeaderComponent,
         FooterComponent,
         PageSidebarComponent,
-        SubheaderComponent,
+        // SubheaderComponent,
         DashboardComponent
     ],
     imports: [
