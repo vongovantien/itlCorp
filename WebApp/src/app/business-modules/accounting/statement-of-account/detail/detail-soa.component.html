@@ -1,31 +1,26 @@
-<div class="m-subheader">
-    <div class="d-flex align-items-center">
-        <div class="mr-auto">
-            <app-breadcrumb></app-breadcrumb>
-        </div>
-        <div class="c-button-actions">
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                [routerLink]="'/home/accounting/statement-of-account/edit'"
-                [queryParams]="{ no: soa.soano, currency: 'VND' }">
+<app-sub-header>
+    <div class="c-button-actions">
+        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+            [routerLink]="'/home/accounting/statement-of-account/edit'"
+            [queryParams]="{ no: soa.soano, currency: 'VND' }">
+            <span>
+                <i class="la la-edit"></i>
                 <span>
-                    <i class="la la-edit"></i>
-                    <span>
-                        Edit
-                    </span>
+                    Edit
                 </span>
-            </button>
-            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                (click)="exportExcelSOA()">
+            </span>
+        </button>
+        <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+            (click)="exportExcelSOA()">
+            <span>
+                <i class="la la-upload"></i>
                 <span>
-                    <i class="la la-upload"></i>
-                    <span>
-                        export
-                    </span>
+                    export
                 </span>
-            </button>
-        </div>
+            </span>
+        </button>
     </div>
-</div>
+</app-sub-header>
 
 <div class="m-content">
     <div class="m-portlet">
