@@ -10,5 +10,7 @@ namespace eFMS.API.Documentation.DL.IService
     public interface IShipmentService
     {
         IQueryable<Shipments> GetShipmentNotLocked();
+
+        IQueryable<Shipments> GetShipmentsCreditPayer(string partner, List<string> productServices);
     }
 }

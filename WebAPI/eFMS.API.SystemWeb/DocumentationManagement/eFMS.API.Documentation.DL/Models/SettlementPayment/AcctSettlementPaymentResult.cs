@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace eFMS.API.Documentation.DL.Models
+namespace eFMS.API.Documentation.DL.Models.SettlementPayment
 {
     public class AcctSettlementPaymentResult : AcctSettlementPayment
     {

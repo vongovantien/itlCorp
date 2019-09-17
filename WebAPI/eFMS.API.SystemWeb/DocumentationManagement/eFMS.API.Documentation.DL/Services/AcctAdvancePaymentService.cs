@@ -1369,11 +1369,11 @@ namespace eFMS.API.Documentation.DL.Services
             if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
             if (approve != null && advance != null)
             {
-                if (userCurrent == GetLeaderIdOfUser(userCurrent) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                if (userCurrent == GetLeaderIdOfUser(advance.Requester) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                 {
                     approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Denie của Leader
                 }
-                else if (userCurrent == GetManagerIdOfUser(userCurrent) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                else if (userCurrent == GetManagerIdOfUser(advance.Requester) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                 {
                     approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Denie của Manager
                     approve.ManagerApr = userCurrent; //Cập nhật user manager denie                   

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Documentation.DL.Models.SettlementPayment;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Documentation.Service.ViewModels;
 using System.Collections.Generic;
@@ -46,6 +47,10 @@ namespace eFMS.API.Shipment.Infrastructure
 
             CreateMap<AcctApproveAdvance, AcctApproveAdvanceModel>();
             CreateMap<spc_GetSurchargeByHouseBill, CsShipmentSurchargeDetailsModel>();
+
+            CreateMap<ShipmentChargeSettlement, CsShipmentSurcharge>();
+            CreateMap<AcctSettlementPaymentModel, AcctSettlementPayment>();
+            CreateMap<AcctApproveSettlement, AcctApproveSettlementModel>();
         }
     }
 }
