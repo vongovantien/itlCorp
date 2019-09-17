@@ -76,7 +76,7 @@ export class JobManagementBuyingRateComponent extends AppList {
     }
 
     prepareEditCharge(charge: any) {
-        this.BuyingRateChargeToEdit = cloneDeep(charge);
+        this.BuyingRateChargeToEdit = charge;
         setTimeout(() => {
             this.editBuyingRatePopup.show();
         }, 100);

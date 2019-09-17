@@ -19,12 +19,13 @@ export class AddSellingRatePopupComponent extends PopupBase implements OnInit {
     @Output() outputAddSelling = new EventEmitter<any>();
 
     lstSellingRateChargesComboBox: any[] = [];
-    isDisplay: boolean = true;
     sellingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
     currentActiveItemDefault: { id: null, text: null }[] = [];
     lstPartners: any[] = [];
     lstUnits: any[] = [];
     lstCurrencies: any[] = [];
+    currentSelectedCharge: string = null;
+    objectBePaidActive: { 'text', 'id' }[] = [];
 
     constructor(
         private baseServices: BaseService,
@@ -50,10 +51,7 @@ export class AddSellingRatePopupComponent extends PopupBase implements OnInit {
                 }
                 const res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.sellingRateChargeToAdd);
                 if (res.status) {
-                    form.onReset();
-                    // this.resetDisplay();
-                    this.sellingRateChargeToAdd = new CsShipmentSurcharge();
-                    this.currentActiveItemDefault = [];
+                    this.close(form);
                     this.outputAddSelling.emit(true);
 
                     if (!isContinue) {
@@ -68,15 +66,10 @@ export class AddSellingRatePopupComponent extends PopupBase implements OnInit {
         form.onReset();
         this.currentActiveItemDefault = [];
         this.sellingRateChargeToAdd = new CsShipmentSurcharge();
-        this.resetDisplay();
-        this.hide();
-    }
-
-    resetDisplay() {
-        this.isDisplay = false;
-        setTimeout(() => {
-            this.isDisplay = true;
-        }, 50);
+        this.sellingRateChargeToAdd.objectBePaid = null;
+        this.sellingRateChargeToAdd.paymentObjectId = null;
+        this.objectBePaidActive = [];
+        this.currentSelectedCharge = null;
     }
 
     public getListSellingRateCharges() {

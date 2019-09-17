@@ -20,13 +20,13 @@ export class AddBuyingRatePopupComponent extends PopupBase implements OnInit, On
     @Output() outputAddBuying = new EventEmitter<any>();
 
     buyingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
-    isDisplay: boolean = true;
     lstBuyingRateChargesComboBox: any[] = [];
     lstPartners: any[] = [];
     lstUnits: any[] = [];
     lstCurrencies: any[] = [];
     currentActiveItemDefault: { id: null, text: null }[] = [];
     currentSelectedCharge: string = null;
+    objectBePaidActive: { 'text', 'id' }[] = [];
 
     invoiceDate: any;
     constructor(
@@ -61,15 +61,6 @@ export class AddBuyingRatePopupComponent extends PopupBase implements OnInit, On
         });
     }
 
-    close(form: NgForm) {
-        form.onReset();
-        this.currentActiveItemDefault = [];
-        this.buyingRateChargeToAdd = new CsShipmentSurcharge();
-        this.currentSelectedCharge = null;
-        // this.resetDisplay();
-        this.hide();
-    }
-
     calculateTotalEachBuying() {
         let total = 0;
         if (this.buyingRateChargeToAdd.vatrate >= 0) {
@@ -93,11 +84,8 @@ export class AddBuyingRatePopupComponent extends PopupBase implements OnInit, On
                 }
                 const res = await this.baseServices.postAsync(this.api_menu.Documentation.CsShipmentSurcharge.addNew, this.buyingRateChargeToAdd);
                 if (res.status) {
-                    this.currentSelectedCharge = null;
-                    form.onReset();
+                    this.close(form);
                     this.outputAddBuying.emit(true);
-                    this.buyingRateChargeToAdd = new CsShipmentSurcharge();
-                    this.currentActiveItemDefault = [];
 
                     if (!isContinue) {
                         this.hide();
@@ -106,11 +94,15 @@ export class AddBuyingRatePopupComponent extends PopupBase implements OnInit, On
             }
         }, 300);
     }
-    resetDisplay() {
-        this.isDisplay = false;
-        setTimeout(() => {
-            this.isDisplay = true;
-        }, 50);
+
+    close(form: NgForm) {
+        form.onReset();
+        this.currentSelectedCharge = null;
+        this.buyingRateChargeToAdd = new CsShipmentSurcharge();
+        this.currentActiveItemDefault = [];
+        this.buyingRateChargeToAdd.objectBePaid = null;
+        this.buyingRateChargeToAdd.paymentObjectId = null;
+        this.objectBePaidActive = [];
     }
 
     public getListBuyingRateCharges() {

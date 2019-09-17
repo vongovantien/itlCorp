@@ -6,11 +6,11 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Add selling charge</h5>
-          <button type="button" class="close" aria-label="Close" (click)="close(addSellingRateChargeFormOps)">
+          <button type="button" class="close" aria-label="Close" (click)="close(addSellingRateChargeFormOps); hide()">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body" *ngIf="isDisplay">
+        <div class="modal-body">
           <div class="m-form m-form--state">
             <div class="row">
               <div class="col-lg-4">
@@ -19,7 +19,7 @@
                   <label class="form-control-label" for="" #selectedSellingChargeCode>
                     Charge <span class="m--font-danger">(*)</span>
                     <small class="m--margin-left-5 m--font-primary"> &nbsp;
-                      {{selectedSellingChargeCode.value==null?'':selectedSellingChargeCode.value}}
+                      {{currentSelectedCharge}}
                     </small>
                   </label>
 
@@ -30,6 +30,7 @@
                                         sellingRateChargeToAdd.vatrate=$event.charge.vatrate;
                                         selectedSellingChargeCode.value=$event.charge.code;
                                         sellingRateChargeToAdd.currencyId=$event.currency;
+                                        currentSelectedCharge=$event.charge.code;
                                         currentActiveItemDefault=[{ id: $event.currency, text: $event.currency }];
                                         calculateTotalEachSelling ();"
                     [selectedDisplayFields]="['charge.chargeNameEn']" [dataSources]="lstSellingRateChargesComboBox"
@@ -54,8 +55,10 @@
                   <ng-select [allowClear]="true" [items]="[
                                                 { 'text': 'AGENT', 'id': 'AGENT' },
                                                 { 'text': 'CUSTOMER','id': 'CUSTOMER' },
-                                                { 'text': 'OTHER', 'id': 'OTHER' }]"
+                                                { 'text': 'OTHER', 'id': 'OTHER' }]" [active]="objectBePaidActive"
                     (selected)="sellingRateChargeToAdd.objectBePaid=$event.id;
+                                        objectBePaidActive.id = $event.id; 
+                                        objectBePaidActive.text=$event.id;
                                         sellingRateChargeToAdd.objectBePaid==='AGENT'? sellingRateChargeToAdd.paymentObjectId=opsTransaction.agentId:null;
                                         sellingRateChargeToAdd.objectBePaid==='CUSTOMER'? sellingRateChargeToAdd.paymentObjectId=opsTransaction.customerId:null;
                                         sellingRateChargeToAdd.objectBePaid==='OTHER'? sellingRateChargeToAdd.paymentObjectId=null:null;"
@@ -249,7 +252,7 @@
             </span>
           </button>
           <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-            (click)="close(addSellingRateChargeFormOps)">
+            (click)="close(addSellingRateChargeFormOps); hide()">
             <span>
               <i class="la la-ban"></i>
               <span>

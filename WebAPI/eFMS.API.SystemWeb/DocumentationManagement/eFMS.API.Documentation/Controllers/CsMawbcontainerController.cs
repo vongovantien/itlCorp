@@ -69,6 +69,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("Update")]
+        //[Authorize]
         public IActionResult Update(CsMawbcontainerEdit model)
         {
             if (!ModelState.IsValid) return BadRequest();
