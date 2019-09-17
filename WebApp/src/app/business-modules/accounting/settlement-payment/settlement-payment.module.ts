@@ -18,6 +18,7 @@ import { SettlementFormChargePopupComponent } from './components/popup/form-char
 import { NgxCurrencyModule } from 'ngx-currency';
 import { SettlementShipmentItemComponent } from './components/shipment-item/shipment-item.component';
 import { SettlementTableSurchargeComponent } from './components/table-surcharge/table-surcharge.component';
+import { SettlementPaymentDetailComponent } from './detail/detail-settlement-payment.component';
 
 const routing: Routes = [
     {
@@ -29,6 +30,10 @@ const routing: Routes = [
     {
         path: "new", component: SettlementPaymentAddNewComponent,
         data: { name: "New", path: "New", level: 3 }
+    },
+    {
+        path: ":id", component: SettlementPaymentDetailComponent,
+        data: { name: "Detail", path: "Detail", level: 3 }
     },
 ];
 
@@ -75,6 +80,7 @@ const customCurrencyMaskConfig = {
     declarations: [
         SettlementPaymentComponent,
         SettlementPaymentAddNewComponent,
+        SettlementPaymentDetailComponent,
         ...COMPONENT
     ],
     providers: [],

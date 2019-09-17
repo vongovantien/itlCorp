@@ -11,6 +11,7 @@ namespace eFMS.API.Documentation.DL.IService
 {
     public interface ICsShipmentSurchargeService : IRepositoryBase<CsShipmentSurcharge, CsShipmentSurchargeModel>
     {
+        List<CsShipmentSurchargeDetailsModel> GetByHB(Guid hblid);
         List<CsShipmentSurchargeDetailsModel> GetByHB(Guid HbID,string type);
         HandleState DeleteCharge(Guid chargeId);
         List<object> GroupChargeByHB(Guid id,string PartnerId,bool IsHouseBillID);

@@ -1,5 +1,5 @@
-<div class="modal fade" id="pl-sheet-popup" bsModal #popup="bs-modal" role="dialog"
-    (onHide)="onHide($event)" (onShow)="onShow($event)">
+<div class="modal fade" id="pl-sheet-popup" bsModal #popup="bs-modal" role="dialog" (onHide)="onHide($event)"
+    (onShow)="onShow($event)">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -12,13 +12,14 @@
                 <div class="form-group">
                     <label for="">Currency</label>
                     <select [(ngModel)]="selectedCurrency" class="form-control">
-                        <option *ngFor="let currency of currencyList; let i = index" [ngValue]="currency">{{currency.id}}</option>
+                        <option *ngFor="let currency of currencyList; let i = index" [ngValue]="currency">
+                            {{currency.id}}</option>
                     </select>
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
                 <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                    data-dismiss="modal">
+                    data-dismiss="modal" (click)="previewPL()">
                     <span>
                         <i class="la la-print"></i>
                         <span>
@@ -39,3 +40,4 @@
         </div>
     </div>
 </div>
+<app-report-preview [data]="dataReport"></app-report-preview>

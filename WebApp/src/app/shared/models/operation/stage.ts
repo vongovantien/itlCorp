@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 
 export class Stage {
     comment: string = '';
@@ -22,12 +21,13 @@ export class Stage {
     userModified: string = '';
     isSelected?: boolean = false;
     doneDate: string = '';
-    constructor(data?: any) {
-    let self = this;
-    _.forEach(data, (val, key) => {
-        if (self.hasOwnProperty(key)) {
-            self[key] = val;
+
+    constructor(object?: any) {
+        const self = this;
+        for (const key in object) {
+            if (self.hasOwnProperty(key)) {
+                self[key] = object[key];
+            }
         }
-    });
-  }
+    }
 }

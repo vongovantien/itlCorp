@@ -65,8 +65,5 @@
 
   <ItemGroup>
     <Folder Include="Helpers\" />
-    <Folder Include="IService\" />
-    <Folder Include="Models\Criteria\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 </Project>

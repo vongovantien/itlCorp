@@ -16,7 +16,7 @@
                         Requester:
                     </label>
                     <input type="text" class="form-control m-input m-input--square" placeholder="Requester"
-                        [value]="userLogged.id" formControlName="requester" disabled>
+                        [value]="userLogged.id" formControlName="requester">
                 </div>
             </div>
             <div class="col-4">
@@ -28,7 +28,7 @@
                         <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                             [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
                             name="daterange" placeholder="Select request date" [autoApply]="true"
-                            formControlName="requestDate" [attr.disabled]="isDisabled" />
+                            formControlName="requestDate" />
                         <span class="m-input-icon__icon m-input-icon__icon--right">
                             <span>
                                 <i class="la la-calendar"></i>
@@ -42,19 +42,21 @@
             <div class="col-4">
                 <div class="form-group">
                     <label>Payment Method</label>
-                    <input type="text" class="form-control" formControlName="paymentMethod">
+                    <select formControlName="paymentMethod" class="form-control">
+                        <option *ngFor="let method of methods" [ngValue]="method">{{method.title}}</option>
+                    </select>
                 </div>
             </div>
             <div class="col-4">
                 <div class="form-group">
                     <label>Settlement Amount</label>
-                    <input type="text" formControlName="amount" class="form-control">
+                    <input currencyMask type="text" formControlName="amount" class="form-control">
                 </div>
             </div>
             <div class="col-4">
                 <div class="form-group">
                     <label>Currency</label>
-                    <select formControlName="currency" class="form-control">
+                    <select formControlName="currency" class="form-control" >
                         <option *ngFor="let currency of currencyList" [ngValue]="currency">{{currency.id}}</option>
                     </select>
                 </div>

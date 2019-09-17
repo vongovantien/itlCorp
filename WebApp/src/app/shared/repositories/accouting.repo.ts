@@ -222,7 +222,56 @@ export class AccoutingRepo {
         );
     }
 
+    getShipmentOfSettlements(settlementNo: string) {
+        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSettlementPayment/GetShipmentOfSettlements`, { settlementNo: settlementNo }).pipe(
+            map((data: any) => data)
+        );
+    }
 
+    getShipmentByPartnerOrService(partnerId: string, services: string[]) {
+        return this._api.get(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/Shipment/GetShipmentsCreditPayer`, { partner: partnerId, productServices: services }).pipe(
+            map((data: any) => data)
+        );
+    }
 
+    getExistingCharge(jobId: string, hbl: string, mbl: string) {
+        return this._api.get(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/GetExistsCharge`, { jobId: jobId, HBL: hbl, MBL: mbl }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    addNewSettlement(body: any = {}) {
+        return this._api.post(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/Add`, body)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    getDetailSettlementPayment(settlementId: string) {
+        return this._api.get(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/GetDetailSettlementPaymentById`, { settlementId: settlementId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateSettlementPayment(body: any = {}) {
+        return this._api.put(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/Update`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    deleteSettlement(settlementNo: string) {
+        return this._api.delete(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/delete`, { settlementNo: settlementNo })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    getPaymentManagement(jobId: string, mbl: string, hbl: string) {
+        return this._api.get(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/GetPaymentManagementByShipment`, { JobId: jobId, mbl: mbl, hbl: hbl }).pipe(
+            map((data: any) => data)
+        );
+    }
 
 }
+
+

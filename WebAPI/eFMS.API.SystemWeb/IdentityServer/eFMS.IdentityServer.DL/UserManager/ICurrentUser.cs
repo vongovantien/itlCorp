@@ -1,4 +1,5 @@
-﻿using System;
+﻿using eFMS.IdentityServer.DL.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,7 +7,9 @@ namespace eFMS.IdentityServer.DL.UserManager
 {
     public interface ICurrentUser
     {
-        String UserID { get; }
-        //String EmployeeID { get; }
+        string UserID { get; }
+        string EmployeeID { get; }
+        string UserName { get; }
+        SysEmployeeModel CurrentEmployee { get; }
     }
 }

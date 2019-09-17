@@ -18,9 +18,9 @@ export class JobManagementFormSearchComponent extends AppForm {
     @Output() onSearch: EventEmitter<ISearchDataShipment>  = new EventEmitter<ISearchDataShipment>();
 
     filterTypes: CommonInterface.ICommonTitleValue[];
-    productServices: IValueDisplay[] = [];
-    serviceModes: IValueDisplay[] = [];
-    shipmentModes: IValueDisplay[] = [];
+    productServices: CommonInterface.IValueDisplay[] = [];
+    serviceModes: CommonInterface.IValueDisplay[] = [];
+    shipmentModes: CommonInterface.IValueDisplay[] = [];
 
     formSearch: FormGroup;
     searchText: AbstractControl;
@@ -68,7 +68,7 @@ export class JobManagementFormSearchComponent extends AppForm {
             .pipe(
                 catchError(this.catchError)
             ).subscribe(
-                (response: ICommonShipmentData) => {
+                (response: CommonInterface.ICommonShipmentData) => {
                     this.productServices = response.productServices;
                     this.serviceModes = response.serviceModes;
                     this.shipmentModes = response.shipmentModes;
@@ -143,7 +143,6 @@ export class JobManagementFormSearchComponent extends AppForm {
             'user': [],
             'serviceDate': [],
 
-
         });
 
         this.searchText = this.formSearch.controls['searchText'];
@@ -189,16 +188,7 @@ export class JobManagementFormSearchComponent extends AppForm {
     }
 }
 
-interface ICommonShipmentData {
-    productServices: IValueDisplay[];
-    serviceModes: IValueDisplay[];
-    shipmentModes: IValueDisplay[];
-}
 
-interface IValueDisplay {
-    value: string;
-    displayName: string;
-}
 
 interface ISearchDataShipment {
     all: string;

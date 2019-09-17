@@ -5,6 +5,8 @@ import { HttpErrorResponse } from "@angular/common/http";
 import moment from "moment";
 import { UtilityHelper } from "src/helper";
 import { NgProgressRef } from "@ngx-progressbar/core";
+import { ButtonModalSetting } from "./shared/models/layout/button-modal-setting.model";
+import { ButtonType } from "./shared/enums/type-button.enum";
 
 export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit {
 
@@ -33,6 +35,26 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
     isCheckAll: boolean = false;
 
     _progressRef: NgProgressRef;
+
+    cancelButtonSetting: ButtonModalSetting = {
+        buttonAttribute: {
+            type: 'button',
+            titleButton: "Cancel",
+            classStyle: "btn btn-default m-btn--square m-btn--icon m-btn--uppercase",
+            icon: "la la-ban"
+        },
+        typeButton: ButtonType.cancel,
+    };
+
+    searchlButtonSetting: ButtonModalSetting = {
+        buttonAttribute: {
+            type: 'button',
+            titleButton: "Search",
+            classStyle: "btn btn-brand m-btn--square m-btn--icon m-btn--uppercase",
+            icon: "la la-search"
+        },
+        typeButton: ButtonType.search,
+    };
 
     ngOnInit(): void { }
 

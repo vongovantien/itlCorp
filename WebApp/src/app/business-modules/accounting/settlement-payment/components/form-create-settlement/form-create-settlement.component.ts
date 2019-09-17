@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { User, Currency } from 'src/app/shared/models';
 import { BaseService, DataService } from 'src/app/shared/services';
 import { AbstractControl, FormGroup, FormBuilder } from '@angular/forms';
 import { SystemConstants } from 'src/constants/system.const';
-import { takeUntil, catchError } from 'rxjs/operators';
+import { takeUntil, catchError, distinctUntilChanged, map } from 'rxjs/operators';
 import { SystemRepo } from 'src/app/shared/repositories';
 
 @Component({
@@ -13,6 +13,8 @@ import { SystemRepo } from 'src/app/shared/repositories';
 })
 
 export class SettlementFormCreateComponent extends AppForm {
+
+    @Output() onChangeCurrency: EventEmitter<Currency> = new EventEmitter<Currency>();
 
     userLogged: User;
 
@@ -26,6 +28,7 @@ export class SettlementFormCreateComponent extends AppForm {
     note: AbstractControl;
 
     currencyList: Currency[];
+    methods: CommonInterface.ICommonTitleValue[];
 
     constructor(
         private _baseService: BaseService,
@@ -36,16 +39,25 @@ export class SettlementFormCreateComponent extends AppForm {
         super();
     }
 
-    ngOnInit() { 
+    ngOnInit() {
+        this.initFormSettlement();
+        this.initBasicData();
+        this.getUserLogged();
+        this.getCurrency();
+
+    }
+
+    initFormSettlement() {
         this.form = this._fb.group({
-            'settlementNo': [],
-            'requester': [],
+            'settlementNo': [{ value: null, disabled: true }],
+            'requester': [{ value: null, disabled: true }],
             'requestDate': [new Date],
             'paymentMethod': [],
-            'amount': [],
+            'amount': [{ value: null, disabled: true }],
             'currency': [],
             'note': [],
         });
+
 
         this.settlementNo = this.form.controls['settlementNo'];
         this.requester = this.form.controls['requester'];
@@ -55,10 +67,13 @@ export class SettlementFormCreateComponent extends AppForm {
         this.currency = this.form.controls['currency'];
         this.note = this.form.controls['note'];
 
-        this.getUserLogged();
-        this.getCurrency();
-
-    }   
+        this.currency.valueChanges.pipe(
+                distinctUntilChanged((prev, curr) => prev.id === curr.id),
+                map((data: any) => data)
+            ).subscribe((value: Currency) => {
+                this.onChangeCurrency.emit(value);
+            });
+    }
 
     getUserLogged() {
         this.userLogged = this._baseService.getUserLogin() || 'admin';
@@ -82,10 +97,24 @@ export class SettlementFormCreateComponent extends AppForm {
                                 (data: any) => {
                                     this.currencyList = data || [];
                                     this.currency.setValue(this.currencyList.filter((item: Currency) => item.id === 'VND')[0]);
+                                    // this._dataService.setData(SystemConstants.CSTORAGE.CURRENCY, data);
+
                                 },
                             );
                     }
                 }
             );
+    }
+
+    initBasicData() {
+        this.methods = this.getMethod();
+        this.paymentMethod.setValue(this.methods[0]);
+    }
+
+    getMethod(): CommonInterface.ICommonTitleValue[] {
+        return [
+            { title: 'Cash', value: 'Cash' },
+            { title: 'Bank Transfer', value: 'Bank' },
+        ];
     }
 }

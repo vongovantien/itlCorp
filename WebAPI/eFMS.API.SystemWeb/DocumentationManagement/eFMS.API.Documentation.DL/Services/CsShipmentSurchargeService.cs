@@ -323,5 +323,14 @@ namespace eFMS.API.Documentation.DL.Services
             };
             return ((eFMSDataContext)DataContext.DC).ExecuteProcedure<spc_GetListChargeShipmentMaster>(parameters);
         }
+
+        public List<CsShipmentSurchargeDetailsModel> GetByHB(Guid hblid)
+        {
+            List<CsShipmentSurchargeDetailsModel> results = new List<CsShipmentSurchargeDetailsModel>();
+            var data = GetChargeByHouseBill(hblid, string.Empty);
+            if (data.Count == 0) return results;
+            results = mapper.Map<List<CsShipmentSurchargeDetailsModel>>(data);
+            return results;
+        }
     }
 }

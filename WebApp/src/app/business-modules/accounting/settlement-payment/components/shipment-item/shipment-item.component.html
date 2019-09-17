@@ -1,13 +1,15 @@
-<div class="row align-items-center">
+<div class="row align-items-center" *ngIf="!!data">
     <div class="col">
         <div class="d-flex">
             <a class="m--margin-right-10">
                 <i class="la la-angle-double-down"></i>
             </a>
-            <label class="m-checkbox">
-                <input type="checkbox" [(ngModel)]="isCheckAll" (change)="checkUncheckAllRequest()">
-                <span></span>
-            </label>
+            <a (click)="checkUncheckAllRequest($event)">
+                <label class="m-checkbox m-checkbox--bold">
+                    <input type="checkbox" [(ngModel)]="isCheckAll">
+                    <span></span>
+                </label>
+            </a>
             <a>
                 <i class="la la-file-text"></i>
             </a>
@@ -17,32 +19,34 @@
         <div class="d-flex">
             <span class="font-weight-bold">Job:</span>
             &nbsp;
-            xxxxxxxxxx
+            {{data.jobId}}
         </div>
     </div>
     <div class="col">
         <div class="d-flex">
             <span class="font-weight-bold">HBL:</span>
             &nbsp;
-            xxxxxxxxxx
+            {{data.hbl}}
         </div>
     </div>
     <div class="col">
         <div class="d-flex">
             <span class="font-weight-bold">MBL:</span>
             &nbsp;
-            xxxxxxxxxx
+            {{data.mbl}}
         </div>
     </div>
     <div class="col">
         <div class="d-flex">
             <span class="font-weight-bold">Total Amount:</span>
             &nbsp;
-            xxxxxxxxxx
+            {{data.totalAmount | number: '.0-3'}}
+            &nbsp;
+            <span> {{ data.currencyShipment | uppercase }} </span>
         </div>
     </div>
     <div class="col">
-        <a (click)="showPaymentManagement($event)" class="text-underline text-primary">Payment
+        <a (click)="showPaymentManagement($event, data)" class="text-underline text-primary">Payment
             Management</a>
     </div>
 </div>

@@ -29,8 +29,22 @@ namespace eFMS.API.Documentation.DL.Services
         //private ISysUserApiService sysUserApi;
         private readonly ICurrentUser currentUser;
         private readonly IStringLocalizer stringLocalizer;
+        private readonly ICsShipmentSurchargeService surchargeService;
+        private readonly IContextBase<CatPartner> partnerRepository;
+        private readonly IContextBase<SysUser> userRepository;
+        private readonly IContextBase<CatUnit> unitRepository;
+        private readonly IContextBase<CatPlace> placeRepository;
 
-        public OpsTransactionService(IContextBase<OpsTransaction> repository, IMapper mapper, ICurrentUser user, IStringLocalizer<LanguageSub> localizer) : base(repository, mapper)
+
+        public OpsTransactionService(IContextBase<OpsTransaction> repository, 
+            IMapper mapper, 
+            ICurrentUser user, 
+            IStringLocalizer<LanguageSub> localizer, 
+            ICsShipmentSurchargeService surcharge, 
+            IContextBase<CatPartner> partner, 
+            IContextBase<SysUser> userRepo,
+            IContextBase<CatUnit> unitRepo,
+            IContextBase<CatPlace> placeRepo) : base(repository, mapper)
         {
             //catStageApi = stageApi;
             //catplaceApi = placeApi;
@@ -38,6 +52,11 @@ namespace eFMS.API.Documentation.DL.Services
             //sysUserApi = userApi;
             currentUser = user;
             stringLocalizer = localizer;
+            surchargeService = surcharge;
+            partnerRepository = partner;
+            userRepository = userRepo;
+            unitRepository = unitRepo;
+            placeRepository = placeRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -422,6 +441,145 @@ namespace eFMS.API.Documentation.DL.Services
                 return stringLocalizer[LanguageSub.MSG_MAWB_EXISTED, model.Mblno].Value;
             }
             return null;
+        }
+
+        public Crystal PreviewFormPLsheet(Guid id, string currency)
+        {
+            var shipment = DataContext.First(x => x.Id == id);
+            Crystal result = null;
+            var parameter = new FormPLsheetReportParameter
+            {
+                Contact = currentUser.UserName,
+                CompanyName = "CompanyName",
+                CompanyDescription = "CompanyDescription",
+                CompanyAddress1 = "CompanyAddress1",
+                CompanyAddress2 = "CompanyAddress2",
+                Website = "Website",
+                CurrDecimalNo = 2,
+                DecimalNo = 2,
+                HBLList = shipment.Hwbno
+            };
+
+            result = new Crystal
+            {
+                ReportName = "FormPLsheet.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            var dataSources = new List<FormPLsheetReport>{};
+            var agent = partnerRepository.Get(x => x.Id == shipment.AgentId).FirstOrDefault();
+            var supplier = partnerRepository.Get(x => x.Id == shipment.SupplierId).FirstOrDefault();
+            var surcharges = surchargeService.GetByHB(shipment.Hblid);
+            var user = userRepository.Get(x => x.Id == shipment.SalemanId).FirstOrDefault();
+            var units = unitRepository.Get();
+            var polName = placeRepository.Get(x => x.Id == shipment.Pol).FirstOrDefault()?.NameEn;
+            var podName = placeRepository.Get(x => x.Id == shipment.Pod).FirstOrDefault()?.NameEn;
+            if(surcharges != null)
+            {
+                foreach(var item in surcharges)
+                {
+                    var unitCode = units.FirstOrDefault(x => x.Id == item.UnitId)?.Code;
+                    bool isOBH = false;
+                    decimal cost = 0;
+                    decimal revenue = 0;
+                    decimal saleProfit = 0;
+                    string partnerName = string.Empty;
+                    if (item.Type == "OBH")
+                    {
+                        isOBH = true;
+                        partnerName = item.PayerName;
+                    }
+                    if(item.Type == "BUY")
+                    {
+                        cost = item.Total;
+                    }
+                    if(item.Type == "SELL")
+                    {
+                        revenue = item.Total;
+                    }
+                    saleProfit = cost + revenue;
+
+                    var surchargeRpt = new FormPLsheetReport
+                    {
+                        COSTING = "COSTING Test",
+                        TransID = shipment.JobNo,
+                        TransDate = (DateTime)shipment.CreatedDate,
+                        HWBNO = shipment.Hwbno,
+                        MAWB = shipment.Mblno,
+                        PartnerName = "PartnerName",
+                        ContactName = user?.Username,
+                        ShipmentType = "Logistics",
+                        NominationParty = string.Empty,
+                        Nominated = true,
+                        POL = polName,
+                        POD = podName,
+                        Commodity = string.Empty,
+                        Volumne = string.Empty,
+                        Carrier = supplier.PartnerNameEn,
+                        Agent = agent?.PartnerNameEn,
+                        ContainerNo = item.ContNo,
+                        OceanVessel = string.Empty,
+                        LocalVessel = string.Empty,
+                        FlightNo = shipment.FlightVessel,
+                        SeaImpVoy = string.Empty,
+                        LoadingDate = ((DateTime)shipment.ServiceDate).ToString("dd' 'MMM' 'yyyy"),
+                        ArrivalDate = shipment.FinishDate!= null?((DateTime)shipment.FinishDate).ToString("dd' 'MM' 'yyyy"): null,
+                        FreightCustomer = "FreightCustomer",
+                        FreightColoader = 128,
+                        PayableAccount = item.PartnerName,
+                        Description = item.ChargeNameEn,
+                        Curr = item.CurrencyId,
+                        VAT = (decimal)item.Vatrate,
+                        VATAmount = 12,
+                        Cost = cost,
+                        Revenue = revenue,
+                        Exchange = 13,
+                        VNDExchange = 12,
+                        Paid = true,
+                        DatePaid = DateTime.Now,
+                        Docs = item.InvoiceNo,
+                        Notes = item.Notes,
+                        InputData = "InputData",
+                        SalesProfit = saleProfit,
+                        Quantity = item.Quantity,
+                        UnitPrice = (decimal)item.UnitPrice,
+                        Unit = unitCode,
+                        LastRevised = string.Empty,
+                        OBH = isOBH,
+                        ExtRateVND = 34,
+                        KBck = true,
+                        NoInv = true,
+                        Approvedby = string.Empty,
+                        ApproveDate = DateTime.Now,
+                        SalesCurr = currency,
+                        GW = shipment.SumGrossWeight ?? 0,
+                        MCW = 13,
+                        HCW = shipment.SumChargeWeight ?? 0,
+                        PaymentTerm = string.Empty,
+                        DetailNotes = string.Empty,
+                        ExpressNotes = string.Empty,
+                        InvoiceNo = "InvoiceNo",
+                        CodeVender = "CodeVender",
+                        CodeCus = "CodeCus",
+                        Freight = true,
+                        Collect = true,
+                        FreightPayableAt = "FreightPayableAt",
+                        PaymentTime = 1,
+                        PaymentTimeCus = 1,
+                        Noofpieces = 12,
+                        UnitPieaces = "UnitPieaces",
+                        TpyeofService = "TpyeofService",
+                        ShipmentSource = "FREE-HAND",
+                        RealCost = true
+                    };
+                    dataSources.Add(surchargeRpt);
+                }
+            }
+            result.AddDataSource(dataSources);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameter);
+
+            return result;
         }
     }
 }

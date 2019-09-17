@@ -3,7 +3,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Add New Charge</h5>
-                <button type="button" (click)="hide()" class="close">
+                <button type="button" (click)="closePopup()" class="close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -46,7 +46,7 @@
                                                                 <ng-container
                                                                     *ngFor="let charge of charges; let i = index; trackBy: trackByFn">
                                                                     <tr class="data-row " (click)="selectCharge(charge)"
-                                                                        [class.data-selected]="!!selectedCharge && charge.code === selectedCharge.code">
+                                                                        [class.data-selected]="!!selectedCharge && charge.id === selectedCharge.id">
                                                                         <td>{{charge.code}}</td>
                                                                         <td>{{charge.chargeNameEn}}</td>
                                                                         <td>{{charge.chargeNameVn}}</td>
@@ -107,7 +107,7 @@
                                         <div class="form-group">
                                             <label for="">Unit <span class="text-danger">*</span></label>
                                             <select class="form-control" formControlName="unit">
-                                                <option [ngValue]="null">Select Unit</option>
+                                                <option [ngValue]="null" disabled>Select Unit</option>
                                                 <option *ngFor="let unit of units; trackBy: trackByFn" [ngValue]="unit">
                                                     {{unit.code}}</option>
                                             </select>
@@ -150,7 +150,7 @@
                                 </div>
                             </div>
                             <div class="col-4 d-flex justify-content-center align-items-end">
-                                <div class="d-flex">
+                                <div class="d-flex" *ngIf="state === 'create'">
                                     <label class="m-checkbox m-checkbox--bold "
                                         [class.m-checkbox--disabled]="isDisabledOBH">
                                         <input type="checkbox" formControlName="isOBH"
@@ -162,7 +162,9 @@
                             </div>
                             <div class="col-4">
                                 <div class="form-group">
-                                    <label for="">OBH Partner</label>
+                                    <label for="">OBH Partner
+                                        <span class="text-danger" *ngIf="!!selectedCharge && selectedCharge.type === 'OBH'">*</span>
+                                    </label>
                                     <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedOBHPartner"
                                         #OBHPartnerComponent (itemSelected)="onSelectDataFormInfo($event, 'obh')"
                                         [selectedDisplayFields]="configPartner.selectedDisplayFields"
@@ -259,26 +261,29 @@
                         <div class="m--align-center m--margin-top-20">
                             <button
                                 class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                title="Save" (click)="submit()">
+                                title="Save" (click)="saveCharge()"
+                                [disabled]="!form.valid || !selectedShipment.value || !selectedPayer.value || (!!selectedCharge && selectedCharge.type === 'OBH' && !selectedOBHPartner.value)">
                                 <span>
                                     <i class="la la-save"></i>
                                     <span>
-                                        Add
+                                        {{state === 'update' ? 'Update' : 'Add'}}
                                     </span>
                                 </span>
                             </button>
+                            <!-- {{selectedCharge.type === 'OBH' && !selectedOBHPartner.value}} -->
                             <button
                                 class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                title="Save & Send Request">
+                                title="Update & Continue" (click)="updateToContinue()"
+                                [disabled]="!form.valid || !selectedShipment.value || !selectedPayer.value || (!!selectedCharge && selectedCharge.type === 'OBH' && !selectedOBHPartner.value)">
                                 <span>
                                     <i class="la la-download"></i>
                                     <span>
-                                        Add & Continue
+                                        {{state === 'Add & Continue' ? 'Update' : 'Update & Continue'}}
                                     </span>
                                 </span>
                             </button>
                             <button class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" title="Cancel"
-                                (click)="hide()">
+                                (click)="closePopup()">
                                 <span>
                                     <i class="la la-ban"></i>
                                     <span>
