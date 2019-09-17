@@ -286,6 +286,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         // await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.opsTransaction, false, false);
     }
 
+
     /**
      * get container information of a job
      * @param listContainers list of container

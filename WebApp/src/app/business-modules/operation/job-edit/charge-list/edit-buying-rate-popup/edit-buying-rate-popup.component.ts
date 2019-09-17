@@ -25,7 +25,7 @@ export class EditBuyingRatePopupComponent extends PopupBase implements OnInit, O
     lstPartners: any[] = [];
     lstUnits: any[] = [];
     lstCurrencies: any[] = [];
-    currentActiveItemDefault: { id: null, text: null }[] = [];
+    currentActiveItemDefault: any[] = [];
     buyingRateChargeActive = [];
     exchangeRateDate: any;
     invoiceDate: any;

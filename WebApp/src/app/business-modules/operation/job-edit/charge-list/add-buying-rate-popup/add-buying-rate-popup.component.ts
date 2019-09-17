@@ -29,6 +29,7 @@ export class AddBuyingRatePopupComponent extends PopupBase implements OnInit, On
     objectBePaidActive: any[] = [];
 
     invoiceDate: any;
+
     constructor(
         private baseServices: BaseService,
         private api_menu: API_MENU,

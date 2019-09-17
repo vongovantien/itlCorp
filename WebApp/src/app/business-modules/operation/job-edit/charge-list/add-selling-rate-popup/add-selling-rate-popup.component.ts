@@ -20,7 +20,7 @@ export class AddSellingRatePopupComponent extends PopupBase implements OnInit {
 
     lstSellingRateChargesComboBox: any[] = [];
     sellingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
-    currentActiveItemDefault: { id: null, text: null }[] = [];
+    currentActiveItemDefault: any[] = [];
     lstPartners: any[] = [];
     lstUnits: any[] = [];
     lstCurrencies: any[] = [];
