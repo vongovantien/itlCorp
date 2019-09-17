@@ -57,8 +57,6 @@
                                                 { 'text': 'CUSTOMER','id': 'CUSTOMER' },
                                                 { 'text': 'OTHER', 'id': 'OTHER' }]" [active]="objectBePaidActive"
                     (selected)="sellingRateChargeToAdd.objectBePaid=$event.id;
-                                        objectBePaidActive.id = $event.id; 
-                                        objectBePaidActive.text=$event.id;
                                         sellingRateChargeToAdd.objectBePaid==='AGENT'? sellingRateChargeToAdd.paymentObjectId=opsTransaction.agentId:null;
                                         sellingRateChargeToAdd.objectBePaid==='CUSTOMER'? sellingRateChargeToAdd.paymentObjectId=opsTransaction.customerId:null;
                                         sellingRateChargeToAdd.objectBePaid==='OTHER'? sellingRateChargeToAdd.paymentObjectId=null:null;"

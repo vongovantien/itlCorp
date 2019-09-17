@@ -57,8 +57,6 @@
                                                 { 'text': 'SHIPPING LINE','id': 'SHIPPING' },
                                                 { 'text': 'OTHER', 'id': 'OTHER' }]" [active]="objectBePaidActive"
                     (selected)="buyingRateChargeToAdd.objectBePaid=$event.id;
-                                                    objectBePaidActive.id = $event.id; 
-                                                    objectBePaidActive.text=$event.id;
                                                     buyingRateChargeToAdd.objectBePaid==='AGENT'? buyingRateChargeToAdd.paymentObjectId=opsTransaction.agentId:null;
                                                     buyingRateChargeToAdd.objectBePaid==='SHIPPING'? buyingRateChargeToAdd.paymentObjectId=opsTransaction.supplierId:null;
                                                     buyingRateChargeToAdd.objectBePaid==='OTHER'? buyingRateChargeToAdd.paymentObjectId=null:null;"
