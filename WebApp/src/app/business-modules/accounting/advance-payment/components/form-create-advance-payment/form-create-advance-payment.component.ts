@@ -86,8 +86,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
                 map((data: any) => data.startDate)
             )
             .subscribe((value: any) => {
-                console.log(value);
-                this.maxDateDeadLine = value;
+                this.maxDateDeadLine = value.startDate;
                 setTimeout(() => {
                     this.deadLine.setValue({
                         startDate: new Date(new Date(value).setDate(new Date(value).getDate() + 9)),
