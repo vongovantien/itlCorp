@@ -1019,7 +1019,7 @@ namespace eFMS.API.Documentation.DL.Services
                            Customer = cus.PartnerNameVn,
                            Consignee = cnee.PartnerNameVn,
                            Consigner = cner.PartnerNameVn,
-                           ContainerQty = opst.SumContainers.Value.ToString(),
+                           ContainerQty = opst.SumContainers.HasValue ? opst.SumContainers.Value.ToString() + "/" : "",
                            GW = opst.SumGrossWeight,
                            NW = opst.SumNetWeight,
                            CustomsId = sur.ClearanceNo,
