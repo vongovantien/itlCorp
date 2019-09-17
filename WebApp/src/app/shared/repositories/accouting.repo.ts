@@ -306,16 +306,10 @@ export class AccoutingRepo {
             );
     }
 
-    previewSettlementPayment(param: any) {
-        if (typeof param === 'string') {
-            return this._api.post(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/PreviewSettlementPaymentRequestBySettlementId`, null, { settlementId: param }).pipe(
-                map((data: any) => data)
-            );
-        } else {
-            return this._api.post(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/PreviewSettlementPaymentRequest`, param).pipe(
-                map((data: any) => data)
-            );
-        }
+    previewSettlementPayment(settlementNo: any) {
+        return this._api.post(`${environment.HOST.WEB_URL}/doc.local/api/${this.VERSION}/en-US/AcctSettlementPayment/Preview`, null, { settlementNo: settlementNo }).pipe(
+            map((data: any) => data)
+        );
     }
 
 }

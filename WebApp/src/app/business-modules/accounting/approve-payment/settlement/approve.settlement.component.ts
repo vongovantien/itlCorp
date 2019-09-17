@@ -181,7 +181,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
     }
 
     preview() {
-        this._accoutingRepo.previewSettlementPayment(this.settlementPayment.settlement.id)
+        this._accoutingRepo.previewSettlementPayment(this.settlementPayment.settlement.settlementNo)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
