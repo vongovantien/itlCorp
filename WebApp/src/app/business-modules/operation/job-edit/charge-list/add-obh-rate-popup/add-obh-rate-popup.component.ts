@@ -17,7 +17,7 @@ export class AddObhRatePopupComponent extends PopupBase implements OnInit {
     @Input() opsTransaction: OpsTransaction = null;
     @Output() outputAddOBH = new EventEmitter<any>();
 
-    currentActiveItemDefault: { id: null, text: null }[] = [];
+    currentActiveItemDefault: any[] = [];
     obhChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
     lstOBHChargesComboBox: any[] = [];
     lstPartners: any[] = [];

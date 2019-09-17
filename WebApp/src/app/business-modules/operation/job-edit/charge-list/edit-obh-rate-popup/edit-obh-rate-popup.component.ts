@@ -24,7 +24,7 @@ export class EditObhRatePopupComponent extends PopupBase implements OnInit, OnCh
     lstCurrencies: any[] = [];
     lstUnits: any[] = [];
     lstPartners: any[] = [];
-    currentActiveItemDefault: { id: null, text: null }[] = [];
+    currentActiveItemDefault: any[] = [];
     obhChargeActive: any[] = [];
     exchangeRateDate: any;
     invoiceDate: any;
