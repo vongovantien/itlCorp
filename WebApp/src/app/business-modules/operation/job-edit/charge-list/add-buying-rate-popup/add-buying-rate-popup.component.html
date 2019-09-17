@@ -7,7 +7,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Add buying charge</h5>
-          <button type="button" class="close" aria-label="Close" (click)="close(addBuyingRateChargeFormOps)">
+          <button type="button" class="close" aria-label="Close" (click)="close(addBuyingRateChargeFormOps); hide()">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -55,8 +55,10 @@
                   <ng-select [allowClear]="true" [items]="[
                                                 { 'text': 'AGENT', 'id': 'AGENT' },
                                                 { 'text': 'SHIPPING LINE','id': 'SHIPPING' },
-                                                { 'text': 'OTHER', 'id': 'OTHER' }]"
+                                                { 'text': 'OTHER', 'id': 'OTHER' }]" [active]="objectBePaidActive"
                     (selected)="buyingRateChargeToAdd.objectBePaid=$event.id;
+                                                    objectBePaidActive.id = $event.id; 
+                                                    objectBePaidActive.text=$event.id;
                                                     buyingRateChargeToAdd.objectBePaid==='AGENT'? buyingRateChargeToAdd.paymentObjectId=opsTransaction.agentId:null;
                                                     buyingRateChargeToAdd.objectBePaid==='SHIPPING'? buyingRateChargeToAdd.paymentObjectId=opsTransaction.supplierId:null;
                                                     buyingRateChargeToAdd.objectBePaid==='OTHER'? buyingRateChargeToAdd.paymentObjectId=null:null;"
@@ -287,7 +289,7 @@
             </span>
           </button>
           <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-            (click)="close(addBuyingRateChargeFormOps)">
+            (click)="close(addBuyingRateChargeFormOps); hide()">
             <span>
               <i class="la la-ban"></i>
               <span>

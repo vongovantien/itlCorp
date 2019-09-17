@@ -662,7 +662,8 @@
             <summary>
             preview Form PL sheet
             </summary>
-            <param name="id"></param>
+            <param name="jobId"></param>
+            <param name="currency"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Documentation.Controllers.ShipmentController">

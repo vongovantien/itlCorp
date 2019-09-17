@@ -66,7 +66,7 @@ export class JobManagementSellingRateComponent extends AppList {
     }
 
     prepareEditCharge(charge: CsShipmentSurcharge) {
-        this.SellingRateChargeToEdit = cloneDeep(charge);
+        this.SellingRateChargeToEdit = charge;
         if (this.SellingRateChargeToEdit) {
             setTimeout(() => {
                 this.editSellingRatePopup.show({ backdrop: 'static' });

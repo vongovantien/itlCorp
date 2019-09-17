@@ -73,10 +73,10 @@ export class JobManagementOBHComponent extends AppList {
     }
 
     prepareEditCharge(charge: any) {
-        this.OBHChargeToEdit = cloneDeep(charge);
+        this.OBHChargeToEdit = charge;
         if (this.OBHChargeToEdit) {
             setTimeout(() => {
-                this.editOHBRatePopup.show({ backdrop: 'static' });
+                this.editOHBRatePopup.show();
             }, 100);
         }
     }
