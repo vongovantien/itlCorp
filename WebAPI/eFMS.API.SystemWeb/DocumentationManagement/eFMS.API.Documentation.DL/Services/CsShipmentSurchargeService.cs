@@ -10,6 +10,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -21,18 +22,10 @@ namespace eFMS.API.Documentation.DL.Services
 {
     public class CsShipmentSurchargeService : RepositoryBase<CsShipmentSurcharge, CsShipmentSurchargeModel>, ICsShipmentSurchargeService
     {
-        public CsShipmentSurchargeService(IContextBase<CsShipmentSurcharge> repository, IMapper mapper) : base(repository, mapper)
+        private readonly IStringLocalizer stringLocalizer;
+        public CsShipmentSurchargeService(IContextBase<CsShipmentSurcharge> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer) : base(repository, mapper)
         {
-
-        }
-        public override HandleState Add(CsShipmentSurchargeModel model)
-        {
-            model.Id = Guid.NewGuid();
-            model.ExchangeDate = DateTime.Now;
-            model.DatetimeCreated = DateTime.Now;
-            //var entity = mapper.Map<CsShipmentSurcharge>(model);
-            var result = this.Add(model);
-            return result;
+            stringLocalizer = localizer;
         }
 
         public HandleState DeleteCharge(Guid chargeId)
@@ -42,10 +35,10 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var charge = DataContext.Where(x => x.Id == chargeId).FirstOrDefault();
                 if (charge == null)
-                    hs = new HandleState("Charge not found! ");
+                    hs = new HandleState(stringLocalizer[LanguageSub.MSG_SURCHARGE_NOT_FOUND].Value);
                 if (charge != null && (charge.CreditNo != null || charge.Soano != null))
                 {
-                    hs = new HandleState("Cannot delete, this charge is containing Credit Debit Note/SOA no!");
+                    hs = new HandleState(stringLocalizer[LanguageSub.MSG_SURCHARGE_NOT_ALLOW_DELETED].Value);
                 }
                 else
                 {
