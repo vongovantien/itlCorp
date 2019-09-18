@@ -222,9 +222,9 @@ namespace eFMS.API.Documentation.DL.Services
                 RequesterName = s.Key.RequesterName,
                 RequestDate = s.Key.RequestDate,
                 StatusApproval = s.Key.StatusApproval,
-                StatusApprovalName = CustomData.StatusApproveAdvance.Where(x => x.Value == s.Key.StatusApproval).Select(x => x.DisplayName).FirstOrDefault(),
+                StatusApprovalName = Common.CustomData.StatusApproveAdvance.Where(x => x.Value == s.Key.StatusApproval).Select(x => x.DisplayName).FirstOrDefault(),
                 PaymentMethod = s.Key.PaymentMethod,
-                PaymentMethodName = CustomData.PaymentMethod.Where(x => x.Value == s.Key.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
+                PaymentMethodName = Common.CustomData.PaymentMethod.Where(x => x.Value == s.Key.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
                 Note = s.Key.Note
             }
             ).OrderByDescending(orb => orb.DatetimeModified);

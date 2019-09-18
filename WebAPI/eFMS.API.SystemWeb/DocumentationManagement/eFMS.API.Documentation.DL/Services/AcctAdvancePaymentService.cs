@@ -183,9 +183,9 @@ namespace eFMS.API.Documentation.DL.Services
                 StatusApproval = s.Key.StatusApproval,
                 AdvanceStatusPayment = s.Key.AdvanceStatusPayment,
                 PaymentMethod = s.Key.PaymentMethod,
-                PaymentMethodName = CustomData.PaymentMethod.Where(x => x.Value == s.Key.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
+                PaymentMethodName = Common.CustomData.PaymentMethod.Where(x => x.Value == s.Key.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
                 Amount = s.Sum(su => su.Amount),
-                StatusApprovalName = CustomData.StatusApproveAdvance.Where(x => x.Value == s.Key.StatusApproval).Select(x => x.DisplayName).FirstOrDefault()
+                StatusApprovalName = Common.CustomData.StatusApproveAdvance.Where(x => x.Value == s.Key.StatusApproval).Select(x => x.DisplayName).FirstOrDefault()
             }
             ).OrderByDescending(orb => orb.DatetimeModified);
 
