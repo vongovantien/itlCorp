@@ -21,7 +21,6 @@ export class AppMultipleSelectComponent extends AppPage {
     }
 
     ngOnInit() {
-        this.isCheckAll = this.source.every((item: any) => item.isSelected);
     }
 
     ngOnChanges() {
@@ -35,7 +34,6 @@ export class AppMultipleSelectComponent extends AppPage {
                 }
             }
             this.isCheckAll = this.source.every((item: any) => item.isSelected);
-
         }
     }
 
