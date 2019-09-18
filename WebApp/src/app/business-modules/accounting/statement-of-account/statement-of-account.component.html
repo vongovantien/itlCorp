@@ -1,19 +1,14 @@
 <app-sub-header>
-    <div class="d-flex align-items-center">
-        <div class="mr-auto">
-            <app-breadcrumb></app-breadcrumb>
-        </div>
-        <div class="c-button-actions">
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                [routerLink]="'/home/accounting/statement-of-account/new'">
+    <div class="c-button-actions">
+        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+            [routerLink]="'/home/accounting/statement-of-account/new'">
+            <span>
+                <i class="la la-plus"></i>
                 <span>
-                    <i class="la la-plus"></i>
-                    <span>
-                        add new
-                    </span>
+                    add new
                 </span>
-            </button>
-        </div>
+            </span>
+        </button>
     </div>
 </app-sub-header>
 
@@ -40,7 +35,8 @@
                                                 <tr>
                                                     <th class="table-actions-col"></th>
                                                     <th *ngFor="let header of headers; let i = index; trackBy: trackByFn"
-                                                        [class]="sortClass(header.sortable ? header.field : '')" (click)="sortBy(header.sortable ? header.field : '')">
+                                                        [class]="sortClass(header.sortable ? header.field : '')"
+                                                        (click)="sortBy(header.sortable ? header.field : '')">
                                                         <span>{{header.title}}</span>
                                                         <span class="sort-indicator"></span>
                                                     </th>
@@ -67,7 +63,8 @@
                                                         </div>
                                                     </td>
                                                     <td class="text-underline">
-                                                        <a [routerLink]="['/home/accounting/statement-of-account/detail/']" [queryParams]="{no: soa.soano, currency: 'VND'}">{{soa.soano}}</a>
+                                                        <a [routerLink]="['/home/accounting/statement-of-account/detail/']"
+                                                            [queryParams]="{no: soa.soano, currency: 'VND'}">{{soa.soano}}</a>
                                                     </td>
                                                     <td>
                                                         <span>{{soa.partnerName}}</span>
@@ -76,14 +73,20 @@
                                                         <span>{{soa.shipment}}</span>
                                                     </td>
                                                     <td>
-                                                        <span>{{soa.creditAmount | number :'.0-2'}} {{soa.currency}}</span>
+                                                        <span>{{soa.creditAmount | number :'.0-2'}}
+                                                            {{soa.currency}}</span>
                                                     </td>
                                                     <td>
-                                                        <span>{{soa.debitAmount | number: '.0-2'}} {{soa.currency}}</span>
+                                                        <span>{{soa.debitAmount | number: '.0-2'}}
+                                                            {{soa.currency}}</span>
                                                     </td>
                                                     <td>
-                                                        <span *ngIf="soa.totalAmount >= 0">{{soa.totalAmount | number: '.0-2' }} {{soa.currency}}</span>
-                                                        <span *ngIf="soa.totalAmount < 0">({{soa.totalAmount | abs | number: '.0-2' }}) {{soa.currency}}</span>
+                                                        <span
+                                                            *ngIf="soa.totalAmount >= 0">{{soa.totalAmount | number: '.0-2' }}
+                                                            {{soa.currency}}</span>
+                                                        <span
+                                                            *ngIf="soa.totalAmount < 0">({{soa.totalAmount | abs | number: '.0-2' }})
+                                                            {{soa.currency}}</span>
 
                                                     </td>
                                                     <td>
@@ -130,7 +133,8 @@
                                             <div class="col-sm-6" *ngIf="totalItems > pageSize">
                                                 <div class="float-right">
                                                     <pagination [boundaryLinks]="true" [totalItems]="totalItems"
-                                                        [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)" [(ngModel)]="page">
+                                                        [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
+                                                        [(ngModel)]="page">
                                                     </pagination>
                                                 </div>
                                             </div>
