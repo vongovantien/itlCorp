@@ -233,6 +233,11 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// Check duplicate shipment settlement
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
         [HttpPost("CheckDuplicateShipmentSettlement")]
         public IActionResult CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria)
         {
@@ -472,12 +477,17 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// Preview Settlement 
+        /// </summary>
+        /// <param name="settlementNo"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Preview")]
         public IActionResult Preview(string settlementNo)
         {
-            var result = acctSettlementPaymentService.Preview(settlementNo);
-            return Ok(result);
+            var data = acctSettlementPaymentService.Preview(settlementNo);         
+            return Ok(data);
         }
     }
 }
