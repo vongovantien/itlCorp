@@ -109,6 +109,9 @@ namespace eFMS.API.Documentation.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
             model.UserCreated = currentUser.UserID;
+            model.Id = Guid.NewGuid();
+            model.ExchangeDate = DateTime.Now;
+            model.DatetimeCreated = DateTime.Now;
             var hs = csShipmentSurchargeService.Add(model);           
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

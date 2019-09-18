@@ -53,5 +53,8 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string MSG_MAWBCONTAINER_COMMODITY_NAME_NOT_FOUND = "MSG_MAWBCONTAINER_COMMODITY_NAME_NOT_FOUND";
         public static readonly string MSG_MAWBCONTAINER_UNIT_OF_MEASURE_NOT_FOUND = "MSG_MAWBCONTAINER_UNIT_OF_MEASURE_NOT_FOUND";
         public static readonly string MSG_MAWBCONTAINER_QUANTITY_MUST_BE_1 = "MSG_MAWBCONTAINER_QUANTITY_MUST_BE_1";
+
+        public static readonly string MSG_SURCHARGE_NOT_FOUND = "MSG_SURCHARGE_NOT_FOUND";
+        public static readonly string MSG_SURCHARGE_NOT_ALLOW_DELETED = "MSG_SURCHARGE_NOT_ALLOW_DELETED";
     }
 }

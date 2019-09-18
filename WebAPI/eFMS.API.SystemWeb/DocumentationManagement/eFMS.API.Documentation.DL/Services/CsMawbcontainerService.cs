@@ -124,11 +124,11 @@ namespace eFMS.API.Documentation.DL.Services
                         foreach (var item in list)
                         {
                             sumCont = sumCont + (int)item.Quantity;
-                            sumGW = sumGW + item.Gw != null?(long)item.Gw: 0;
-                            sumNW = sumNW + item.Nw != null?(long)item.Nw: 0;
-                            sumCW = sumCW + item.ChargeAbleWeight != null?(long)item.ChargeAbleWeight: 0;
-                            sumCBM = sumCBM + item.Cbm != null? (long)item.Cbm: 0;
-                            sumPackages = sumPackages + item.PackageQuantity != null? (int)item.PackageQuantity: 0;
+                            sumGW = sumGW + (item.Gw != null?(long)item.Gw: 0);
+                            sumNW = sumNW + (item.Nw != null?(long)item.Nw: 0);
+                            sumCW = sumCW + (item.ChargeAbleWeight != null?(long)item.ChargeAbleWeight: 0);
+                            sumCBM = sumCBM + (item.Cbm != null? (long)item.Cbm: 0);
+                            sumPackages = sumPackages + (item.PackageQuantity != null? (int)item.PackageQuantity: 0);
                             if (ht.ContainsKey(item.ContainerTypeName))
                             {
                                 var sumContDes = Convert.ToInt32(ht[item.ContainerTypeName]) + item.Quantity;
@@ -141,7 +141,7 @@ namespace eFMS.API.Documentation.DL.Services
                             if (item.Id == Guid.Empty)
                             {
                                 item.Id = Guid.NewGuid();
-                                item.UserModified = "admin";//currentUser.UserID;
+                                item.UserModified = currentUser.UserID;
                                 item.Mblid = (Guid)masterId;
                                 item.DatetimeModified = DateTime.Now;
                                 var hs = Add(item, false);
@@ -150,7 +150,7 @@ namespace eFMS.API.Documentation.DL.Services
                             {
                                 if (DataContext.Count(x => x.Id == item.Id) == 1)
                                 {
-                                    item.UserModified = "admin";//currentUser.UserID;
+                                    item.UserModified = currentUser.UserID;
                                     item.DatetimeModified = DateTime.Now;
                                     var hs = Update(item, x => x.Id == item.Id, false);
                                 }
@@ -175,7 +175,7 @@ namespace eFMS.API.Documentation.DL.Services
                             opstrans.SumContainers = sumCont != 0 ? (int?)sumCont : null ;
                             opstrans.ContainerDescription = containerDes;
                             opstrans.ModifiedDate = DateTime.Now;
-                            opstrans.UserModified = "admin";// currentUser.UserID;
+                            opstrans.UserModified = currentUser.UserID;
                             opsTransRepository.Update(opstrans, x => x.Id == masterId, false);
                         }
                         DataContext.SubmitChanges();

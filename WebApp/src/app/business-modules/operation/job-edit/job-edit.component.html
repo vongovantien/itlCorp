@@ -336,8 +336,9 @@
                                                         <app-combo-grid-virtual-scroll
                                                             [currentActiveItemId]="{field:'id',value:opsTransaction.warehouseId}"
                                                             (itemSelected)="opsTransaction.warehouseId = $event.id"
-                                                            [selectedDisplayFields]="['nameEn']" [dataSources]="ports"
-                                                            [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                                                            [selectedDisplayFields]="['nameEn']"
+                                                            [dataSources]="warehouses"
+                                                            [displayFields]="[{'field':'code','label':'Code'},{'field':'nameEn','label':'Warehouse Name'},{'field':'countryNameEN','label':'Country'}]">
                                                         </app-combo-grid-virtual-scroll>
                                                     </div>
                                                 </div>

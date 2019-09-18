@@ -271,43 +271,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
     async saveContainers(event) {
         this.opsTransaction.csMawbcontainers = event;
-        // let containers = '';
-        // if (this.opsTransaction.csMawbcontainers != null) {
-        //     for (let i = 0; i < this.opsTransaction.csMawbcontainers.length; i++) {
-        //         containers = containers + this.opsTransaction.csMawbcontainers[i].quantity + "x" + this.opsTransaction.csMawbcontainers[i].containerTypeName;
-        //         if (i < this.opsTransaction.csMawbcontainers.length - 1) {
-        //             containers = containers + ";";
-        //         }
-        //     }
-        // }
-        // this.opsTransaction.containerDescription = containers;
         this.getListContainersOfJob();
-        // this.getGoodInfomation(this.opsTransaction.csMawbcontainers);
-        // await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.opsTransaction, false, false);
-    }
-
-
-    /**
-     * get container information of a job
-     * @param listContainers list of container
-     */
-    getGoodInfomation(listContainers) {
-        this.opsTransaction.sumGrossWeight = 0;
-        this.opsTransaction.sumNetWeight = 0;
-        this.opsTransaction.sumChargeWeight = 0;
-        this.opsTransaction.sumCbm = 0;
-        this.opsTransaction.sumContainers = 0;
-        this.opsTransaction.sumPackages = 0;
-        // tslint:disable-next-line: prefer-for-of
-        for (let i = 0; i < listContainers.length; i++) {
-            listContainers[i].isSave = true;
-            this.opsTransaction.sumGrossWeight = this.opsTransaction.sumGrossWeight + listContainers[i].gw;
-            this.opsTransaction.sumNetWeight = this.opsTransaction.sumNetWeight + listContainers[i].nw;
-            this.opsTransaction.sumChargeWeight = this.opsTransaction.sumChargeWeight + listContainers[i].chargeAbleWeight;
-            this.opsTransaction.sumCbm = this.opsTransaction.sumCbm + listContainers[i].cbm;
-            this.opsTransaction.sumContainers = this.opsTransaction.sumContainers + listContainers[i].quantity;
-            this.opsTransaction.sumPackages = this.opsTransaction.sumPackages + listContainers[i].packageQuantity;
-        }
+        this.getShipmentDetails(this.opsTransaction.id);
     }
     // -------------    End Container   -------------------//
 

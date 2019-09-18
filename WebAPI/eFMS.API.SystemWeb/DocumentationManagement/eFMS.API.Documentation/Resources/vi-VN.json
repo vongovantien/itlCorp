@@ -32,5 +32,8 @@
   "MSG_MAWBCONTAINER_EXISTED": "Data (Cont Type '{0}' & Cont Q'ty '{1}' & Container No '{2}' & Package Type '{3}') has been existed",
   "MSG_MAWBCONTAINER_COMMODITY_NAME_NOT_FOUND": "Commodity name is not found",
   "MSG_MAWBCONTAINER_UNIT_OF_MEASURE_NOT_FOUND": "Unit of measure name is not found",
-  "MSG_MAWBCONTAINER_QUANTITY_MUST_BE_1": "Quantity must be 1"
+  "MSG_MAWBCONTAINER_QUANTITY_MUST_BE_1": "Quantity must be 1",
+
+  "MSG_SURCHARGE_NOT_FOUND": "Charge not found!",
+  "MSG_SURCHARGE_NOT_ALLOW_DELETED": "Cannot delete, this charge is containing Credit Debit Note/SOA no!"
 }
