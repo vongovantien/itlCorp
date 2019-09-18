@@ -18,7 +18,6 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap';
 @Component({
     selector: 'app-approve-settlement',
     templateUrl: './approve.settlement.component.html',
-
 })
 
 export class ApporveSettlementPaymentComponent extends AppPage {
@@ -111,7 +110,6 @@ export class ApporveSettlementPaymentComponent extends AppPage {
             .subscribe(
                 (res: any) => {
                     this.approveInfo = res;
-                    console.log(this.approveInfo);
                 },
             );
     }
@@ -149,7 +147,6 @@ export class ApporveSettlementPaymentComponent extends AppPage {
             )
             .subscribe(
                 (res: any) => {
-                    console.log(res);
                     if (res.status) {
                         this._toastService.success(res.message, ' Approve Is Successfull');
                         this.getInfoApproveSettlement(this.settlementPayment.settlement.settlementNo)

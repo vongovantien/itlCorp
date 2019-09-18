@@ -45,7 +45,7 @@
                                     <tr *ngIf="!data.advancePayment.length" app-table-none-record
                                         [colspan]="headerAdvance.length"></tr>
                                     <ng-container *ngIf="!!data.advancePayment.length">
-                                        <tr *ngFor="let advance of data.advancePayment; trackBy: trackByFn">
+                                        <tr *ngFor="let advance of data.advancePayment; trackBy: trackByFn" class="text-center">
                                             <td>{{advance.advanceNo}}</td>
                                             <td>{{advance.description}}</td>
                                             <td>{{advance.totalAmount | number: '.0-3'}}</td>
@@ -72,7 +72,7 @@
                                     <tr *ngIf="!data.settlementPayment.length" app-table-none-record
                                         [colspan]="headerSettlement.length"></tr>
                                     <ng-container *ngIf="!!data.settlementPayment.length">
-                                        <tr *ngFor="let settlement of data.settlementPayment; trackBy: trackByFn">
+                                        <tr *ngFor="let settlement of data.settlementPayment; trackBy: trackByFn" class="text-center">
                                             <td>{{settlement.settlementNo}}</td>
                                             <td>{{settlement.chargeName}}</td>
                                             <td>{{settlement.amount | number: '.0-3'}}</td>

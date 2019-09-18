@@ -1,0 +1,16 @@
+:host {
+    .table-wrapper {
+        &.table-scrollable {
+            .table-actions-col{
+                min-width: 80px !important;
+            }
+            thead {
+                tr {
+                    th {
+                        min-width: 80px;
+                    }
+                }
+            }
+        }
+    }
+}

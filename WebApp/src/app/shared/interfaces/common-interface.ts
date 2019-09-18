@@ -3,6 +3,8 @@ namespace CommonInterface {
         title: string;
         field: string;
         sortable?: boolean;
+        class?: string;
+        width?: number;
     }
 
     export interface IComboGirdConfig {

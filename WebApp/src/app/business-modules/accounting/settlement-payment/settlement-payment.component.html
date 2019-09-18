@@ -1,4 +1,4 @@
-<div class="advance-payment-page">
+<div class="advance-payment-page m-animate-fade-in">
     <app-sub-header>
         <div class="c-button-actions">
             <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
@@ -21,7 +21,7 @@
         </div>
     </app-sub-header>
     <div class="m-content">
-        
+
         <settle-payment-form-search (onSearch)="onSearchSettlement($event)"></settle-payment-form-search>
 
         <div class="m-portlet">
@@ -53,25 +53,22 @@
                                                         data-toggle="collapse"
                                                         [attr.data-target]="'#ops-shipment-00' + (settlePayment.id+1)"
                                                         title="Collapse"
-                                                        (click)="showCustomClearance(settlePayment.settlementNo, i)">
+                                                        (click)="showSurcharge(settlePayment.settlementNo, i)">
                                                         <i class="la la-angle-up"></i>
                                                     </button>
-                                                    <span
+                                                    <ng-container
                                                         *ngIf="settlePayment.statusApproval === 'New' || settlePayment.statusApproval === 'Denied'">
-                                                        <a title="Delete settle payment" class="pointer"
+                                                        <a title="Delete" class="pointer"
                                                             (click)="showDeletePopup(settlePayment)">
                                                             <i class="la la-trash text-danger"></i>
                                                         </a>
+                                                    </ng-container>
+                                                    <span>
+                                                        <a title="Preview" class="pointer"
+                                                            (click)="printSettlement(settlePayment.settlementNo)">
+                                                            <i class="la la-file-text-o"></i>
+                                                        </a>
                                                     </span>
-                                                </div>
-
-                                            </td>
-                                            <td class="table-actions-col">
-                                                <div class="table-actions">
-                                                    <label class="m-checkbox m-checkbox--bold">
-                                                        <input type="checkbox">
-                                                        <span></span>
-                                                    </label>
                                                 </div>
                                             </td>
                                             <td class="text-underline text-primary pointer">
@@ -146,7 +143,7 @@
                             </table>
                         </div>
                     </perfect-scrollbar>
-                    <div class="pagination-nav">
+                    <div class="pagination-nav ">
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="tatable__pager-size">
@@ -180,3 +177,7 @@
 
 <confirm-popup [body]="'Do you want to delete?'" [labelConfirm]="'Yes'" (onSubmit)="onDeleteSettlemenPayment()">
 </confirm-popup>
+
+<ng-container *ngIf="dataReport">
+    <app-report-preview [data]="dataReport"></app-report-preview>
+</ng-container>

@@ -127,6 +127,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
 
                     // *SWITCH UI TO GROUP LIST SHIPMENT
                     this.requestSurchargeListComponent.TYPE = 'GROUP'; // ? LIST
+                    this.requestSurchargeListComponent.STATE = 'WRITE'; // ? READ
 
                     if (this.requestSurchargeListComponent.groupShipments.length) {
                         this.requestSurchargeListComponent.openAllCharge.next(true);

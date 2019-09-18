@@ -38,7 +38,7 @@ export class SettlementListChargeComponent extends AppList {
     settlementCode: string = '';
 
     TYPE: string = 'LIST';
-    STATE: string = 'WRITE';  // * list'state READ/WRITE
+    STATE: string = '';  // * list'state READ/WRITE
 
     constructor(
         private _sortService: SortService,

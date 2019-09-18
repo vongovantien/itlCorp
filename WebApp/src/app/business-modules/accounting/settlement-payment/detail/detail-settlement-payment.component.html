@@ -4,12 +4,6 @@
         <div class="m-form">
             <div class="m-portlet__body">
                 <settle-payment-form-create (onChangeCurrency)="onChangeCurrency($event)"></settle-payment-form-create>
-            </div>
-        </div>
-    </div>
-    <div class="m-portlet">
-        <div class="m-form">
-            <div class="m-portlet__body">
                 <div class="row" *ngIf="!!settlementPayment">
                     <div class="col-6">
                         <div class="m--align-left">
@@ -26,7 +20,13 @@
                         </div>
                     </div>
                 </div>
-
+            </div>
+        </div>
+    </div>
+    <div class="m-portlet">
+        <div class="m-form">
+            <div class="m-portlet__body">
+               
                 <settle-payment-list-charge></settle-payment-list-charge>
                 
                 <div class="row">

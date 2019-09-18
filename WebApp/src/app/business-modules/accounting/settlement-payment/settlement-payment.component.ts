@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import { catchError, finalize, map, } from 'rxjs/operators';
 import { User, SettlementPayment } from 'src/app/shared/models';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { ReportPreviewComponent } from 'src/app/shared/common';
 
 @Component({
     selector: 'app-settlement-payment',
@@ -16,6 +17,7 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 export class SettlementPaymentComponent extends AppList {
 
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
 
     headers: CommonInterface.IHeaderTable[];
     settlements: SettlementPayment[] = [];
@@ -27,6 +29,8 @@ export class SettlementPaymentComponent extends AppList {
     headerCustomClearance: CommonInterface.IHeaderTable[];
 
     userLogged: User;
+    dataReport: any = null;
+
     constructor(
         private _accoutingRepo: AccoutingRepo,
         private _toastService: ToastrService,
@@ -45,8 +49,7 @@ export class SettlementPaymentComponent extends AppList {
     ngOnInit() {
         this.headers = [
             { title: '', field: '' },
-            { title: 'Settlemenent No', field: 'settlementNo', sortable: true },
-
+            { title: 'Settlement No', field: 'settlementNo', sortable: true },
             { title: 'Amount', field: 'amount', sortable: true },
             { title: 'Currency', field: 'chargeCurrency', sortable: true },
             { title: 'Requester', field: 'requester', sortable: true },
@@ -68,7 +71,7 @@ export class SettlementPaymentComponent extends AppList {
 
     }
 
-    showCustomClearance(settlementNo: string, indexsSettle: number) {
+    showSurcharge(settlementNo: string, indexsSettle: number) {
         if (!!this.settlements[indexsSettle].settleRequests.length) {
             this.customClearances = this.settlements[indexsSettle].settleRequests;
         } else {
@@ -194,6 +197,25 @@ export class SettlementPaymentComponent extends AppList {
         }
 
     }
+
+    printSettlement(settlementNo: string) {
+        this._accoutingRepo.previewSettlementPayment(settlementNo)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    setTimeout(() => {
+                        this.previewPopup.show();
+                    }, 1000);
+
+                },
+            );
+    }
+
+
 
 
 }

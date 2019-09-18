@@ -2,10 +2,10 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { SortService } from 'src/app/shared/services';
 import { Surcharge } from 'src/app/shared/models';
-
 @Component({
     selector: 'table-surcharge-settlement',
-    templateUrl: './table-surcharge.component.html'
+    templateUrl: './table-surcharge.component.html',
+    styleUrls: ['./table-surcharge.component.scss']
 })
 
 export class SettlementTableSurchargeComponent extends AppList {
@@ -25,21 +25,21 @@ export class SettlementTableSurchargeComponent extends AppList {
 
     ngOnInit() {
         this.headers = [
-            { title: 'Charge Name', field: 'chargeName', sortable: true },
+            { title: 'Charge Name', field: 'chargeName', sortable: true, width: 200 },
             { title: 'Qty', field: 'quantity', sortable: true },
             { title: 'Unit', field: 'unitName', sortable: true },
             { title: 'Unit Price', field: 'unitPrice', sortable: true },
             { title: 'Currency', field: 'currencyId', sortable: true },
             { title: 'VAT', field: 'vatrate', sortable: true },
             { title: 'Amount', field: 'amount', sortable: true },
-            { title: 'Payer', field: 'payer', sortable: true },
-            { title: 'OBH Partner', field: 'obhPartnerName', sortable: true },
+            { title: 'Payer', field: 'payer', sortable: true, width: 200 },
+            { title: 'OBH Partner', field: 'obhPartnerName', sortable: true, width: 200 },
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Series No', field: 'seriesNo', sortable: true },
             { title: 'Inv Date', field: 'invoiceDate', sortable: true },
             { title: 'Custom No', field: 'clearanceNo', sortable: true },
             { title: 'Cont No', field: 'contNo', sortable: true },
-            { title: 'Note', field: 'notes', sortable: true },
+            { title: 'Note', field: 'notes', sortable: true, width: 200 },
         ];
     }
 
