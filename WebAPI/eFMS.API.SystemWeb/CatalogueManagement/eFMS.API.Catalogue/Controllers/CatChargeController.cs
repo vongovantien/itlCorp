@@ -334,5 +334,16 @@ namespace eFMS.API.Catalogue.Controllers
             }
         }
 
+        /// <summary>
+        /// Get list service
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetListServices")]
+        public IActionResult GetListServices()
+        {
+            var results = catChargeService.GetListService();
+            return Ok(results);
+        }
+
     }
 }

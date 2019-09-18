@@ -334,5 +334,10 @@ namespace eFMS.API.Catalogue.DL.Services
 
             return list;
         }
+
+        public object GetListService()
+        {
+            return API.Common.Globals.CustomData.Services;
+        }
     }
 }
