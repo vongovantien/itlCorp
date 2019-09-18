@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace eFMS.API.ReportData.Models
+﻿namespace eFMS.API.ReportData.Models
 {
     public class FilesNames
     {
@@ -14,6 +9,11 @@ namespace eFMS.API.ReportData.Models
         public const string CommodityList = "Commodity List.xlsx";
         public const string StageList = "Stage List.xlsx";
         public const string UnitList = "Unit List.xlsx";
+        public const string ProvinceName = "Province List.xlsx";
+        public const string DistrictName = "District List.xlsx";
+        public const string TowardName = "Town-Ward List.xlsx";
+        public const string ChargeName = "Charge List.xlsx";
+        public const string CurrencyName = "Currency List.xlsx";
 
     }
 }

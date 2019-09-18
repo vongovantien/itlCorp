@@ -16,7 +16,8 @@ namespace eFMS.API.ReportData.Models
             public const string CatCommodityGroupUrl = "/Catalogue/api/v1/en-US/CatCommodityGroup/query";
             public const string CatStageUrl = "/Catalogue/api/v1/en-US/CatStage/query";
             public const string CatUnitUrl = "/Catalogue/api/v1/en-US/CatUnit/query";
-
+            public const string CatchargeUrl = "/Catalogue/api/v1/en-US/CatCharge/query";
+            public const string CatCurrencyUrl = "/Catalogue/api/v1/en-US/CatCurrency/getAllByQuery";
         }
     }
 }

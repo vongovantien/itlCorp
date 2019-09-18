@@ -174,6 +174,106 @@ namespace eFMS.API.ReportData.Controllers
                 fileDownloadName: FilesNames.UnitList
             );
         }
+        /// <summary>
+        /// export province
+        /// </summary>
+        /// <returns></returns>
+        [Route("Catalogue/ExportProvince")]
+        [HttpPost]
+        public async Task<IActionResult> ExportProvince(CatPlaceCriteria catPlaceCriteria)
+        {
+            Helper helper = new Helper();
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPlaceCriteria, aPis.HostStaging + Urls.Catelogue.CatplaceUrl);
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatProvince>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
+            var stream = helper.CreateProvinceExcelFile(dataObjects.Result);
+            var buffer = stream as MemoryStream;
+            return this.File(
+            fileContents: buffer.ToArray(),
+            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            fileDownloadName: FilesNames.ProvinceName
+        );
+        }
+
+        /// <summary>
+        /// export district
+        /// </summary>
+        /// <returns></returns>
+        [Route("Catalogue/ExportDistrict")]
+        [HttpPost]
+        public async Task<IActionResult> ExportDistrict(CatPlaceCriteria catPlaceCriteria)
+        {
+            Helper helper = new Helper();
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPlaceCriteria, aPis.HostStaging + Urls.Catelogue.CatplaceUrl);
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatDistrict>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
+            var stream = helper.CreateDistrictExcelFile(dataObjects.Result);
+            var buffer = stream as MemoryStream;
+            return this.File(
+            fileContents: buffer.ToArray(),
+            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            fileDownloadName: FilesNames.DistrictName
+        );
+        }
+
+        /// <summary>
+        /// export town-ward
+        /// </summary>
+        /// <returns></returns>
+        [Route("Catalogue/ExportTownWard")]
+        [HttpPost]
+        public async Task<IActionResult> ExportTownWard(CatPlaceCriteria catPlaceCriteria)
+        {
+            Helper helper = new Helper();
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPlaceCriteria, aPis.HostStaging + Urls.Catelogue.CatplaceUrl);
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatTownWard>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
+            var stream = helper.CreateTownWardExcelFile(dataObjects.Result);
+            var buffer = stream as MemoryStream;
+            return this.File(
+            fileContents: buffer.ToArray(),
+            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            fileDownloadName: FilesNames.TowardName
+        );
+        }
+
+        /// <summary>
+        /// export charge
+        /// </summary>
+        /// <returns></returns>
+        [Route("Catalogue/ExportCharge")]
+        [HttpPost]
+        public async Task<IActionResult> ExportCharge(CatChargeCriteria catChargeCriteria)
+        {
+            Helper helper = new Helper();
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catChargeCriteria, aPis.HostStaging + Urls.Catelogue.CatchargeUrl);
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatCharge>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
+            var stream = helper.CreateChargeExcelFile(dataObjects.Result);
+            var buffer = stream as MemoryStream;
+            return this.File(
+            fileContents: buffer.ToArray(),
+            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            fileDownloadName: FilesNames.ChargeName
+        );
+        }
+        /// <summary>
+        /// export currency
+        /// </summary>
+        /// <returns></returns>
+        [Route("Catalogue/ExportCurrency")]
+        [HttpPost]
+        public async Task<IActionResult> ExportCurrency(CatCurrrencyCriteria catCurrrencyCriteria)
+        {
+            Helper helper = new Helper();
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catCurrrencyCriteria, aPis.HostStaging + Urls.Catelogue.CatCurrencyUrl);
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatCurrency>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
+            var stream = helper.CreateCurrencyExcelFile(dataObjects.Result);
+            var buffer = stream as MemoryStream;
+            return this.File(
+            fileContents: buffer.ToArray(),
+            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            fileDownloadName: FilesNames.CurrencyName
+        );
+        }
+
+
         #endregion
     }
 }

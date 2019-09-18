@@ -64,6 +64,290 @@ namespace eFMS.API.ReportData
         }
         #endregion
 
+        #region Province
+        public Stream CreateProvinceExcelFile(List<CatProvince> listObj, Stream stream = null)
+        {
+            try
+            {
+                var list = listObj;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("First Sheet");
+                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
+                    BindingFormatForProvinceExcel(workSheet, list);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+        public void BindingFormatForProvinceExcel(ExcelWorksheet worksheet, List<CatProvince> listItems)
+        {
+            // Tạo header
+            worksheet.Cells[1, 1].Value = "Province Code";
+            worksheet.Cells[1, 2].Value = "English Name";
+            worksheet.Cells[1, 3].Value = "Local Name";
+            worksheet.Cells[1, 4].Value = "Country";
+            worksheet.Cells[1, 5].Value = "Inactive";
+            worksheet.Cells.AutoFitColumns(minWidth, maxWidth);
+            worksheet.Cells["A1:Z1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            for (int i = 0; i < listItems.Count; i++)
+            {
+                var item = listItems[i];
+                worksheet.Cells[i + 2, 1].Value = item.Code;
+                worksheet.Cells[i + 2, 2].Value = item.NameEn;
+                worksheet.Cells[i + 2, 3].Value = item.NameVn;
+                worksheet.Cells[i + 2, 4].Value = item.CountryNameEN;
+                string inactivechar = "";
+                if (item.Inactive == true)
+                {
+                    inactivechar = "Active";
+                }
+                else
+                {
+                    inactivechar = "Inactive";
+                }
+                worksheet.Cells[i + 2, 5].Value = inactivechar;
+            }
+        }
+
+
+        #endregion
+
+        #region TownWard
+        public Stream CreateTownWardExcelFile(List<CatTownWard> listObj, Stream stream = null)
+        {
+            try
+            {
+                var list = listObj;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("First Sheet");
+                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
+                    BindingFormatForTownWardExcel(workSheet, list);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+        public void BindingFormatForTownWardExcel(ExcelWorksheet worksheet, List<CatTownWard> listItems)
+        {
+            // Tạo header
+            worksheet.Cells[1, 1].Value = "Town-Ward Code";
+            worksheet.Cells[1, 2].Value = "English Name";
+            worksheet.Cells[1, 3].Value = "Local Name";
+            worksheet.Cells[1, 4].Value = "District";
+            worksheet.Cells[1, 5].Value = "Province";
+            worksheet.Cells[1, 6].Value = "Country";
+            worksheet.Cells[1, 7].Value = "Inactive";
+            worksheet.Cells.AutoFitColumns(minWidth, maxWidth);
+            worksheet.Cells["A1:Z1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            for (int i = 0; i < listItems.Count; i++)
+            {
+                var item = listItems[i];
+                worksheet.Cells[i + 2, 1].Value = item.Code;
+                worksheet.Cells[i + 2, 2].Value = item.NameEn;
+                worksheet.Cells[i + 2, 3].Value = item.NameVn;
+                worksheet.Cells[i + 2, 4].Value = item.DistrictNameEN;
+                worksheet.Cells[i + 2, 5].Value = item.ProvinceNameEN;
+                worksheet.Cells[i + 2, 6].Value = item.CountryNameEN;
+                string inactivechar = "";
+                if (item.Inactive == true)
+                {
+                    inactivechar = "Active";
+                }
+                else
+                {
+                    inactivechar = "Inactive";
+                }
+                worksheet.Cells[i + 2, 7].Value = inactivechar;
+            }
+        }
+
+        #endregion
+
+        #region Charge
+        public Stream CreateChargeExcelFile(List<CatCharge> listObj, Stream stream = null)
+        {
+            try
+            {
+                var list = listObj;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("First Sheet");
+                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
+                    BindingFormatForCatChargeExcel(workSheet, list);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+        public void BindingFormatForCatChargeExcel(ExcelWorksheet worksheet, List<CatCharge> listItems)
+        {
+            // Tạo header
+            worksheet.Cells[1, 1].Value = "Code";
+            worksheet.Cells[1, 2].Value = "English Name";
+            worksheet.Cells[1, 3].Value = "Local Name";
+            worksheet.Cells[1, 4].Value = "Type";
+            worksheet.Cells[1, 5].Value = "Inactive";
+            worksheet.Cells.AutoFitColumns(minWidth, maxWidth);
+            worksheet.Cells["A1:Z1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            for (int i = 0; i < listItems.Count; i++)
+            {
+                var item = listItems[i];
+                worksheet.Cells[i + 2, 1].Value = item.Code;
+                worksheet.Cells[i + 2, 2].Value = item.ChargeNameEn;
+                worksheet.Cells[i + 2, 3].Value = item.ChargeNameVn;
+                worksheet.Cells[i + 2, 4].Value = item.Type;
+                string inactivechar = "";
+                if (item.Inactive == true)
+                {
+                    inactivechar = "Active";
+                }
+                else
+                {
+                    inactivechar = "Inactive";
+                }
+                worksheet.Cells[i + 2, 5].Value = inactivechar;
+            }
+        }
+
+        #endregion
+
+        #region Charge
+        public Stream CreateCurrencyExcelFile(List<CatCurrency> listObj, Stream stream = null)
+        {
+            try
+            {
+                var list = listObj;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("First Sheet");
+                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
+                    BindingFormatForCatCurrencyExcel(workSheet, list);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+        public void BindingFormatForCatCurrencyExcel(ExcelWorksheet worksheet, List<CatCurrency> listItems)
+        {
+            // Tạo header
+            worksheet.Cells[1, 1].Value = "Code";
+            worksheet.Cells[1, 2].Value = "Currency Name";
+            worksheet.Cells[1, 3].Value = "Is Default";
+            worksheet.Cells[1, 4].Value = "Inactive";
+            worksheet.Cells.AutoFitColumns(minWidth, maxWidth);
+            worksheet.Cells["A1:Z1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            for (int i = 0; i < listItems.Count; i++)
+            {
+                var item = listItems[i];
+                worksheet.Cells[i + 2, 1].Value = item.Id;
+                worksheet.Cells[i + 2, 2].Value = item.CurrencyName;
+                worksheet.Cells[i + 2, 3].Value = item.IsDefault;
+                string inactivechar = "";
+                if (item.Inactive == true)
+                {
+                    inactivechar = "Active";
+                }
+                else
+                {
+                    inactivechar = "Inactive";
+                }
+                worksheet.Cells[i + 2, 4].Value = inactivechar;
+            }
+        }
+
+        #endregion
+
+
+
+        #region District
+        public Stream CreateDistrictExcelFile(List<CatDistrict> listObj, Stream stream = null)
+        {
+            try
+            {
+                var list = listObj;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("First Sheet");
+                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
+                    BindingFormatForDistrictExcel(workSheet, list);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+        public void BindingFormatForDistrictExcel(ExcelWorksheet worksheet, List<CatDistrict> listItems)
+        {
+            // Tạo header
+            worksheet.Cells[1, 1].Value = "District Code";
+            worksheet.Cells[1, 2].Value = "English Name";
+            worksheet.Cells[1, 3].Value = "Local Name";
+            worksheet.Cells[1, 4].Value = "Province";
+            worksheet.Cells[1, 5].Value = "Country";
+            worksheet.Cells[1, 6].Value = "Inactive";
+            worksheet.Cells.AutoFitColumns(minWidth, maxWidth);
+            worksheet.Cells["A1:Z1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            for (int i = 0; i < listItems.Count; i++)
+            {
+                var item = listItems[i];
+                worksheet.Cells[i + 2, 1].Value = item.Code;
+                worksheet.Cells[i + 2, 2].Value = item.NameEn;
+                worksheet.Cells[i + 2, 3].Value = item.NameVn;
+                worksheet.Cells[i + 2, 4].Value = item.ProvinceNameEN;
+                worksheet.Cells[i + 2, 5].Value = item.CountryNameEN;
+                string inactivechar = "";
+                if (item.Inactive == true)
+                {
+                    inactivechar = "Active";
+                }
+                else
+                {
+                    inactivechar = "Inactive";
+                }
+                worksheet.Cells[i + 2, 6].Value = inactivechar;
+            }
+        }
+
+
+        #endregion
+
+
         #region Commodity List
         public Stream CreateCommoditylistExcelFile(List<CatCommodityModel> listObj, Stream stream = null)
         {
