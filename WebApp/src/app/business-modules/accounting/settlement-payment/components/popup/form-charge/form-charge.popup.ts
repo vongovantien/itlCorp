@@ -366,10 +366,10 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     getPartnerData(data: any) {
         this.configPartner.dataSource = data;
         this.configPartner.displayFields = [
-            { field: 'partnerNameEn', label: 'Name' },
-            { field: 'partnerNameVn', label: 'Customer Name' },
+            { field: 'shortName', label: 'Name' },
+            { field: 'partnerNameEn', label: 'Customer Name' },
         ];
-        this.configPartner.selectedDisplayFields = ['partnerNameEn'];
+        this.configPartner.selectedDisplayFields = ['shortName'];
 
     }
 

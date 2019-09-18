@@ -103,19 +103,19 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     getPartnerData(data: any) {
         this.configPartner.dataSource = data;
         this.configPartner.displayFields = [
-            { field: 'partnerNameEn', label: 'Name' },
-            { field: 'partnerNameVn', label: 'Customer Name' },
+            { field: 'shortName', label: 'Name' },
+            { field: 'partnerNameEn', label: 'Customer Name' },
         ];
-        this.configPartner.selectedDisplayFields = ['partnerNameEn'];
+        this.configPartner.selectedDisplayFields = ['shortName'];
     }
 
     getProductService() {
-        this._operationRepo.getShipmentCommonData()
+        this._operationRepo.getListService()
             .pipe(catchError(this.catchError))
             .subscribe(
-                (data: CommonInterface.ICommonShipmentData) => {
-                    this.initService = data.productServices;
-                    this.services = (data.productServices || []).map((item: CommonInterface.IValueDisplay) => ({ id: item.value, text: item.displayName }));
+                (data: CommonInterface.IValueDisplay[]) => {
+                    this.initService = data;
+                    this.services = (data || []).map((item: CommonInterface.IValueDisplay) => ({ id: item.value, text: item.displayName }));
                     this.selectedServices = this.services;
                 }
             );

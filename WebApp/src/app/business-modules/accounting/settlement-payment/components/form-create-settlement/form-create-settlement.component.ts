@@ -51,7 +51,7 @@ export class SettlementFormCreateComponent extends AppForm {
         this.form = this._fb.group({
             'settlementNo': [{ value: null, disabled: true }],
             'requester': [{ value: null, disabled: true }],
-            'requestDate': [new Date],
+            'requestDate': [{startDate: new Date(), endDate: new Date()}],
             'paymentMethod': [],
             'amount': [{ value: null, disabled: true }],
             'currency': [],

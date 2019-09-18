@@ -1,6 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
-
 @Component({
     selector: 'app-multiple-select',
     templateUrl: './select-multiple.component.html',
@@ -22,13 +21,14 @@ export class AppMultipleSelectComponent extends AppPage {
     }
 
     ngOnInit() {
+        this.isCheckAll = this.source.every((item: any) => item.isSelected);
     }
 
     ngOnChanges() {
         if (!!this.active.length && !!this.source.length) {
-
+            const ids: any[] = this.active.map( i => i.id);
             for (const item of this.source) {
-                if (this.active.filter((i: any) => Boolean(i)).includes(item)) {
+                if (ids.includes(item.id)) {
                     item.isSelected = true;
                 } else {
                     item.isSelected = false;
