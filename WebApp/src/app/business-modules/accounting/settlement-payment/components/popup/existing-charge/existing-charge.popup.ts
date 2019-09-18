@@ -133,11 +133,13 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             case 'service':
                 this.selectedServices = [];
                 this.selectedServices.push(...data);
+                this.charges = [];
 
                 if (!!this.selectedPartner.value && !!this.selectedPartnerData) {
                     this.resetShipment();
                     this.getShipment(this.selectedPartnerData.id, this.selectedServices.map((service: { id: string, text: string }) => service.id));
                 }
+
                 break;
             case 'shipment':
                 this.selectedShipment = { field: data.jobId, value: data.hbl };
