@@ -342,3 +342,6 @@ bin
 /eFMS.ReportData/eFMS.ReportData.Extension/obj/Debug/eFMS.ReportData.Extension.csproj.CoreCompileInputs.cache
 /eFMS.ReportData/eFMS.ReportData.Extension/obj/Debug/eFMS.ReportData.Extension.csprojAssemblyReference.cache
 /eFMS.ReportData/eFMS.ReportData/eFMS.ReportData.csproj.user
+/WebAPI/eFMS.API.SystemWeb/eFMS.API.ReportData/.vs
+/WebAPI/eFMS.API.SystemWeb/eFMS.API.ReportData/eFMS.API.ReportData/obj
+/WebAPI/eFMS.API.SystemWeb/AccountingManagement/eFMS.API.Accounting/obj

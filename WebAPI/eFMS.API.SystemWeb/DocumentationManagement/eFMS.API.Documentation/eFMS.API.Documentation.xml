@@ -192,6 +192,13 @@
             <param name="MBL"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSettlementPaymentController.CheckDuplicateShipmentSettlement(eFMS.API.Documentation.DL.Models.Criteria.CheckDuplicateShipmentSettlementCriteria)">
+            <summary>
+            Check duplicate shipment settlement
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.AcctSettlementPaymentController.Add(eFMS.API.Documentation.DL.Models.SettlementPayment.CreateUpdateSettlementModel)">
             <summary>
             add new settlement payment
@@ -233,6 +240,13 @@
             Get information approve settlement by settlementNo
             </summary>
             <param name="settlementNo">settlementNo that want to retrieve approve settlement</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctSettlementPaymentController.Preview(System.String)">
+            <summary>
+            Preview Settlement 
+            </summary>
+            <param name="settlementNo"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Documentation.Controllers.AcctSOAController">
