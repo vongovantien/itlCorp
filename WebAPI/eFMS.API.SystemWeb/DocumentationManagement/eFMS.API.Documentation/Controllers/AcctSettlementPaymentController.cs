@@ -281,6 +281,11 @@ namespace eFMS.API.Documentation.Controllers
                     }
                 }
             }
+            else
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = "Settlement Payment don't have any charge in this period, Please check it again!" };
+                return Ok(_result);
+            }
 
             var hs = acctSettlementPaymentService.AddSettlementPayment(model);
 
@@ -332,6 +337,11 @@ namespace eFMS.API.Documentation.Controllers
                         return Ok(_result);
                     }
                 }
+            }
+            else
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = "Settlement Payment don't have any charge in this period, Please check it again!" };
+                return Ok(_result);
             }
 
             var hs = acctSettlementPaymentService.UpdateSettlementPayment(model);
@@ -394,6 +404,11 @@ namespace eFMS.API.Documentation.Controllers
                         return Ok(_result);
                     }
                 }
+            }
+            else
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = "Settlement Payment don't have any charge in this period, Please check it again!" };
+                return Ok(_result);
             }
 
             AcctApproveSettlementModel approve = new AcctApproveSettlementModel

@@ -147,6 +147,11 @@ namespace eFMS.API.Documentation.Controllers
                 //    }
                 //}
             }
+            else
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = "Advance Payment don't have any request in this period, Please check it again!" };
+                return Ok(_result);
+            }
 
             var hs = acctAdvancePaymentService.AddAdvancePayment(model);
 
@@ -275,6 +280,11 @@ namespace eFMS.API.Documentation.Controllers
                 //    }
                 //}
             }
+            else
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = "Advance Payment don't have any request in this period, Please check it again!" };
+                return Ok(_result);
+            }
 
             var hs = acctAdvancePaymentService.UpdateAdvancePayment(model);
 
@@ -354,7 +364,12 @@ namespace eFMS.API.Documentation.Controllers
                 //        return BadRequest(_result);
                 //    }
                 //}
-            }           
+            }
+            else
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = "Advance Payment don't have any request in this period, Please check it again!" };
+                return Ok(_result);
+            }
 
             HandleState hs;
             if (string.IsNullOrEmpty(model.AdvanceNo))//Insert Advance Payment

@@ -24,32 +24,30 @@ namespace eFMS.API.Documentation.DL.Services
     {
         private readonly ICurrentUser currentUser;
         private readonly IOptions<WebUrl> webUrl;
-        readonly IContextBase<AcctSettlementPayment> AcctSettlementPaymentRepo;
-        readonly IContextBase<AcctApproveSettlement> AcctApproveSettlementRepo;
-        readonly IContextBase<SysUser> SysUserRepo;
-        readonly IContextBase<CsShipmentSurcharge> CsShipmentSurchargeRepo;
-        readonly IContextBase<OpsTransaction> OpsTransactionRepo;
-        readonly IContextBase<CsTransaction> CsTransactionRepo;
-        readonly IContextBase<CsTransactionDetail> CsTransactionDetailRepo;
-        readonly IContextBase<CustomsDeclaration> CustomsDeclarationRepo;
-        readonly IContextBase<AcctAdvancePayment> AcctAdvancePaymentRepo;
-        readonly IContextBase<AcctAdvanceRequest> AcctAdvanceRequestRepo;
-        readonly IContextBase<CatCurrencyExchange> CatCurrencyExchangeRepo;
-        readonly IContextBase<SysUserGroup> SysUserGroupRepo;
-        readonly IContextBase<SysGroup> SysGroupRepo;
-        readonly IContextBase<CatDepartment> CatDepartmentRepo;
-        readonly IContextBase<SysEmployee> SysEmployeeRepo;
-        readonly IContextBase<CatCharge> CatChargeRepo;
-        readonly IContextBase<CatUnit> CatUnitRepo;
-        readonly IContextBase<CatPartner> CatPartnerRepo;
-        readonly IContextBase<SysBranch> SysBranchRepo;
+        readonly IContextBase<AcctApproveSettlement> acctApproveSettlementRepo;
+        readonly IContextBase<SysUser> sysUserRepo;
+        readonly IContextBase<CsShipmentSurcharge> csShipmentSurchargeRepo;
+        readonly IContextBase<OpsTransaction> opsTransactionRepo;
+        readonly IContextBase<CsTransaction> csTransactionRepo;
+        readonly IContextBase<CsTransactionDetail> csTransactionDetailRepo;
+        readonly IContextBase<CustomsDeclaration> customsDeclarationRepo;
+        readonly IContextBase<AcctAdvancePayment> acctAdvancePaymentRepo;
+        readonly IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepo;
+        readonly IContextBase<CatCurrencyExchange> catCurrencyExchangeRepo;
+        readonly IContextBase<SysUserGroup> sysUserGroupRepo;
+        readonly IContextBase<SysGroup> sysGroupRepo;
+        readonly IContextBase<CatDepartment> catDepartmentRepo;
+        readonly IContextBase<SysEmployee> sysEmployeeRepo;
+        readonly IContextBase<CatCharge> catChargeRepo;
+        readonly IContextBase<CatUnit> catUnitRepo;
+        readonly IContextBase<CatPartner> catPartnerRepo;
+        readonly IContextBase<SysBranch> sysBranchRepo;
 
         public AcctSettlementPaymentService(IContextBase<AcctSettlementPayment> repository,
             IMapper mapper,
             ICurrentUser user,
             IOpsTransactionService ops,
             IOptions<WebUrl> url,
-            IContextBase<AcctSettlementPayment> acctSettlementPayment,
             IContextBase<AcctApproveSettlement> acctApproveSettlement,
             IContextBase<SysUser> sysUser,
             IContextBase<CsShipmentSurcharge> csShipmentSurcharge,
@@ -71,40 +69,39 @@ namespace eFMS.API.Documentation.DL.Services
         {
             currentUser = user;
             webUrl = url;
-            AcctSettlementPaymentRepo = acctSettlementPayment;
-            AcctApproveSettlementRepo = acctApproveSettlement;
-            SysUserRepo = sysUser;
-            CsShipmentSurchargeRepo = csShipmentSurcharge;
-            OpsTransactionRepo = opsTransaction;
-            CsTransactionRepo = csTransaction;
-            CsTransactionDetailRepo = csTransactionDetail;
-            CustomsDeclarationRepo = customsDeclaration;
-            AcctAdvancePaymentRepo = acctAdvancePayment;
-            AcctAdvanceRequestRepo = acctAdvanceRequest;
-            CatCurrencyExchangeRepo = catCurrencyExchange;
-            SysUserGroupRepo = sysUserGroup;
-            SysGroupRepo = sysGroup;
-            CatDepartmentRepo = catDepartment;
-            SysEmployeeRepo = sysEmployee;
-            CatChargeRepo = catCharge;
-            CatUnitRepo = catUnit;
-            CatPartnerRepo = catPartner;
-            SysBranchRepo = sysBranch;
+            acctApproveSettlementRepo = acctApproveSettlement;
+            sysUserRepo = sysUser;
+            csShipmentSurchargeRepo = csShipmentSurcharge;
+            opsTransactionRepo = opsTransaction;
+            csTransactionRepo = csTransaction;
+            csTransactionDetailRepo = csTransactionDetail;
+            customsDeclarationRepo = customsDeclaration;
+            acctAdvancePaymentRepo = acctAdvancePayment;
+            acctAdvanceRequestRepo = acctAdvanceRequest;
+            catCurrencyExchangeRepo = catCurrencyExchange;
+            sysUserGroupRepo = sysUserGroup;
+            sysGroupRepo = sysGroup;
+            catDepartmentRepo = catDepartment;
+            sysEmployeeRepo = sysEmployee;
+            catChargeRepo = catCharge;
+            catUnitRepo = catUnit;
+            catPartnerRepo = catPartner;
+            sysBranchRepo = sysBranch;
         }
 
         #region --- LIST SETTLEMENT PAYMENT ---
         public List<AcctSettlementPaymentResult> Paging(AcctSettlementPaymentCriteria criteria, int page, int size, out int rowsCount)
         {
-            var settlement = AcctSettlementPaymentRepo.Get();
-            var user = SysUserRepo.Get();
-            var surcharge = CsShipmentSurchargeRepo.Get();
-            var opst = OpsTransactionRepo.Get();
-            var csTrans = CsTransactionRepo.Get();
-            var csTransDe = CsTransactionDetailRepo.Get();
-            var custom = CustomsDeclarationRepo.Get();
-            var advRequest = AcctAdvanceRequestRepo.Get();
+            var settlement = Get();
+            var user = sysUserRepo.Get();
+            var surcharge = csShipmentSurchargeRepo.Get();
+            var opst = opsTransactionRepo.Get();
+            var csTrans = csTransactionRepo.Get();
+            var csTransDe = csTransactionDetailRepo.Get();
+            var custom = customsDeclarationRepo.Get();
+            var advRequest = acctAdvanceRequestRepo.Get();
             //Lấy danh sách Currency Exchange của ngày hiện tại
-            var currencyExchange = CatCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
 
             List<string> refNo = new List<string>();
             if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
@@ -245,13 +242,13 @@ namespace eFMS.API.Documentation.DL.Services
 
         public List<ShipmentOfSettlementResult> GetShipmentOfSettlements(string settlementNo)
         {
-            var settlement = AcctSettlementPaymentRepo.Get();
-            var surcharge = CsShipmentSurchargeRepo.Get();
-            var opst = OpsTransactionRepo.Get();
-            var csTrans = CsTransactionRepo.Get();
-            var csTransDe = CsTransactionDetailRepo.Get();
+            var settlement = Get(x => x.SettlementNo == settlementNo);
+            var surcharge = csShipmentSurchargeRepo.Get();
+            var opst = opsTransactionRepo.Get();
+            var csTrans = csTransactionRepo.Get();
+            var csTransDe = csTransactionDetailRepo.Get();
             //Lấy danh sách Currency Exchange của ngày hiện tại
-            var currencyExchange = CatCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
 
             var data = from set in settlement
                        join sur in surcharge on set.SettlementNo equals sur.SettlementCode into sc
@@ -262,8 +259,8 @@ namespace eFMS.API.Documentation.DL.Services
                        from cstd in csd.DefaultIfEmpty()
                        join cst in csTrans on cstd.JobId equals cst.Id into cs
                        from cst in cs.DefaultIfEmpty()
-                       where
-                            sur.SettlementCode == settlementNo
+                       //where
+                       //     sur.SettlementCode == settlementNo
                        select new ShipmentOfSettlementResult
                        {
                            JobId = (cst.JobNo != null ? cst.JobNo : ops.JobNo),
@@ -302,16 +299,16 @@ namespace eFMS.API.Documentation.DL.Services
                 var userCurrenct = currentUser.UserID;
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
 
-                var settlement = AcctSettlementPaymentRepo.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
+                var settlement = Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
                 if (settlement == null) return new HandleState("Not Found Settlement Payment");
-                if (!settlement.StatusApproval.Equals("New") && !settlement.StatusApproval.Equals("Denied"))
+                if (!settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_NEW) && !settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
                 {
                     return new HandleState("Not allow delete. Settlements are awaiting approval.");
                 }
                 dc.AcctSettlementPayment.Remove(settlement);
 
                 //Phí chừng từ (chỉ cập nhật lại SettlementCode bằng null)
-                var surchargeShipment = CsShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo && x.IsFromShipment == true).ToList();
+                var surchargeShipment = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo && x.IsFromShipment == true).ToList();
                 if (surchargeShipment != null && surchargeShipment.Count > 0)
                 {
                     surchargeShipment.ForEach(sur =>
@@ -323,7 +320,7 @@ namespace eFMS.API.Documentation.DL.Services
                     dc.CsShipmentSurcharge.UpdateRange(surchargeShipment);
                 }
                 //Phí hiện trường (Xóa khỏi surcharge)
-                var surchargeScene = CsShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo && x.IsFromShipment == false).ToList();
+                var surchargeScene = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo && x.IsFromShipment == false).ToList();
                 if (surchargeScene != null && surchargeScene.Count > 0)
                 {
                     dc.CsShipmentSurcharge.RemoveRange(surchargeScene);
@@ -341,20 +338,20 @@ namespace eFMS.API.Documentation.DL.Services
         #region --- DETAILS SETTLEMENT PAYMENT ---
         public AcctSettlementPaymentModel GetSettlementPaymentById(Guid idSettlement)
         {
-            var settlement = AcctSettlementPaymentRepo.Get(x => x.Id == idSettlement).FirstOrDefault();
+            var settlement = Get(x => x.Id == idSettlement).FirstOrDefault();
             var settlementMap = mapper.Map<AcctSettlementPaymentModel>(settlement);
             return settlementMap;
         }
 
         public List<ShipmentSettlement> GetListShipmentSettlementBySettlementNo(string settlementNo)
         {
-            var surcharge = CsShipmentSurchargeRepo.Get();
-            var settlement = AcctSettlementPaymentRepo.Get();
-            var opsTrans = OpsTransactionRepo.Get();
-            var csTransD = CsTransactionDetailRepo.Get();
-            var csTrans = CsTransactionRepo.Get();
+            var surcharge = csShipmentSurchargeRepo.Get();
+            var settlement = Get();
+            var opsTrans = opsTransactionRepo.Get();
+            var csTransD = csTransactionDetailRepo.Get();
+            var csTrans = csTransactionRepo.Get();
             //Lấy danh sách Currency Exchange của ngày hiện tại
-            var currencyExchange = CatCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
 
             var dataQuery = from sur in surcharge
                             join opst in opsTrans on sur.Hblid equals opst.Hblid into opst2
@@ -408,14 +405,14 @@ namespace eFMS.API.Documentation.DL.Services
 
         public List<ShipmentChargeSettlement> GetChargesSettlementBySettlementNoAndShipment(string settlementNo, string JobId, string MBL, string HBL)
         {
-            var surcharge = CsShipmentSurchargeRepo.Get();
-            var charge = CatChargeRepo.Get();
-            var unit = CatUnitRepo.Get();
-            var payer = CatPartnerRepo.Get();
-            var payee = CatPartnerRepo.Get();
-            var opsTrans = OpsTransactionRepo.Get();
-            var csTransD = CsTransactionDetailRepo.Get();
-            var csTrans = CsTransactionRepo.Get();
+            var surcharge = csShipmentSurchargeRepo.Get();
+            var charge = catChargeRepo.Get();
+            var unit = catUnitRepo.Get();
+            var payer = catPartnerRepo.Get();
+            var payee = catPartnerRepo.Get();
+            var opsTrans = opsTransactionRepo.Get();
+            var csTransD = csTransactionDetailRepo.Get();
+            var csTrans = csTransactionRepo.Get();
 
             var data = from sur in surcharge
                        join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -474,14 +471,14 @@ namespace eFMS.API.Documentation.DL.Services
 
         public List<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo)
         {
-            var surcharge = CsShipmentSurchargeRepo.Get();
-            var charge = CatChargeRepo.Get();
-            var unit = CatUnitRepo.Get();
-            var payer = CatPartnerRepo.Get();
-            var payee = CatPartnerRepo.Get();
-            var opsTrans = OpsTransactionRepo.Get();
-            var csTransD = CsTransactionDetailRepo.Get();
-            var csTrans = CsTransactionRepo.Get();
+            var surcharge = csShipmentSurchargeRepo.Get();
+            var charge = catChargeRepo.Get();
+            var unit = catUnitRepo.Get();
+            var payer = catPartnerRepo.Get();
+            var payee = catPartnerRepo.Get();
+            var opsTrans = opsTransactionRepo.Get();
+            var csTransD = csTransactionDetailRepo.Get();
+            var csTrans = csTransactionRepo.Get();
 
             var data = from sur in surcharge
                        join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -540,14 +537,14 @@ namespace eFMS.API.Documentation.DL.Services
         #region --- PAYMENT MANAGEMENT ---
         public List<AdvancePaymentMngt> GetAdvancePaymentMngts(string JobId, string MBL, string HBL)
         {
-            var advance = AcctAdvancePaymentRepo.Get();
-            var request = AcctAdvanceRequestRepo.Get();
+            var advance = acctAdvancePaymentRepo.Get();
+            var request = acctAdvanceRequestRepo.Get();
             //Chỉ lấy những advance có status là Done
             var data = from req in request
                        join ad in advance on req.AdvanceNo equals ad.AdvanceNo into ad2
                        from ad in ad2.DefaultIfEmpty()
                        where
-                            ad.StatusApproval == "Done"
+                            ad.StatusApproval == Constants.STATUS_APPROVAL_DONE
                        && req.JobId == JobId
                        && req.Mbl == MBL
                        && req.Hbl == HBL
@@ -584,16 +581,16 @@ namespace eFMS.API.Documentation.DL.Services
 
         public List<SettlementPaymentMngt> GetSettlementPaymentMngts(string JobId, string MBL, string HBL)
         {
-            var settlement = AcctSettlementPaymentRepo.Get();
-            var surcharge = CsShipmentSurchargeRepo.Get();
-            var charge = CatChargeRepo.Get();
-            var payee = CatPartnerRepo.Get();
-            var payer = CatPartnerRepo.Get();
-            var opsTrans = OpsTransactionRepo.Get();
-            var csTransD = CsTransactionDetailRepo.Get();
-            var csTrans = CsTransactionRepo.Get();
+            var settlement = Get();
+            var surcharge = csShipmentSurchargeRepo.Get();
+            var charge = catChargeRepo.Get();
+            var payee = catPartnerRepo.Get();
+            var payer = catPartnerRepo.Get();
+            var opsTrans = opsTransactionRepo.Get();
+            var csTransD = csTransactionDetailRepo.Get();
+            var csTrans = csTransactionRepo.Get();
             //Lấy danh sách Currency Exchange của ngày hiện tại
-            var currencyExchange = CatCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
 
             //Chỉ lấy ra những settlement có status là done
             var data = from settle in settlement
@@ -608,7 +605,7 @@ namespace eFMS.API.Documentation.DL.Services
                        join cst in csTrans on cstd.JobId equals cst.Id into cst2
                        from cst in cst2.DefaultIfEmpty()
                        where
-                                settle.StatusApproval == "Done"
+                                settle.StatusApproval == Constants.STATUS_APPROVAL_DONE
                             && (opst.JobNo == null ? cst.JobNo : opst.JobNo) == JobId
                             && (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno) == HBL
                             && (opst.Mblno == null ? cstd.Mawb : opst.Mblno) == MBL
@@ -677,18 +674,18 @@ namespace eFMS.API.Documentation.DL.Services
         public List<ShipmentChargeSettlement> GetExistsCharge(string JobId, string HBL, string MBL)
         {
             //Chỉ lấy ra những phí chứng từ (thuộc credit hoặc đối tượng obh credit)
-            var surcharge = CsShipmentSurchargeRepo
+            var surcharge = csShipmentSurchargeRepo
                 .Get(x =>
                         x.IsFromShipment == true
                     && (x.Type == "BUY" || (x.PayerId != null && x.CreditNo != null))
                 );
-            var charge = CatChargeRepo.Get();
-            var unit = CatUnitRepo.Get();
-            var payer = CatPartnerRepo.Get();
-            var payee = CatPartnerRepo.Get();
-            var opsTrans = OpsTransactionRepo.Get(x => x.CurrentStatus != "Canceled");
-            var csTransD = CsTransactionDetailRepo.Get();
-            var csTrans = CsTransactionRepo.Get();
+            var charge = catChargeRepo.Get();
+            var unit = catUnitRepo.Get();
+            var payer = catPartnerRepo.Get();
+            var payee = catPartnerRepo.Get();
+            var opsTrans = opsTransactionRepo.Get(x => x.CurrentStatus != "Canceled");
+            var csTransD = csTransactionDetailRepo.Get();
+            var csTrans = csTransactionRepo.Get();
 
             var data = from sur in surcharge
                        join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -752,7 +749,7 @@ namespace eFMS.API.Documentation.DL.Services
             var result = false;
             if (string.IsNullOrEmpty(criteria.SettlementNo))
             {
-                result = CsShipmentSurchargeRepo.Get(x =>
+                result = csShipmentSurchargeRepo.Get(x =>
                        x.ChargeId == criteria.ChargeID
                     && x.Hblid == criteria.HBLID
                     && (criteria.TypeCharge == "BUY" ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == "OBH" ? x.PayerId == criteria.Partner : 1 == 1))
@@ -763,7 +760,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                result = CsShipmentSurchargeRepo.Get(x =>
+                result = csShipmentSurchargeRepo.Get(x =>
                        x.SettlementCode != criteria.SettlementNo
                     && x.ChargeId == criteria.ChargeID
                     && x.Hblid == criteria.HBLID
@@ -785,7 +782,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var settlement = mapper.Map<AcctSettlementPayment>(model.Settlement);
                 settlement.Id = model.Settlement.Id = Guid.NewGuid();
                 settlement.SettlementNo = model.Settlement.SettlementNo = CreateSettlementNo(dc);
-                settlement.StatusApproval = "New";
+                settlement.StatusApproval = Constants.STATUS_APPROVAL_NEW;
                 settlement.UserCreated = settlement.UserModified = userCurrent;
                 settlement.DatetimeCreated = settlement.DatetimeModified = DateTime.Now;
 
@@ -796,7 +793,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var chargeShipment = model.ShipmentCharge.Where(x => x.Id != Guid.Empty && x.IsFromShipment == true).Select(s => s.Id).ToList();
                     if (chargeShipment.Count > 0)
                     {
-                        var listChargeShipment = CsShipmentSurchargeRepo.Get(x => chargeShipment.Contains(x.Id)).ToList();
+                        var listChargeShipment = csShipmentSurchargeRepo.Get(x => chargeShipment.Contains(x.Id)).ToList();
                         listChargeShipment.ForEach(req =>
                         {
                             req.SettlementCode = settlement.SettlementNo;
@@ -839,7 +836,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 var settlement = mapper.Map<AcctSettlementPayment>(model.Settlement);
 
-                var settlementCurrent = AcctSettlementPaymentRepo.Get(x => x.Id == settlement.Id).FirstOrDefault();
+                var settlementCurrent = Get(x => x.Id == settlement.Id).FirstOrDefault();
                 settlement.DatetimeCreated = settlementCurrent.DatetimeCreated;
                 settlement.UserCreated = settlementCurrent.UserCreated;
 
@@ -851,7 +848,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     //Start --Phí chứng từ (IsFromShipment = true)--
                     //Cập nhật SettlementCode = null cho các SettlementNo
-                    var chargeShipmentOld = CsShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo && x.IsFromShipment == true).ToList();
+                    var chargeShipmentOld = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo && x.IsFromShipment == true).ToList();
                     if (chargeShipmentOld.Count > 0)
                     {
                         chargeShipmentOld.ForEach(req =>
@@ -866,7 +863,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var chargeShipmentUpdate = model.ShipmentCharge.Where(x => x.Id != Guid.Empty && x.IsFromShipment == true).Select(s => s.Id).ToList();
                     if (chargeShipmentUpdate.Count > 0)
                     {
-                        var listChargeShipmentUpdate = CsShipmentSurchargeRepo.Get(x => chargeShipmentUpdate.Contains(x.Id)).ToList();
+                        var listChargeShipmentUpdate = csShipmentSurchargeRepo.Get(x => chargeShipmentUpdate.Contains(x.Id)).ToList();
                         listChargeShipmentUpdate.ForEach(req =>
                         {
                             req.SettlementCode = settlement.SettlementNo;
@@ -878,7 +875,7 @@ namespace eFMS.API.Documentation.DL.Services
                     //End --Phí chứng từ (IsFromShipment = true)--
 
                     //Start --Phí hiện trường (IsFromShipment = false)--
-                    var chargeScene = CsShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo && x.IsFromShipment == false).ToList();
+                    var chargeScene = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo && x.IsFromShipment == false).ToList();
                     var idsChargeScene = chargeScene.Select(x => x.Id);
                     //Add các phí hiện trường mới (nếu có)
                     var chargeSceneAdd = model.ShipmentCharge.Where(x => x.Id == Guid.Empty && x.IsFromShipment == false).ToList();
@@ -899,7 +896,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var chargeSceneUpdate = model.ShipmentCharge.Where(x => x.Id != Guid.Empty && idsChargeScene.Contains(x.Id) && x.IsFromShipment == false).Select(s => s.Id).ToList();
                     if (chargeSceneUpdate.Count > 0)
                     {
-                        var listChargeExists = CsShipmentSurchargeRepo.Get(x => chargeSceneUpdate.Contains(x.Id)).ToList();
+                        var listChargeExists = csShipmentSurchargeRepo.Get(x => chargeSceneUpdate.Contains(x.Id)).ToList();
                         listChargeExists.ForEach(req =>
                         {
                             req.UserModified = userCurrent;
@@ -930,9 +927,9 @@ namespace eFMS.API.Documentation.DL.Services
         public decimal GetAdvanceAmountByShipmentAndCurrency(string JobId, string MBL, string HBL, string Currency)
         {
             //Chỉ lấy ra các charge có status advance là done
-            var currencyExchange = CatCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
-            var advance = AcctAdvancePaymentRepo.Get(x => x.StatusApproval == "Done");                       
-            var request = AcctAdvanceRequestRepo.Get(x => x.JobId == JobId && x.Mbl == MBL && x.Hbl == HBL);
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+            var advance = acctAdvancePaymentRepo.Get(x => x.StatusApproval == Constants.STATUS_APPROVAL_DONE);                       
+            var request = acctAdvanceRequestRepo.Get(x => x.JobId == JobId && x.Mbl == MBL && x.Hbl == HBL);
             var query = from adv in advance
                         join req in request on adv.AdvanceNo equals req.AdvanceNo into req1
                         from req in req1.DefaultIfEmpty()
@@ -943,20 +940,20 @@ namespace eFMS.API.Documentation.DL.Services
 
         public AscSettlementPaymentRequestReportParams GetFirstShipmentOfSettlement(string settlementNo)
         {
-            var surcharge = CsShipmentSurchargeRepo.Get();
-            var charge = CatChargeRepo.Get();
-            var opsTrans = OpsTransactionRepo.Get();
-            var csTransDe = CsTransactionDetailRepo.Get();
-            var csTrans = CsTransactionRepo.Get();
+            var surcharge = csShipmentSurchargeRepo.Get();
+            var charge = catChargeRepo.Get();
+            var opsTrans = opsTransactionRepo.Get();
+            var csTransDe = csTransactionDetailRepo.Get();
+            var csTrans = csTransactionRepo.Get();
 
-            var advRequest = AcctAdvanceRequestRepo.Get();
-            var advPayment = AcctAdvancePaymentRepo.Get();
-            var settlement = AcctSettlementPaymentRepo.Get(x => x.StatusApproval == "Done");
-            var settleApprove = AcctApproveSettlementRepo.Get(x => x.IsDeputy == false);
+            var advRequest = acctAdvanceRequestRepo.Get();
+            var advPayment = acctAdvancePaymentRepo.Get();
+            var settlement = Get(x => x.StatusApproval == Constants.STATUS_APPROVAL_DONE);
+            var settleApprove = acctApproveSettlementRepo.Get(x => x.IsDeputy == false);
             
-            var customer = CatPartnerRepo.Get();
-            var consignee = CatPartnerRepo.Get();
-            var consigner = CatPartnerRepo.Get();
+            var customer = catPartnerRepo.Get();
+            var consignee = catPartnerRepo.Get();
+            var consigner = catPartnerRepo.Get();
 
             var data = from sur in surcharge
                        join cat in charge on sur.ChargeId equals cat.Id into cat2
@@ -982,7 +979,7 @@ namespace eFMS.API.Documentation.DL.Services
                        select new AscSettlementPaymentRequestReportParams
                        {
                            JobId = (opst.JobNo == null ? cst.JobNo : opst.JobNo),
-                           AdvDate = (!string.IsNullOrEmpty(advance.StatusApproval) && advance.StatusApproval == "Done" ? advance.DatetimeModified.Value.ToString("dd/MM/yyyy") : ""),
+                           AdvDate = (!string.IsNullOrEmpty(advance.StatusApproval) && advance.StatusApproval == Constants.STATUS_APPROVAL_DONE ? advance.DatetimeModified.Value.ToString("dd/MM/yyyy") : ""),
                            SettlementNo = settlementNo,
                            Customer = cus.PartnerNameVn != null ? cus.PartnerNameVn : "",
                            Consignee = cnee.PartnerNameVn != null ? cnee.PartnerNameVn : "",
@@ -1003,13 +1000,13 @@ namespace eFMS.API.Documentation.DL.Services
 
         public IQueryable<AscSettlementPaymentRequestReport> GetChargeOfSettlement(string settlementNo, string currency)
         {
-            var surcharge = CsShipmentSurchargeRepo.Get();
-            var charge = CatChargeRepo.Get();
-            var opsTrans = OpsTransactionRepo.Get();
-            var csTransDe = CsTransactionDetailRepo.Get();
-            var csTrans = CsTransactionRepo.Get();
+            var surcharge = csShipmentSurchargeRepo.Get();
+            var charge = catChargeRepo.Get();
+            var opsTrans = opsTransactionRepo.Get();
+            var csTransDe = csTransactionDetailRepo.Get();
+            var csTrans = csTransactionRepo.Get();
 
-            var currencyExchange = CatCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
 
             var data = from sur in surcharge
                        join cat in charge on sur.ChargeId equals cat.Id into cat2
@@ -1101,7 +1098,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             Crystal result = null;
 
-            var settlement = AcctSettlementPaymentRepo.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
+            var settlement = Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
             
             var listSettlementPayment = new List<AscSettlementPaymentRequestReport>();
 
@@ -1109,8 +1106,7 @@ namespace eFMS.API.Documentation.DL.Services
             
             var parameter = new AscSettlementPaymentRequestReportParams();
             parameter = GetFirstShipmentOfSettlement(settlementNo);
-
-            parameter.SettleRequester = string.IsNullOrEmpty(settlement.Requester) ? null : GetEmployeeByUserId(settlement.Requester).EmployeeNameVn;
+            parameter.SettleRequester = settlement != null && !string.IsNullOrEmpty(settlement.Requester) ? GetEmployeeByUserId(settlement.Requester).EmployeeNameVn : "";
             parameter.SettleRequestDate = settlement.RequestDate != null ? settlement.RequestDate.Value.ToString("dd/MM/yyyy") : "";
             
             //Lấy thông tin các User Approve Settlement
@@ -1178,8 +1174,8 @@ namespace eFMS.API.Documentation.DL.Services
 
                 if (!string.IsNullOrEmpty(settlement.SettlementNo))
                 {
-                    var settle = AcctSettlementPaymentRepo.Get(x => x.SettlementNo == settlement.SettlementNo).FirstOrDefault();
-                    if (settle.StatusApproval != "New" && settle.StatusApproval != "Denied" && settle.StatusApproval != "Done")
+                    var settle = Get(x => x.SettlementNo == settlement.SettlementNo).FirstOrDefault();
+                    if (settle.StatusApproval != Constants.STATUS_APPROVAL_NEW && settle.StatusApproval != Constants.STATUS_APPROVAL_DENIED && settle.StatusApproval != Constants.STATUS_APPROVAL_DONE)
                     {
                         return new HandleState("Awaiting Approval");
                     }
@@ -1192,7 +1188,7 @@ namespace eFMS.API.Documentation.DL.Services
                 acctApprove.Buhead = GetBUHeadId();
 
 
-                var checkExistsApproveBySettlementNo = AcctApproveSettlementRepo.Get(x => x.SettlementNo == acctApprove.SettlementNo && x.IsDeputy == false).FirstOrDefault();
+                var checkExistsApproveBySettlementNo = acctApproveSettlementRepo.Get(x => x.SettlementNo == acctApprove.SettlementNo && x.IsDeputy == false).FirstOrDefault();
                 if (checkExistsApproveBySettlementNo == null) //Insert AcctApproveSettlement
                 {
                     acctApprove.Id = Guid.NewGuid();
@@ -1252,11 +1248,11 @@ namespace eFMS.API.Documentation.DL.Services
             var emailUserAprNext = "";
 
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var settlement = AcctSettlementPaymentRepo.Get(x => x.Id == settlementId).FirstOrDefault();
+            var settlement = Get(x => x.Id == settlementId).FirstOrDefault();
 
             if (settlement == null) return new HandleState("Not Found Settlement Payment");
 
-            var approve = AcctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo && x.IsDeputy == false).FirstOrDefault();
+            var approve = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo && x.IsDeputy == false).FirstOrDefault();
 
             if (approve == null) return new HandleState("Not Found Settlement Approval by SettlementNo is " + settlement.SettlementNo);
 
@@ -1271,7 +1267,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (userCurrent == GetLeaderIdOfUser(settlement.Requester) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                 {
-                    settlement.StatusApproval = "LeaderApproved";
+                    settlement.StatusApproval = Constants.STATUS_APPROVAL_LEADERAPPROVED;
                     approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Approve của Leader
 
                     //Lấy email của Department Manager
@@ -1281,7 +1277,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else if (userCurrent == GetManagerIdOfUser(settlement.Requester) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                 {
-                    settlement.StatusApproval = "DepartmentManagerApproved";
+                    settlement.StatusApproval = Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED;
                     approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Approve của Manager
                     approve.ManagerApr = userCurrent;
 
@@ -1292,7 +1288,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else if (userCurrent == GetAccountantId() || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                 {
-                    settlement.StatusApproval = "Done";
+                    settlement.StatusApproval =Constants.STATUS_APPROVAL_DONE;
                     approve.AccountantAprDate = approve.BuheadAprDate = DateTime.Now;//Cập nhật ngày Approve của Accountant & BUHead
                     approve.AccountantApr = userCurrent;
                     approve.BuheadApr = approve.Buhead;
@@ -1329,11 +1325,11 @@ namespace eFMS.API.Documentation.DL.Services
             var userCurrent = currentUser.UserID;
 
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var settlement = AcctSettlementPaymentRepo.Get(x => x.Id == settlementId).FirstOrDefault();
+            var settlement = Get(x => x.Id == settlementId).FirstOrDefault();
 
             if (settlement == null) return new HandleState("Not Found Settlement Payment");
 
-            var approve = AcctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo && x.IsDeputy == false).FirstOrDefault();
+            var approve = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo && x.IsDeputy == false).FirstOrDefault();
             if (approve == null) return new HandleState("Not Found Approve Settlement by SettlementNo " + settlement.SettlementNo);
 
             //Lấy ra dept code của userApprove dựa vào userApprove
@@ -1366,7 +1362,7 @@ namespace eFMS.API.Documentation.DL.Services
                 dc.AcctApproveSettlement.Update(approve);
 
                 //Cập nhật lại advance status của Settlement Payment
-                settlement.StatusApproval = "Denied";
+                settlement.StatusApproval = Constants.STATUS_APPROVAL_DENIED;
                 settlement.UserModified = userCurrent;
                 settlement.DatetimeModified = DateTime.Now;
                 dc.AcctSettlementPayment.Update(settlement);
@@ -1382,7 +1378,7 @@ namespace eFMS.API.Documentation.DL.Services
         public AcctApproveSettlementModel GetInfoApproveSettlementBySettlementNo(string settlementNo)
         {
             var userCurrent = currentUser.UserID;
-            var approveSettlement = AcctApproveSettlementRepo.Get(x => x.SettlementNo == settlementNo && x.IsDeputy == false).FirstOrDefault();
+            var approveSettlement = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementNo && x.IsDeputy == false).FirstOrDefault();
             var aprSettlementMap = new AcctApproveSettlementModel();
 
             if (approveSettlement != null)
@@ -1408,14 +1404,14 @@ namespace eFMS.API.Documentation.DL.Services
         
         public AcctApproveSettlementModel GetInfoApproveSettlementNoCheckBySettlementNo(string settlementNo)
         {
-            var settleApprove = AcctApproveSettlementRepo.Get(x => x.IsDeputy == false && x.SettlementNo == settlementNo);
+            var settleApprove = acctApproveSettlementRepo.Get(x => x.IsDeputy == false && x.SettlementNo == settlementNo);
 
-            var userRequest = SysUserRepo.Get();
-            var empRequest = SysEmployeeRepo.Get();
-            var userManager = SysUserRepo.Get();
-            var empManager = SysEmployeeRepo.Get();
-            var userAccountant = SysUserRepo.Get();
-            var empAccountant = SysEmployeeRepo.Get();
+            var userRequest = sysUserRepo.Get();
+            var empRequest = sysEmployeeRepo.Get();
+            var userManager = sysUserRepo.Get();
+            var empManager = sysEmployeeRepo.Get();
+            var userAccountant = sysUserRepo.Get();
+            var empAccountant = sysEmployeeRepo.Get();
 
             var data = from settleapr in settleApprove 
                        join ureq in userRequest on settleapr.Requester equals ureq.Id into ureq1
@@ -1455,7 +1451,7 @@ namespace eFMS.API.Documentation.DL.Services
             string stt;
 
             //Lấy ra dòng cuối cùng của table acctSettlementPayment
-            var rowlast = AcctSettlementPaymentRepo.Get().OrderByDescending(x => x.SettlementNo).FirstOrDefault();
+            var rowlast = Get().OrderByDescending(x => x.SettlementNo).FirstOrDefault();
 
             if (rowlast == null)
             {
@@ -1528,10 +1524,10 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         private IQueryable<string> GetJobIdBySettlementNo(string settlementNo)
         {
-            var surcharge = CsShipmentSurchargeRepo.Get();
-            var opst = OpsTransactionRepo.Get();
-            var csTrans = CsTransactionRepo.Get();
-            var csTransDe = CsTransactionDetailRepo.Get();
+            var surcharge = csShipmentSurchargeRepo.Get();
+            var opst = opsTransactionRepo.Get();
+            var csTrans = csTransactionRepo.Get();
+            var csTransDe = csTransactionDetailRepo.Get();
             var query = from sur in surcharge
                         join ops in opst on sur.Hblid equals ops.Hblid into op
                         from ops in op.DefaultIfEmpty()
@@ -1555,10 +1551,10 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         private IQueryable<Shipments> GetShipmentBySettlementNo(string settlementNo)
         {
-            var surcharge = CsShipmentSurchargeRepo.Get();
-            var opst = OpsTransactionRepo.Get();
-            var csTrans = CsTransactionRepo.Get();
-            var csTransDe = CsTransactionDetailRepo.Get();
+            var surcharge = csShipmentSurchargeRepo.Get();
+            var opst = opsTransactionRepo.Get();
+            var csTrans = csTransactionRepo.Get();
+            var csTransDe = csTransactionDetailRepo.Get();
             var query = from sur in surcharge
                         join ops in opst on sur.Hblid equals ops.Hblid into op
                         from ops in op.DefaultIfEmpty()
@@ -1593,13 +1589,13 @@ namespace eFMS.API.Documentation.DL.Services
         private IQueryable<string> GetAdvanceNoByShipment(string JobId, string MBL, string HBL)
         {
             //Chỉ lấy ra những Advance thuộc shipment có status là done
-            var request = AcctAdvanceRequestRepo.Get();
-            var advance = AcctAdvancePaymentRepo.Get();
+            var request = acctAdvanceRequestRepo.Get();
+            var advance = acctAdvancePaymentRepo.Get();
             var query = from req in request
                         join ad in advance on req.AdvanceNo equals ad.AdvanceNo into ad2
                         from ad in ad2.DefaultIfEmpty()
                         where
-                               ad.StatusApproval == "Done"
+                               ad.StatusApproval == Constants.STATUS_APPROVAL_DONE
                             && req.JobId == JobId
                             && req.Mbl == MBL
                             && req.Hbl == HBL
@@ -1615,7 +1611,7 @@ namespace eFMS.API.Documentation.DL.Services
         private int GetGroupIdOfUser(string userId)
         {
             //Lấy ra groupId của user
-            var grpIdOfUser = SysUserGroupRepo.Get(x => x.UserId == userId).FirstOrDefault().GroupId;
+            var grpIdOfUser = sysUserGroupRepo.Get(x => x.UserId == userId).FirstOrDefault().GroupId;
             return grpIdOfUser;
         }
 
@@ -1623,7 +1619,7 @@ namespace eFMS.API.Documentation.DL.Services
         private SysGroup GetInfoGroupOfUser(string userId)
         {
             var grpIdOfUser = GetGroupIdOfUser(userId);
-            var infoGrpOfUser = SysGroupRepo.Get(x => x.Id == grpIdOfUser).FirstOrDefault();
+            var infoGrpOfUser = sysGroupRepo.Get(x => x.Id == grpIdOfUser).FirstOrDefault();
             return infoGrpOfUser;
         }
 
@@ -1631,7 +1627,7 @@ namespace eFMS.API.Documentation.DL.Services
         private CatDepartment GetInfoDeptOfUser(string userId, string idBranch = "27d26acb-e247-47b7-961e-afa7b3d7e11e")
         {
             var deptIdOfUser = GetInfoGroupOfUser(userId).DepartmentId;
-            var deptOfUser = CatDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Id == deptIdOfUser).FirstOrDefault();
+            var deptOfUser = catDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Id == deptIdOfUser).FirstOrDefault();
             return deptOfUser;
         }
 
@@ -1649,7 +1645,7 @@ namespace eFMS.API.Documentation.DL.Services
             //Lấy ra deptId của User
             var deptIdOfUser = GetInfoGroupOfUser(userId).DepartmentId;
             //Lấy ra mangerId của User
-            var managerIdOfUser = CatDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Id == deptIdOfUser).FirstOrDefault().ManagerId;
+            var managerIdOfUser = catDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Id == deptIdOfUser).FirstOrDefault().ManagerId;
             return managerIdOfUser;
         }
 
@@ -1657,7 +1653,7 @@ namespace eFMS.API.Documentation.DL.Services
         //Đang gán cứng BrandId của Branch ITL HCM (27d26acb-e247-47b7-961e-afa7b3d7e11e)
         private string GetAccountantId(string idBranch = "27d26acb-e247-47b7-961e-afa7b3d7e11e")
         {
-            var accountantManagerId = CatDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Code == "Accountant").FirstOrDefault().ManagerId;
+            var accountantManagerId = catDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Code == "Accountant").FirstOrDefault().ManagerId;
             return accountantManagerId;
         }
 
@@ -1665,27 +1661,27 @@ namespace eFMS.API.Documentation.DL.Services
         //Đang gán cứng BrandId của Branch ITL HCM (27d26acb-e247-47b7-961e-afa7b3d7e11e)
         private string GetBUHeadId(string idBranch = "27d26acb-e247-47b7-961e-afa7b3d7e11e")
         {
-            var buHeadId = SysBranchRepo.Get(x => x.Id == Guid.Parse(idBranch)).FirstOrDefault().ManagerId;
+            var buHeadId = sysBranchRepo.Get(x => x.Id == Guid.Parse(idBranch)).FirstOrDefault().ManagerId;
             return buHeadId;
         }
 
         //Lấy ra employeeId của User
         private string GetEmployeeIdOfUser(string UserId)
         {
-            return SysUserRepo.Get(x => x.Id == UserId).FirstOrDefault().EmployeeId;
+            return sysUserRepo.Get(x => x.Id == UserId).FirstOrDefault().EmployeeId;
         }
 
         //Lấy info Employee của User dựa vào employeeId
         private SysEmployee GetEmployeeByEmployeeId(string employeeId)
         {
-            return SysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault();
+            return sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault();
         }
 
         //Lấy info Employee của User dựa vào userId
         private SysEmployee GetEmployeeByUserId(string userId)
         {
             var employeeId = GetEmployeeIdOfUser(userId);
-            return SysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault();
+            return sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault();
         }
 
         //Lấy ra ds các user được ủy quyền theo nhóm leader, manager department, accountant manager, BUHead dựa vào dept
@@ -1709,7 +1705,7 @@ namespace eFMS.API.Documentation.DL.Services
             HandleState result = new HandleState("Not Found");
 
             //Lấy ra Settlement Approval dựa vào settlementNo
-            var acctApprove = AcctApproveSettlementRepo.Get(x => x.SettlementNo == settlementNo && x.IsDeputy == false).FirstOrDefault();
+            var acctApprove = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementNo && x.IsDeputy == false).FirstOrDefault();
             if (acctApprove == null)
             {
                 result = new HandleState("Not Found Settlement Approval by SettlementNo is " + settlementNo);
@@ -1717,7 +1713,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             //Lấy ra Settlement Payment dựa vào SettlementNo
-            var advance = AcctSettlementPaymentRepo.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
+            var advance = Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
             if (advance == null)
             {
                 result = new HandleState("Not Found Settlement Payment by SettlementNo is" + settlementNo);
@@ -1749,7 +1745,7 @@ namespace eFMS.API.Documentation.DL.Services
                         result = new HandleState();
                         //Check group CSManager đã approve chưa
                         //Nếu đã approve thì không được approve nữa
-                        if (advance.StatusApproval.Equals("DepartmentManagerApproved")
+                        if (advance.StatusApproval.Equals(Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
                             && acctApprove.ManagerAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.ManagerApr))
                         {
@@ -1768,14 +1764,14 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     //Check group DepartmentManager đã được Approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Manager)
-                        && advance.StatusApproval.Equals("DepartmentManagerApproved")
+                        && advance.StatusApproval.Equals(Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
                         && acctApprove.ManagerAprDate != null
                         && !string.IsNullOrEmpty(acctApprove.ManagerApr))
                     {
                         result = new HandleState();
                         //Check group Accountant đã approve chưa
                         //Nếu đã approve thì không được approve nữa
-                        if (advance.StatusApproval.Equals("Done")
+                        if (advance.StatusApproval.Equals(Constants.STATUS_APPROVAL_DONE)
                             && acctApprove.AccountantAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.AccountantApr))
                         {
@@ -1811,7 +1807,7 @@ namespace eFMS.API.Documentation.DL.Services
                         result = new HandleState();
                         //Check group Leader đã được approve chưa
                         //Nếu đã approve thì không được approve nữa
-                        if (advance.StatusApproval.Equals("LeaderApproved")
+                        if (advance.StatusApproval.Equals(Constants.STATUS_APPROVAL_LEADERAPPROVED)
                             && acctApprove.LeaderAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.Leader))
                         {
@@ -1840,13 +1836,13 @@ namespace eFMS.API.Documentation.DL.Services
 
                     //Check group Leader đã được approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Leader)
-                        && advance.StatusApproval.Equals("LeaderApproved")
+                        && advance.StatusApproval.Equals(Constants.STATUS_APPROVAL_LEADERAPPROVED)
                         && acctApprove.LeaderAprDate != null)
                     {
                         result = new HandleState();
                         //Check group Manager Department đã approve chưa
                         //Nếu đã approve thì không được approve nữa
-                        if (advance.StatusApproval.Equals("DepartmentManagerApproved")
+                        if (advance.StatusApproval.Equals(Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
                             && acctApprove.ManagerAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.ManagerApr))
                         {
@@ -1866,14 +1862,14 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     //Check group DepartmentManager đã được Approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Manager)
-                        && advance.StatusApproval.Equals("DepartmentManagerApproved")
+                        && advance.StatusApproval.Equals(Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
                         && acctApprove.ManagerAprDate != null
                         && !string.IsNullOrEmpty(acctApprove.ManagerApr))
                     {
                         result = new HandleState();
                         //Check group Accountant đã approve chưa
                         //Nếu đã approve thì không được approve nữa
-                        if (advance.StatusApproval.Equals("Done")
+                        if (advance.StatusApproval.Equals(Constants.STATUS_APPROVAL_DONE)
                             && acctApprove.AccountantAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.AccountantApr))
                         {
@@ -1893,12 +1889,12 @@ namespace eFMS.API.Documentation.DL.Services
         //Send Mail đề nghị Approve
         private bool SendMailSuggestApproval(string settlementNo, string userReciver, string emailUserReciver)
         {
-            var surcharge = CsShipmentSurchargeRepo.Get();
+            var surcharge = csShipmentSurchargeRepo.Get();
 
             //Lấy danh sách Currency Exchange của ngày hiện tại
-            var currencyExchange = CatCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
             //Lấy ra SettlementPayment dựa vào SettlementNo
-            var settlement = AcctSettlementPaymentRepo.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
+            var settlement = Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
 
             //Lấy ra tên & email của user Requester
             var requesterId = GetEmployeeIdOfUser(settlement.Requester);
@@ -1987,12 +1983,12 @@ namespace eFMS.API.Documentation.DL.Services
         //Send Mail Approved
         private bool SendMailApproved(string settlementNo, DateTime approvedDate)
         {
-            var surcharge = CsShipmentSurchargeRepo.Get();//dc.CsShipmentSurcharge;
+            var surcharge = csShipmentSurchargeRepo.Get();//dc.CsShipmentSurcharge;
 
             //Lấy danh sách Currency Exchange của ngày hiện tại
-            var currencyExchange = CatCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
             //Lấy ra SettlementPayment dựa vào SettlementNo
-            var settlement = AcctSettlementPaymentRepo.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
+            var settlement = Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
 
             //Lấy ra tên & email của user Requester
             var requesterId = GetEmployeeIdOfUser(settlement.Requester);
@@ -2064,12 +2060,12 @@ namespace eFMS.API.Documentation.DL.Services
         //Send Mail Deny Approve
         private bool SendMailDeniedApproval(string settlementNo, string comment, DateTime DeniedDate)
         {
-            var surcharge = CsShipmentSurchargeRepo.Get();
+            var surcharge = csShipmentSurchargeRepo.Get();
 
             //Lấy danh sách Currency Exchange của ngày hiện tại
-            var currencyExchange = CatCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
             //Lấy ra SettlementPayment dựa vào SettlementNo
-            var settlement = AcctSettlementPaymentRepo.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
+            var settlement = Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
 
             //Lấy ra tên & email của user Requester
             var requesterId = GetEmployeeIdOfUser(settlement.Requester);
