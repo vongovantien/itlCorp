@@ -65,6 +65,8 @@ export class SettlementPaymentAddNewComponent extends AppPage {
                         this._toastService.success(res.message);
 
                         this._router.navigate([`home/accounting/settlement-payment/${res.data.settlement.id}`]);
+                    } else {
+                        this._toastService.warning(res.message);
                     }
                 }
             );
@@ -93,7 +95,8 @@ export class SettlementPaymentAddNewComponent extends AppPage {
                         this._toastService.success(`${res.data.settlement.settlementNo}`, ' Send request successfully');
 
                         this._router.navigate([`home/accounting/settlement-payment/${res.data.settlement.id}/approve`]);
-
+                    } else {
+                        this._toastService.warning(res.message);
                     }
                 }
             );

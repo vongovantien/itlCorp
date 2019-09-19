@@ -141,9 +141,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             price: [, Validators.compose([
                 Validators.required
             ])],
-            vat: [, Validators.compose([
-                Validators.required
-            ])],
+            vat: [0],
             amount: [],
             invoiceNo: [],
             invoiceDate: [null],
@@ -220,6 +218,10 @@ export class SettlementFormChargePopupComponent extends PopupBase {
 
             this.selectedOBHPartner = { field: 'id', value: data.paymentObjectId };
             this.selectedPayer = { field: 'id', value: data.payerId };
+
+            this.selectedOBHData = this.configPartner.dataSource.filter(i => i.id === data.paymentObjectId)[0];
+            this.selectedPayerData = this.configPartner.dataSource.filter(i => i.id === data.payerId)[0];
+
         }
 
         this.selectedShipmentData = <OperationInteface.IShipment>{ hbl: data.hbl, jobId: data.jobId, mbl: data.mbl, hblid: data.hblid };
@@ -335,7 +337,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
 
                     // * update config combogrid.
                     this.configShipment.displayFields = [
-                        { field: 'jobId', label: 'Job No' },
+                        { field: 'jobId', label: 'Job ID' },
                         { field: 'mbl', label: 'MBL' },
                         { field: 'hbl', label: 'HBL' },
                     ];
@@ -414,7 +416,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
 
     submit() {
         const body = new Surcharge({
-            // id: null,
+            id: !!this.selectedSurcharge ? this.selectedSurcharge.id : '00000000-0000-0000-0000-000000000000',
             hblid: this.selectedShipmentData.hblid,
             type: this.selectedCharge.type === 'CREDIT' ? 'BUY' : 'OBH',
             chargeId: this.selectedCharge.id || '',
@@ -454,6 +456,8 @@ export class SettlementFormChargePopupComponent extends PopupBase {
                 payerId: this.selectedPayer.value,
                 paymentObjectId: this.selectedOBHPartner.value,
                 objectBePaid: null,
+                payer: this.selectedPayerData.shortName,
+                obhPartnerName: this.selectedOBHData.shortName
             };
             Object.assign(body, dataChargeOBH);
         }

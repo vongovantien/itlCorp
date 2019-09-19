@@ -179,6 +179,12 @@ export class SettlementListChargeComponent extends AppList {
                 return;
             }
         }
+        const headingShipmentComponent: SettlementShipmentItemComponent[] = this.headingShipmentGroup.toArray();
+
+        // * Reset check all in heading shipment group.
+        for (const item of headingShipmentComponent) {
+            item.isCheckAll = false;
+        }
     }
 
     returnChargeFromShipment(groupShipment: any) {

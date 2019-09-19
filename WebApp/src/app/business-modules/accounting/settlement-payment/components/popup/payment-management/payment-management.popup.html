@@ -28,7 +28,7 @@
                             <span class="font-weight-bold">Total Advance:</span>
                             {{data.totalAdvance}}
                         </div>
-                        <ul class="list-unstyled list-group" *ngIf="!!data.settlementPayment.length">
+                        <ul class="list-unstyled list-group">
                             <div class="row p-2">
                                 <div
                                     class="col text-center font-weight-bold  border border-top-0 border-bottom-0 border-left-0">
@@ -51,30 +51,32 @@
                                     Advance Date
                                 </div>
                             </div>
-                            <li *ngFor="let advance of data.advancePayment; trackBy: trackByFn"
-                                class="text-center list-group-item-primary">
-                                <div class="row p-3">
-                                    <div class="col text-center">{{advance.advanceNo}}</div>
-                                    <div class="col text-center">{{advance.description}}</div>
-                                    <div class="col text-center">{{advance.totalAmount | number: '.0-3'}}</div>
-                                    <div class="col text-center">{{advance.advanceCurrency}}</div>
-                                    <div class="col text-center">{{advance.advanceDate | date: 'dd/MM/yyyy'}}
-                                    </div>
-                                </div>
-                                <ul class="list-group">
-                                    <li *ngFor="let request of advance.chargeAdvancePaymentMngts"
-                                        class="list-group-item">
-                                        <div class="row">
-                                            <div class="col text-center"></div>
-                                            <div class="col text-center">{{request.description}}</div>
-                                            <div class="col text-center">{{request.totalAmount | number: '.0-3'}}
-                                            </div>
-                                            <div class="col text-center">{{request.advanceCurrency}}</div>
-                                            <div class="col text-center"></div>
+                            <ng-container *ngIf="!!data.advancePayment.length">
+                                <li *ngFor="let advance of data.advancePayment; trackBy: trackByFn"
+                                    class="text-center list-group-item-primary">
+                                    <div class="row p-3">
+                                        <div class="col text-center">{{advance.advanceNo}}</div>
+                                        <div class="col text-center">{{advance.description}}</div>
+                                        <div class="col text-center">{{advance.totalAmount | number: '.0-3'}}</div>
+                                        <div class="col text-center">{{advance.advanceCurrency}}</div>
+                                        <div class="col text-center">{{advance.advanceDate | date: 'dd/MM/yyyy'}}
                                         </div>
-                                    </li>
-                                </ul>
-                            </li>
+                                    </div>
+                                    <ul class="list-group">
+                                        <li *ngFor="let request of advance.chargeAdvancePaymentMngts"
+                                            class="list-group-item">
+                                            <div class="row">
+                                                <div class="col text-center"></div>
+                                                <div class="col text-center">{{request.description}}</div>
+                                                <div class="col text-center">{{request.totalAmount | number: '.0-3'}}
+                                                </div>
+                                                <div class="col text-center">{{request.advanceCurrency}}</div>
+                                                <div class="col text-center"></div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ng-container>
                         </ul>
                         <div *ngIf="!data.advancePayment.length" class="table">
                             <div class="no-data">
@@ -89,7 +91,7 @@
                             <span class="font-weight-bold">Total Settlement:</span>
                             {{data.totalSettlement}}
                         </div>
-                        <ul class="list-unstyled list-group" *ngIf="!!data.settlementPayment.length">
+                        <ul class="list-unstyled list-group">
                             <div class="row p-2">
                                 <div
                                     class="col text-center font-weight-bold  border border-top-0 border-bottom-0 border-left-0">
@@ -120,35 +122,38 @@
                                     OBH Partner
                                 </div>
                             </div>
-                            <li *ngFor="let settlement of data.settlementPayment; trackBy: trackByFn"
-                                class="text-center list-group-item-primary">
-                                <div class="row p-3">
-                                    <div class="col text-center">{{settlement.settlementNo}}</div>
-                                    <div class="col text-center">{{settlement.chargeName}}</div>
-                                    <div class="col text-center">{{settlement.totalAmount | number: '.0-3'}}</div>
-                                    <div class="col text-center">{{settlement.settlementCurrency}}</div>
-                                    <div class="col text-center">{{settlement.settlementDate | date: 'dd/MM/yyyy'}}
-                                    </div>
-                                    <div class="col text-center">{{settlement.payer}}
-                                    </div>
-                                    <div class="col text-center">{{settlement.obhPartner}}</div>
-                                </div>
-                                <ul class="list-group">
-                                    <li *ngFor="let charge of settlement.chargeSettlementPaymentMngts"
-                                        class="list-group-item">
-                                        <div class="row">
-                                            <div class="col text-center"></div>
-                                            <div class="col text-center">{{charge.chargeName}}</div>
-                                            <div class="col text-center">{{charge.totalAmount | number: '.0-3'}}
-                                            </div>
-                                            <div class="col text-center">{{charge.settlementCurrency}}</div>
-                                            <div class="col text-center"></div>
-                                            <div class="col text-center"></div>
-                                            <div class="col text-center"></div>
+                            <ng-container *ngIf="!!data.settlementPayment.length">
+                                <li *ngFor="let settlement of data.settlementPayment; trackBy: trackByFn"
+                                    class="text-center list-group-item-primary">
+                                    <div class="row p-3">
+                                        <div class="col text-center">{{settlement.settlementNo}}</div>
+                                        <div class="col text-center">{{settlement.chargeName}}</div>
+                                        <div class="col text-center">{{settlement.totalAmount | number: '.0-3'}}</div>
+                                        <div class="col text-center">{{settlement.settlementCurrency}}</div>
+                                        <div class="col text-center">{{settlement.settlementDate | date: 'dd/MM/yyyy'}}
                                         </div>
-                                    </li>
-                                </ul>
-                            </li>
+                                        <div class="col text-center">{{settlement.payer}}
+                                        </div>
+                                        <div class="col text-center">{{settlement.obhPartner}}</div>
+                                    </div>
+                                    <ul class="list-group">
+                                        <li *ngFor="let charge of settlement.chargeSettlementPaymentMngts"
+                                            class="list-group-item">
+                                            <div class="row">
+                                                <div class="col text-center"></div>
+                                                <div class="col text-center">{{charge.chargeName}}</div>
+                                                <div class="col text-center">{{charge.totalAmount | number: '.0-3'}}
+                                                </div>
+                                                <div class="col text-center">{{charge.settlementCurrency}}</div>
+                                                <div class="col text-center"></div>
+                                                <div class="col text-center"></div>
+                                                <div class="col text-center"></div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ng-container>
+
                         </ul>
                         <div *ngIf="!data.settlementPayment.length" class="table">
                             <div class="no-data">
