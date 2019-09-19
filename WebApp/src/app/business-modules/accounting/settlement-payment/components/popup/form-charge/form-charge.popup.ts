@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, Input } from '@angular/core';
+import { Component, EventEmitter, Output, Input, Inject } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { SystemRepo, AccoutingRepo, OperationRepo } from 'src/app/shared/repositories';
 import { takeUntil, debounceTime, switchMap, skip, distinctUntilChanged, catchError, map } from 'rxjs/operators';
@@ -9,6 +9,7 @@ import { DataService } from 'src/app/shared/services';
 import { FormGroup, AbstractControl, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
+import { CurrencyMaskConfig } from 'ngx-currency/src/currency-mask.config';
 
 @Component({
     selector: 'form-charge-popup',
@@ -26,6 +27,11 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     term$ = new BehaviorSubject<string>('');
     charges: any[] = [];
     selectedCharge: any = null;
+
+    configAmountCurrency: Partial<CurrencyMaskConfig> = {
+        align: "left",
+        precision: 2,
+    };
 
     configShipment: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
@@ -98,7 +104,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         private _sysRepo: SystemRepo,
         private _operationRepo: OperationRepo,
         private _fb: FormBuilder,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
     ) {
         super();
     }

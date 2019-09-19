@@ -149,7 +149,7 @@
                             <div class="col-4">
                                 <div class="form-group">
                                     <label for="">Amount</label>
-                                    <input currencyMask type="text" class="form-control" formControlName="amount"
+                                    <input currencyMask [options]="configAmountCurrency" type="text" class="form-control" formControlName="amount"
                                         placeholder="Amount" disabled>
                                 </div>
                             </div>
