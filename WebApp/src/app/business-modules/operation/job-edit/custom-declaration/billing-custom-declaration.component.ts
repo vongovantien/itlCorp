@@ -94,8 +94,26 @@ export class BillingCustomDeclarationComponent extends AppPage implements OnInit
       });
       const responses = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.updateToAJob, dataToUpdate, false, true);
       if (responses.success === true) {
-        await this.getCustomClearanesOfJob(this.currentJob.jobNo);
-        await this.updateShipmentVolumn();
+        this.customClearanceRepo.getListImportedInJob(this.currentJob.jobNo).pipe(
+          takeUntil(this.ngUnsubscribe),
+          catchError(this.catchError),
+          finalize(() => {
+            this.dataImportedSearch = this.importedData;
+            this.setPageMaster(this.pagerMaster);
+            this.updateShipmentVolumn();
+          })
+        ).subscribe(
+          (res: any) => {
+            this.importedData = res;
+            if (this.importedData != null) {
+              this.importedData.forEach(element => {
+                element.isChecked = false;
+              });
+            } else {
+              this.importedData = [];
+            }
+          }
+        );
       }
     }
   }
