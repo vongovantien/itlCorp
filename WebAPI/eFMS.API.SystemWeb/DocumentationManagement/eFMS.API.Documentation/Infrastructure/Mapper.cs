@@ -49,6 +49,7 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<spc_GetSurchargeByHouseBill, CsShipmentSurchargeDetailsModel>();
 
             CreateMap<ShipmentChargeSettlement, CsShipmentSurcharge>();
+            CreateMap<AcctSettlementPayment, AcctSettlementPaymentModel>();
             CreateMap<AcctSettlementPaymentModel, AcctSettlementPayment>();
             CreateMap<AcctApproveSettlement, AcctApproveSettlementModel>();
         }

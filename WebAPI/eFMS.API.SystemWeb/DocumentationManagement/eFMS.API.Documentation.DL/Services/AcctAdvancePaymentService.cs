@@ -24,19 +24,56 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly ICurrentUser currentUser;
         private readonly IOpsTransactionService opsTransactionService;
         private readonly IOptions<WebUrl> webUrl;
-        public AcctAdvancePaymentService(IContextBase<AcctAdvancePayment> repository, IMapper mapper, ICurrentUser user, IOpsTransactionService ops, IOptions<WebUrl> url) : base(repository, mapper)
+        readonly IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepo;
+        readonly IContextBase<SysUser> sysUserRepo;
+        readonly IContextBase<OpsTransaction> opsTransactionRepo;
+        readonly IContextBase<CsTransaction> csTransactionRepo;
+        readonly IContextBase<CsTransactionDetail> csTransactionDetailRepo;
+        readonly IContextBase<SysEmployee> sysEmployeeRepo;
+        readonly IContextBase<AcctApproveAdvance> AcctApproveAdvanceRepo;
+        readonly IContextBase<SysUserGroup> sysUserGroupRepo;
+        readonly IContextBase<CatDepartment> catDepartmentRepo;
+        readonly IContextBase<SysGroup> sysGroupRepo;
+        readonly IContextBase<SysBranch> sysBranchRepo;
+
+        public AcctAdvancePaymentService(IContextBase<AcctAdvancePayment> repository, 
+            IMapper mapper, 
+            ICurrentUser user, 
+            IOpsTransactionService ops, 
+            IOptions<WebUrl> url,
+            IContextBase<AcctAdvanceRequest> acctAdvanceRequest,
+            IContextBase<SysUser> sysUser,
+            IContextBase<OpsTransaction> opsTransaction,
+            IContextBase<CsTransaction> csTransaction,
+            IContextBase<CsTransactionDetail> csTransactionDetail,
+            IContextBase<SysEmployee> sysEmployee,
+            IContextBase<AcctApproveAdvance> acctApproveAdvance,
+            IContextBase<SysUserGroup> sysUserGroup,
+            IContextBase<CatDepartment> catDepartment,
+            IContextBase<SysGroup> sysGroup,
+            IContextBase<SysBranch> sysBranch) : base(repository, mapper)
         {
             currentUser = user;
             opsTransactionService = ops;
             webUrl = url;
+            acctAdvanceRequestRepo = acctAdvanceRequest;
+            sysUserRepo = sysUser;
+            opsTransactionRepo = opsTransaction;
+            csTransactionRepo = csTransaction;
+            csTransactionDetailRepo = csTransactionDetail;
+            sysEmployeeRepo = sysEmployee;
+            AcctApproveAdvanceRepo = acctApproveAdvance;
+            sysUserGroupRepo = sysUserGroup;
+            catDepartmentRepo = catDepartment;
+            sysGroupRepo = sysGroup;
+            sysBranchRepo = sysBranch;
         }
 
         public List<AcctAdvancePaymentResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount)
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var advance = dc.AcctAdvancePayment;
-            var request = dc.AcctAdvanceRequest;
-            var user = dc.SysUser;
+            var advance = DataContext.Get();
+            var request = acctAdvanceRequestRepo.Get();
+            var user = sysUserRepo.Get();
 
             List<string> refNo = new List<string>();
             if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
@@ -135,15 +172,6 @@ namespace eFMS.API.Documentation.DL.Services
                            UserModified = ad.UserModified,
                            DatetimeModified = ad.DatetimeModified,
                            StatusApproval = ad.StatusApproval,
-                           AdvanceStatusPayment =
-                            request.Where(x => x.StatusPayment == "NotSettled" && x.AdvanceNo == ad.AdvanceNo).Count() == request.Where(x => x.AdvanceNo == ad.AdvanceNo).Count()
-                            ?
-                                "NotSettled"
-                            :
-                                request.Where(x => x.StatusPayment == "Settled" && x.AdvanceNo == ad.AdvanceNo).Count() == request.Where(x => x.AdvanceNo == ad.AdvanceNo).Count() ?
-                                    "Settled"
-                                :
-                                    "PartialSettlement",
                            PaymentMethod = ad.PaymentMethod,
                            Amount = re.Amount
                        };
@@ -164,7 +192,6 @@ namespace eFMS.API.Documentation.DL.Services
                 x.UserModified,
                 x.DatetimeModified,
                 x.StatusApproval,
-                x.AdvanceStatusPayment,
                 x.PaymentMethod
             }).Select(s => new AcctAdvancePaymentResult
             {
@@ -181,7 +208,7 @@ namespace eFMS.API.Documentation.DL.Services
                 UserModified = s.Key.UserModified,
                 DatetimeModified = s.Key.DatetimeModified,
                 StatusApproval = s.Key.StatusApproval,
-                AdvanceStatusPayment = s.Key.AdvanceStatusPayment,
+                AdvanceStatusPayment = GetAdvanceStatusPayment(s.Key.AdvanceNo),
                 PaymentMethod = s.Key.PaymentMethod,
                 PaymentMethodName = Common.CustomData.PaymentMethod.Where(x => x.Value == s.Key.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
                 Amount = s.Sum(su => su.Amount),
@@ -203,11 +230,25 @@ namespace eFMS.API.Documentation.DL.Services
             return data.ToList();
         }
 
+        public string GetAdvanceStatusPayment(string advanceNo)
+        {
+            var requestTmp = acctAdvanceRequestRepo.Get();
+            var result = requestTmp.Where(x => x.StatusPayment == "NotSettled" && x.AdvanceNo == advanceNo).Count() == requestTmp.Where(x => x.AdvanceNo == advanceNo).Count()
+                            ?
+                                "NotSettled"
+                            :
+                                requestTmp.Where(x => x.StatusPayment == "Settled" && x.AdvanceNo == advanceNo).Count() == requestTmp.Where(x => x.AdvanceNo == advanceNo).Count() ?
+                                    "Settled"
+                                :
+                                    "PartialSettlement";
+
+            return result;
+        }
+
         public List<AcctAdvanceRequestModel> GetGroupRequestsByAdvanceNo(string advanceNo)
         {
             //Sum(Amount) theo lô hàng (JobId, HBL)
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var list = dc.AcctAdvanceRequest.Where(x => x.AdvanceNo == advanceNo)
+            var list = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo)
                 .GroupBy(g => new { g.JobId, g.Hbl, g.CustomNo })
                 .Select(se => new AcctAdvanceRequest
                 {
@@ -225,8 +266,7 @@ namespace eFMS.API.Documentation.DL.Services
         public List<AcctAdvanceRequestModel> GetGroupRequestsByAdvanceId(Guid advanceId)
         {
             //Sum(Amount) theo lô hàng (JobId, HBL)
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var list = dc.AcctAdvanceRequest.Where(x => x.Id == advanceId)
+            var list = acctAdvanceRequestRepo.Get(x => x.Id == advanceId)
                 .GroupBy(g => new { g.JobId, g.Hbl, g.CustomNo })
                 .Select(se => new AcctAdvanceRequest
                 {
@@ -247,9 +287,9 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         public List<Shipments> GetShipments()
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var shipmentsOperation = dc.OpsTransaction
-                                    .Where(x => x.Hblid != Guid.Empty && x.CurrentStatus != "Canceled")
+            //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var shipmentsOperation = opsTransactionRepo
+                                    .Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != "Canceled")
                                     .Select(x => new Shipments
                                     {
                                         JobId = x.JobNo,
@@ -257,8 +297,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         MBL = x.Mblno
                                     });
 
-            var shipmentsDocumention = (from t in dc.CsTransaction
-                                        join td in dc.CsTransactionDetail on t.Id equals td.JobId
+            var shipmentsDocumention = (from t in csTransactionRepo.Get()
+                                        join td in csTransactionDetailRepo.Get() on t.Id equals td.JobId
                                         select new Shipments
                                         {
                                             JobId = t.JobNo,
@@ -312,7 +352,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var advance = mapper.Map<AcctAdvancePayment>(model);
                 advance.Id = model.Id = Guid.NewGuid();
                 advance.AdvanceNo = model.AdvanceNo = CreateAdvanceNo(dc);
-                advance.StatusApproval = model.StatusApproval = string.IsNullOrEmpty(model.StatusApproval) ? "New" : model.StatusApproval;
+                advance.StatusApproval = model.StatusApproval = string.IsNullOrEmpty(model.StatusApproval) ? Constants.STATUS_APPROVAL_NEW : model.StatusApproval;
 
                 advance.DatetimeCreated = advance.DatetimeModified = DateTime.Now;
                 advance.UserCreated = advance.UserModified = userCurrent;
@@ -352,19 +392,18 @@ namespace eFMS.API.Documentation.DL.Services
         {
             try
             {
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var result = false;
                 //Check trường hợp Add new advance payment
                 if (string.IsNullOrEmpty(criteria.AdvanceNo))
                 {
-                    result = dc.AcctAdvanceRequest.Any(x =>
+                    result = acctAdvanceRequestRepo.Get().Any(x =>
                       x.JobId == criteria.JobId
                    && x.Hbl == criteria.HBL
                    && x.Mbl == criteria.MBL);
                 }
                 else //Check trường hợp Update advance payment
                 {
-                    result = dc.AcctAdvanceRequest.Any(x =>
+                    result = acctAdvanceRequestRepo.Get().Any(x =>
                       x.JobId == criteria.JobId
                    && x.Hbl == criteria.HBL
                    && x.Mbl == criteria.MBL
@@ -383,7 +422,7 @@ namespace eFMS.API.Documentation.DL.Services
             try
             {
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-                var requests = dc.AcctAdvanceRequest.Where(x => x.AdvanceNo == advanceNo).ToList();
+                var requests = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo).ToList();
                 if (requests == null) return new HandleState("Not Found Advance Request");
                 //Xóa các Advance Request có AdvanceNo = AdvanceNo truyền vào
                 dc.AcctAdvanceRequest.RemoveRange(requests);
@@ -402,16 +441,16 @@ namespace eFMS.API.Documentation.DL.Services
 
         public AcctAdvancePaymentModel GetAdvancePaymentByAdvanceNo(string advanceNo)
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var advanceModel = new AcctAdvancePaymentModel();
 
             //Lấy ra Advance Payment dựa vào Advance No
-            var advance = dc.AcctAdvancePayment.Where(x => x.AdvanceNo == advanceNo).FirstOrDefault();
+            var advance = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault();
             //Không tìm thấy Advance Payment thì trả về null
             if (advance == null) return null;
 
             //Lấy ra danh sách Advance Request dựa vào Advance No và sắp xếp giảm dần theo DatetimeModified Advance Request
-            var request = dc.AcctAdvanceRequest.Where(x => x.AdvanceNo == advanceNo).OrderByDescending(x => x.DatetimeModified).ToList();
+            var request = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo).OrderByDescending(x => x.DatetimeModified).ToList();
             //Không tìm thấy Advance Request thì trả về null
             if (request == null) return null;
 
@@ -425,16 +464,16 @@ namespace eFMS.API.Documentation.DL.Services
 
         public AcctAdvancePaymentModel GetAdvancePaymentByAdvanceId(Guid advanceId)
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var advanceModel = new AcctAdvancePaymentModel();
 
             //Lấy ra Advance Payment dựa vào Advance Id
-            var advance = dc.AcctAdvancePayment.Where(x => x.Id == advanceId).FirstOrDefault();
+            var advance = DataContext.Get(x => x.Id == advanceId).FirstOrDefault();
             //Không tìm thấy Advance Payment thì trả về null
             if (advance == null) return null;
 
             //Lấy ra danh sách Advance Request dựa vào Advance No và sắp xếp giảm dần theo DatetimeModified Advance Request
-            var request = dc.AcctAdvanceRequest.Where(x => x.AdvanceNo == advance.AdvanceNo).OrderByDescending(x => x.DatetimeModified).ToList();
+            var request = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advance.AdvanceNo).OrderByDescending(x => x.DatetimeModified).ToList();
             //Không tìm thấy Advance Request thì trả về null
             if (request == null) return null;
 
@@ -455,7 +494,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 var advance = mapper.Map<AcctAdvancePayment>(model);
 
-                var advanceCurrent = dc.AcctAdvancePayment.Where(x => x.Id == advance.Id).FirstOrDefault();
+                var advanceCurrent = DataContext.Get(x => x.Id == advance.Id).FirstOrDefault();
                 advance.DatetimeCreated = advanceCurrent.DatetimeCreated;
                 advance.UserCreated = advanceCurrent.UserCreated;
 
@@ -471,7 +510,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var requestUpdate = request.Where(x => x.UserCreated != null && x.UserCreated != "").ToList();
 
                     //Lấy ra các Request có cùng AdvanceNo và không tồn tại trong requestUpdate
-                    var requestNeedRemove = dc.AcctAdvanceRequest.Where(x => x.AdvanceNo == advance.AdvanceNo && !requestUpdate.Contains(x)).ToList();
+                    var requestNeedRemove = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && !requestUpdate.Contains(x)).ToList();
                     //Xóa các requestNeedRemove
                     dc.AcctAdvanceRequest.RemoveRange(requestNeedRemove);
 
@@ -571,12 +610,12 @@ namespace eFMS.API.Documentation.DL.Services
 
             //Lấy ra tên requester
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var employeeId = dc.SysUser.Where(x => x.Id == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
-            var requesterName = dc.SysEmployee.Where(x => x.Id == employeeId).Select(x => x.EmployeeNameVn).FirstOrDefault();
+            var employeeId = sysUserRepo.Get(x => x.Id == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
+            var requesterName = sysEmployeeRepo.Get(x => x.Id == employeeId).Select(x => x.EmployeeNameVn).FirstOrDefault();
 
             string managerName = "";
             string accountantName = "";
-            var approveAdvance = dc.AcctApproveAdvance.Where(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
+            var approveAdvance = AcctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
             if (approveAdvance != null)
             {
                 managerName = string.IsNullOrEmpty(approveAdvance.Manager) ? null : GetEmployeeByUserId(approveAdvance.Manager).EmployeeNameVn;
@@ -761,12 +800,12 @@ namespace eFMS.API.Documentation.DL.Services
 
             //Lấy ra tên requester
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var employeeId = dc.SysUser.Where(x => x.Id == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
-            var requesterName = dc.SysEmployee.Where(x => x.Id == employeeId).Select(x => x.EmployeeNameVn).FirstOrDefault();
+            var employeeId = sysUserRepo.Get(x => x.Id == advance.Requester).Select(x => x.EmployeeId).FirstOrDefault();
+            var requesterName = sysEmployeeRepo.Get(x => x.Id == employeeId).Select(x => x.EmployeeNameVn).FirstOrDefault();
 
             string managerName = "";
             string accountantName = "";
-            var approveAdvance = dc.AcctApproveAdvance.Where(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
+            var approveAdvance = AcctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
             if (approveAdvance != null)
             {
                 managerName = string.IsNullOrEmpty(approveAdvance.Manager) ? null : GetEmployeeByUserId(approveAdvance.Manager).EmployeeNameVn;
@@ -899,27 +938,24 @@ namespace eFMS.API.Documentation.DL.Services
         //Lấy ra groupId của User
         private int GetGroupIdOfUser(string userId)
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             //Lấy ra groupId của user
-            var grpIdOfUser = dc.SysUserGroup.Where(x => x.UserId == userId).FirstOrDefault().GroupId;
+            var grpIdOfUser = sysUserGroupRepo.Get(x => x.UserId == userId).FirstOrDefault().GroupId;
             return grpIdOfUser;
         }
 
         //Lấy Info của Group 
         private SysGroup GetInfoGroupOfUser(string userId)
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var grpIdOfUser = GetGroupIdOfUser(userId);
-            var infoGrpOfUser = dc.SysGroup.Where(x => x.Id == grpIdOfUser).FirstOrDefault();
+            var infoGrpOfUser = sysGroupRepo.Get(x => x.Id == grpIdOfUser).FirstOrDefault();
             return infoGrpOfUser;
         }
 
         //Lấy Info Dept của User
         private CatDepartment GetInfoDeptOfUser(string userId, string idBranch = "27d26acb-e247-47b7-961e-afa7b3d7e11e")
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var deptIdOfUser = GetInfoGroupOfUser(userId).DepartmentId;
-            var deptOfUser = dc.CatDepartment.Where(x => x.BranchId == Guid.Parse(idBranch) && x.Id == deptIdOfUser).FirstOrDefault();
+            var deptOfUser = catDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Id == deptIdOfUser).FirstOrDefault();
             return deptOfUser;
         }
 
@@ -927,7 +963,6 @@ namespace eFMS.API.Documentation.DL.Services
         //Leader đây chính là ManagerID của Group
         private string GetLeaderIdOfUser(string userId)
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var leaderIdOfUser = GetInfoGroupOfUser(userId).ManagerId;
             return leaderIdOfUser;
         }
@@ -935,11 +970,10 @@ namespace eFMS.API.Documentation.DL.Services
         //Lấy ra ManagerId của User
         private string GetManagerIdOfUser(string userId, string idBranch = "27d26acb-e247-47b7-961e-afa7b3d7e11e")
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             //Lấy ra deptId của User
             var deptIdOfUser = GetInfoGroupOfUser(userId).DepartmentId;
             //Lấy ra mangerId của User
-            var managerIdOfUser = dc.CatDepartment.Where(x => x.BranchId == Guid.Parse(idBranch) && x.Id == deptIdOfUser).FirstOrDefault().ManagerId;
+            var managerIdOfUser = catDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Id == deptIdOfUser).FirstOrDefault().ManagerId;
             return managerIdOfUser;
         }
 
@@ -947,8 +981,7 @@ namespace eFMS.API.Documentation.DL.Services
         //Đang gán cứng BrandId của Branch ITL HCM (27d26acb-e247-47b7-961e-afa7b3d7e11e)
         private string GetAccountantId(string idBranch = "27d26acb-e247-47b7-961e-afa7b3d7e11e")
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var accountantManagerId = dc.CatDepartment.Where(x => x.BranchId == Guid.Parse(idBranch) && x.Code == "Accountant").FirstOrDefault().ManagerId;
+            var accountantManagerId = catDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Code == "Accountant").FirstOrDefault().ManagerId;
             return accountantManagerId;
         }
 
@@ -956,31 +989,27 @@ namespace eFMS.API.Documentation.DL.Services
         //Đang gán cứng BrandId của Branch ITL HCM (27d26acb-e247-47b7-961e-afa7b3d7e11e)
         private string GetBUHeadId(string idBranch = "27d26acb-e247-47b7-961e-afa7b3d7e11e")
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var buHeadId = dc.SysBranch.Where(x => x.Id == Guid.Parse(idBranch)).FirstOrDefault().ManagerId;
+            var buHeadId = sysBranchRepo.Get(x => x.Id == Guid.Parse(idBranch)).FirstOrDefault().ManagerId;
             return buHeadId;
         }
 
         //Lấy ra employeeId của User
         private string GetEmployeeIdOfUser(string UserId)
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            return dc.SysUser.Where(x => x.Id == UserId).FirstOrDefault().EmployeeId;
+            return sysUserRepo.Get(x => x.Id == UserId).FirstOrDefault().EmployeeId;
         }
 
         //Lấy info Employee của User dựa vào employeeId
         private SysEmployee GetEmployeeByEmployeeId(string employeeId)
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            return dc.SysEmployee.Where(x => x.Id == employeeId).FirstOrDefault();
+            return sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault();
         }
 
         //Lấy info Employee của User dựa vào userId
         private SysEmployee GetEmployeeByUserId(string userId)
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var employeeId = GetEmployeeIdOfUser(userId);
-            return dc.SysEmployee.Where(x => x.Id == employeeId).FirstOrDefault();
+            return sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault();
         }
 
 
@@ -997,9 +1026,9 @@ namespace eFMS.API.Documentation.DL.Services
 
                 if (!string.IsNullOrEmpty(approve.AdvanceNo))
                 {
-                    var advance = dc.AcctAdvancePayment.Where(x => x.AdvanceNo == approve.AdvanceNo).FirstOrDefault();
+                    var advance = DataContext.Get(x => x.AdvanceNo == approve.AdvanceNo).FirstOrDefault();
                     //&& advance.StatusApproval != "RequestApproval"
-                    if (advance.StatusApproval != "New" && advance.StatusApproval != "Denied" && advance.StatusApproval != "Done")
+                    if (advance.StatusApproval != Constants.STATUS_APPROVAL_NEW && advance.StatusApproval != Constants.STATUS_APPROVAL_DENIED && advance.StatusApproval != Constants.STATUS_APPROVAL_DONE)
                     {
                         return new HandleState("Awaiting Approval");
                     }
@@ -1012,7 +1041,7 @@ namespace eFMS.API.Documentation.DL.Services
                 acctApprove.Buhead = GetBUHeadId();
 
 
-                var checkExistsApproveByAdvanceNo = dc.AcctApproveAdvance.Where(x => x.AdvanceNo == acctApprove.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
+                var checkExistsApproveByAdvanceNo = AcctApproveAdvanceRepo.Get(x => x.AdvanceNo == acctApprove.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
                 if (checkExistsApproveByAdvanceNo == null) //Insert AcctApproveAdvance
                 {
                     acctApprove.Id = Guid.NewGuid();
@@ -1082,12 +1111,10 @@ namespace eFMS.API.Documentation.DL.Services
         //Nếu group hiện tại đã được approve thì không cho approve nữa
         private HandleState CheckApprovedOfDeptPrevAndDeptCurrent(string advanceNo, string userId, string deptOfUser)
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-
             HandleState result = new HandleState("Not Found");
 
             //Lấy ra Advance Approval dựa vào advanceNo
-            var acctApprove = dc.AcctApproveAdvance.Where(x => x.AdvanceNo == advanceNo && x.IsDeputy == false).FirstOrDefault();
+            var acctApprove = AcctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeputy == false).FirstOrDefault();
             if (acctApprove == null)
             {
                 result = new HandleState("Not Found Advance Approval by AdvanceNo is " + advanceNo);
@@ -1095,7 +1122,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             //Lấy ra Advance Payment dựa vào advanceNo
-            var advance = dc.AcctAdvancePayment.Where(x => x.AdvanceNo == advanceNo).FirstOrDefault();
+            var advance = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault();
             if (advance == null)
             {
                 result = new HandleState("Not Found Advance Payment by AdvanceNo is" + advanceNo);
@@ -1127,7 +1154,7 @@ namespace eFMS.API.Documentation.DL.Services
                         result = new HandleState();
                         //Check group CSManager đã approve chưa
                         //Nếu đã approve thì không được approve nữa
-                        if (advance.StatusApproval.Equals("DepartmentManagerApproved")
+                        if (advance.StatusApproval.Equals(Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
                             && acctApprove.ManagerAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.ManagerApr))
                         {
@@ -1146,14 +1173,14 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     //Check group DepartmentManager đã được Approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Manager)
-                        && advance.StatusApproval.Equals("DepartmentManagerApproved")
+                        && advance.StatusApproval.Equals(Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
                         && acctApprove.ManagerAprDate != null
                         && !string.IsNullOrEmpty(acctApprove.ManagerApr))
                     {
                         result = new HandleState();
                         //Check group Accountant đã approve chưa
                         //Nếu đã approve thì không được approve nữa
-                        if (advance.StatusApproval.Equals("Done")
+                        if (advance.StatusApproval.Equals(Constants.STATUS_APPROVAL_DONE)
                             && acctApprove.AccountantAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.AccountantApr))
                         {
@@ -1189,7 +1216,7 @@ namespace eFMS.API.Documentation.DL.Services
                         result = new HandleState();
                         //Check group Leader đã được approve chưa
                         //Nếu đã approve thì không được approve nữa
-                        if (advance.StatusApproval.Equals("LeaderApproved")
+                        if (advance.StatusApproval.Equals(Constants.STATUS_APPROVAL_LEADERAPPROVED)
                             && acctApprove.LeaderAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.Leader))
                         {
@@ -1218,13 +1245,13 @@ namespace eFMS.API.Documentation.DL.Services
 
                     //Check group Leader đã được approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Leader)
-                        && advance.StatusApproval.Equals("LeaderApproved")
+                        && advance.StatusApproval.Equals(Constants.STATUS_APPROVAL_LEADERAPPROVED)
                         && acctApprove.LeaderAprDate != null)
                     {
                         result = new HandleState();
                         //Check group Manager Department đã approve chưa
                         //Nếu đã approve thì không được approve nữa
-                        if (advance.StatusApproval.Equals("DepartmentManagerApproved")
+                        if (advance.StatusApproval.Equals(Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
                             && acctApprove.ManagerAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.ManagerApr))
                         {
@@ -1244,14 +1271,14 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     //Check group DepartmentManager đã được Approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Manager)
-                        && advance.StatusApproval.Equals("DepartmentManagerApproved")
+                        && advance.StatusApproval.Equals(Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
                         && acctApprove.ManagerAprDate != null
                         && !string.IsNullOrEmpty(acctApprove.ManagerApr))
                     {
                         result = new HandleState();
                         //Check group Accountant đã approve chưa
                         //Nếu đã approve thì không được approve nữa
-                        if (advance.StatusApproval.Equals("Done")
+                        if (advance.StatusApproval.Equals(Constants.STATUS_APPROVAL_DONE)
                             && acctApprove.AccountantAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.AccountantApr))
                         {
@@ -1277,11 +1304,11 @@ namespace eFMS.API.Documentation.DL.Services
             var emailUserAprNext = "";
 
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var advance = dc.AcctAdvancePayment.Where(x => x.Id == advanceId).FirstOrDefault();
+            var advance = DataContext.Get(x => x.Id == advanceId).FirstOrDefault();
 
             if (advance == null) return new HandleState("Not Found Advance Payment");
 
-            var approve = dc.AcctApproveAdvance.Where(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
+            var approve = AcctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
 
             if (approve == null) return new HandleState("Not Found Advance Approval by AdvanceNo is " + advance.AdvanceNo);
 
@@ -1296,7 +1323,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (userCurrent == GetLeaderIdOfUser(advance.Requester) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                 {
-                    advance.StatusApproval = "LeaderApproved";
+                    advance.StatusApproval = Constants.STATUS_APPROVAL_LEADERAPPROVED;
                     approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Approve của Leader
 
                     //Lấy email của Department Manager
@@ -1306,7 +1333,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else if (userCurrent == GetManagerIdOfUser(advance.Requester) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                 {
-                    advance.StatusApproval = "DepartmentManagerApproved";
+                    advance.StatusApproval = Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED;
                     approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Approve của Manager
                     approve.ManagerApr = userCurrent;
 
@@ -1317,7 +1344,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else if (userCurrent == GetAccountantId() || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                 {
-                    advance.StatusApproval = "Done";
+                    advance.StatusApproval = Constants.STATUS_APPROVAL_DONE;
                     approve.AccountantAprDate = approve.BuheadAprDate = DateTime.Now;//Cập nhật ngày Approve của Accountant & BUHead
                     approve.AccountantApr = userCurrent;
                     approve.BuheadApr = approve.Buhead;
@@ -1354,11 +1381,11 @@ namespace eFMS.API.Documentation.DL.Services
             var userCurrent = currentUser.UserID;
 
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var advance = dc.AcctAdvancePayment.Where(x => x.Id == advanceId).FirstOrDefault();
+            var advance = DataContext.Get(x => x.Id == advanceId).FirstOrDefault();
 
             if (advance == null) return new HandleState("Not Found Advance Payment");
 
-            var approve = dc.AcctApproveAdvance.Where(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
+            var approve = AcctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
             if (approve == null) return new HandleState("Not Found Approve Advance by advanceNo " + advance.AdvanceNo);
 
             //Lấy ra dept code của userApprove dựa vào userApprove
@@ -1391,7 +1418,7 @@ namespace eFMS.API.Documentation.DL.Services
                 dc.AcctApproveAdvance.Update(approve);
 
                 //Cập nhật lại advance status của Advance Payment
-                advance.StatusApproval = "Denied";
+                advance.StatusApproval = Constants.STATUS_APPROVAL_DENIED;
                 advance.UserModified = userCurrent;
                 advance.DatetimeModified = DateTime.Now;
                 dc.AcctAdvancePayment.Update(advance);
@@ -1409,8 +1436,8 @@ namespace eFMS.API.Documentation.DL.Services
         {
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             //Lấy ra AdvancePayment dựa vào AdvanceNo
-            var advance = dc.AcctAdvancePayment.Where(x => x.AdvanceNo == advanceNo).FirstOrDefault();
-
+            var advance = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault();
+            
             //Lấy ra tên & email của user Requester
             var requesterId = GetEmployeeIdOfUser(advance.Requester);
             var requesterName = GetEmployeeByEmployeeId(requesterId).EmployeeNameVn;

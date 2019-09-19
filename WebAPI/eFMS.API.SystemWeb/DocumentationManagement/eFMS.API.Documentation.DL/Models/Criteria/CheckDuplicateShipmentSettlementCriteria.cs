@@ -6,7 +6,7 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
 {
     public class CheckDuplicateShipmentSettlementCriteria
     {
-        public string SettlementNo { get; set; }
+        public Guid SurchargeID { get; set; }
         public Guid ChargeID { get; set; }
         public string TypeCharge { get; set; }
         public Guid HBLID { get; set; }
