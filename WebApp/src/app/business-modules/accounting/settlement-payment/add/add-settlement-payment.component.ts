@@ -99,6 +99,10 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             );
     }
 
+    back() {
+        this._router.navigate(['home/accounting/settlement-payment']);
+    }
+
 }
 interface IDataSettlement {
     settlement: any;

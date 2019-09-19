@@ -193,6 +193,10 @@ export class SettlementPaymentDetailComponent extends AppPage {
                 },
             );
     }
+
+    back() {
+        this._router.navigate(['home/accounting/settlement-payment']);
+    }
 }
 
 export interface ISettlementPaymentData {

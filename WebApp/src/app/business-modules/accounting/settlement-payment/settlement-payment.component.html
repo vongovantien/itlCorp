@@ -91,7 +91,31 @@
                                         <tr class="collapse-panel-row" app-table-collapse-row
                                             [id]="'ops-shipment-00' + settlePayment.id + 1"
                                             [parentId]="'#adv-payment-list-table'">
-                                            sdad
+                                            <table class="table table-secondary dataTable">
+                                                <thead>
+                                                    <tr class="text-center" app-table-header [headers]="headers" (onClick)="sortByCustomClearance($event)">
+                                                    </tr>
+                                                </thead>
+                                                <tbody *ngIf="customClearances.length > 0">
+                                                    <tr *ngFor="let clearance of customClearances; let j = index; trackBy: trackByFn" class="text-center">
+                                                        <td>
+                                                            <span>{{clearance.jobId}}</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>{{clearance.mbl}}</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>{{clearance.hbl}}</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>{{clearance.amount}}</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>{{clearance.settlementCurrency}}</span>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </tr>
                                     </ng-container>
                                     <tr *ngIf="!isLoading && !settlements.length" app-table-none-record

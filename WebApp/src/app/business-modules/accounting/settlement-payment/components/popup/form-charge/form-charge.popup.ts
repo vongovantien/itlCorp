@@ -429,7 +429,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             total: this.form.value.amount,
             notes: this.form.value.note,
             invoiceNo: this.form.value.invoiceNo,
-            invoiceDate: !!this.form.value.invoiceDate ? formatDate(this.form.value.invoiceDate.startDate, 'yyyy-MM-dd', 'en') : null,
+            invoiceDate: !!this.form.value.invoiceDate && !!this.form.value.invoiceDate.startDate ? formatDate(this.form.value.invoiceDate.startDate, 'yyyy-MM-dd', 'en') : null,
             seriesNo: this.form.value.serieNo,
             paymentRequestType: this.form.value.type.value,
             isFromShipment: false,
