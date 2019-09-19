@@ -92,7 +92,7 @@ namespace eFMS.API.Documentation.DL.Services
         #region --- LIST SETTLEMENT PAYMENT ---
         public List<AcctSettlementPaymentResult> Paging(AcctSettlementPaymentCriteria criteria, int page, int size, out int rowsCount)
         {
-            var settlement = Get();
+            var settlement = DataContext.Get();
             var user = sysUserRepo.Get();
             var surcharge = csShipmentSurchargeRepo.Get();
             var opst = opsTransactionRepo.Get();
@@ -242,7 +242,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         public List<ShipmentOfSettlementResult> GetShipmentOfSettlements(string settlementNo)
         {
-            var settlement = Get(x => x.SettlementNo == settlementNo);
+            var settlement = DataContext.Get();
             var surcharge = csShipmentSurchargeRepo.Get();
             var opst = opsTransactionRepo.Get();
             var csTrans = csTransactionRepo.Get();
@@ -259,8 +259,8 @@ namespace eFMS.API.Documentation.DL.Services
                        from cstd in csd.DefaultIfEmpty()
                        join cst in csTrans on cstd.JobId equals cst.Id into cs
                        from cst in cs.DefaultIfEmpty()
-                       //where
-                       //     sur.SettlementCode == settlementNo
+                       where
+                            sur.SettlementCode == settlementNo
                        select new ShipmentOfSettlementResult
                        {
                            JobId = (cst.JobNo != null ? cst.JobNo : ops.JobNo),
@@ -299,7 +299,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var userCurrenct = currentUser.UserID;
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
 
-                var settlement = Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
+                var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
                 if (settlement == null) return new HandleState("Not Found Settlement Payment");
                 if (!settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_NEW) && !settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
                 {
@@ -338,7 +338,7 @@ namespace eFMS.API.Documentation.DL.Services
         #region --- DETAILS SETTLEMENT PAYMENT ---
         public AcctSettlementPaymentModel GetSettlementPaymentById(Guid idSettlement)
         {
-            var settlement = Get(x => x.Id == idSettlement).FirstOrDefault();
+            var settlement = DataContext.Get(x => x.Id == idSettlement).FirstOrDefault();
             var settlementMap = mapper.Map<AcctSettlementPaymentModel>(settlement);
             return settlementMap;
         }
@@ -346,7 +346,7 @@ namespace eFMS.API.Documentation.DL.Services
         public List<ShipmentSettlement> GetListShipmentSettlementBySettlementNo(string settlementNo)
         {
             var surcharge = csShipmentSurchargeRepo.Get();
-            var settlement = Get();
+            var settlement = DataContext.Get();
             var opsTrans = opsTransactionRepo.Get();
             var csTransD = csTransactionDetailRepo.Get();
             var csTrans = csTransactionRepo.Get();
@@ -581,7 +581,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         public List<SettlementPaymentMngt> GetSettlementPaymentMngts(string JobId, string MBL, string HBL)
         {
-            var settlement = Get();
+            var settlement = DataContext.Get();
             var surcharge = csShipmentSurchargeRepo.Get();
             var charge = catChargeRepo.Get();
             var payee = catPartnerRepo.Get();
@@ -747,7 +747,7 @@ namespace eFMS.API.Documentation.DL.Services
         public bool CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria)
         {
             var result = false;
-            if (string.IsNullOrEmpty(criteria.SettlementNo))
+            if (criteria.SurchargeID == Guid.Empty)
             {
                 result = csShipmentSurchargeRepo.Get(x =>
                        x.ChargeId == criteria.ChargeID
@@ -761,7 +761,7 @@ namespace eFMS.API.Documentation.DL.Services
             else
             {
                 result = csShipmentSurchargeRepo.Get(x =>
-                       x.SettlementCode != criteria.SettlementNo
+                       x.Id != criteria.SurchargeID
                     && x.ChargeId == criteria.ChargeID
                     && x.Hblid == criteria.HBLID
                     && (criteria.TypeCharge == "BUY" ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == "OBH" ? x.PayerId == criteria.Partner : 1 == 1))
@@ -836,7 +836,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 var settlement = mapper.Map<AcctSettlementPayment>(model.Settlement);
 
-                var settlementCurrent = Get(x => x.Id == settlement.Id).FirstOrDefault();
+                var settlementCurrent = DataContext.Get(x => x.Id == settlement.Id).FirstOrDefault();
                 settlement.DatetimeCreated = settlementCurrent.DatetimeCreated;
                 settlement.UserCreated = settlementCurrent.UserCreated;
 
@@ -948,7 +948,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             var advRequest = acctAdvanceRequestRepo.Get();
             var advPayment = acctAdvancePaymentRepo.Get();
-            var settlement = Get(x => x.StatusApproval == Constants.STATUS_APPROVAL_DONE);
+            var settlement = DataContext.Get(x => x.StatusApproval == Constants.STATUS_APPROVAL_DONE);
             var settleApprove = acctApproveSettlementRepo.Get(x => x.IsDeputy == false);
             
             var customer = catPartnerRepo.Get();
@@ -1098,7 +1098,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             Crystal result = null;
 
-            var settlement = Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
+            var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
             
             var listSettlementPayment = new List<AscSettlementPaymentRequestReport>();
 
@@ -1174,7 +1174,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 if (!string.IsNullOrEmpty(settlement.SettlementNo))
                 {
-                    var settle = Get(x => x.SettlementNo == settlement.SettlementNo).FirstOrDefault();
+                    var settle = DataContext.Get(x => x.SettlementNo == settlement.SettlementNo).FirstOrDefault();
                     if (settle.StatusApproval != Constants.STATUS_APPROVAL_NEW && settle.StatusApproval != Constants.STATUS_APPROVAL_DENIED && settle.StatusApproval != Constants.STATUS_APPROVAL_DONE)
                     {
                         return new HandleState("Awaiting Approval");
@@ -1248,7 +1248,7 @@ namespace eFMS.API.Documentation.DL.Services
             var emailUserAprNext = "";
 
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var settlement = Get(x => x.Id == settlementId).FirstOrDefault();
+            var settlement = DataContext.Get(x => x.Id == settlementId).FirstOrDefault();
 
             if (settlement == null) return new HandleState("Not Found Settlement Payment");
 
@@ -1325,7 +1325,7 @@ namespace eFMS.API.Documentation.DL.Services
             var userCurrent = currentUser.UserID;
 
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var settlement = Get(x => x.Id == settlementId).FirstOrDefault();
+            var settlement = DataContext.Get(x => x.Id == settlementId).FirstOrDefault();
 
             if (settlement == null) return new HandleState("Not Found Settlement Payment");
 
@@ -1451,7 +1451,7 @@ namespace eFMS.API.Documentation.DL.Services
             string stt;
 
             //Lấy ra dòng cuối cùng của table acctSettlementPayment
-            var rowlast = Get().OrderByDescending(x => x.SettlementNo).FirstOrDefault();
+            var rowlast = DataContext.Get().OrderByDescending(x => x.SettlementNo).FirstOrDefault();
 
             if (rowlast == null)
             {
@@ -1713,8 +1713,8 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             //Lấy ra Settlement Payment dựa vào SettlementNo
-            var advance = Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
-            if (advance == null)
+            var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
+            if (settlement == null)
             {
                 result = new HandleState("Not Found Settlement Payment by SettlementNo is" + settlementNo);
                 return result;
@@ -1726,11 +1726,11 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 //Manager Department Approve
                 //Kiểm tra user có phải là dept manager hoặc có phải là user được ủy quyền duyệt hay không
-                if (userId == GetManagerIdOfUser(advance.Requester) || GetListUserDeputyByDept(deptOfUser).Contains(userId))
+                if (userId == GetManagerIdOfUser(settlement.Requester) || GetListUserDeputyByDept(deptOfUser).Contains(userId))
                 {
                     //Kiểm tra User Approve có thuộc cùng dept với User Requester hay
                     //Nếu không cùng thì không cho phép Approve (đối với Dept Manager)
-                    if (GetInfoGroupOfUser(userId).DepartmentId != GetInfoGroupOfUser(advance.Requester).DepartmentId)
+                    if (GetInfoGroupOfUser(userId).DepartmentId != GetInfoGroupOfUser(settlement.Requester).DepartmentId)
                     {
                         result = new HandleState("Not in the same department");
                     }
@@ -1745,7 +1745,7 @@ namespace eFMS.API.Documentation.DL.Services
                         result = new HandleState();
                         //Check group CSManager đã approve chưa
                         //Nếu đã approve thì không được approve nữa
-                        if (advance.StatusApproval.Equals(Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
+                        if (settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
                             && acctApprove.ManagerAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.ManagerApr))
                         {
@@ -1764,14 +1764,14 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     //Check group DepartmentManager đã được Approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Manager)
-                        && advance.StatusApproval.Equals(Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
+                        && settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
                         && acctApprove.ManagerAprDate != null
                         && !string.IsNullOrEmpty(acctApprove.ManagerApr))
                     {
                         result = new HandleState();
                         //Check group Accountant đã approve chưa
                         //Nếu đã approve thì không được approve nữa
-                        if (advance.StatusApproval.Equals(Constants.STATUS_APPROVAL_DONE)
+                        if (settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DONE)
                             && acctApprove.AccountantAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.AccountantApr))
                         {
@@ -1787,11 +1787,11 @@ namespace eFMS.API.Documentation.DL.Services
             else //Trường hợp có leader
             {
                 //Leader Approve
-                if (userId == GetLeaderIdOfUser(advance.Requester) || GetListUserDeputyByDept(deptOfUser).Contains(userId))
+                if (userId == GetLeaderIdOfUser(settlement.Requester) || GetListUserDeputyByDept(deptOfUser).Contains(userId))
                 {
                     //Kiểm tra User Approve có thuộc cùng dept với User Requester hay
                     //Nếu không cùng thì không cho phép Approve (đối với Dept Manager)
-                    if (GetInfoGroupOfUser(userId).DepartmentId != GetInfoGroupOfUser(advance.Requester).DepartmentId)
+                    if (GetInfoGroupOfUser(userId).DepartmentId != GetInfoGroupOfUser(settlement.Requester).DepartmentId)
                     {
                         result = new HandleState("Not in the same department");
                     }
@@ -1807,7 +1807,7 @@ namespace eFMS.API.Documentation.DL.Services
                         result = new HandleState();
                         //Check group Leader đã được approve chưa
                         //Nếu đã approve thì không được approve nữa
-                        if (advance.StatusApproval.Equals(Constants.STATUS_APPROVAL_LEADERAPPROVED)
+                        if (settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_LEADERAPPROVED)
                             && acctApprove.LeaderAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.Leader))
                         {
@@ -1821,11 +1821,11 @@ namespace eFMS.API.Documentation.DL.Services
                 }
 
                 //Manager Department Approve
-                if (userId == GetManagerIdOfUser(advance.Requester) || GetListUserDeputyByDept(deptOfUser).Contains(userId))
+                if (userId == GetManagerIdOfUser(settlement.Requester) || GetListUserDeputyByDept(deptOfUser).Contains(userId))
                 {
                     //Kiểm tra User Approve có thuộc cùng dept với User Requester hay
                     //Nếu không cùng thì không cho phép Approve (đối với Dept Manager)
-                    if (GetInfoGroupOfUser(userId).DepartmentId != GetInfoGroupOfUser(advance.Requester).DepartmentId)
+                    if (GetInfoGroupOfUser(userId).DepartmentId != GetInfoGroupOfUser(settlement.Requester).DepartmentId)
                     {
                         result = new HandleState("Not in the same department");
                     }
@@ -1836,13 +1836,13 @@ namespace eFMS.API.Documentation.DL.Services
 
                     //Check group Leader đã được approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Leader)
-                        && advance.StatusApproval.Equals(Constants.STATUS_APPROVAL_LEADERAPPROVED)
+                        && settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_LEADERAPPROVED)
                         && acctApprove.LeaderAprDate != null)
                     {
                         result = new HandleState();
                         //Check group Manager Department đã approve chưa
                         //Nếu đã approve thì không được approve nữa
-                        if (advance.StatusApproval.Equals(Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
+                        if (settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
                             && acctApprove.ManagerAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.ManagerApr))
                         {
@@ -1862,14 +1862,14 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     //Check group DepartmentManager đã được Approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Manager)
-                        && advance.StatusApproval.Equals(Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
+                        && settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED)
                         && acctApprove.ManagerAprDate != null
                         && !string.IsNullOrEmpty(acctApprove.ManagerApr))
                     {
                         result = new HandleState();
                         //Check group Accountant đã approve chưa
                         //Nếu đã approve thì không được approve nữa
-                        if (advance.StatusApproval.Equals(Constants.STATUS_APPROVAL_DONE)
+                        if (settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DONE)
                             && acctApprove.AccountantAprDate != null
                             && !string.IsNullOrEmpty(acctApprove.AccountantApr))
                         {
@@ -1894,7 +1894,7 @@ namespace eFMS.API.Documentation.DL.Services
             //Lấy danh sách Currency Exchange của ngày hiện tại
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
             //Lấy ra SettlementPayment dựa vào SettlementNo
-            var settlement = Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
+            var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
 
             //Lấy ra tên & email của user Requester
             var requesterId = GetEmployeeIdOfUser(settlement.Requester);
@@ -1988,7 +1988,7 @@ namespace eFMS.API.Documentation.DL.Services
             //Lấy danh sách Currency Exchange của ngày hiện tại
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
             //Lấy ra SettlementPayment dựa vào SettlementNo
-            var settlement = Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
+            var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
 
             //Lấy ra tên & email của user Requester
             var requesterId = GetEmployeeIdOfUser(settlement.Requester);
@@ -2065,7 +2065,7 @@ namespace eFMS.API.Documentation.DL.Services
             //Lấy danh sách Currency Exchange của ngày hiện tại
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
             //Lấy ra SettlementPayment dựa vào SettlementNo
-            var settlement = Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
+            var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
 
             //Lấy ra tên & email của user Requester
             var requesterId = GetEmployeeIdOfUser(settlement.Requester);

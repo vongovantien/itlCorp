@@ -265,7 +265,7 @@ namespace eFMS.API.Documentation.Controllers
                 {
                     var shipment = new CheckDuplicateShipmentSettlementCriteria
                     {
-                        SettlementNo = item.SettlementCode,
+                        SurchargeID = item.Id,
                         ChargeID = item.ChargeId,
                         TypeCharge = item.Type,
                         HBLID = item.Hblid,
@@ -322,7 +322,7 @@ namespace eFMS.API.Documentation.Controllers
                 {
                     var shipment = new CheckDuplicateShipmentSettlementCriteria
                     {
-                        SettlementNo = item.SettlementCode,
+                        SurchargeID = item.Id,
                         ChargeID = item.ChargeId,
                         TypeCharge = item.Type,
                         HBLID = item.Hblid,
@@ -389,7 +389,7 @@ namespace eFMS.API.Documentation.Controllers
                 {
                     var shipment = new CheckDuplicateShipmentSettlementCriteria
                     {
-                        SettlementNo = item.SettlementCode,
+                        SurchargeID = item.Id,
                         ChargeID = item.ChargeId,
                         TypeCharge = item.Type,
                         HBLID = item.Hblid,

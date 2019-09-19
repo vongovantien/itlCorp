@@ -71,7 +71,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         public List<AcctAdvancePaymentResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount)
         {
-            var advance = Get();
+            var advance = DataContext.Get();
             var request = acctAdvanceRequestRepo.Get();
             var user = sysUserRepo.Get();
 
@@ -445,7 +445,7 @@ namespace eFMS.API.Documentation.DL.Services
             var advanceModel = new AcctAdvancePaymentModel();
 
             //Lấy ra Advance Payment dựa vào Advance No
-            var advance = Get(x => x.AdvanceNo == advanceNo).FirstOrDefault();
+            var advance = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault();
             //Không tìm thấy Advance Payment thì trả về null
             if (advance == null) return null;
 
@@ -468,7 +468,7 @@ namespace eFMS.API.Documentation.DL.Services
             var advanceModel = new AcctAdvancePaymentModel();
 
             //Lấy ra Advance Payment dựa vào Advance Id
-            var advance = Get(x => x.Id == advanceId).FirstOrDefault();
+            var advance = DataContext.Get(x => x.Id == advanceId).FirstOrDefault();
             //Không tìm thấy Advance Payment thì trả về null
             if (advance == null) return null;
 
@@ -494,7 +494,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 var advance = mapper.Map<AcctAdvancePayment>(model);
 
-                var advanceCurrent = Get(x => x.Id == advance.Id).FirstOrDefault();
+                var advanceCurrent = DataContext.Get(x => x.Id == advance.Id).FirstOrDefault();
                 advance.DatetimeCreated = advanceCurrent.DatetimeCreated;
                 advance.UserCreated = advanceCurrent.UserCreated;
 
@@ -1026,7 +1026,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 if (!string.IsNullOrEmpty(approve.AdvanceNo))
                 {
-                    var advance = Get(x => x.AdvanceNo == approve.AdvanceNo).FirstOrDefault();
+                    var advance = DataContext.Get(x => x.AdvanceNo == approve.AdvanceNo).FirstOrDefault();
                     //&& advance.StatusApproval != "RequestApproval"
                     if (advance.StatusApproval != Constants.STATUS_APPROVAL_NEW && advance.StatusApproval != Constants.STATUS_APPROVAL_DENIED && advance.StatusApproval != Constants.STATUS_APPROVAL_DONE)
                     {
@@ -1122,7 +1122,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             //Lấy ra Advance Payment dựa vào advanceNo
-            var advance = Get(x => x.AdvanceNo == advanceNo).FirstOrDefault();
+            var advance = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault();
             if (advance == null)
             {
                 result = new HandleState("Not Found Advance Payment by AdvanceNo is" + advanceNo);
@@ -1304,7 +1304,7 @@ namespace eFMS.API.Documentation.DL.Services
             var emailUserAprNext = "";
 
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var advance = Get(x => x.Id == advanceId).FirstOrDefault();
+            var advance = DataContext.Get(x => x.Id == advanceId).FirstOrDefault();
 
             if (advance == null) return new HandleState("Not Found Advance Payment");
 
@@ -1381,7 +1381,7 @@ namespace eFMS.API.Documentation.DL.Services
             var userCurrent = currentUser.UserID;
 
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var advance = Get(x => x.Id == advanceId).FirstOrDefault();
+            var advance = DataContext.Get(x => x.Id == advanceId).FirstOrDefault();
 
             if (advance == null) return new HandleState("Not Found Advance Payment");
 
@@ -1436,7 +1436,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             //Lấy ra AdvancePayment dựa vào AdvanceNo
-            var advance = Get(x => x.AdvanceNo == advanceNo).FirstOrDefault();
+            var advance = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault();
             
             //Lấy ra tên & email của user Requester
             var requesterId = GetEmployeeIdOfUser(advance.Requester);
