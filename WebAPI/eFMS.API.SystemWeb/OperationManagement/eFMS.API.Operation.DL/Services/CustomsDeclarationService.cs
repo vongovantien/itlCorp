@@ -278,10 +278,10 @@ namespace eFMS.API.Operation.DL.Services
 
         public object GetClearanceTypeData()
         {
-            var types = CustomData.Types;
-            var cargoTypes = CustomData.CargoTypes;
-            var routes = CustomData.Routes;
-            var serviceTypes = CustomData.ServiceTypes;
+            var types = Common.CustomData.Types;
+            var cargoTypes = Common.CustomData.CargoTypes;
+            var routes = Common.CustomData.Routes;
+            var serviceTypes = Common.CustomData.ServiceTypes;
             var results = new { types, cargoTypes, routes, serviceTypes };
             return results;
         }
@@ -419,7 +419,7 @@ namespace eFMS.API.Operation.DL.Services
                 item.TypeValid = true;
                 if (!string.IsNullOrEmpty(_type))
                 {
-                    var isFound = CustomData.Types.Any(x => x.Value == _type);
+                    var isFound = Common.CustomData.Types.Any(x => x.Value == _type);
                     if (!isFound)
                     {
                         item.Type = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
@@ -428,7 +428,7 @@ namespace eFMS.API.Operation.DL.Services
                     }
                     else
                     {
-                        item.Type = CustomData.Types.Where(x => x.Value == _type).First().Value;
+                        item.Type = Common.CustomData.Types.Where(x => x.Value == _type).First().Value;
                     }
                 }
 
@@ -738,7 +738,7 @@ namespace eFMS.API.Operation.DL.Services
                 }
                 else
                 {
-                    var isFound = CustomData.ServiceTypes.Any(x => x.Value == _serviceType);
+                    var isFound = Common.CustomData.ServiceTypes.Any(x => x.Value == _serviceType);
                     if (!isFound)
                     {
                         item.ServiceType = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
@@ -747,7 +747,7 @@ namespace eFMS.API.Operation.DL.Services
                     }
                     else
                     {
-                        item.ServiceType = CustomData.ServiceTypes.Where(x => x.Value == _serviceType).First().Value;
+                        item.ServiceType = Common.CustomData.ServiceTypes.Where(x => x.Value == _serviceType).First().Value;
                     }
                 }
 
@@ -766,7 +766,7 @@ namespace eFMS.API.Operation.DL.Services
                 }
                 else
                 {
-                    var isFound = CustomData.CargoTypes.Any(x => x.Value == _cargoType);
+                    var isFound = Common.CustomData.CargoTypes.Any(x => x.Value == _cargoType);
                     if (!isFound)
                     {
                         item.CargoType = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
@@ -775,7 +775,7 @@ namespace eFMS.API.Operation.DL.Services
                     }
                     else
                     {
-                        item.CargoType = CustomData.CargoTypes.Where(x => x.Value == _cargoType).First().Value;
+                        item.CargoType = Common.CustomData.CargoTypes.Where(x => x.Value == _cargoType).First().Value;
                     }
                 }
 
@@ -790,7 +790,7 @@ namespace eFMS.API.Operation.DL.Services
                 }
                 else
                 {
-                    var isFound = CustomData.Routes.Any(x => x.Value == _route);
+                    var isFound = Common.CustomData.Routes.Any(x => x.Value == _route);
                     if (!isFound)
                     {
                         item.Route = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
@@ -799,7 +799,7 @@ namespace eFMS.API.Operation.DL.Services
                     }
                     else
                     {
-                        item.Route = CustomData.Routes.Where(x => x.Value == _route).First().Value;
+                        item.Route = Common.CustomData.Routes.Where(x => x.Value == _route).First().Value;
                     }
                 }
 
