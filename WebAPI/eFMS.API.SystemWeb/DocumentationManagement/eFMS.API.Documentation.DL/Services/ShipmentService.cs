@@ -12,14 +12,14 @@ using System.Text;
 
 namespace eFMS.API.Documentation.DL.Services
 {
-    public class ShipmentService: IShipmentService
+    public class ShipmentService : IShipmentService
     {
         readonly IContextBase<CsTransaction> csRepository;
         readonly IContextBase<OpsTransaction> opsRepository;
         readonly IContextBase<CsTransactionDetail> detailRepository;
         readonly IContextBase<CsShipmentSurcharge> surCharge;
         readonly IMapper mapper;
-        public ShipmentService(IContextBase<CsTransaction> cs, IContextBase<OpsTransaction> ops, IMapper iMapper, IContextBase<CsTransactionDetail> detail, IContextBase<CsShipmentSurcharge> surcharge) 
+        public ShipmentService(IContextBase<CsTransaction> cs, IContextBase<OpsTransaction> ops, IMapper iMapper, IContextBase<CsTransactionDetail> detail, IContextBase<CsShipmentSurcharge> surcharge)
         {
             csRepository = cs;
             opsRepository = ops;
@@ -54,24 +54,15 @@ namespace eFMS.API.Documentation.DL.Services
             return shipments;
         }
 
-        public IQueryable<Shipments> GetShipmentsCreditPayer(string partner, List<string> productServices)
+        public IQueryable<Shipments> GetShipmentsCreditPayer(string partner, List<string> services)
         {
             //Chỉ lấy ra những phí Credit(BUY) & Payer
-            var surcharge = surCharge.Get(x => 
-                    (x.Type == "BUY" || (x.PayerId != null && x.CreditNo != null)) 
-                &&  (x.PayerId == partner || x.PaymentObjectId == partner)
+            var surcharge = surCharge.Get(x =>
+                    (x.Type == "BUY" || (x.PayerId != null && x.CreditNo != null))
+                && (x.PayerId == partner || x.PaymentObjectId == partner)
             );
-            var shipmentOperation = opsRepository.Get(x => 
-                    x.CurrentStatus != "Canceled" 
-                &&  productServices.Contains(x.ProductService));
-            var shipmentsOperation = surcharge.Join(shipmentOperation, x => x.Hblid, y => y.Hblid, (x, y) => new { x, y }).Select(x => new Shipments
-            {
-                JobId = x.y.JobNo,
-                HBL = x.y.Hwbno,
-                MBL = x.y.Mblno,
-            });
 
-            var transactions = csRepository.Get();
+            var transactions = csRepository.Get(x => services.Contains(x.TransactionType));
             var shipmentDocumention = transactions.Join(detailRepository.Get(), x => x.Id, y => y.JobId, (x, y) => new { x, y }).Select(x => new Shipments
             {
                 Id = x.y.Id,
@@ -79,16 +70,34 @@ namespace eFMS.API.Documentation.DL.Services
                 HBL = x.y.Hwbno,
                 MBL = x.y.Mawb,
             });
-            var shipmentsDocumention = surcharge.Join(shipmentDocumention, x => x.Hblid, y => y.Id, (x, y) => new { x, y }).Select(x => new Shipments
+            var shipmentsDocumention = surcharge.Join(shipmentDocumention, x => x.Hblid, y => y.Id, (x, y) => new { x, y })
+                .Select(x => new Shipments
+                {
+                    Id = x.x.Id,
+                    JobId = x.y.JobId,
+                    HBL = x.y.HBL,
+                    MBL = x.y.MBL,
+                });
+
+            IQueryable<Shipments> shipments = shipmentsDocumention
+                .Where(x => x.JobId != null && x.HBL != null && x.MBL != null)
+                .Select(s => new Shipments { JobId = s.JobId, HBL = s.HBL, MBL = s.MBL });
+            //Nếu có chứa Service Custom Logistic
+            if (services.Contains("CL"))
             {
-                Id = x.x.Id,
-                JobId = x.y.JobId,
-                HBL = x.y.HBL,
-                MBL = x.y.MBL,
-            });
-            
-            var shipments = shipmentsOperation.Union(shipmentsDocumention).Where(x => x.JobId != null && x.HBL != null && x.MBL != null).Select(s => new Shipments { JobId = s.JobId, HBL = s.HBL, MBL = s.MBL });
-            var shipmentsResult = shipments.GroupBy(x => new { x.JobId, x.HBL, x.MBL }).Select(s => new Shipments {
+                var shipmentOperation = opsRepository.Get(x => x.CurrentStatus != "Canceled");
+                var shipmentsOperation = surcharge.Join(shipmentOperation, x => x.Hblid, y => y.Hblid, (x, y) => new { x, y }).Select(x => new Shipments
+                {
+                    JobId = x.y.JobNo,
+                    HBL = x.y.Hwbno,
+                    MBL = x.y.Mblno,
+                });
+
+                shipments = shipmentsDocumention.Union(shipmentsOperation).Where(x => x.JobId != null && x.HBL != null && x.MBL != null).Select(s => new Shipments { JobId = s.JobId, HBL = s.HBL, MBL = s.MBL });
+            }
+
+            var shipmentsResult = shipments.GroupBy(x => new { x.JobId, x.HBL, x.MBL }).Select(s => new Shipments
+            {
                 JobId = s.Key.JobId,
                 HBL = s.Key.HBL,
                 MBL = s.Key.MBL

@@ -156,7 +156,9 @@ namespace eFMS.API.Documentation.DL.Services
                                 }
                             }
                         }
-                        if(ht.Count > 0)
+                        var opstrans = opsTransRepository.First(x => x.Id == masterId);
+
+                        if (ht.Count > 0)
                         {
                             var containerDes = string.Empty;
                             ICollection keys = ht.Keys;
@@ -165,8 +167,6 @@ namespace eFMS.API.Documentation.DL.Services
                                 containerDes = containerDes + ht[key] + "x" + key + "; ";
                             }
                             containerDes = containerDes.Substring(0, containerDes.Length - 2);
-                            var opstrans = opsTransRepository.First(x => x.Id == masterId);
-
                             opstrans.SumCbm = sumCBM != 0? (decimal?)sumCBM: null;
                             opstrans.SumChargeWeight = sumCW != 0 ? (decimal?)sumCW : null;
                             opstrans.SumGrossWeight = sumGW != 0 ? (decimal?)sumGW : null;
@@ -174,10 +174,15 @@ namespace eFMS.API.Documentation.DL.Services
                             opstrans.SumPackages = sumPackages != 0 ? (int?)sumPackages : null;
                             opstrans.SumContainers = sumCont != 0 ? (int?)sumCont : null ;
                             opstrans.ContainerDescription = containerDes;
-                            opstrans.ModifiedDate = DateTime.Now;
-                            opstrans.UserModified = currentUser.UserID;
-                            opsTransRepository.Update(opstrans, x => x.Id == masterId, false);
                         }
+                        else
+                        {
+                            opstrans.SumCbm = opstrans.SumChargeWeight = opstrans.SumGrossWeight = opstrans.SumNetWeight = opstrans.SumPackages = opstrans.SumContainers = null;
+                            opstrans.ContainerDescription = null;
+                        }
+                        opstrans.ModifiedDate = DateTime.Now;
+                        opstrans.UserModified = currentUser.UserID;
+                        opsTransRepository.Update(opstrans, x => x.Id == masterId, false);
                         DataContext.SubmitChanges();
                         opsTransRepository.SubmitChanges();
                         trans.Commit();
