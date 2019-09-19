@@ -94,9 +94,56 @@ export class BillingCustomDeclarationComponent extends AppPage implements OnInit
       });
       const responses = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.updateToAJob, dataToUpdate, false, true);
       if (responses.success === true) {
-        await this.getCustomClearanesOfJob(this.currentJob.jobNo);
-        this.updateShipmentVolumn();
+        this.customClearanceRepo.getListImportedInJob(this.currentJob.jobNo).pipe(
+          takeUntil(this.ngUnsubscribe),
+          catchError(this.catchError),
+          finalize(() => {
+            this.dataImportedSearch = this.importedData;
+            this.setPageMaster(this.pagerMaster);
+            this.updateShipmentVolumn();
+          })
+        ).subscribe(
+          (res: any) => {
+            this.importedData = res;
+            if (this.importedData != null) {
+              this.importedData.forEach(element => {
+                element.isChecked = false;
+              });
+            } else {
+              this.importedData = [];
+            }
+          }
+        );
       }
+    }
+  }
+  async updateShipmentVolumn() {
+    if (this.importedData != null) {
+      this.currentJob.sumGrossWeight = 0;
+      this.currentJob.sumNetWeight = 0;
+      this.currentJob.sumCbm = 0;
+      if (this.importedData.length > 0) {
+        for (let i = 0; i < this.importedData.length; i++) {
+          this.currentJob.sumGrossWeight = this.currentJob.sumGrossWeight + this.importedData[i].grossWeight == null ? 0 : this.importedData[i].grossWeight;
+          this.currentJob.sumNetWeight = this.currentJob.sumNetWeight + this.importedData[i].netWeight == null ? 0 : this.importedData[i].netWeight;
+          this.currentJob.sumCbm = this.currentJob.sumCbm + this.importedData[i].cbm == null ? 0 : this.importedData[i].cbm;
+        }
+        if (this.currentJob.sumGrossWeight === 0) {
+          this.currentJob.sumGrossWeight = null;
+        }
+        if (this.currentJob.sumNetWeight === 0) {
+          this.currentJob.sumNetWeight = null;
+        }
+        if (this.currentJob.sumCbm === 0) {
+          this.currentJob.sumCbm = null;
+        }
+      } else {
+        this.currentJob.sumGrossWeight = null;
+        this.currentJob.sumNetWeight = null;
+        this.currentJob.sumCbm = null;
+      }
+
+      await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.currentJob, false, false);
     }
   }
   getListCleranceNotImported() {
@@ -147,32 +194,8 @@ export class BillingCustomDeclarationComponent extends AppPage implements OnInit
   }
   async closeAddMore(event) {
     if (event) {
+      // this.updateShipmentVolumn();
       await this.getCustomClearanesOfJob(this.currentJob.jobNo);
-      this.updateShipmentVolumn();
-    }
-  }
-  async updateShipmentVolumn() {
-    if (this.importedData != null) {
-      this.currentJob.sumGrossWeight = 0;
-      this.currentJob.sumNetWeight = 0;
-      this.currentJob.sumCbm = 0;
-      if (this.importedData.length > 0) {
-        for (let i = 0; i < this.importedData.length; i++) {
-          this.currentJob.sumGrossWeight = this.currentJob.sumGrossWeight + this.importedData[i].grossWeight == null ? 0 : this.importedData[i].grossWeight;
-          this.currentJob.sumNetWeight = this.currentJob.sumNetWeight + this.importedData[i].netWeight == null ? 0 : this.importedData[i].netWeight;
-          this.currentJob.sumCbm = this.currentJob.sumCbm + this.importedData[i].cbm == null ? 0 : this.importedData[i].cbm;
-        }
-      }
-      if (this.currentJob.sumGrossWeight === 0) {
-        this.currentJob.sumGrossWeight = null;
-      }
-      if (this.currentJob.sumNetWeight === 0) {
-        this.currentJob.sumNetWeight = null;
-      }
-      if (this.currentJob.sumCbm === 0) {
-        this.currentJob.sumCbm = null;
-      }
-      await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.currentJob, false, false);
     }
   }
   setPageMaster(pager: PagerSetting) {

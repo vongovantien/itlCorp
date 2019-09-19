@@ -24,24 +24,36 @@ namespace eFMS.API.Operation.DL.Services
         private readonly ICatStageApiService catStageApi;
         private readonly ICurrentUser currentUser;
         private readonly ICatDepartmentApiService catDepartmentApi;
+        private readonly IContextBase<OpsTransaction> opsTransRepository;
+
         public OpsStageAssignedService(IContextBase<OpsStageAssigned> repository, IMapper mapper,
             ICatStageApiService stageApi,
             ICurrentUser user,
-            ICatDepartmentApiService departmentApi) : base(repository, mapper)
+            ICatDepartmentApiService departmentApi,
+            IContextBase<OpsTransaction> opsTransRepo) : base(repository, mapper)
         {
             catStageApi = stageApi;
             currentUser = user;
             catDepartmentApi = departmentApi;
+            opsTransRepository = opsTransRepo;
         }
 
         public HandleState AddMultipleStage(List<OpsStageAssignedEditModel> models, Guid jobId)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var result = new HandleState();
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var stagesByJob = DataContext.Get(x => x.JobId == jobId);
             var listToDelete = stagesByJob.Where(x => !models.Any(model => model.Id == x.Id));
-            foreach(var item in models)
+
+            if (listToDelete.Count() > 0)
+            {
+                ChangeTrackerHelper.currentUser = currentUser.UserID;
+                var list = mapper.Map<List<OpsStageAssigned>>(listToDelete);
+                foreach(var item in list)
+                {
+                    DataContext.Delete(x => x.Id == item.Id, false);
+                }
+            }
+            foreach (var item in models)
             {
                 if (item.Id == Guid.Empty)
                 {
@@ -52,25 +64,20 @@ namespace eFMS.API.Operation.DL.Services
                     assignedItem.Status = Constants.InSchedule;
                     assignedItem.CreatedDate = assignedItem.ModifiedDate = DateTime.Now;
                     assignedItem.UserCreated = currentUser.UserID;
-                    dc.Add(assignedItem);
+                    DataContext.Add(assignedItem, false);
                 }
                 else
                 {
-                    var assignedToUpdate = dc.OpsStageAssigned.Find(item.Id);
+                    var assignedToUpdate = DataContext.First(x => x.Id == item.Id);
                     assignedToUpdate.UserModified = currentUser.UserID;
                     assignedToUpdate.ModifiedDate = DateTime.Now;
                     assignedToUpdate.OrderNumberProcessed = item.OrderNumberProcessed;
-                    dc.Update(assignedToUpdate);
+                    DataContext.Update(assignedToUpdate, x => x.Id == assignedToUpdate.Id, false);
                 }
-            }
-            if(listToDelete.Count() > 0)
-            {
-                var list = mapper.Map<List<OpsStageAssigned>>(listToDelete);
-                dc.RemoveRange(list);
             }
             try
             {
-                dc.SaveChanges();
+                DataContext.SubmitChanges();
             }
             catch (Exception ex)
             {
@@ -127,9 +134,8 @@ namespace eFMS.API.Operation.DL.Services
             var assigned = mapper.Map<OpsStageAssigned>(model);
             assigned.UserModified = currentUser.UserID;
             assigned.ModifiedDate = DateTime.Now;
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var stageAssigneds = DataContext.Get(x => x.JobId == model.JobId);
-            var job = dc.OpsTransaction.Find(model.JobId);
+            var job = opsTransRepository.First(x => x.Id == model.JobId);
             if (job.CurrentStatus != Constants.Deleted && job.CurrentStatus != Constants.Finish)
             {
                 if (assigned.Status?.Trim() == DataTypeEx.GetStageStatus(StageEnum.Overdue))
@@ -153,11 +159,12 @@ namespace eFMS.API.Operation.DL.Services
             try
             {
                 result = DataContext.Update(assigned, x => x.Id == assigned.Id, false);
+                SubmitChanges();
                 if (result.Success)
                 {
-                    dc.OpsTransaction.Update(job);
+                    opsTransRepository.Update(job, x => x.Id == job.Id);
+                    opsTransRepository.SubmitChanges();
                 }
-                dc.SaveChanges();
             }
             catch (Exception ex)
             {
