@@ -103,8 +103,8 @@ export class ContainerListComponent extends PopupBase implements OnInit {
       this.lstMasterContainers.splice(index, 1);
       // this.lstMasterContainers.push(this.initNewContainer());
     }
+    // this.outputContainers.emit(this.lstMasterContainers);
     this.hide();
-    this.outputContainers.emit(this.lstMasterContainers);
   }
 
   addNewRowContainer() {
