@@ -1,10 +1,16 @@
 <div class="select-multiple-container" (clickOutside)="onclickOutSide()">
     <div class="select-multiple-item-selected" (click)="isShow = !isShow">
         <ng-template #placeholder>
-            <span class="placeholder float-left" >{{placeHolder}}</span>
+            <span class="placeholder float-left">{{placeHolder}}</span>
+        </ng-template>
+        <ng-template #all>
+            <span class="placeholder float-left">All</span>
         </ng-template>
         <ul class="list-inline" *ngIf="!!active.length else placeholder">
-            <li *ngFor="let item of active; let i = index" class="list-inline-item">{{item.text}}</li>
+            <ng-container *ngIf="active.length < source.length">
+                <li *ngFor="let item of active; let i = index" class="list-inline-item">{{item.text}}</li>
+            </ng-container>
+            <ng-container *ngIf="active.length === source.length">All</ng-container>
         </ul>
         <div class="icon-dropdown float-right">
             <i class=" la la-angle-down" *ngIf="!active.length"></i>

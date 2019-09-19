@@ -54,7 +54,7 @@
                         <table class="table table-brand dataTable table-striped">
                             <thead>
                                 <tr app-table-header [headers]="headers" class="text-center" (onClick)="sortSurcharge($event)">
-                                    <th>
+                                    <th class="first">
                                         <label class="m-checkbox">
                                             <input type="checkbox" [(ngModel)]="isCheckAll"
                                                 (change)="checkUncheckAllCharge()">

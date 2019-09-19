@@ -28,22 +28,22 @@ export class SettlementPaymentManagementPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
-        this.headerAdvance = [
-            { title: 'Advance No', field: 'advanceNo', sortable: true },
-            { title: 'Description', field: 'description', sortable: true },
-            { title: 'Total Amount', field: 'totalAmount', sortable: true },
-            { title: 'Currency', field: 'currency', sortable: true },
-            { title: 'Advance Date', field: 'advanceDate', sortable: true },
-        ];
+        // this.headerAdvance = [
+        //     { title: 'Advance No', field: 'advanceNo', sortable: true },
+        //     { title: 'Description', field: 'description', sortable: true },
+        //     { title: 'Total Amount', field: 'totalAmount', sortable: true },
+        //     { title: 'Currency', field: 'currency', sortable: true },
+        //     { title: 'Advance Date', field: 'advanceDate', sortable: true },
+        // ];
 
-        this.headerSettlement = [
-            { title: 'Settlement No', field: 'AdvanceNo', sortable: true },
-            { title: 'Charge Name', field: 'AdvanceNo', sortable: true },
-            { title: 'Total Amount', field: 'AdvanceNo', sortable: true },
-            { title: 'Currency', field: 'AdvanceNo', sortable: true },
-            { title: 'Settlement Date', field: 'AdvanceNo', sortable: true },
-            { title: 'OBH Partner', field: 'AdvanceNo', sortable: true },
-        ];
+        // this.headerSettlement = [
+        //     { title: 'Settlement No', field: 'AdvanceNo', sortable: true },
+        //     { title: 'Charge Name', field: 'AdvanceNo', sortable: true },
+        //     { title: 'Total Amount', field: 'AdvanceNo', sortable: true },
+        //     { title: 'Currency', field: 'AdvanceNo', sortable: true },
+        //     { title: 'Settlement Date', field: 'AdvanceNo', sortable: true },
+        //     { title: 'OBH Partner', field: 'AdvanceNo', sortable: true },
+        // ];
 
         this.data = {
             jobId: '',
