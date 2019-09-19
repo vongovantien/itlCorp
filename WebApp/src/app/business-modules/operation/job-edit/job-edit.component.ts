@@ -491,6 +491,9 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
     selectTab($event: any, tabName: string) {
         this.tab = tabName;
+        if (tabName === 'job-edit') {
+            this.getShipmentDetails(this.jobId);
+        }
         this.getAllSurCharges();
         // this.router.navigate([`home/operation/job-edit/${this.jobId}`], {queryParams: {tab: this.tab}});
     }

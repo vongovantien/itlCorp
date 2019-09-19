@@ -125,9 +125,35 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
       });
       const responses = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.updateToAJob, dataToUpdate, false, true);
       if (responses.success === true) {
+        this.updateShipmentVolumn(dataToUpdate);
         this.isCloseModal.emit(true);
         this.hide();
       }
+    }
+  }
+
+  async updateShipmentVolumn(importedData) {
+    if (importedData != null) {
+      this.currentJob.sumGrossWeight = 0;
+      this.currentJob.sumNetWeight = 0;
+      this.currentJob.sumCbm = 0;
+      if (importedData.length > 0) {
+        for (let i = 0; i < importedData.length; i++) {
+          this.currentJob.sumGrossWeight = this.currentJob.sumGrossWeight + importedData[i].grossWeight == null ? 0 : importedData[i].grossWeight;
+          this.currentJob.sumNetWeight = this.currentJob.sumNetWeight + importedData[i].netWeight == null ? 0 : importedData[i].netWeight;
+          this.currentJob.sumCbm = this.currentJob.sumCbm + importedData[i].cbm == null ? 0 : importedData[i].cbm;
+        }
+      }
+      if (this.currentJob.sumGrossWeight === 0) {
+        this.currentJob.sumGrossWeight = null;
+      }
+      if (this.currentJob.sumNetWeight === 0) {
+        this.currentJob.sumNetWeight = null;
+      }
+      if (this.currentJob.sumCbm === 0) {
+        this.currentJob.sumCbm = null;
+      }
+      await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.currentJob, false, false);
     }
   }
   getListCleranceNotImported() {
