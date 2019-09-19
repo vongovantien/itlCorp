@@ -9,8 +9,8 @@
         "build:test:vi": "ng build --prod --c=test-vi",
         "build:test:en": "ng build --prod --c=test-en",
         "build:stag": "ng build --prod --c=staging-vi && ng build --prod --c=staging-en",
-        "build:stag:vi": "ng build --prod --c=stag-vi",
-        "build:stag:en": "ng build --prod --c=stag-en",
+        "build:stag:vi": "ng build --prod --c=staging-vi",
+        "build:stag:en": "ng build --prod --c=staging-en",
         "test": "ng test",
         "lint": "ng lint",
         "e2e": "ng e2e"
