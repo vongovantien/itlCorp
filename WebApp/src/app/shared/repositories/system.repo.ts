@@ -86,7 +86,7 @@ export class SystemRepo {
     }
 
     getListService() {
-        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/AcctSOA/GetListServices`)
+        return this._api.get(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatCharge/GetListServices`)
             .pipe(
                 catchError((error) => throwError(error)),
                 map((data: any) => data)

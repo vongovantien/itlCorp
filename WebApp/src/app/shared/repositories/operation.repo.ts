@@ -71,6 +71,14 @@ export class OperationRepo {
             })
         );
     }
+
+    getListService() {
+        return this._api.get(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatCharge/GetListServices`)
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => data)
+            );
+    }
 }
 
 

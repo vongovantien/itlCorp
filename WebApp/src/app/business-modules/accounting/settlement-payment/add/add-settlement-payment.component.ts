@@ -38,6 +38,12 @@ export class SettlementPaymentAddNewComponent extends AppPage {
     }
 
     saveSettlement() {
+        if (!this.requestSurchargeListComponent.surcharges.length) {
+            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+            return;
+        }
+
+        this._progressRef.start();
         const body: IDataSettlement = {
             settlement: {
                 id: "00000000-0000-0000-0000-000000000000",
@@ -52,7 +58,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
         };
 
         this._accountingRepo.addNewSettlement(body)
-            .pipe(catchError(this.catchError))
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     console.log(res);

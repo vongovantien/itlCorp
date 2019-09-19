@@ -48,7 +48,6 @@ export class SettlementPaymentComponent extends AppList {
 
     ngOnInit() {
         this.headers = [
-            { title: '', field: '' },
             { title: 'Settlement No', field: 'settlementNo', sortable: true },
             { title: 'Amount', field: 'amount', sortable: true },
             { title: 'Currency', field: 'chargeCurrency', sortable: true },
