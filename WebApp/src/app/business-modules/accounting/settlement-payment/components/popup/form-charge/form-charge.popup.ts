@@ -176,7 +176,6 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     }
 
     initFormUpdate(data: any) {
-        console.log(data);
         this.selectedSurcharge = data;
         this.form.setValue({
             customNo: !!data.clearanceNo ? (this.initCD.filter((item: CustomDeclaration) => item.clearanceNo === data.clearanceNo).length ? this.initCD.filter((item: CustomDeclaration) => item.clearanceNo === data.clearanceNo)[0] : null) : null,

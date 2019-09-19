@@ -61,7 +61,6 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {
-                    console.log(res);
                     if (res.status) {
                         this._toastService.success(res.message);
 
