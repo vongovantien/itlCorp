@@ -176,6 +176,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     }
 
     initFormUpdate(data: any) {
+        console.log(data);
         this.selectedSurcharge = data;
         this.form.setValue({
             customNo: !!data.clearanceNo ? (this.initCD.filter((item: CustomDeclaration) => item.clearanceNo === data.clearanceNo).length ? this.initCD.filter((item: CustomDeclaration) => item.clearanceNo === data.clearanceNo)[0] : null) : null,
@@ -568,7 +569,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
 
     checkValidateSurcharge(body: any) {
         const bodyToValidate: IShipmentValidate = {
-            settlementNo: this.settlementCode || null,
+            surchargeID: this.action !== 'update' ? '00000000-0000-0000-0000-000000000000' : this.selectedSurcharge.id,
             chargeID: body.chargeId,
             typeCharge: body.type,
             hblid: body.hblid,
@@ -641,7 +642,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
 }
 
 interface IShipmentValidate {
-    settlementNo: string;
+    surchargeID: string;
     chargeID: string;
     typeCharge: string;
     hblid: string;

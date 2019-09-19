@@ -53,7 +53,7 @@ export class AdvancePaymentComponent extends AppList {
             { title: 'DeadLine Date', field: 'deadlinePayment', sortable: true },
             { title: 'Modified Date', field: 'advanceDatetimeModified', sortable: true },
             { title: 'Status Approval', field: 'statusApprovalName', sortable: true },
-            { title: 'Status Payment', field: 'statusPayment', sortable: true },
+            { title: 'Status Payment', field: 'advanceStatusPayment', sortable: true },
             { title: 'Payment Method', field: 'paymentMethod', sortable: true },
             { title: 'Description', field: 'advanceNote', sortable: true },
 
@@ -99,27 +99,13 @@ export class AdvancePaymentComponent extends AppList {
 
     sortAdvancePayment(sort: string): void {
         if (!!sort) {
-            this.advancePayments = this._sortService.sort(this.advancePayments, sort, this.order);
+            this.advancePayments = this._sortService.sort(this.advancePayments, this.sort, this.order);
         }
     }
 
-    sortClassCollapse(sort: string): string {
-        if (!!sort) {
-            let classes = 'sortable ';
-            if (this.sort === sort) {
-                classes += ('sort-' + (this.order ? 'asc' : 'desc') + ' ');
-            }
-            return classes;
-        }
-        return '';
-    }
-
-    sortByCollapse(sort: string): void {
-        if (!!sort) {
-            this.setSortBy(sort, this.sort !== sort ? true : !this.order);
-            if (!!this.groupRequest.length) {
-                this.groupRequest = this._sortService.sort(this.groupRequest, sort, this.order);
-            }
+    sortByCollapse(sort: CommonInterface.ISortData): void {
+        if (!!sort.sortField) {
+            this.groupRequest = this._sortService.sort(this.groupRequest, sort.sortField, sort.order);
         }
     }
 
