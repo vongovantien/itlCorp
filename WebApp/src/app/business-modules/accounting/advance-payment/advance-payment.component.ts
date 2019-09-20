@@ -91,7 +91,8 @@ export class AdvancePaymentComponent extends AppList {
                 })
             ).subscribe(
                 (res: any) => {
-                    this.advancePayments = res.data;
+                    this.advancePayments = res.data || [];
+                    console.log(this.advancePayments);
                     this.totalItems = res.totalItems || 0;
                 },
             );

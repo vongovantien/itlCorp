@@ -6,7 +6,6 @@ import { catchError, takeUntil, distinctUntilChanged, map } from 'rxjs/operators
 import { AppForm } from 'src/app/app.form';
 import { FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
 import { SystemConstants } from 'src/constants/system.const';
-import moment from 'moment';
 
 @Component({
     selector: 'adv-payment-form-create',
@@ -31,7 +30,6 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     note: AbstractControl;
     currency: AbstractControl;
 
-    maxDateDeadLine = moment();
 
     constructor(
         private _fb: FormBuilder,
@@ -86,7 +84,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
                 map((data: any) => data.startDate)
             )
             .subscribe((value: any) => {
-                this.maxDateDeadLine = value.startDate;
+                this.minDate = value;
                 setTimeout(() => {
                     this.deadLine.setValue({
                         startDate: new Date(new Date(value).setDate(new Date(value).getDate() + 9)),
@@ -97,7 +95,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     }
 
     onUpdateRequestDate(value: { startDate: any; endDate: any }) {
-        this.maxDateDeadLine = value.startDate;
+        this.minDate = value.startDate;
         this.deadLine.setValue({
             startDate: new Date(new Date(value.startDate).setDate(new Date(value.startDate).getDate() + 9)),
             endDate: new Date(new Date(value.endDate).setDate(new Date(value.endDate).getDate() + 9)),

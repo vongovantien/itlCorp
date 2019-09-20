@@ -1143,3 +1143,7 @@ input:checked + .slider:before {
     -ms-transform: translateX(26px);
     transform: translateX(26px);
 }
+
+a:not([href]):not([tabindex]) {
+  color: #3966b6;
+}

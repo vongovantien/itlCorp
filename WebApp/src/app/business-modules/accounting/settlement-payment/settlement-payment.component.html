@@ -93,7 +93,7 @@
                                             [parentId]="'#adv-payment-list-table'">
                                             <table class="table table-secondary dataTable">
                                                 <thead>
-                                                    <tr class="text-center" app-table-header [headers]="headers" (onClick)="sortByCustomClearance($event)">
+                                                    <tr class="text-center" app-table-header [headers]="headerCustomClearance" (onClick)="sortByCustomClearance($event)">
                                                     </tr>
                                                 </thead>
                                                 <tbody *ngIf="customClearances.length > 0">
