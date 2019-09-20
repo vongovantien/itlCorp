@@ -119,8 +119,8 @@
                                     <td>{{surcharge.currencyId}}</td>
                                     <td>{{surcharge.vatrate}}</td>
                                     <td>{{surcharge.total | number: '.0-3'}}</td>
-                                    <td>{{surcharge.payer}}</td>
-                                    <td>{{surcharge.obhPartnerName}}</td>
+                                    <td>{{surcharge.type === 'BUY' ? surcharge.payer : surcharge.obhPartnerName}}</td>
+                                    <td>{{surcharge.type === 'OBH' ? surcharge.obhPartnerName: surcharge.payer}}</td>
                                     <td>{{surcharge.invoiceNo}}</td>
                                     <td>{{surcharge.seriesNo}}</td>
                                     <td>{{surcharge.invoiceDate | date: 'dd/MM/yyyy'}}</td>
