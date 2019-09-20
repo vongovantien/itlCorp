@@ -7,6 +7,7 @@ namespace eFMS.API.Accounting.Service.Models
     {
         public CsTransaction()
         {
+            CsTransactionDetail = new HashSet<CsTransactionDetail>();
         }
 
         public Guid Id { get; set; }
@@ -59,5 +60,7 @@ namespace eFMS.API.Accounting.Service.Models
         public DateTime? ModifiedDate { get; set; }
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
+
+        public virtual ICollection<CsTransactionDetail> CsTransactionDetail { get; set; }
     }
 }

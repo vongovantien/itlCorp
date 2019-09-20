@@ -93,6 +93,7 @@ namespace eFMS.API.Documentation.DL.Services
         public List<AcctSettlementPaymentResult> Paging(AcctSettlementPaymentCriteria criteria, int page, int size, out int rowsCount)
         {
             var settlement = DataContext.Get();
+            var approveSettle = acctApproveSettlementRepo.Get(x => x.IsDeputy == false);
             var user = sysUserRepo.Get();
             var surcharge = csShipmentSurchargeRepo.Get();
             var opst = opsTransactionRepo.Get();
@@ -148,6 +149,8 @@ namespace eFMS.API.Documentation.DL.Services
                        from u in u2.DefaultIfEmpty()
                        join sur in surcharge on set.SettlementNo equals sur.SettlementCode into sc
                        from sur in sc.DefaultIfEmpty()
+                       join apr in approveSettle on set.SettlementNo equals apr.SettlementNo into apr1
+                       from apr in apr1.DefaultIfEmpty()
                        where
                        (
                             criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ? refNo.Contains(set.SettlementNo) : 1 == 1
@@ -155,7 +158,13 @@ namespace eFMS.API.Documentation.DL.Services
                        &&
                        (
                             !string.IsNullOrEmpty(criteria.Requester) ?
-                                set.Requester == criteria.Requester
+                            (
+                                    set.Requester == criteria.Requester 
+                                ||  apr.Manager == criteria.Requester 
+                                ||  apr.Accountant == criteria.Requester
+                                ||  apr.ManagerApr == criteria.Requester
+                                ||  apr.AccountantApr == criteria.Requester
+                            )
                             :
                                 1 == 1
                        )
@@ -185,7 +194,7 @@ namespace eFMS.API.Documentation.DL.Services
                        select new AcctSettlementPaymentResult
                        {
                            Id = set.Id,
-                           Amount = sur.Total,
+                           Amount = sur.Total == null ? 0 : sur.Total,
                            SettlementNo = set.SettlementNo,
                            SettlementCurrency = set.SettlementCurrency,
                            Requester = set.Requester,
@@ -266,7 +275,7 @@ namespace eFMS.API.Documentation.DL.Services
                            JobId = (cst.JobNo != null ? cst.JobNo : ops.JobNo),
                            HBL = (cstd.Hwbno != null ? cstd.Hwbno : ops.Hwbno),
                            MBL = (cstd.Mawb != null ? cstd.Mawb : ops.Mblno),
-                           Amount = sur.Total,
+                           Amount = sur.Total != null ? sur.Total : 0,
                            ChargeCurrency = sur.CurrencyId,
                            SettlementCurrency = set.SettlementCurrency
                        };
@@ -370,7 +379,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 HBL = (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno),
                                 MBL = (opst.Mblno == null ? cstd.Mawb : opst.Mblno),
                                 CurrencyShipment = settle.SettlementCurrency,
-                                TotalAmount = sur.Total * GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency)
+                                TotalAmount = (sur.Total != null ? sur.Total : 0) * GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency)
                             };
 
             dataQuery = dataQuery
@@ -452,7 +461,7 @@ namespace eFMS.API.Documentation.DL.Services
                            UnitPrice = sur.UnitPrice,
                            CurrencyId = sur.CurrencyId,
                            Vatrate = sur.Vatrate,
-                           Total = sur.Total,
+                           Total = sur.Total != null ? sur.Total : 0,
                            PayerId = sur.PayerId,
                            Payer = par.ShortName,
                            PaymentObjectId = sur.PaymentObjectId,
@@ -515,7 +524,7 @@ namespace eFMS.API.Documentation.DL.Services
                            UnitPrice = sur.UnitPrice,
                            CurrencyId = sur.CurrencyId,
                            Vatrate = sur.Vatrate,
-                           Total = sur.Total,
+                           Total = sur.Total != null ? sur.Total : 0,
                            PayerId = sur.PayerId,
                            Payer = par.ShortName,
                            PaymentObjectId = sur.PaymentObjectId,
@@ -612,7 +621,7 @@ namespace eFMS.API.Documentation.DL.Services
                        select new SettlementPaymentMngt
                        {
                            SettlementNo = settle.SettlementNo,
-                           TotalAmount = sur.Total,
+                           TotalAmount = sur.Total != null ? sur.Total : 0,
                            SettlementCurrency = settle.SettlementCurrency,
                            ChargeCurrency = sur.CurrencyId,
                            SettlementDate = settle.DatetimeCreated
@@ -659,7 +668,7 @@ namespace eFMS.API.Documentation.DL.Services
                        {
                            SettlementNo = item.SettlementNo,
                            ChargeName = cc.ChargeNameEn,
-                           TotalAmount = sur.Total,
+                           TotalAmount = sur.Total != null ? sur.Total : 0,
                            SettlementCurrency = sur.CurrencyId,
                            OBHPartner = pae.ShortName,
                            Payer = par.ShortName
@@ -725,7 +734,7 @@ namespace eFMS.API.Documentation.DL.Services
                            UnitPrice = sur.UnitPrice,
                            CurrencyId = sur.CurrencyId,
                            Vatrate = sur.Vatrate,
-                           Total = sur.Total,
+                           Total = sur.Total != null ? sur.Total : 0,
                            PayerId = sur.PayerId,
                            Payer = par.ShortName,
                            PaymentObjectId = sur.PaymentObjectId,
@@ -893,16 +902,26 @@ namespace eFMS.API.Documentation.DL.Services
                     }
 
                     //Cập nhật lại các thông tin của phí hiện trường (nếu có edit chỉnh sửa phí hiện trường)
-                    var chargeSceneUpdate = model.ShipmentCharge.Where(x => x.Id != Guid.Empty && idsChargeScene.Contains(x.Id) && x.IsFromShipment == false).Select(s => s.Id).ToList();
-                    if (chargeSceneUpdate.Count > 0)
+                    var chargeSceneUpdate = model.ShipmentCharge.Where(x => x.Id != Guid.Empty && idsChargeScene.Contains(x.Id) && x.IsFromShipment == false);
+                    var idChargeSceneUpdate = chargeSceneUpdate.Select(s => s.Id).ToList();
+                    if (chargeSceneUpdate.Count() > 0)
                     {
-                        var listChargeExists = csShipmentSurchargeRepo.Get(x => chargeSceneUpdate.Contains(x.Id)).ToList();
-                        listChargeExists.ForEach(req =>
-                        {
+                        var listChargeExists = csShipmentSurchargeRepo.Get(x => idChargeSceneUpdate.Contains(x.Id));
+                        var listChargeSceneUpdate = mapper.Map<List<CsShipmentSurcharge>>(chargeSceneUpdate);
+                        //listChargeExists.ForEach(req =>
+                        //{
+                        //    req = listChargeSceneUpdate.Where(x => x.Id == req.Id).First();
+                        //    req.UserModified = userCurrent;
+                        //    req.DatetimeModified = DateTime.Now;
+                        //});
+                        listChargeSceneUpdate.ForEach(req => {
+                            req.UserCreated = listChargeExists.Where(x => x.Id == req.Id).First().UserCreated;
+                            req.DatetimeCreated = listChargeExists.Where(x => x.Id == req.Id).First().DatetimeCreated;
                             req.UserModified = userCurrent;
                             req.DatetimeModified = DateTime.Now;
                         });
-                        dc.CsShipmentSurcharge.UpdateRange(listChargeExists);
+
+                        dc.CsShipmentSurcharge.UpdateRange(listChargeSceneUpdate);
                     }
 
                     //Xóa các phí hiện trường đã chọn xóa của user
@@ -1038,7 +1057,7 @@ namespace eFMS.API.Documentation.DL.Services
                            HBL = (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno),
                            Description = cat.ChargeNameEn,
                            InvoiceNo = sur.InvoiceNo == null ? "" : sur.InvoiceNo,
-                           Amount = sur.Total * GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, currency),
+                           Amount = (sur.Total != null ? sur.Total : 0) * GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, currency),
                            Debt = false,
                            Currency = "",
                            Note = sur.Notes,
@@ -1480,21 +1499,21 @@ namespace eFMS.API.Documentation.DL.Services
         {
             if (currencyFrom != currencyTo)
             {
-                var get1 = currencyExchange.Where(x => x.CurrencyFromId == currencyFrom && x.CurrencyToId == currencyTo).FirstOrDefault();
+                var get1 = currencyExchange.Where(x => x.CurrencyFromId == currencyFrom && x.CurrencyToId == currencyTo).OrderByDescending(x => x.Rate).FirstOrDefault();
                 if (get1 != null)
                 {
                     return get1.Rate;
                 }
                 else
                 {
-                    var get2 = currencyExchange.Where(x => x.CurrencyFromId == currencyTo && x.CurrencyToId == currencyFrom).FirstOrDefault();
+                    var get2 = currencyExchange.Where(x => x.CurrencyFromId == currencyTo && x.CurrencyToId == currencyFrom).OrderByDescending(x => x.Rate).FirstOrDefault();
                     if (get2 != null)
                     {
                         return 1 / get2.Rate;
                     }
                     else
                     {
-                        var get3 = currencyExchange.Where(x => x.CurrencyFromId == currencyFrom || x.CurrencyFromId == currencyTo).ToList();
+                        var get3 = currencyExchange.Where(x => x.CurrencyFromId == currencyFrom || x.CurrencyFromId == currencyTo).OrderByDescending(x => x.Rate).ToList();
                         if (get3.Count > 1)
                         {
                             if (get3[0].CurrencyFromId == currencyFrom && get3[1].CurrencyFromId == currencyTo)
