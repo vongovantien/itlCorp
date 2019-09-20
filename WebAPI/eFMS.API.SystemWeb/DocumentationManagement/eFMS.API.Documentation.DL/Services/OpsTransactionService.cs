@@ -62,7 +62,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             model.Id = Guid.NewGuid();
             model.CreatedDate = DateTime.Now;
-            model.UserCreated = currentUser.UserID; //currentUser.UserID;
+            model.UserCreated = currentUser.UserID;
             model.ModifiedDate = model.CreatedDate;
             model.UserModified = model.UserCreated;
             //model.CurrentStatus = "InSchedule";

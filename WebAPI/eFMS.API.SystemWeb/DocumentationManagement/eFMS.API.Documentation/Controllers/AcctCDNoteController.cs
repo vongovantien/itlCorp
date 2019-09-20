@@ -38,8 +38,6 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult AddNew(AcctCdnoteModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            model.UserCreated = currentUser.UserID;
-            model.DatetimeCreated = DateTime.Now;
             var hs = cdNoteServices.AddNewCDNote(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

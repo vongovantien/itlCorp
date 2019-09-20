@@ -23,9 +23,19 @@ namespace eFMS.API.Documentation.DL.Services
     public class AcctCDNoteServices : RepositoryBase<AcctCdnote, AcctCdnoteModel>, IAcctCDNoteServices
     {
         private readonly ICurrentUser currentUser;
-        public AcctCDNoteServices(IContextBase<AcctCdnote> repository,IMapper mapper, ICurrentUser user) : base(repository, mapper)
+        IContextBase<CsShipmentSurcharge> surchargeRepository;
+        IContextBase<OpsTransaction> opstransRepository;
+        IContextBase<CsTransaction> cstransRepository;
+
+        public AcctCDNoteServices(IContextBase<AcctCdnote> repository,IMapper mapper, ICurrentUser user, 
+            IContextBase<CsShipmentSurcharge> surchargeRepo,
+            IContextBase<OpsTransaction> opstransRepo,
+            IContextBase<CsTransaction> cstransRepo) : base(repository, mapper)
         {
             currentUser = user;
+            surchargeRepository = surchargeRepo;
+            opstransRepository = opstransRepo;
+            cstransRepository = cstransRepo;
         }
 
         private string RandomCode()
@@ -51,61 +61,62 @@ namespace eFMS.API.Documentation.DL.Services
         {
             try
             {
-
-                var cdNote = mapper.Map<AcctCdnote>(model);
-                cdNote.Id = Guid.NewGuid();
-                cdNote.Code = RandomCode();
-                var hs = DataContext.Add(cdNote);
+                model.Id = Guid.NewGuid();
+                model.Code = RandomCode();
+                model.UserCreated = currentUser.UserID;
+                model.DatetimeCreated = DateTime.Now;
+                var hs = DataContext.Add(model, false);
 
                 if (hs.Success)
                 {
                     foreach (var c in model.listShipmentSurcharge)
                     {
-                        var charge = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Id == c.Id).FirstOrDefault();
+                        var charge = surchargeRepository.Get(x => x.Id == c.Id).FirstOrDefault();
                         if (charge != null)
                         {
                             if(charge.Type == "BUY")
                             {
-                                charge.CreditNo = cdNote.Code;
+                                charge.CreditNo = model.Code;
                             }
                             else if(charge.Type == "SELL")
                             {
-                                charge.DebitNo = cdNote.Code;
+                                charge.DebitNo = model.Code;
                             }
                             else
                             {
                                 if(model.PartnerId == charge.PaymentObjectId)
                                 {
-                                    charge.DebitNo = cdNote.Code;
+                                    charge.DebitNo = model.Code;
                                 }
                                 if(model.PartnerId == charge.PayerId)
                                 {
-                                    charge.CreditNo = cdNote.Code;
+                                    charge.CreditNo = model.Code;
                                 }
                             }
-                            //charge.Cdno = cdNote.Code; -- to continue
-                            //charge.Soaclosed = true;
                             charge.DatetimeModified = DateTime.Now;
                             charge.UserModified = currentUser.UserID;
                         }
-                        ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Update(charge);
-                    }
-                    var jobOpsTrans = ((eFMSDataContext)DataContext.DC).OpsTransaction.FirstOrDefault();
-                    if (jobOpsTrans != null)
-                    {
-                        jobOpsTrans.UserModified = model.UserModified;
-                        jobOpsTrans.ModifiedDate = DateTime.Now;
-                        ((eFMSDataContext)DataContext.DC).OpsTransaction.Update(jobOpsTrans);
-                    }
-                    var jobCSTrans = ((eFMSDataContext)DataContext.DC).CsTransaction.FirstOrDefault();
-                    if (jobCSTrans != null)
-                    {
-                        jobCSTrans.UserModified = model.UserModified;
-                        jobCSTrans.ModifiedDate = DateTime.Now;
-                        ((eFMSDataContext)DataContext.DC).CsTransaction.Update(jobCSTrans);
+                        surchargeRepository.Update(charge, x => x.Id == charge.Id, false);
                     }
                 }
-                ((eFMSDataContext)DataContext.DC).SaveChanges();
+                var jobOpsTrans = opstransRepository.First(x => x.Id == model.JobId);
+                if (jobOpsTrans != null)
+                {
+                    jobOpsTrans.UserModified = model.UserModified;
+                    jobOpsTrans.ModifiedDate = DateTime.Now;
+                    opstransRepository.Update(jobOpsTrans, x => x.Id == jobOpsTrans.Id, false);
+                }
+                var jobCSTrans = cstransRepository.First(x => x.Id == model.JobId);
+                if (jobCSTrans != null)
+                {
+                    jobCSTrans.UserModified = model.UserModified;
+                    jobCSTrans.ModifiedDate = DateTime.Now;
+                    cstransRepository.Update(jobCSTrans, x => x.Id == jobCSTrans.Id, false);
+                }
+                SubmitChanges();
+                surchargeRepository.SubmitChanges();
+                opstransRepository.SubmitChanges();
+                cstransRepository.SubmitChanges();
 
                 return new HandleState();
             }
@@ -122,12 +133,12 @@ namespace eFMS.API.Documentation.DL.Services
             try
             {
                 var cdNote = DataContext.First(x => (x.Id == model.Id && x.Code == model.Code));
-                cdNote = mapper.Map<AcctCdnote>(model);
                 if (cdNote == null)
                 {
                     throw new Exception("CD Note not found !");
                 }
-                var stt = DataContext.Update(cdNote, x => x.Id == cdNote.Id);
+                cdNote = mapper.Map<AcctCdnote>(model);
+                var stt = DataContext.Update(cdNote, x => x.Id == cdNote.Id, false);
                 if (stt.Success)
                 {
                     foreach (var item in model.listShipmentSurcharge)
@@ -135,24 +146,27 @@ namespace eFMS.API.Documentation.DL.Services
                         item.Cdclosed = true;
                         item.DatetimeModified = DateTime.Now;
                         item.UserModified = currentUser.UserID; // need update in the future 
-                        ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Update(item);
+                        surchargeRepository.Update(item, x => x.Id == item.Id, false);
                     }
-                    var jobOpsTrans = ((eFMSDataContext)DataContext.DC).OpsTransaction.FirstOrDefault();
+                    var jobOpsTrans = opstransRepository.First(x => x.Id == model.Id);
                     if(jobOpsTrans != null)
                     {
                         jobOpsTrans.UserModified = model.UserModified;
                         jobOpsTrans.ModifiedDate = DateTime.Now;
-                        ((eFMSDataContext)DataContext.DC).OpsTransaction.Update(jobOpsTrans);
+                        opstransRepository.Update(jobOpsTrans, x => x.Id == jobOpsTrans.Id, false);
                     }
-                    var jobCSTrans = ((eFMSDataContext)DataContext.DC).CsTransaction.FirstOrDefault();
+                    var jobCSTrans = cstransRepository.First(x => x.Id == model.Id);
                     if(jobCSTrans != null)
                     {
                         jobCSTrans.UserModified = model.UserModified;
                         jobCSTrans.ModifiedDate = DateTime.Now;
-                        ((eFMSDataContext)DataContext.DC).CsTransaction.Update(jobCSTrans);
+                        cstransRepository.Update(jobCSTrans, x => x.Id == jobCSTrans.Id, false);
                     }
-                    ((eFMSDataContext)DataContext.DC).SaveChanges();
                 }
+                SubmitChanges();
+                surchargeRepository.SubmitChanges();
+                opstransRepository.SubmitChanges();
+                cstransRepository.SubmitChanges();
 
                 return new HandleState();
 
