@@ -17,7 +17,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState AddNewCDNote(AcctCdnoteModel model);
         HandleState UpdateCDNote(AcctCdnoteModel model);
         HandleState DeleteCDNote(Guid idCDNote);
-        List<object> GroupCDNoteByPartner(Guid JobId,bool IsHouseBillID);
+        List<object> GroupCDNoteByPartner(Guid id,bool IsHouseBillID);
         AcctCDNoteDetailsModel GetCDNoteDetails(Guid JobId, string cdNo);
         Crystal Preview(AcctCDNoteDetailsModel model);
 

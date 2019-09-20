@@ -258,11 +258,11 @@ namespace eFMS.API.Documentation.DL.Services
             };
             return result;
         }
-        List<CsShipmentSurchargeDetailsModel> Query(Guid HbID, string type)
+        List<CsShipmentSurchargeDetailsModel> Query(Guid hbId, string type)
         {
             if (type == null) type = string.Empty;
             List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
-            var query = GetChargeByHouseBill(HbID, type);
+            var query = GetChargeByHouseBill(hbId, type);
             if (query.Count == 0) return listCharges;
             var exchangRates = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => x.Inactive == false).ToList();
             foreach (var item in query)
