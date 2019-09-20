@@ -24,6 +24,7 @@ export class Surcharge {
     vatrate: number = 0;
     settlementCode: string = '';
     id: string = "00000000-0000-0000-0000-000000000000";
+    surchargeId: string = '';
     isSelected: boolean = false;
     hblid: string = '';
     type: string = '';

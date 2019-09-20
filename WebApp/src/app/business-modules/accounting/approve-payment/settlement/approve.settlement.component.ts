@@ -178,11 +178,14 @@ export class ApporveSettlementPaymentComponent extends AppPage {
     }
 
     preview() {
+        if (!this.requestSurchargeListComponent.surcharges.length) {
+            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+            return;
+        }
+
+        this._progressRef.start();
         this._accoutingRepo.previewSettlementPayment(this.settlementPayment.settlement.settlementNo)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            )
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: any) => {
                     this.dataReport = res;

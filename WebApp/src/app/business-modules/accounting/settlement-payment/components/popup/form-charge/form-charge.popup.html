@@ -137,7 +137,7 @@
                                     </div>
                                     <div class="col-6">
                                         <div class="form-group">
-                                            <label for="">VAT <span class="text-danger">*</span></label>
+                                            <label for="">VAT </label>
                                             <input type="text" class="form-control" formControlName="vat"
                                                 placeholder="VAT" (ngModelChange)="calculateTotalAmount()">
                                         </div>
@@ -149,7 +149,7 @@
                             <div class="col-4">
                                 <div class="form-group">
                                     <label for="">Amount</label>
-                                    <input currencyMask type="text" class="form-control" formControlName="amount"
+                                    <input currencyMask [options]="configAmountCurrency" type="text" class="form-control" formControlName="amount"
                                         placeholder="Amount" disabled>
                                 </div>
                             </div>

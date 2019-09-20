@@ -124,6 +124,10 @@ export class AdvancePaymentAddNewComponent extends AppPage {
 
     }
 
+    back() {
+        this._router.navigate(['home/accounting/advance-payment']);
+    }
+
 }
 
 

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, Input } from '@angular/core';
+import { Component, EventEmitter, Output, Input, Inject } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { SystemRepo, AccoutingRepo, OperationRepo } from 'src/app/shared/repositories';
 import { takeUntil, debounceTime, switchMap, skip, distinctUntilChanged, catchError, map } from 'rxjs/operators';
@@ -9,6 +9,7 @@ import { DataService } from 'src/app/shared/services';
 import { FormGroup, AbstractControl, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
+import { CurrencyMaskConfig } from 'ngx-currency/src/currency-mask.config';
 
 @Component({
     selector: 'form-charge-popup',
@@ -26,6 +27,11 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     term$ = new BehaviorSubject<string>('');
     charges: any[] = [];
     selectedCharge: any = null;
+
+    configAmountCurrency: Partial<CurrencyMaskConfig> = {
+        align: "left",
+        precision: 2,
+    };
 
     configShipment: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
@@ -98,7 +104,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         private _sysRepo: SystemRepo,
         private _operationRepo: OperationRepo,
         private _fb: FormBuilder,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
     ) {
         super();
     }
@@ -135,9 +141,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             price: [, Validators.compose([
                 Validators.required
             ])],
-            vat: [, Validators.compose([
-                Validators.required
-            ])],
+            vat: [0],
             amount: [],
             invoiceNo: [],
             invoiceDate: [null],
@@ -214,6 +218,10 @@ export class SettlementFormChargePopupComponent extends PopupBase {
 
             this.selectedOBHPartner = { field: 'id', value: data.paymentObjectId };
             this.selectedPayer = { field: 'id', value: data.payerId };
+
+            this.selectedOBHData = this.configPartner.dataSource.filter(i => i.id === data.paymentObjectId)[0];
+            this.selectedPayerData = this.configPartner.dataSource.filter(i => i.id === data.payerId)[0];
+
         }
 
         this.selectedShipmentData = <OperationInteface.IShipment>{ hbl: data.hbl, jobId: data.jobId, mbl: data.mbl, hblid: data.hblid };
@@ -329,7 +337,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
 
                     // * update config combogrid.
                     this.configShipment.displayFields = [
-                        { field: 'jobId', label: 'Job No' },
+                        { field: 'jobId', label: 'Job ID' },
                         { field: 'mbl', label: 'MBL' },
                         { field: 'hbl', label: 'HBL' },
                     ];
@@ -408,7 +416,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
 
     submit() {
         const body = new Surcharge({
-            // id: null,
+            id: !!this.selectedSurcharge ? this.selectedSurcharge.id : '00000000-0000-0000-0000-000000000000',
             hblid: this.selectedShipmentData.hblid,
             type: this.selectedCharge.type === 'CREDIT' ? 'BUY' : 'OBH',
             chargeId: this.selectedCharge.id || '',
@@ -423,7 +431,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             total: this.form.value.amount,
             notes: this.form.value.note,
             invoiceNo: this.form.value.invoiceNo,
-            invoiceDate: !!this.form.value.invoiceDate ? formatDate(this.form.value.invoiceDate.startDate, 'yyyy-MM-dd', 'en') : null,
+            invoiceDate: !!this.form.value.invoiceDate && !!this.form.value.invoiceDate.startDate ? formatDate(this.form.value.invoiceDate.startDate, 'yyyy-MM-dd', 'en') : null,
             seriesNo: this.form.value.serieNo,
             paymentRequestType: this.form.value.type.value,
             isFromShipment: false,
@@ -448,6 +456,8 @@ export class SettlementFormChargePopupComponent extends PopupBase {
                 payerId: this.selectedPayer.value,
                 paymentObjectId: this.selectedOBHPartner.value,
                 objectBePaid: null,
+                payer: this.selectedPayerData.shortName,
+                obhPartnerName: this.selectedOBHData.shortName
             };
             Object.assign(body, dataChargeOBH);
         }
@@ -562,7 +572,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
 
     checkValidateSurcharge(body: any) {
         const bodyToValidate: IShipmentValidate = {
-            settlementNo: this.settlementCode || null,
+            surchargeID: this.action !== 'update' ? '00000000-0000-0000-0000-000000000000' : this.selectedSurcharge.id,
             chargeID: body.chargeId,
             typeCharge: body.type,
             hblid: body.hblid,
@@ -635,7 +645,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
 }
 
 interface IShipmentValidate {
-    settlementNo: string;
+    surchargeID: string;
     chargeID: string;
     typeCharge: string;
     hblid: string;
