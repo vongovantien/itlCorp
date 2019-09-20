@@ -209,7 +209,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             this.isDisabledOBHPartner = true;
 
             this.selectedPayer = { field: 'id', value: data.paymentObjectId };
-            this.selectedPayerData = this.configPartner.dataSource.filter(i => i.id === data.payerId)[0];
+            this.selectedPayerData = this.configPartner.dataSource.filter(i => i.id === data.paymentObjectId)[0];
 
         } else {
             this.isOBH.enable();

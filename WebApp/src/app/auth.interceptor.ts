@@ -34,7 +34,7 @@ export class AuthInterceptor implements HttpInterceptor {
                     title = error.statusText;
                 }
                 this._toastService.error(errorMessage, title);
-                return throwError(errorMessage);
+                return throwError(error);
             })
         );
     }
