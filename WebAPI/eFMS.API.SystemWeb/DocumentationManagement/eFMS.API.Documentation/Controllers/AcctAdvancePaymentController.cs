@@ -210,10 +210,8 @@ namespace eFMS.API.Documentation.Controllers
         [Route("GetAdvancePaymentByAdvanceNo")]
         public IActionResult GetAdvancePaymentByAdvanceNo(string advanceNo)
         {
-            var data = acctAdvancePaymentService.GetAdvancePaymentByAdvanceNo(advanceNo);
-            if (data != null)
-                return Ok(data);
-            return NotFound();
+            var data = acctAdvancePaymentService.GetAdvancePaymentByAdvanceNo(advanceNo);          
+            return Ok(data);
         }
 
         /// <summary>
@@ -226,9 +224,7 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult GetAdvancePaymentByAdvanceId(Guid advanceId)
         {
             var data = acctAdvancePaymentService.GetAdvancePaymentByAdvanceId(advanceId);
-            if (data != null)
-                return Ok(data);
-            return NotFound();
+            return Ok(data);
         }
 
         /// <summary>

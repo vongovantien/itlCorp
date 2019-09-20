@@ -312,7 +312,8 @@ namespace eFMS.API.Documentation.DL.Services
                 SqlParam.GetParameter("Type", criteria.Type),
                 SqlParam.GetParameter("IsOBH", criteria.IsOBH),
                 SqlParam.GetParameter("StrCreators", criteria.StrCreators),
-                SqlParam.GetParameter("StrCharges", criteria.StrCharges)
+                SqlParam.GetParameter("StrCharges", criteria.StrCharges),
+                SqlParam.GetParameter("CommodityGroupID", criteria.CommodityGroupID)
             };
             return ((eFMSDataContext)DataContext.DC).ExecuteProcedure<spc_GetListChargeShipmentMaster>(parameters);
         }

@@ -18,6 +18,7 @@ namespace eFMS.API.Documentation.Service.Models
         public bool? Obh { get; set; }
         public string CreatorShipment { get; set; }
         public string ServiceTypeId { get; set; }
+        public short? CommodityGroupId { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
