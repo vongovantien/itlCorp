@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace eFMS.API.Accounting.Service.Models
 {
@@ -6,6 +7,8 @@ namespace eFMS.API.Accounting.Service.Models
     {
         public CatUnit()
         {
+            CsMawbcontainerContainerType = new HashSet<CsMawbcontainer>();
+            CsMawbcontainerUnitOfMeasure = new HashSet<CsMawbcontainer>();
         }
 
         public short Id { get; set; }
@@ -21,5 +24,8 @@ namespace eFMS.API.Accounting.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
+
+        public virtual ICollection<CsMawbcontainer> CsMawbcontainerContainerType { get; set; }
+        public virtual ICollection<CsMawbcontainer> CsMawbcontainerUnitOfMeasure { get; set; }
     }
 }
