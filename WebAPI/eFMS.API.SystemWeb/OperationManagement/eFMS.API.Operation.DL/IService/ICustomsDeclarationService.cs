@@ -14,6 +14,7 @@ namespace eFMS.API.Operation.DL.IService
         object GetClearanceTypeData();
         HandleState ImportClearancesFromEcus();
         List<CustomsDeclarationModel> Paging(CustomsDeclarationCriteria criteria, int page, int size, out int rowsCount);
+        List<CustomsDeclarationModel> GetCustomDeclaration(string customNo, string taxCode, bool Imported, int pageNumber, int pageSize, out int rowsCount);
         IQueryable<CustomsDeclarationModel> Query(CustomsDeclarationCriteria criteria);
         List<CustomsDeclarationModel> GetBy(string jobNo);
         HandleState UpdateJobToClearances(List<CustomsDeclarationModel> clearances);
