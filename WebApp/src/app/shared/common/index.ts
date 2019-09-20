@@ -16,6 +16,8 @@ export * from './table-row-none-record/table-none-record.component';
 export * from './table-header/table-header.component';
 export * from './table-row-loading/table-row-loading.component';
 export * from './sub-header/sub-header.component';
+export * from './table-collapse-row/table-collapse-row.component';
+
 
 
 

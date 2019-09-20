@@ -40,10 +40,10 @@ export class SettlementPaymentComponent extends AppList {
         private _router: Router
     ) {
         super();
-        this.requestList = this.getListSettlePayment;
-        // this.requestSort = this.sortAdvancePayment;
         this._progressRef = this._progressService.ref();
-        this.requestSort = this.sortLocal;
+
+        this.requestList = this.getListSettlePayment;
+        this.requestSort = this.sortSettlementPayment;
     }
 
     ngOnInit() {
@@ -95,13 +95,6 @@ export class SettlementPaymentComponent extends AppList {
         this.userLogged = this._baseService.getUserLogin() || 'admin';
     }
 
-    getRequestAdvancePaymentGroup() {
-
-    }
-
-    deleteAdvancePayment() {
-
-    }
 
     onSearchSettlement(data: any) {
         this.dataSearch = data;
@@ -109,25 +102,10 @@ export class SettlementPaymentComponent extends AppList {
     }
 
 
-    sortByCustomClearance(sort: string): void {
-        if (!!sort) {
-            this.setSortBy(sort, this.sort !== sort ? true : !this.order);
-            if (typeof (this.requestSort) === 'function') {
-                this.customClearances = this._sortService.sort(this.customClearances, this.sort, this.order);
-            }
+    sortByCustomClearance(sortData: CommonInterface.ISortData): void {
+        if (!!sortData.sortField) {
+            this.customClearances = this._sortService.sort(this.customClearances, sortData.sortField, sortData.order);
         }
-    }
-
-    sortClassCustomClearance(sort: string): string {
-        if (!!sort) {
-            let classes = 'sortable ';
-            if (this.sort === sort) {
-                classes += ('sort-' + (this.order ? 'asc' : 'desc') + ' ');
-            }
-
-            return classes;
-        }
-        return '';
     }
 
     getListSettlePayment(dataSearch?: any) {
@@ -180,7 +158,7 @@ export class SettlementPaymentComponent extends AppList {
             );
     }
 
-    sortLocal(sort: string): void {
+    sortSettlementPayment(sort: string): void {
         this.settlements = this._sortService.sort(this.settlements, sort, this.order);
     }
 

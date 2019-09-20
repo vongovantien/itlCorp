@@ -85,6 +85,8 @@ export class SettlementPaymentDetailComponent extends AppPage {
                     if (res.status) {
                         this._toastService.success(res.message);
                         this.getDetailSettlement(this.settlementId);
+                    } else {
+                        this._toastService.warning(res.message);
                     }
                 }
             );
@@ -168,18 +170,22 @@ export class SettlementPaymentDetailComponent extends AppPage {
                         this._toastService.success(`${res.data.settlement.settlementNo}`, ' Send request successfully');
 
                         this._router.navigate([`home/accounting/settlement-payment/${res.data.settlement.id}/approve`]);
-                       
+                    }else {
+                        this._toastService.warning(res.message);
                     }
                 }
             );
     }
 
     preview() {
+        if (!this.requestSurchargeListComponent.surcharges.length) {
+            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+            return;
+        }
+
+        this._progressRef.start();
         this._accoutingRepo.previewSettlementPayment(this.settlementPayment.settlement.settlementNo)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            )
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: any) => {
                     this.dataReport = res;
@@ -189,6 +195,10 @@ export class SettlementPaymentDetailComponent extends AppPage {
 
                 },
             );
+    }
+
+    back() {
+        this._router.navigate(['home/accounting/settlement-payment']);
     }
 }
 

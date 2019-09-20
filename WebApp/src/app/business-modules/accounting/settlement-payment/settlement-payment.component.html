@@ -31,14 +31,9 @@
                         <div class="table-wrapper table-scrollabler" id="adv-payment-list-table">
                             <table class="table table-brand table-hover dataTable">
                                 <thead>
-                                    <tr class="text-center">
-                                        <th class="m--w-50">
-                                        </th>
-                                        <th *ngFor="let header of headers; let i = index; trackBy: trackByFn"
-                                            [class]="sortClass(header.sortable ? header.field : '')"
-                                            (click)="sortBy(header.sortable ? header.field : '')">
-                                            <span>{{header.title}}</span>
-                                            <span class="sort-indicator"></span>
+                                    <tr class="text-center" app-table-header [headers]="headers"
+                                        (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                                        <th class="m--w-50 first">
                                         </th>
                                     </tr>
                                 </thead>
@@ -93,47 +88,34 @@
                                             <td>{{settlePayment.paymentMethodName}}</td>
                                             <td>{{settlePayment.note}}</td>
                                         </tr>
-                                        <tr class="collapse-panel-row">
-                                            <td colspan="100">
-                                                <div class="detail-panel-block collapse"
-                                                    id="ops-shipment-00{{settlePayment.id+1}}"
-                                                    data-parent="#adv-payment-list-table">
-                                                    <div class="table-inside-block">
-                                                        <table class="table table-secondary dataTable">
-                                                            <thead>
-                                                                <tr class="text-center">
-                                                                    <th *ngFor="let header of headerCustomClearance; trackBy: trackByFn"
-                                                                        [class]="sortClassCustomClearance(header.sortable ? header.field : '')"
-                                                                        (click)="sortByCustomClearance(header.sortable ? header.field : '')">
-                                                                        <span>{{header.title}}</span>
-                                                                        <span class="sort-indicator"></span>
-                                                                    </th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody *ngIf="customClearances.length > 0">
-                                                                <tr *ngFor="let clearance of customClearances; let j = index; trackBy: trackByFn"
-                                                                    class="text-center">
-                                                                    <td>
-                                                                        <span>{{clearance.jobId}}</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>{{clearance.mbl}}</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>{{clearance.hbl}}</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>{{clearance.amount}}</span>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span>{{clearance.settlementCurrency}}</span>
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </td>
+                                        <tr class="collapse-panel-row" app-table-collapse-row
+                                            [id]="'ops-shipment-00' + settlePayment.id + 1"
+                                            [parentId]="'#adv-payment-list-table'">
+                                            <table class="table table-secondary dataTable">
+                                                <thead>
+                                                    <tr class="text-center" app-table-header [headers]="headers" (onClick)="sortByCustomClearance($event)">
+                                                    </tr>
+                                                </thead>
+                                                <tbody *ngIf="customClearances.length > 0">
+                                                    <tr *ngFor="let clearance of customClearances; let j = index; trackBy: trackByFn" class="text-center">
+                                                        <td>
+                                                            <span>{{clearance.jobId}}</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>{{clearance.mbl}}</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>{{clearance.hbl}}</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>{{clearance.amount}}</span>
+                                                        </td>
+                                                        <td>
+                                                            <span>{{clearance.settlementCurrency}}</span>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </tr>
                                     </ng-container>
                                     <tr *ngIf="!isLoading && !settlements.length" app-table-none-record
