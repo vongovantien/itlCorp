@@ -18,7 +18,7 @@
                                         <span class="text-primary m--margin-left-10"
                                             *ngIf="!!selectedCharge">{{selectedCharge.code}}</span>
                                     </label>
-                                    <div (clickOutside)="onClickOutsideChargeName($event)">
+                                    <div (clickOutside)="onClickOutsideChargeName()">
                                         <input name="keyword"
                                             class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             placeholder="Input keyword" (click)="isShow = !isShow"

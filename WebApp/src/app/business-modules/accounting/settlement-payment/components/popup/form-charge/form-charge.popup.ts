@@ -259,7 +259,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         });
     }
 
-    onSearchAutoComplete(keyword: string) {
+    onSearchAutoComplete(keyword: string = '') {
         // if (!this.selectedCharge) {
         //     if (!!keyword) {
         //         this.isShow = true;
@@ -269,7 +269,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         // } else {
         //     this.isShow = false;
         // }
-        this.term$.next(keyword.trim());
+        this.term$.next(keyword);
     }
 
     autocomplete = (time: number, callBack: Function) => (source$: Observable<any>) =>
