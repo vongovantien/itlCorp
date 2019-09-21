@@ -29,8 +29,8 @@
             <!--begin: Search Form -->
             <div class="m-form m-form--label-align-right">
               <div class="row align-items-center">
-                <div class="col-lg-4 order-2 order-lg-1">
-                  <div class="form-group">
+           
+               <!--   <div class="form-group">
                     <div class="m-input-icon m-input-icon--left">
                       <input type="text" class="form-control m-input m-input--square" placeholder="Search..."
                         autocomplete="nope" [(ngModel)]="keyword" name="keyword" (change)="keyword = keyword.trim();"
@@ -41,9 +41,68 @@
                         </span>
                       </span>
                     </div>
-                  </div>
+                  </div> -->
+
+
+                  <form class="col-3" [formGroup]="form">
+                      <div class="form-group" >
+                          <div (clickOutside)="isShow = false">
+                            <input name="keyword" class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                placeholder="Input keyword" (click)="isShow = !isShow"
+                                formControlName="customNo" (ngModelChange)="onSearchAutoComplete($event)">
+                        </div>
+                      </div>
+                  </form>
+                  <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
+                  data-target="#search-custom-modal">
+                  <span>
+                      <i class="la la-plus"></i>
+                      <span>
+                          Search Mutiple
+                      </span>
+                  </span>
+                </button>
+                  <div  class="modal fade" id="search-custom-modal" data-backdrop="static" role="dialog"
+                  aria-labelledby="" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+
+              <form>
+                <div class="modal-header">
+                    <h5 class="modal-title">Search Mutiple</h5>
+                    <app-close-modal-button></app-close-modal-button>
                 </div>
+                <div class="modal-body">
+                    <!--begin::add-commodity-form-->
+                    <div class="m-form m-form--state">
+                        <div class="col-12">
+                                <textarea rows="6" [(ngModel)] = 'customNoSearch' class="form-control m-input m-input--square" name="customNo">
+  
+                               </textarea>
+                        </div>
+
+                     
+                    </div>
+                    <!--end:add-commodity-form -->
+                </div>
+                <div class="modal-footer m--align-center c-button-actions">
+                    <button type="button" (click) = 'getListCleranceNotImported()' class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal">
+                  <span>
+                      <i class="la la-download"></i>
+                      <span>
+                          Apply
+                      </span>
+                  </span>
+                </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--end::add-commodity-modal-->
+              
               </div>
+            
             </div>
             <!--end: Search Form -->
             <!--begin: Datatable-->
@@ -69,15 +128,9 @@
                   </tr>
                 </thead>
                 <tbody class="tbody-group">
-                  <tr *ngIf="!notImportedCustomClearances">
-                    <td colspan="100">
-                      <div class="no-data">
-                        <i class="flaticon-coins"></i>
-                        <span class="no-data-text">No records found</span>
-                      </div>
-                    </td>
+                  <tr *ngIf="!isLoading && !notImportedCustomClearances.length" app-table-none-record [colspan]="headers.length + 1">
                   </tr>
-                  <ng-container *ngIf="notImportedCustomClearances">
+                  <ng-container *ngIf="!isLoading && !!notImportedCustomClearances.length">
                     <tr class="" *ngFor="let item of notImportedCustomClearances; let i=index; trackBy: trackByFn">
                       <td class="table-actions-col">
                         <div class="table-actions">
@@ -120,34 +173,14 @@
                       </td>
                     </tr>
                   </ng-container>
+                  <tr app-table-row-loading *ngIf="isLoading && !notImportedCustomClearances.length"></tr>
                 </tbody>
               </table>
             </div>
             <!--end: Datatable-->
             <!--begin::pagination-->
-            <div class="pagination-nav">
-              <div class="row">
-                <div class="col-sm-6">
-                  <div class="tatable__pager-size">
-                    <div class="select-box">
-                      <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
-                        (change)="selectPageSize(pageSize)" name="pagesize">
-                        <ng-container *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
-                          <option [ngValue]="item">{{item}} line / screen</option>
-                        </ng-container>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-sm-6" *ngIf="totalItems > pageSize">
-                  <div class="float-right">
-                    <pagination [boundaryLinks]="true" [totalItems]="totalItems" [itemsPerPage]="pageSize"
-                      [maxSize]="10" (pageChanged)="pageChanged($event)" [(ngModel)]="page">
-                    </pagination>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <app-pagination currentPage *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)"
+              (pagerObject)="setPage($event)"></app-pagination>
             <!--end::pagination-->
             <!--end::m-portlet -->
           </div>

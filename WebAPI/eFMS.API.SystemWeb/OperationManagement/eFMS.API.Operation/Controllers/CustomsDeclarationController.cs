@@ -91,10 +91,10 @@ namespace eFMS.API.Operation.Controllers
         /// <param name="criteria"></param>
         /// <returns></returns>
 
-        [HttpPost("CustomDeclaration")]
-        public IActionResult GetCustomDeclaration(string customNo, string customerNo,bool imporTed, int page, int size)
+        [HttpGet("CustomDeclaration")]
+        public IActionResult GetCustomDeclaration(string keySearch, string customerNo,bool imporTed, int page, int size)
         {
-            var data = customsDeclarationService.GetCustomDeclaration(customNo, customerNo, imporTed, page, size, out int rowsCount);
+            var data = customsDeclarationService.GetCustomDeclaration(keySearch , customerNo, imporTed, page, size, out int rowsCount);
             var result = new { data, totalItems = rowsCount, page, size };
             return Ok(result);
         }
