@@ -60,7 +60,6 @@ namespace eFMS.API.Documentation.DL.Services
 
         private string RandomCode(string typeCDNote)
         {
-            string code = "LG";
             //var allowedChars = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ0123456789";
             //var head = new char[3];
             //var body = new char[4];
@@ -75,7 +74,8 @@ namespace eFMS.API.Documentation.DL.Services
             //    body[i] = allowedChars[rd.Next(0, allowedChars.Length)];
             //}
 
-            //return (new string(head)  +"-"+ new string(body)).ToUpper();
+            //return (new string(head) + "-" + new string(body)).ToUpper();
+            string code = "LG";
             switch (typeCDNote)
             {
                 case "CREDIT":
@@ -88,7 +88,14 @@ namespace eFMS.API.Documentation.DL.Services
                     code = code + "IV";
                     break;
             }
-            var count = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
+            int count = 0;
+            var cdCode = DataContext.Get(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year)
+                .OrderByDescending(x => x.DatetimeModified).FirstOrDefault()?.Code;
+            if(cdCode != null)
+            {
+                cdCode = cdCode.Substring(7, 5);
+                Int32.TryParse(cdCode, out count);
+            }
             code = GenerateID.GenerateCDNoteNo(code, count);
             return code;
         }
@@ -480,21 +487,40 @@ namespace eFMS.API.Documentation.DL.Services
                             {
                                 //-to contiue
                                 //item.Cdno = null;
-                                if(item.Type == "BUY")
+                                //if(item.Type == "BUY")
+                                //{
+                                //    item.CreditNo = null;
+                                //}
+                                //else if(item.Type == "BUY")
+                                //{
+                                //    item.DebitNo = null;
+                                //}
+                                //else
+                                //{
+                                //    if(item.DebitNo == cdNote.Code)
+                                //    {
+                                //        item.DebitNo = null;
+                                //    }
+                                //    if(item.CreditNo == cdNote.Code)
+                                //    {
+                                //        item.CreditNo = null;
+                                //    }
+                                //}
+                                if (item.Type == "BUY")
                                 {
                                     item.CreditNo = null;
                                 }
-                                else if(item.Type == "BUY")
+                                else if (item.Type == "SELL")
                                 {
                                     item.DebitNo = null;
                                 }
                                 else
                                 {
-                                    if(item.DebitNo == cdNote.Code)
+                                    if (item.DebitNo == cdNote.Code)
                                     {
                                         item.DebitNo = null;
                                     }
-                                    if(item.CreditNo == cdNote.Code)
+                                    if (item.CreditNo == cdNote.Code)
                                     {
                                         item.CreditNo = null;
                                     }
