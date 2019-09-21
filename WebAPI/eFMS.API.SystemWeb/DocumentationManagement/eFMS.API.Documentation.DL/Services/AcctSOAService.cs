@@ -338,20 +338,22 @@ namespace eFMS.API.Documentation.DL.Services
         {
             DbParameter[] parameters =
             {
-                SqlParam.GetParameter("CurrencyLocal", criteria.CurrencyLocal),
-                SqlParam.GetParameter("CustomerID", criteria.CustomerID),
-                SqlParam.GetParameter("DateType", criteria.DateType),
-                SqlParam.GetParameter("FromDate", criteria.FromDate),
-                SqlParam.GetParameter("ToDate", criteria.ToDate),
-                SqlParam.GetParameter("Type", criteria.Type),
-                SqlParam.GetParameter("IsOBH", criteria.IsOBH),
-                SqlParam.GetParameter("StrCreators", criteria.StrCreators),
-                SqlParam.GetParameter("StrCharges", criteria.StrCharges),
+                SqlParam.GetParameter("currencyLocal", criteria.CurrencyLocal),
+                SqlParam.GetParameter("customerID", criteria.CustomerID),
+                SqlParam.GetParameter("dateType", criteria.DateType),
+                SqlParam.GetParameter("fromDate", criteria.FromDate),
+                SqlParam.GetParameter("toDate", criteria.ToDate),
+                SqlParam.GetParameter("type", criteria.Type),
+                SqlParam.GetParameter("isOBH", criteria.IsOBH),
+                SqlParam.GetParameter("strCreators", criteria.StrCreators),
+                SqlParam.GetParameter("strCharges", criteria.StrCharges),
                 SqlParam.GetParameter("inSOA", criteria.InSoa),
                 SqlParam.GetParameter("jobId", criteria.JobId),
                 SqlParam.GetParameter("hbl", criteria.Hbl),
                 SqlParam.GetParameter("mbl", criteria.Mbl),
-                SqlParam.GetParameter("cdNote", criteria.CDNote)
+                SqlParam.GetParameter("cdNote", criteria.CDNote),
+                SqlParam.GetParameter("commodityGroupID", criteria.CommodityGroupID),
+                SqlParam.GetParameter("strServices", criteria.StrServices)
             };
             return ((eFMSDataContext)DataContext.DC).ExecuteProcedure<spc_GetListMoreChargeMasterByCondition>(parameters);
         }

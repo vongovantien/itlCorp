@@ -73,6 +73,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var advance = DataContext.Get();
             var request = acctAdvanceRequestRepo.Get();
+            var approveAdvance = AcctApproveAdvanceRepo.Get(x => x.IsDeputy == false);
             var user = sysUserRepo.Get();
 
             List<string> refNo = new List<string>();
@@ -106,6 +107,8 @@ namespace eFMS.API.Documentation.DL.Services
                        from u in u2.DefaultIfEmpty()
                        join re in request on ad.AdvanceNo equals re.AdvanceNo into re2
                        from re in re2.DefaultIfEmpty()
+                       join apr in approveAdvance on ad.AdvanceNo equals apr.AdvanceNo into apr2
+                       from apr in apr2.DefaultIfEmpty()
                        where
                          (
                             criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ? refNo.Contains(ad.AdvanceNo) : 1 == 1
@@ -113,7 +116,13 @@ namespace eFMS.API.Documentation.DL.Services
                          &&
                          (
                             !string.IsNullOrEmpty(criteria.Requester) ?
-                                ad.Requester == criteria.Requester
+                            (
+                                    ad.Requester == criteria.Requester
+                                ||  apr.Manager == criteria.Requester
+                                ||  apr.Accountant == criteria.Requester
+                                ||  apr.ManagerApr == criteria.Requester
+                                ||  apr.AccountantApr == criteria.Requester
+                            )
                             :
                                 1 == 1
                          )

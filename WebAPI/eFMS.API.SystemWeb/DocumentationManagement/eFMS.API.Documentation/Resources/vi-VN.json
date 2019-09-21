@@ -35,5 +35,9 @@
   "MSG_MAWBCONTAINER_QUANTITY_MUST_BE_1": "Quantity must be 1",
 
   "MSG_SURCHARGE_NOT_FOUND": "Charge not found!",
-  "MSG_SURCHARGE_NOT_ALLOW_DELETED": "Cannot delete, this charge is containing Credit Debit Note/SOA no!"
+  "MSG_SURCHARGE_NOT_ALLOW_DELETED": "Cannot delete, this charge is containing Credit Debit Note/SOA no!",
+
+  "MSG_CDNOTE_NOT_ALLOW_DELETED_NOT_FOUND": "Credit debit note not found !",
+  "MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SOA": "Cannot delete, this credit debit not is containing at least one charge have SOA no!",
+  "MSG_CDNOTE_NOT_NOT_FOUND": "CD Note not found !"
 }

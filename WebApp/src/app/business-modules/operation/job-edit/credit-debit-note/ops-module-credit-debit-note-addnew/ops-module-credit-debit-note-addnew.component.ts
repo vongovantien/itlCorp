@@ -194,13 +194,14 @@ export class OpsModuleCreditDebitNoteAddnewComponent extends PopupBase implement
                     this.CDNoteWorking.total = this.totalDebit - this.totalCredit;
                     this.CDNoteWorking.currencyId = "USD"; // in the future , this id must be local currency of each country
                     this.CDNoteWorking.listShipmentSurcharge = filter(this.listChargeOfPartner[0].listCharges, function (o: any) {
-                        return o.isSelected;
+                        return o.isSelected && o.isRemaining;
                     });
                     if (this.CDNoteWorking.listShipmentSurcharge.length === 0) {
                         this.popupNotSelectedAlert.show();
                     } else {
                         const res = await this.baseServices.postAsync(this.api_menu.Documentation.AcctSOA.addNew, this.CDNoteWorking);
                         if (res.status) {
+                            // -----this.listChargeOfPartner[0].listCharges
                             this.hide();
                             // $('#ops-add-credit-debit-note-modal').modal('hide');
                             this.CDNoteWorking = new AcctCDNote();

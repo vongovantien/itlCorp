@@ -258,11 +258,11 @@ namespace eFMS.API.Documentation.DL.Services
             };
             return result;
         }
-        List<CsShipmentSurchargeDetailsModel> Query(Guid HbID, string type)
+        List<CsShipmentSurchargeDetailsModel> Query(Guid hbId, string type)
         {
             if (type == null) type = string.Empty;
             List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
-            var query = GetChargeByHouseBill(HbID, type);
+            var query = GetChargeByHouseBill(hbId, type);
             if (query.Count == 0) return listCharges;
             var exchangRates = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => x.Inactive == false).ToList();
             foreach (var item in query)
@@ -304,15 +304,17 @@ namespace eFMS.API.Documentation.DL.Services
         {
             DbParameter[] parameters =
             {
-                SqlParam.GetParameter("CurrencyLocal", criteria.CurrencyLocal),
-                SqlParam.GetParameter("CustomerID", criteria.CustomerID),
-                SqlParam.GetParameter("DateType", criteria.DateType),
-                SqlParam.GetParameter("FromDate", criteria.FromDate),
-                SqlParam.GetParameter("ToDate", criteria.ToDate),
-                SqlParam.GetParameter("Type", criteria.Type),
-                SqlParam.GetParameter("IsOBH", criteria.IsOBH),
-                SqlParam.GetParameter("StrCreators", criteria.StrCreators),
-                SqlParam.GetParameter("StrCharges", criteria.StrCharges)
+                SqlParam.GetParameter("currencyLocal", criteria.CurrencyLocal),
+                SqlParam.GetParameter("customerID", criteria.CustomerID),
+                SqlParam.GetParameter("dateType", criteria.DateType),
+                SqlParam.GetParameter("fromDate", criteria.FromDate),
+                SqlParam.GetParameter("toDate", criteria.ToDate),
+                SqlParam.GetParameter("type", criteria.Type),
+                SqlParam.GetParameter("isOBH", criteria.IsOBH),
+                SqlParam.GetParameter("strCreators", criteria.StrCreators),
+                SqlParam.GetParameter("strCharges", criteria.StrCharges),
+                SqlParam.GetParameter("commodityGroupID", criteria.CommodityGroupID),
+                SqlParam.GetParameter("strServices", criteria.StrServices)
             };
             return ((eFMSDataContext)DataContext.DC).ExecuteProcedure<spc_GetListChargeShipmentMaster>(parameters);
         }

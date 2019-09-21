@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
@@ -13,6 +14,7 @@ using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,90 +24,129 @@ namespace eFMS.API.Documentation.DL.Services
 {
     public class AcctCDNoteServices : RepositoryBase<AcctCdnote, AcctCdnoteModel>, IAcctCDNoteServices
     {
+        private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
-        public AcctCDNoteServices(IContextBase<AcctCdnote> repository,IMapper mapper, ICurrentUser user) : base(repository, mapper)
+        IContextBase<CsShipmentSurcharge> surchargeRepository;
+        IContextBase<OpsTransaction> opstransRepository;
+        IContextBase<CsTransaction> cstransRepository;
+        IContextBase<CatPartner> partnerRepositoty;
+        IContextBase<CsTransactionDetail> trandetailRepositoty;
+        IContextBase<CatCharge> catchargeRepository;
+        IContextBase<CatCurrency> currencyRepository;
+        IContextBase<CatUnit> unitRepository;
+
+        public AcctCDNoteServices(IStringLocalizer<LanguageSub> localizer,
+            IContextBase<AcctCdnote> repository,IMapper mapper, ICurrentUser user, 
+            IContextBase<CsShipmentSurcharge> surchargeRepo,
+            IContextBase<OpsTransaction> opstransRepo,
+            IContextBase<CsTransaction> cstransRepo,
+            IContextBase<CatPartner> partnerRepo,
+            IContextBase<CsTransactionDetail> trandetailRepo,
+            IContextBase<CatCharge> catchargeRepo,
+            IContextBase<CatCurrency> currencyRepo,
+            IContextBase<CatUnit> unitRepo) : base(repository, mapper)
         {
+            stringLocalizer = localizer;
             currentUser = user;
+            surchargeRepository = surchargeRepo;
+            opstransRepository = opstransRepo;
+            cstransRepository = cstransRepo;
+            partnerRepositoty = partnerRepo;
+            trandetailRepositoty = trandetailRepo;
+            catchargeRepository = catchargeRepo;
+            currencyRepository = currencyRepo;
+            unitRepository = unitRepo;
         }
 
-        private string RandomCode()
+        private string RandomCode(string typeCDNote)
         {
-            var allowedChars = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ0123456789";
-            var head = new char[3];
-            var body = new char[4];
-            var rd = new Random();
-            for (var i = 0; i < 3; i++)
-            {
-                head[i] = allowedChars[rd.Next(0, allowedChars.Length)];
-            }
+            //var allowedChars = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ0123456789";
+            //var head = new char[3];
+            //var body = new char[4];
+            //var rd = new Random();
+            //for (var i = 0; i < 3; i++)
+            //{
+            //    head[i] = allowedChars[rd.Next(0, allowedChars.Length)];
+            //}
 
-            for (var i = 0; i < 4; i++)
-            {
-                body[i] = allowedChars[rd.Next(0, allowedChars.Length)];
-            }
+            //for (var i = 0; i < 4; i++)
+            //{
+            //    body[i] = allowedChars[rd.Next(0, allowedChars.Length)];
+            //}
 
-            return (new string(head)  +"-"+ new string(body)).ToUpper();
+            //return (new string(head) + "-" + new string(body)).ToUpper();
+            string code = "LG";
+            switch (typeCDNote)
+            {
+                case "CREDIT":
+                    code = code + "CN";
+                    break;
+                case "DEBIT":
+                    code = code + "DN";
+                    break;
+                case "INVOICE":
+                    code = code + "IV";
+                    break;
+            }
+            int count = 0;
+            var cdCode = DataContext.Get(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year)
+                .OrderByDescending(x => x.DatetimeModified).FirstOrDefault()?.Code;
+            if(cdCode != null)
+            {
+                cdCode = cdCode.Substring(7, 5);
+                Int32.TryParse(cdCode, out count);
+            }
+            code = GenerateID.GenerateCDNoteNo(code, count);
+            return code;
         }
 
         public HandleState AddNewCDNote(AcctCdnoteModel model)
         {
             try
             {
-
-                var cdNote = mapper.Map<AcctCdnote>(model);
-                cdNote.Id = Guid.NewGuid();
-                cdNote.Code = RandomCode();
-                var hs = DataContext.Add(cdNote);
+                model.Id = Guid.NewGuid();
+                model.Code = RandomCode(model.Type);
+                model.UserCreated = currentUser.UserID;
+                model.DatetimeCreated = DateTime.Now;
+                var hs = Add(model, false);
 
                 if (hs.Success)
                 {
                     foreach (var c in model.listShipmentSurcharge)
                     {
-                        var charge = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Id == c.Id).FirstOrDefault();
+                        var charge = surchargeRepository.Get(x => x.Id == c.Id).FirstOrDefault();
                         if (charge != null)
                         {
                             if(charge.Type == "BUY")
                             {
-                                charge.CreditNo = cdNote.Code;
+                                charge.CreditNo = model.Code;
                             }
                             else if(charge.Type == "SELL")
                             {
-                                charge.DebitNo = cdNote.Code;
+                                charge.DebitNo = model.Code;
                             }
                             else
                             {
                                 if(model.PartnerId == charge.PaymentObjectId)
                                 {
-                                    charge.DebitNo = cdNote.Code;
+                                    charge.DebitNo = model.Code;
                                 }
                                 if(model.PartnerId == charge.PayerId)
                                 {
-                                    charge.CreditNo = cdNote.Code;
+                                    charge.CreditNo = model.Code;
                                 }
                             }
-                            //charge.Cdno = cdNote.Code; -- to continue
-                            //charge.Soaclosed = true;
                             charge.DatetimeModified = DateTime.Now;
                             charge.UserModified = currentUser.UserID;
                         }
-                        ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Update(charge);
-                    }
-                    var jobOpsTrans = ((eFMSDataContext)DataContext.DC).OpsTransaction.FirstOrDefault();
-                    if (jobOpsTrans != null)
-                    {
-                        jobOpsTrans.UserModified = model.UserModified;
-                        jobOpsTrans.ModifiedDate = DateTime.Now;
-                        ((eFMSDataContext)DataContext.DC).OpsTransaction.Update(jobOpsTrans);
-                    }
-                    var jobCSTrans = ((eFMSDataContext)DataContext.DC).CsTransaction.FirstOrDefault();
-                    if (jobCSTrans != null)
-                    {
-                        jobCSTrans.UserModified = model.UserModified;
-                        jobCSTrans.ModifiedDate = DateTime.Now;
-                        ((eFMSDataContext)DataContext.DC).CsTransaction.Update(jobCSTrans);
+                        surchargeRepository.Update(charge, x => x.Id == charge.Id, false);
                     }
                 }
-                ((eFMSDataContext)DataContext.DC).SaveChanges();
+                UpdateJobModifyTime(model.JobId);
+                SubmitChanges();
+                surchargeRepository.SubmitChanges();
+                opstransRepository.SubmitChanges();
+                cstransRepository.SubmitChanges();
 
                 return new HandleState();
             }
@@ -116,18 +157,17 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
         }
-
         public HandleState UpdateCDNote(AcctCdnoteModel model)
         {
             try
             {
                 var cdNote = DataContext.First(x => (x.Id == model.Id && x.Code == model.Code));
-                cdNote = mapper.Map<AcctCdnote>(model);
                 if (cdNote == null)
                 {
-                    throw new Exception("CD Note not found !");
+                    return new HandleState(stringLocalizer[LanguageSub.MSG_CDNOTE_NOT_NOT_FOUND].Value);
                 }
-                var stt = DataContext.Update(cdNote, x => x.Id == cdNote.Id);
+                cdNote = mapper.Map<AcctCdnote>(model);
+                var stt = DataContext.Update(cdNote, x => x.Id == cdNote.Id, false);
                 if (stt.Success)
                 {
                     foreach (var item in model.listShipmentSurcharge)
@@ -135,24 +175,14 @@ namespace eFMS.API.Documentation.DL.Services
                         item.Cdclosed = true;
                         item.DatetimeModified = DateTime.Now;
                         item.UserModified = currentUser.UserID; // need update in the future 
-                        ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Update(item);
+                        surchargeRepository.Update(item, x => x.Id == item.Id, false);
                     }
-                    var jobOpsTrans = ((eFMSDataContext)DataContext.DC).OpsTransaction.FirstOrDefault();
-                    if(jobOpsTrans != null)
-                    {
-                        jobOpsTrans.UserModified = model.UserModified;
-                        jobOpsTrans.ModifiedDate = DateTime.Now;
-                        ((eFMSDataContext)DataContext.DC).OpsTransaction.Update(jobOpsTrans);
-                    }
-                    var jobCSTrans = ((eFMSDataContext)DataContext.DC).CsTransaction.FirstOrDefault();
-                    if(jobCSTrans != null)
-                    {
-                        jobCSTrans.UserModified = model.UserModified;
-                        jobCSTrans.ModifiedDate = DateTime.Now;
-                        ((eFMSDataContext)DataContext.DC).CsTransaction.Update(jobCSTrans);
-                    }
-                    ((eFMSDataContext)DataContext.DC).SaveChanges();
+                    UpdateJobModifyTime(model.Id);
                 }
+                DataContext.SubmitChanges();
+                surchargeRepository.SubmitChanges();
+                opstransRepository.SubmitChanges();
+                cstransRepository.SubmitChanges();
 
                 return new HandleState();
 
@@ -174,25 +204,26 @@ namespace eFMS.API.Documentation.DL.Services
 
                 if(IsHouseBillID == false)
                 {
-                    List<Guid> lst_Hbid = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == id).ToList().Select(x => x.Id).ToList();
-                    foreach (var _id in lst_Hbid)
+                    //List<Guid> lst_Hbid = trandetailRepositoty.Get(x => x.JobId == id);//((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == id).ToList().Select(x => x.Id).ToList();
+                    List<CsTransactionDetail> housebills = trandetailRepositoty.Get(x => x.JobId == id).ToList();
+                    foreach (var housebill in housebills)
                     {
-                        var houseBill = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.Id == _id).FirstOrDefault();
+                        //var houseBill = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.Id == _id).FirstOrDefault();
                         List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
-                        if (houseBill != null)
+                        if (housebill != null)
                         {
-                            listCharges = Query(houseBill.Id, null);
+                            listCharges = Query(housebill.Id, null);
 
                             foreach (var c in listCharges)
                             {
                                 if (c.PaymentObjectId != null)
                                 {
-                                    var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PaymentObjectId).FirstOrDefault();
+                                    var partner = partnerRepositoty.Get(x => x.Id == c.PaymentObjectId).FirstOrDefault();//((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PaymentObjectId).FirstOrDefault();
                                     if (partner != null) listPartners.Add(partner);
                                 }
                                 if (c.PayerId != null)
                                 {
-                                    var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PayerId).FirstOrDefault();
+                                    var partner = partnerRepositoty.Get(x => x.Id == c.PayerId).FirstOrDefault();//((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PayerId).FirstOrDefault();
                                     if (partner != null) listPartners.Add(partner);
                                 }
                             }
@@ -209,12 +240,12 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         if (c.PaymentObjectId != null)
                         {
-                            var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PaymentObjectId).FirstOrDefault();
+                            var partner = partnerRepositoty.Get(x => x.Id == c.PaymentObjectId).FirstOrDefault();//((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PaymentObjectId).FirstOrDefault();
                             if (partner != null) listPartners.Add(partner);
                         }
                         if (c.PayerId != null)
                         {
-                            var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PayerId).FirstOrDefault();
+                            var partner = partnerRepositoty.Get(x => x.Id == c.PayerId).FirstOrDefault();//((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PayerId).FirstOrDefault();
                             if (partner != null) listPartners.Add(partner);
                         }
                     }
@@ -223,15 +254,15 @@ namespace eFMS.API.Documentation.DL.Services
                 listPartners = listPartners.Distinct().ToList();
                 foreach(var item in listPartners)
                 {
-                    var jobId = IsHouseBillID == true ? ((eFMSDataContext)DataContext.DC).OpsTransaction.Where(x => x.Hblid == id).FirstOrDefault()?.Id : id;
+                    var jobId = IsHouseBillID == true ? opstransRepository.Get(x => x.Hblid == id).FirstOrDefault()?.Id : id;
                     var cdNotes = DataContext.Where(x => x.PartnerId == item.Id && x.JobId== jobId).ToList();
                     List<object> listCDNote = new List<object>();
                     foreach(var cdNote in cdNotes)
                     {
                         // -to continue
                         //var chargesOfCDNote = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Cdno == cdNote.Code).ToList();
-                        var chargesOfCDNote = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code).ToList();
-                        listCDNote.Add(new { cdNote, total_charge= chargesOfCDNote.Count });                      
+                        var chargesOfCDNote = surchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);//((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code).ToList();
+                        listCDNote.Add(new { cdNote, total_charge= chargesOfCDNote.Count() });                      
 
                     }
 
@@ -252,23 +283,27 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
-        private List<CsShipmentSurchargeDetailsModel> Query(Guid HbID, string type)
+        private List<CsShipmentSurchargeDetailsModel> Query(Guid hbId, string type)
         {
             List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
-            var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Hblid == HbID);
+            var charges = surchargeRepository.Get(x => x.Hblid == hbId);
+            var partners = partnerRepositoty.Get();
+            var catcharges = catchargeRepository.Get();
+            var currencies = currencyRepository.Get();
+            var units = unitRepository.Get();
            
             var query = (from charge in charges
-                         where charge.Hblid == HbID
-                         join chargeDetail in ((eFMSDataContext)DataContext.DC).CatCharge on charge.ChargeId equals chargeDetail.Id
+                         //where charge.Hblid == hbId
+                         join chargeDetail in catcharges on charge.ChargeId equals chargeDetail.Id
 
-                         join partner in ((eFMSDataContext)DataContext.DC).CatPartner on charge.PaymentObjectId equals partner.Id into partnerGroup
+                         join partner in partners on charge.PaymentObjectId equals partner.Id into partnerGroup
                          from p in partnerGroup.DefaultIfEmpty()
 
-                         join payer in ((eFMSDataContext)DataContext.DC).CatPartner on charge.PayerId equals payer.Id into payerGroup
+                         join payer in partners on charge.PayerId equals payer.Id into payerGroup
                          from pay in payerGroup.DefaultIfEmpty()
 
-                         join unit in ((eFMSDataContext)DataContext.DC).CatUnit on charge.UnitId equals unit.Id
-                         join currency in ((eFMSDataContext)DataContext.DC).CatCurrency on charge.CurrencyId equals currency.Id
+                         join unit in units on charge.UnitId equals unit.Id
+                         join currency in currencies on charge.CurrencyId equals currency.Id
                          select new { charge, p, pay, unit.UnitNameEn, currency.CurrencyName, chargeDetail.ChargeNameEn, chargeDetail.Code }
                         ).ToList();
             foreach (var item in query)
@@ -427,74 +462,93 @@ namespace eFMS.API.Documentation.DL.Services
                 var cdNote = DataContext.Where(x => x.Id == idSoA).FirstOrDefault();
                 if (cdNote == null)
                 {
-                    hs = new HandleState("Credit debit note not found !");
+                    hs = new HandleState(stringLocalizer[LanguageSub.MSG_CDNOTE_NOT_ALLOW_DELETED_NOT_FOUND].Value);
                 }
                 else
                 {
                     //to continue
                     //var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Cdno == cdNote.Code).ToList();
-                    var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code).ToList();
+                    var charges = surchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code); //((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code).ToList();
                     var isOtherSOA = false;
                     foreach(var item in charges)
                     {
-                        if (item.Soano != null)
-                        {
-                            isOtherSOA = true;
-                        }
+                        isOtherSOA |= (item.Soano != null || item.PaySoano != null);
                     }
                     if (isOtherSOA == true)
                     {
-                        hs = new HandleState("Cannot delete, this credit debit not is containing at least one charge have SOA no!");
+                        hs = new HandleState(stringLocalizer[LanguageSub.MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SOA].Value);
                     }
                     else
                     {                       
-                        var _hs = DataContext.Delete(x => x.Id == idSoA);
+                        var _hs = DataContext.Delete(x => x.Id == idSoA, false);
                         if (hs.Success)
                         {
                             foreach (var item in charges)
                             {
                                 //-to contiue
                                 //item.Cdno = null;
-                                if(item.Type == "BUY")
+                                //if(item.Type == "BUY")
+                                //{
+                                //    item.CreditNo = null;
+                                //}
+                                //else if(item.Type == "BUY")
+                                //{
+                                //    item.DebitNo = null;
+                                //}
+                                //else
+                                //{
+                                //    if(item.DebitNo == cdNote.Code)
+                                //    {
+                                //        item.DebitNo = null;
+                                //    }
+                                //    if(item.CreditNo == cdNote.Code)
+                                //    {
+                                //        item.CreditNo = null;
+                                //    }
+                                //}
+                                if (item.Type == "BUY")
                                 {
                                     item.CreditNo = null;
                                 }
-                                else if(item.Type == "BUY")
+                                else if (item.Type == "SELL")
                                 {
                                     item.DebitNo = null;
                                 }
                                 else
                                 {
-                                    if(item.DebitNo == cdNote.Code)
+                                    if (item.DebitNo == cdNote.Code)
                                     {
                                         item.DebitNo = null;
                                     }
-                                    if(item.CreditNo == cdNote.Code)
+                                    if (item.CreditNo == cdNote.Code)
                                     {
                                         item.CreditNo = null;
                                     }
                                 }
                                 item.UserModified = cdNote.UserModified;
                                 item.DatetimeModified = DateTime.Now;
-                                ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Update(item);
+                                surchargeRepository.Update(item, x => x.Id == item.Id, false);
                             }
                             ((eFMSDataContext)DataContext.DC).SaveChanges();
-                            var jobOpsTrans = ((eFMSDataContext)DataContext.DC).OpsTransaction.FirstOrDefault();
+                            var jobOpsTrans = opstransRepository.Get(x => x.Id == cdNote.JobId).FirstOrDefault();//((eFMSDataContext)DataContext.DC).OpsTransaction.FirstOrDefault();
                             if (jobOpsTrans != null)
                             {
-                                //jobOpsTrans.UserModified = model.UserModified;
+                                jobOpsTrans.UserModified = currentUser.UserID;
                                 jobOpsTrans.ModifiedDate = DateTime.Now;
-                                ((eFMSDataContext)DataContext.DC).OpsTransaction.Update(jobOpsTrans);
+                                opstransRepository.Update(jobOpsTrans, x => x.Id == jobOpsTrans.Id, false);//((eFMSDataContext)DataContext.DC).OpsTransaction.Update(jobOpsTrans);
                             }
-                            var jobCSTrans = ((eFMSDataContext)DataContext.DC).CsTransaction.FirstOrDefault();
+                            var jobCSTrans = cstransRepository.Get(x => x.Id == cdNote.JobId).FirstOrDefault(); //((eFMSDataContext)DataContext.DC).CsTransaction.FirstOrDefault();
                             if (jobCSTrans != null)
                             {
-                                //jobCSTrans.UserModified = model.UserModified;
+                                jobCSTrans.UserModified = currentUser.UserID;
                                 jobCSTrans.ModifiedDate = DateTime.Now;
-                                ((eFMSDataContext)DataContext.DC).CsTransaction.Update(jobCSTrans);
+                                cstransRepository.Update(jobCSTrans, x => x.Id == jobCSTrans.Id, false);//((eFMSDataContext)DataContext.DC).CsTransaction.Update(jobCSTrans);
                             }
                         }
-                        
+                        DataContext.SubmitChanges();
+                        surchargeRepository.SubmitChanges();
+                        opstransRepository.SubmitChanges();
+                        cstransRepository.SubmitChanges();
                     }
                 }
 
@@ -640,6 +694,24 @@ namespace eFMS.API.Documentation.DL.Services
             result.SetParameter(parameter);
             return result;
                 
+        }
+
+        private void UpdateJobModifyTime(Guid jobId)
+        {
+            var jobOpsTrans = opstransRepository.First(x => x.Id == jobId);
+            if (jobOpsTrans != null)
+            {
+                jobOpsTrans.UserModified = currentUser.UserID;
+                jobOpsTrans.ModifiedDate = DateTime.Now;
+                opstransRepository.Update(jobOpsTrans, x => x.Id == jobId, false);
+            }
+            var jobCSTrans = cstransRepository.First(x => x.Id == jobId);
+            if (jobCSTrans != null)
+            {
+                jobCSTrans.UserModified = currentUser.UserID;
+                jobCSTrans.ModifiedDate = DateTime.Now;
+                cstransRepository.Update(jobCSTrans, x => x.Id == jobId, false);
+            }
         }
     }
 }

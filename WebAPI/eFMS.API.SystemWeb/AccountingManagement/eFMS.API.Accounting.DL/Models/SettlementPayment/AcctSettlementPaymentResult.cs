@@ -1,10 +1,10 @@
 ﻿using eFMS.API.Accounting.Service.Models;
 
-namespace eFMS.API.Accounting.DL.Models
+namespace eFMS.API.Documentation.DL.Models.SettlementPayment
 {
     public class AcctSettlementPaymentResult : AcctSettlementPayment
     {
-        public decimal? Amount { get; set; }
+        public decimal Amount { get; set; }
         public string RequesterName { get; set; }
         public string PaymentMethodName { get; set; }        
         public string StatusApprovalName { get; set; }
