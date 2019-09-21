@@ -19,4 +19,13 @@ export class CatalogueRepo {
             })
         );
     }
+
+    getCommondity() {
+        return this._api.post(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatCommonity/Query`, {}).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
+    }
 }

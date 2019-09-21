@@ -73,6 +73,11 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete()),
                 tap((res: any) => {
+                    if (!res.settlement) {
+                        this._router.navigate(['home/accounting/settlement-payment']);
+                        this._toastService.warning("Settlement not found");
+                        return;
+                    }
                     this.settlementPayment = res;
 
                     this.formCreateSurcharge.form.disable();

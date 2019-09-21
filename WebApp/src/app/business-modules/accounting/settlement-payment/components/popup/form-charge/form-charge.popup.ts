@@ -209,6 +209,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             this.isDisabledOBHPartner = true;
 
             this.selectedPayer = { field: 'id', value: data.paymentObjectId };
+            this.selectedPayerData = this.configPartner.dataSource.filter(i => i.id === data.paymentObjectId)[0];
 
         } else {
             this.isOBH.enable();
@@ -448,6 +449,8 @@ export class SettlementFormChargePopupComponent extends PopupBase {
                 objectBePaid: 'OTHER',
                 paymentObjectId: this.selectedPayer.value,
                 payerId: null,
+                payer: this.selectedPayerData.shortName,
+                obhPartnerName: ''
             };
             Object.assign(body, dataChargeCredit);
         }

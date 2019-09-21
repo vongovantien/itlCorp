@@ -89,10 +89,12 @@ export class ApproveAdvancePaymentComponent extends AppPage {
                         this.listRequestAdvancePaymentComponent.advanceNo = this.advancePayment.advanceNo;
 
                         this.getInfoApprove(this.advancePayment.advanceNo);
+                    } else {
+                        this._toastService.warning('Advance Payment not found');
+                        this.back();
+                        return;
                     }
                 },
-                () => { },
-                () => { },
             );
     }
 

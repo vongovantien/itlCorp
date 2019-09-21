@@ -100,8 +100,14 @@ export class SettlementPaymentDetailComponent extends AppPage {
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (res: any) => {
+                (res: ISettlementPaymentData) => {
+                    if (!res.settlement) {
+                        this.back();
+                        this._toastService.warning("Settlement not found");
+                        return;
+                    }
                     this.settlementPayment = res;
+
                     switch (this.settlementPayment.settlement.statusApproval) {
                         case 'New':
                         case 'Denied':
@@ -204,7 +210,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
 
 export interface ISettlementPaymentData {
     chargeGrpSettlement: any;
-    chargeNoGrpSettlement: Surcharge[],
+    chargeNoGrpSettlement: Surcharge[];
     settlement: any;
 }
 

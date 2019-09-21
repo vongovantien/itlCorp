@@ -60,7 +60,6 @@ export class LoginComponent implements OnInit, AfterViewInit, AfterViewChecked {
 
 
     ngOnInit() {
-        this.currenURL = this.route.snapshot.paramMap.get("url") || 'home/dashboard';
 
         if (this.baseService.checkLoginSession()) {
             this.setupLocalInfo();
@@ -71,6 +70,7 @@ export class LoginComponent implements OnInit, AfterViewInit, AfterViewChecked {
     async Login(form: NgForm) {
         if (form.form.status !== "INVALID") {
             this.baseService.spinnerShow();
+            this.currenURL = this.route.snapshot.paramMap.get("url") || 'home/dashboard';
             await this.configureWithNewConfigApi();
             this.oauthService.fetchTokenUsingPasswordFlow(this.username, this.password).then((resp) => {
                 return this.oauthService.loadUserProfile();

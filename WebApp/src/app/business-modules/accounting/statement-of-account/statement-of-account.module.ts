@@ -15,6 +15,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { StatementOfAccountSummaryComponent } from './components/summary/summary-soa.component';
 import { NgProgressModule } from '@ngx-progressbar/core';
+import { StatementOfAccountFormCreateComponent } from './components/form-create-soa/form-create-soa.component';
 
 const routing: Routes = [
     {
@@ -54,7 +55,8 @@ const routing: Routes = [
 const COMPONENTS = [
     StatementOfAccountSearchComponent,
     StatementOfAccountAddChargeComponent,
-    StatementOfAccountSummaryComponent
+    StatementOfAccountSummaryComponent,
+    StatementOfAccountFormCreateComponent
 ];
 
 @NgModule({

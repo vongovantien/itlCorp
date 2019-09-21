@@ -2,11 +2,11 @@ import { OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterConten
 import { Observable, Subject, throwError } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 
-import moment from "moment";
 import { UtilityHelper } from "src/helper";
 import { NgProgressRef } from "@ngx-progressbar/core";
 import { ButtonModalSetting } from "./shared/models/layout/button-modal-setting.model";
 import { ButtonType } from "./shared/enums/type-button.enum";
+import moment from "moment";
 
 export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit {
 
@@ -26,6 +26,7 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
         "This Month": [new Date(new Date().getFullYear(), new Date().getMonth(), 1), new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)],
         "Last Month": [new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1), new Date(new Date().getFullYear(), new Date().getMonth(), 0)]
     };
+
     maxDate: any = moment();
     minDate: any = moment();
 

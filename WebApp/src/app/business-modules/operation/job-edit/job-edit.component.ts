@@ -144,7 +144,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                 await this.getShipmentDetails(params.id);
                 this.getListContainersOfJob();
                 if (this.opsTransaction != null) {
-                    this.getSurCharges('BUY');
+                    this.getAllSurCharges();
                     this.serviceDate = (this.opsTransaction.serviceDate !== null) ? { startDate: new Date(this.opsTransaction.serviceDate), endDate: new Date(this.opsTransaction.serviceDate) } : null;
                     this.finishDate = this.opsTransaction.finishDate != null ? { startDate: new Date(this.opsTransaction.finishDate), endDate: new Date(this.opsTransaction.finishDate) } : null;
                     let index = this.productServices.findIndex(x => x.id === this.opsTransaction.productService);

@@ -67,6 +67,11 @@ export class AdvancePaymentDetailComponent extends AppPage {
             )
             .subscribe(
                 (res: any) => {
+                    if (!res) {
+                        this._toastService.warning('Advance Payment not found');
+                        this.back();
+                        return;
+                    }
                     this.advancePayment = new AdvancePayment(res);
                     switch (this.advancePayment.statusApproval) {
                         case 'New':
@@ -98,7 +103,12 @@ export class AdvancePaymentDetailComponent extends AppPage {
 
                     this.listRequestAdvancePaymentComponent.advanceNo = this.advancePayment.advanceNo;
                 },
+                (error: any) => {
+                   console.log(error);
+                },
+                () => { }
             );
+           
     }
 
     updateAdvPayment() {
@@ -143,7 +153,7 @@ export class AdvancePaymentDetailComponent extends AppPage {
                             });
                         }
                     },
-              );
+                );
         }
     }
 

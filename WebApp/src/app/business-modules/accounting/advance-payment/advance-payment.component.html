@@ -136,7 +136,7 @@
                                             </table>
                                         </tr>
                                     </ng-container>
-                                    <tr *ngIf="!isLoading && !advancePayments.length" app-table-none-record [colspan]=headers.length + 1>
+                                    <tr *ngIf="!isLoading && !advancePayments.length" app-table-none-record [colspan]="headers.length + 1">
                                     </tr>
                                     <tr class="loading-wrapper" *ngIf="isLoading" app-table-row-loading>
                                     </tr>
