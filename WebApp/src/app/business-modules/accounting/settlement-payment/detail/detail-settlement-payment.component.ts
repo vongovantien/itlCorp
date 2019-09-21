@@ -22,7 +22,6 @@ export class SettlementPaymentDetailComponent extends AppPage {
     @ViewChild(SettlementFormCreateComponent, { static: false }) formCreateSurcharge: SettlementFormCreateComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
 
-
     settlementId: string = '';
     settlementCode: string = '';
     settlementPayment: ISettlementPaymentData;
@@ -145,7 +144,6 @@ export class SettlementPaymentDetailComponent extends AppPage {
                     if (this.requestSurchargeListComponent.groupShipments.length) {
                         this.requestSurchargeListComponent.openAllCharge.next(true);
                     }
-
                 },
             );
     }

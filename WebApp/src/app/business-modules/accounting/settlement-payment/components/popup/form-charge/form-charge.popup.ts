@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Output, Input, Inject } from '@angular/core';
+import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { SystemRepo, AccoutingRepo, OperationRepo } from 'src/app/shared/repositories';
-import { takeUntil, debounceTime, switchMap, skip, distinctUntilChanged, catchError, map } from 'rxjs/operators';
+import { takeUntil, debounceTime, switchMap, skip, distinctUntilChanged, catchError, map, take } from 'rxjs/operators';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { CustomDeclaration, Surcharge } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
@@ -23,7 +23,10 @@ export class SettlementFormChargePopupComponent extends PopupBase {
 
     @Input() state: string = 'create';
 
+    private _isShowAutoComplete = new BehaviorSubject<boolean>(false);
+    $isShowAutoComplete: Observable<boolean> = this._isShowAutoComplete.asObservable();
     isShow: boolean = false;
+
     term$ = new BehaviorSubject<string>('');
     charges: any[] = [];
     selectedCharge: any = null;
@@ -120,7 +123,9 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         // * Search autocomplete surcharge.
         this.term$.pipe(
             distinctUntilChanged(),
-            this.autocomplete(200, ((term: any) => this._accoutingRepo.getSettlePaymentCharges(this.chargeName.value || "")))
+            this.autocomplete(500, ((term: any) => {
+                return this._accoutingRepo.getSettlePaymentCharges(this.chargeName.value || "");
+            }))
         ).subscribe(
             (res: any) => {
                 this.charges = res || [];
@@ -128,6 +133,16 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             (error: any) => { },
             () => { }
         );
+
+        // * Detect close autocomplete when user click outside chargename control or select charge.
+        this.$isShowAutoComplete
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+            )
+            .subscribe((isShow: boolean) => {
+                this.isShow = isShow;
+                this.chargeName.setValue(!!this.selectedCharge ? this.selectedCharge.chargeNameVn : null);
+            });
     }
 
     initForm() {
@@ -205,6 +220,8 @@ export class SettlementFormChargePopupComponent extends PopupBase {
 
             // * DISABLED CHECKBOX OBH, OBH PARTNER.
             this.isOBH.disable();
+            this.isOBH.setValue(false);
+
             this.isDisabledOBH = true;
             this.isDisabledOBHPartner = true;
 
@@ -212,8 +229,10 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             this.selectedPayerData = this.configPartner.dataSource.filter(i => i.id === data.paymentObjectId)[0];
 
         } else {
+
             this.isOBH.enable();
-            this.isOBH.setValue(false);
+            this.isOBH.setValue(true);
+
             this.isDisabledOBH = false;
             this.isDisabledOBHPartner = false;
 
@@ -224,8 +243,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             this.selectedPayerData = this.configPartner.dataSource.filter(i => i.id === data.payerId)[0];
 
         }
-
-        this.selectedShipmentData = <OperationInteface.IShipment>{ hbl: data.hbl, jobId: data.jobId, mbl: data.mbl, hblid: data.hblid };
+        this.selectedShipmentData = this.configShipment.dataSource.filter((i: OperationInteface.IShipment) => i.hblid === data.hblid)[0];
         this.selectedShipment = { field: 'jobId', value: data.jobId };
 
 
@@ -242,12 +260,16 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     }
 
     onSearchAutoComplete(keyword: string) {
-        if (!!keyword) {
-            if (!this.charges.length) {
-                this.isShow = true;
-            }
-            this.term$.next(keyword.trim());
-        }
+        // if (!this.selectedCharge) {
+        //     if (!!keyword) {
+        //         this.isShow = true;
+        //     } else {
+        //         this.isShow = false;
+        //     }
+        // } else {
+        //     this.isShow = false;
+        // }
+        this.term$.next(keyword.trim());
     }
 
     autocomplete = (time: number, callBack: Function) => (source$: Observable<any>) =>
@@ -273,7 +295,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     }
 
     selectCharge(charge: any) {
-        this.isShow = false;
+        this._isShowAutoComplete.next(false);
         this.chargeName.setValue(charge.chargeNameVn);
         this.selectedCharge = charge;
 
@@ -334,16 +356,12 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             .subscribe(
                 (res: any[]) => {
                     this.configShipment.dataSource = res;
-                    // this.cdNotes = this.initCDNotes = res.listCdNote;
-
-                    // * update config combogrid.
                     this.configShipment.displayFields = [
                         { field: 'jobId', label: 'Job ID' },
                         { field: 'mbl', label: 'MBL' },
                         { field: 'hbl', label: 'HBL' },
                     ];
                     this.configShipment.selectedDisplayFields = ['jobId', `mbl`, 'hbl'];
-
                 }
             );
     }
@@ -643,6 +661,10 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     closePopup() {
         this.hide();
         this.resetForm();
+    }
+
+    onClickOutsideChargeName() {
+        this._isShowAutoComplete.next(false);
     }
 
 }

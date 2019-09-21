@@ -39,7 +39,6 @@ export class SettlementListChargeComponent extends AppList {
 
     TYPE: string = 'LIST';
     STATE: string = 'WRITE';  // * list'state READ/WRITE
-
     constructor(
         private _sortService: SortService,
         private _toastService: ToastrService
@@ -134,7 +133,9 @@ export class SettlementListChargeComponent extends AppList {
         data.event.preventDefault();
 
         this.paymentManagementPopup.getDataPaymentManagement(data.data.jobId, data.data.hbl, data.data.mbl);
-        this.paymentManagementPopup.show();
+        setTimeout(() => {
+            this.paymentManagementPopup.show();
+        }, 500);
         return false;
     }
 
