@@ -12,5 +12,9 @@ namespace eFMS.API.ReportData.Models
         public string GatewayName { get; set; }
         public string CustomerName { get; set; }
         public string ImportCountryName { get; set; }
+        public string ExportCountryName { get; set; }
+        public string JobNo { get; set; }
+        public string ClearanceDate { get; set; }
+        public string Status { get; set; }
     }
 }

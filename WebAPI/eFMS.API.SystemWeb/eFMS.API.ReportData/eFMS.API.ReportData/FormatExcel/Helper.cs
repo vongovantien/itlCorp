@@ -758,6 +758,58 @@ namespace eFMS.API.ReportData
         #endregion
 
         #region Custom Clearence
+        public Stream CreateCustomClearanceExcelFile(List<CustomsDeclaration> listObj, Stream stream = null)
+        {
+            try
+            {
+                var list = listObj;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("First Sheet");
+                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
+                    BindingFormatForCustomClearanceExcel(workSheet, list);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+        public void BindingFormatForCustomClearanceExcel(ExcelWorksheet worksheet, List<CustomsDeclaration> listItems)
+        {
+            // Tạo header
+            worksheet.Cells[1, 1].Value = "Clearance No";
+            worksheet.Cells[1, 2].Value = "Type";
+            worksheet.Cells[1, 3].Value = "Clearance Location";
+            worksheet.Cells[1, 4].Value = "Partner Name";
+            worksheet.Cells[1, 5].Value = "Import Country";
+            worksheet.Cells[1, 6].Value = "Export Country";
+            worksheet.Cells[1, 7].Value = "JOBID";
+            worksheet.Cells[1, 8].Value = "Clearacne Date";
+            worksheet.Cells[1, 9].Value = "Status";
+
+            worksheet.Cells.AutoFitColumns(minWidth, maxWidth);
+            worksheet.Cells["A1:Z1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            for (int i = 0; i < listItems.Count; i++)
+            {
+                var item = listItems[i];
+                worksheet.Cells[i + 2, 1].Value = item.CleareanceNo;
+                worksheet.Cells[i + 2, 2].Value = item.Type;
+                worksheet.Cells[i + 2, 3].Value = item.GatewayName;
+                worksheet.Cells[i + 2, 4].Value = item.CustomerName;
+                worksheet.Cells[i + 2, 5].Value = item.ImportCountryName;
+                worksheet.Cells[i + 2, 6].Value = item.ExportCountryName;
+                worksheet.Cells[i + 2, 7].Value = item.JobNo;
+                worksheet.Cells[i + 2, 8].Value = item.ClearanceDate;
+                worksheet.Cells[i + 2, 9].Value = item.Status;
+            }
+        }
+
+
 
         #endregion
 

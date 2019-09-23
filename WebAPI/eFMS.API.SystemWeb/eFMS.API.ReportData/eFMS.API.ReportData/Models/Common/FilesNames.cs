@@ -14,6 +14,8 @@
         public const string TowardName = "Town-Ward List.xlsx";
         public const string ChargeName = "Charge List.xlsx";
         public const string CurrencyName = "Currency List.xlsx";
+        public const string CustomClearanceName = "CustomClearance List.xlsx";
+
 
     }
 }
