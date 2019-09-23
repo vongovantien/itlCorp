@@ -118,10 +118,10 @@ namespace eFMS.API.Accounting.DL.Services
                             !string.IsNullOrEmpty(criteria.Requester) ?
                             (
                                     ad.Requester == criteria.Requester
-                                ||  apr.Manager == criteria.Requester
-                                ||  apr.Accountant == criteria.Requester
-                                ||  apr.ManagerApr == criteria.Requester
-                                ||  apr.AccountantApr == criteria.Requester
+                                ||  (apr.Manager == criteria.Requester && apr.ManagerAprDate != null)
+                                ||  (apr.Accountant == criteria.Requester && apr.AccountantAprDate != null)
+                                ||  (apr.ManagerApr == criteria.Requester && apr.ManagerAprDate != null)
+                                ||  (apr.AccountantApr == criteria.Requester && apr.AccountantAprDate != null)
                             )
                             :
                                 1 == 1
