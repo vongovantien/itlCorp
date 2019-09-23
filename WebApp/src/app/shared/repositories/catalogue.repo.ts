@@ -43,7 +43,7 @@ export class CatalogueRepo {
             })
         );
     }
-}
+
 
     getUnit() {
         return this._api.get(`localhost:44361/api/${this.VERSION}/en-US/CatUnit`).pipe(

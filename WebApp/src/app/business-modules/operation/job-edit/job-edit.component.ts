@@ -117,7 +117,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         private _unitRepo: UnitRepo,
         private _operationRepo: OperationRepo,
         private _data: DataService,
-        private _catalogueRepo: CatalogueRepo
+        private _catalogueRepo: CatalogueRepo,
         private systemRepo: SystemRepo,
         private catalogueRepo: CatalogueRepo,
         private _ngProgressService: NgProgress

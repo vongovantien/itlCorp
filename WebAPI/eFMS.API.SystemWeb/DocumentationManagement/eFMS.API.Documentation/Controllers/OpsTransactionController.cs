@@ -226,7 +226,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="jobId"></param>
         /// <param name="currency"></param>
         /// <returns></returns>
-        [HttpPost("PreviewFormPLsheet")]
+        [HttpGet("PreviewFormPLsheet")]
         [Authorize]
         public IActionResult PreviewFormPLsheet(Guid jobId, string currency)
         {

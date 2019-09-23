@@ -524,7 +524,7 @@ namespace eFMS.API.Documentation.DL.Services
                         POD = podName,
                         Commodity = string.Empty,
                         Volumne = string.Empty,
-                        Carrier = supplier.PartnerNameEn,
+                        Carrier = supplier?.PartnerNameEn,
                         Agent = agent?.PartnerNameEn,
                         ContainerNo = item.ContNo,
                         OceanVessel = string.Empty,
