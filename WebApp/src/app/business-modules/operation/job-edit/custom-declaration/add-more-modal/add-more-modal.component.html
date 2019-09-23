@@ -29,21 +29,6 @@
             <!--begin: Search Form -->
             <div class="m-form m-form--label-align-right">
               <div class="row align-items-center">
-           
-               <!--   <div class="form-group">
-                    <div class="m-input-icon m-input-icon--left">
-                      <input type="text" class="form-control m-input m-input--square" placeholder="Search..."
-                        autocomplete="nope" [(ngModel)]="keyword" name="keyword" (change)="keyword = keyword.trim();"
-                        (keyup)="searchClearanceNotImported($event)">
-                      <span class="m-input-icon__icon m-input-icon__icon--left">
-                        <span>
-                          <i class="la la-search"></i>
-                        </span>
-                      </span>
-                    </div>
-                  </div> -->
-
-
                   <form class="col-3" [formGroup]="form">
                       <div class="form-group" >
                           <div (clickOutside)="isShow = false">
@@ -54,15 +39,15 @@
                       </div>
                   </form>
                   <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal"
-                  data-target="#search-custom-modal">
+                  (click) ='showPopupSearch()'>
                   <span>
                       <i class="la la-plus"></i>
                       <span>
-                          Search Mutiple
+                          Search Multiple
                       </span>
                   </span>
                 </button>
-                  <div  class="modal fade" id="search-custom-modal" data-backdrop="static" role="dialog"
+                  <!-- <div  class="modal fade" id="search-custom-modal" data-backdrop="static" role="dialog"
                   aria-labelledby="" aria-hidden="true">
                   <div class="modal-dialog" role="document">
                   <div class="modal-content">
@@ -73,7 +58,7 @@
                     <app-close-modal-button></app-close-modal-button>
                 </div>
                 <div class="modal-body">
-                    <!--begin::add-commodity-form-->
+                  
                     <div class="m-form m-form--state">
                         <div class="col-12">
                                 <textarea rows="6" [(ngModel)] = 'customNoSearch' class="form-control m-input m-input--square" name="customNo">
@@ -83,10 +68,10 @@
 
                      
                     </div>
-                    <!--end:add-commodity-form -->
+                   
                 </div>
                 <div class="modal-footer m--align-center c-button-actions">
-                    <button type="button" (click) = 'getListCleranceNotImported()' class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal">
+                <button type="button" (click) = 'getListCleranceNotImported()' class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal">
                   <span>
                       <i class="la la-download"></i>
                       <span>
@@ -94,11 +79,19 @@
                       </span>
                   </span>
                 </button>
+                <button type="button" (click) = 'clearMultipleSearch()' class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" data-toggle="modal">
+                  <span>
+                      <i class="la la-ban"></i>
+                      <span>
+                          Clear
+                      </span>
+                  </span>
+                </button>
                 </div>
             </form>
         </div>
     </div>
-</div>
+</div> -->
 <!--end::add-commodity-modal-->
               
               </div>
@@ -210,3 +203,4 @@
     </div>
   </div>
 </div>
+<app-search-multiple (isCloseModal)="closepp($event)"></app-search-multiple>

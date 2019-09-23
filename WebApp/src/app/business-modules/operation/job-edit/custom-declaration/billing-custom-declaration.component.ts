@@ -20,6 +20,7 @@ import { AppPage } from 'src/app/app.base';
 })
 export class BillingCustomDeclarationComponent extends AppPage implements OnInit {
   @ViewChild(AddMoreModalComponent, { static: false }) poupAddMore: AddMoreModalComponent;
+
   @Input() currentJob: OpsTransaction;
   notImportedCustomClearances: any[];
   customClearances: any[];

@@ -238,27 +238,26 @@ namespace eFMS.API.Operation.DL.Services
         {
             List<CustomsDeclarationModel> returnList = null;
             var foos = keySearch;
-            string[] fooArray = null;
+            string[] clearanceNoArray = null;
+            string replaceString = foos;
             if (foos != null)
             {
-                fooArray = foos.Split(',');
+                replaceString = foos.Replace("\t", "");
+                clearanceNoArray = replaceString.Split(',');
             }
-      
-
-
             Func<CustomsDeclarationModel, bool> query = x => (x.PartnerTaxCode == customerNo)
-            && (keySearch != null ? fooArray.Contains(x.ClearanceNo) :  x.ClearanceNo == keySearch || x.Hblid == keySearch
+            && (keySearch != null ? clearanceNoArray.Contains(x.ClearanceNo) :  x.ClearanceNo == keySearch || x.Hblid == keySearch
             || x.ExportCountryCode == keySearch || x.ImportCountryCode == keySearch || x.CommodityCode == keySearch
             || x.Note == keySearch || x.FirstClearanceNo == keySearch || string.IsNullOrEmpty(keySearch));
             var data = GetAllData().Where(query);
-            //if (Imported == true)
-            //{
-            //    data = data.Where(x => x.JobNo != null);
-            //}
-            //else if (Imported == false)
-            //{
-            //    data = data.Where(x => x.JobNo == null);
-            //}
+            if (Imported == true)
+            {
+                data = data.Where(x => x.JobNo != null);
+            }
+            else if (Imported == false)
+            {
+                data = data.Where(x => x.JobNo == null);
+            }
             rowsCount = data.Count();
             if (rowsCount == 0) return returnList;
             else data = data.OrderByDescending(x => x.DatetimeModified);
