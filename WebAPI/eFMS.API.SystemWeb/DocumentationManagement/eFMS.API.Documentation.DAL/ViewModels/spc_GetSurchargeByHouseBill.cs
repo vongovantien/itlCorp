@@ -70,5 +70,10 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string ReceiverName { get; set; }
         public string PayerName { get; set; }
         public string CurrencyCode { get; set; }
+        public decimal RateToLocal { get; set; }
+        public decimal RateToUSD { get; set; }
+        public string PartnerShortName { get; set; }
+        public string ReceiverShortName { get; set; }
+        public string PayerShortName { get; set; }
     }
 }

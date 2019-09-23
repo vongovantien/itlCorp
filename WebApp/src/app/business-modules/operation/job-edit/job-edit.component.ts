@@ -416,7 +416,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             this.ListBuyingRateCharges.forEach((element: any) => {
                 const currentLocalBuying = element.total * element.exchangeRate;
                 this.totalBuyingLocal += currentLocalBuying;
-                this.totalBuyingUSD += currentLocalBuying / element.exchangeRateUSDToVND;
+                // this.totalBuyingUSD += currentLocalBuying / element.exchangeRateUSDToVND;
+                this.totalBuyingUSD += element.total * element.rateToUSD;
                 this.totalProfit();
             });
         }
@@ -432,7 +433,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             this.ListSellingRateCharges.forEach(element => {
                 const currentLocalSelling = element.total * element.exchangeRate;
                 this.totalSellingLocal += currentLocalSelling;
-                this.totalSellingUSD += currentLocalSelling / element.exchangeRateUSDToVND;
+                // this.totalSellingUSD += currentLocalSelling / element.exchangeRateUSDToVND;
+                this.totalSellingUSD += element.total * element.rateToUSD;
                 this.totalProfit();
             });
         }
@@ -449,7 +451,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             this.ListOBHCharges.forEach((element: any) => {
                 const currentOBHCharge = element.total * element.exchangeRate;
                 this.totalOBHLocal += currentOBHCharge;
-                this.totalOBHUSD += currentOBHCharge / element.exchangeRateUSDToVND;
+                // this.totalOBHUSD += currentOBHCharge / element.exchangeRateUSDToVND;
+                this.totalOBHUSD += element.total * element.rateToUSD;
                 this.totalProfit();
             });
 
@@ -493,8 +496,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this.tab = tabName;
         if (tabName === 'job-edit') {
             this.getShipmentDetails(this.jobId);
+            this.getAllSurCharges();
         }
-        this.getAllSurCharges();
         // this.router.navigate([`home/operation/job-edit/${this.jobId}`], {queryParams: {tab: this.tab}});
     }
 

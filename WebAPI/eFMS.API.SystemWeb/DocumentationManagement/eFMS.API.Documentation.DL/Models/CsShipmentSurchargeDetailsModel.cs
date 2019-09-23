@@ -16,6 +16,10 @@ namespace eFMS.API.Documentation.DL.Models
         public string ChargeCode { get; set; }
         public decimal? ExchangeRate { get; set; }
         public decimal? ExchangeRateUSDToVND { get; set; }
-        public string hwbno { get; set; }
+        public decimal RateToUSD { get; set; }
+        public string Hwbno { get; set; }
+        public string PartnerShortName { get; set; }
+        public string ReceiverShortName { get; set; }
+        public string PayerShortName { get; set; }
     }
 }
