@@ -9,5 +9,6 @@ export enum ButtonType {
     reset = "reset",
     detail = "detail",
     closeModal = "closeModal",
-    search = "search"
+    search = "search",
+    searchMultiple = 'searchMultiple'
 }

@@ -20,15 +20,17 @@ import { AppPage } from 'src/app/app.base';
 })
 export class BillingCustomDeclarationComponent extends AppPage implements OnInit {
   @ViewChild(AddMoreModalComponent, { static: false }) poupAddMore: AddMoreModalComponent;
+
   @Input() currentJob: OpsTransaction;
   notImportedCustomClearances: any[];
   customClearances: any[];
   pagerMaster: PagerSetting = PAGINGSETTING;
-  notImportedData: any[];
+  notImportedData: any[] = [];
   importedData: any[];
   searchImportedString: string = '';
   checkAllImported = false;
   dataImportedSearch: any[];
+  
 
   constructor(private baseServices: BaseService,
     private api_menu: API_MENU,
@@ -147,7 +149,7 @@ export class BillingCustomDeclarationComponent extends AppPage implements OnInit
     }
   }
   getListCleranceNotImported() {
-    this.customClearanceRepo.getListNotImportToJob(false).pipe(
+    this.customClearanceRepo.getListNotImportToJob("",this.currentJob.customerId,false,this.pagerMaster.currentPage,this.pagerMaster.pageSize).pipe(
       takeUntil(this.ngUnsubscribe),
       catchError(this.catchError),
       finalize(() => { })
@@ -158,19 +160,20 @@ export class BillingCustomDeclarationComponent extends AppPage implements OnInit
     );
   }
   async showPopupAdd() {
-    this.customClearanceRepo.getListNotImportToJob(false).pipe(
-      takeUntil(this.ngUnsubscribe),
-      catchError(this.catchError),
-      finalize(() => { })
-    ).subscribe(
-      (res: any) => {
-        if (res) {
-          this.poupAddMore.notImportedData = this.poupAddMore.dataNotImportedSearch = this.notImportedData;
-          this.poupAddMore.getDataNotImported();
-          this.poupAddMore.show({ backdrop: 'static' });
-        }
-      }
-    );
+    this.poupAddMore.show({ backdrop: 'static' });
+    // this.customClearanceRepo.getListNotImportToJob("",this.currentJob.customerId,false,this.pagerMaster.currentPage,this.pagerMaster.pageSize).pipe(
+    //   takeUntil(this.ngUnsubscribe),
+    //   catchError(this.catchError),
+    //   finalize(() => { })
+    // ).subscribe(
+    //   (res: any) => {
+    //     if (res) {
+    //       // this.poupAddMore.notImportedData = this.poupAddMore.dataNotImportedSearch = this.notImportedData;
+    //       // this.poupAddMore.getDataNotImported();
+     
+    //     }
+    //   }
+    // );
   }
   changeAllImported() {
     if (this.checkAllImported) {

@@ -217,7 +217,7 @@ namespace eFMS.API.Operation.DL.Services
                                                                                     && (x.ClearanceDate <= criteria.ToClearanceDate || criteria.ToClearanceDate == null)
                                                                                     && (x.DatetimeCreated >= criteria.FromImportDate || criteria.FromImportDate == null)
                                                                                     && (x.DatetimeCreated <= criteria.ToImportDate || criteria.ToImportDate == null);
-            var data = GetCustomClearanceViewList(string.Empty);
+            //var data = GetCustomClearanceViewList(string.Empty);
             if (criteria.ImPorted == true)
             {
                 query = query.And(x => x.JobNo != null);
@@ -231,6 +231,46 @@ namespace eFMS.API.Operation.DL.Services
             if (rowsCount == 0) return new List<CustomsDeclarationModel>();
             var results = MapClearancesToClearanceModels(list);
             return results;
+        }
+
+
+        public List<CustomsDeclarationModel> GetCustomDeclaration(string keySearch, string customerNo, bool Imported, int pageNumber, int pageSize, out int rowsCount)
+        {
+            List<CustomsDeclarationModel> returnList = null;
+            var foos = keySearch;
+            string[] clearanceNoArray = null;
+            string replaceString = foos;
+            if (foos != null)
+            {
+                replaceString = foos.Replace("\t", "");
+                clearanceNoArray = replaceString.Split(',');
+            }
+            Func<CustomsDeclarationModel, bool> query = x => (x.PartnerTaxCode == customerNo)
+            && (keySearch != null ? clearanceNoArray.Contains(x.ClearanceNo) :  x.ClearanceNo == keySearch || x.Hblid == keySearch
+            || x.ExportCountryCode == keySearch || x.ImportCountryCode == keySearch || x.CommodityCode == keySearch
+            || x.Note == keySearch || x.FirstClearanceNo == keySearch || string.IsNullOrEmpty(keySearch));
+            var data = GetAllData().Where(query);
+            if (Imported == true)
+            {
+                data = data.Where(x => x.JobNo != null);
+            }
+            else if (Imported == false)
+            {
+                data = data.Where(x => x.JobNo == null);
+            }
+            rowsCount = data.Count();
+            if (rowsCount == 0) return returnList;
+            else data = data.OrderByDescending(x => x.DatetimeModified);
+
+            if (pageSize > 1)
+            {
+                if (pageNumber < 1)
+                {
+                    pageNumber = 1;
+                }
+                returnList = data.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+            }
+            return returnList;
         }
 
         private List<CustomsDeclarationModel> MapClearancesToClearanceModels(IQueryable<CustomsDeclaration> list)
@@ -330,6 +370,37 @@ namespace eFMS.API.Operation.DL.Services
             }
             return results?.AsQueryable();
         }
+
+        public List<CustomsDeclarationModel> GetCustomDeclaration(string customNo, string taxCode, bool? ImPorted, int pageNumber, int  pageSize, out int rowsCount)
+        {
+            Func<CustomsDeclarationModel, bool> query = x => x.PartnerTaxCode == taxCode && (x.ClearanceNo == customNo || string.IsNullOrEmpty(customNo));
+
+            Expression<Func<CustomsDeclarationModel, object>> orderByProperty = x => x.DatetimeModified;
+            List <CustomsDeclarationModel> returnList = null;
+            var results = GetAllData().Where(query);
+            rowsCount = results.Count();
+            if (rowsCount == 0) return returnList;
+            else results = results.OrderByDescending(x => x.DatetimeModified);
+            if (ImPorted == true)
+            {
+                results = results.Where(x => x.JobNo != null);
+            }
+            else if (ImPorted == false)
+            {
+                results = results.Where(x => x.JobNo == null);
+            }
+            if (pageSize > 1)
+            {
+                if (pageNumber < 1)
+                {
+                    pageNumber = 1;
+                }
+                returnList = results.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+            }
+            return returnList;
+        }
+
+
         private List<CustomsDeclarationModel> GetAllData()
         {
             //get from cache
