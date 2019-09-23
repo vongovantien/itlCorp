@@ -1,9 +1,8 @@
 ﻿using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
+using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Common.Globals;
-using eFMS.API.Documentation.DL.Models.Criteria;
-using eFMS.API.Documentation.DL.Models.SettlementPayment;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
