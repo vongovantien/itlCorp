@@ -757,6 +757,10 @@ namespace eFMS.API.ReportData
 
         #endregion
 
+        #region Custom Clearence
+
+        #endregion
+
 
 
 
