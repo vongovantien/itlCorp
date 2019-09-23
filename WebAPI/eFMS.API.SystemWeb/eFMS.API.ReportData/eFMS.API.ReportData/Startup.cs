@@ -48,32 +48,41 @@ namespace eFMS.API.ReportData
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApiVersionDescriptionProvider provider)
         {
-            if (env.IsDevelopment())
+            try
             {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
 
-            app.UseHttpsRedirection();
-            app.UseSwagger();
-            app.UseSwaggerUI(options =>
-            {
-                string swaggerJsonBasePath = string.IsNullOrWhiteSpace(options.RoutePrefix) ? "." : "..";
-                foreach (var description in provider.ApiVersionDescriptions)
+                if (env.IsDevelopment())
                 {
-                    options.SwaggerEndpoint(
-                        $"{swaggerJsonBasePath}/swagger/{description.GroupName}/swagger.json",
-                        description.GroupName.ToUpperInvariant());
+                    app.UseDeveloperExceptionPage();
                 }
-            });
+                else
+                {
+                    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                    app.UseHsts();
+                }
 
-            app.UseCors("AllowAllOrigins");
+                app.UseHttpsRedirection();
+                app.UseSwagger();
+                app.UseSwaggerUI(options =>
+                {
+                    string swaggerJsonBasePath = string.IsNullOrWhiteSpace(options.RoutePrefix) ? "." : "..";
+                    foreach (var description in provider.ApiVersionDescriptions)
+                    {
+                        options.SwaggerEndpoint(
+                            $"{swaggerJsonBasePath}/swagger/{description.GroupName}/swagger.json",
+                            description.GroupName.ToUpperInvariant());
+                    }
+                });
 
-            app.UseMvc();
+                app.UseCors("AllowAllOrigins");
+
+                app.UseMvc();
+            }
+            catch (System.Exception ex)
+            {
+
+                throw ex;
+            }
         }
     }
 }

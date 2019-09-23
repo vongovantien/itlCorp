@@ -8,6 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Shipment, CustomDeclaration } from 'src/app/shared/models';
 import { SortService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
     selector: 'app-job-mangement',
@@ -48,6 +49,7 @@ export class JobManagementComponent extends AppList implements OnInit {
         private _operationRepo: OperationRepo,
         private _ngProgressService: NgProgress,
         private _toastService: ToastrService,
+        private _http: HttpClient
     ) {
         super();
         this.requestSort = this.sortShipment;

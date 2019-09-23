@@ -12,7 +12,13 @@ export class OperationRepo {
     }
 
     getListContainersOfJob(data: any = {}) {
-        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/CsMawbcontainer/Query`, data).pipe(
+        // return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/CsMawbcontainer/Query`, data).pipe(
+        //     catchError((error) => throwError(error)),
+        //     map((res: any) => {
+        //         return res;
+        //     })
+        // );
+        return this._api.post(`localhost:44366/api/v1/vi/OpsTransaction/api/${this.VERSION}/vi/CsMawbcontainer/Query`, data).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;
@@ -22,10 +28,26 @@ export class OperationRepo {
     }
 
     getListShipment(page?: number, size?: number, body = {}) {
-        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/OpsTransaction/Paging`, body, {
-            page: '' + page,
-            size: '' + size
-        }).pipe(
+        // return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/OpsTransaction/Paging`, body, {
+        //     page: '' + page,
+        //     size: '' + size
+        // }).pipe(
+        //     catchError((error) => throwError(error)),
+        //     map((data: any) => data)
+        // );
+        return this._api.post(`localhost:44366/api/v1/vi/OpsTransaction/Paging?page=${page}&size=${size}`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+    getDetailShipment(id: string) {
+        return this._api.get(`localhost:44366/api/v1/vi/OpsTransaction?id=${id}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+    getOPSShipmentCommonData() {
+        return this._api.get(`localhost:44366/api/v1/vi/Terminology/GetOPSShipmentCommonData`).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -78,6 +100,20 @@ export class OperationRepo {
                 catchError((error) => throwError(error)),
                 map((data: any) => data)
             );
+    }
+    previewCDNote(data) {
+        // return this._api.get(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatCurrency/getAll`).pipe(
+        //     catchError((error) => throwError(error)),
+        //     map((data: any) => {
+        //         return data;
+        //     })
+        // );
+        return this._api.post(`localhost:44366/api/${this.VERSION}/en-US/AcctCDNote/PreviewOpsCdNote`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
     }
 }
 

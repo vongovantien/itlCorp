@@ -12,7 +12,7 @@ import { prepareNg2SelectData } from 'src/helper/data.helper';
 
 import { ChargeConstants } from 'src/constants/charge.const';
 import { ContainerListComponent } from './container-list/container-list.component';
-import { OperationRepo, UnitRepo } from 'src/app/shared/repositories';
+import { OperationRepo, UnitRepo, SystemRepo, CatalogueRepo } from 'src/app/shared/repositories';
 import { AppPage } from "src/app/app.base";
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { CancelCreateJobPopupComponent } from './job-confirm-popup/cancel-create-job-popup/cancel-create-job-popup.component';
@@ -24,6 +24,7 @@ import { DataService } from 'src/app/shared/services';
 import { ConfirmCancelJobPopupComponent } from './job-confirm-popup/confirm-cancel-job-popup/confirm-cancel-job-popup.component';
 import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
 import { CsShipmentSurcharge } from 'src/app/shared/models';
+import { NgProgressComponent, NgProgress } from '@ngx-progressbar/core';
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
@@ -113,8 +114,13 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         private _unitRepo: UnitRepo,
         private _operationRepo: OperationRepo,
         private _data: DataService,
+        private systemRepo: SystemRepo,
+        private catalogueRepo: CatalogueRepo,
+        private _ngProgressService: NgProgress
     ) {
         super();
+
+        this._progressRef = this._ngProgressService.ref();
     }
 
     ngOnInit() {
@@ -123,10 +129,10 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             this.tab = 'job-edit';
             this.tabCharge = 'buying';
             // this.getPackageTypes();
-            this.getUnits();
+            //this.getUnits();
             this.getPartners();
             this.getListCurrencies();
-            this.getCurrencies();
+            // this.getCurrencies();
             this.getListBuyingRateCharges();
             this.getListSellingRateCharges();
             this.getListOBHCharges();
@@ -137,30 +143,32 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             this.getBillingOps();
             this.getWarehouses();
             // this.getContainerData();
-            this.getListPackageTypes();
+            // this.getListPackageTypes();
             await this.getShipmentCommonData();
             if (!!params && !!params.id) {
                 this.jobId = params.id;
-                await this.getShipmentDetails(params.id);
-                this.getListContainersOfJob();
+                this.getShipmentDetails(params.id);
                 if (this.opsTransaction != null) {
-                    this.getAllSurCharges();
-                    this.serviceDate = (this.opsTransaction.serviceDate !== null) ? { startDate: new Date(this.opsTransaction.serviceDate), endDate: new Date(this.opsTransaction.serviceDate) } : null;
-                    this.finishDate = this.opsTransaction.finishDate != null ? { startDate: new Date(this.opsTransaction.finishDate), endDate: new Date(this.opsTransaction.finishDate) } : null;
-                    let index = this.productServices.findIndex(x => x.id === this.opsTransaction.productService);
-                    if (index > -1) { this.productServiceActive = [this.productServices[index]]; }
-                    index = this.serviceModes.findIndex(x => x.id === this.opsTransaction.serviceMode);
-                    if (index > -1) { this.serviceModeActive = [this.serviceModes[index]]; }
-                    index = this.shipmentModes.findIndex(x => x.id === this.opsTransaction.shipmentMode);
-                    if (index > -1) { this.shipmentModeActive = [this.shipmentModes[index]]; }
-                    index = this.packageTypes.findIndex(x => x.id === this.opsTransaction.packageTypeId);
-                    if (index > -1) { this.packagesUnitActive = [this.packageTypes[index]]; }
-                    // this.getAllSurCharges();
-                    // this.getShipmentContainer();
-                    this.getCustomClearances();
-                } else {
-                    this.serviceDate = null;
-                    this.finishDate = null;
+                    this.getListContainersOfJob();
+                    if (this.opsTransaction != null) {
+                        this.getAllSurCharges();
+                        this.serviceDate = (this.opsTransaction.serviceDate !== null) ? { startDate: new Date(this.opsTransaction.serviceDate), endDate: new Date(this.opsTransaction.serviceDate) } : null;
+                        this.finishDate = this.opsTransaction.finishDate != null ? { startDate: new Date(this.opsTransaction.finishDate), endDate: new Date(this.opsTransaction.finishDate) } : null;
+                        let index = this.productServices.findIndex(x => x.id === this.opsTransaction.productService);
+                        if (index > -1) { this.productServiceActive = [this.productServices[index]]; }
+                        index = this.serviceModes.findIndex(x => x.id === this.opsTransaction.serviceMode);
+                        if (index > -1) { this.serviceModeActive = [this.serviceModes[index]]; }
+                        index = this.shipmentModes.findIndex(x => x.id === this.opsTransaction.shipmentMode);
+                        if (index > -1) { this.shipmentModeActive = [this.shipmentModes[index]]; }
+                        index = this.packageTypes.findIndex(x => x.id === this.opsTransaction.packageTypeId);
+                        if (index > -1) { this.packagesUnitActive = [this.packageTypes[index]]; }
+                        // this.getAllSurCharges();
+                        // this.getShipmentContainer();
+                        this.getCustomClearances();
+                    } else {
+                        this.serviceDate = null;
+                        this.finishDate = null;
+                    }
                 }
             }
         });
@@ -283,16 +291,34 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     async getShipmentDetails(id: any) {
-        this.opsTransaction = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.getById + "?id=" + id, false, true);
-        console.log("des", this.opsTransaction);
+        // this.opsTransaction = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.getById + "?id=" + id, false, true);
+        // console.log("des", this.opsTransaction);
+        this._operationRepo.getDetailShipment(id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (response: any) => {
+                    this.opsTransaction = response;
+                },
+            );
         this.baseServices.setData("CurrentOpsTransaction", this.opsTransaction);
     }
 
     async getShipmentCommonData() {
-        const data = await shipmentHelper.getOPSShipmentCommonData(this.baseServices, this.api_menu);
-        this.productServices = dataHelper.prepareNg2SelectData(data.productServices, 'value', 'displayName');
-        this.serviceModes = dataHelper.prepareNg2SelectData(data.serviceModes, 'value', 'displayName');
-        this.shipmentModes = dataHelper.prepareNg2SelectData(data.shipmentModes, 'value', 'displayName');
+        // const data = await shipmentHelper.getOPSShipmentCommonData(this.baseServices, this.api_menu);
+        this._operationRepo.getOPSShipmentCommonData()
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (responses: any) => {
+
+                    this.productServices = dataHelper.prepareNg2SelectData(responses.productServices, 'value', 'displayName');
+                    this.serviceModes = dataHelper.prepareNg2SelectData(responses.serviceModes, 'value', 'displayName');
+                    this.shipmentModes = dataHelper.prepareNg2SelectData(responses.shipmentModes, 'value', 'displayName');
+                },
+            );
     }
 
     private getPorts() {
@@ -320,10 +346,19 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     private getBillingOps() {
-        this.baseServices.get(this.api_menu.System.User_Management.getAll).subscribe((res: any) => {
-            this.billingOps = res;
-            this.salemans = res;
-        });
+        // this.baseServices.get(this.api_menu.System.User_Management.getAll).subscribe((res: any) => {
+        //     this.billingOps = res;
+        //     this.salemans = res;
+        // });
+        this.systemRepo.getListSystemUser()
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (responses: any) => {
+                    this.salemans = responses;
+                },
+            );
     }
 
     public getListBuyingRateCharges() {
@@ -359,16 +394,35 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     public getUnits() {
-        this.baseServices.post(this.api_menu.Catalogue.Unit.getAllByQuery, { inactive: false }).subscribe((data: any) => {
-            this.lstUnits = data;
-            // this._data.setData('lstUnits', this.lstUnits);
-        });
+        // this.baseServices.post(this.api_menu.Catalogue.Unit.getAllByQuery, { inactive: false }).subscribe((data: any) => {
+        //     this.lstUnits = data;
+        //     // this._data.setData('lstUnits', this.lstUnits);
+        // });
+        this.catalogueRepo.getUnit().pipe(
+            catchError(this.catchError),
+            finalize(() => this._progressRef.complete())
+        ).subscribe(
+            (responses: any) => {
+                this.lstUnits = responses;
+            },
+        );
     }
 
     public getListCurrencies() {
-        this.baseServices.post(this.api_menu.Catalogue.Currency.getAllByQuery, { inactive: false }).subscribe((res: any) => {
-            // this._data.setData('lstCurrencies', res);
-        });
+        // this.baseServices.post(this.api_menu.Catalogue.Currency.getAllByQuery, { inactive: false }).subscribe((res: any) => {
+        //     // this._data.setData('lstCurrencies', res);
+        // });
+        this.catalogueRepo.getCurrency()
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (responses: any) => {
+
+                    this._data.setData('lstCurrencies', responses);
+                    this.lstCurrencies = prepareNg2SelectData(responses, "id", "id");
+                },
+            );
     }
 
     public getCurrencies(isAddNew = true) {

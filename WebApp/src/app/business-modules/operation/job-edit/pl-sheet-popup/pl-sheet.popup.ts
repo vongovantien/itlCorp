@@ -43,6 +43,8 @@ export class PlSheetPopupComponent extends PopupBase {
             .subscribe(
                 (res: any) => {
                     this.currencyList = res || [];
+                    console.log('sfsfsfsfsfsfs');
+                    console.log(this.currencyList);
                     this.selectedCurrency = this.currencyList.filter((item: any) => item.id === 'VND')[0];
                 },
             );

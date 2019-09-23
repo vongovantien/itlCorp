@@ -46,7 +46,7 @@ export class ContainerListComponent extends PopupBase implements OnInit {
 
   ngOnInit() {
     this.getComodities();
-    this.getUnits();
+    // this.getUnits();
     this.lstContainerTemp = this.lstMasterContainers;
   }
   showImportPopup() {

@@ -9,7 +9,7 @@ import { PopupBase } from 'src/app/popup.base';
     templateUrl: './report-preview.component.html'
 })
 export class ReportPreviewComponent extends PopupBase {
-    
+
     @Input() modalId: any;
     @Input() data: Crystal = null;
     @ViewChild('formReport', { static: true }) frm: ElementRef;
