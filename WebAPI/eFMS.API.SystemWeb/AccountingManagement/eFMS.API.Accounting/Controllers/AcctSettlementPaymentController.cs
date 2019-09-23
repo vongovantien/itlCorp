@@ -12,11 +12,10 @@ using eFMS.API.Accounting.Infrastructure.Common;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.DL.Common;
 using System;
-using eFMS.API.Documentation.DL.Models.SettlementPayment;
-using eFMS.API.Documentation.DL.Models.Criteria;
 using System.Collections.Generic;
 using AutoMapper;
 using System.Linq;
+using eFMS.API.Accounting.DL.Models.SettlementPayment;
 
 namespace eFMS.API.Accounting.Controllers
 {

@@ -120,9 +120,9 @@
                                                     <span *ngIf="item.serviceMode == 'Import'">{{ item.podName }}</span>
                                                     <span *ngIf="item.serviceMode == 'Export'">{{ item.polName }}</span>
                                                 </td>
-                                                <td>
+                                                <!-- <td>
                                                     <span>{{ item.flightVessel }}</span>
-                                                </td>
+                                                </td> -->
                                                 <td>
                                                     <span>{{ item.sumContainers }}</span>
                                                 </td>
@@ -135,13 +135,13 @@
                                                 <td>
                                                     <span>{{ item.sumCbm }}</span>
                                                 </td>
-                                                <td>
+                                                <!-- <td>
                                                     <span>{{ item.invoiceNo }}</span>
-                                                </td>
+                                                </td> -->
                                                 <td>
                                                     <span>{{ item.modifiedDate | date:'dd/MM/yyyy' }}</span>
                                                 </td>
-                                                <td>
+                                                <!-- <td>
                                                     <ng-container *ngIf="item.currentStatus">
                                                         <span class="m-badge m-badge--primary m-badge--wide"
                                                             *ngIf="item.currentStatus == jobStatusConts.inSchedule">{{ item.currentStatus }}</span>
@@ -154,7 +154,7 @@
                                                         <span class="m-badge m-badge--success m-badge--wide"
                                                             *ngIf="item.currentStatus == jobStatusConts.finish">{{ item.currentStatus }}</span>
                                                     </ng-container>
-                                                </td>
+                                                </td> -->
                                             </tr>
                                             <tr class="collapse-panel-row">
                                                 <td colspan="14">

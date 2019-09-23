@@ -44,4 +44,6 @@ export class OpsTransaction {
         //packageQuantity: number = null;
         csMawbcontainers: Container[] = null;
         containerDescription: string = '';
+        commodityGroupId: string = '';
+
 }

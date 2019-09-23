@@ -6,7 +6,7 @@
                 <button type="button" (click)="hide()" class="close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                
+
             </div>
             <div class="modal-body">
                 <div class="m-form m-form--state bg-secondary m--padding-15 m--margin-bottom-15">
@@ -17,8 +17,10 @@
                                     Shipment
                                 </label>
                                 <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedShipment"
-                                    (itemSelected)="onSelectDataFormInfo($event, 'shipment')" [dataSources]="configShipment.dataSource"
-                                    [displayFields]="configShipment.displayFields"   [selectedDisplayFields]="configShipment.selectedDisplayFields">
+                                    (itemSelected)="onSelectDataFormInfo($event, 'shipment')"
+                                    [dataSources]="configShipment.dataSource"
+                                    [displayFields]="configShipment.displayFields"
+                                    [selectedDisplayFields]="configShipment.selectedDisplayFields">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -27,9 +29,11 @@
                                 <label class="form-control-label">
                                     Debit/Credit Note
                                 </label>
-                                <select class="form-control" [(ngModel)]="selectedCDNote" name="selectedCDNote" placeholder="Select">
+                                <select class="form-control" [(ngModel)]="selectedCDNote" name="selectedCDNote"
+                                    placeholder="Select">
                                     <option [value]="null" disabled>Choose Debit/Credit Note</option>
-                                    <option *ngFor="let cdNote of cdNotes; let i = index" [ngValue]="cdNote">{{cdNote.creditDebitNo}}</option>
+                                    <option *ngFor="let cdNote of cdNotes; let i = index" [ngValue]="cdNote">
+                                        {{cdNote.creditDebitNo}}</option>
                                 </select>
                             </div>
                         </div>
@@ -70,50 +74,69 @@
                             </div>
                         </div>
                         <div class="col-lg-8">
-                        <div class="form-group form-charge">
-                            <label class="form-control-label">
-                                Charge
-                            </label>
-                            <div class="charge-list-selected" *ngIf="!!selectedCharges.length">
-                                <ul class="list-unstyled list">
-                                    <li class="charge-list-item d-flex justify-content-between align-items-center"
-                                        *ngFor="let chargeItem of selectedCharges; let i = index; trackBy: trackByFn">
-                        
-                                        <div *ngIf="chargeItem.id !== 'All' else all">{{chargeItem.code}} -
-                                            {{chargeItem.chargeNameEn}}
-                                        </div>
-                                        <ng-template #all>All</ng-template>
-                                        <a title="Delete" (click)="onRemoveCharge(i)">
-                                            <i class="la la-close"></i>
-                                        </a>
-                                    </li>
-                                </ul>
+                            <div class="form-group form-charge">
+                                <label class="form-control-label">
+                                    Charge
+                                </label>
+                                <div class="charge-list-selected" *ngIf="!!selectedCharges.length">
+                                    <ul class="list-unstyled list">
+                                        <li class="charge-list-item d-flex justify-content-between align-items-center"
+                                            *ngFor="let chargeItem of selectedCharges; let i = index; trackBy: trackByFn">
+
+                                            <div *ngIf="chargeItem.id !== 'All' else all">{{chargeItem.code}} -
+                                                {{chargeItem.chargeNameEn}}
+                                            </div>
+                                            <ng-template #all>All</ng-template>
+                                            <a title="Delete" (click)="onRemoveCharge(i)">
+                                                <i class="la la-close"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCharge"
+                                    (itemSelected)="onSelectDataFormInfo($event, 'charge')"
+                                    [dataSources]="configCharge.dataSource"
+                                    [displayFields]="configCharge.displayFields ">
+                                </app-combo-grid-virtual-scroll>
                             </div>
-                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCharge"
-                                (itemSelected)="onSelectDataFormInfo($event, 'charge')" [dataSources]="configCharge.dataSource"
-                                [displayFields]="configCharge.displayFields ">
-                            </app-combo-grid-virtual-scroll>
-                        </div>
                         </div>
                     </div>
-                    <div class="form-actions m--align-right">
-                        <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onApplySearchCharge()">
-                            <span>
-                                <i class="la la-download"></i>
-                                <span>
-                                    Apply
-                                </span>
-                            </span>
-                        </button>
-                        <button type="reset" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"  (click)="onResetData()">
-                            <span>
-                                <i class="la la-refresh"></i>
-                                <span>
-                                    Reset
-                                </span>
-                            </span>
-                        </button>
+                    <div class="row">
+                        <div class="col-4">
+                            <label class="form-control-label" for="">
+                                Commodity Group
+                            </label>
+                            <select [(ngModel)]="commondity" class="form-control">
+                                <option [ngValue]="null">Select Commodity</option>
+                                <option *ngFor="let comodity of commonityGroup" [ngValue]="comodity">
+                                    {{comodity.groupNameEn}}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-8">
+                            <div class="form-actions m--align-right m--margin-top-10">
+                                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                                    (click)="onApplySearchCharge()">
+                                    <span>
+                                        <i class="la la-download"></i>
+                                        <span>
+                                            Apply
+                                        </span>
+                                    </span>
+                                </button>
+                                <button type="reset" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                                    (click)="onResetData()">
+                                    <span>
+                                        <i class="la la-refresh"></i>
+                                        <span>
+                                            Reset
+                                        </span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
                 <div class="m-form m-form--state">
                     <div class="m-form m-form--label-align-right">
@@ -139,7 +162,8 @@
                                 <tr>
                                     <th>
                                         <label class="m-checkbox">
-                                            <input type="checkbox" [(ngModel)]="isCheckAllCharge" (change)="checkUncheckAllCharge()">
+                                            <input type="checkbox" [(ngModel)]="isCheckAllCharge"
+                                                (change)="checkUncheckAllCharge()">
                                             <span></span>
                                         </label>
                                     </th>
@@ -164,9 +188,10 @@
                                     *ngFor="let charge of listCharges | filter: keyword:[ 'jobId', 'chargeCode', 'hbl', 'chargeName', 'hbl',  'mbl', 'currency'] ; let i = index; trackBy: trackByFn">
                                     <td class="table-actions-col">
                                         <div class="table-actions">
-                                            <label class="m-checkbox"  *ngIf="!charge.soaNo">
-                                                <input type="checkbox" (change)="onChangeCheckBoxCharge($event)" value="{{charge}}"
-                                                    [(ngModel)]="charge.isSelected" name="{{charge.code}}">
+                                            <label class="m-checkbox" *ngIf="!charge.soaNo">
+                                                <input type="checkbox" (change)="onChangeCheckBoxCharge($event)"
+                                                    value="{{charge}}" [(ngModel)]="charge.isSelected"
+                                                    name="{{charge.code}}">
                                                 <span></span>
                                             </label>
                                         </div>
@@ -220,14 +245,13 @@
                                     </td>
                                 </tr>
                             </tbody>
-                    
+
                         </table>
                     </div>
                 </div>
             </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="addMoreCharge()">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="addMoreCharge()">
                     <span>
                         <i class="la la-save"></i>
                         <span>

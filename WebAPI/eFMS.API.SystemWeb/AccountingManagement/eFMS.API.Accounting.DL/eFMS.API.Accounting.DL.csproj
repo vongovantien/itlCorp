@@ -40,9 +40,6 @@
     <Reference Include="eFMS.API.Accounting.Service">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Accounting.Service.dll</HintPath>
     </Reference>
-    <Reference Include="eFMS.API.Catalogue.Service">
-      <HintPath>..\bin\netcoreapp2.2\eFMS.API.Catalogue.Service.dll</HintPath>
-    </Reference>
     <Reference Include="eFMS.API.Common">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
     </Reference>

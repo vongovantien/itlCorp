@@ -53,11 +53,14 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     billingOps: any[] = [];
     warehouses: any[] = [];
     salemans: any[] = [];
+    commodityGroup: any[] = [];
+
     productServiceActive: any[] = [];
     serviceModeActive: any[] = [];
     shipmentModeActive: any[] = [];
     searchcontainer: string = '';
     lstMasterContainers: any[];
+    commodityGroupActive: any[] = [];
 
     lstBuyingRateChargesComboBox: any[] = [];
     lstSellingRateChargesComboBox: any[] = [];
@@ -114,6 +117,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         private _unitRepo: UnitRepo,
         private _operationRepo: OperationRepo,
         private _data: DataService,
+        private _catalogueRepo: CatalogueRepo
         private systemRepo: SystemRepo,
         private catalogueRepo: CatalogueRepo,
         private _ngProgressService: NgProgress
@@ -142,6 +146,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             this.getAgents();
             this.getBillingOps();
             this.getWarehouses();
+            this.getCommodityGroup();
             // this.getContainerData();
             // this.getListPackageTypes();
             await this.getShipmentCommonData();
@@ -162,6 +167,10 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                         if (index > -1) { this.shipmentModeActive = [this.shipmentModes[index]]; }
                         index = this.packageTypes.findIndex(x => x.id === this.opsTransaction.packageTypeId);
                         if (index > -1) { this.packagesUnitActive = [this.packageTypes[index]]; }
+
+                    this.commodityGroupActive = this.commodityGroup.filter( i => i.id === this.opsTransaction.commodityGroupId);
+
+
                         // this.getAllSurCharges();
                         // this.getShipmentContainer();
                         this.getCustomClearances();
@@ -277,7 +286,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             );
     }
 
-    async saveContainers(event) {
+    saveContainers(event) {
         this.opsTransaction.csMawbcontainers = event;
         this.getListContainersOfJob();
         this.getShipmentDetails(this.opsTransaction.id);
@@ -288,6 +297,20 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { placeType: PlaceTypeEnum.Warehouse, inactive: false }).subscribe((res: any) => {
             this.warehouses = res;
         });
+    }
+
+    getCommodityGroup() {
+        this._catalogueRepo.getCommodityGroup()
+            .pipe()
+            .subscribe(
+                (res: any) => {
+                    this.commodityGroup = res;
+                    this.commodityGroup = dataHelper.prepareNg2SelectData(this.commodityGroup,
+                        "id",
+                        "groupNameEn"
+                    );
+                }
+            );
     }
 
     async getShipmentDetails(id: any) {

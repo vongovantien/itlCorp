@@ -22,7 +22,6 @@ namespace eFMS.API.Accounting.DL.Services
     public class AcctAdvancePaymentService : RepositoryBase<AcctAdvancePayment, AcctAdvancePaymentModel>, IAcctAdvancePaymentService
     {
         private readonly ICurrentUser currentUser;
-        private readonly IOpsTransactionService opsTransactionService;
         private readonly IOptions<WebUrl> webUrl;
         readonly IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepo;
         readonly IContextBase<SysUser> sysUserRepo;
@@ -39,7 +38,6 @@ namespace eFMS.API.Accounting.DL.Services
         public AcctAdvancePaymentService(IContextBase<AcctAdvancePayment> repository,
             IMapper mapper,
             ICurrentUser user,
-            IOpsTransactionService ops,
             IOptions<WebUrl> url,
             IContextBase<AcctAdvanceRequest> acctAdvanceRequest,
             IContextBase<SysUser> sysUser,
@@ -54,7 +52,6 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysBranch> sysBranch) : base(repository, mapper)
         {
             currentUser = user;
-            opsTransactionService = ops;
             webUrl = url;
             acctAdvanceRequestRepo = acctAdvanceRequest;
             sysUserRepo = sysUser;
@@ -296,7 +293,6 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public List<Shipments> GetShipments()
         {
-            //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var shipmentsOperation = opsTransactionRepo
                                     .Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED)
                                     .Select(x => new Shipments
@@ -450,7 +446,6 @@ namespace eFMS.API.Accounting.DL.Services
 
         public AcctAdvancePaymentModel GetAdvancePaymentByAdvanceNo(string advanceNo)
         {
-            //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var advanceModel = new AcctAdvancePaymentModel();
 
             //Lấy ra Advance Payment dựa vào Advance No
@@ -473,7 +468,6 @@ namespace eFMS.API.Accounting.DL.Services
 
         public AcctAdvancePaymentModel GetAdvancePaymentByAdvanceId(Guid advanceId)
         {
-            //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var advanceModel = new AcctAdvancePaymentModel();
 
             //Lấy ra Advance Payment dựa vào Advance Id
@@ -579,12 +573,9 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 foreach (var jobId in advance.AdvanceRequests.GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId))
                 {
-                    OpsTransactionCriteria criteria = new OpsTransactionCriteria
-                    {
-                        JobNo = jobId
-                    };
                     //Lấy ra NW, CBM, PSC, Container Qty
-                    var ops = opsTransactionService.Query(criteria).FirstOrDefault();
+                    var ops = opsTransactionRepo.Get(x => x.JobNo == jobId).FirstOrDefault();
+                    
                     if (ops != null)
                     {
                         contQty += ops.SumContainers.HasValue ? ops.SumContainers.Value : 0;
@@ -731,11 +722,11 @@ namespace eFMS.API.Accounting.DL.Services
 
             var parameter = new AdvancePaymentRequestReportParams
             {
-                CompanyName = "INDO TRANS LOGISTICS CORPORATION‎",
-                CompanyAddress1 = "52‎-‎54‎-‎56 ‎Truong Son St‎.‎, ‎Tan Binh Dist‎.‎, ‎HCM City‎, ‎Vietnam‎",
-                CompanyAddress2 = "",
-                Website = "www‎.‎itlvn‎.‎com‎",
-                Contact = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎",
+                CompanyName = Constants.COMPANY_NAME,
+                CompanyAddress1 = Constants.COMPANY_ADDRESS1,
+                CompanyAddress2 = Constants.COMPANY_ADDRESS2,
+                Website = Constants.COMPANY_WEBSITE,
+                Contact = Constants.COMPANY_CONTACT,
                 Inword = _inword
             };
 
@@ -768,12 +759,8 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 foreach (var jobId in advance.AdvanceRequests.GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId))
                 {
-                    OpsTransactionCriteria criteria = new OpsTransactionCriteria
-                    {
-                        JobNo = jobId
-                    };
                     //Lấy ra NW, CBM, PSC, Container Qty
-                    var ops = opsTransactionService.Query(criteria).FirstOrDefault();
+                    var ops = opsTransactionRepo.Get(x => x.JobNo == jobId).FirstOrDefault();
                     if (ops != null)
                     {
                         contQty += ops.SumContainers.HasValue ? ops.SumContainers.Value : 0;
@@ -918,11 +905,11 @@ namespace eFMS.API.Accounting.DL.Services
 
             var parameter = new AdvancePaymentRequestReportParams
             {
-                CompanyName = "INDO TRANS LOGISTICS CORPORATION‎",
-                CompanyAddress1 = "52‎-‎54‎-‎56 ‎Truong Son St‎.‎, ‎Tan Binh Dist‎.‎, ‎HCM City‎, ‎Vietnam‎",
-                CompanyAddress2 = "‎",
-                Website = "www‎.‎itlvn‎.‎com‎",
-                Contact = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎",
+                CompanyName = Constants.COMPANY_NAME,
+                CompanyAddress1 = Constants.COMPANY_ADDRESS1,
+                CompanyAddress2 = Constants.COMPANY_ADDRESS2,
+                Website = Constants.COMPANY_WEBSITE,
+                Contact = Constants.COMPANY_CONTACT,
                 Inword = _inword
             };
 
@@ -988,7 +975,7 @@ namespace eFMS.API.Accounting.DL.Services
         //Đang gán cứng BrandId của Branch ITL HCM (27d26acb-e247-47b7-961e-afa7b3d7e11e)
         private string GetAccountantId(string idBranch = "27d26acb-e247-47b7-961e-afa7b3d7e11e")
         {
-            var accountantManagerId = catDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Code == "Accountant").FirstOrDefault().ManagerId;
+            var accountantManagerId = catDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Code == Constants.DEPT_CODE_ACCOUNTANT).FirstOrDefault().ManagerId;
             return accountantManagerId;
         }
 
@@ -1105,9 +1092,9 @@ namespace eFMS.API.Accounting.DL.Services
         private List<string> GetListUserDeputyByDept(string dept, string idBranch = "27d26acb-e247-47b7-961e-afa7b3d7e11e")
         {
             Dictionary<string, string> listUsers = new Dictionary<string, string> {
-                 { "william.hiep","OPS" },//User ủy quyền cho dept OPS
-                 { "linda.linh","Accountant" },//User ủy quyền cho dept Accountant
-                 { "christina.my","Accountant" }//User ủy quyền cho dept Accountant
+                 { "william.hiep", Constants.DEPT_CODE_OPS },//User ủy quyền cho dept OPS
+                 { "linda.linh", Constants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
+                 { "christina.my", Constants.DEPT_CODE_ACCOUNTANT }//User ủy quyền cho dept Accountant
             };
             var list = listUsers.ToList();
             var deputy = listUsers.Where(x => x.Value == dept).Select(x => x.Key).ToList();
@@ -1441,7 +1428,6 @@ namespace eFMS.API.Accounting.DL.Services
         //Send Mail đề nghị Approve
         private bool SendMailSuggestApproval(string advanceNo, string userReciver, string emailUserReciver)
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             //Lấy ra AdvancePayment dựa vào AdvanceNo
             var advance = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault();
 
@@ -1451,7 +1437,7 @@ namespace eFMS.API.Accounting.DL.Services
             var emailRequester = GetEmployeeByEmployeeId(requesterId).Email;
 
             //Lấy ra thông tin của Advance Request dựa vào AdvanceNo
-            var requests = dc.AcctAdvanceRequest.Where(x => x.AdvanceNo == advanceNo).GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId);
+            var requests = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo).GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId);
             string jobIds = "";
             foreach (var request in requests)
             {
@@ -1460,7 +1446,7 @@ namespace eFMS.API.Accounting.DL.Services
             jobIds += ")";
             jobIds = jobIds.Replace("; )", "").Replace(")", "");
 
-            var totalAmount = dc.AcctAdvanceRequest.Where(x => x.AdvanceNo == advanceNo).Sum(x => x.Amount);
+            var totalAmount = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo).Sum(x => x.Amount);
             if (totalAmount != null)
             {
                 totalAmount = Math.Round(totalAmount.Value, 2);
@@ -1515,7 +1501,6 @@ namespace eFMS.API.Accounting.DL.Services
         //Send Mail Approved
         private bool SendMailApproved(string advanceNo, DateTime approvedDate)
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             //Lấy ra AdvancePayment dựa vào AdvanceNo
             var advance = DataContext.Where(x => x.AdvanceNo == advanceNo).FirstOrDefault();
 
@@ -1526,7 +1511,7 @@ namespace eFMS.API.Accounting.DL.Services
 
 
             //Lấy ra thông tin của Advance Request dựa vào AdvanceNo
-            var requests = dc.AcctAdvanceRequest.Where(x => x.AdvanceNo == advanceNo).GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId);
+            var requests = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo).GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId);
             string jobIds = "";
             foreach (var request in requests)
             {
@@ -1535,7 +1520,7 @@ namespace eFMS.API.Accounting.DL.Services
             jobIds += ")";
             jobIds = jobIds.Replace(", )", "").Replace(")", "");
 
-            var totalAmount = dc.AcctAdvanceRequest.Where(x => x.AdvanceNo == advanceNo).Sum(x => x.Amount);
+            var totalAmount = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo).Sum(x => x.Amount);
             if (totalAmount != null)
             {
                 totalAmount = Math.Round(totalAmount.Value, 2);

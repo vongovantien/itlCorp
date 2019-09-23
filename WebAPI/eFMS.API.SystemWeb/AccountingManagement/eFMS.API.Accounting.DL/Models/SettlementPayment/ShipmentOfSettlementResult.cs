@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace eFMS.API.Documentation.DL.Models
+namespace eFMS.API.Accounting.DL.Models
 {
     public class ShipmentOfSettlementResult
     {
