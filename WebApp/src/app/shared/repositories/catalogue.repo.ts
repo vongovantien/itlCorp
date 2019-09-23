@@ -28,4 +28,13 @@ export class CatalogueRepo {
             })
         );
     }
+
+    getCommodityGroup() {
+        return this._api.post(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatCommodityGroup/Query`, {}).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
+    }
 }

@@ -130,7 +130,7 @@ export class JobManagementFormSearchComponent extends AppForm {
             { field: 'partnerNameEn', label: 'Name' },
             { field: 'partnerNameVn', label: 'Customer Name' },
         ];
-        this.configPartner.selectedDisplayFields = ['partnerNameEn'];
+        this.configPartner.selectedDisplayFields = ['shortName'];
     }
 
     initFormSearch() {

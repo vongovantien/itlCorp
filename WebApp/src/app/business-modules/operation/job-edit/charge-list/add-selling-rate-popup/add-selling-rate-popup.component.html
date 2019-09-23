@@ -23,7 +23,7 @@
                     </small>
                   </label>
 
-                  <app-combo-grid-virtual-scroll
+                  <app-combo-grid-virtual-scroll [isTooltip]="true"
                     [currentActiveItemId]="{field:'charge.id',value:sellingRateChargeToAdd.chargeId}" (itemSelected)="sellingRateChargeToAdd.chargeId=$event.charge.id;
                                         sellingRateChargeToAdd.unitId=$event.charge.unitId;
                                         sellingRateChargeToAdd.unitPrice=$event.charge.unitPrice;
@@ -148,7 +148,7 @@
                   <label class="form-control-label" for="">
                     Unit price <span class="m--font-danger">(*)</span>
                   </label>
-                  <input type="number" class="form-control m-input m-input--square"
+                  <input currencyMask type="text" class="form-control m-input m-input--square"
                     [(ngModel)]="sellingRateChargeToAdd.unitPrice" autocomplete="nope"
                     (keyup)="calculateTotalEachSelling()" (change)="calculateTotalEachSelling()"
                     placeholder="Enter number" #SellingRateChargeUnitPriceNameOps="ngModel" required
@@ -201,7 +201,7 @@
                   <label class="form-control-label" for="">
                     Total
                   </label>
-                  <input type="text" class="form-control m-input m-input--square" disabled
+                  <input currencyMask [options]="{align: 'left', precision: 2}" type="text" class="form-control m-input m-input--square" disabled
                     name="SellingRateChargeTotalNameOps" [(ngModel)]="sellingRateChargeToAdd.total">
                 </div>
               </div>

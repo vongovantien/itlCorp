@@ -133,7 +133,7 @@
                     </td>
                 </tr>
             </ng-container>
-            <tr *ngIf="!data.length" app-table-none-record></tr>
+            <tr *ngIf="!data.length" app-table-none-record [colspan]="headers.length + 1"></tr>
         </tbody>
     </table>
 </div>
