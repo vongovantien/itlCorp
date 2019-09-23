@@ -13,7 +13,7 @@ namespace eFMS.API.Accounting.DL.Models.Criteria
         public bool IsOBH { get; set; }
         public string StrCreators { get; set; }
         public string StrCharges { get; set; }
-        public int CommodityGroupID { get; set; }
+        public int? CommodityGroupID { get; set; }
         public string StrServices { get; set; }
     }
 }

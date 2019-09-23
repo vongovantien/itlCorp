@@ -203,7 +203,8 @@ namespace eFMS.API.Documentation.DL.Services
                            StatusApproval = set.StatusApproval,
                            PaymentMethod = set.PaymentMethod,
                            Note = set.Note,
-                           ChargeCurrency = sur.CurrencyId
+                           ChargeCurrency = sur.CurrencyId,
+                           DatetimeModified = set.DatetimeModified
                        };
 
             data = data.GroupBy(x => new

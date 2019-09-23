@@ -1,6 +1,4 @@
-﻿using eFMS.API.Documentation.DL.Models;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace eFMS.API.Accounting.DL.Models
 {
