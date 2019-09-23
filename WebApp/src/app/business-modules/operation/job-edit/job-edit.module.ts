@@ -35,6 +35,8 @@ import { JobManagementSellingRateComponent } from './components/selling-rate/sel
 import { JobManagementOBHComponent } from './components/obh/obh.component';
 import { AddMoreModalComponent } from './custom-declaration/add-more-modal/add-more-modal.component';
 import { ContainerImportComponent } from './container-list/container-import/container-import.component';
+import { HttpClientModule } from '@angular/common/http';
+import { SearchMultipleComponent } from './custom-declaration/components/search-multiple/search-multiple.component';
 
 const routing: Routes = [
     {
@@ -70,6 +72,7 @@ const COMPONENTS = [
         SharedModule,
         FormsModule,
         ReactiveFormsModule,
+        HttpClientModule,
         ...LIB
     ],
     exports: [],
@@ -105,6 +108,7 @@ const COMPONENTS = [
         AddMoreModalComponent,
         ContainerImportComponent,
         ...COMPONENTS,
+        SearchMultipleComponent,
 
     ],
     providers: [
