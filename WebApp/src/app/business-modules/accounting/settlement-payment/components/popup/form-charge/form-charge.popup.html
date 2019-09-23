@@ -2,7 +2,7 @@
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add New Charge</h5>
+                <h5 class="modal-title">{{state === 'create' ? 'Add New Charge' : 'Update Charge'}}</h5>
                 <button type="button" (click)="closePopup()" class="close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -14,12 +14,11 @@
                             <div class="col-4">
                                 <div class="form-group">
                                     <label for="">Charge Name
-                                        <span class="text-danger">*</span>
+                                        <span class="text-danger">(*)</span>
                                         <span class="text-primary m--margin-left-10"
                                             *ngIf="!!selectedCharge">{{selectedCharge.code}}</span>
                                     </label>
-                                    <!-- auto complete -->
-                                    <div (clickOutside)="isShow = false">
+                                    <div (clickOutside)="onClickOutsideChargeName()">
                                         <input name="keyword"
                                             class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             placeholder="Input keyword" (click)="isShow = !isShow"
@@ -54,15 +53,8 @@
                                                                             <td>{{charge.chargeNameVn}}</td>
                                                                         </tr>
                                                                     </ng-container>
-                                                                    <tr *ngIf="!charges.length">
-                                                                        <td colspan="100">
-                                                                            <div class="no-data">
-                                                                                <i class="flaticon-coins"></i>
-                                                                                <span class="no-data-text">No records
-                                                                                    found</span>
-                                                                            </div>
-                                                                        </td>
-                                                                    </tr>
+                                                                    <tr *ngIf="!charges.length" app-table-none-record
+                                                                        [colspan]="3"> </tr>
                                                                 </tbody>
                                                             </table>
                                                         </div>
@@ -76,7 +68,7 @@
                             </div>
                             <div class="col-4">
                                 <div class="form-group">
-                                    <label for="">Shipment <span class="text-danger">*</span></label>
+                                    <label for="">Shipment <span class="text-danger">(*)</span></label>
                                     <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedShipment"
                                         [height]="150" (itemSelected)="onSelectDataFormInfo($event, 'shipment')"
                                         [dataSources]="configShipment.dataSource"
@@ -87,7 +79,7 @@
                             </div>
                             <div class="col-4">
                                 <div class="form-group">
-                                    <label for="">Payer <span class="text-danger">*</span></label>
+                                    <label for="">Payer <span class="text-danger">(*)</span></label>
                                     <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPayer"
                                         (itemSelected)="onSelectDataFormInfo($event, 'payer')"
                                         [selectedDisplayFields]="configPartner.selectedDisplayFields"
@@ -102,14 +94,14 @@
                                 <div class="row">
                                     <div class="col-6">
                                         <div class="form-group">
-                                            <label for="">Qty <span class="text-danger">*</span></label>
+                                            <label for="">Qty <span class="text-danger">(*)</span></label>
                                             <input type="text" class="form-control" formControlName="qty"
                                                 placeholder="Quantity" (ngModelChange)="calculateTotalAmount()">
                                         </div>
                                     </div>
                                     <div class="col-6">
                                         <div class="form-group">
-                                            <label for="">Unit <span class="text-danger">*</span></label>
+                                            <label for="">Unit <span class="text-danger">(*)</span></label>
                                             <select class="form-control" formControlName="unit">
                                                 <option [ngValue]="null" disabled>Select Unit</option>
                                                 <option *ngFor="let unit of units; trackBy: trackByFn" [ngValue]="unit">
@@ -121,7 +113,7 @@
                             </div>
                             <div class="col-4">
                                 <div class="form-group">
-                                    <label for="">Unit Price <span class="text-danger">*</span></label>
+                                    <label for="">Unit Price <span class="text-danger">(*)</span></label>
                                     <input currencyMask type="text" class="form-control" formControlName="price"
                                         placeholder="Unit Price" (ngModelChange)="calculateTotalAmount()">
                                 </div>
@@ -149,12 +141,12 @@
                             <div class="col-4">
                                 <div class="form-group">
                                     <label for="">Amount</label>
-                                    <input currencyMask [options]="configAmountCurrency" type="text" class="form-control" formControlName="amount"
-                                        placeholder="Amount" disabled>
+                                    <input currencyMask [options]="configAmountCurrency" type="text"
+                                        class="form-control" formControlName="amount" placeholder="Amount" disabled>
                                 </div>
                             </div>
                             <div class="col-4 d-flex justify-content-center align-items-end">
-                                <div class="d-flex" *ngIf="state === 'create'">
+                                <div class="d-flex">
                                     <label class="m-checkbox m-checkbox--bold "
                                         [class.m-checkbox--disabled]="isDisabledOBH">
                                         <input type="checkbox" formControlName="isOBH"
@@ -168,7 +160,7 @@
                                 <div class="form-group">
                                     <label for="">OBH Partner
                                         <span class="text-danger"
-                                            *ngIf="!!selectedCharge && selectedCharge.type === 'OBH'">*</span>
+                                            *ngIf="!!selectedCharge && selectedCharge.type === 'OBH'">(*)</span>
                                     </label>
                                     <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedOBHPartner"
                                         #OBHPartnerComponent (itemSelected)="onSelectDataFormInfo($event, 'obh')"
@@ -275,7 +267,6 @@
                                     </span>
                                 </span>
                             </button>
-                            <!-- {{selectedCharge.type === 'OBH' && !selectedOBHPartner.value}} -->
                             <button
                                 class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
                                 title="Update & Continue" (click)="updateToContinue()"

@@ -14,7 +14,5 @@ import { Component, OnInit } from '@angular/core';
 })
 
 export class TableRowLoadingComponent implements OnInit {
-    constructor() { }
-
     ngOnInit() { }
 }
