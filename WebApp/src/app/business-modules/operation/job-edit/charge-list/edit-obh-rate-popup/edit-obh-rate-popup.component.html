@@ -23,7 +23,7 @@
                     <small class="m--margin-left-5 m--font-primary">{{obhChargeToEdit.chargeCode}}</small>
                   </label>
 
-                  <app-combo-grid-virtual-scroll
+                  <app-combo-grid-virtual-scroll [isTooltip]="true"
                     [currentActiveItemId]="{field:'charge.id',value:obhChargeToEdit.chargeId}"
                     [disabled]="obhChargeToEdit.cdno" (itemSelected)="obhChargeToEdit.chargeId=$event.charge.id;
                                                                 obhChargeToEdit.unitId=$event.charge.unitId;
@@ -138,7 +138,7 @@
                   <label class="form-control-label" for="">
                     Unit price <span class="m--font-danger">(*)</span>
                   </label>
-                  <input type="number" class="form-control m-input m-input--square" autocomplete="nope"
+                  <input currencyMask  type="text" class="form-control m-input m-input--square" autocomplete="nope"
                     [disabled]="obhChargeToEdit.cdno" [(ngModel)]="obhChargeToEdit.unitPrice" placeholder="Enter number"
                     required name="OBHUnitPriceNameEdtOps" #OBHUnitPriceNameEdtOps="ngModel"
                     (keyup)="calculateTotalEachOBH(true)" (change)="calculateTotalEachOBH(true)">
@@ -188,7 +188,7 @@
                   <label class="form-control-label" for="">
                     Total
                   </label>
-                  <input type="text" class="form-control m-input m-input--square" disabled
+                  <input currencyMask [options]="{align: 'left', precision: 2}" type="text" class="form-control m-input m-input--square" disabled
                     name="OBHChargeTotalNameEdtOps" [(ngModel)]="obhChargeToEdit.total">
                 </div>
               </div>

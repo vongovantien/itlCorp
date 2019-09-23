@@ -62,14 +62,14 @@ export class JobManagementComponent extends AppList implements OnInit {
             { title: 'Customer', field: 'customerName', sortable: true },
             { title: 'Service Date', field: 'serviceDate', sortable: true },
             { title: 'Service Port', field: 'polName', sortable: true },
-            { title: 'Flight/Vessel', field: 'flightVessel', sortable: true },
+            // { title: 'Flight/Vessel', field: 'flightVessel', sortable: true },
             { title: "Cont Q'ty", field: 'sumContainers', sortable: true },
             { title: "Pack Q'ty", field: 'sumPackages', sortable: true },
             { title: 'G.W', field: 'sumGrossWeight', sortable: true },
             { title: 'CBM', field: 'sumCbm', sortable: true },
-            { title: 'Invoice No', field: 'invoiceNo', sortable: true },
+            // { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Modified Date', field: 'modifiedDate', sortable: true },
-            { title: 'Status', field: 'currentStatus', sortable: true },
+            // { title: 'Status', field: 'currentStatus', sortable: true },
         ];
 
         this.headerCustomClearance = [

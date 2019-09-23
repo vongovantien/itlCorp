@@ -121,7 +121,8 @@ export class StatementOfAccountEditComponent extends AppList {
                         strCreators: this.soa.creatorShipment,
                         serviceTypeId: this.soa.serviceTypeId,
                         chargeShipments: this.soa.chargeShipments,
-                        note: this.soa.note
+                        note: this.soa.note,
+                        commodityGroupId: this.soa.commodityGroupId
                     };
                     this.dataSearch = new SOASearchCharge(datSearchMoreCharge);
 
@@ -254,7 +255,8 @@ export class StatementOfAccountEditComponent extends AppList {
                 type: this.soa.type,
                 obh: this.soa.obh,
                 creatorShipment: this.soa.creatorShipment,
-                customer: this.soa.customer
+                customer: this.soa.customer,
+                commodityGroupId: this.soa.commodityGroupId
             };
             this._progressRef.start();
             this._accoutingRepo.updateSOA(body)

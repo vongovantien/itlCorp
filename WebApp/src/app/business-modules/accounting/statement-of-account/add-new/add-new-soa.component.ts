@@ -76,6 +76,9 @@ export class StatementOfAccountAddnewComponent extends AppList {
             this.addChargePopup.charges = this.formCreate.charges;
             this.addChargePopup.configCharge = this.formCreate.configCharge;
 
+            this.addChargePopup.commonityGroup = this.formCreate.commonityGroup;
+            this.addChargePopup.commondity = this.formCreate.commondity;
+
             this.addChargePopup.show({ backdrop: 'static' });
         }
     }
@@ -113,7 +116,8 @@ export class StatementOfAccountAddnewComponent extends AppList {
                 customer: this.dataSearch.customerID,
                 type: this.dataSearch.type,
                 obh: this.dataSearch.isOBH,
-                creatorShipment: this.dataSearch.strCreators
+                creatorShipment: this.dataSearch.strCreators,
+                commodityGroupId: this.dataSearch.commodityGroupId
             };
             this._accountRepo.createSOA(body)
                 .pipe(catchError(this.catchError))
@@ -162,6 +166,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
     }
 
     onUpdateMoreSOA(data: any) {
+        // this.formCreate.commondity = data.commodityGroupId;
         this.dataCharge = data;
         this.listCharges = data.chargeShipments || [];
         this.dataSearch.chargeShipments = this.listCharges;

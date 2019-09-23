@@ -64,7 +64,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
     isApplied: boolean = false;
 
-    commodities: any[] = [];
+    commonityGroup: any[] = [];
     commondity: any = null;
     
     constructor(
@@ -87,11 +87,11 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     }
 
     getCommondity() {
-        this._catalougeRepo.getCommondity()
+        this._catalougeRepo.getCommodityGroup()
         .pipe(catchError(this.catchError))
         .subscribe(
             (res: any) => {
-                this.commodities = res || [];
+                this.commonityGroup = res || [];
             },
             (errors: any) => {},
             () => {},
@@ -125,8 +125,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         this.configPartner.dataSource = data;
         this.configPartner.displayFields = [
             { field: 'taxCode', label: 'Taxcode' },
-            { field: 'partnerNameEn', label: 'Name' },
-            { field: 'partnerNameVn', label: 'Customer Name' },
+            { field: 'shortName', label: 'Name' },
+            { field: 'partnerNameEn', label: 'Customer Name' },
         ];
         this.configPartner.selectedDisplayFields = ['partnerNameEn'];
     }
@@ -380,6 +380,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 strCharges: this.selectedCharges.map((item: any) => item.code).toString(),
                 note: this.note,
                 serviceTypeId: !!this.selectedService.length ? this.mapServiceId(this.selectedService[0].id) : this.mapServiceId('All'),
+                commodityGroupId: !!this.commondity ? this.commondity.id : null
             };
             this.dataSearch = new SOASearchCharge(body);
             console.log(this.dataSearch);

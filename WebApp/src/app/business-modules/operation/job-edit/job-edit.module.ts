@@ -35,6 +35,7 @@ import { JobManagementSellingRateComponent } from './components/selling-rate/sel
 import { JobManagementOBHComponent } from './components/obh/obh.component';
 import { AddMoreModalComponent } from './custom-declaration/add-more-modal/add-more-modal.component';
 import { ContainerImportComponent } from './container-list/container-import/container-import.component';
+import { NgxCurrencyModule } from 'ngx-currency';
 
 const routing: Routes = [
     {
@@ -62,6 +63,18 @@ const COMPONENTS = [
     JobManagementOBHComponent
 ];
 
+const customCurrencyMaskConfig = {
+    align: "right",
+    allowNegative: false,
+    allowZero: true,
+    decimal: ".",
+    precision: 0,
+    prefix: "",
+    suffix: "",
+    thousands: ",",
+    nullable: true
+};
+
 @NgModule({
     imports: [
         CommonModule,
@@ -70,6 +83,7 @@ const COMPONENTS = [
         SharedModule,
         FormsModule,
         ReactiveFormsModule,
+        NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
         ...LIB
     ],
     exports: [],
