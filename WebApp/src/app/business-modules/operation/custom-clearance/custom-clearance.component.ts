@@ -13,10 +13,14 @@ import { CustomDeclaration } from 'src/app/shared/models';
 import { AppList } from 'src/app/app.list';
 import { CDNoteRepo } from 'src/app/shared/repositories';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { ApiService } from 'src/app/shared/services/api.service';
+
+
 
 import _map from 'lodash/map';
 import { formatDate } from '@angular/common';
 import { NgProgress } from '@ngx-progressbar/core';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 
 @Component({
     selector: 'app-custom-clearance',
@@ -41,7 +45,9 @@ export class CustomClearanceComponent extends AppList {
         private _sortService: SortService,
         private _toastrService: ToastrService,
         private _cdNoteRepo: CDNoteRepo,
-        private _ngProgressService: NgProgress
+        private _ngProgressService: NgProgress,
+        private _api: ApiService,
+        private _http: HttpClient
     ) {
         super();
         this.requestList = this.getListCustomsDeclaration;
@@ -300,10 +306,14 @@ export class CustomClearanceComponent extends AppList {
         this.excelService.generateExcel(exportModel);
     }
 
-    async export1() {
-        debugger;
-        const res =  await this.baseServices.postAsync('http://localhost:63492/api/v1/vi/ReportData/CustomsDeclaration/ExportCustomClearance',this.searchObject);
-        this.downloadFile(res,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','export.xlsx')
+    export1() {
+        this._http.post('http://localhost:63492/api/v1/vi/ReportData/CustomsDeclaration/ExportCustomClearance', this.searchObject).subscribe(
+            (res: any) => {
+                console.log(res);
+                // this.downloadFile(res, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'export.xlsx')
+            }
+        )
+
     }
     downloadFile(blob: any, type: string, filename: string) {
         var binaryData = [];
