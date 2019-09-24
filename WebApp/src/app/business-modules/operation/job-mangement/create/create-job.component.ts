@@ -27,7 +27,7 @@ import { DataService } from "src/app/shared/services";
             }
         `]
 })
-export class JobManagementCreateJobComponent extends AppPage  {
+export class JobManagementCreateJobComponent extends AppPage {
 
     DataStorage: Object = null;
     productServices: any[] = [];
@@ -83,6 +83,12 @@ export class JobManagementCreateJobComponent extends AppPage  {
         this.getListAgent();
         this.getListBillingOps();
         this.getCommodityGroup();
+        this.setCurrentBillingOPS();
+    }
+    setCurrentBillingOPS() {
+        const claim = localStorage.getItem('id_token_claims_obj');
+        const currenctUser = JSON.parse(claim)["id"];
+        this.OpsTransactionToAdd.billingOpsId = currenctUser;
     }
 
     async getShipmentCommonData() {
@@ -164,16 +170,16 @@ export class JobManagementCreateJobComponent extends AppPage  {
 
     getCommodityGroup() {
         this._catalogueRepo.getCommodityGroup()
-        .pipe()
-        .subscribe(
-            (res: any) => {
-                this.commonityGroup = res;
-                this.commonityGroup = dataHelper.prepareNg2SelectData(this.commonityGroup,
-                    "id",
-                    "groupNameEn"
-                );
-            }
-        );
+            .pipe()
+            .subscribe(
+                (res: any) => {
+                    this.commonityGroup = res;
+                    this.commonityGroup = dataHelper.prepareNg2SelectData(this.commonityGroup,
+                        "id",
+                        "groupNameEn"
+                    );
+                }
+            );
     }
 
     public submitNewOps(form: NgForm) {

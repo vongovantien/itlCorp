@@ -115,7 +115,10 @@ namespace eFMS.API.Documentation.DL.Common
             new ProductService { Value = "SeaLCL", DisplayName = "Sea LCL" },
             new ProductService { Value = "Air", DisplayName = "Air" },
             new ProductService { Value = "Trucking", DisplayName = "Trucking" },
+            new ProductService { Value = "Crossborder", DisplayName = "Cross border" },
             new ProductService { Value = "Warehouse", DisplayName = "Warehouse" },
+            new ProductService { Value = "Railway", DisplayName = "Railway" },
+            new ProductService { Value = "Express", DisplayName = "Express" },
             new ProductService { Value = "Other", DisplayName = "Other" }
         };
         public static readonly List<ServiceMode> ServiceModes = new List<ServiceMode>

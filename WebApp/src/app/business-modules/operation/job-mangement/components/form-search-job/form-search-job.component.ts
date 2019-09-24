@@ -15,7 +15,7 @@ import { formatDate } from '@angular/common';
 })
 
 export class JobManagementFormSearchComponent extends AppForm {
-    @Output() onSearch: EventEmitter<ISearchDataShipment>  = new EventEmitter<ISearchDataShipment>();
+    @Output() onSearch: EventEmitter<ISearchDataShipment> = new EventEmitter<ISearchDataShipment>();
 
     filterTypes: CommonInterface.ICommonTitleValue[];
     productServices: CommonInterface.IValueDisplay[] = [];
@@ -167,8 +167,8 @@ export class JobManagementFormSearchComponent extends AppForm {
     searchShipment() {
         const body: ISearchDataShipment = {
             all: null,
-            jobNo: this.filterType.value.value === 'jobId' ? this.searchText.value : null,
-            hwbno: this.filterType.value.value === 'hbl' ? this.searchText.value : null,
+            jobNo: this.filterType.value.value === 'jobId' ? this.searchText.value.trim() : null,
+            hwbno: this.filterType.value.value === 'hbl' ? this.searchText.value.trim() : null,
             productService: !!this.productService.value ? this.productService.value.value : null,
             serviceMode: !!this.serviceMode.value ? this.serviceMode.value.value : null,
             shipmentMode: !!this.shipmentMode.value ? this.shipmentMode.value.value : null,

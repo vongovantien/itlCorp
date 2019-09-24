@@ -34,7 +34,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysUser> userRepository;
         private readonly IContextBase<CatUnit> unitRepository;
         private readonly IContextBase<CatPlace> placeRepository;
-        private readonly IContextBase<OpsStageAssigned> opsStageRepository;
+        private readonly IContextBase<OpsStageAssigned> opsStageAssignedRepository;
         private readonly IContextBase<CsShipmentSurcharge> surchargeRepository;
         private readonly IContextBase<CustomsDeclaration> customDeclarationRepository;
 
@@ -47,7 +47,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysUser> userRepo,
             IContextBase<CatUnit> unitRepo,
             IContextBase<CatPlace> placeRepo,
-            IContextBase<OpsStageAssigned> opsStageRepo,
+            IContextBase<OpsStageAssigned> opsStageAssignedRepo,
             IContextBase<CsShipmentSurcharge> surchargeRepo,
             IContextBase<CustomsDeclaration> customDeclarationRepo) : base(repository, mapper)
         {
@@ -62,7 +62,7 @@ namespace eFMS.API.Documentation.DL.Services
             userRepository = userRepo;
             unitRepository = unitRepo;
             placeRepository = placeRepo;
-            opsStageRepository = opsStageRepo;
+            opsStageAssignedRepository = opsStageAssignedRepo;
             surchargeRepository = surchargeRepo;
             customDeclarationRepository = customDeclarationRepo;
         }
@@ -94,23 +94,38 @@ namespace eFMS.API.Documentation.DL.Services
             var result = Delete(x => x.Id == id, false);
             if (result.Success)
             {
-                var assigneds = opsStageRepository.Get(x => x.JobId == id);//((eFMSDataContext)DataContext.DC).OpsStageAssigned.Where(x => x.JobId == id);
+                var assigneds = opsStageAssignedRepository.Get(x => x.JobId == id);//((eFMSDataContext)DataContext.DC).OpsStageAssigned.Where(x => x.JobId == id);
                 if (assigneds != null)
                 {
-                    ((eFMSDataContext)DataContext.DC).OpsStageAssigned.RemoveRange(assigneds);
+                    RemoveStageAssigned(assigneds);
                 }
                 if(detail != null)
                 {
                     var surcharges = surchargeRepository.Get(x => x.Hblid == detail.Hblid && x.Soano == null);
                     if (surcharges != null)
                     {
-                        ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.RemoveRange(surcharges);
+                        RemoveSurcharge(surcharges);
                     }
                 }
             }
             SubmitChanges();
-            ((eFMSDataContext)DataContext.DC).SaveChanges();
+            opsStageAssignedRepository.SubmitChanges();
+            surchargeRepository.SubmitChanges();
             return result;
+        }
+        private void RemoveSurcharge(IQueryable<CsShipmentSurcharge> list)
+        {
+            foreach(var item in list)
+            {
+                surchargeRepository.Delete(x => x.Id == item.Id, false);
+            }
+        }
+        private void RemoveStageAssigned(IQueryable<OpsStageAssigned> list)
+        {
+            foreach(var item in list)
+            {
+                opsStageAssignedRepository.Delete(x => x.Id == item.Id, false);
+            }
         }
         public OpsTransactionModel GetDetails(Guid id)
         {
@@ -261,15 +276,30 @@ namespace eFMS.API.Documentation.DL.Services
 
 
             };
-
-
-
-
-
-
             return result;
         }
 
+        private string SetProductServiveShipment(OpsTransactionClearanceModel model)
+        {
+            string productService = string.Empty;
+            if (model.CustomsDeclaration.ServiceType == "Sea")
+            {
+                if (model.CustomsDeclaration.CargoType == "FCL")
+                {
+                    model.CustomsDeclaration.CargoType = "SeaFCL";
+                }
+                if (model.CustomsDeclaration.CargoType == "LCL")
+                {
+                    model.CustomsDeclaration.CargoType = "SeaLCL";
+                }
+                productService = model.CustomsDeclaration.CargoType;
+            }
+            else
+            {
+                productService = model.CustomsDeclaration.ServiceType;
+            }
+            return productService;
+        }
         public HandleState ConvertClearanceToJob(OpsTransactionClearanceModel model)
         {
             var result = new HandleState();
@@ -285,7 +315,13 @@ namespace eFMS.API.Documentation.DL.Services
                     result = new HandleState(stringLocalizer[LanguageSub.MSG_CLEARANCENO_EXISTED, model.CustomsDeclaration.ClearanceNo].Value);
                     return result;
                 }
-                if(model.CustomsDeclaration.JobNo == null)
+                string productService = SetProductServiveShipment(model);
+                if(productService == null)
+                {
+                    result = new HandleState(stringLocalizer[LanguageSub.MSG_CLEARANCENO_CARGOTYPE_NOT_ALLOW_EMPTY].Value);
+                    return result;
+                }
+                if (model.CustomsDeclaration.JobNo == null)
                 {
                     model.OpsTransaction.Id = Guid.NewGuid();
                     model.OpsTransaction.Hblid = Guid.NewGuid();
@@ -293,6 +329,7 @@ namespace eFMS.API.Documentation.DL.Services
                     model.OpsTransaction.UserCreated = currentUser.UserID; //currentUser.UserID;
                     model.OpsTransaction.ModifiedDate = DateTime.Now;
                     model.OpsTransaction.UserModified = currentUser.UserID;
+                    model.OpsTransaction.ProductService = productService;
                     int countNumberJob = DataContext.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
                     model.OpsTransaction.JobNo = GenerateID.GenerateOPSJobID(Constants.OPS_SHIPMENT, countNumberJob);
                     var dayStatus = (int)(model.OpsTransaction.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
@@ -386,9 +423,15 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             item.OpsTransaction.CurrentStatus = TermData.Processing;
                         }
+                        string productService = SetProductServiveShipment(item);
+                        if (productService == null)
+                        {
+                            result = new HandleState(stringLocalizer[LanguageSub.MSG_CLEARANCENO_CARGOTYPE_NOT_ALLOW_EMPTY].Value);
+                            return result;
+                        }
+                        item.OpsTransaction.ProductService = productService;
                         var transaction = mapper.Map<OpsTransaction>(item.OpsTransaction);
                         DataContext.Add(transaction, false);
-
                         item.CustomsDeclaration.JobNo = item.OpsTransaction.JobNo;
                         item.CustomsDeclaration.UserModified = currentUser.UserID;
                         item.CustomsDeclaration.DatetimeModified = DateTime.Now;
