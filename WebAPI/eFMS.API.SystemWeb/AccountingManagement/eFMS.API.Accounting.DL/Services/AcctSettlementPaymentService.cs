@@ -215,7 +215,8 @@ namespace eFMS.API.Accounting.DL.Services
                 x.RequestDate,
                 x.StatusApproval,
                 x.PaymentMethod,
-                x.Note
+                x.Note,
+                x.DatetimeModified
             }
             ).Select(s => new AcctSettlementPaymentResult
             {
@@ -230,7 +231,8 @@ namespace eFMS.API.Accounting.DL.Services
                 StatusApprovalName = Common.CustomData.StatusApproveAdvance.Where(x => x.Value == s.Key.StatusApproval).Select(x => x.DisplayName).FirstOrDefault(),
                 PaymentMethod = s.Key.PaymentMethod,
                 PaymentMethodName = Common.CustomData.PaymentMethod.Where(x => x.Value == s.Key.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
-                Note = s.Key.Note
+                Note = s.Key.Note,
+                DatetimeModified = s.Key.DatetimeModified
             }
             ).OrderByDescending(orb => orb.DatetimeModified);
 
