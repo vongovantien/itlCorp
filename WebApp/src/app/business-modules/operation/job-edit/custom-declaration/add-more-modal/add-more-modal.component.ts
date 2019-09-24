@@ -86,15 +86,17 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
                     this.isLoading = true;
   }
             ),
+            
             distinctUntilChanged(),
             finalize(() => {
                 this.isLoading = false;
             }),
-            this.autocomplete(300, ((term: any) => this.customClearanceRepo.getListNotImportToJob(this.strKeySearch, this.currentJob.customerId, false, this.pager.currentPage, this.pager.pageSize)))
+            this.autocomplete(300, ((term: any) => this.customClearanceRepo.getListNotImportToJob(this.customNo.value, this.currentJob.customerId, false, this.pager.currentPage, this.pager.pageSize)))
         ).subscribe(
             (res: any) => {
                 this.notImportedCustomClearances = res.data || [];
                 this.pager.totalItems = res.totalItems;
+                this.pager.totalPages = res.totalPages;
             },
             (error: any) => { },
             () => { }
@@ -110,6 +112,8 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
   }
   async refreshData() {
     this.keyword = '';
+
+
     this.getListCleranceNotImported();
   }
     setPage(pager: PagerSetting) {
@@ -207,8 +211,14 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
     }
   }
     onSearchAutoComplete(keyword: string) {
+        this.pager.currentPage = 1;
+        this.pager.pageSize = 15;
         this.notImportedCustomClearances = [];
         this.term$.next(keyword.trim());
+        if(keyword.trim() ==''){
+        
+            this.getListCleranceNotImported();
+    }
     }
 
     autocomplete = (time: number, callBack: Function) => (source$: Observable<any>) =>
@@ -273,7 +283,16 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
         this.notImportedCustomClearances = [];
         this.isLoading = true;
         if(this.customNo.value != ''){
-            this.strKeySearch = this.customNo.value + '' + this.customNoSearch;
+          if(this.customNoSearch != 'isMultiple' && this.customNoSearch !='' ){
+                if( this.customNo.value !=''){
+                    this.customNo.setValue('');
+                }
+                this.strKeySearch = this.customNo.value + ',' + this.customNoSearch;
+                this.strKeySearch = this.customNoSearch;
+            }
+             else {
+                 this.strKeySearch = this.customNo.value;
+           }
         }else{
             this.strKeySearch = this.customNoSearch;
         }
@@ -286,6 +305,8 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
       (res: any) => {
                 this.notImportedCustomClearances = res.data || [];
                 this.pager.totalItems = res.totalItems;
+           
+
                  },
             (error: any) => { 
             },
@@ -294,7 +315,8 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
   }
 
     async showPopupSearch() {
-        this.popupSearchMultiple.show({ backdrop: 'static' });
+        this.popupSearchMultiple.show();
+        this.customNo.setValue('');
     }
   // app list
   setSortBy(sort?: string, order?: boolean): void {

@@ -15,16 +15,18 @@ export class SearchMultipleComponent extends PopupBase implements OnInit {
   }
   close() {
     this.customNoSearch = '';
+    this.isCloseModal.emit('');
     this.hide();
 }
 ApplyToList(){
   debugger;
-  this.isCloseModal.emit(this.customNoSearch);
+  this.isCloseModal.emit(this.customNoSearch+'isMultiple');
   this.hide()
 }
 ClearToList(){
   debugger;
   this.isCloseModal.emit('');
+  this.customNoSearch = '';
   this.hide()
 }
 
