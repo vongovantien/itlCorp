@@ -13,18 +13,18 @@ export class SystemRepo {
     }
 
     getListSystemUser() {
-        return this._api.get(`localhost:44360/api/${this.VERSION}/vi/SysUser`).pipe(
-            catchError((error) => throwError(error)),
-            map((data: any) => {
-                return data;
-            })
-        );
-        // return this._api.get(`${environment.HOST.WEB_URL}/${this.MODULE}/api/${this.VERSION}/vi/SysUser`).pipe(
+        // return this._api.get(`localhost:44360/api/${this.VERSION}/vi/SysUser`).pipe(
         //     catchError((error) => throwError(error)),
         //     map((data: any) => {
         //         return data;
         //     })
         // );
+        return this._api.get(`${environment.HOST.WEB_URL}/${this.MODULE}/api/${this.VERSION}/vi/SysUser`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
     }
 
     getListCurrency(page?: number, size?: number) {

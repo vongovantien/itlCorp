@@ -12,18 +12,18 @@ export class CatalogueRepo {
     }
 
     getCurrency() {
-        // return this._api.get(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatCurrency/getAll`).pipe(
-        //     catchError((error) => throwError(error)),
-        //     map((data: any) => {
-        //         return data;
-        //     })
-        // );
-        return this._api.get(`localhost:44361/api/${this.VERSION}/en-US/CatCurrency/getAll`).pipe(
+        return this._api.get(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatCurrency/getAll`).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => {
                 return data;
             })
         );
+        // return this._api.get(`localhost:44361/api/${this.VERSION}/en-US/CatCurrency/getAll`).pipe(
+        //     catchError((error) => throwError(error)),
+        //     map((data: any) => {
+        //         return data;
+        //     })
+        // );
     }
 
     getCommondity() {
@@ -46,7 +46,7 @@ export class CatalogueRepo {
 
 
     getUnit() {
-        return this._api.get(`localhost:44361/api/${this.VERSION}/en-US/CatUnit`).pipe(
+        return this._api.get(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatUnit`).pipe(
             map((res: any) => {
                 return res;
             })
