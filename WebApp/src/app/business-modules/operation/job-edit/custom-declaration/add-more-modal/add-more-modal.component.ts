@@ -90,7 +90,7 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
             finalize(() => {
                 this.isLoading = false;
             }),
-            this.autocomplete(300, ((term: any) => this._http.get(`http://localhost:44365/api/v1/vi/CustomsDeclaration/CustomDeclaration?keySearch=${this.customNo.value}&customerNo=${this.currentJob.customerId}&imporTed=${false}&page=${this.pager.currentPage}&size=${this.pager.pageSize}`)))
+            this.autocomplete(300, ((term: any) => this.customClearanceRepo.getListNotImportToJob(this.strKeySearch, this.currentJob.customerId, false, this.pager.currentPage, this.pager.pageSize)))
         ).subscribe(
             (res: any) => {
                 this.notImportedCustomClearances = res.data || [];
