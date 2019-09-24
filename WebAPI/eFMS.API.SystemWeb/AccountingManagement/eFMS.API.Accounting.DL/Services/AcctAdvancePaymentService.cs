@@ -713,7 +713,7 @@ namespace eFMS.API.Accounting.DL.Services
             decimal _amount = acctAdvance.AdvValue.HasValue ? acctAdvance.AdvValue.Value : 0;
             //decimal _amount2 = 3992.123M;
 
-            var _currency = advance.AdvanceCurrency == "VND" ?
+            var _currency = advance.AdvanceCurrency == Constants.CURRENCY_LOCAL ?
                        (_amount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
                     :
                     advance.AdvanceCurrency;
@@ -897,7 +897,7 @@ namespace eFMS.API.Accounting.DL.Services
             //Chuyển tiền Amount thành chữ
             decimal _amount = acctAdvance.AdvValue.HasValue ? acctAdvance.AdvValue.Value : 0;
 
-            var _currency = advance.AdvanceCurrency == "VND" ?
+            var _currency = advance.AdvanceCurrency == Constants.CURRENCY_LOCAL ?
                        (_amount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
                     :
                     advance.AdvanceCurrency;

@@ -1149,7 +1149,7 @@ namespace eFMS.API.Accounting.DL.Services
             var _inword = "";
             if (_amount > 0)
             {
-                var _currency = settlement.SettlementCurrency == "VND" ?
+                var _currency = settlement.SettlementCurrency == Constants.CURRENCY_LOCAL ?
                            (_amount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
                         :
                         settlement.SettlementCurrency;
