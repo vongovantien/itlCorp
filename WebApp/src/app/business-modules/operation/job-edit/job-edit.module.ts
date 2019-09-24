@@ -36,7 +36,6 @@ import { JobManagementOBHComponent } from './components/obh/obh.component';
 import { AddMoreModalComponent } from './custom-declaration/add-more-modal/add-more-modal.component';
 import { ContainerImportComponent } from './container-list/container-import/container-import.component';
 import { NgxCurrencyModule } from 'ngx-currency';
-import { HttpClientModule } from '@angular/common/http';
 import { SearchMultipleComponent } from './custom-declaration/components/search-multiple/search-multiple.component';
 
 const routing: Routes = [
@@ -86,7 +85,6 @@ const customCurrencyMaskConfig = {
         FormsModule,
         ReactiveFormsModule,
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
-        HttpClientModule,
         ...LIB
     ],
     exports: [],
