@@ -229,7 +229,7 @@ export class AccoutingRepo {
     }
 
     getShipmentByPartnerOrService(partnerId: string, services: string[]) {
-        return this._api.get(`${environment.HOST.WEB_URL}/Accounting/api/${this.VERSION}/en-US/Shipment/GetShipmentsCreditPayer`, { partner: partnerId, productServices: services }).pipe(
+        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/en-US/Shipment/GetShipmentsCreditPayer`, { partner: partnerId, productServices: services }).pipe(
             map((data: any) => data)
         );
     }

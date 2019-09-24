@@ -76,8 +76,8 @@ export class StatementOfAccountAddnewComponent extends AppList {
             this.addChargePopup.charges = this.formCreate.charges;
             this.addChargePopup.configCharge = this.formCreate.configCharge;
 
-            this.addChargePopup.commonityGroup = this.formCreate.commonityGroup;
-            this.addChargePopup.commondity = this.formCreate.commondity;
+            this.addChargePopup.commodityGroup = this.formCreate.commodityGroup;
+            this.addChargePopup.commodity = this.formCreate.commodity;
 
             this.addChargePopup.show({ backdrop: 'static' });
         }

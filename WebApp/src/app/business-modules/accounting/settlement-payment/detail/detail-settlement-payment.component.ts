@@ -45,7 +45,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
         this._activedRouter.params.subscribe((param: any) => {
             if (!!param.id) {
                 this.settlementId = param.id;
-                this.getDetailSettlement(this.settlementId);
+                this.getDetailSettlement(this.settlementId, 'LIST');
             }
         });
     }
@@ -83,7 +83,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this.getDetailSettlement(this.settlementId);
+                        this.getDetailSettlement(this.settlementId, 'GROUP');
                     } else {
                         this._toastService.warning(res.message);
                     }
@@ -91,7 +91,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
             );
     }
 
-    getDetailSettlement(settlementId: string) {
+    getDetailSettlement(settlementId: string, typeCharge: string) {
         this._progressRef.start();
         this._accoutingRepo.getDetailSettlementPayment(settlementId)
             .pipe(
@@ -130,7 +130,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
                             amount: this.settlementPayment.chargeGrpSettlement.reduce((acc, curr) => acc + curr.totalAmount, 0),
                             currency: this.formCreateSurcharge.currencyList.filter(currency => currency.id === this.settlementPayment.settlement.settlementCurrency)[0]
                         });
-                    }, 100);
+                    }, 300);
 
                     this.requestSurchargeListComponent.surcharges = this.settlementPayment.chargeNoGrpSettlement;
                     this.requestSurchargeListComponent.groupShipments = this.settlementPayment.chargeGrpSettlement;
@@ -138,8 +138,8 @@ export class SettlementPaymentDetailComponent extends AppPage {
                     this.requestSurchargeListComponent.settlementCode = this.settlementPayment.settlement.settlementNo;
 
                     // *SWITCH UI TO GROUP LIST SHIPMENT
-                    this.requestSurchargeListComponent.TYPE = 'GROUP'; // ? LIST
-                    this.requestSurchargeListComponent.STATE = 'WRITE'; // ? READ
+                    this.requestSurchargeListComponent.TYPE = typeCharge; // ? GROUP/LIST
+                    this.requestSurchargeListComponent.STATE = 'WRITE'; //  ? READ/WRITE
 
                     if (this.requestSurchargeListComponent.groupShipments.length) {
                         this.requestSurchargeListComponent.openAllCharge.next(true);
@@ -174,7 +174,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
                         this._toastService.success(`${res.data.settlement.settlementNo}`, ' Send request successfully');
 
                         this._router.navigate([`home/accounting/settlement-payment/${res.data.settlement.id}/approve`]);
-                    }else {
+                    } else {
                         this._toastService.warning(res.message);
                     }
                 }
