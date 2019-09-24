@@ -21,7 +21,7 @@ namespace eFMS.API.ReportData.Models
         }
         public class CustomClearance
         {
-            public const string CustomClearanceUrl = "/Catalogue/api/v1/en-US/CustomsDeclaration/Query";
+            public const string CustomClearanceUrl = "/Operation/api/v1/en-US/CustomsDeclaration/Query";
 
         }
     }

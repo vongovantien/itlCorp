@@ -7,7 +7,7 @@ namespace eFMS.API.ReportData.Models
 {
     public class CustomsDeclaration
     {
-        public string CleareanceNo { get; set; }
+        public string ClearanceNo { get; set; }
         public string Type { get; set; }
         public string GatewayName { get; set; }
         public string CustomerName { get; set; }

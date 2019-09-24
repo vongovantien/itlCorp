@@ -797,7 +797,7 @@ namespace eFMS.API.ReportData
             for (int i = 0; i < listItems.Count; i++)
             {
                 var item = listItems[i];
-                worksheet.Cells[i + 2, 1].Value = item.CleareanceNo;
+                worksheet.Cells[i + 2, 1].Value = item.ClearanceNo;
                 worksheet.Cells[i + 2, 2].Value = item.Type;
                 worksheet.Cells[i + 2, 3].Value = item.GatewayName;
                 worksheet.Cells[i + 2, 4].Value = item.CustomerName;
@@ -805,7 +805,17 @@ namespace eFMS.API.ReportData
                 worksheet.Cells[i + 2, 6].Value = item.ExportCountryName;
                 worksheet.Cells[i + 2, 7].Value = item.JobNo;
                 worksheet.Cells[i + 2, 8].Value = item.ClearanceDate;
-                worksheet.Cells[i + 2, 9].Value = item.Status;
+
+                string status = "";
+                if (item.JobNo != null)
+                {
+                    status = "Imported";
+                }
+                else
+                {
+                    status = "Not Imported";
+                }
+                worksheet.Cells[i + 2, 9].Value = status;
             }
         }
 

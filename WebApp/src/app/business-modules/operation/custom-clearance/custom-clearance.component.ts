@@ -300,6 +300,30 @@ export class CustomClearanceComponent extends AppList {
         this.excelService.generateExcel(exportModel);
     }
 
+    async export1() {
+        debugger;
+        const res =  await this.baseServices.postAsync('http://localhost:63492/api/v1/vi/ReportData/CustomsDeclaration/ExportCustomClearance',this.searchObject);
+        this.downloadFile(res,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','export.xlsx')
+    }
+    downloadFile(blob: any, type: string, filename: string) {
+        var binaryData = [];
+        binaryData.push(blob);
+
+        const url = window.URL.createObjectURL(new Blob(binaryData, { type: type })); // <-- work with blob directly
+
+        // create hidden dom element (so it works in all browsers)
+        const a = document.createElement('a');
+        a.setAttribute('style', 'display:none;');
+        document.body.appendChild(a);
+
+        // create file, attach to hidden element and open hidden element
+        a.href = url;
+        a.download = filename;
+        a.click();
+    }
+
+
+
 }
 
 
