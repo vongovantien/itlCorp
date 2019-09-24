@@ -166,6 +166,7 @@ namespace eFMS.API.Accounting.DL.Services
                             a.DatetimeModified = DateTime.Now;
                         }
                     );
+                    dc.CsShipmentSurcharge.UpdateRange(surcharge);
                     dc.SaveChanges();
                 }
 
@@ -189,7 +190,7 @@ namespace eFMS.API.Accounting.DL.Services
             var dataMapSOA = mapper.Map<spc_GetListAcctSOAByMaster, Models.AcctSOADetailResult>(dataSOA.FirstOrDefault());
 
             var chargeShipmentList = GetSpcChargeShipmentBySOANo(soaNo, currencyLocal).ToList();
-            var dataMapChargeShipment = mapper.Map<List<spc_GetListChargeShipmentMasterBySOANo>, List<Models.ChargeShipmentModel>>(chargeShipmentList);
+            var dataMapChargeShipment = mapper.Map<List<spc_GetListChargeShipmentMasterBySOANo>, List<ChargeShipmentModel>>(chargeShipmentList);
 
             dataMapSOA.ChargeShipments = dataMapChargeShipment;
             dataMapSOA.AmountDebitLocal = Math.Round(chargeShipmentList.Sum(x => x.AmountDebitLocal),3);
@@ -230,12 +231,11 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public string GetInfoServiceOfSoa(string soaNo)
         {
-            //var serviceTypeId = ((eFMSDataContext)DataContext.DC).AcctSoa.Where(x => x.Soano == soaNo).FirstOrDefault()?.ServiceTypeId;
             var serviceTypeId = DataContext.Get(x => x.Soano == soaNo).FirstOrDefault()?.ServiceTypeId;
 
             var serviceName = "";
 
-            if (serviceTypeId != null)
+            if (!string.IsNullOrEmpty(serviceTypeId))
             {
                 //Tách chuỗi servicetype thành mảng
                 string[] arrayStrServiceTypeId = serviceTypeId.Split(';').Where(x => x.ToString() != "").ToArray();
@@ -294,6 +294,7 @@ namespace eFMS.API.Accounting.DL.Services
                             a.DatetimeModified = a.ExchangeDate = DateTime.Now;
                         }
                         );
+                        dc.CsShipmentSurcharge.UpdateRange(surchargeCredit);
                     }
 
                     if (surchargeDebit.Count() > 0)
@@ -307,6 +308,7 @@ namespace eFMS.API.Accounting.DL.Services
                             a.DatetimeModified = a.ExchangeDate = DateTime.Now;
                         }
                         );
+                        dc.CsShipmentSurcharge.UpdateRange(surchargeDebit);
                     }
 
                 }
