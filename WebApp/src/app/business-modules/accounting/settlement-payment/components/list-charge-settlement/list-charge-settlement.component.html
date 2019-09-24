@@ -42,6 +42,19 @@
                 </label>
             </div>
         </div>
+        <div class="col-lg-4" *ngIf="!!STATE && STATE === 'WRITE' && TYPE === 'LIST'">
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="Search charge" [(ngModel)]="keyword" name="keyword">
+            </div>
+        </div>
+        <div class="col-8" [ngClass]="TYPE === 'LIST' ? 'col-8' : 'col-12'">
+            <div class="m--align-right foat-right">
+                <a class="pointer icon-switch" (click)="switchToGroup()">
+                    <i class="la la-list" *ngIf="TYPE === 'GROUP' else list"></i>
+                    <ng-template #list> <i class="la la-sitemap"></i></ng-template>
+                </a>
+            </div>
+        </div>
     </div>
     <div class="row m--margin-top-10">
         <div class="col-12">
@@ -86,8 +99,9 @@
                             </tr>
                         </thead>
                         <tbody class="tbody-group">
-                            <ng-container *ngFor="let surcharge of surcharges; let i = index; trackBy: trackByFn">
-                                <tr class="text-center">
+                            <ng-container
+                                *ngFor="let surcharge of surcharges | filter: keyword:['jobId', 'hbl', 'mbl', 'chargeName', 'payer', 'obhPartnerName']; let i = index; trackBy: trackByFn">
+                                <tr class="text-center" [class.selected-row]="i === selectedIndexSurcharge">
                                     <td class="table-actions-col">
                                         <div class="table-actions">
                                             <label class="m-checkbox" *ngIf="!surcharge.isFromShipment">
@@ -105,9 +119,7 @@
                                             </ng-container>
                                         </div>
                                     </td>
-                                    <td>{{surcharge.jobId}}</td>
-                                    <td>{{surcharge.hbl}}</td>
-                                    <td>{{surcharge.mbl}}</td>
+                                    <td>{{surcharge.jobId}} - {{surcharge.hbl}} - {{surcharge.mbl}}</td>
                                     <td class="text-primary pointer"
                                         (click)="openSurchargeDetail(surcharge, i, 'update')"
                                         [class.text-underline]="!surcharge.isFromShipment">
@@ -119,8 +131,8 @@
                                     <td>{{surcharge.currencyId}}</td>
                                     <td>{{surcharge.vatrate}}</td>
                                     <td>{{surcharge.total | number: '.0-3'}}</td>
-                                    <td>{{surcharge.payer}}</td>
-                                    <td>{{surcharge.obhPartnerName}}</td>
+                                    <td>{{surcharge.type === 'OBH' ? surcharge.payer : surcharge.obhPartnerName}}</td>
+                                    <td>{{surcharge.type === 'OBH' ? surcharge.obhPartnerName : surcharge.payer}}</td>
                                     <td>{{surcharge.invoiceNo}}</td>
                                     <td>{{surcharge.seriesNo}}</td>
                                     <td>{{surcharge.invoiceDate | date: 'dd/MM/yyyy'}}</td>

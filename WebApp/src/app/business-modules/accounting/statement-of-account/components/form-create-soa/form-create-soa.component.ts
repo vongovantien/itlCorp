@@ -64,8 +64,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
     isApplied: boolean = false;
 
-    commonityGroup: any[] = [];
-    commondity: any = null;
+    commodityGroup: any[] = [];
+    commodity: any = null;
     
     constructor(
         private _sysRepo: SystemRepo,
@@ -91,7 +91,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         .pipe(catchError(this.catchError))
         .subscribe(
             (res: any) => {
-                this.commonityGroup = res || [];
+                this.commodityGroup = res || [];
             },
             (errors: any) => {},
             () => {},
@@ -380,10 +380,9 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 strCharges: this.selectedCharges.map((item: any) => item.code).toString(),
                 note: this.note,
                 serviceTypeId: !!this.selectedService.length ? this.mapServiceId(this.selectedService[0].id) : this.mapServiceId('All'),
-                commodityGroupId: !!this.commondity ? this.commondity.id : null
+                commodityGroupId: !!this.commodity ? this.commodity.id : null
             };
             this.dataSearch = new SOASearchCharge(body);
-            console.log(this.dataSearch);
             this.onApply.emit(this.dataSearch);
         }
     }
@@ -395,8 +394,6 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         if (!!rangeDate.endDate) {
             this.updateDataSearch('toDate', formatDate(rangeDate.endDate, 'yyyy-MM-dd', 'en'));
         }
-
-        console.log(this.dataSearch);
     }
 
     onChangeNote(note: string) {
@@ -426,7 +423,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         let serviceTypeId = '';
         if (!!service) {
             if (service === 'All') {
-                this.services.shift(); // * remove item with value 'All'
+                this.services = this.services.filter( service => service.id !== 'All');
                 serviceTypeId = this.services.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
             } else {
                 serviceTypeId = this.selectedService.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');

@@ -52,7 +52,6 @@ const LIB = [
         SharedModule,
         FormsModule,
         ReactiveFormsModule,
-        HttpClientModule,
         ...LIB
     ],
     exports: [],

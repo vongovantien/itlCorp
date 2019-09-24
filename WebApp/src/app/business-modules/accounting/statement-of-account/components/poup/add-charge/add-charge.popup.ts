@@ -60,8 +60,8 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
     isCheckAllCharge: boolean = false;
     listCharges: any[] = [];
 
-    commondity: any = null;
-    commonityGroup: any[] = [];
+    commodity: any = null;
+    commodityGroup: any[] = [];
 
     constructor(
         private _accoutingRepo: AccoutingRepo,
@@ -265,7 +265,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
             isOBH: this.selectedOBH.id,
             strCreators: this.searchInfo.strCreators,
             strCharges: this.selectedCharges.map((item: any) => item.code).toString(),
-            commondityGroupId: !!this.commondity ? this.commondity.id : null
+            commondityGroupId: !!this.commodity ? this.commodity.id : null
         };
         this._accoutingRepo.getListMoreCharge(body)
             .pipe(catchError(this.catchError))

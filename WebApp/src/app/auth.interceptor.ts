@@ -10,7 +10,6 @@ import { ToastrService } from 'ngx-toastr';
 export class AuthInterceptor implements HttpInterceptor {
     constructor(private _toastService: ToastrService) { }
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        console.log(req);
         const authHeader = `Bearer ${localStorage.getItem('access_token')}`;
         const authReq = req.clone({ headers: req.headers.set('Authorization', authHeader), url: req.url });
 

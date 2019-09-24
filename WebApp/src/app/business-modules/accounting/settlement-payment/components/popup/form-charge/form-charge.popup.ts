@@ -14,7 +14,6 @@ import { CurrencyMaskConfig } from 'ngx-currency/src/currency-mask.config';
 @Component({
     selector: 'form-charge-popup',
     templateUrl: './form-charge.popup.html',
-    styleUrls: ['./form-charge.popup.scss']
 })
 
 export class SettlementFormChargePopupComponent extends PopupBase {
@@ -496,7 +495,6 @@ export class SettlementFormChargePopupComponent extends PopupBase {
                 }
             } else { // ? else => update normaly.
                 this.checkValidateSurcharge(body);
-                // this.onRequest.emit(body);
             }
             // ? else => create normaly.
         } else {
@@ -508,10 +506,11 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         this.isContinue = true;
         this.submit();
 
-
-        setTimeout(() => {
-            this.show();
-        }, 500);
+        if (this.state !== 'update') {
+            setTimeout(() => {
+                this.show();
+            }, 500);
+        }
     }
 
     saveCharge() {
@@ -608,18 +607,19 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (!res.status) {
-                        if (this.action === 'update') {
-                            this.onUpdateChange.emit(body);
-                        } else {
-                            this.onRequest.emit(body);
-                        }
-
                         if (this.isContinue) {
                             this.resetFormToContinue();
                         } else {
                             this.resetForm();
                         }
+
                         this.hide();
+
+                        if (this.action === 'update') {
+                            this.onUpdateChange.emit(body);
+                        } else {
+                            this.onRequest.emit(body);
+                        }
                     } else {
                         this._toastService.warning(res.message);
                     }
