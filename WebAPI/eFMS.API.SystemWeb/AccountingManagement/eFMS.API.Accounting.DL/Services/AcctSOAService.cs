@@ -61,6 +61,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 a.DatetimeModified = a.ExchangeDate = DateTime.Now;
                             }
                         );
+                        dc.CsShipmentSurcharge.UpdateRange(surchargeCredit);
                     }
 
                     if (surchargeDebit.Count() > 0)
@@ -74,6 +75,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 a.DatetimeModified = a.ExchangeDate = DateTime.Now;
                             }
                         );
+                        dc.CsShipmentSurcharge.UpdateRange(surchargeDebit);
                     }
                 }
                 dc.SaveChanges();

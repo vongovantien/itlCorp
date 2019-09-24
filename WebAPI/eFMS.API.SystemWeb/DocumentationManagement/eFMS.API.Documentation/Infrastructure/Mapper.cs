@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using eFMS.API.Documentation.DL.Models;
-using eFMS.API.Documentation.DL.Models.SettlementPayment;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Documentation.Service.ViewModels;
 using System.Collections.Generic;
@@ -32,26 +31,11 @@ namespace eFMS.API.Shipment.Infrastructure
 
             CreateMap<spc_GetListChargeShipmentMaster, ChargeShipmentModel>();
 
-            CreateMap<AcctSoa, AcctSoaModel>();
-            CreateMap<AcctSoaModel, AcctSoa>();
-            CreateMap<spc_GetListAcctSOAByMaster, AcctSOAResult>();
-            CreateMap<spc_GetListAcctSOAByMaster, AcctSOADetailResult>();
-            CreateMap<spc_GetListChargeShipmentMasterBySOANo, ChargeShipmentModel>();
-            CreateMap<spc_GetListMoreChargeMasterByCondition, ChargeShipmentModel>();
-            CreateMap<spc_GetDataExportSOABySOANo, ExportSOAModel>();
             CreateMap<CsShipmentSurchargeModel, CsShipmentSurcharge>();
 
-            CreateMap<AcctAdvancePayment, AcctAdvancePaymentModel>();
-            CreateMap<AcctAdvancePaymentModel, AcctAdvancePayment>();
             CreateMap<CsMawbcontainerImportModel, CsMawbcontainer>();
 
-            CreateMap<AcctApproveAdvance, AcctApproveAdvanceModel>();
             CreateMap<spc_GetSurchargeByHouseBill, CsShipmentSurchargeDetailsModel>();
-
-            CreateMap<ShipmentChargeSettlement, CsShipmentSurcharge>();
-            CreateMap<AcctSettlementPayment, AcctSettlementPaymentModel>();
-            CreateMap<AcctSettlementPaymentModel, AcctSettlementPayment>();
-            CreateMap<AcctApproveSettlement, AcctApproveSettlementModel>();
         }
     }
 }
