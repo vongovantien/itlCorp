@@ -55,5 +55,15 @@ namespace eFMS.API.Accounting.DL.Common
         public static readonly string COMPANY_CONTACT = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎";
         #endregion -- INFO COMPANY --
 
+        #region -- PAYMENT METHOD --
+        public static readonly string PAYMENT_METHOD_CASH = "Cash";
+        public static readonly string PAYMENT_METHOD_BANK = "Bank";
+        #endregion -- PAYMENT METHOD --
+
+        #region -- STATUS SOA --
+        public static readonly string STATUS_SOA_NEW = "New";
+        #endregion -- STATUS SOA --
+
+        public static readonly string CURRENCY_LOCAL = "VND";
     }
 }
