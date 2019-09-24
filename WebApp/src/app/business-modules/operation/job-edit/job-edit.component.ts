@@ -132,11 +132,10 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this.route.params.subscribe(async (params: any) => {
             this.tab = 'job-edit';
             this.tabCharge = 'buying';
-            // this.getPackageTypes();
-            //this.getUnits();
+            this.getUnits();
             this.getPartners();
             this.getListCurrencies();
-            // this.getCurrencies();
+            this.getCurrencies();
             this.getListBuyingRateCharges();
             this.getListSellingRateCharges();
             this.getListOBHCharges();
@@ -147,16 +146,15 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             this.getBillingOps();
             this.getWarehouses();
             this.getCommodityGroup();
-            // this.getContainerData();
-            // this.getListPackageTypes();
+            this.getListPackageTypes();
             await this.getShipmentCommonData();
             if (!!params && !!params.id) {
                 this.jobId = params.id;
-                this.getShipmentDetails(params.id);
+                await this.getShipmentDetails(params.id);
                 if (this.opsTransaction != null) {
                     this.getListContainersOfJob();
                     if (this.opsTransaction != null) {
-                        this.getAllSurCharges();
+                        this.getSurCharges('BUY');
                         this.serviceDate = (this.opsTransaction.serviceDate !== null) ? { startDate: new Date(this.opsTransaction.serviceDate), endDate: new Date(this.opsTransaction.serviceDate) } : null;
                         this.finishDate = this.opsTransaction.finishDate != null ? { startDate: new Date(this.opsTransaction.finishDate), endDate: new Date(this.opsTransaction.finishDate) } : null;
                         let index = this.productServices.findIndex(x => x.id === this.opsTransaction.productService);
@@ -168,11 +166,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                         index = this.packageTypes.findIndex(x => x.id === this.opsTransaction.packageTypeId);
                         if (index > -1) { this.packagesUnitActive = [this.packageTypes[index]]; }
 
-                    this.commodityGroupActive = this.commodityGroup.filter( i => i.id === this.opsTransaction.commodityGroupId);
+                        this.commodityGroupActive = this.commodityGroup.filter(i => i.id === this.opsTransaction.commodityGroupId);
 
-
-                        // this.getAllSurCharges();
-                        // this.getShipmentContainer();
                         this.getCustomClearances();
                     } else {
                         this.serviceDate = null;
@@ -314,17 +309,17 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     async getShipmentDetails(id: any) {
-        // this.opsTransaction = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.getById + "?id=" + id, false, true);
+        this.opsTransaction = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.getById + "?id=" + id, false, true);
         // console.log("des", this.opsTransaction);
-        this._operationRepo.getDetailShipment(id)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            ).subscribe(
-                (response: any) => {
-                    this.opsTransaction = response;
-                },
-            );
+        // this._operationRepo.getDetailShipment(id)
+        //     .pipe(
+        //         catchError(this.catchError),
+        //         finalize(() => this._progressRef.complete())
+        //     ).subscribe(
+        //         (response: any) => {
+        //             this.opsTransaction = response;
+        //         },
+        //     );
         this.baseServices.setData("CurrentOpsTransaction", this.opsTransaction);
     }
 
