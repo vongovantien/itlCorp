@@ -227,7 +227,7 @@
                                         <span>{{charge.invoiceNo}}</span>
                                     </td>
                                     <td>
-                                        <span>{{charge.serviceDate | date: 'dd/MM/yyyy'}}</span>
+                                        <span>{{!!charge.serviceDate ? (charge.serviceDate | date: 'dd/MM/yyyy') : ''}}</span>
                                     </td>
                                     <td>
                                         <span>{{charge.note}}</span>
