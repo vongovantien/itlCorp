@@ -11,7 +11,7 @@ import { prepareNg2SelectData } from 'src/helper/data.helper';
 
 import { ChargeConstants } from 'src/constants/charge.const';
 import { ContainerListComponent } from './container-list/container-list.component';
-import { OperationRepo, UnitRepo, SystemRepo, DocumentationRepo, CatalogueRepo } from 'src/app/shared/repositories';
+import { OperationRepo, UnitRepo, SystemRepo, CatalogueRepo } from 'src/app/shared/repositories';
 import { AppPage } from "src/app/app.base";
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { CancelCreateJobPopupComponent } from './job-confirm-popup/cancel-create-job-popup/cancel-create-job-popup.component';
@@ -24,6 +24,7 @@ import { ConfirmCancelJobPopupComponent } from './job-confirm-popup/confirm-canc
 import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
 import { CsShipmentSurcharge } from 'src/app/shared/models';
 import { NgProgress } from '@ngx-progressbar/core';
+import { DocumentationRepo } from 'src/app/shared/repositories/documentation.repo';
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
@@ -131,6 +132,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this.route.params.subscribe((params: any) => {
             this.tab = 'job-edit';
             this.tabCharge = 'buying';
+
             this.getShipmentCommonData();
             this.getUnits();
             this.getPartners();
@@ -147,33 +149,9 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             this.getWarehouses();
             this.getCommodityGroup();
             this.getListPackageTypes();
-            this.getShipmentCommonData();
             if (!!params && !!params.id) {
                 this.jobId = params.id;
                 this.getShipmentDetails(params.id);
-                if (this.opsTransaction != null) {
-                    this.getListContainersOfJob();
-                    if (this.opsTransaction != null) {
-                        this.getSurCharges('BUY');
-                        this.serviceDate = (this.opsTransaction.serviceDate !== null) ? { startDate: new Date(this.opsTransaction.serviceDate), endDate: new Date(this.opsTransaction.serviceDate) } : null;
-                        this.finishDate = this.opsTransaction.finishDate != null ? { startDate: new Date(this.opsTransaction.finishDate), endDate: new Date(this.opsTransaction.finishDate) } : null;
-                        let index = this.productServices.findIndex(x => x.id === this.opsTransaction.productService);
-                        if (index > -1) { this.productServiceActive = [this.productServices[index]]; }
-                        index = this.serviceModes.findIndex(x => x.id === this.opsTransaction.serviceMode);
-                        if (index > -1) { this.serviceModeActive = [this.serviceModes[index]]; }
-                        index = this.shipmentModes.findIndex(x => x.id === this.opsTransaction.shipmentMode);
-                        if (index > -1) { this.shipmentModeActive = [this.shipmentModes[index]]; }
-                        index = this.packageTypes.findIndex(x => x.id === this.opsTransaction.packageTypeId);
-                        if (index > -1) { this.packagesUnitActive = [this.packageTypes[index]]; }
-
-                        this.commodityGroupActive = this.commodityGroup.filter(i => i.id === this.opsTransaction.commodityGroupId);
-
-                        this.getCustomClearances();
-                    } else {
-                        this.serviceDate = null;
-                        this.finishDate = null;
-                    }
-                }
             }
         });
 
@@ -316,6 +294,29 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             ).subscribe(
                 (response: any) => {
                     this.opsTransaction = response;
+                    if (this.opsTransaction != null) {
+                        this.getListContainersOfJob();
+                        if (this.opsTransaction != null) {
+                            this.getAllSurCharges();
+                            this.serviceDate = (this.opsTransaction.serviceDate !== null) ? { startDate: new Date(this.opsTransaction.serviceDate), endDate: new Date(this.opsTransaction.serviceDate) } : null;
+                            this.finishDate = this.opsTransaction.finishDate != null ? { startDate: new Date(this.opsTransaction.finishDate), endDate: new Date(this.opsTransaction.finishDate) } : null;
+                            let index = this.productServices.findIndex(x => x.id === this.opsTransaction.productService);
+                            if (index > -1) { this.productServiceActive = [this.productServices[index]]; }
+                            index = this.serviceModes.findIndex(x => x.id === this.opsTransaction.serviceMode);
+                            if (index > -1) { this.serviceModeActive = [this.serviceModes[index]]; }
+                            index = this.shipmentModes.findIndex(x => x.id === this.opsTransaction.shipmentMode);
+                            if (index > -1) { this.shipmentModeActive = [this.shipmentModes[index]]; }
+                            index = this.packageTypes.findIndex(x => x.id === this.opsTransaction.packageTypeId);
+                            if (index > -1) { this.packagesUnitActive = [this.packageTypes[index]]; }
+
+                            this.commodityGroupActive = this.commodityGroup.filter(i => i.id === this.opsTransaction.commodityGroupId);
+
+                            this.getCustomClearances();
+                        } else {
+                            this.serviceDate = null;
+                            this.finishDate = null;
+                        }
+                    }
                 },
             );
         this.baseServices.setData("CurrentOpsTransaction", this.opsTransaction);
@@ -361,10 +362,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     private getBillingOps() {
-        // this.baseServices.get(this.api_menu.System.User_Management.getAll).subscribe((res: any) => {
-        //     this.billingOps = res;
-        //     this.salemans = res;
-        // });
         this.systemRepo.getListSystemUser()
             .pipe(
                 catchError(this.catchError),
@@ -410,10 +407,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     public getUnits() {
-        // this.baseServices.post(this.api_menu.Catalogue.Unit.getAllByQuery, { inactive: false }).subscribe((data: any) => {
-        //     this.lstUnits = data;
-        //     // this._data.setData('lstUnits', this.lstUnits);
-        // });
         this._catalogueRepo.getUnit().pipe(
             catchError(this.catchError),
             finalize(() => this._progressRef.complete())
