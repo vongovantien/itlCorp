@@ -23,6 +23,7 @@ using System;
 using eFMS.API.Accounting.Service.Contexts;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Services;
+using eFMS.API.Accounting.DL.Common;
 
 namespace eFMS.API.Accounting.Infrastructure
 {
@@ -38,7 +39,6 @@ namespace eFMS.API.Accounting.Infrastructure
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddTransient<IAcctAdvancePaymentService, AcctAdvancePaymentService>();
-            services.AddTransient<IOpsTransactionService, OpsTransactionService>();
             services.AddTransient<IAcctCDNoteServices, AcctCDNoteServices>();
             services.AddTransient<IAcctSettlementPaymentService, AcctSettlementPaymentService>();
             services.AddTransient<IAcctSOAService, AcctSOAService>();
@@ -89,6 +89,9 @@ namespace eFMS.API.Accounting.Infrastructure
                 options.RequireHttpsMetadata = bool.Parse(configuration["Authentication:RequireHttpsMetadata"]);
                 options.ApiName = configuration["Authentication:ApiName"];
                 options.ApiSecret = configuration["Authentication:ApiSecret"];
+            });
+            services.Configure<WebUrl>(option => {
+                option.Url = configuration.GetSection("WebUrl").Value;
             });
             return services;
         }

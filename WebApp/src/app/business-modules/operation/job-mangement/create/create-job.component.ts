@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Component } from "@angular/core";
 import { BaseService } from "src/app/shared/services/base.service";
 import { API_MENU } from "src/constants/api-menu.const";
 import { OpsTransaction } from "src/app/shared/models/document/OpsTransaction.model";
@@ -8,12 +8,11 @@ import { PartnerGroupEnum } from "src/app/shared/enums/partnerGroup.enum";
 import { NgForm } from "@angular/forms";
 import { Router } from "@angular/router";
 import { PlaceTypeEnum } from "src/app/shared/enums/placeType-enum";
-import { JobRepo } from "src/app/shared/repositories";
-import { PopupBase } from "src/app/popup.base";
+import { CatalogueRepo, OperationRepo } from "src/app/shared/repositories";
 import { takeUntil, catchError, finalize } from "rxjs/operators";
 import { NgxSpinnerService } from "ngx-spinner";
 import { ToastrService } from "ngx-toastr";
-
+import { AppPage } from "src/app/app.base";
 
 @Component({
     selector: "app-job-mangement-create",
@@ -25,7 +24,8 @@ import { ToastrService } from "ngx-toastr";
             }
         `]
 })
-export class JobManagementCreateJobComponent extends PopupBase implements OnInit, OnDestroy {
+export class JobManagementCreateJobComponent extends AppPage {
+
     DataStorage: Object = null;
     productServices: any[] = [];
     serviceModes: any[] = [];
@@ -55,34 +55,39 @@ export class JobManagementCreateJobComponent extends PopupBase implements OnInit
 
     isDisplay: boolean = true;
 
+    commonityGroup: any[] = [];
 
     constructor(
         private baseServices: BaseService,
         private api_menu: API_MENU,
         private router: Router,
-        private jobRepo: JobRepo,
+        private _operationRepo: OperationRepo,
         private spinner: NgxSpinnerService,
-        private _toaster: ToastrService
+        private _toaster: ToastrService,
+        private _catalogueRepo: CatalogueRepo,
     ) {
         super();
-  
         this.baseServices.dataStorage.subscribe(data => {
             this.DataStorage = data;
         });
     }
 
     ngOnInit() {
-        console.log(this.OpsTransactionToAdd);
         this.getShipmentCommonData();
         this.getListCustomers();
         this.getListPorts();
         this.getListSupplier();
         this.getListAgent();
         this.getListBillingOps();
+        this.getCommodityGroup();
+        this.setCurrentBillingOPS();
+    }
+    setCurrentBillingOPS() {
+        const claim = localStorage.getItem('id_token_claims_obj');
+        const currenctUser = JSON.parse(claim)["id"];
+        this.OpsTransactionToAdd.billingOpsId = currenctUser;
     }
 
-    ngOnDestroy(): void {
-    }
     async getShipmentCommonData() {
         const data = await shipmentHelper.getOPSShipmentCommonData(
             this.baseServices,
@@ -125,7 +130,6 @@ export class JobManagementCreateJobComponent extends PopupBase implements OnInit
             })
             .subscribe((res: any) => {
                 this.listPort = res;
-                console.log(this.listPort);
             });
     }
 
@@ -138,9 +142,9 @@ export class JobManagementCreateJobComponent extends PopupBase implements OnInit
             })
             .subscribe((res: any) => {
                 this.listSuppliers = res;
-                console.log({ Supplier: this.listSuppliers });
             });
     }
+
     private getListAgent() {
         this.baseServices
             .post(this.api_menu.Catalogue.PartnerData.query, {
@@ -150,7 +154,6 @@ export class JobManagementCreateJobComponent extends PopupBase implements OnInit
             })
             .subscribe((res: any) => {
                 this.listAgents = res;
-                console.log({ Agents: this.listAgents });
             });
     }
 
@@ -159,8 +162,21 @@ export class JobManagementCreateJobComponent extends PopupBase implements OnInit
             .get(this.api_menu.System.User_Management.getAll)
             .subscribe((res: any) => {
                 this.listBillingOps = res;
-                console.log({ "Billing Ops": this.listBillingOps });
             });
+    }
+
+    getCommodityGroup() {
+        this._catalogueRepo.getCommodityGroup()
+            .pipe()
+            .subscribe(
+                (res: any) => {
+                    this.commonityGroup = res;
+                    this.commonityGroup = dataHelper.prepareNg2SelectData(this.commonityGroup,
+                        "id",
+                        "groupNameEn"
+                    );
+                }
+            );
     }
 
     public submitNewOps(form: NgForm) {
@@ -169,7 +185,7 @@ export class JobManagementCreateJobComponent extends PopupBase implements OnInit
                 const error = $("#add-new-ops-job-form").find("div.has-danger");
                 if (error.length === 0) {
                     this.OpsTransactionToAdd.serviceDate = this.selectedDate.startDate != null ? dataHelper.dateTimeToUTC(this.selectedDate.startDate) : null;
-                    this.jobRepo.addOPSJob(this.OpsTransactionToAdd).pipe(
+                    this._operationRepo.addOPSJob(this.OpsTransactionToAdd).pipe(
                         takeUntil(this.ngUnsubscribe),
                         catchError(this.catchError),
                         finalize(() => { this.spinner.hide(); })
@@ -192,16 +208,12 @@ export class JobManagementCreateJobComponent extends PopupBase implements OnInit
             }
         }, 300);
     }
+
     resetDisplay() {
         this.isDisplay = false;
         setTimeout(() => {
             this.isDisplay = true;
         }, 300);
-    }
-
-
-    private get disabledV(): string {
-        return this._disabledV;
     }
 
     private set disabledV(value: string) {

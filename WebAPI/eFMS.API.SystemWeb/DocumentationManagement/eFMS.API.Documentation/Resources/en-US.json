@@ -19,6 +19,7 @@
   "MSG_CLEARANCENO_EXISTED": "Custom No [{0}] existed ! Please recheck it?",
   "MSG_CLEARANCE_CONVERT_TO_JOB": "Clearance convert to a job successfully!!!",
   "MSG_LIST_CLEARANCE_CONVERT_TO_JOB": "List of clearances convert to list of jobs successfully!!!",
+  "MSG_CLEARANCENO_CARGOTYPE_NOT_ALLOW_EMPTY": "Cargo type not allow empty !",
 
   "MSG_MAWBCONTAINER_CONTAINERTYPE_EMPTY": "Container type name is empty",
   "MSG_MAWBCONTAINER_CONTAINERTYPE_NOT_FOUND": "Container type name '{0}' not found",

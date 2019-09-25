@@ -12,6 +12,7 @@ import { JobManagementCreateJobComponent } from './create/create-job.component';
 import { JobManagementDetailJobComponent } from './detail/detail-job.component';
 
 import { JobManagementFormSearchComponent } from './components/form-search-job/form-search-job.component';
+import { HttpClientModule } from '@angular/common/http';
 
 
 const routing: Routes = [

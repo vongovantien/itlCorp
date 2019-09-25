@@ -24,7 +24,7 @@
                                             placeholder="Input keyword" (click)="isShow = !isShow"
                                             formControlName="chargeName" (ngModelChange)="onSearchAutoComplete($event)">
                                         <div class="dropdown e--combogrid combogrid-autocomplete" *ngIf="isShow">
-                                            <div class="dropdown-menu e--combogrid-content">
+                                            <div class="dropdown-menu e--combogrid-content d-block">
                                                 <div class="tabel-wrapper table-fixed">
                                                     <div class="table-head-fixed">
                                                         <div class="table-header">
@@ -274,7 +274,7 @@
                                 <span>
                                     <i class="la la-download"></i>
                                     <span>
-                                        {{state === 'Add & Continue' ? 'Update' : 'Update & Continue'}}
+                                        {{state === 'update' ? 'Update & Continue' : 'Add & Continue'}}
                                     </span>
                                 </span>
                             </button>

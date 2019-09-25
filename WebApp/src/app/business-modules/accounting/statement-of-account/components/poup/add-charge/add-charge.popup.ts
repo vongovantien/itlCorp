@@ -60,6 +60,9 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
     isCheckAllCharge: boolean = false;
     listCharges: any[] = [];
 
+    commodity: any = null;
+    commodityGroup: any[] = [];
+
     constructor(
         private _accoutingRepo: AccoutingRepo,
         private _toastService: ToastrService,
@@ -191,11 +194,6 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
                 this.cdNotes = [];
                 this.selectedCDNote = null;
                 this.cdNotes = this.filterCDNoteByShipment(this.selectedShipmentData);
-
-                // if (this.cdNotes.length === 1) {
-                //     this.selectedCDNote = this.cdNotes[0];
-                // }
-                
                 break;
             case 'charge':
                 if (data.id === 'All') {
@@ -267,6 +265,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
             isOBH: this.selectedOBH.id,
             strCreators: this.searchInfo.strCreators,
             strCharges: this.selectedCharges.map((item: any) => item.code).toString(),
+            commondityGroupId: !!this.commodity ? this.commodity.id : null
         };
         this._accoutingRepo.getListMoreCharge(body)
             .pipe(catchError(this.catchError))
@@ -348,4 +347,5 @@ interface ISearchMoreCharge {
     isOBH: boolean;
     strCreators: string;
     strCharges: string;
+    commondityGroupId: any;
 }

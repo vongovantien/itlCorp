@@ -12,73 +12,142 @@ export class OperationRepo {
     }
 
     getListContainersOfJob(data: any = {}) {
-        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/CsMawbcontainer/Query`, data).pipe(
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsMawbcontainer/Query`, data).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;
             })
         );
+        // return this._api.post(`localhost:44366/api/v1/vi/OpsTransaction/api/${this.VERSION}/vi/CsMawbcontainer/Query`, data).pipe(
+        //     catchError((error) => throwError(error)),
+        //     map((res: any) => {
+        //         return res;
+        //     })
+        // );
 
-    }
-
-    getListShipment(page?: number, size?: number, body = {}) {
-        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/OpsTransaction/Paging`, body, {
-            page: '' + page,
-            size: '' + size
-        }).pipe(
-            catchError((error) => throwError(error)),
-            map((data: any) => data)
-        );
-    }
-
-    checkShipmentAllowToDelete(id: string) {
-        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/OpsTransaction/CheckAllowDelete/${id}`).pipe(
-            catchError((error) => throwError(error)),
-            map((data: any) => data)
-        );
-    }
-
-    deleteShipment(id: string) {
-        return this._api.delete(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/OpsTransaction/Delete/${id}`).pipe(
-            catchError((error) => throwError(error)),
-            map((data: any) => data)
-        );
     }
 
     getCustomDeclaration(jobNo: string) {
-        return this._api.get(`${environment.HOST.WEB_URL}/Operation/api/${this.VERSION}/vi/CustomsDeclaration/GetBy`, { jobNo: jobNo }).pipe(
+        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/GetBy`, { jobNo: jobNo }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     getShipmentCommonData() {
-        return this._api.get(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/Terminology/GetOPSShipmentCommonData`).pipe(
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/Terminology/GetOPSShipmentCommonData`).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
     downloadcontainerfileExcel() {
-        return this._api.downloadfile(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/CsMawbcontainer/downloadFileExcel`).pipe(
+        return this._api.downloadfile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsMawbcontainer/downloadFileExcel`).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
     importContainerExcel(data) {
-        return this._api.post(`${environment.HOST.WEB_URL}/Documentation/api/${this.VERSION}/vi/CsMawbcontainer/Import`, data).pipe(
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsMawbcontainer/Import`, data).pipe(
             map((res: any) => {
                 return res;
             })
         );
     }
 
-    getListService() {
-        return this._api.get(`${environment.HOST.WEB_URL}/Catalogue/api/${this.VERSION}/en-US/CatCharge/GetListServices`)
+    previewCDNote(data) {
+        // return this._api.get(`${environment.HOST.DOCUMENTATION}/Catalogue/api/${this.VERSION}/en-US/CatCurrency/getAll`).pipe(
+        //     catchError((error) => throwError(error)),
+        //     map((data: any) => {
+        //         return data;
+        //     })
+        // );
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/PreviewOpsCdNote`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    getListCustomsDeclaration() {
+        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/CustomsDeclaration`)
             .pipe(
-                catchError((error) => throwError(error)),
                 map((data: any) => data)
             );
     }
+
+    getListCustomDeclaration(page: number, pageSize: number, body: any) {
+        return this._api.post(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/CustomsDeclaration/Paging`, body, {
+            pageNumber: '' + page,
+            pageSize: '' + pageSize
+        }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    importCustomClearanceFromEcus() {
+        return this._api.post(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/CustomsDeclaration/ImportClearancesFromEcus`, {}).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    deleteMultipleClearance(body: any[] = []) {
+        return this._api.put(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/CustomsDeclaration/DeleteMultiple`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    getClearanceType() {
+        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/CustomsDeclaration/GetClearanceTypes`)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    getListImportedInJob(jobNo: string) {
+        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/GetBy?jobNo=` + jobNo);
+    }
+
+    getListNotImportToJob(strKeySearch: string, customerNo: string, isImported: boolean, page: number, size: number) {
+        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/CustomDeclaration`, { keySearch: strKeySearch, customerNo: customerNo, imporTed: isImported, page: page, size: size }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+
+    getListStageOfJob(jobId: string) {
+        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/OpsStageAssigned/GetBy`, { jobId: jobId });
+    }
+
+    getDetailStageOfJob(stageId: string) {
+        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/OpsStageAssigned/${stageId}`);
+    }
+
+    getListStageNotAssigned(jobId: string) {
+        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/OpsStageAssigned/GetNotAssigned`, { jobId: jobId });
+    }
+
+    addStageToJob(jobId: string, body: any = {}) {
+        return this._api.put(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/OpsStageAssigned/AddMultipleStage`, body, { jobId: jobId });
+    }
+
+    updateStageToJob(body: any = {}) {
+        return this._api.put(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/OpsStageAssigned/Update`, body);
+    }
+
+    addOPSJob(body: any = {}) {
+        return this._api.post(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/OpsTransaction/Add`, body);
+    }
+
+    previewPL(jobId, currency) {
+        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/OpsTransaction/PreviewFormPLsheet`, { jobId: jobId, currency: currency }).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }
 
 

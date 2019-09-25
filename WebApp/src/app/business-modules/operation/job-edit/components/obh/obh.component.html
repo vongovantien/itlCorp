@@ -53,12 +53,12 @@
                     </td>
                     <td>
                         <span>
-                            {{charge.receiverName}}
+                            {{charge.receiverShortName}}
                         </span>
                     </td>
                     <td>
                         <span>
-                            {{charge.payerName}}
+                            {{charge.payerShortName}}
                         </span>
                     </td>
                     <td>
@@ -133,7 +133,7 @@
                     </td>
                 </tr>
             </ng-container>
-            <tr *ngIf="!data.length" app-table-none-record></tr>
+            <tr *ngIf="!data.length" app-table-none-record [colspan]="headers.length + 1"></tr>
         </tbody>
     </table>
 </div>

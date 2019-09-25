@@ -24,7 +24,7 @@
                       {{currentSelectedCharge}}
                     </small>
                   </label>
-                  <app-combo-grid-virtual-scroll
+                  <app-combo-grid-virtual-scroll [isTooltip]="true"
                     [currentActiveItemId]="{field:'charge.id',value:buyingRateChargeToAdd.chargeId}" (itemSelected)="buyingRateChargeToAdd.chargeId=$event.charge.id;
                                             buyingRateChargeToAdd.unitId=$event.charge.unitId;
                                             buyingRateChargeToAdd.unitPrice=$event.charge.unitPrice;
@@ -200,7 +200,7 @@
                   <label class="form-control-label" for="">
                     Total
                   </label>
-                  <input type="text" class="form-control m-input m-input--square" disabled
+                  <input currencyMask [options]="{align: 'left', precision: 2}" type="text" class="form-control m-input m-input--square" disabled
                     name="BuyingRateChargeTotalNameOps" [(ngModel)]="buyingRateChargeToAdd.total">
                 </div>
               </div>

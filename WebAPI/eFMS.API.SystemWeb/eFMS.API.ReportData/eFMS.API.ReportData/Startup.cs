@@ -58,7 +58,7 @@ namespace eFMS.API.ReportData
                     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                     app.UseHsts();
                 }
-                app.UseCors("AllowAllOrigins");
+
                 app.UseHttpsRedirection();
                 app.UseSwagger();
                 app.UseSwaggerUI(options =>
@@ -71,7 +71,16 @@ namespace eFMS.API.ReportData
                             description.GroupName.ToUpperInvariant());
                     }
                 });
+
+                app.UseCors("AllowAllOrigins");
+
                 app.UseMvc();
+            }
+            catch (System.Exception ex)
+            {
+
+                throw ex;
+            }
         }
     }
 }

@@ -1,17 +1,13 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { formatDate } from '@angular/common';
-
 import { forkJoin } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AppPage } from 'src/app/app.base';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { Currency, Partner, User } from 'src/app/shared/models';
-import { SystemRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { BaseService, SortService, DataService } from 'src/app/shared/services';
-import { ToastrService } from 'ngx-toastr';
 import { SystemConstants } from 'src/constants/system.const';
-
-
 
 @Component({
     selector: 'soa-search-box',
@@ -46,8 +42,8 @@ export class StatementOfAccountSearchComponent extends AppPage {
 
     constructor(
         private _sysRepo: SystemRepo,
+        private _catalogueRepo: CatalogueRepo,
         private _baseService: BaseService,
-        private _toastService: ToastrService,
         private _sortService: SortService,
         private _dataService: DataService
     ) {
@@ -66,9 +62,9 @@ export class StatementOfAccountSearchComponent extends AppPage {
 
     getBasicData() {
         forkJoin([ // ? forkJoin like Promise.All
-            this._sysRepo.getListCurrency(),
+            this._catalogueRepo.getListCurrency(),
             this._sysRepo.getListSystemUser(),
-            this._sysRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, inactive: false })
+            this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, inactive: false })
         ]).pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 ([dataCurrency, dataSystemUser, dataPartner]: any) => {

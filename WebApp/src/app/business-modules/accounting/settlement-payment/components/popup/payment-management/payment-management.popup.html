@@ -154,8 +154,8 @@
                                                 </div>
                                                 <div class="col text-center">{{charge.settlementCurrency}}</div>
                                                 <div class="col text-center"></div>
-                                                <div class="col text-center"></div>
-                                                <div class="col text-center"></div>
+                                                <div class="col text-center">{{charge.payer}}</div>
+                                                <div class="col text-center">{{charge.obhPartner}}</div>
                                             </div>
                                         </li>
                                     </ul>
@@ -171,9 +171,8 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
-                <div class="modal-footer m--align-right">
+                <div class="modal-footer m--align-right" *ngIf="!!data.balance">
                     <span class="font-weight-bold align-middle"> Balance: </span>
                     <span class="m-badge m-badge--info m-badge--wide font-13">
                         {{data.balance}}

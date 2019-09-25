@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
-import { SystemRepo, AccoutingRepo, OperationRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, AccoutingRepo, OperationRepo, SystemRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { takeUntil, debounceTime, switchMap, skip, distinctUntilChanged, catchError, map, take } from 'rxjs/operators';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { CustomDeclaration, Surcharge } from 'src/app/shared/models';
@@ -14,7 +14,6 @@ import { CurrencyMaskConfig } from 'ngx-currency/src/currency-mask.config';
 @Component({
     selector: 'form-charge-popup',
     templateUrl: './form-charge.popup.html',
-    styleUrls: ['./form-charge.popup.scss']
 })
 
 export class SettlementFormChargePopupComponent extends PopupBase {
@@ -101,10 +100,10 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     settlementCode: string = '';
 
     constructor(
-        private _systemRepo: SystemRepo,
+        private _documentRepo: DocumentationRepo,
         private _accoutingRepo: AccoutingRepo,
         private _dataService: DataService,
-        private _sysRepo: SystemRepo,
+        private _catalogueRepo: CatalogueRepo,
         private _operationRepo: OperationRepo,
         private _fb: FormBuilder,
         private _toastService: ToastrService,
@@ -124,7 +123,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         this.term$.pipe(
             distinctUntilChanged(),
             this.autocomplete(500, ((term: any) => {
-                return this._accoutingRepo.getSettlePaymentCharges(this.chargeName.value || "");
+                return this._catalogueRepo.getSettlePaymentCharges(this.chargeName.value || "");
             }))
         ).subscribe(
             (res: any) => {
@@ -260,15 +259,6 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     }
 
     onSearchAutoComplete(keyword: string = '') {
-        // if (!this.selectedCharge) {
-        //     if (!!keyword) {
-        //         this.isShow = true;
-        //     } else {
-        //         this.isShow = false;
-        //     }
-        // } else {
-        //     this.isShow = false;
-        // }
         this.term$.next(keyword);
     }
 
@@ -282,7 +272,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         )
 
     getCustomNo() {
-        this._accoutingRepo.getListCustomsDeclaration()
+        this._operationRepo.getListCustomsDeclaration()
             .pipe(
                 catchError(this.catchError),
                 map((response: any[]) => response.map((item: CustomDeclaration) => new CustomDeclaration(item))),
@@ -349,7 +339,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     }
 
     getShipment() {
-        this._accoutingRepo.getShipmentNotLocked()
+        this._documentRepo.getShipmentNotLocked()
             .pipe(
                 catchError(this.catchError)
             )
@@ -375,7 +365,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             .subscribe(
                 (data: any) => {
                     if (!data) {
-                        this._sysRepo.getListPartner(null, null, { inactive: false })
+                        this._catalogueRepo.getListPartner(null, null, { inactive: false })
                             .pipe(catchError(this.catchError))
                             .subscribe(
                                 (dataPartner: any) => {
@@ -401,7 +391,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     }
 
     getUnit() {
-        this._systemRepo.getUnit({ inactive: false })
+        this._catalogueRepo.getUnit()
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: []) => {
@@ -496,7 +486,6 @@ export class SettlementFormChargePopupComponent extends PopupBase {
                 }
             } else { // ? else => update normaly.
                 this.checkValidateSurcharge(body);
-                // this.onRequest.emit(body);
             }
             // ? else => create normaly.
         } else {
@@ -508,10 +497,11 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         this.isContinue = true;
         this.submit();
 
-
-        setTimeout(() => {
-            this.show();
-        }, 500);
+        if (this.state !== 'update') {
+            setTimeout(() => {
+                this.show();
+            }, 500);
+        }
     }
 
     saveCharge() {
@@ -608,18 +598,19 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (!res.status) {
-                        if (this.action === 'update') {
-                            this.onUpdateChange.emit(body);
-                        } else {
-                            this.onRequest.emit(body);
-                        }
-
                         if (this.isContinue) {
                             this.resetFormToContinue();
                         } else {
                             this.resetForm();
                         }
+
                         this.hide();
+
+                        if (this.action === 'update') {
+                            this.onUpdateChange.emit(body);
+                        } else {
+                            this.onRequest.emit(body);
+                        }
                     } else {
                         this._toastService.warning(res.message);
                     }

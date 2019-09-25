@@ -37,6 +37,13 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Operation.Controllers.CustomsDeclarationController.GetCustomDeclaration(System.String,System.String,System.Boolean,System.Int32,System.Int32)">
+            <summary>
+            search customdeclareation by customNo
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Operation.Controllers.CustomsDeclarationController.Paging(eFMS.API.Operation.DL.Models.Criteria.CustomsDeclarationCriteria,System.Int32,System.Int32)">
             <summary>
             get and paging the list of custom declarations by conditions

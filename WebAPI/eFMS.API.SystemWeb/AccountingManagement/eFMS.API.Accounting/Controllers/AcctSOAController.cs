@@ -65,7 +65,7 @@ namespace eFMS.API.Accounting.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            model.Status = "New";
+            model.Status = Constants.STATUS_SOA_NEW;
             model.DatetimeCreated = DateTime.Now;
             model.DatetimeModified = DateTime.Now;
             model.UserCreated = model.UserModified = currentUser.UserID;
@@ -129,7 +129,7 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult GetBySoaNoAndCurrencyLocal(string soaNo, string currencyLocal)
         {
             if (string.IsNullOrEmpty(currencyLocal))
-                currencyLocal = "VND";
+                currencyLocal = Constants.CURRENCY_LOCAL;
             var results = acctSOAService.GetBySoaNoAndCurrencyLocal(soaNo, currencyLocal);
             return Ok(results);
         }
@@ -255,7 +255,7 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult GetDataExportSOABySOANo(string soaNo, string currencyLocal)
         {
             if(string.IsNullOrEmpty(currencyLocal))
-                currencyLocal = "VND";
+                currencyLocal = Constants.CURRENCY_LOCAL;
             var data = acctSOAService.GetDataExportSOABySOANo(soaNo, currencyLocal);
             return Ok(data);
         }

@@ -31,6 +31,8 @@ export class SOA {
     creatorShipment: string = '';
     obh: boolean = false;
     customer: string = '';
+    commodityGroupId: any = null;
+
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

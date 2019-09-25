@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>eFMS.API.ReportData</name>
+    </assembly>
+    <members>
+        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportCountry(eFMS.API.ReportData.Models.CatCountryCriteria)">
+            <summary>
+            export country
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportWareHouse(eFMS.API.ReportData.Models.CatPlaceCriteria)">
+            <summary>
+            export warehouse
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportPortIndex(eFMS.API.ReportData.Models.CatPlaceCriteria)">
+            <summary>
+            export portindex
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportPartner(eFMS.API.ReportData.Models.CatPartnerCriteria)">
+            <summary>
+            export partnerdata
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportCommodityList(eFMS.API.ReportData.Models.CatCommodityCriteria)">
+            <summary>
+            export commodity list
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportCommodityGroup(eFMS.API.ReportData.Models.CatCommodityGroupCriteria)">
+            <summary>
+            export commodity group
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportStage(eFMS.API.ReportData.Models.CatStageCriteria)">
+            <summary>
+            export stage
+            </summary>
+            <returns></returns>
+            
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportUnit(eFMS.API.ReportData.Models.CatUnitCriteria)">
+            <summary>
+            export unit
+            </summary> 
+            <returns></returns>
+             
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportProvince(eFMS.API.ReportData.Models.CatPlaceCriteria)">
+            <summary>
+            export province
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportDistrict(eFMS.API.ReportData.Models.CatPlaceCriteria)">
+            <summary>
+            export district
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportTownWard(eFMS.API.ReportData.Models.CatPlaceCriteria)">
+            <summary>
+            export town-ward
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportCharge(eFMS.API.ReportData.Models.CatChargeCriteria)">
+            <summary>
+            export charge
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportCurrency(eFMS.API.ReportData.Models.CatCurrrencyCriteria)">
+            <summary>
+            export currency
+            </summary>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

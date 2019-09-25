@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, finalize } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
-import { SystemRepo, AccoutingRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, AccoutingRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { SortService, DataService } from 'src/app/shared/services';
 import { StatementOfAccountAddChargeComponent } from '../components/poup/add-charge/add-charge.popup';
 import { ToastrService } from 'ngx-toastr';
@@ -36,12 +36,11 @@ export class StatementOfAccountAddnewComponent extends AppList {
     dataCharge: any = null;
 
     constructor(
-        private _sysRepo: SystemRepo,
         private _sortService: SortService,
         private _accountRepo: AccoutingRepo,
         private _toastService: ToastrService,
         private _router: Router,
-        private _dataService: DataService
+        private _documentRepo: DocumentationRepo
     ) {
         super();
         this.requestSort = this.sortLocal;
@@ -75,6 +74,9 @@ export class StatementOfAccountAddnewComponent extends AppList {
 
             this.addChargePopup.charges = this.formCreate.charges;
             this.addChargePopup.configCharge = this.formCreate.configCharge;
+
+            this.addChargePopup.commodityGroup = this.formCreate.commodityGroup;
+            this.addChargePopup.commodity = this.formCreate.commodity;
 
             this.addChargePopup.show({ backdrop: 'static' });
         }
@@ -113,7 +115,8 @@ export class StatementOfAccountAddnewComponent extends AppList {
                 customer: this.dataSearch.customerID,
                 type: this.dataSearch.type,
                 obh: this.dataSearch.isOBH,
-                creatorShipment: this.dataSearch.strCreators
+                creatorShipment: this.dataSearch.strCreators,
+                commodityGroupId: this.dataSearch.commodityGroupId
             };
             this._accountRepo.createSOA(body)
                 .pipe(catchError(this.catchError))
@@ -139,7 +142,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
     searchChargeWithDataSearch(dataSearch: any) {
         this.isLoading = true;
         this.dataSearch = dataSearch;
-        this._accountRepo.getListChargeShipment(dataSearch)
+        this._documentRepo.getListChargeShipment(dataSearch)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this.isLoading = false; })
@@ -162,6 +165,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
     }
 
     onUpdateMoreSOA(data: any) {
+        // this.formCreate.commondity = data.commodityGroupId;
         this.dataCharge = data;
         this.listCharges = data.chargeShipments || [];
         this.dataSearch.chargeShipments = this.listCharges;

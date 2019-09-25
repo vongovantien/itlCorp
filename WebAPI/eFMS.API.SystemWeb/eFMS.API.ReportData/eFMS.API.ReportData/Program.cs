@@ -7,6 +7,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 
 namespace eFMS.API.ReportData
 {
@@ -14,7 +15,18 @@ namespace eFMS.API.ReportData
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            var appSettings = JObject.Parse(File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json")));
+            var environmentValue = appSettings["Environment"].ToString();
+
+            var webHostBuilder = CreateWebHostBuilder(args);
+
+            if (!String.IsNullOrEmpty(environmentValue))
+            {
+                webHostBuilder.UseEnvironment(environmentValue);
+            }
+
+            var host = webHostBuilder.Build();
+            host.Run();
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>

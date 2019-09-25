@@ -34,7 +34,6 @@ export class CustomClearanceFormSearchComponent extends AppForm {
     constructor(
         private _fb: FormBuilder,
         private _baseService: BaseService,
-        private _systemRepo: SystemRepo,
         private _dataService: DataService,
         private _sysRepo: SystemRepo
     ) {

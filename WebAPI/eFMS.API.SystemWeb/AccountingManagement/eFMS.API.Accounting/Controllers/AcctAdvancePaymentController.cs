@@ -118,7 +118,7 @@ namespace eFMS.API.Accounting.Controllers
             if(model.AdvanceRequests.Count > 0)
             {
                 //Nếu sum(Amount) > 100.000.000 & Payment Method là Cash thì báo lỗi
-                if (model.PaymentMethod.Equals("Cash"))
+                if (model.PaymentMethod.Equals(Constants.PAYMENT_METHOD_CASH))
                 {
                     var totalAmount = model.AdvanceRequests.Sum(x => x.Amount);
                     if (totalAmount > 100000000)
@@ -233,7 +233,7 @@ namespace eFMS.API.Accounting.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            if (!model.StatusApproval.Equals("New") && !model.StatusApproval.Equals("Denied"))
+            if (!model.StatusApproval.Equals(Constants.STATUS_APPROVAL_NEW) && !model.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
             {
                 ResultHandle _result = new ResultHandle { Status = false, Message = "Only allowed to edit the advance payment status is New or Deny" };
                 return BadRequest(_result);
@@ -242,7 +242,7 @@ namespace eFMS.API.Accounting.Controllers
             if (model.AdvanceRequests.Count > 0)
             {
                 //Nếu sum(Amount) > 100.000.000 & Payment Method là Cash thì báo lỗi
-                if (model.PaymentMethod.Equals("Cash"))
+                if (model.PaymentMethod.Equals(Constants.PAYMENT_METHOD_CASH))
                 {
                     var totalAmount = model.AdvanceRequests.Sum(x => x.Amount);
                     if (totalAmount > 100000000)
@@ -322,7 +322,7 @@ namespace eFMS.API.Accounting.Controllers
             if (model.AdvanceRequests.Count > 0)
             {
                 //Nếu sum(Amount) > 100.000.000 & Payment Method là Cash thì báo lỗi
-                if (model.PaymentMethod.Equals("Cash"))
+                if (model.PaymentMethod.Equals(Constants.PAYMENT_METHOD_CASH))
                 {
                     var totalAmount = model.AdvanceRequests.Sum(x => x.Amount);
                     if (totalAmount > 100000000)
@@ -360,7 +360,7 @@ namespace eFMS.API.Accounting.Controllers
             }
             else //Update Advance Payment
             {
-                if (!model.StatusApproval.Equals("New") && !model.StatusApproval.Equals("Denied"))
+                if (!model.StatusApproval.Equals(Constants.STATUS_APPROVAL_NEW) && !model.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
                 {
                     ResultHandle _result = new ResultHandle { Status = false, Message = "Only allowed to edit the advance payment status is New or Deny" };
                     return BadRequest(_result);

@@ -8,7 +8,7 @@ import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mo
 import { SortService } from 'src/app/shared/services';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ReportPreviewComponent } from 'src/app/shared/common';
-import { CDNoteRepo } from 'src/app/shared/repositories';
+import { OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
 import { NgxSpinnerService } from 'ngx-spinner';
 declare var $: any;
@@ -30,8 +30,9 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
     private baseServices: BaseService,
     private api_menu: API_MENU,
     private sortService: SortService,
-    private cdNoteRepo: CDNoteRepo,
-    private spinner: NgxSpinnerService
+    private _documentRepo: DocumentationRepo,
+    private spinner: NgxSpinnerService,
+    private _operationRepo: OperationRepo
   ) {
     super();
   }
@@ -81,7 +82,7 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
   async closeEditModal(event: any) {
     this.currentCDNo = this.CDNoteDetails.cdNote.code;
     // this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?JobId=" + this.currentJob.id + "&cdNo=" + this.currentCDNo);
-    this.cdNoteRepo.getDetails(this.currentJob.id, this.currentCDNo).pipe(
+    this._documentRepo.getDetailsCDNote(this.currentJob.id, this.currentCDNo).pipe(
       takeUntil(this.ngUnsubscribe),
       catchError(this.catchError),
       finalize(() => { this.spinner.hide(); }),
@@ -110,18 +111,31 @@ export class OpsModuleCreditDebitNoteDetailComponent extends PopupBase {
     );
   }
   async Preview() {
-    this.dataReport = null;
-    if (this.CDNoteDetails.listSurcharges.length === 0) {
-      this.baseServices.errorToast("This credit debit node must have at least 1 surcharge !");
-    } else {
-      const response = await this.baseServices.postAsync(this.api_menu.Documentation.AcctSOA.previewCDNote, this.CDNoteDetails);
-      this.dataReport = response;
+    // if (this.CDNoteDetails.listSurcharges.length === 0) {
+    //   this.baseServices.errorToast("This credit debit node must have at least 1 surcharge !");
+    // } else {
+    //   const response = await this.baseServices.postAsync(this.api_menu.Documentation.AcctSOA.previewCDNote, this.CDNoteDetails);
+    //   this.dataReport = response;
 
-      // * wait to report form submited
-      setTimeout(() => {
-        this.reportPopup.show();
-      }, 100);
-    }
+    //   // * wait to report form submited
+    //   setTimeout(() => {
+    //     this.reportPopup.show();
+    //   }, 100);
+    // }
+    this._operationRepo.previewCDNote(this.CDNoteDetails)
+      .pipe(
+        catchError(this.catchError),
+        finalize(() => { })
+      )
+      .subscribe(
+        (res: any) => {
+          this.dataReport = res;
+          setTimeout(() => {
+            this.reportPopup.show();
+          }, 1000);
+
+        },
+      );
   }
 
   sort(property: any) {

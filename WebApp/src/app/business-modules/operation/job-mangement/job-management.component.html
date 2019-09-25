@@ -67,19 +67,12 @@
                             <div class="table-wrapper table-scrollabler" id="ops-job-list-table">
                                 <table class="table table-hover table-brand dataTable">
                                     <thead>
-                                        <tr>
-                                            <th class="table-actions-col no-sorting"></th>
-                                            <th *ngFor="let header of headers; trackBy: trackByFn"
-                                                [class]="sortClass(header.sortable ? header.field : '')"
-                                                (click)="sortBy(header.sortable ? header.field : '')">
-                                                <span>{{header.title}}</span>
-                                                <span class="sort-indicator"></span>
-                                            </th>
+                                        <tr app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
+                                            <th class="table-actions-col no-sorting first"></th>
                                         </tr>
                                     </thead>
                                     <tbody class="tbody-group" *ngIf="shipments.length > 0; else norecord">
                                         <ng-container *ngFor="let item of shipments; let i = index; trackBy: trackByFn">
-
                                             <tr class="collapse-toggle-row">
                                                 <td class="table-actions-col">
                                                     <div class="table-actions" style="width: 100px">
@@ -120,9 +113,9 @@
                                                     <span *ngIf="item.serviceMode == 'Import'">{{ item.podName }}</span>
                                                     <span *ngIf="item.serviceMode == 'Export'">{{ item.polName }}</span>
                                                 </td>
-                                                <td>
+                                                <!-- <td>
                                                     <span>{{ item.flightVessel }}</span>
-                                                </td>
+                                                </td> -->
                                                 <td>
                                                     <span>{{ item.sumContainers }}</span>
                                                 </td>
@@ -135,13 +128,13 @@
                                                 <td>
                                                     <span>{{ item.sumCbm }}</span>
                                                 </td>
-                                                <td>
+                                                <!-- <td>
                                                     <span>{{ item.invoiceNo }}</span>
-                                                </td>
+                                                </td> -->
                                                 <td>
                                                     <span>{{ item.modifiedDate | date:'dd/MM/yyyy' }}</span>
                                                 </td>
-                                                <td>
+                                                <!-- <td>
                                                     <ng-container *ngIf="item.currentStatus">
                                                         <span class="m-badge m-badge--primary m-badge--wide"
                                                             *ngIf="item.currentStatus == jobStatusConts.inSchedule">{{ item.currentStatus }}</span>
@@ -154,7 +147,7 @@
                                                         <span class="m-badge m-badge--success m-badge--wide"
                                                             *ngIf="item.currentStatus == jobStatusConts.finish">{{ item.currentStatus }}</span>
                                                     </ng-container>
-                                                </td>
+                                                </td> -->
                                             </tr>
                                             <tr class="collapse-panel-row">
                                                 <td colspan="14">
@@ -212,14 +205,7 @@
                                         </ng-container>
                                     </tbody>
                                     <ng-template #norecord>
-                                        <tr>
-                                            <td colspan="14">
-                                                <div class="no-data">
-                                                    <i class="flaticon-coins"></i>
-                                                    <span class="no-data-text">No records found</span>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                        <tr app-table-none-record [colspan]="headers.length + 1"></tr>
                                     </ng-template>
                                 </table>
                             </div>

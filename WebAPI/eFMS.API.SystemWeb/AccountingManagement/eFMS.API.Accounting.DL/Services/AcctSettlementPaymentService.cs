@@ -1,15 +1,13 @@
 ﻿using AutoMapper;
 using eFMS.API.Accounting.DL.Common;
-using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
+using eFMS.API.Accounting.DL.Models.ReportResults;
+using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using eFMS.API.Accounting.Service.Contexts;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
-using eFMS.API.Documentation.DL.Models.Criteria;
-using eFMS.API.Documentation.DL.Models.ReportResults;
-using eFMS.API.Documentation.DL.Models.SettlementPayment;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -21,7 +19,7 @@ using System.Linq;
 
 namespace eFMS.API.Accounting.DL.Services
 {
-    public class AcctSettlementPaymentService : RepositoryBase<AcctSettlementPayment, AcctSettlementPaymentModel>, IAcctSettlementPaymentService
+    public class AcctSettlementPaymentService : RepositoryBase<AcctSettlementPayment, AcctSettlementPaymentModel>, IService.IAcctSettlementPaymentService
     {
         private readonly ICurrentUser currentUser;
         private readonly IOptions<WebUrl> webUrl;
@@ -47,7 +45,6 @@ namespace eFMS.API.Accounting.DL.Services
         public AcctSettlementPaymentService(IContextBase<AcctSettlementPayment> repository,
             IMapper mapper,
             ICurrentUser user,
-            IOpsTransactionService ops,
             IOptions<WebUrl> url,
             IContextBase<AcctApproveSettlement> acctApproveSettlement,
             IContextBase<SysUser> sysUser,
@@ -204,7 +201,8 @@ namespace eFMS.API.Accounting.DL.Services
                            StatusApproval = set.StatusApproval,
                            PaymentMethod = set.PaymentMethod,
                            Note = set.Note,
-                           ChargeCurrency = sur.CurrencyId
+                           ChargeCurrency = sur.CurrencyId,
+                           DatetimeModified = set.DatetimeModified
                        };
 
             data = data.GroupBy(x => new
@@ -217,7 +215,8 @@ namespace eFMS.API.Accounting.DL.Services
                 x.RequestDate,
                 x.StatusApproval,
                 x.PaymentMethod,
-                x.Note
+                x.Note,
+                x.DatetimeModified
             }
             ).Select(s => new AcctSettlementPaymentResult
             {
@@ -232,7 +231,8 @@ namespace eFMS.API.Accounting.DL.Services
                 StatusApprovalName = Common.CustomData.StatusApproveAdvance.Where(x => x.Value == s.Key.StatusApproval).Select(x => x.DisplayName).FirstOrDefault(),
                 PaymentMethod = s.Key.PaymentMethod,
                 PaymentMethodName = Common.CustomData.PaymentMethod.Where(x => x.Value == s.Key.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
-                Note = s.Key.Note
+                Note = s.Key.Note,
+                DatetimeModified = s.Key.DatetimeModified
             }
             ).OrderByDescending(orb => orb.DatetimeModified);
 
@@ -473,7 +473,8 @@ namespace eFMS.API.Accounting.DL.Services
                            ClearanceNo = sur.ClearanceNo,
                            ContNo = sur.ContNo,
                            Notes = sur.Notes,
-                           IsFromShipment = sur.IsFromShipment
+                           IsFromShipment = sur.IsFromShipment,
+                           TypeOfFee = sur.TypeOfFee
                        };
 
             return data.ToList();
@@ -536,7 +537,8 @@ namespace eFMS.API.Accounting.DL.Services
                            ClearanceNo = sur.ClearanceNo,
                            ContNo = sur.ContNo,
                            Notes = sur.Notes,
-                           IsFromShipment = sur.IsFromShipment
+                           IsFromShipment = sur.IsFromShipment,
+                           TypeOfFee = sur.TypeOfFee
                        };
 
             return data.OrderByDescending(x => x.JobId).ToList();
@@ -671,8 +673,8 @@ namespace eFMS.API.Accounting.DL.Services
                            ChargeName = cc.ChargeNameEn,
                            TotalAmount = sur.Total != null ? sur.Total : 0,
                            SettlementCurrency = sur.CurrencyId,
-                           OBHPartner = pae.ShortName,
-                           Payer = par.ShortName
+                           OBHPartner = (sur.Type == Constants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),
+                           Payer = (sur.Type == Constants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName)
                        }).ToList()
                 });
             }
@@ -1025,7 +1027,6 @@ namespace eFMS.API.Accounting.DL.Services
             var data = from sur in surcharge
                        join cat in charge on sur.ChargeId equals cat.Id into cat2
                        from cat in cat2.DefaultIfEmpty()
-
                        join opst in opsTrans on sur.Hblid equals opst.Hblid into opst2
                        from opst in opst2.DefaultIfEmpty()
                        join cstd in csTransDe on sur.Hblid equals cstd.Id into cstd2
@@ -1131,10 +1132,10 @@ namespace eFMS.API.Accounting.DL.Services
             parameter.StlAscDpManagerSignDate = infoSettleAprove != null && infoSettleAprove.AccountantAprDate.HasValue ? infoSettleAprove.AccountantAprDate.Value.ToString("dd/MM/yyyy") : "";
             parameter.StlBODSignDate = infoSettleAprove != null && infoSettleAprove.BuheadAprDate.HasValue ? infoSettleAprove.BuheadAprDate.Value.ToString("dd/MM/yyyy") : "";
 
-            parameter.CompanyName = "INDO TRANS LOGISTICS CORPORATION‎";
-            parameter.CompanyAddress1 = "52‎-‎54‎-‎56 ‎Truong Son St‎.‎, ‎Tan Binh Dist‎.‎, ‎HCM City‎, ‎Vietnam‎";
+            parameter.CompanyName = Constants.COMPANY_NAME;
+            parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
             parameter.CompanyAddress2 = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎";
-            parameter.Website = "www‎.‎itlvn‎.‎com‎";
+            parameter.Website = Constants.COMPANY_WEBSITE;
             parameter.Contact = currentUser.UserID;//Get user login
 
             //Lấy ra tổng Advance Amount của các charge thuộc Settlement
@@ -1152,7 +1153,7 @@ namespace eFMS.API.Accounting.DL.Services
             var _inword = "";
             if (_amount > 0)
             {
-                var _currency = settlement.SettlementCurrency == "VND" ?
+                var _currency = settlement.SettlementCurrency == Constants.CURRENCY_LOCAL ?
                            (_amount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
                         :
                         settlement.SettlementCurrency;
@@ -1668,7 +1669,7 @@ namespace eFMS.API.Accounting.DL.Services
         //Đang gán cứng BrandId của Branch ITL HCM (27d26acb-e247-47b7-961e-afa7b3d7e11e)
         private string GetAccountantId(string idBranch = "27d26acb-e247-47b7-961e-afa7b3d7e11e")
         {
-            var accountantManagerId = catDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Code == "Accountant").FirstOrDefault().ManagerId;
+            var accountantManagerId = catDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Code == Constants.DEPT_CODE_ACCOUNTANT).FirstOrDefault().ManagerId;
             return accountantManagerId;
         }
 
@@ -1704,9 +1705,9 @@ namespace eFMS.API.Accounting.DL.Services
         private List<string> GetListUserDeputyByDept(string dept, string idBranch = "27d26acb-e247-47b7-961e-afa7b3d7e11e")
         {
             Dictionary<string, string> listUsers = new Dictionary<string, string> {
-                 { "william.hiep","OPS" },//User ủy quyền cho dept OPS
-                 { "linda.linh","Accountant" },//User ủy quyền cho dept Accountant
-                 { "christina.my","Accountant" }//User ủy quyền cho dept Accountant
+                 { "william.hiep", Constants.DEPT_CODE_OPS },//User ủy quyền cho dept OPS
+                 { "linda.linh", Constants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
+                 { "christina.my", Constants.DEPT_CODE_ACCOUNTANT }//User ủy quyền cho dept Accountant
             };
             var list = listUsers.ToList();
             var deputy = listUsers.Where(x => x.Value == dept).Select(x => x.Key).ToList();
@@ -1998,7 +1999,7 @@ namespace eFMS.API.Accounting.DL.Services
         //Send Mail Approved
         private bool SendMailApproved(string settlementNo, DateTime approvedDate)
         {
-            var surcharge = csShipmentSurchargeRepo.Get();//dc.CsShipmentSurcharge;
+            var surcharge = csShipmentSurchargeRepo.Get();
 
             //Lấy danh sách Currency Exchange của ngày hiện tại
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();

@@ -7,7 +7,7 @@ import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { formatDate } from '@angular/common';
 import _includes from 'lodash/includes';
 import _uniq from 'lodash/uniq';
-import { SystemRepo, CatalogueRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { DataService } from 'src/app/shared/services';
 import { ToastrService } from 'ngx-toastr';
 
@@ -64,14 +64,14 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
     isApplied: boolean = false;
 
-    commodities: any[] = [];
-    commondity: any = null;
-    
+    commodityGroup: any[] = [];
+    commodity: any = null;
+
     constructor(
-        private _sysRepo: SystemRepo,
         private _toastService: ToastrService,
         private _dataService: DataService,
-        private _catalougeRepo: CatalogueRepo
+        private _catalogueRepo: CatalogueRepo,
+        private _sysRepo: SystemRepo
     ) {
         super();
     }
@@ -87,15 +87,15 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     }
 
     getCommondity() {
-        this._catalougeRepo.getCommondity()
-        .pipe(catchError(this.catchError))
-        .subscribe(
-            (res: any) => {
-                this.commodities = res || [];
-            },
-            (errors: any) => {},
-            () => {},
-        );
+        this._catalogueRepo.getCommodityGroup()
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.commodityGroup = res || [];
+                },
+                (errors: any) => { },
+                () => { },
+            );
     }
 
     getPartner() {
@@ -107,11 +107,11 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
             .subscribe(
                 (data: any) => {
                     if (!data) {
-                        this._sysRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, inactive: false })
+                        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, inactive: false })
                             .pipe(catchError(this.catchError))
                             .subscribe(
                                 (dataPartner: any) => {
-                                    this.getPartnerData(dataPartner)
+                                    this.getPartnerData(dataPartner);
                                 },
                             );
                     } else {
@@ -125,8 +125,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         this.configPartner.dataSource = data;
         this.configPartner.displayFields = [
             { field: 'taxCode', label: 'Taxcode' },
-            { field: 'partnerNameEn', label: 'Name' },
-            { field: 'partnerNameVn', label: 'Customer Name' },
+            { field: 'shortName', label: 'Name' },
+            { field: 'partnerNameEn', label: 'Customer Name' },
         ];
         this.configPartner.selectedDisplayFields = ['partnerNameEn'];
     }
@@ -146,7 +146,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     }
 
     getService() {
-        this._sysRepo.getListService()
+        this._catalogueRepo.getListService()
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
@@ -176,11 +176,11 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                     if (!!data) {
                         this.getCurrencyData(data);
                     } else {
-                        this._sysRepo.getListCurrency()
+                        this._catalogueRepo.getListCurrency()
                             .pipe(catchError(this.catchError))
                             .subscribe(
                                 (dataCurrency: any) => {
-                                    this.getCurrencyData(dataCurrency)
+                                    this.getCurrencyData(dataCurrency);
                                 },
                             );
                     }
@@ -208,12 +208,12 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                             );
                     }
                 }
-            )
+            );
 
     }
 
     getCharge() {
-        this._sysRepo.getListCharge()
+        this._catalogueRepo.getListCharge()
             .pipe(catchError(this.catchError))
             .subscribe((data) => {
                 this.charges = data;
@@ -380,9 +380,9 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 strCharges: this.selectedCharges.map((item: any) => item.code).toString(),
                 note: this.note,
                 serviceTypeId: !!this.selectedService.length ? this.mapServiceId(this.selectedService[0].id) : this.mapServiceId('All'),
+                commodityGroupId: !!this.commodity ? this.commodity.id : null
             };
             this.dataSearch = new SOASearchCharge(body);
-            console.log(this.dataSearch);
             this.onApply.emit(this.dataSearch);
         }
     }
@@ -394,8 +394,6 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         if (!!rangeDate.endDate) {
             this.updateDataSearch('toDate', formatDate(rangeDate.endDate, 'yyyy-MM-dd', 'en'));
         }
-
-        console.log(this.dataSearch);
     }
 
     onChangeNote(note: string) {
@@ -425,7 +423,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         let serviceTypeId = '';
         if (!!service) {
             if (service === 'All') {
-                this.services.shift(); // * remove item with value 'All'
+                this.services = this.services.filter(service => service.id !== 'All');
                 serviceTypeId = this.services.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
             } else {
                 serviceTypeId = this.selectedService.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');

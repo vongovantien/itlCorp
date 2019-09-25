@@ -17,12 +17,14 @@ import { DecimalNumberGreaterThan0Directive, StyleCellDirective, AutofocusDirect
 import { PaginationComponent, TableLayoutComponent, InputTableLayoutComponent, BreadcrumbComponent, DefaultButtonComponent, DeleteConfirmModalComponent, SearchOptionsComponent, InputFormComponent, TableDetailComponent, CloseModalButtonComponent, ReportPreviewComponent, ComboGridVirtualScrollComponent, CfBeforeLeaveModalComponent, AppMultipleSelectComponent, TableNoneRecordComponent, TableHeaderComponent, TableRowLoadingComponent, SubHeaderComponent, TableCollapseRowComponent } from "./common";
 import { CollapseModule } from "ngx-bootstrap/collapse";
 import { UploadAlertComponent } from './common/popup/upload-alert/upload-alert.component';
+import { TooltipModule } from "ngx-bootstrap/tooltip";
 
 const Libary = [
   ModalModule,
   SelectModule,
   ScrollingModule,
-  CollapseModule
+  CollapseModule,
+  TooltipModule.forRoot()
 ];
 
 const APP_PIPES = [

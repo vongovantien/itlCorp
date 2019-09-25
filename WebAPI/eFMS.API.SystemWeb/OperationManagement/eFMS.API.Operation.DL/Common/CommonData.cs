@@ -24,7 +24,7 @@ namespace eFMS.API.Operation.DL.Common
             new CommonData { Value = "Sea", DisplayName = "Sea" },
             new CommonData { Value = "Crossborder", DisplayName = "Cross border" },
             new CommonData { Value = "Warehouse", DisplayName = "Warehouse" },
-            new CommonData { Value = "Inland", DisplayName = "Inland" },
+            new CommonData { Value = "Trucking", DisplayName = "Inland" },
             new CommonData { Value = "Railway", DisplayName = "Railway" },
             new CommonData { Value = "Express", DisplayName = "Express" }
         };

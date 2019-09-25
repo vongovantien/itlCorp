@@ -1,7 +1,7 @@
 import { Component, Output, EventEmitter, Input } from '@angular/core';
 import { User, Currency } from 'src/app/shared/models';
 import { BaseService, DataService } from 'src/app/shared/services';
-import { SystemRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo } from 'src/app/shared/repositories';
 import { catchError, takeUntil, distinctUntilChanged, map } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
 import { FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
@@ -34,7 +34,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     constructor(
         private _fb: FormBuilder,
         private _baseService: BaseService,
-        private _sysRepo: SystemRepo,
+        private _catalogueRepo: CatalogueRepo,
         private _dataService: DataService,
     ) {
         super();
@@ -132,7 +132,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
                         this.currencyList = res || [];
                         this.currency.setValue(this.currencyList.filter((item: Currency) => item.id === 'VND')[0]);
                     } else {
-                        this._sysRepo.getListCurrency()
+                        this._catalogueRepo.getListCurrency()
                             .pipe(catchError(this.catchError))
                             .subscribe(
                                 (data: any) => {

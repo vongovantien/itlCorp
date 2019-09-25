@@ -4,7 +4,9 @@ import {environment} from 'src/environments/environment';
 export const authConfig: AuthConfig = {
 
   // Url of the Identity Provider
-  issuer: environment.HOST.INDENTITY_SERVER_URL,
+  // issuer: environment.HOST.INDENTITY_SERVER_URL,
+  issuer: 'http://test.api-efms.itlvn.com/identityserver',
+  
 
   // URL of the SPA to redirect the user to after login
   redirectUri: window.location.origin + '/#/home',  

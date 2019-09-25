@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>..\bin\netcoreapp2.2\eFMS.API.ReportData.xml</DocumentationFile>
+    <DocumentationFile>eFMS.API.ReportData.xml</DocumentationFile>
     <OutputPath>..\bin</OutputPath>
   </PropertyGroup>
 
@@ -21,6 +21,11 @@
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="4.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="4.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUi" Version="4.0.1" />
+  </ItemGroup>
+   <ItemGroup>
+    <Content Include="eFMS.API.ReportData.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">

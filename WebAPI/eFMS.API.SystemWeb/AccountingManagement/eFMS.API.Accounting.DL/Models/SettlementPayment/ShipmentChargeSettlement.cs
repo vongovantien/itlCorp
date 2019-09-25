@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace eFMS.API.Documentation.DL.Models.SettlementPayment
+namespace eFMS.API.Accounting.DL.Models.SettlementPayment
 {
     public class ShipmentChargeSettlement
     {
@@ -42,5 +42,6 @@ namespace eFMS.API.Documentation.DL.Models.SettlementPayment
         public string Soano { get; set; }
         public bool? IsFromShipment { get; set; }
         public string PaySoano { get; set; }
+        public string TypeOfFee { get; set; }
     }
 }

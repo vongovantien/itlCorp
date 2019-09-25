@@ -12,10 +12,10 @@ namespace eFMS.API.Documentation.DL.IService
     public interface ICsShipmentSurchargeService : IRepositoryBase<CsShipmentSurcharge, CsShipmentSurchargeModel>
     {
         List<CsShipmentSurchargeDetailsModel> GetByHB(Guid hblid);
-        List<CsShipmentSurchargeDetailsModel> GetByHB(Guid HbID,string type);
+        List<CsShipmentSurchargeDetailsModel> GetByHB(Guid hbID,string type);
         HandleState DeleteCharge(Guid chargeId);
-        List<object> GroupChargeByHB(Guid id,string PartnerId,bool IsHouseBillID);
-        List<CatPartner> GetAllParner(Guid id,bool IsHouseBillID);
+        List<object> GroupChargeByHB(Guid id,string partnerId,bool isHouseBillID);
+        List<CatPartner> GetAllParner(Guid id,bool isHouseBillID);
         ChargeShipmentResult GetListChargeShipment(ChargeShipmentCriteria criteria);
     }
 }

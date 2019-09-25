@@ -10,15 +10,13 @@ import { AppPage } from 'src/app/app.base';
 import { OpsModuleCreditDebitNoteAddnewComponent } from './ops-module-credit-debit-note-addnew/ops-module-credit-debit-note-addnew.component';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
-import { CDNoteRepo } from 'src/app/shared/repositories';
+import { DocumentationRepo } from 'src/app/shared/repositories';
 import { OpsModuleCreditDebitNoteDetailComponent } from './ops-module-credit-debit-note-detail/ops-module-credit-debit-note-detail.component';
 import { OpsModuleCreditDebitNoteEditComponent } from './ops-module-credit-debit-note-edit/ops-module-credit-debit-note-edit.component';
 import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDetails.model';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { SortService } from 'src/app/shared/services';
 
-
-declare var $: any;
 @Component({
     selector: 'app-ops-module-credit-debit-note',
     templateUrl: './ops-module-credit-debit-note.component.html'
@@ -38,12 +36,16 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
     subscribe: Subject<any> = new Subject();
 
     cdNoteIdToDelete: string = null;
+    CDNoteDetails: AcctCDNoteDetails = null;
+
+    isDesc = true;
+    sortKey: string = '';
 
     constructor(
         private baseServices: BaseService,
         private api_menu: API_MENU,
         private _spinner: NgxSpinnerService,
-        private _cdNoteRepo: CDNoteRepo,
+        private _documentRepo: DocumentationRepo,
         private sortService: SortService
     ) {
         super();
@@ -73,14 +75,9 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
     }
 
     getAllCDNote() {
-        // this.baseServices.get(this.api_menu.Documentation.AcctSOA.getAll + "?Id=" + this.CurrentHBID + "&IsHouseBillID=true").subscribe((data: any) => {
-        //   this.listCDNotes = cloneDeep(data);
-        //   this.constListCDNotes = cloneDeep(data);
-        //   console.log({ "ALL_CD": this.listCDNotes });
-        // });
         this._spinner.show();
 
-        this._cdNoteRepo.getListCDNoteByHouseBill(this.CurrentHBID).pipe(
+        this._documentRepo.getListCDNoteByHouseBill(this.CurrentHBID).pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),
             finalize(() => { this._spinner.hide(); }),
@@ -103,15 +100,12 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
                     this.constListCDNotes = cloneDeep(res);
                 }
             },
-            // error
             (errs: any) => {
-                // this.handleErrors(errs)
             },
-            // complete
             () => { }
         );
     }
-    CDNoteDetails: AcctCDNoteDetails = null;
+
     async openDetails(cdNo: string) {
         this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?jobId=" + this.currentJob.id + "&cdNo=" + cdNo);
         if (this.CDNoteDetails != null) {
@@ -152,21 +146,18 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
         this.CDNoteDetails.totalCredit = totalCredit;
         this.CDNoteDetails.totalDebit = totalDebit;
     }
+
     async openEditCDNotePopUp(event) {
         this.CDNoteDetails = null;
-        console.log(event);
         if (event != null) {
             this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?jobId=" + this.currentJob.id + "&cdNo=" + event);
-            // this.baseServices.setData("CDNoteDetails", event);
-            // this.popupEdit.cdNoteDetails = this.CDNoteDetails;
             if (!!this.CDNoteDetails) {
-                // this.popupEdit.cdNoteDetails = this.CDNoteDetails;
                 this.popupEdit.show({ backdrop: 'static' });
             }
         }
     }
+
     async closeEditModal(event) {
-        console.log(event);
         this.CDNoteDetails = await this.baseServices.getAsync(this.api_menu.Documentation.AcctSOA.getDetails + "?jobId=" + this.currentJob.id + "&cdNo=" + this.CDNoteDetails.cdNote.code);
         if (this.CDNoteDetails != null) {
             if (this.CDNoteDetails.listSurcharges != null) {
@@ -175,13 +166,14 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
             this.poupDetail.show({ backdrop: 'static' });
         }
     }
-    async closeDetailModal(event) {
+
+    closeDetailModal(event) {
         this.poupDetail.show();
-        console.log("Mở popup detail");
         if (event) {
             this.getAllCDNote();
         }
     }
+
     SearchCDNotes(search_key: string) {
         this.listCDNotes = cloneDeep(this.constListCDNotes)
         search_key = search_key.trim().toLowerCase();
@@ -237,8 +229,7 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
             this.confirmDeletePopup.hide();
         }
     }
-    isDesc = true;
-    sortKey: string = '';
+   
     sort(property) {
         this.isDesc = !this.isDesc;
         this.sortKey = property;

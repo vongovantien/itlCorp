@@ -1,4 +1,4 @@
-import { Component, ViewChild, Input, ViewChildren, QueryList } from '@angular/core';
+import { Component, ViewChild, ViewChildren, QueryList, Output, EventEmitter } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { SettlementExistingChargePopupComponent } from '../popup/existing-charge/existing-charge.popup';
 import { SettlementFormChargePopupComponent } from '../popup/form-charge/form-charge.popup';
@@ -16,7 +16,7 @@ import { ToastrService } from 'ngx-toastr';
 })
 
 export class SettlementListChargeComponent extends AppList {
-
+    @Output() onChangeType: EventEmitter<any> = new EventEmitter<any>();
 
     @ViewChild(SettlementExistingChargePopupComponent, { static: true }) existingChargePopup: SettlementExistingChargePopupComponent;
     @ViewChild(SettlementFormChargePopupComponent, { static: false }) formChargePopup: SettlementFormChargePopupComponent;
@@ -30,7 +30,7 @@ export class SettlementListChargeComponent extends AppList {
 
     surcharges: Surcharge[] = [];
     selectedSurcharge: Surcharge = new Surcharge();
-    selectedIndexSurcharge: number = 0;
+    selectedIndexSurcharge: number;
 
     stateFormCharge: string = 'create';
 
@@ -39,6 +39,7 @@ export class SettlementListChargeComponent extends AppList {
 
     TYPE: string = 'LIST';
     STATE: string = 'WRITE';  // * list'state READ/WRITE
+
     constructor(
         private _sortService: SortService,
         private _toastService: ToastrService
@@ -48,9 +49,7 @@ export class SettlementListChargeComponent extends AppList {
 
     ngOnInit() {
         this.headers = [
-            { title: 'JobId', field: 'jobId', sortable: true },
-            { title: 'HBL', field: 'hbl', sortable: true },
-            { title: 'MBL', field: 'mbl', sortable: true },
+            { title: 'JobId - HBL - MBL', field: 'jobId', sortable: true, width: 200 },
             { title: 'Charge Name', field: 'chargeName', sortable: true },
             { title: 'Qty', field: 'quantity', sortable: true },
             { title: 'Unit', field: 'unitName', sortable: true },
@@ -68,7 +67,6 @@ export class SettlementListChargeComponent extends AppList {
             { title: 'Note', field: 'notes', sortable: true },
         ];
         this.selectedSurcharge = this.surcharges[0];
-
     }
 
     showExistingCharge() {
@@ -90,6 +88,11 @@ export class SettlementListChargeComponent extends AppList {
     onUpdateRequestSurcharge(surcharge: any) {
         this.TYPE = 'LIST'; // * SWITCH UI TO LIST
         this.surcharges[this.selectedIndexSurcharge] = surcharge;
+
+        if (this.formChargePopup.isContinue) {
+            // * Update next charge.
+            this.openSurchargeDetail(this.surcharges[this.selectedIndexSurcharge + 1], this.selectedIndexSurcharge + 1, 'update');
+        }
     }
 
     openSurchargeDetail(surcharge: Surcharge, index?: number, action?: string) {
@@ -97,7 +100,7 @@ export class SettlementListChargeComponent extends AppList {
             return;
         } else {
             // * CHECK SURCHARGE IS FROM SHIPMENT.
-            if (surcharge.isFromShipment) {
+            if (!surcharge || surcharge.isFromShipment) {
                 return;
             } else if (this.TYPE === 'LIST') {
                 this.selectedIndexSurcharge = index;
@@ -216,6 +219,18 @@ export class SettlementListChargeComponent extends AppList {
     openCopySurcharge(surcharge: Surcharge) {
         this.formChargePopup.selectedSurcharge = surcharge;
         this.openSurchargeDetail(surcharge, null, 'copy');
+    }
+
+    switchToGroup() {
+        if (this.TYPE === 'GROUP') {
+            this.TYPE = 'LIST';
+        } else if (this.STATE !== 'READ') {
+            this.onChangeType.emit();
+        } else {
+            this.TYPE = 'GROUP';
+        }
+        
+        this.selectedIndexSurcharge = null;
     }
 }
 

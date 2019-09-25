@@ -6,7 +6,6 @@ using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Service.Contexts;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Accounting.Service.ViewModels;
-using eFMS.API.Documentation.DL.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
@@ -19,12 +18,14 @@ using System.Linq;
 
 namespace eFMS.API.Accounting.DL.Services
 {
-    public class AcctSOAService : RepositoryBase<AcctSoa, AcctSoaModel>, IAcctSOAService
+    public class AcctSOAService : RepositoryBase<AcctSoa, Models.AcctSoaModel>, IAcctSOAService
     {
         private readonly ICurrentUser currentUser;
-        public AcctSOAService(IContextBase<AcctSoa> repository, IMapper mapper, ICurrentUser user) : base(repository, mapper)
+        readonly IContextBase<CsShipmentSurcharge> csShipmentSurchargeRepo;
+        public AcctSOAService(IContextBase<AcctSoa> repository, IMapper mapper, ICurrentUser user, IContextBase<CsShipmentSurcharge> csShipmentSurcharge) : base(repository, mapper)
         {
             currentUser = user;
+            csShipmentSurchargeRepo = csShipmentSurcharge;
         }
 
         public HandleState AddSOA(AcctSoaModel model)
@@ -33,44 +34,48 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var soa = mapper.Map<AcctSoa>(model);
-                soa.Soano = model.Soano = CreateSoaNo(dc);
+                soa.Soano = model.Soano = CreateSoaNo();
                 //var hs = dc.AcctSoa.Add(soa);
                 var hs = DataContext.Add(soa);
 
                 if (hs.Success)
                 {
                     //Lấy ra những charge có type là BUY hoặc OBH-BUY mà chưa tồn tại trong 1 SOA nào cả
-                    var surchargeCredit = dc.CsShipmentSurcharge.Where(x => model.Surcharges != null
-                                                                   && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == "BUY" || c.type == "OBH-BUY") )
+                    var surchargeCredit = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
+                                                                   && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == Constants.TYPE_CHARGE_BUY || c.type == Constants.TYPE_CHARGE_OBH_BUY) )
                                                                    && (x.Soano == null || x.Soano == "")).ToList();
 
                     //Lấy ra những charge có type là SELL hoặc OBH-SELL mà chưa tồn tại trong 1 SOA nào cả
-                    var surchargeDebit = dc.CsShipmentSurcharge.Where(x => model.Surcharges != null
-                                                                   && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == "SELL" || c.type == "OBH-SELL"))
+                    var surchargeDebit = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
+                                                                   && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == Constants.TYPE_CHARGE_SELL || c.type == Constants.TYPE_CHARGE_OBH_SELL))
                                                                    && (x.Soano == null || x.Soano == "")).ToList();
 
                     if (surchargeCredit.Count() > 0)
                     {
                         //Update PaySOANo cho CsShipmentSurcharge có type BUY hoặc OBH-BUY(Payer)
+                        //Change request: Cập nhật lại ngày ExchangeDate (23/09/2019)
                         surchargeCredit.ForEach(a =>
                             {
                                 a.PaySoano = soa.Soano;
                                 a.UserModified = currentUser.UserID;
-                                a.DatetimeModified = DateTime.Now;
+                                a.DatetimeModified = a.ExchangeDate = DateTime.Now;
                             }
                         );
+                        dc.CsShipmentSurcharge.UpdateRange(surchargeCredit);
                     }
 
                     if (surchargeDebit.Count() > 0)
                     {
                         //Update SOANo cho CsShipmentSurcharge có type là SELL hoặc OBH-SELL(Receiver)
+                        //Change request: Cập nhật lại ngày ExchangeDate (23/09/2019)
                         surchargeDebit.ForEach(a =>
                             {
                                 a.Soano = soa.Soano;
                                 a.UserModified = currentUser.UserID;
-                                a.DatetimeModified = DateTime.Now;
+                                a.DatetimeModified = a.ExchangeDate = DateTime.Now;
                             }
                         );
+                        dc.CsShipmentSurcharge.UpdateRange(surchargeDebit);
                     }
                 }
                 dc.SaveChanges();
@@ -83,12 +88,12 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
-        private string CreateSoaNo(eFMSDataContext dc)
+        private string CreateSoaNo()
         {
             var prefix = (DateTime.Now.Year.ToString()).Substring(2, 2);
             string stt;
             //Lấy ra dòng cuối cùng của table acctSOA
-            var rowLast = dc.AcctSoa.LastOrDefault();
+            var rowLast = DataContext.Get().LastOrDefault(); //dc.AcctSoa.LastOrDefault();
             if (rowLast == null)
             {
                 stt = "00001";
@@ -111,7 +116,7 @@ namespace eFMS.API.Accounting.DL.Services
             return prefix + stt;
         }
 
-        public List<AcctSOAResult> Paging(AcctSOACriteria criteria, int page, int size, out int rowsCount)
+        public List<Models.AcctSOAResult> Paging(AcctSOACriteria criteria, int page, int size, out int rowsCount)
         {
             var data = GetListAcctSOA(criteria).AsQueryable();
             rowsCount = (data.Count() > 0) ? data.Count() : 0;
@@ -149,7 +154,7 @@ namespace eFMS.API.Accounting.DL.Services
             try
             {
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-                var surcharge = dc.CsShipmentSurcharge.Where(x => x.Soano == soaNo || x.PaySoano == soaNo).ToList();
+                var surcharge = csShipmentSurchargeRepo.Get(x => x.Soano == soaNo || x.PaySoano == soaNo).ToList();
                 if (surcharge.Count() > 0)
                 {
                     //Update SOANo = NULL & PaySOANo = NULL to CsShipmentSurcharge
@@ -161,6 +166,7 @@ namespace eFMS.API.Accounting.DL.Services
                             a.DatetimeModified = DateTime.Now;
                         }
                     );
+                    dc.CsShipmentSurcharge.UpdateRange(surcharge);
                     dc.SaveChanges();
                 }
 
@@ -181,7 +187,7 @@ namespace eFMS.API.Accounting.DL.Services
                 CurrencyLocal = currencyLocal
             };
             var dataSOA = GetListAcctSOA(criteria).AsQueryable();
-            var dataMapSOA = mapper.Map<spc_GetListAcctSOAByMaster, AcctSOADetailResult>(dataSOA.FirstOrDefault());
+            var dataMapSOA = mapper.Map<spc_GetListAcctSOAByMaster, Models.AcctSOADetailResult>(dataSOA.FirstOrDefault());
 
             var chargeShipmentList = GetSpcChargeShipmentBySOANo(soaNo, currencyLocal).ToList();
             var dataMapChargeShipment = mapper.Map<List<spc_GetListChargeShipmentMasterBySOANo>, List<ChargeShipmentModel>>(chargeShipmentList);
@@ -225,11 +231,11 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public string GetInfoServiceOfSoa(string soaNo)
         {
-            var serviceTypeId = ((eFMSDataContext)DataContext.DC).AcctSoa.Where(x => x.Soano == soaNo).FirstOrDefault()?.ServiceTypeId;
+            var serviceTypeId = DataContext.Get(x => x.Soano == soaNo).FirstOrDefault()?.ServiceTypeId;
 
             var serviceName = "";
 
-            if (serviceTypeId != null)
+            if (!string.IsNullOrEmpty(serviceTypeId))
             {
                 //Tách chuỗi servicetype thành mảng
                 string[] arrayStrServiceTypeId = serviceTypeId.Split(';').Where(x => x.ToString() != "").ToArray();
@@ -268,37 +274,41 @@ namespace eFMS.API.Accounting.DL.Services
                 if (hs.Success)
                 {
                     //Lấy ra những charge có type là BUY hoặc OBH-BUY mà chưa tồn tại trong 1 SOA nào cả
-                    var surchargeCredit = dc.CsShipmentSurcharge.Where(x => model.Surcharges != null
-                                                                   && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == "BUY" || c.type == "OBH-BUY"))
+                    var surchargeCredit = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
+                                                                   && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == Constants.TYPE_CHARGE_BUY || c.type == Constants.TYPE_CHARGE_OBH_BUY))
                                                                    && (x.Soano == null || x.Soano == "")).ToList();
 
                     //Lấy ra những charge có type là SELL hoặc OBH-SELL mà chưa tồn tại trong 1 SOA nào cả
-                    var surchargeDebit = dc.CsShipmentSurcharge.Where(x => model.Surcharges != null
-                                                                   && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == "SELL" || c.type == "OBH-SELL"))
+                    var surchargeDebit = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
+                                                                   && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == Constants.TYPE_CHARGE_SELL || c.type == Constants.TYPE_CHARGE_OBH_SELL))
                                                                    && (x.Soano == null || x.Soano == "")).ToList();
 
                     if (surchargeCredit.Count() > 0)
                     {
                         //Update PaySOANo cho CsShipmentSurcharge có type BUY hoặc OBH-BUY(Payer)
+                        //Change request: Cập nhật lại ngày ExchangeDate (23/09/2019)
                         surchargeCredit.ForEach(a =>
                         {
                             a.PaySoano = soa.Soano;
                             a.UserModified = currentUser.UserID;
-                            a.DatetimeModified = DateTime.Now;
+                            a.DatetimeModified = a.ExchangeDate = DateTime.Now;
                         }
                         );
+                        dc.CsShipmentSurcharge.UpdateRange(surchargeCredit);
                     }
 
                     if (surchargeDebit.Count() > 0)
                     {
                         //Update SOANo cho CsShipmentSurcharge có type là SELL hoặc OBH-SELL(Receiver)
+                        //Change request: Cập nhật lại ngày ExchangeDate (23/09/2019)
                         surchargeDebit.ForEach(a =>
                         {
                             a.Soano = soa.Soano;
                             a.UserModified = currentUser.UserID;
-                            a.DatetimeModified = DateTime.Now;
+                            a.DatetimeModified = a.ExchangeDate = DateTime.Now;
                         }
                         );
+                        dc.CsShipmentSurcharge.UpdateRange(surchargeDebit);
                     }
 
                 }

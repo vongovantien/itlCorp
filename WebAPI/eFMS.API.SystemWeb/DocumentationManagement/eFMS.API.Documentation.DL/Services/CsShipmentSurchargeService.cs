@@ -23,9 +23,19 @@ namespace eFMS.API.Documentation.DL.Services
     public class CsShipmentSurchargeService : RepositoryBase<CsShipmentSurcharge, CsShipmentSurchargeModel>, ICsShipmentSurchargeService
     {
         private readonly IStringLocalizer stringLocalizer;
-        public CsShipmentSurchargeService(IContextBase<CsShipmentSurcharge> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer) : base(repository, mapper)
+        IContextBase<CsTransactionDetail> tranDetailRepository;
+        IContextBase<CatPartner> partnerRepository;
+        IContextBase<OpsTransaction> opsTransRepository;
+
+        public CsShipmentSurchargeService(IContextBase<CsShipmentSurcharge> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer,
+            IContextBase<CsTransactionDetail> tranDetailRepo,
+            IContextBase<CatPartner> partnerRepo,
+            IContextBase<OpsTransaction> opsTransRepo) : base(repository, mapper)
         {
             stringLocalizer = localizer;
+            tranDetailRepository = tranDetailRepo;
+            partnerRepository = partnerRepo;
+            opsTransRepository = opsTransRepo;
         }
 
         public HandleState DeleteCharge(Guid chargeId)
@@ -52,42 +62,63 @@ namespace eFMS.API.Documentation.DL.Services
             return hs;
         }
 
-        public List<CatPartner> GetAllParner(Guid id, bool IsHouseBillID = false)
+        public List<CatPartner> GetAllParner(Guid id, bool isHouseBillID = false)
         {
             try
             {
                 List<CatPartner> listPartners = new List<CatPartner>();
-                if (IsHouseBillID == false)
+                if (isHouseBillID == false)
                 {
-                    List<Guid> lst_Hbid = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == id).ToList().Select(x => x.Id).ToList();
-                    foreach (var idHB in lst_Hbid)
-                    {
-                        var houseBill = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.Id == idHB).FirstOrDefault();
-                        List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
-                        if (houseBill != null)
-                        {
-                            listCharges = Query(houseBill.Id, null);
+                    //List<Guid> lst_Hbid = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == id).ToList().Select(x => x.Id).ToList();
+                    //foreach (var idHB in lst_Hbid)
+                    //{
+                    //    var houseBill = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.Id == idHB).FirstOrDefault();
+                    //    List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
+                    //    if (houseBill != null)
+                    //    {
+                    //        listCharges = Query(houseBill.Id, null);
 
-                            foreach (var c in listCharges)
+                    //        foreach (var c in listCharges)
+                    //        {
+                    //            if (c.PaymentObjectId != null)
+                    //            {
+                    //                var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PaymentObjectId).FirstOrDefault();
+                    //                if (partner != null) listPartners.Add(partner);
+                    //            }
+                    //            if (c.PayerId != null)
+                    //            {
+                    //                var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PayerId).FirstOrDefault();
+                    //                if (partner != null) listPartners.Add(partner);
+                    //            }
+                    //        }
+                    //    }
+
+                    //}
+                    var houseBills = tranDetailRepository.Get(x => x.JobId == id); //((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == id).ToList().Select(x => x.Id).ToList();
+                    foreach (var housebill in houseBills)
+                    {
+                        //var houseBill = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.Id == idHB).FirstOrDefault();
+                        List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
+                        listCharges = Query(housebill.Id, null);
+
+                        foreach (var c in listCharges)
+                        {
+                            if (c.PaymentObjectId != null)
                             {
-                                if (c.PaymentObjectId != null)
-                                {
-                                    var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PaymentObjectId).FirstOrDefault();
-                                    if (partner != null) listPartners.Add(partner);
-                                }
-                                if (c.PayerId != null)
-                                {
-                                    var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PayerId).FirstOrDefault();
-                                    if (partner != null) listPartners.Add(partner);
-                                }
+                                var partner = partnerRepository.Get(x => x.Id == c.PaymentObjectId).FirstOrDefault(); //((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PaymentObjectId).FirstOrDefault();
+                                if (partner != null) listPartners.Add(partner);
+                            }
+                            if (c.PayerId != null)
+                            {
+                                var partner = partnerRepository.Get(x => x.Id == c.PayerId).FirstOrDefault(); //((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PayerId).FirstOrDefault();
+                                if (partner != null) listPartners.Add(partner);
                             }
                         }
-
                     }
                 }
                 else
                 {
-                    var houseBill = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.Id == id).FirstOrDefault();
+                    var houseBill = tranDetailRepository.Get(x => x.Id == id).FirstOrDefault();
                     List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
                    
                     listCharges = Query(id, null);
@@ -96,12 +127,12 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         if (c.PaymentObjectId != null)
                         {
-                            var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PaymentObjectId).FirstOrDefault();
+                            var partner = partnerRepository.Get(x => x.Id == c.PaymentObjectId).FirstOrDefault();
                             if (partner != null) listPartners.Add(partner);
                         }
                         if (c.PayerId != null)
                         {
-                            var partner = ((eFMSDataContext)DataContext.DC).CatPartner.Where(x => x.Id == c.PayerId).FirstOrDefault();
+                            var partner = partnerRepository.Get(x => x.Id == c.PayerId).FirstOrDefault();
                             if (partner != null) listPartners.Add(partner);
                         }
                     }
@@ -120,51 +151,79 @@ namespace eFMS.API.Documentation.DL.Services
 
        
 
-        public List<CsShipmentSurchargeDetailsModel> GetByHB(Guid HbID,string type)
+        public List<CsShipmentSurchargeDetailsModel> GetByHB(Guid hbID,string type)
         {
-            return Query(HbID,type);
+            return Query(hbID,type);
         }
 
-        public List<object> GetByListHB(List<Guid> lst_Hbid)
-        {
-           List<object> returnList = new List<object>();
-           foreach(var id in lst_Hbid)
-            {
-                var houseBill = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.Id == id).FirstOrDefault();
-                List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
-                if (houseBill != null)
-                {
-                    listCharges = Query(houseBill.Id, null);
-                }
+        //public List<object> GetByListHB(List<Guid> lst_Hbid)
+        //{
+        //   List<object> returnList = new List<object>();
+        //   foreach(var id in lst_Hbid)
+        //    {
+        //        var houseBill = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.Id == id).FirstOrDefault();
+        //        List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
+        //        if (houseBill != null)
+        //        {
+        //            listCharges = Query(houseBill.Id, null);
+        //        }
 
-                var returnObj = new { houseBill.Hwbno, houseBill.Hbltype, houseBill.Id, listCharges };
-                returnList.Add(returnObj);
-            }
-            return returnList;
-        }
+        //        var returnObj = new { houseBill.Hwbno, houseBill.Hbltype, houseBill.Id, listCharges };
+        //        returnList.Add(returnObj);
+        //    }
+        //    return returnList;
+        //}
 
-        public List<object> GroupChargeByHB(Guid Id, string PartnerId, bool IsHouseBillID)
+        public List<object> GroupChargeByHB(Guid id, string partnerId, bool isHouseBillID)
         {
+            //List<object> returnList = new List<object>();
+            //List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
+            //if (IsHouseBillID == false)
+            //{
+            //    List<Guid> lst_Hbid = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == Id).ToList().Select(x => x.Id).ToList();
+            //    foreach (var id in lst_Hbid)
+            //    {
+            //        var houseBill = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.Id == id).FirstOrDefault();
+            //        if (houseBill != null)
+            //        {
+            //            listCharges = Query(houseBill.Id, null);
+            //            listCharges = listCharges.Where(x => (x.PayerId == PartnerId || x.Type == "OBH" || x.PaymentObjectId == PartnerId)).ToList();
+            //        }
+            //        listCharges = listCharges.Where(x => (x.CreditNo == null || x.CreditNo.Trim() == "" || x.DebitNo == null || x.DebitNo.Trim() == "")).ToList();
+
+            //        foreach (var item in listCharges)
+            //        {
+            //            var exchangeRate = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == item.ExchangeDate.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == "VND" && x.Inactive == false)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+            //            item.ExchangeRate = exchangeRate?.Rate;
+            //        }
+            //        var returnObj = new { houseBill.Hwbno, houseBill.Hbltype, houseBill.Id, listCharges };
+
+            //        returnList.Add(returnObj);
+
+            //    }
+            //}
+            //else
+            //{
+            //    var houseBill = ((eFMSDataContext)DataContext.DC).OpsTransaction.Where(x => x.Hblid == Id).FirstOrDefault();
+            //    listCharges = Query(Id, null);
+            //    listCharges = listCharges.Where(x => ((x.PayerId == PartnerId && x.Type == "OBH") || x.PaymentObjectId == PartnerId)).ToList();
+            //    var returnObj = new { houseBill.Hwbno, houseBill.Id, listCharges };
+
+            //    returnList.Add(returnObj);
+            //}
+
+            //return returnList;
+
             List<object> returnList = new List<object>();
             List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
-            if (IsHouseBillID == false)
+            if (isHouseBillID == false)
             {
-                List<Guid> lst_Hbid = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == Id).ToList().Select(x => x.Id).ToList();
-                foreach (var id in lst_Hbid)
+                var houseBills = tranDetailRepository.Get(x => x.JobId == id);
+                foreach (var houseBill in houseBills)
                 {
-                    var houseBill = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.Id == id).FirstOrDefault();
-                    if (houseBill != null)
-                    {
-                        listCharges = Query(houseBill.Id, null);
-                        listCharges = listCharges.Where(x => (x.PayerId == PartnerId || x.Type == "OBH" || x.PaymentObjectId == PartnerId)).ToList();
-                    }
+                    listCharges = Query(houseBill.Id, null);
+                    listCharges = listCharges.Where(x => (x.PayerId == partnerId || x.Type == "OBH" || x.PaymentObjectId == partnerId)).ToList();
                     listCharges = listCharges.Where(x => (x.CreditNo == null || x.CreditNo.Trim() == "" || x.DebitNo == null || x.DebitNo.Trim() == "")).ToList();
-
-                    foreach (var item in listCharges)
-                    {
-                        var exchangeRate = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == item.ExchangeDate.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == "VND" && x.Inactive == false)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-                        item.ExchangeRate = exchangeRate?.Rate;
-                    }
                     var returnObj = new { houseBill.Hwbno, houseBill.Hbltype, houseBill.Id, listCharges };
 
                     returnList.Add(returnObj);
@@ -173,9 +232,9 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                var houseBill = ((eFMSDataContext)DataContext.DC).OpsTransaction.Where(x => x.Hblid == Id).FirstOrDefault();
-                listCharges = Query(Id, null);
-                listCharges = listCharges.Where(x => ((x.PayerId == PartnerId && x.Type == "OBH") || x.PaymentObjectId == PartnerId)).ToList();
+                var houseBill = opsTransRepository.Get(x => x.Hblid == id).FirstOrDefault();
+                listCharges = Query(id, null);
+                listCharges = listCharges.Where(x => ((x.PayerId == partnerId && x.Type == "OBH") || x.PaymentObjectId == partnerId)).ToList();
                 var returnObj = new { houseBill.Hwbno, houseBill.Id, listCharges };
 
                 returnList.Add(returnObj);
@@ -208,8 +267,8 @@ namespace eFMS.API.Documentation.DL.Services
         //                ).ToList();
         //    foreach (var item in query)
         //    {
-               
-                
+
+
         //        var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item.charge);
         //        if(charge.ExchangeDate != null)
         //        {
@@ -262,40 +321,25 @@ namespace eFMS.API.Documentation.DL.Services
         {
             if (type == null) type = string.Empty;
             List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
-            var query = GetChargeByHouseBill(hbId, type);
+            var query = GetChargeByHouseBill(hbId, type, string.Empty);
             if (query.Count == 0) return listCharges;
-            var exchangRates = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => x.Inactive == false).ToList();
             foreach (var item in query)
             {
                 var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item);
                 charge.Currency = item.CurrencyCode;
                 charge.Unit = item.UnitNameEn;
                 charge.NameEn = item.ChargeNameEn;
-                if (charge.ExchangeDate != null)
-                {
-                    var exchangeCurrencyToVND = exchangRates.Where(x => (x.DatetimeCreated.Value.Date == charge.ExchangeDate.Value.Date
-                        && x.CurrencyFromId == charge.CurrencyId
-                        && x.CurrencyToId == "VND")).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-                    var exchangeUSDToVND = exchangRates.Where(x => (x.DatetimeCreated.Value.Date == charge.ExchangeDate.Value.Date
-                        && x.CurrencyFromId == "USD"
-                        && x.CurrencyToId == "VND")).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-                    charge.ExchangeRate = exchangeCurrencyToVND == null ? 1 : exchangeCurrencyToVND.Rate;
-                    charge.ExchangeRateUSDToVND = exchangeUSDToVND == null ? 1 : exchangeUSDToVND.Rate;
-                }
-                else
-                {
-                    charge.ExchangeRate = 1;
-                    charge.ExchangeRateUSDToVND = 1;
-                }
+                charge.ExchangeRate = item.RateToLocal;
                 listCharges.Add(charge);
             }
             return listCharges;
         }
-        private List<spc_GetSurchargeByHouseBill> GetChargeByHouseBill(Guid id, string type)
+        private List<spc_GetSurchargeByHouseBill> GetChargeByHouseBill(Guid id, string type, string currencyLocal)
         {
             var parameters = new[]{
-                new SqlParameter(){ ParameterName="@hblid", Value = id.ToString() },
-                new SqlParameter(){ ParameterName="@type", Value = type } 
+                new SqlParameter(){ ParameterName = "@hblid", Value = id.ToString() },
+                new SqlParameter(){ ParameterName = "@type", Value = type },
+                new SqlParameter(){ ParameterName = "@currencyLocal", Value = currencyLocal }
             };
             var list = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<spc_GetSurchargeByHouseBill>(parameters);
             return list;
@@ -322,9 +366,16 @@ namespace eFMS.API.Documentation.DL.Services
         public List<CsShipmentSurchargeDetailsModel> GetByHB(Guid hblid)
         {
             List<CsShipmentSurchargeDetailsModel> results = new List<CsShipmentSurchargeDetailsModel>();
-            var data = GetChargeByHouseBill(hblid, string.Empty);
+            var data = GetChargeByHouseBill(hblid, string.Empty, null);
             if (data.Count == 0) return results;
-            results = mapper.Map<List<CsShipmentSurchargeDetailsModel>>(data);
+            foreach(var item in data)
+            {
+                var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item);
+                charge.Unit = item.UnitNameEn;
+                charge.Currency = item.CurrencyCode;
+                charge.ExchangeRate = item.RateToLocal;
+                results.Add(charge);
+            }
             return results;
         }
     }

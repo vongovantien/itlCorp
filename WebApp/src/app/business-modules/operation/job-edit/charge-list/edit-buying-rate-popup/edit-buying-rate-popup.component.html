@@ -29,7 +29,7 @@
                     </small>
                   </label>
 
-                  <app-combo-grid-virtual-scroll
+                  <app-combo-grid-virtual-scroll [height]="150" [isTooltip]="true"
                     [currentActiveItemId]="{field:'charge.id',value:buyingRateChargeToEdit.chargeId}" (itemSelected)="buyingRateChargeToEdit.chargeId=$event.charge.id;
                                         buyingRateChargeToEdit.unitId=$event.charge.unitId;
                                         buyingRateChargeToEdit.unitPrice=$event.charge.unitPrice;
@@ -57,7 +57,7 @@
                   </label>
                   <ng-select [allowClear]="true" [items]="[
                                                 { 'text': 'AGENT', 'id': 'AGENT' },
-                                                { 'text': 'SHIPPING LINE','id': 'SHIPPING' },
+                                                { 'text': 'SUPPLIER','id': 'SHIPPING' },
                                                 { 'text': 'OTHER', 'id': 'OTHER' }]"
                     [active]="[{'text':buyingRateChargeToEdit.objectBePaid,'id':buyingRateChargeToEdit.objectBePaid}]"
                     [disabled]="buyingRateChargeToEdit.cdno"
@@ -155,7 +155,7 @@
                   <label class="form-control-label" for="">
                     Unit price <span class="m--font-danger">(*)</span>
                   </label>
-                  <input type="number" class="form-control m-input m-input--square"
+                  <input currencyMask type="text" class="form-control m-input m-input--square"
                     [disabled]="buyingRateChargeToEdit.cdno" [(ngModel)]="buyingRateChargeToEdit.unitPrice"
                     autocomplete="nope" (keyup)="calculateTotalEachBuying()" (change)="calculateTotalEachBuying()"
                     placeholder="Enter number" #BuyingRateChargeUnitPriceNameOps="ngModel" required
@@ -208,8 +208,9 @@
                   <label class="form-control-label" for="">
                     Total
                   </label>
-                  <input type="text" class="form-control m-input m-input--square" disabled
-                    name="BuyingRateChargeTotalNameOps" [(ngModel)]="buyingRateChargeToEdit.total">
+                  <input currencyMask [options]="{align: 'left', precision: 2}" type="text"
+                    class="form-control m-input m-input--square" disabled name="BuyingRateChargeTotalNameOps"
+                    [(ngModel)]="buyingRateChargeToEdit.total">
                 </div>
               </div>
             </div>
