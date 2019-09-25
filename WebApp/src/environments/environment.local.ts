@@ -4,7 +4,6 @@ export const environment = {
     local: true,
     HOST: {
         WEB_URL: "localhost:",
-        CD_NOTE: "test.api-efms.itlvn.com:44366",
         ACCOUNTING: "localhost:44368",
         DOCUMENTATION: "localhost:44366",
         CATALOGUE: "localhost:44361",

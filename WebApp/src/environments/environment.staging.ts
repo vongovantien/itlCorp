@@ -1,11 +1,10 @@
 
 
 export const environment = {
-    production: true, 
+    production: true,
     local: false,
     HOST: {
         WEB_URL: "staging.api-efms.itlvn.com",
-        CD_NOTE: "staging.api-efms.itlvn.com",
         ACCOUNTING: "staging.api-efms.itlvn.com/Accounting",
         DOCUMENTATION: "staging.api-efms.itlvn.com/Documentation",
         CATALOGUE: "staging.api-efms.itlvn.com/Catalogue",
@@ -15,4 +14,3 @@ export const environment = {
     },
 }
 
-   
