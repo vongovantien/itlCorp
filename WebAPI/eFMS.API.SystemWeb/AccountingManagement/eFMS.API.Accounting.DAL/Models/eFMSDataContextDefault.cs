@@ -2239,6 +2239,10 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.TypeOfFee)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.UnitId).HasColumnName("UnitID");
 
                 entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 4)");

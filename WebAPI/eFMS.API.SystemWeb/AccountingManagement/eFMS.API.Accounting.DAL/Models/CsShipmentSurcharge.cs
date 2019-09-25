@@ -56,8 +56,9 @@ namespace eFMS.API.Accounting.Service.Models
         public string CreditNo { get; set; }
         public string DebitNo { get; set; }
         public string Soano { get; set; }
-        public bool? IsFromShipment { get; set; }
         public string PaySoano { get; set; }
+        public bool? IsFromShipment { get; set; }
+        public string TypeOfFee { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
