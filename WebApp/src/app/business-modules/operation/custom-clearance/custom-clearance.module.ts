@@ -12,6 +12,7 @@ import { SelectModule } from 'ng2-select';
 import { CustomClearanceAddnewComponent } from './addnew/custom-clearance-addnew.component';
 import { CustomClearanceEditComponent } from './detail/custom-clearance-edit.component';
 import { CustomClearanceImportComponent } from './import/custom-clearance-import.component';
+import { HttpClientModule } from '@angular/common/http';
 
 const routing: Routes = [
     {
@@ -64,6 +65,7 @@ const LIB = [
         RouterModule.forChild(routing),
         FormsModule,
         ReactiveFormsModule,
+        HttpClientModule,
         ...LIB
     ],
     exports: [],

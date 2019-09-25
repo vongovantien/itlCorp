@@ -60,5 +60,23 @@ namespace eFMS.API.ReportData.Infrastructure
                 });
             return services;
         }
+
+        public static IServiceCollection AddCrossOrigin(this IServiceCollection services)
+        {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    builder =>
+                    {
+                        builder
+                            .WithHeaders("accept", "content-type", "origin", "x-custom-header")
+                            .AllowAnyOrigin()
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowCredentials();
+                    });
+            });
+            return services;
+        }
     }
 }

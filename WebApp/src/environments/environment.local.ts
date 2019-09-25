@@ -9,6 +9,7 @@ export const environment = {
         CATALOGUE: "localhost:44361",
         OPERATION: "localhost:44365",
         SYSTEM: "localhost:44360",
+        REPORT:"localhost:63492",
         INDENTITY_SERVER_URL: "https://localhost:44369"
     },
 };

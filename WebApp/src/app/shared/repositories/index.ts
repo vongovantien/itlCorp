@@ -4,6 +4,8 @@ export * from './unit.repo';
 export * from './operation.repo';
 export * from './catalogue.repo';
 export * from './documentation.repo';
+export * from './report.repo';
+
 
 
 

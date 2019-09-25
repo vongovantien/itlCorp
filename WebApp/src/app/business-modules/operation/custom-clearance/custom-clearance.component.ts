@@ -10,12 +10,16 @@ import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { catchError, map, finalize } from 'rxjs/operators';
 import { CustomDeclaration } from 'src/app/shared/models';
 import { AppList } from 'src/app/app.list';
-import { OperationRepo, DocumentationRepo, CatalogueRepo } from 'src/app/shared/repositories';
+import { OperationRepo, DocumentationRepo, CatalogueRepo, ReportRepo } from 'src/app/shared/repositories';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { ApiService } from 'src/app/shared/services/api.service';
+
+
 
 import _map from 'lodash/map';
 import { formatDate } from '@angular/common';
 import { NgProgress } from '@ngx-progressbar/core';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 
 @Component({
@@ -42,8 +46,11 @@ export class CustomClearanceComponent extends AppList {
         private _toastrService: ToastrService,
         private _operationRepo: OperationRepo,
         private _ngProgressService: NgProgress,
+        private _api: ApiService,
+        private _http: HttpClient,
         private _documentRepo: DocumentationRepo,
-        private _catalogueRepo: CatalogueRepo
+        private _catalogueRepo: CatalogueRepo,
+        private _reportRepo : ReportRepo
     ) {
         super();
         this.requestList = this.getListCustomsDeclaration;
@@ -264,45 +271,55 @@ export class CustomClearanceComponent extends AppList {
         return clearancesToConvert;
     }
 
-    async export() {
-        let customClearances = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.query, this.searchObject);
-        customClearances = _map(customClearances, function (item, index) {
-            return [
-                index + 1,
-                item.clearanceNo,
-                item.type,
-                item.gateway,
-                item.customerName,
-                item.importCountryName,
-                item.exportCountryName,
-                item.jobNo,
-                formatDate(item.clearanceDate, 'dd/MM/yyyy', 'en'),
-                (item.jobNo !== null && item.jobNo !== '') ? 'Imported' : 'Not Imported'
-            ];
-        });
+    // async export() {
+    //     let customClearances = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.query, this.searchObject);
+    //     customClearances = _map(customClearances, function (item, index) {
+    //         return [
+    //             index + 1,
+    //             item.clearanceNo,
+    //             item.type,
+    //             item.gateway,
+    //             item.customerName,
+    //             item.importCountryName,
+    //             item.exportCountryName,
+    //             item.jobNo,
+    //             formatDate(item.clearanceDate, 'dd/MM/yyyy', 'en'),
+    //             (item.jobNo != null && item.jobNo != '') ? 'Imported' : 'Not Imported'
+    //         ];
+    //     });
 
-        /**Set up stylesheet */
-        const exportModel: ExportExcel = new ExportExcel();
-        exportModel.fileName = "Custom Clearance Report";
-        const currrently_user = localStorage.getItem('currently_userName');
-        exportModel.title = "Custom Clearance Report ";
-        exportModel.author = currrently_user;
-        exportModel.header = [
-            { name: "No.", width: 10 },
-            { name: "Clearance No", width: 25 },
-            { name: "Type", width: 10 },
-            { name: "Gateway", width: 25 },
-            { name: "Partner Name", width: 25 },
-            { name: "Import Country", width: 25 },
-            { name: "Export Country", width: 25 },
-            { name: "JOBID", width: 25 },
-            { name: "Clearance Date", width: 20 },
-            { name: "Status", width: 25 }
-        ];
+    //     /**Set up stylesheet */
+    //     const exportModel: ExportExcel = new ExportExcel();
+    //     exportModel.fileName = "Custom Clearance Report";
+    //     const currrently_user = localStorage.getItem('currently_userName');
+    //     exportModel.title = "Custom Clearance Report ";
+    //     exportModel.author = currrently_user;
+    //     exportModel.header = [
+    //         { name: "No.", width: 10 },
+    //         { name: "Clearance No", width: 25 },
+    //         { name: "Type", width: 10 },
+    //         { name: "Gateway", width: 25 },
+    //         { name: "Partner Name", width: 25 },
+    //         { name: "Import Country", width: 25 },
+    //         { name: "Export Country", width: 25 },
+    //         { name: "JOBID", width: 25 },
+    //         { name: "Clearance Date", width: 20 },
+    //         { name: "Status", width: 25 }
+    //     ];
 
-        exportModel.data = customClearances;
-        this.excelService.generateExcel(exportModel);
+    //     exportModel.data = customClearances;
+    //     this.excelService.generateExcel(exportModel);
+    // }
+
+    export() {
+        this._reportRepo.exportCustomClearance(this.searchObject).subscribe(
+               response => this.downLoadFile(response, "application/ms-excel"
+               ));
+  
     }
+
+
+  
 
 }
 

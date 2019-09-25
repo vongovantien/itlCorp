@@ -273,6 +273,28 @@ namespace eFMS.API.ReportData.Controllers
         );
         }
 
+        /// <summary>
+        /// export Custom Clearance
+        /// </summary>
+        /// <returns></returns>
+        #endregion
+        #region Custom Clearance
+        [Route("CustomsDeclaration/ExportCustomClearance")]
+        [HttpPost]
+        public async Task<IActionResult> ExportCustomClearance(CustomsDeclarationCriteria customsDeclarationCriteria)
+        {
+            Helper helper = new Helper();
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(customsDeclarationCriteria, aPis.HostStaging + Urls.CustomClearance.CustomClearanceUrl);
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<CustomsDeclaration>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
+            var stream = helper.CreateCustomClearanceExcelFile(dataObjects.Result);
+            var buffer = stream as MemoryStream;
+            return this.File(
+            fileContents: buffer.ToArray(),
+            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            fileDownloadName: FilesNames.CustomClearanceName
+        );
+        }
+
 
         #endregion
     }

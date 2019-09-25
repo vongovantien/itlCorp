@@ -40,6 +40,7 @@ namespace eFMS.API.ReportData
                 config.DefaultApiVersion = new ApiVersion(1, 0);
                 config.ApiVersionReader = new HeaderApiVersionReader("api-version");
             });
+            services.AddCrossOrigin();
             services.AddSwagger();
             services.AddConfigureSetting(Configuration);
         
@@ -48,9 +49,6 @@ namespace eFMS.API.ReportData
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApiVersionDescriptionProvider provider)
         {
-            try
-            {
-
                 if (env.IsDevelopment())
                 {
                     app.UseDeveloperExceptionPage();
@@ -78,11 +76,5 @@ namespace eFMS.API.ReportData
 
                 app.UseMvc();
             }
-            catch (System.Exception ex)
-            {
-
-                throw ex;
-            }
-        }
     }
 }
