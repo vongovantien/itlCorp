@@ -10,7 +10,7 @@ import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { catchError, map, finalize } from 'rxjs/operators';
 import { CustomDeclaration } from 'src/app/shared/models';
 import { AppList } from 'src/app/app.list';
-import { OperationRepo, DocumentationRepo, CatalogueRepo } from 'src/app/shared/repositories';
+import { OperationRepo, DocumentationRepo, CatalogueRepo, ReportRepo } from 'src/app/shared/repositories';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ApiService } from 'src/app/shared/services/api.service';
 
@@ -49,7 +49,8 @@ export class CustomClearanceComponent extends AppList {
         private _api: ApiService,
         private _http: HttpClient,
         private _documentRepo: DocumentationRepo,
-        private _catalogueRepo: CatalogueRepo
+        private _catalogueRepo: CatalogueRepo,
+        private _reportRepo : ReportRepo
     ) {
         super();
         this.requestList = this.getListCustomsDeclaration;
@@ -311,27 +312,14 @@ export class CustomClearanceComponent extends AppList {
     // }
 
     export() {
-        this._http.post('http://localhost:63492/api/v1/vi/ReportData/CustomsDeclaration/ExportCustomClearance', this.searchObject,{
-            responseType: 'arraybuffer'} 
-           ).subscribe(
+        this._reportRepo.exportCustomClearance(this.searchObject).subscribe(
                response => this.downLoadFile(response, "application/ms-excel"
                ));
   
     }
-    downLoadFile(data: any, type: string) {
-        const blob: Blob = new Blob([data], {type: type});
-        const fileName: string = 'Custom Clearance Report.xlsx';
-        const objectUrl: string = URL.createObjectURL(blob);
-        const a: HTMLAnchorElement = document.createElement('a') as HTMLAnchorElement;
 
-        a.href = objectUrl;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();        
 
-        document.body.removeChild(a);
-        URL.revokeObjectURL(objectUrl);
-    }
+  
 
 }
 
