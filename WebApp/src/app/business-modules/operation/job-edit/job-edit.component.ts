@@ -131,6 +131,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this.route.params.subscribe((params: any) => {
             this.tab = 'job-edit';
             this.tabCharge = 'buying';
+            await this.getShipmentCommonData();
             this.getUnits();
             this.getPartners();
             this.getListCurrencies();
@@ -370,6 +371,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                 finalize(() => this._progressRef.complete())
             ).subscribe(
                 (responses: any) => {
+                    this.billingOps = responses;
                     this.salemans = responses;
                 },
             );

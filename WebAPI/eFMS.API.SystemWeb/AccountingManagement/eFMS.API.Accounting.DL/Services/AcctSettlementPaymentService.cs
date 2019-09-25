@@ -473,7 +473,8 @@ namespace eFMS.API.Accounting.DL.Services
                            ClearanceNo = sur.ClearanceNo,
                            ContNo = sur.ContNo,
                            Notes = sur.Notes,
-                           IsFromShipment = sur.IsFromShipment
+                           IsFromShipment = sur.IsFromShipment,
+                           TypeOfFee = sur.TypeOfFee
                        };
 
             return data.ToList();
@@ -536,7 +537,8 @@ namespace eFMS.API.Accounting.DL.Services
                            ClearanceNo = sur.ClearanceNo,
                            ContNo = sur.ContNo,
                            Notes = sur.Notes,
-                           IsFromShipment = sur.IsFromShipment
+                           IsFromShipment = sur.IsFromShipment,
+                           TypeOfFee = sur.TypeOfFee
                        };
 
             return data.OrderByDescending(x => x.JobId).ToList();

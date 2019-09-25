@@ -42,5 +42,6 @@ namespace eFMS.API.Accounting.DL.Models.SettlementPayment
         public string Soano { get; set; }
         public bool? IsFromShipment { get; set; }
         public string PaySoano { get; set; }
+        public string TypeOfFee { get; set; }
     }
 }
