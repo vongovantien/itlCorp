@@ -192,15 +192,16 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 List<object> returnList = new List<object>();
                 List<CatPartner> listPartners = new List<CatPartner>();
+                List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
 
-                if(IsHouseBillID == false)
+                if (IsHouseBillID == false)
                 {
                     //List<Guid> lst_Hbid = trandetailRepositoty.Get(x => x.JobId == id);//((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == id).ToList().Select(x => x.Id).ToList();
                     List<CsTransactionDetail> housebills = trandetailRepositoty.Get(x => x.JobId == id).ToList();
                     foreach (var housebill in housebills)
                     {
                         //var houseBill = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.Id == _id).FirstOrDefault();
-                        List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
+                        //List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
                         if (housebill != null)
                         {
                             listCharges = Query(housebill.Id);
@@ -224,7 +225,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
+                    //List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
                     listCharges = Query(id);
 
                     foreach (var c in listCharges)
@@ -252,7 +253,23 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         // -to continue
                         //var chargesOfCDNote = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Cdno == cdNote.Code).ToList();
-                        var chargesOfCDNote = surchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);//((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code).ToList();
+                        var chargesOfCDNote = listCharges.Where(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);//((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code).ToList();
+                        decimal totalDebit = 0;
+                        decimal totalCredit = 0;
+                        foreach(var charge in chargesOfCDNote)
+                        {
+                            if (charge.Type == "BUY" || charge.Type == "LOGISTIC" || (charge.Type == "OBH" && cdNote.PartnerId == charge.PayerId))
+                            {
+                                // calculate total credit
+                                totalCredit += (decimal)(charge.Total * charge.ExchangeRate);
+                            }
+                            if (charge.Type == "SELL" || (charge.Type == "OBH" && cdNote.PartnerId == charge.PaymentObjectId))
+                            {
+                                // calculate total debit 
+                                totalDebit += (decimal)(charge.Total * charge.ExchangeRate);
+                            }
+                        }
+                        cdNote.Total = totalDebit - totalCredit;
                         listCDNote.Add(new { cdNote, total_charge= chargesOfCDNote.Count() });                      
 
                     }
