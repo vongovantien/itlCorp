@@ -84,5 +84,11 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportCustomClearance(eFMS.API.ReportData.Models.CustomsDeclarationCriteria)">
+            <summary>
+            export Custom Clearance
+            </summary>
+            <returns></returns>
+        </member>
     </members>
 </doc>

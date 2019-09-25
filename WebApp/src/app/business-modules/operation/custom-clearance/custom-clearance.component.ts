@@ -44,11 +44,10 @@ export class CustomClearanceComponent extends AppList {
         private api_menu: API_MENU,
         private _sortService: SortService,
         private _toastrService: ToastrService,
-        private _cdNoteRepo: CDNoteRepo,
         private _operationRepo: OperationRepo,
         private _ngProgressService: NgProgress,
         private _api: ApiService,
-        private _http: HttpClient
+        private _http: HttpClient,
         private _documentRepo: DocumentationRepo,
         private _catalogueRepo: CatalogueRepo
     ) {

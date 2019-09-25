@@ -76,11 +76,5 @@ namespace eFMS.API.ReportData
 
                 app.UseMvc();
             }
-            catch (System.Exception ex)
-            {
-
-                throw ex;
-            }
-        }
     }
 }
