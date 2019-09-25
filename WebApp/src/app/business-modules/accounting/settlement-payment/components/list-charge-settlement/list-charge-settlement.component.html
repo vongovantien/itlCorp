@@ -44,7 +44,8 @@
         </div>
         <div class="col-lg-4" *ngIf="!!STATE && STATE === 'WRITE' && TYPE === 'LIST'">
             <div class="form-group">
-                <input type="text" class="form-control" placeholder="Search charge" [(ngModel)]="keyword" name="keyword">
+                <input type="text" class="form-control" placeholder="Search charge" [(ngModel)]="keyword"
+                    name="keyword">
             </div>
         </div>
         <div class="col-8" [ngClass]="TYPE === 'LIST' ? 'col-8' : 'col-12'">
@@ -104,19 +105,19 @@
                                 <tr class="text-center" [class.selected-row]="i === selectedIndexSurcharge">
                                     <td class="table-actions-col">
                                         <div class="table-actions">
-                                            <label class="m-checkbox" *ngIf="!surcharge.isFromShipment">
+                                            <label class="m-checkbox">
                                                 <input type="checkbox" (change)="onChangeCheckBoxCharge()"
                                                     value="{{surcharge}}" [(ngModel)]="surcharge.isSelected">
                                                 <span></span>
                                             </label>
-                                            <ng-container *ngIf="!surcharge.isFromShipment">
-                                                <span>
+                                            <span [class.m--margin-right-20]="surcharge.isFromShipment">
+                                                <ng-container *ngIf="!surcharge.isFromShipment">
                                                     <a (click)="openCopySurcharge(surcharge)" title="Copy"
                                                         class="pointer">
                                                         <i class="la la-copy"></i>
                                                     </a>
-                                                </span>
-                                            </ng-container>
+                                                </ng-container>
+                                            </span>
                                         </div>
                                     </td>
                                     <td>{{surcharge.jobId}} - {{surcharge.hbl}} - {{surcharge.mbl}}</td>

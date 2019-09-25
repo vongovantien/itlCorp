@@ -71,7 +71,7 @@
                                             <th class="table-actions-col no-sorting first"></th>
                                         </tr>
                                     </thead>
-                                    <tbody class="tbody-group" *ngIf="shipments.length > 0; else norecord">
+                                    <tbody class="tbody-group">
                                         <ng-container *ngFor="let item of shipments; let i = index; trackBy: trackByFn">
                                             <tr class="collapse-toggle-row">
                                                 <td class="table-actions-col">
@@ -80,7 +80,8 @@
                                                             class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed"
                                                             data-toggle="collapse"
                                                             [attr.data-target]="'#ops-shipment-00' + (item.id+1)"
-                                                            title="Collapse" (click)="showCustomClearance(item.jobNo, i)">
+                                                            title="Collapse"
+                                                            (click)="showCustomClearance(item.jobNo, i)">
                                                             <i class="la la-angle-up"></i>
                                                         </button>
                                                         <button type="button"
@@ -97,8 +98,8 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <a
-                                                        [routerLink]="['/home/operation/job-edit/' + item.id]">{{ item.jobNo }}</a>
+                                                    <a [routerLink]="['/home/operation/job-edit/' + item.id]">{{ item.jobNo }}
+                                                    </a>
                                                 </td>
                                                 <td>
                                                     <span>{{ item.hwbno }}</span>
@@ -113,9 +114,6 @@
                                                     <span *ngIf="item.serviceMode == 'Import'">{{ item.podName }}</span>
                                                     <span *ngIf="item.serviceMode == 'Export'">{{ item.polName }}</span>
                                                 </td>
-                                                <!-- <td>
-                                                    <span>{{ item.flightVessel }}</span>
-                                                </td> -->
                                                 <td>
                                                     <span>{{ item.sumContainers }}</span>
                                                 </td>
@@ -128,85 +126,65 @@
                                                 <td>
                                                     <span>{{ item.sumCbm }}</span>
                                                 </td>
-                                                <!-- <td>
-                                                    <span>{{ item.invoiceNo }}</span>
-                                                </td> -->
                                                 <td>
                                                     <span>{{ item.modifiedDate | date:'dd/MM/yyyy' }}</span>
                                                 </td>
-                                                <!-- <td>
-                                                    <ng-container *ngIf="item.currentStatus">
-                                                        <span class="m-badge m-badge--primary m-badge--wide"
-                                                            *ngIf="item.currentStatus == jobStatusConts.inSchedule">{{ item.currentStatus }}</span>
-                                                        <span class="m-badge m-badge--info m-badge--wide"
-                                                            *ngIf="item.currentStatus == jobStatusConts.processing">{{ item.currentStatus }}</span>
-                                                        <span class="m-badge m-badge--warning m-badge--wide"
-                                                            *ngIf="item.currentStatus == jobStatusConts.warning">{{ item.currentStatus }}</span>
-                                                        <span class="m-badge m-badge--danger m-badge--wide"
-                                                            *ngIf="item.currentStatus == jobStatusConts.overdued">{{ item.currentStatus }}</span>
-                                                        <span class="m-badge m-badge--success m-badge--wide"
-                                                            *ngIf="item.currentStatus == jobStatusConts.finish">{{ item.currentStatus }}</span>
-                                                    </ng-container>
-                                                </td> -->
                                             </tr>
-                                            <tr class="collapse-panel-row">
-                                                <td colspan="14">
-                                                    <div class="detail-panel-block collapse"
-                                                        id="ops-shipment-00{{item.id+1}}"
-                                                        data-parent="#ops-job-list-table">
-                                                        <div class="table-inside-block">
-                                                            <table class="table table-secondary dataTable">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th *ngFor="let header of headerCustomClearance; trackBy: trackByFn" [class]="sortClassCustomClearance(header.sortable ? header.field : '')"
-                                                                            (click)="sortByCustomClearance(header.sortable ? header.field : '')">
-                                                                            <span>{{header.title}}</span>
-                                                                            <span class="sort-indicator"></span>
-                                                                        </th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody *ngIf="customClearances.length > 0">
-                                                                    <tr
-                                                                        *ngFor="let clearance of customClearances; let j = index; trackBy: trackByFn">
-                                                                        <td>
-                                                                            <span>{{ clearance.clearanceNo }}</span>
-                                                                        </td>
-                                                                        <td>
-                                                                            <span>{{ clearance.clearanceDate | date:'dd/MM/yyyy' }}</span>
-                                                                        </td>
-                                                                        <td>
-                                                                            <span>{{ clearance.hblid }}</span>
-                                                                        </td>
-                                                                        <td>
-                                                                            <span>{{ clearance.exportCountryCode }}</span>
-                                                                        </td>
-                                                                        <td>
-                                                                            <span>{{ clearance.importCountryCode }}</span>
-                                                                        </td>
-                                                                        <td>
-                                                                            <span>{{ clearance.commodityCode }}</span>
-                                                                        </td>
-                                                                        <td>
-                                                                            <span>{{ clearance.qtyCont }}</span>
-                                                                        </td>
-                                                                        <td>
-                                                                            <span>{{ clearance.source }}</span>
-                                                                        </td>
-                                                                        <td>
-                                                                            <span>{{ clearance.note }}</span>
-                                                                        </td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                </td>
+                                            <tr class="collapse-panel-row" app-table-collapse-row
+                                                [id]="'ops-shipment-00' + item.id + 1"
+                                                [parentId]="'#ops-job-list-table'">
+                                                <table class="table table-secondary dataTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th *ngFor="let header of headerCustomClearance; trackBy: trackByFn"
+                                                                app-table-headers [headers]="headerCustomClearance"
+                                                                (onclick)="sortClassCustomClearance($event.sortField)">
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <ng-container *ngIf="!isLoading && !!customClearances.length">
+                                                            <tr
+                                                                *ngFor="let clearance of customClearances; let j = index; trackBy: trackByFn">
+                                                                <td>
+                                                                    <span>{{ clearance.clearanceNo }}</span>
+                                                                </td>
+                                                                <td>
+                                                                    <span>{{ clearance.clearanceDate | date:'dd/MM/yyyy' }}</span>
+                                                                </td>
+                                                                <td>
+                                                                    <span>{{ clearance.hblid }}</span>
+                                                                </td>
+                                                                <td>
+                                                                    <span>{{ clearance.exportCountryCode }}</span>
+                                                                </td>
+                                                                <td>
+                                                                    <span>{{ clearance.importCountryCode }}</span>
+                                                                </td>
+                                                                <td>
+                                                                    <span>{{ clearance.commodityCode }}</span>
+                                                                </td>
+                                                                <td>
+                                                                    <span>{{ clearance.qtyCont }}</span>
+                                                                </td>
+                                                                <td>
+                                                                    <span>{{ clearance.source }}</span>
+                                                                </td>
+                                                                <td>
+                                                                    <span>{{ clearance.note }}</span>
+                                                                </td>
+                                                            </tr>
+                                                        </ng-container>
+                                                        <tr *ngIf="!isLoading && !customClearances.length"
+                                                            app-table-none-record [colspan]="customClearances.length">
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </tr>
                                         </ng-container>
+                                        <tr *ngIf="!isLoading && !shipments.length" app-table-none-record [colspan]="headers.length + 1"></tr>
+                                        <tr *ngIf="isLoading" app-table-row-loading></tr>
                                     </tbody>
-                                    <ng-template #norecord>
-                                        <tr app-table-none-record [colspan]="headers.length + 1"></tr>
-                                    </ng-template>
                                 </table>
                             </div>
                             <div class="pagination-nav">
@@ -216,7 +194,8 @@
                                             <div class="select-box">
                                                 <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
                                                     (change)="selectPageSize(pageSize, dataSearch)" name="pagesize">
-                                                    <ng-container *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
+                                                    <ng-container
+                                                        *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
                                                         <option [ngValue]="item">{{item}} line / screen</option>
                                                     </ng-container>
                                                 </select>
@@ -225,14 +204,15 @@
                                     </div>
                                     <div class="col-sm-6" *ngIf="totalItems > pageSize">
                                         <div class="float-right">
-                                            <pagination [boundaryLinks]="true" [totalItems]="totalItems" [itemsPerPage]="pageSize"
-                                                (pageChanged)="pageChanged($event)" [(ngModel)]="page">
+                                            <pagination [boundaryLinks]="true" [totalItems]="totalItems"
+                                                [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
+                                                [(ngModel)]="page">
                                             </pagination>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                           
+
                         </div>
                     </div>
                 </div>

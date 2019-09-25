@@ -93,32 +93,40 @@
                                             [parentId]="'#adv-payment-list-table'">
                                             <table class="table table-secondary dataTable">
                                                 <thead>
-                                                    <tr class="text-center" app-table-header [headers]="headerCustomClearance" (onClick)="sortByCustomClearance($event)">
+                                                    <tr class="text-center" app-table-header
+                                                        [headers]="headerCustomClearance"
+                                                        (onClick)="sortByCustomClearance($event)">
                                                     </tr>
                                                 </thead>
-                                                <tbody *ngIf="!isLoading && !!customClearances.length">
-                                                    <tr *ngFor="let clearance of customClearances; let j = index; trackBy: trackByFn" class="text-center">
-                                                        <td>
-                                                            <span>{{clearance.jobId}}</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>{{clearance.mbl}}</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>{{clearance.hbl}}</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>{{clearance.amount | number: '.0-3'}}</span>
-                                                        </td>
-                                                        <td>
-                                                            <span>{{clearance.settlementCurrency}}</span>
-                                                        </td>
+                                                <tbody >
+                                                    <ng-container *ngIf="!!customClearances.length">
+                                                        <tr *ngFor="let clearance of customClearances; let j = index; trackBy: trackByFn"
+                                                            class="text-center">
+                                                            <td>
+                                                                <span>{{clearance.jobId}}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>{{clearance.mbl}}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>{{clearance.hbl}}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>{{clearance.amount | number: '.0-3'}}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>{{clearance.settlementCurrency}}</span>
+                                                            </td>
+                                                        </tr>
+                                                    </ng-container>
+                                                    <tr *ngIf="customClearances.length"
+                                                        app-table-none-record [colspan]="headerCustomClearance.length">
                                                     </tr>
                                                 </tbody>
                                             </table>
                                         </tr>
                                     </ng-container>
-                                    <tr *ngIf="!isLoading && !customClearances.length" app-table-none-record
+                                    <tr *ngIf="!isLoading && !settlements.length" app-table-none-record
                                         [colspan]="headers.length + 1"></tr>
                                     <tr *ngIf="isLoading" app-table-row-loading></tr>
                                 </tbody>

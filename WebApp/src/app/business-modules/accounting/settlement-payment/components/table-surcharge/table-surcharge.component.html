@@ -10,7 +10,7 @@
             <ng-container *ngFor="let surcharge of data.chargeSettlements; let i = index; trackBy: trackByFn">
                 <tr class="text-center">
                     <td class="table-actions-col">
-                        <div class="m-checkbox-list d-flex">
+                        <div class="m-checkbox-list d-flex justify-content-center">
                             <label class="m-checkbox">
                                 <input type="checkbox" (change)="onChangeCheckBoxCharge()" value="{{surcharge}}"
                                     [(ngModel)]="surcharge.isSelected">
