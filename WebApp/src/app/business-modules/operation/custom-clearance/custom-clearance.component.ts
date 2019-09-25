@@ -266,73 +266,68 @@ export class CustomClearanceComponent extends AppList {
         return clearancesToConvert;
     }
 
-    async export() {
-        let customClearances = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.query, this.searchObject);
-        customClearances = _map(customClearances, function (item, index) {
-            return [
-                index + 1,
-                item.clearanceNo,
-                item.type,
-                item.gateway,
-                item.customerName,
-                item.importCountryName,
-                item.exportCountryName,
-                item.jobNo,
-                formatDate(item.clearanceDate, 'dd/MM/yyyy', 'en'),
-                (item.jobNo != null && item.jobNo != '') ? 'Imported' : 'Not Imported'
-            ];
-        });
+    // async export() {
+    //     let customClearances = await this.baseServices.postAsync(this.api_menu.Operation.CustomClearance.query, this.searchObject);
+    //     customClearances = _map(customClearances, function (item, index) {
+    //         return [
+    //             index + 1,
+    //             item.clearanceNo,
+    //             item.type,
+    //             item.gateway,
+    //             item.customerName,
+    //             item.importCountryName,
+    //             item.exportCountryName,
+    //             item.jobNo,
+    //             formatDate(item.clearanceDate, 'dd/MM/yyyy', 'en'),
+    //             (item.jobNo != null && item.jobNo != '') ? 'Imported' : 'Not Imported'
+    //         ];
+    //     });
 
-        /**Set up stylesheet */
-        const exportModel: ExportExcel = new ExportExcel();
-        exportModel.fileName = "Custom Clearance Report";
-        const currrently_user = localStorage.getItem('currently_userName');
-        exportModel.title = "Custom Clearance Report ";
-        exportModel.author = currrently_user;
-        exportModel.header = [
-            { name: "No.", width: 10 },
-            { name: "Clearance No", width: 25 },
-            { name: "Type", width: 10 },
-            { name: "Gateway", width: 25 },
-            { name: "Partner Name", width: 25 },
-            { name: "Import Country", width: 25 },
-            { name: "Export Country", width: 25 },
-            { name: "JOBID", width: 25 },
-            { name: "Clearance Date", width: 20 },
-            { name: "Status", width: 25 }
-        ];
+    //     /**Set up stylesheet */
+    //     const exportModel: ExportExcel = new ExportExcel();
+    //     exportModel.fileName = "Custom Clearance Report";
+    //     const currrently_user = localStorage.getItem('currently_userName');
+    //     exportModel.title = "Custom Clearance Report ";
+    //     exportModel.author = currrently_user;
+    //     exportModel.header = [
+    //         { name: "No.", width: 10 },
+    //         { name: "Clearance No", width: 25 },
+    //         { name: "Type", width: 10 },
+    //         { name: "Gateway", width: 25 },
+    //         { name: "Partner Name", width: 25 },
+    //         { name: "Import Country", width: 25 },
+    //         { name: "Export Country", width: 25 },
+    //         { name: "JOBID", width: 25 },
+    //         { name: "Clearance Date", width: 20 },
+    //         { name: "Status", width: 25 }
+    //     ];
 
-        exportModel.data = customClearances;
-        this.excelService.generateExcel(exportModel);
+    //     exportModel.data = customClearances;
+    //     this.excelService.generateExcel(exportModel);
+    // }
+
+    export() {
+        this._http.post('http://localhost:63492/api/v1/vi/ReportData/CustomsDeclaration/ExportCustomClearance', this.searchObject,{
+            responseType: 'arraybuffer'} 
+           ).subscribe(
+               response => this.downLoadFile(response, "application/ms-excel"
+               ));
+  
     }
+    downLoadFile(data: any, type: string) {
+        const blob: Blob = new Blob([data], {type: type});
+        const fileName: string = 'Custom Clearance Report.xlsx';
+        const objectUrl: string = URL.createObjectURL(blob);
+        const a: HTMLAnchorElement = document.createElement('a') as HTMLAnchorElement;
 
-    export1() {
-        this._http.post('http://localhost:63492/api/v1/vi/ReportData/CustomsDeclaration/ExportCustomClearance', this.searchObject).subscribe(
-            (res: any) => {
-                console.log(res);
-                // this.downloadFile(res, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'export.xlsx')
-            }
-        )
-
-    }
-    downloadFile(blob: any, type: string, filename: string) {
-        var binaryData = [];
-        binaryData.push(blob);
-
-        const url = window.URL.createObjectURL(new Blob(binaryData, { type: type })); // <-- work with blob directly
-
-        // create hidden dom element (so it works in all browsers)
-        const a = document.createElement('a');
-        a.setAttribute('style', 'display:none;');
+        a.href = objectUrl;
+        a.download = fileName;
         document.body.appendChild(a);
+        a.click();        
 
-        // create file, attach to hidden element and open hidden element
-        a.href = url;
-        a.download = filename;
-        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(objectUrl);
     }
-
-
 
 }
 

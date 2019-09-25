@@ -40,6 +40,7 @@ namespace eFMS.API.ReportData
                 config.DefaultApiVersion = new ApiVersion(1, 0);
                 config.ApiVersionReader = new HeaderApiVersionReader("api-version");
             });
+            services.AddCrossOrigin();
             services.AddSwagger();
             services.AddConfigureSetting(Configuration);
         
@@ -70,9 +71,6 @@ namespace eFMS.API.ReportData
                             description.GroupName.ToUpperInvariant());
                     }
                 });
-
-                app.UseCors("AllowAllOrigins");
-
                 app.UseMvc();
         }
     }

@@ -273,7 +273,10 @@ namespace eFMS.API.ReportData.Controllers
         );
         }
 
-
+        /// <summary>
+        /// export Custom Clearance
+        /// </summary>
+        /// <returns></returns>
         #endregion
         #region Custom Clearance
         [Route("CustomsDeclaration/ExportCustomClearance")]
