@@ -12,7 +12,7 @@ export class SystemRepo {
     }
 
     getListSystemUser() {
-        return this._api.get(`${environment.HOST.SYSTEM}/${this.MODULE}/api/${this.VERSION}/vi/SysUser`).pipe(
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUser`).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => {
                 return data;

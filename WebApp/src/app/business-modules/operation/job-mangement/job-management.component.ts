@@ -8,7 +8,6 @@ import { ToastrService } from 'ngx-toastr';
 import { Shipment, CustomDeclaration } from 'src/app/shared/models';
 import { SortService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
-import { HttpClient } from '@angular/common/http';
 
 @Component({
     selector: 'app-job-mangement',
@@ -49,7 +48,6 @@ export class JobManagementComponent extends AppList implements OnInit {
         private _documentRepo: DocumentationRepo,
         private _ngProgressService: NgProgress,
         private _toastService: ToastrService,
-        private _http: HttpClient,
         private _operationRepo: OperationRepo
     ) {
         super();
@@ -96,10 +94,11 @@ export class JobManagementComponent extends AppList implements OnInit {
             this.customClearances = this.shipments[indexsShipment].customClearances;
         } else {
             this._progressRef.start();
+            this.isLoading = true;
             this._operationRepo.getCustomDeclaration(jobNo)
                 .pipe(
                     catchError(this.catchError),
-                    finalize(() => this._progressRef.complete())
+                    finalize(() => { this._progressRef.complete(); this.isLoading = false; })
                 ).subscribe(
                     (res: CustomDeclaration[]) => {
                         if (!!res) {
@@ -180,10 +179,11 @@ export class JobManagementComponent extends AppList implements OnInit {
 
     getShipments(dataSearch?: any) {
         this._progressRef.start();
+        this.isLoading = true;
         this._documentRepo.getListShipment(this.page, this.pageSize, dataSearch)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
+                finalize(() => { this._progressRef.complete(); this.isLoading = false; })
             ).subscribe(
                 (responses: any) => {
                     if (!!responses.data) {

@@ -37,6 +37,7 @@ import { AddMoreModalComponent } from './custom-declaration/add-more-modal/add-m
 import { ContainerImportComponent } from './container-list/container-import/container-import.component';
 import { NgxCurrencyModule } from 'ngx-currency';
 import { SearchMultipleComponent } from './custom-declaration/components/search-multiple/search-multiple.component';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 const routing: Routes = [
     {
@@ -56,6 +57,7 @@ const LIB = [
     SelectModule,
     TabsModule.forRoot(),
     ModalModule.forRoot(),
+    DragDropModule 
 ];
 
 const COMPONENTS = [

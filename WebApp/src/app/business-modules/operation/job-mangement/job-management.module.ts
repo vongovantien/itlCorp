@@ -6,13 +6,12 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SelectModule } from 'ng2-select';
-import { ModalModule, PaginationModule } from 'ngx-bootstrap';
+import { PaginationModule } from 'ngx-bootstrap';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { JobManagementCreateJobComponent } from './create/create-job.component';
 import { JobManagementDetailJobComponent } from './detail/detail-job.component';
 
 import { JobManagementFormSearchComponent } from './components/form-search-job/form-search-job.component';
-import { HttpClientModule } from '@angular/common/http';
 
 
 const routing: Routes = [
@@ -42,7 +41,6 @@ const LIB = [
     SelectModule,
     NgProgressModule,
     PaginationModule.forRoot(),
-    ModalModule.forRoot()
 ];
 
 @NgModule({

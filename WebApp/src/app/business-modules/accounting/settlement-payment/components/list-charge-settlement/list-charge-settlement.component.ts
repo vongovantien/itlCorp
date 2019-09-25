@@ -174,7 +174,7 @@ export class SettlementListChargeComponent extends AppList {
             // * UPDATE GROUP SHIPMENT LIST
             this.groupShipments = this.groupShipments.filter((groupItem: any) => groupItem.chargeSettlements.length);
         } else {
-            const surchargeSelected: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.isSelected && !surcharge.isFromShipment);
+            const surchargeSelected: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.isSelected);
 
             if (!!surchargeSelected.length) {
                 this.surcharges = this.surcharges.filter((surcharge: Surcharge) => !surcharge.isSelected);
@@ -201,9 +201,7 @@ export class SettlementListChargeComponent extends AppList {
 
     checkUncheckAllCharge() {
         for (const charge of this.surcharges) {
-            if (!charge.isFromShipment) {
-                charge.isSelected = this.isCheckAll;
-            }
+            charge.isSelected = this.isCheckAll;
         }
     }
 
@@ -213,7 +211,9 @@ export class SettlementListChargeComponent extends AppList {
 
     showPaymentManagement(surcharge: Surcharge) {
         this.paymentManagementPopup.getDataPaymentManagement(surcharge.jobId, surcharge.hbl, surcharge.mbl);
-        this.paymentManagementPopup.show();
+        setTimeout(() => {
+            this.paymentManagementPopup.show();
+        }, 500);
     }
 
     openCopySurcharge(surcharge: Surcharge) {
@@ -229,7 +229,7 @@ export class SettlementListChargeComponent extends AppList {
         } else {
             this.TYPE = 'GROUP';
         }
-        
+
         this.selectedIndexSurcharge = null;
     }
 }
