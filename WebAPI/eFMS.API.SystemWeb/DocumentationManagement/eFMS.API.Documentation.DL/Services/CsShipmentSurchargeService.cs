@@ -373,6 +373,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item);
                 charge.Unit = item.UnitNameEn;
                 charge.Currency = item.CurrencyCode;
+                charge.ExchangeRate = item.RateToLocal;
                 results.Add(charge);
             }
             return results;
