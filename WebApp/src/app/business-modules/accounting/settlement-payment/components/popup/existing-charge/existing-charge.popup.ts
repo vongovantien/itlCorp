@@ -3,7 +3,7 @@ import { PopupBase } from 'src/app/popup.base';
 import { SystemConstants } from 'src/constants/system.const';
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
 import { DataService, SortService } from 'src/app/shared/services';
-import { SystemRepo, OperationRepo, AccoutingRepo } from 'src/app/shared/repositories';
+import { OperationRepo, AccoutingRepo, DocumentationRepo, CatalogueRepo } from 'src/app/shared/repositories';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { Surcharge } from 'src/app/shared/models';
@@ -52,11 +52,12 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
 
     constructor(
         private _dataService: DataService,
-        private _sysRepo: SystemRepo,
-        private _operationRepo: OperationRepo,
+        private _catalogue: CatalogueRepo,
+        private _catalogueRepo: CatalogueRepo,
         private _accoutingRepo: AccoutingRepo,
         private _sortService: SortService,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _documentRepo: DocumentationRepo
     ) {
         super();
     }
@@ -86,7 +87,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             .subscribe(
                 (data: any) => {
                     if (!data) {
-                        this._sysRepo.getListPartner(null, null, { inactive: false })
+                        this._catalogue.getListPartner(null, null, { inactive: false })
                             .pipe(catchError(this.catchError))
                             .subscribe(
                                 (dataPartner: any) => {
@@ -110,7 +111,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     }
 
     getProductService() {
-        this._operationRepo.getListService()
+        this._catalogueRepo.getListService()
             .pipe(catchError(this.catchError))
             .subscribe(
                 (data: CommonInterface.IValueDisplay[]) => {
@@ -152,7 +153,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
 
 
     getShipment(partnerId: string, service: string[]) {
-        this._accoutingRepo.getShipmentByPartnerOrService(partnerId, service)
+        this._documentRepo.getShipmentByPartnerOrService(partnerId, service)
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
@@ -241,7 +242,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         this.selectedCharge = this.charges
             .filter((charge: Surcharge) => charge.isSelected && !charge.settlementCode)
             .map((surcharge: Surcharge) => new Surcharge(surcharge));
-            
+
         if (!this.selectedCharge.length) {
             this._toastService.warning(`Don't have any charges in this period, Please check it again! `, '', { positionClass: 'toast-bottom-right' });
             return;

@@ -1,7 +1,7 @@
 import { Component, ViewChild, Output, EventEmitter } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
-import { AccoutingRepo } from 'src/app/shared/repositories';
+import { AccoutingRepo, OperationRepo } from 'src/app/shared/repositories';
 import { catchError, map } from 'rxjs/operators';
 import { CustomDeclaration, AdvancePaymentRequest } from 'src/app/shared/models';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
@@ -59,6 +59,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     constructor(
         private _fb: FormBuilder,
         private _accoutingRepo: AccoutingRepo,
+        private _operationRepo: OperationRepo
     ) {
         super();
     }
@@ -221,7 +222,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     }
 
     getCustomNo() {
-        this._accoutingRepo.getListCustomsDeclaration()
+        this._operationRepo.getListCustomsDeclaration()
             .pipe(
                 catchError(this.catchError),
                 map((response: any[]) => response.map((item: CustomDeclaration) => new CustomDeclaration(item))),

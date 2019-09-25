@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { StatementOfAccountAddChargeComponent } from '../components/poup/add-charge/add-charge.popup';
-import { AccoutingRepo, SystemRepo } from 'src/app/shared/repositories';
+import { AccoutingRepo, CatalogueRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { SOA, SOASearchCharge, Charge } from 'src/app/shared/models';
 import { ToastrService } from 'ngx-toastr';
@@ -43,7 +43,7 @@ export class StatementOfAccountEditComponent extends AppList {
         private _accoutingRepo: AccoutingRepo,
         private _toastService: ToastrService,
         private _activedRoute: ActivatedRoute,
-        private _sysRepo: SystemRepo,
+        private _sysRepo: CatalogueRepo,
         private _sortService: SortService,
         private _router: Router,
         private _dataService: DataService,

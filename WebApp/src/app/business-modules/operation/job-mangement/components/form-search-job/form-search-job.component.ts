@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
-import { OperationRepo, SystemRepo } from 'src/app/shared/repositories';
+import { OperationRepo, CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { SystemConstants } from 'src/constants/system.const';
 import { DataService } from 'src/app/shared/services';
@@ -42,10 +42,11 @@ export class JobManagementFormSearchComponent extends AppForm {
     selectedPartner: any = {};
 
     constructor(
-        private _opearationRepo: OperationRepo,
+        private _operationRepo: OperationRepo,
         private _fb: FormBuilder,
         private _dataService: DataService,
-        private _sysRepo: SystemRepo
+        private _sysRepo: SystemRepo,
+        private _catalogueRepo: CatalogueRepo
     ) {
         super();
     }
@@ -55,7 +56,7 @@ export class JobManagementFormSearchComponent extends AppForm {
         this.getPartner();
         this.getUser();
         this.getCommondata();
-
+        
         this.filterTypes = [
             { title: 'Job Id', value: 'jobId' },
             { title: 'HBL', value: 'hbl' },
@@ -64,7 +65,7 @@ export class JobManagementFormSearchComponent extends AppForm {
     }
 
     getCommondata() {
-        this._opearationRepo.getShipmentCommonData()
+        this._operationRepo.getShipmentCommonData()
             .pipe(
                 catchError(this.catchError)
             ).subscribe(
@@ -85,7 +86,7 @@ export class JobManagementFormSearchComponent extends AppForm {
             .subscribe(
                 (data: any) => {
                     if (!data) {
-                        this._sysRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, inactive: false })
+                        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, inactive: false })
                             .pipe(catchError(this.catchError))
                             .subscribe(
                                 (dataPartner: any) => {
@@ -167,8 +168,8 @@ export class JobManagementFormSearchComponent extends AppForm {
     searchShipment() {
         const body: ISearchDataShipment = {
             all: null,
-            jobNo: this.filterType.value.value === 'jobId' ? this.searchText.value.trim() : null,
-            hwbno: this.filterType.value.value === 'hbl' ? this.searchText.value.trim() : null,
+            jobNo: this.filterType.value.value === 'jobId' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
+            hwbno: this.filterType.value.value === 'hbl' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
             productService: !!this.productService.value ? this.productService.value.value : null,
             serviceMode: !!this.serviceMode.value ? this.serviceMode.value.value : null,
             shipmentMode: !!this.shipmentMode.value ? this.shipmentMode.value.value : null,

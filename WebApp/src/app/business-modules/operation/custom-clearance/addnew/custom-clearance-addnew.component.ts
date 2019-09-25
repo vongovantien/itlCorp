@@ -11,6 +11,7 @@ import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services/sort.service';
+import { CatalogueRepo, OperationRepo } from 'src/app/shared/repositories';
 
 @Component({
     selector: 'app-custom-clearance-addnew',
@@ -32,20 +33,24 @@ export class CustomClearanceAddnewComponent implements OnInit {
         private _location: Location,
         private cdr: ChangeDetectorRef,
         private sortService: SortService,
-        private toastr: ToastrService) {
+        private _catalogueRepo: CatalogueRepo,
+        private _operationRepo: OperationRepo,
+        private toastr: ToastrService
+    ) {
         this.keepCalendarOpeningWithRange = true;
         this.selectedDate = Date.now();
         this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
     }
 
-    async ngOnInit() {
+    ngOnInit() {
         this.getClearanceType();
-        await this.getListCustomer();
-        await this.getListPort();
+        this.getListCustomer();
+        this.getListPort();
         this.getListCountry();
-        await this.getListUnit();
-        await this.getListCommodity();
+        this.getListUnit();
+        this.getListCommodity();
     }
+
     async addCustomClearance(formAdd: NgForm) {
         if (this.strCustomerCurrent == '' || this.strPortCurrent == '') return;
         if (this.serviceTypeCurrent[0] != 'Air' && this.serviceTypeCurrent[0] != 'Express') {
@@ -94,6 +99,7 @@ export class CustomClearanceAddnewComponent implements OnInit {
             }
         }
     }
+
     async convertClearanceToShipment(formAdd: NgForm) {
         if (this.strCustomerCurrent === '' || this.strPortCurrent === '' || this.typeClearanceCurrent.length === 0
             || this.customDeclaration.hblid == null || this.customDeclaration.hblid === ''
@@ -126,7 +132,6 @@ export class CustomClearanceAddnewComponent implements OnInit {
             }
         }
     }
-
 
     mapClearanceToShipment() {
         let shipment = new OpsTransaction();
@@ -182,51 +187,47 @@ export class CustomClearanceAddnewComponent implements OnInit {
         return shipment;
     }
 
-    async getListCustomer() {
-        //partnerGroup = 3 ~ Customer
-        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.CUSTOMER }, true, true);
-        this.listCustomer = res;
+    getListCustomer() {
+        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.CUSTOMER })
+            .subscribe((res: any) => { this.listCustomer = res; });
     }
 
     getClearanceType() {
-        this.baseServices.get(this.api_menu.Operation.CustomClearance.getClearanceTypes).subscribe((res: any) => {
-            this.serviceTypes = res.serviceTypes.map(x => ({ "text": x.displayName, "id": x.value }));
-            this.typeClearance = res.types.map(x => ({ "text": x.displayName, "id": x.value }));
-            this.routeClearance = res.routes.map(x => ({ "text": x.displayName, "id": x.value }));
-            this.cargoTypes = res.cargoTypes.map(x => ({ "text": x.displayName, "id": x.value }));
-        });
+        this._operationRepo.getClearanceType()
+            .subscribe(
+                (res: any) => {
+                    this.serviceTypes = res.serviceTypes.map(x => ({ "text": x.displayName, "id": x.value }));
+                    this.typeClearance = res.types.map(x => ({ "text": x.displayName, "id": x.value }));
+                    this.routeClearance = res.routes.map(x => ({ "text": x.displayName, "id": x.value }));
+                    this.cargoTypes = res.cargoTypes.map(x => ({ "text": x.displayName, "id": x.value }));
+                }
+            );
     }
 
-    async getListPort() {
-        //placeType = 8 ~ Port
-        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, { placeType: PlaceTypeEnum.Port }, true, true);
-        this.listPort = res;
+    getListPort() {
+        this._catalogueRepo.getListPort({ placeType: PlaceTypeEnum.Port })
+            .subscribe((res: any) => { this.listPort = res; });
     }
 
     getListCountry() {
-        this.baseServices.get(this.api_menu.Catalogue.Country.getAll).subscribe((res: any) => {
-            this.listCountry = res;
-        });
+        this._catalogueRepo.getListAllCountry()
+            .subscribe((res: any) => { this.listCountry = res; });
     }
 
-    async getListCommodity() {
-        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.Commodity.query, {}, true, true);
-        this.listCommodity = res;
+    getListCommodity() {
+        this._catalogueRepo.getCommondity()
+            .subscribe((res: any) => { this.listCommodity = res; });
     }
 
-    async getListUnit() {
-        //unitType = Package
-        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: 'Package' }, true, true);
-        this.listUnit = res;
-        var datasort = this.sortService.sort(res, res[0].code, true);
-        console.log(datasort)
-        this.strUnitCurrent = datasort != null ? datasort[0].code : '';
-        console.log(this.strUnitCurrent);
+    getListUnit() {
+        this._catalogueRepo.getUnit({ unitType: 'Package' })
+            .subscribe((res: any) => {
+                this.listUnit = res;
+                const datasort = this.sortService.sort(res, res[0].code, true);
+                this.strUnitCurrent = datasort != null ? datasort[0].code : '';
+            });
     }
 
-    /**
-      * Daterange picker
-      */
     selectedRange: any;
     selectedDate: any;
     keepCalendarOpeningWithRange: true;

@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { JobConstants } from 'src/constants/job.const';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { AppList } from 'src/app/app.list';
-import { OperationRepo } from 'src/app/shared/repositories';
+import { OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Shipment, CustomDeclaration } from 'src/app/shared/models';
@@ -46,10 +46,11 @@ export class JobManagementComponent extends AppList implements OnInit {
 
     constructor(
         private sortService: SortService,
-        private _operationRepo: OperationRepo,
+        private _documentRepo: DocumentationRepo,
         private _ngProgressService: NgProgress,
         private _toastService: ToastrService,
-        private _http: HttpClient
+        private _http: HttpClient,
+        private _operationRepo: OperationRepo
     ) {
         super();
         this.requestSort = this.sortShipment;
@@ -112,7 +113,7 @@ export class JobManagementComponent extends AppList implements OnInit {
 
     deleteSipment(shipment: Shipment) {
         this._progressRef.start();
-        this._operationRepo.checkShipmentAllowToDelete(shipment.id)
+        this._documentRepo.checkShipmentAllowToDelete(shipment.id)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
@@ -132,7 +133,7 @@ export class JobManagementComponent extends AppList implements OnInit {
 
     onDeleteShipment() {
         this._progressRef.start();
-        this._operationRepo.deleteShipment(this.selectedShipment.id)
+        this._documentRepo.deleteShipment(this.selectedShipment.id)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
@@ -179,7 +180,7 @@ export class JobManagementComponent extends AppList implements OnInit {
 
     getShipments(dataSearch?: any) {
         this._progressRef.start();
-        this._operationRepo.getListShipment(this.page, this.pageSize, dataSearch)
+        this._documentRepo.getListShipment(this.page, this.pageSize, dataSearch)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())

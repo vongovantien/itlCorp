@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Component } from "@angular/core";
 import { BaseService } from "src/app/shared/services/base.service";
 import { API_MENU } from "src/constants/api-menu.const";
 import { OpsTransaction } from "src/app/shared/models/document/OpsTransaction.model";
@@ -8,14 +8,11 @@ import { PartnerGroupEnum } from "src/app/shared/enums/partnerGroup.enum";
 import { NgForm } from "@angular/forms";
 import { Router } from "@angular/router";
 import { PlaceTypeEnum } from "src/app/shared/enums/placeType-enum";
-import { JobRepo, CatalogueRepo } from "src/app/shared/repositories";
-import { PopupBase } from "src/app/popup.base";
+import { CatalogueRepo, OperationRepo } from "src/app/shared/repositories";
 import { takeUntil, catchError, finalize } from "rxjs/operators";
 import { NgxSpinnerService } from "ngx-spinner";
 import { ToastrService } from "ngx-toastr";
 import { AppPage } from "src/app/app.base";
-import { DataService } from "src/app/shared/services";
-
 
 @Component({
     selector: "app-job-mangement-create",
@@ -64,7 +61,7 @@ export class JobManagementCreateJobComponent extends AppPage {
         private baseServices: BaseService,
         private api_menu: API_MENU,
         private router: Router,
-        private jobRepo: JobRepo,
+        private _operationRepo: OperationRepo,
         private spinner: NgxSpinnerService,
         private _toaster: ToastrService,
         private _catalogueRepo: CatalogueRepo,
@@ -188,7 +185,7 @@ export class JobManagementCreateJobComponent extends AppPage {
                 const error = $("#add-new-ops-job-form").find("div.has-danger");
                 if (error.length === 0) {
                     this.OpsTransactionToAdd.serviceDate = this.selectedDate.startDate != null ? dataHelper.dateTimeToUTC(this.selectedDate.startDate) : null;
-                    this.jobRepo.addOPSJob(this.OpsTransactionToAdd).pipe(
+                    this._operationRepo.addOPSJob(this.OpsTransactionToAdd).pipe(
                         takeUntil(this.ngUnsubscribe),
                         catchError(this.catchError),
                         finalize(() => { this.spinner.hide(); })

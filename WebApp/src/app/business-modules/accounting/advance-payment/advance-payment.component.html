@@ -29,7 +29,8 @@
                         <div class="table-wrapper" id="adv-payment-list-table">
                             <table class="table table-brand table-hover dataTable">
                                 <thead>
-                                    <tr class="text-center" app-table-header [headers]="headers" (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                                    <tr class="text-center" app-table-header [headers]="headers"
+                                        (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                                         <th class="m--w-50 first">
                                         </th>
                                     </tr>
@@ -99,13 +100,15 @@
                                             [parentId]="'#adv-payment-list-table'">
                                             <table class="table table-secondary dataTable">
                                                 <thead>
-                                                    <tr class="text-center" app-table-header [headers]="headerGroupRequest" (onClick)="sortByCollapse($event)">
+                                                    <tr class="text-center" app-table-header
+                                                        [headers]="headerGroupRequest"
+                                                        (onClick)="sortByCollapse($event)">
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <ng-container
-                                                        *ngFor="let request of groupRequest; let j = index; trackBy: trackByFn">
-                                                        <tr class="text-center">
+                                                    <ng-container *ngIf="!isLoading && !!groupRequest.length">
+                                                        <tr class="text-center"
+                                                            *ngFor="let request of groupRequest; let j = index; trackBy: trackByFn">
                                                             <td>{{request.jobId}}</td>
                                                             <td>{{request.customNo}}</td>
                                                             <td>{{request.hbl}}</td>
@@ -130,13 +133,17 @@
                                                             </td>
                                                         </tr>
                                                     </ng-container>
-                                                    <tr *ngIf="!groupRequest.length" app-table-none-record>
+                                                    <tr *ngIf="!isLoading && !groupRequest.length"
+                                                        app-table-none-record>
+                                                    </tr>
+                                                    <tr *ngIf="isLoading" app-table-row-loading>
                                                     </tr>
                                                 </tbody>
                                             </table>
                                         </tr>
                                     </ng-container>
-                                    <tr *ngIf="!isLoading && !advancePayments.length" app-table-none-record [colspan]="headers.length + 1">
+                                    <tr *ngIf="!isLoading && !advancePayments.length" app-table-none-record
+                                        [colspan]="headers.length + 1">
                                     </tr>
                                     <tr class="loading-wrapper" *ngIf="isLoading" app-table-row-loading>
                                     </tr>

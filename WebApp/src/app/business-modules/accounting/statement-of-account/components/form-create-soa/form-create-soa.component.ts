@@ -7,7 +7,7 @@ import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { formatDate } from '@angular/common';
 import _includes from 'lodash/includes';
 import _uniq from 'lodash/uniq';
-import { SystemRepo, CatalogueRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { DataService } from 'src/app/shared/services';
 import { ToastrService } from 'ngx-toastr';
 
@@ -66,12 +66,12 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
     commodityGroup: any[] = [];
     commodity: any = null;
-    
+
     constructor(
-        private _sysRepo: SystemRepo,
         private _toastService: ToastrService,
         private _dataService: DataService,
-        private _catalougeRepo: CatalogueRepo
+        private _catalogueRepo: CatalogueRepo,
+        private _sysRepo: SystemRepo
     ) {
         super();
     }
@@ -87,15 +87,15 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     }
 
     getCommondity() {
-        this._catalougeRepo.getCommodityGroup()
-        .pipe(catchError(this.catchError))
-        .subscribe(
-            (res: any) => {
-                this.commodityGroup = res || [];
-            },
-            (errors: any) => {},
-            () => {},
-        );
+        this._catalogueRepo.getCommodityGroup()
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.commodityGroup = res || [];
+                },
+                (errors: any) => { },
+                () => { },
+            );
     }
 
     getPartner() {
@@ -107,11 +107,11 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
             .subscribe(
                 (data: any) => {
                     if (!data) {
-                        this._sysRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, inactive: false })
+                        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, inactive: false })
                             .pipe(catchError(this.catchError))
                             .subscribe(
                                 (dataPartner: any) => {
-                                    this.getPartnerData(dataPartner)
+                                    this.getPartnerData(dataPartner);
                                 },
                             );
                     } else {
@@ -146,7 +146,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     }
 
     getService() {
-        this._sysRepo.getListService()
+        this._catalogueRepo.getListService()
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
@@ -176,11 +176,11 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                     if (!!data) {
                         this.getCurrencyData(data);
                     } else {
-                        this._sysRepo.getListCurrency()
+                        this._catalogueRepo.getListCurrency()
                             .pipe(catchError(this.catchError))
                             .subscribe(
                                 (dataCurrency: any) => {
-                                    this.getCurrencyData(dataCurrency)
+                                    this.getCurrencyData(dataCurrency);
                                 },
                             );
                     }
@@ -208,12 +208,12 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                             );
                     }
                 }
-            )
+            );
 
     }
 
     getCharge() {
-        this._sysRepo.getListCharge()
+        this._catalogueRepo.getListCharge()
             .pipe(catchError(this.catchError))
             .subscribe((data) => {
                 this.charges = data;
@@ -423,7 +423,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         let serviceTypeId = '';
         if (!!service) {
             if (service === 'All') {
-                this.services = this.services.filter( service => service.id !== 'All');
+                this.services = this.services.filter(service => service.id !== 'All');
                 serviceTypeId = this.services.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
             } else {
                 serviceTypeId = this.selectedService.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');

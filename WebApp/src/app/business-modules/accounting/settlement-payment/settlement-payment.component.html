@@ -96,7 +96,7 @@
                                                     <tr class="text-center" app-table-header [headers]="headerCustomClearance" (onClick)="sortByCustomClearance($event)">
                                                     </tr>
                                                 </thead>
-                                                <tbody *ngIf="customClearances.length > 0">
+                                                <tbody *ngIf="!isLoading && !!customClearances.length">
                                                     <tr *ngFor="let clearance of customClearances; let j = index; trackBy: trackByFn" class="text-center">
                                                         <td>
                                                             <span>{{clearance.jobId}}</span>
@@ -118,7 +118,7 @@
                                             </table>
                                         </tr>
                                     </ng-container>
-                                    <tr *ngIf="!isLoading && !settlements.length" app-table-none-record
+                                    <tr *ngIf="!isLoading && !customClearances.length" app-table-none-record
                                         [colspan]="headers.length + 1"></tr>
                                     <tr *ngIf="isLoading" app-table-row-loading></tr>
                                 </tbody>

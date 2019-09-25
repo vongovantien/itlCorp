@@ -1,9 +1,9 @@
-import { Component, OnInit, ViewChild, Input } from "@angular/core";
+import { Component, ViewChild, Input } from "@angular/core";
 import { AppPage } from "src/app/app.base";
 import { OpsModuleStageManagementAddStagePopupComponent } from "./add/add-stage.popup.component";
 import { NgxSpinnerService } from "ngx-spinner";
 import { OpsModuleStageManagementDetailComponent } from "./detail/detail-stage-popup.component";
-import { JobRepo } from "src/app/shared/repositories";
+import { OperationRepo } from "src/app/shared/repositories";
 import { ActivatedRoute } from "@angular/router";
 
 
@@ -32,7 +32,7 @@ export class OpsModuleStageManagementComponent extends AppPage {
     timeOutSearch: any;
     constructor(
         private _spinner: NgxSpinnerService,
-        private _jobRepo: JobRepo,
+        private _operation: OperationRepo,
         private _activedRouter: ActivatedRoute,
         private _sortService: SortService
     ) {
@@ -64,7 +64,7 @@ export class OpsModuleStageManagementComponent extends AppPage {
     getListStageJob(id: string) {
         this._spinner.show();
 
-        this._jobRepo.getListStageOfJob(id).pipe(
+        this._operation.getListStageOfJob(id).pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),
             finalize(() => { this._spinner.hide(); }),
@@ -90,7 +90,7 @@ export class OpsModuleStageManagementComponent extends AppPage {
     getListStageAvailable(id: string) {
         this._spinner.show();
 
-        this._jobRepo.getListStageNotAssigned(id).pipe(
+        this._operation.getListStageNotAssigned(id).pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),
             finalize(() => { this._spinner.hide(); }),
@@ -112,7 +112,7 @@ export class OpsModuleStageManagementComponent extends AppPage {
     }
 
     getDetail(id: string) {
-        this._jobRepo.getDetailStageOfJob(id).pipe(
+        this._operation.getDetailStageOfJob(id).pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),
             finalize(() => { this._spinner.hide(); }),

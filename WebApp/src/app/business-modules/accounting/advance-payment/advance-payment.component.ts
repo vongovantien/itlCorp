@@ -139,11 +139,12 @@ export class AdvancePaymentComponent extends AppList {
         if (!!this.advancePayments[index].advanceRequests.length) {
             this.groupRequest = this.advancePayments[index].advanceRequests;
         } else {
+            this.isLoading = true;
             this._progressRef.start();
             this._accoutingRepo.getGroupRequestAdvPayment(advanceNo)
                 .pipe(
                     catchError(this.catchError),
-                    finalize(() => this._progressRef.complete())
+                    finalize(() => { this._progressRef.complete(); this.isLoading = false; })
                 )
                 .subscribe(
                     (res: any) => {

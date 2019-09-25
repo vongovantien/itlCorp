@@ -4,19 +4,19 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { ToastrService } from 'ngx-toastr';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
-import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { catchError, map, finalize } from 'rxjs/operators';
 import { CustomDeclaration } from 'src/app/shared/models';
 import { AppList } from 'src/app/app.list';
-import { CDNoteRepo } from 'src/app/shared/repositories';
+import { OperationRepo, DocumentationRepo, CatalogueRepo } from 'src/app/shared/repositories';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 import _map from 'lodash/map';
 import { formatDate } from '@angular/common';
 import { NgProgress } from '@ngx-progressbar/core';
+import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 
 @Component({
     selector: 'app-custom-clearance',
@@ -40,8 +40,10 @@ export class CustomClearanceComponent extends AppList {
         private api_menu: API_MENU,
         private _sortService: SortService,
         private _toastrService: ToastrService,
-        private _cdNoteRepo: CDNoteRepo,
-        private _ngProgressService: NgProgress
+        private _operationRepo: OperationRepo,
+        private _ngProgressService: NgProgress,
+        private _documentRepo: DocumentationRepo,
+        private _catalogueRepo: CatalogueRepo
     ) {
         super();
         this.requestList = this.getListCustomsDeclaration;
@@ -68,24 +70,26 @@ export class CustomClearanceComponent extends AppList {
         this.getListUnit();
     }
 
-    async getListCustomer() {
-        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.CUSTOMER }, true, true);
-        this.listCustomer = res;
+    getListCustomer() {
+        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.CUSTOMER  })
+            .subscribe((res: any) => { this.listCustomer = res; });
     }
-    async getListPort() {
-        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, { placeType: PlaceTypeEnum.Port }, true, true);
-        this.listPort = res;
+
+    getListPort() {
+        this._catalogueRepo.getListPort({ placeType: PlaceTypeEnum.Port })
+            .subscribe((res: any) => { this.listPort = res; });
     }
-    async getListUnit() {
-        const res = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: 'Package' }, true, true);
-        this.listUnit = res;
+
+    getListUnit() {
+        this._catalogueRepo.getUnit({ unitType: 'Package' })
+            .subscribe((res: any) => { this.listUnit = res; });
     }
 
     getListCustomsDeclaration(dataSearch?: any) {
         this.isLoading = true;
         this._progressRef.start();
         const body = dataSearch || {};
-        this._cdNoteRepo.getListCustomDeclaration(this.page, this.pageSize, body)
+        this._operationRepo.getListCustomDeclaration(this.page, this.pageSize, body)
             .pipe(
                 catchError(this.catchError),
                 map((data: any) => {
@@ -114,7 +118,7 @@ export class CustomClearanceComponent extends AppList {
 
     getDataFromEcus() {
         this._progressRef.start();
-        this._cdNoteRepo.importCustomClearanceFromEcus()
+        this._operationRepo.importCustomClearanceFromEcus()
             .pipe(catchError(this.catchError),
                 finalize(() => { this.isLoading = false; this._progressRef.complete(); }))
             .subscribe(
@@ -147,7 +151,7 @@ export class CustomClearanceComponent extends AppList {
         this._progressRef.start();
         this.confirmDeletePopup.hide();
         const customCheckedArray: CustomDeclaration[] = this.listCustomDeclaration.filter(i => i.isSelected && !i.jobNo) || [];
-        this._cdNoteRepo.deleteMultipleClearance(customCheckedArray || [])
+        this._operationRepo.deleteMultipleClearance(customCheckedArray || [])
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this._progressRef.complete(); })
@@ -166,7 +170,7 @@ export class CustomClearanceComponent extends AppList {
         const clearanceNulls = clearancesToConvert.filter(x => x.opsTransaction == null);
         if (clearanceNulls.length === 0) {
             this._progressRef.start();
-            this._cdNoteRepo.convertClearanceToJob(clearancesToConvert)
+            this._documentRepo.convertClearanceToJob(clearancesToConvert)
                 .pipe(
                     catchError(this.catchError),
                     finalize(() => { this._progressRef.complete(); })
@@ -273,7 +277,7 @@ export class CustomClearanceComponent extends AppList {
                 item.exportCountryName,
                 item.jobNo,
                 formatDate(item.clearanceDate, 'dd/MM/yyyy', 'en'),
-                (item.jobNo != null && item.jobNo != '') ? 'Imported' : 'Not Imported'
+                (item.jobNo !== null && item.jobNo !== '') ? 'Imported' : 'Not Imported'
             ];
         });
 

@@ -2,12 +2,12 @@ import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from "@angu
 import { FormBuilder, FormGroup, AbstractControl, Validators } from "@angular/forms";
 
 import { PopupBase } from "src/app/popup.base";
-import { JobRepo, SystemRepo } from "src/app/shared/repositories";
+import { SystemRepo, OperationRepo } from "src/app/shared/repositories";
 import { User, Stage } from "src/app/shared/models";
 
 import { takeUntil, catchError, finalize } from "rxjs/operators";
 import { ToastrService } from "ngx-toastr";
-import moment from "moment";
+import { formatDate } from "@angular/common";
 
 @Component({
     selector: "detail-stage-popup",
@@ -76,7 +76,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
 
     constructor(
         private _fb: FormBuilder,
-        private _jobRepo: JobRepo,
+        private _operationRepo: OperationRepo,
         private _toaster: ToastrService,
         private _systemRepo: SystemRepo
     ) {
@@ -156,7 +156,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             departmentName: this.data.departmentName,
             description: this.data.description || '',
             processTime: this.data.processTime,
-            deadLineDate: !!this.data.deadline ? { startDate: moment(this.data.deadline), endDate: moment(this.data.deadline) } : null
+            deadLineDate: !!this.data.deadline ? { startDate: new Date(this.data.deadline), endDate: new Date(this.data.deadline) } : null
         });
 
         this.selectedMainPersonInCharge = Object.assign({}, { field: 'username', value: this.data.mainPersonInCharge });
@@ -204,10 +204,10 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
                 processTime: form.value.processTime,
                 comment: form.value.comment,
                 description: form.value.description,
-                deadline: !!form.value.deadLineDate.startDate ? moment(form.value.deadLineDate.startDate).format('YYYY-MM-DDTHH:mm') : null,
+                deadline: !!form.value.deadLineDate.startDate ? formatDate(form.value.deadLineDate.startDate, 'YYYY-MM-DDTHH:mm', 'en') : null,
                 status: this.statusStageActive[0].id || this.statusStage[0].id
             };
-            this._jobRepo.updateStageToJob(body).pipe(
+            this._operationRepo.updateStageToJob(body).pipe(
                 takeUntil(this.ngUnsubscribe),
                 catchError(this.catchError),
                 finalize(() => { }),

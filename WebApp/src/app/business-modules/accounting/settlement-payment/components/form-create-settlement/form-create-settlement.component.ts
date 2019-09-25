@@ -5,7 +5,7 @@ import { BaseService, DataService } from 'src/app/shared/services';
 import { AbstractControl, FormGroup, FormBuilder } from '@angular/forms';
 import { SystemConstants } from 'src/constants/system.const';
 import { takeUntil, catchError, distinctUntilChanged, map } from 'rxjs/operators';
-import { SystemRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo } from 'src/app/shared/repositories';
 
 @Component({
     selector: 'settle-payment-form-create',
@@ -34,7 +34,7 @@ export class SettlementFormCreateComponent extends AppForm {
         private _baseService: BaseService,
         private _fb: FormBuilder,
         private _dataService: DataService,
-        private _sysRepo: SystemRepo
+        private _catalogue: CatalogueRepo
     ) {
         super();
     }
@@ -91,7 +91,7 @@ export class SettlementFormCreateComponent extends AppForm {
                         this.currencyList = res || [];
                         this.currency.setValue(this.currencyList.filter((item: Currency) => item.id === 'VND')[0]);
                     } else {
-                        this._sysRepo.getListCurrency()
+                        this._catalogue.getListCurrency()
                             .pipe(catchError(this.catchError))
                             .subscribe(
                                 (data: any) => {
