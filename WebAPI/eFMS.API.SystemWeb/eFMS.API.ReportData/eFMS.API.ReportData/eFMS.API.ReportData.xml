@@ -4,6 +4,17 @@
         <name>eFMS.API.ReportData</name>
     </assembly>
     <members>
+        <member name="T:eFMS.API.ReportData.Controllers.ReportDataController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">
+            <summary>
+            constructor
+            </summary>
+            <param name="appSettings"></param>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportCountry(eFMS.API.ReportData.Models.CatCountryCriteria)">
             <summary>
             export country
@@ -89,6 +100,14 @@
             export Custom Clearance
             </summary>
             <returns></returns>
+        </member>
+        <member name="T:eFMS.API.ReportData.Helpers.FileHelper">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="T:eFMS.API.ReportData.Models.FilesNames">
+            <summary>Supports all classes in the .NET Framework class hierarchy and provides low-level services to derived classes. This is the ultimate base class of all classes in the .NET Framework; it is the root of the type hierarchy.</summary>
         </member>
     </members>
 </doc>

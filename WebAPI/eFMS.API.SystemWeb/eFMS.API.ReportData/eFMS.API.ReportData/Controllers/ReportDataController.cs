@@ -6,15 +6,23 @@ using Microsoft.AspNetCore.Mvc;
 using eFMS.API.ReportData.HttpServices;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
+using eFMS.API.ReportData.Helpers;
 
 namespace eFMS.API.ReportData.Controllers
 {
+    /// <summary>
+    /// A base class for an MVC controller without view support.
+    /// </summary>
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
     [ApiController]
     public class ReportDataController : ControllerBase
     {
         private readonly APIs aPis;
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="appSettings"></param>
         public ReportDataController(IOptions<APIs> appSettings)
         {
             this.aPis = appSettings.Value;
@@ -32,12 +40,7 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(catCountryCriteria, aPis.HostStaging + Urls.Catelogue.CountryUrl);
             var dataObjects =  responseFromApi.Content.ReadAsAsync<List<CatCountry>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
             var stream = helper.CreateCountryExcelFile(dataObjects.Result);
-            var buffer = stream as MemoryStream;
-            return this.File(
-            fileContents: buffer.ToArray(),
-            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            fileDownloadName: FilesNames.CountryName
-        );
+            return new FileHelper().ExportExcel(stream, FilesNames.CountryName);
         }
         /// <summary>
         /// export warehouse
@@ -51,12 +54,7 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPlaceCriteria, aPis.HostStaging + Urls.Catelogue.CatplaceUrl);
             var dataObjects =  responseFromApi.Content.ReadAsAsync<List<CatWareHouse>>();
             var stream = helper.CreateWareHourseExcelFile(dataObjects.Result);
-            var buffer = stream as MemoryStream;
-            return this.File(
-                fileContents: buffer.ToArray(),
-                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                fileDownloadName: FilesNames.WareHouse
-            );
+            return new FileHelper().ExportExcel(stream, FilesNames.WareHouse);
         }
         /// <summary>
         /// export portindex
@@ -70,12 +68,7 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPlaceCriteria, aPis.HostStaging + Urls.Catelogue.CatplaceUrl);
             var dataObjects =  responseFromApi.Content.ReadAsAsync<List<CatPortIndex>>();  
             var stream = helper.CreatePortIndexExcelFile(dataObjects.Result);
-            var buffer = stream as MemoryStream;
-            return this.File(
-                fileContents: buffer.ToArray(),
-                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                fileDownloadName: FilesNames.PortIndex
-            );
+            return new FileHelper().ExportExcel(stream, FilesNames.PortIndex);
         }
         /// <summary>
         /// export partnerdata
@@ -89,12 +82,7 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPartnerCriteria, aPis.HostStaging + Urls.Catelogue.CatPartnerUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatPartner>>();  
             var stream = helper.CreatePartnerExcelFile(dataObjects.Result);
-            var buffer = stream as MemoryStream;
-            return this.File(
-                fileContents: buffer.ToArray(),
-                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                fileDownloadName: FilesNames.PartnerData
-            );
+            return new FileHelper().ExportExcel(stream, FilesNames.PartnerData);
         }
         /// <summary>
         /// export commodity list
@@ -108,12 +96,7 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(catCommodityCriteria, aPis.HostStaging + Urls.Catelogue.CatCommodityUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatCommodityModel>>();  
             var stream = helper.CreateCommoditylistExcelFile(dataObjects.Result);
-            var buffer = stream as MemoryStream;
-            return this.File(
-                fileContents: buffer.ToArray(),
-                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                fileDownloadName: FilesNames.CommodityList
-            );
+            return new FileHelper().ExportExcel(stream, FilesNames.CommodityList);
         }
         /// <summary>
         /// export commodity group
@@ -127,12 +110,7 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(catCommodityGroupCriteria, aPis.HostStaging + Urls.Catelogue.CatCommodityGroupUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatCommodityGroup>>();
             var stream = helper.CreateCommoditygroupExcelFile(dataObjects.Result);
-            var buffer = stream as MemoryStream;
-            return this.File(
-                fileContents: buffer.ToArray(),
-                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                fileDownloadName: FilesNames.CommodityList
-            );
+            return new FileHelper().ExportExcel(stream, FilesNames.CommodityGroupList);
         }
         /// <summary>
         /// export stage
@@ -147,12 +125,8 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(catStageCriteria, aPis.HostStaging + Urls.Catelogue.CatStageUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatStage>>();
             var stream = helper.CreateCatStateExcelFile(dataObjects.Result);
-            var buffer = stream as MemoryStream;
-            return this.File(
-                fileContents: buffer.ToArray(),
-                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                fileDownloadName: FilesNames.StageList
-            );
+
+            return new FileHelper().ExportExcel(stream, FilesNames.StageList);
         }
         /// <summary>
         /// export unit
@@ -167,12 +141,7 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(catUnitCriteria, aPis.HostStaging + Urls.Catelogue.CatUnitUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatUnit>>();
             var stream = helper.CreateCatUnitExcelFile(dataObjects.Result);
-            var buffer = stream as MemoryStream;
-            return this.File(
-                fileContents: buffer.ToArray(),
-                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                fileDownloadName: FilesNames.UnitList
-            );
+            return new FileHelper().ExportExcel(stream, FilesNames.UnitList);
         }
         /// <summary>
         /// export province
@@ -186,12 +155,7 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPlaceCriteria, aPis.HostStaging + Urls.Catelogue.CatplaceUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatProvince>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
             var stream = helper.CreateProvinceExcelFile(dataObjects.Result);
-            var buffer = stream as MemoryStream;
-            return this.File(
-            fileContents: buffer.ToArray(),
-            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            fileDownloadName: FilesNames.ProvinceName
-        );
+            return new FileHelper().ExportExcel(stream, FilesNames.ProvinceName);
         }
 
         /// <summary>
@@ -206,12 +170,7 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPlaceCriteria, aPis.HostStaging + Urls.Catelogue.CatplaceUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatDistrict>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
             var stream = helper.CreateDistrictExcelFile(dataObjects.Result);
-            var buffer = stream as MemoryStream;
-            return this.File(
-            fileContents: buffer.ToArray(),
-            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            fileDownloadName: FilesNames.DistrictName
-        );
+            return new FileHelper().ExportExcel(stream, FilesNames.DistrictName);
         }
 
         /// <summary>
@@ -226,12 +185,7 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPlaceCriteria, aPis.HostStaging + Urls.Catelogue.CatplaceUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatTownWard>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
             var stream = helper.CreateTownWardExcelFile(dataObjects.Result);
-            var buffer = stream as MemoryStream;
-            return this.File(
-            fileContents: buffer.ToArray(),
-            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            fileDownloadName: FilesNames.TowardName
-        );
+            return new FileHelper().ExportExcel(stream, FilesNames.TowardName);
         }
 
         /// <summary>
@@ -246,12 +200,7 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(catChargeCriteria, aPis.HostStaging + Urls.Catelogue.CatchargeUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatCharge>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
             var stream = helper.CreateChargeExcelFile(dataObjects.Result);
-            var buffer = stream as MemoryStream;
-            return this.File(
-            fileContents: buffer.ToArray(),
-            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            fileDownloadName: FilesNames.ChargeName
-        );
+            return new FileHelper().ExportExcel(stream, FilesNames.ChargeName);
         }
         /// <summary>
         /// export currency
@@ -265,12 +214,7 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(catCurrrencyCriteria, aPis.HostStaging + Urls.Catelogue.CatCurrencyUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatCurrency>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
             var stream = helper.CreateCurrencyExcelFile(dataObjects.Result);
-            var buffer = stream as MemoryStream;
-            return this.File(
-            fileContents: buffer.ToArray(),
-            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            fileDownloadName: FilesNames.CurrencyName
-        );
+            return new FileHelper().ExportExcel(stream, FilesNames.CurrencyName);
         }
 
         /// <summary>
@@ -287,12 +231,7 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(customsDeclarationCriteria, aPis.HostStaging + Urls.CustomClearance.CustomClearanceUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CustomsDeclaration>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
             var stream = helper.CreateCustomClearanceExcelFile(dataObjects.Result);
-            var buffer = stream as MemoryStream;
-            return this.File(
-            fileContents: buffer.ToArray(),
-            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            fileDownloadName: FilesNames.CustomClearanceName
-        );
+            return new FileHelper().ExportExcel(stream, FilesNames.CustomClearanceName);
         }
 
 
