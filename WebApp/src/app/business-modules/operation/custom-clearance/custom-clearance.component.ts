@@ -312,7 +312,7 @@ export class CustomClearanceComponent extends AppList {
     // }
 
     export() {
-        this._http.post(`localhost:63492/api/v1/vi/ReportData/CustomsDeclaration/ExportCustomClearance`,this.searchObject,{
+        this._http.post(`http://test.api-efms.itlvn.com/export/api/v1/vi/ReportData/CustomsDeclaration/ExportCustomClearance`,this.searchObject,{
             responseType: 'arraybuffer'} 
            ).subscribe(
                response => this.downLoadFile(response, "application/ms-excel", 'CustomClearance.xlsx'));  
