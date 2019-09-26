@@ -12,12 +12,7 @@ export class ReportRepo {
     exportCustomClearance(searchObject: any = {}) {
         return this._api.post(`${environment.HOST.REPORT}/api/v1/vi/ReportData/CustomsDeclaration/ExportCustomClearance`, searchObject, {
             responseType: 'arraybuffer'
-        }).pipe(
-            catchError((error) => throwError(error)),
-            map((data: any) => {
-                return data;
-            })
-        )
+        })
     }
 
 
