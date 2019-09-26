@@ -43,7 +43,7 @@ export class LoginComponent {
         private route: ActivatedRoute,
         private oauthService: OAuthService,
         private cookieService: CookieService,
-        ) {
+    ) {
         this.oauthService.setStorage(localStorage);
         this.oauthService.setupAutomaticSilentRefresh();
     }
@@ -80,6 +80,9 @@ export class LoginComponent {
                         this.rememberMe();
 
                         // * CURRENT_URL: url before into auth guard.
+                        if (this.currenURL.includes("login")) {
+                            this.currenURL = "home/dashboard";
+                        }
                         this.router.navigateByUrl(this.currenURL);
                         this.baseService.spinnerHide();
                         this.toastr.info("Welcome back, " + userInfo.userName.toUpperCase() + " !", "Login Success");
@@ -169,5 +172,5 @@ interface IUser {
     preferred_username: string;
     sub: string;
     userName: string;
-    workplaceId:string;
+    workplaceId: string;
 }
