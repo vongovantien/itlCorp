@@ -40,5 +40,6 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string PODName { get; set; }
         public string CurrentStatus { get; set; }
         public string CustomerName { get; set; }
+
     }
 }
