@@ -11,7 +11,7 @@ import { prepareNg2SelectData } from 'src/helper/data.helper';
 
 import { ChargeConstants } from 'src/constants/charge.const';
 import { ContainerListComponent } from './container-list/container-list.component';
-import { OperationRepo, UnitRepo, SystemRepo, CatalogueRepo } from 'src/app/shared/repositories';
+import { OperationRepo, SystemRepo, CatalogueRepo } from 'src/app/shared/repositories';
 import { AppPage } from "src/app/app.base";
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { CancelCreateJobPopupComponent } from './job-confirm-popup/cancel-create-job-popup/cancel-create-job-popup.component';
@@ -114,7 +114,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         private api_menu: API_MENU,
         private route: ActivatedRoute,
         private router: Router,
-        private _unitRepo: UnitRepo,
         private _operationRepo: OperationRepo,
         private _data: DataService,
         private systemRepo: SystemRepo,
@@ -238,7 +237,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     getListPackageTypes() {
-        this._unitRepo.getListUnitByType({ unitType: 'package' })
+        this._catalogueRepo.getUnit({ unitType: 'package' })
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
