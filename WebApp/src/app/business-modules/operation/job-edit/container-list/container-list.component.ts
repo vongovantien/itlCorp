@@ -5,7 +5,7 @@ import { BaseService, SortService } from 'src/app/shared/services';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PopupBase } from 'src/app/popup.base';
 import { NgForm } from '@angular/forms';
-import { UnitRepo, OperationRepo, CatalogueRepo } from 'src/app/shared/repositories';
+import { OperationRepo, CatalogueRepo } from 'src/app/shared/repositories';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ContainerImportComponent } from './container-import/container-import.component';
 
@@ -74,6 +74,7 @@ export class ContainerListComponent extends PopupBase implements OnInit {
         () => { }
       );
   }
+  isDisableSave = false;
   async onSubmitContainer(form: NgForm) {
     for (let i = 0; i < this.lstMasterContainers.length; i++) {
       this.lstMasterContainers[i].verifying = true;
@@ -89,6 +90,7 @@ export class ContainerListComponent extends PopupBase implements OnInit {
       if (hasItemEdited === false) {
         const response = await this.baseServices.putAsync(this.api_menu.Documentation.CsMawbcontainer.update, { csMawbcontainerModels: this.lstMasterContainers, masterId: this.jobId }, true, false);
         if (response.status) {
+          this.isDisableSave = false;
           this.outputContainers.emit(this.lstMasterContainers);
           this.hide();
         }

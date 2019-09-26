@@ -388,8 +388,8 @@
           </div>
         </div>
         <div class="modal-footer m--align-center">
-          <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-            (click)="onSubmitContainer(containerMasterForm)">
+          <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" [disabled]="isDisableSave"
+            (click)="isDisableSave = true; onSubmitContainer(containerMasterForm)">
             <span>
               <i class="la la-save"></i>
               <span>
