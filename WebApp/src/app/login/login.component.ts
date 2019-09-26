@@ -15,14 +15,13 @@ import $ from 'jquery';
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit, AfterViewInit, AfterViewChecked {
-
-
+export class LoginComponent {
     username: string = "";
     password: string = "";
     remember_me: boolean = false;
 
-    currenURL: string = '';
+    currenURL: string = ''; // * URL before redirect to login.
+
     ngAfterViewInit(): void {
         if (this.route.snapshot.paramMap.get("isEndSession")) {
             setTimeout(() => {
@@ -44,12 +43,9 @@ export class LoginComponent implements OnInit, AfterViewInit, AfterViewChecked {
         private route: ActivatedRoute,
         private oauthService: OAuthService,
         private cookieService: CookieService,
-        private changeDetector: ChangeDetectorRef) {
+        ) {
         this.oauthService.setStorage(localStorage);
         this.oauthService.setupAutomaticSilentRefresh();
-    }
-    ngAfterViewChecked() {
-        this.changeDetector.detectChanges();
     }
 
     private async configureWithNewConfigApi() {
@@ -60,10 +56,9 @@ export class LoginComponent implements OnInit, AfterViewInit, AfterViewChecked {
 
 
     ngOnInit() {
-
         if (this.baseService.checkLoginSession()) {
             this.setupLocalInfo();
-            this.router.navigateByUrl('/home/dashboard');
+            this.router.navigateByUrl('/');
         }
     }
 
@@ -72,28 +67,28 @@ export class LoginComponent implements OnInit, AfterViewInit, AfterViewChecked {
             this.baseService.spinnerShow();
             this.currenURL = this.route.snapshot.paramMap.get("url") || 'home/dashboard';
             await this.configureWithNewConfigApi();
-            this.oauthService.fetchTokenUsingPasswordFlow(this.username, this.password).then((resp) => {
-                return this.oauthService.loadUserProfile();
-            }).then(() => {
-                const claims = this.oauthService.getIdentityClaims();
-                if (claims) {
-                    localStorage.setItem("currently_userName", claims['preferred_username']);
-                    localStorage.setItem("currently_userEmail", claims['email']);
-                    this.setupLocalInfo();
-                    this.rememberMe();
-                    this.toastr.info("Welcome back, " + claims['preferred_username'].toUpperCase() + " !", "Login Success", { positionClass: 'toast-bottom-right' });
 
-                    // * CURRENT_URL: url before into auth guard.
-                    this.router.navigateByUrl(this.currenURL);
+            this.oauthService.fetchTokenUsingPasswordFlow(this.username, this.password) // * Request Access Token.
+                .then((resp: any) => {
+                    return this.oauthService.loadUserProfile();
+                }).then(() => {
+                    const userInfo: IUser = <any>this.oauthService.getIdentityClaims(); // * Get info User.
+                    if (!!userInfo) {
+                        localStorage.setItem("currently_userName", userInfo.preferred_username);
+                        // localStorage.setItem("currently_userEmail", userInfo['email']);
+                        this.setupLocalInfo();
+                        this.rememberMe();
+
+                        // * CURRENT_URL: url before into auth guard.
+                        this.router.navigateByUrl(this.currenURL);
+                        this.baseService.spinnerHide();
+                        this.toastr.info("Welcome back, " + userInfo.userName.toUpperCase() + " !", "Login Success");
+                    }
+                }).catch((err) => {
                     this.baseService.spinnerHide();
-                }
-            }).catch((err) => {
-                this.baseService.spinnerHide();
-                // this.toastr.error(err.error.error_description, "", { positionClass: 'toast-bottom-right' });
-            });
+                });
         }
     }
-
 
     rememberMe() {
         if (this.remember_me) {
@@ -163,4 +158,16 @@ export class LoginComponent implements OnInit, AfterViewInit, AfterViewChecked {
         }
     }
 
+}
+
+
+interface IUser {
+    email: string;
+    employeeId: string;
+    id: string;
+    phone_number: string;
+    preferred_username: string;
+    sub: string;
+    userName: string;
+    workplaceId:string;
 }

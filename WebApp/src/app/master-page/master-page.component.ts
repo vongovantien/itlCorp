@@ -29,7 +29,7 @@ export class MasterPageComponent implements OnInit, AfterViewInit {
             const remainingMinutes: number = this.baseServices.remainingExpireTimeToken();
 
             if (!this.baseServices.checkLoginSession()) {
-                this.router.navigate(['/login', { isEndSession: true }]);
+                this.router.navigate(['/login', { isEndSession: true, url: this.router.url }]);
             }
 
             if (remainingMinutes <= 3 && remainingMinutes > 0) {
