@@ -312,9 +312,18 @@ export class CustomClearanceComponent extends AppList {
     // }
 
     export() {
-        this._reportRepo.exportCustomClearance(this.searchObject).subscribe(
-               response => this.downLoadFile(response, "application/ms-excel"
-               ));
+        this._http.post(`http://test.api-efms.itlvn.com/export/api/v1/vi/ReportData/CustomsDeclaration/ExportCustomClearance`,this.searchObject,{
+            responseType: 'arraybuffer'} 
+           ).subscribe(
+               response => this.downLoadFile(response, "application/ms-excel", 'CustomClearance.xlsx'));  
+        //  this._api.post(`localhost:63492/api/v1/vi/ReportData/CustomsDeclaration/ExportCustomClearance`, this.searchObject, {
+        //     responseType: 'arraybuffer'
+        // }).subscribe(
+        //     response => this.downLoadFile(response, "application/ms-excel"
+        // ));
+        // this._reportRepo.exportCustomClearance(this.searchObject).subscribe(
+        //        response => this.downLoadFile(response, "application/ms-excel"
+        //        ));
   
     }
 
