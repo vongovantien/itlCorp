@@ -195,6 +195,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                 (res: any) => {
                     this.dataReport = res;
                     setTimeout(() => {
+                        this.previewPopup.onSubmit();
                         this.previewPopup.show();
                     }, 1000);
 
