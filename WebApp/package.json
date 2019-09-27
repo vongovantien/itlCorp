@@ -13,7 +13,7 @@
         "build:stag:en": "ng build --prod --c=staging-en",
         "local": "ng serve --c=local",
         "test": "ng serve --c=test",
-        "test": "ng test",
+        "build test": "ng test",
         "lint": "ng lint",
         "e2e": "ng e2e"
     },

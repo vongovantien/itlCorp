@@ -236,7 +236,7 @@
           },
           "configurations": {
             "test": {
-              "browserTarget": "eFMS-Web:build:test"
+              "browserTarget": "eFMS-Web:build"
             },
             "vi": {
               "browserTarget": "eFMS-Web:build:vi"
