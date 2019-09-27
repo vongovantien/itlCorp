@@ -2,6 +2,7 @@
 using eFMS.API.Common.Globals.Configs;
 using eFMS.API.System.Service.Contexts;
 using eFMS.IdentityServer.Configuration;
+using eFMS.IdentityServer.DL.Infrastructure;
 using eFMS.IdentityServer.DL.IService;
 using eFMS.IdentityServer.DL.Services;
 using IdentityServer4.Services;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 
 namespace eFMS.IdentityServer.Infrastructure
@@ -39,6 +41,13 @@ namespace eFMS.IdentityServer.Infrastructure
                     = configuration.GetSection("ConnectionStrings:Redis").Value;
                 options.eFMSConnection
                     = configuration.GetSection("ConnectionStrings:eFMSConnection").Value;
+            });
+            service.Configure<LDAPConfig>(options =>
+            {
+                options.LdapPaths
+                    = configuration.GetSection("Ldap:Path").GetChildren().Select(sl => sl.Value).ToArray();
+                options.Domain
+                    = configuration.GetSection("Ldap:Domain").Value;
             });
             return service;
         }

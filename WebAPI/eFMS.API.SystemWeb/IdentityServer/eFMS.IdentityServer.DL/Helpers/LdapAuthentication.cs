@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.DirectoryServices;
-using System.Text;
 
 namespace eFMS.IdentityServer.DL.Helpers
 {
@@ -44,7 +42,6 @@ namespace eFMS.IdentityServer.DL.Helpers
             }
             catch(Exception ex)
             {
-                throw ex;
             }
             return false;
         }

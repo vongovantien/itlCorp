@@ -15,12 +15,10 @@ namespace eFMS.IdentityServer
     public class ProfileService : IProfileService
     {
         readonly IAuthenUserService authenUserService;
-        protected ISysUserLogService userLogService;
         readonly ISysEmployeeService employeeService;
-        public ProfileService(IAuthenUserService service,ISysUserLogService logService, ISysEmployeeService emService)
+        public ProfileService(IAuthenUserService service, ISysEmployeeService emService)
         {
             authenUserService = service;
-            userLogService = logService;
             employeeService = emService;
         }
         public async Task GetProfileDataAsync(ProfileDataRequestContext context)
@@ -28,13 +26,6 @@ namespace eFMS.IdentityServer
             var subjectId = context.Subject.GetSubjectId();
             var user = authenUserService.GetUserById(subjectId);
             var employee = employeeService.First(x => x.Id == user.EmployeeId);
-            var userInfo = new SysUserLogModel
-            {
-                LoggedInOn = DateTime.Now,
-                UserId = user.Id,
-                WorkPlaceId = user.WorkPlaceId
-            };
-            userLogService.Add(userInfo);
 
             var claims = new List<Claim>
                 {

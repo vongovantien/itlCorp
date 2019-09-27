@@ -7,13 +7,24 @@ using System.Linq;
 using eFMS.IdentityServer.DL.IService;
 using eFMS.API.System.DL.ViewModels;
 using eFMS.IdentityServer.Service.Contexts;
+using eFMS.IdentityServer.DL.Models;
+using System;
+using eFMS.IdentityServer.DL.Helpers;
+using eFMS.IdentityServer.DL.Infrastructure;
+using Microsoft.Extensions.Options;
 
 namespace eFMS.IdentityServer.DL.Services
 {
     public class AuthenticateService : RepositoryBase<SysUser, SysUserModel>, IAuthenUserService
     {
-        public AuthenticateService(IContextBase<SysUser> repository, IMapper mapper) : base(repository, mapper)
+        protected ISysUserLogService userLogService;
+        readonly LDAPConfig ldap;
+        public AuthenticateService(IContextBase<SysUser> repository, IMapper mapper,
+            ISysUserLogService logService,
+            IOptions<LDAPConfig> ldapConfig) : base(repository, mapper)
         {
+            userLogService = logService;
+            ldap = ldapConfig.Value;
         }
 
         public SysUserViewModel GetUserById(string id)
@@ -49,7 +60,17 @@ namespace eFMS.IdentityServer.DL.Services
         public int Login(string username, string password,out LoginReturnModel modelReturn)
         {
             LoginReturnModel userInfo = new LoginReturnModel();
-           
+
+            LdapAuthentication Ldap = new LdapAuthentication();
+            bool isAuthenticated = false;
+
+            foreach (var path in ldap.LdapPaths)
+            {
+                Ldap.Path = path;
+                isAuthenticated = Ldap.IsAuthenticated(ldap.Domain, username, password);
+                if (isAuthenticated)
+                    break;
+            }
             var employee = ((eFMSDataContext)DataContext.DC).SysEmployee.Where(x => x.Email == username).FirstOrDefault();
 
             var user = employee == null ? DataContext.First(x => x.Username == username) : DataContext.First(x => x.EmployeeId == employee.Id);
@@ -73,6 +94,13 @@ namespace eFMS.IdentityServer.DL.Services
             userInfo.status = true;
             userInfo.message = "Login successfull !";
             modelReturn = userInfo;
+            var userLog = new SysUserLogModel
+            {
+                LoggedInOn = DateTime.Now,
+                UserId = user.Id,
+                WorkPlaceId = (Guid?) new Guid(userInfo.workplaceId)
+            };
+            userLogService.Add(userLog);
 
             return 1;          
         }

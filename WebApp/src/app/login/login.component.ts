@@ -72,8 +72,9 @@ export class LoginComponent implements OnInit, AfterViewInit, AfterViewChecked {
             this.baseService.spinnerShow();
             this.currenURL = this.route.snapshot.paramMap.get("url") || 'home/dashboard';
             await this.configureWithNewConfigApi();
-            this.oauthService.fetchTokenUsingPasswordFlow(this.username, this.password).then((resp) => {
-                return this.oauthService.loadUserProfile();
+            this.oauthService.fetchTokenUsingPasswordFlowAndLoadUserProfile(this.username, this.password).then((resp) => {
+                console.log(resp);
+                // sreturn this.oauthService.loadUserProfile();
             }).then(() => {
                 const claims = this.oauthService.getIdentityClaims();
                 if (claims) {
