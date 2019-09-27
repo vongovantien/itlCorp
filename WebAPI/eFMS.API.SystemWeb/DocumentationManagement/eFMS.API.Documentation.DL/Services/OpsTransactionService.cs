@@ -230,6 +230,10 @@ namespace eFMS.API.Documentation.DL.Services
                         datajoin = datajoin.GroupBy(x => x.JobNo).SelectMany(x => x).AsQueryable();
                     }
                 }
+                else
+                {
+                    return results.AsQueryable();
+                }
 
             }
 
