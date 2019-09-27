@@ -205,10 +205,7 @@ export class JobManagementComponent extends AppList implements OnInit {
     onSearchShipment(dataSearch: any) {
         debugger;
         this.dataSearch = dataSearch;
-        if(this.dataSearch.jobNo == '' && this.dataSearch.hwbno == null || this.dataSearch.hwbno == ''  ){
-            this.shipments = [];
-            return;
-        }
+       
         this.getShipments(this.dataSearch);
     }
 

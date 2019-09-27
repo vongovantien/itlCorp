@@ -195,6 +195,9 @@ export class JobManagementFormSearchComponent extends AppForm {
         this.selectedPartner = {};
         this.filterType.setValue(this.filterTypes[0]);
         //  this.onSearch.emit(<any>{});
+        // if(this.searchText.value == ''){
+        //     this.onSearch.emit(<any>{});
+        // }
     }
 }
 
