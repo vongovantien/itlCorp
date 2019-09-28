@@ -194,19 +194,62 @@ namespace eFMS.API.Documentation.DL.Services
         public IQueryable<OpsTransactionModel> Query(OpsTransactionCriteria criteria)
         {
             var data = GetView().AsQueryable();
+            var datajoin = data;
+            List<OpsTransactionModel> results = new List<OpsTransactionModel>();
             if (data == null)
                 return null;
-            if(criteria.ServiceDateFrom == null && criteria.ServiceDateTo == null)
+
+            if(criteria.ClearanceNo != null)
+            {
+                var listCustomsDeclaration = ((eFMSDataContext)DataContext.DC).CustomsDeclaration.Where(x => x.ClearanceNo.ToLower().Contains(criteria.ClearanceNo.ToLower()));
+                if(listCustomsDeclaration.Count() > 0)
+                {
+                    datajoin = from custom in listCustomsDeclaration
+                               join datas in data on custom.JobNo equals datas.JobNo
+                               select datas;
+                    if(datajoin.Count() > 1)
+                    {
+                        datajoin = datajoin.GroupBy(x => x.JobNo).SelectMany(x => x).AsQueryable();
+                    }
+                }
+                else
+                {
+                    return results.AsQueryable();
+                }
+            }
+            if(criteria.CreditDebitInvoice != null)
+            {
+                var listDebit = ((eFMSDataContext)DataContext.DC).AcctCdnote.Where(x => x.Code.ToLower().Contains(criteria.CreditDebitInvoice.ToLower()));
+                if(listDebit.Count() > 0)
+                {
+                    datajoin = from acctnote in listDebit
+                               join datas in data on acctnote.JobId equals datas.ID
+                               select datas;
+                    if (datajoin.Count() > 1)
+                    {
+                        datajoin = datajoin.GroupBy(x => x.JobNo).SelectMany(x => x).AsQueryable();
+                    }
+                }
+                else
+                {
+                    return results.AsQueryable(); 
+                }
+
+            }
+
+
+            if (criteria.ServiceDateFrom == null && criteria.ServiceDateTo == null)
             {
                 int year = DateTime.Now.Year -2;
                 DateTime startDay = new DateTime(year, 1, 1);
                 DateTime lastDay = new DateTime(DateTime.Now.Year, 12, 31);
-                data = data.Where(x => x.ServiceDate >= startDay && x.ServiceDate <= lastDay);
+                datajoin = datajoin.Where(x => x.ServiceDate >= startDay && x.ServiceDate <= lastDay);
             }
             if (criteria.All == null)
             {
-                data = data.Where(x => (x.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                datajoin = datajoin.Where(x => (x.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.HWBNO ?? "").IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                && (x.MBLNO ?? "").IndexOf(criteria.Mblno ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.ProductService ?? "").IndexOf(criteria.ProductService ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.ServiceMode ?? "").IndexOf(criteria.ServiceMode ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.CustomerID == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
@@ -218,8 +261,9 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                data = data.Where(x => (x.JobNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                datajoin = datajoin.Where(x => (x.JobNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.HWBNO ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                   || (x.MBLNO ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.ProductService ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.ServiceMode ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.CustomerID == criteria.All || string.IsNullOrEmpty(criteria.All))
@@ -228,8 +272,7 @@ namespace eFMS.API.Documentation.DL.Services
                                && ((x.ServiceDate ?? null) >= (criteria.ServiceDateFrom ?? null) && (x.ServiceDate ?? null) <= (criteria.ServiceDateTo ?? null))
                                ).OrderByDescending(x => x.ModifiedDate);
             }
-            List<OpsTransactionModel> results = new List<OpsTransactionModel>();
-            results = mapper.Map<List<OpsTransactionModel>>(data);
+            results = mapper.Map<List<OpsTransactionModel>>(datajoin);
             return results.AsQueryable();
         }
         private List<sp_GetOpsTransaction> GetView()
