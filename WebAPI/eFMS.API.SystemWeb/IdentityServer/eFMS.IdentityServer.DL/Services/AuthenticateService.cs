@@ -12,6 +12,9 @@ using System;
 using eFMS.IdentityServer.DL.Helpers;
 using eFMS.IdentityServer.DL.Infrastructure;
 using Microsoft.Extensions.Options;
+using System.DirectoryServices;
+using System.Security.Cryptography;
+using System.IO;
 
 namespace eFMS.IdentityServer.DL.Services
 {
@@ -19,12 +22,15 @@ namespace eFMS.IdentityServer.DL.Services
     {
         protected ISysUserLogService userLogService;
         readonly LDAPConfig ldap;
+        IContextBase<SysEmployee> employeeRepository;
         public AuthenticateService(IContextBase<SysUser> repository, IMapper mapper,
             ISysUserLogService logService,
-            IOptions<LDAPConfig> ldapConfig) : base(repository, mapper)
+            IOptions<LDAPConfig> ldapConfig,
+            IContextBase<SysEmployee> employeeRepo) : base(repository, mapper)
         {
             userLogService = logService;
             ldap = ldapConfig.Value;
+            employeeRepository = employeeRepo;
         }
 
         public SysUserViewModel GetUserById(string id)
@@ -56,53 +62,109 @@ namespace eFMS.IdentityServer.DL.Services
             result.InActive = inActive;
             return result;
         }
-
+        private string Signature(string password)
+        {
+            AesManaged aes = new AesManaged();
+            byte[] cipherBytes = Convert.FromBase64String("ITL-$EFMS-&SECRET_KEY001");
+            byte[] rgbIV = Convert.FromBase64String("0000000000000000");
+            using (var rijndaelManaged = new RijndaelManaged { Key = cipherBytes, IV = rgbIV, Mode = CipherMode.CBC })
+            {
+                rijndaelManaged.BlockSize = 128;
+                rijndaelManaged.KeySize = 256;
+                using (var memoryStream =
+                       new MemoryStream(Convert.FromBase64String(password)))
+                using (var cryptoStream =
+                       new CryptoStream(memoryStream,
+                           rijndaelManaged.CreateDecryptor(cipherBytes, rgbIV),
+                           CryptoStreamMode.Read))
+                {
+                    return new StreamReader(cryptoStream).ReadToEnd();
+                }
+            }
+        }
         public int Login(string username, string password,out LoginReturnModel modelReturn)
         {
-            LoginReturnModel userInfo = new LoginReturnModel();
-
             LdapAuthentication Ldap = new LdapAuthentication();
+            SearchResult ldapInfo = null;
             bool isAuthenticated = false;
-
+            SysEmployee employee;
             foreach (var path in ldap.LdapPaths)
             {
                 Ldap.Path = path;
                 isAuthenticated = Ldap.IsAuthenticated(ldap.Domain, username, password);
+                
                 if (isAuthenticated)
+                {
+                    ldapInfo = Ldap.GetNodeInfomation(ldap.Domain, username, password);
                     break;
+                }
             }
-            var employee = ((eFMSDataContext)DataContext.DC).SysEmployee.Where(x => x.Email == username).FirstOrDefault();
-
-            var user = employee == null ? DataContext.First(x => x.Username == username) : DataContext.First(x => x.EmployeeId == employee.Id);
+            var user = DataContext.Get(x => x.Username == username && BCrypt.Net.BCrypt.Verify(password, x.Password)).FirstOrDefault();
+            if (isAuthenticated && username.Contains("."))
+            {
+                if (user != null)
+                {
+                    employee = employeeRepository.Get(x => x.Id == user.EmployeeId).FirstOrDefault();
+                    modelReturn = SetLoginReturnModel(user, employee);
+                    LogUserLogin(user, true? employee.WorkPlaceId.ToString(): null);
+                    return 1;
+                }
+                
+                modelReturn = AddUserFromLDAP(ldapInfo, username, password);
+                return 1;
+            }
             if (user == null)
             {
                 modelReturn = null;
-                return  -2;
+                return -2;
             }
-
-            bool isCorrectPassword = BCrypt.Net.BCrypt.Verify(password, user.Password);
-            if (!isCorrectPassword)
+            employee = employeeRepository.Get(x => x.Id == user.EmployeeId).FirstOrDefault();
+            modelReturn = SetLoginReturnModel(user, employee);
+            LogUserLogin(user, true ? employee.WorkPlaceId.ToString() : null);
+            return 1;
+        }
+        private LoginReturnModel SetLoginReturnModel(SysUser user, SysEmployee employee)
+        {
+            var userInfo = new LoginReturnModel
             {
-                modelReturn = null;
-                return -2;        
-            }
-
-            userInfo.userName = user.Username;
-            userInfo.email = employee == null ? ((eFMSDataContext)DataContext.DC).SysEmployee.First(x => x.Id == user.EmployeeId).Email : ((eFMSDataContext)DataContext.DC).SysEmployee.First(x => x.Id == employee.Id).Email;
-            userInfo.idUser = user.Id;
-            userInfo.workplaceId = employee == null ? ((eFMSDataContext)DataContext.DC).SysEmployee.First(x => x.Id == user.EmployeeId).Id : ((eFMSDataContext)DataContext.DC).SysEmployee.First(x => x.Id == employee.Id).Id;
-            userInfo.status = true;
-            userInfo.message = "Login successfull !";
-            modelReturn = userInfo;
+                userName = user.Username,
+                email = employee?.Email,
+                idUser = user.Id,
+                workplaceId = employee?.Id,
+                status = true,
+                message = "Login successfull !"
+            };
+            return userInfo;
+        }
+        private LoginReturnModel AddUserFromLDAP(SearchResult ldapInfo, string userName, string password)
+        {
+            var ldapProperties = ldapInfo.Properties;
+            var sysEmployee = new SysEmployee
+            {
+                Id = Guid.NewGuid().ToString(),
+                Email = ldapProperties["mail"][0].ToString(),
+                UserCreated = "admin",
+                DatetimeCreated = DateTime.Now,
+                EmployeeNameEn = ldapProperties["displayname"][0].ToString(),
+                EmployeeNameVn = ldapProperties["name"][0].ToString(),
+                Tel = ldapProperties["telephonenumber"][0].ToString(),
+                HomePhone = ldapProperties["mobile"][0].ToString()
+            };
+            var newUser = new SysUser { Id = userName, Password = BCrypt.Net.BCrypt.HashPassword(password), EmployeeId = sysEmployee.Id, Username = userName };
+            DataContext.Add(newUser);
+            employeeRepository.Add(sysEmployee);
+            var modelReturn = new LoginReturnModel { idUser = newUser.Id, userName = newUser.Username, email = sysEmployee.Email };
+            return modelReturn;
+        }
+        private void LogUserLogin(SysUser user, string workplaceId)
+        {
             var userLog = new SysUserLogModel
             {
                 LoggedInOn = DateTime.Now,
                 UserId = user.Id,
-                WorkPlaceId = (Guid?) new Guid(userInfo.workplaceId)
+                WorkPlaceId = workplaceId
             };
             userLogService.Add(userLog);
-
-            return 1;          
         }
     }
 }

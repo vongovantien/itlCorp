@@ -11,6 +11,14 @@ export class SystemConstants {
     // Security
     public static readonly SECRET_KEY = "ITL-$EFMS-&SECRET_KEY001";
     public static readonly USER_CLAIMS = 'id_token_claims_obj';
+    //RSA 1024 = 62 bytes for plain text encode
+    public static readonly ENCRYPT_SERVER_PUBLIC_KEY: string =
+        `-----BEGIN PUBLIC KEY-----
+        MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDrCqKUoVKKqah19HGIA1bX116N
+        uqxlu2Fb9jOSSoDMIM1pJR8l2yf75d9E5uNb9SJXH7ljZ6FEyb19xV18AkFL+O7R
+        VzMA8oH1m1DFjyIAjjNG4HR/IM051ifWLDkMILCEHrq5siZBYPlREY+6f84m4oL6
+        nA/m6ReOsMo057n+ywIDAQAB
+        -----END PUBLIC KEY-----`;
 
     public static readonly DEFAULT_LANGUAGE: string = "en-US";
     public static readonly DEFAULT_HOME_PAGE: string = "/app/main/home";

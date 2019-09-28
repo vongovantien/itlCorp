@@ -15,6 +15,32 @@ using Microsoft.Extensions.Configuration;
 
 namespace AuthServer
 {
+    public class HttpContextUtils
+    {
+        private static IHttpContextAccessor m_httpContextAccessor;
+
+        public static HttpContext Current => m_httpContextAccessor.HttpContext;
+
+        public static string AppBaseUrl => $"{Current.Request.Scheme}://{Current.Request.Host}{Current.Request.PathBase}";
+
+        internal static void Configure(IHttpContextAccessor contextAccessor)
+        {
+            m_httpContextAccessor = contextAccessor;
+        }
+    }
+    public static class HttpContextEx
+    {
+        //public static void AddHttpContextAccessor(this IServiceCollection services)
+        //{
+        //    services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        //}
+
+        public static IApplicationBuilder UseHttpContext(this IApplicationBuilder app)
+        {
+            HttpContextUtils.Configure(app.ApplicationServices.GetRequiredService<IHttpContextAccessor>());
+            return app;
+        }
+    }
     public class Startup
     {
         protected readonly IHostingEnvironment _environment;
@@ -47,6 +73,7 @@ namespace AuthServer
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseHttpContext();
             app.UseIdentityServer();
             //app.Run(async (context) =>
             //{

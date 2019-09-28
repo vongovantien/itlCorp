@@ -1,4 +1,5 @@
 ﻿using eFMS.API.System.DL.Models;
+using eFMS.IdentityServer.DL.Helpers;
 using eFMS.IdentityServer.DL.IService;
 using eFMS.IdentityServer.DL.Services;
 using eFMS.IdentityServer.Service.Models;
@@ -23,7 +24,8 @@ namespace eFMS.IdentityServer
 
         public Task ValidateAsync(ResourceOwnerPasswordValidationContext context)
         {
-            var result = authenUser.Login(context.UserName, context.Password,out LoginReturnModel modelReturn);
+            //string passtest = SecurityHelper.DecryptText(context.Password);
+            var result = authenUser.Login(context.UserName, context.Password, out LoginReturnModel modelReturn);
             var messageError = String.Empty;
             if(result == -2)
             {
@@ -37,7 +39,7 @@ namespace eFMS.IdentityServer
             {
                 List<Claim> list_Claim = new List<Claim>();
                 list_Claim.Add(new Claim("userId", modelReturn.idUser));
-                list_Claim.Add(new Claim("workplaceId", modelReturn.workplaceId));
+                //list_Claim.Add(new Claim("workplaceId", modelReturn.workplaceId));
                 list_Claim.Add(new Claim("email", modelReturn.email));
                 context.Result = new GrantValidationResult(
                     subject: modelReturn.idUser,
