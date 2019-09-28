@@ -10,7 +10,7 @@ using System.Text;
 
 namespace eFMS.API.Catalogue.DL.IService
 {
-    public interface ICatUnitService:IRepositoryBase<CatUnit,CatUnitModel>
+    public interface ICatUnitService: IRepositoryBaseCache<CatUnit,CatUnitModel>
     {
         IQueryable<CatUnit> Query(CatUnitCriteria criteria);
         List<CatUnit> Paging(CatUnitCriteria criteria, int pageNumber, int pageSize, out int rowsCount);

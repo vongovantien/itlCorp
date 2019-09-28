@@ -18,7 +18,7 @@ using System.Linq.Expressions;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
-    public class CatUnitService:RepositoryBase<CatUnit,CatUnitModel>,ICatUnitService
+    public class CatUnitService: RepositoryBaseCache<CatUnit,CatUnitModel>,ICatUnitService
     {
         private readonly IDistributedCache cache;
         private readonly ICurrentUser currentUser;
