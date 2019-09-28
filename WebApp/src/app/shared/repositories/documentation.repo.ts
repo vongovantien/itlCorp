@@ -55,30 +55,6 @@ export class DocumentationRepo {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/AcctCDNote/Get`, { Id: houseBillId, IsHouseBillID: true });
     }
 
-    getListCustomDeclaration(page: number, pageSize: number, body: any) {
-        return this._api.post(`${environment.HOST.WEB_URL}/operation/api/${this.VERSION}/en-US/CustomsDeclaration/Paging`, body, {
-            pageNumber: '' + page,
-            pageSize: '' + pageSize
-        }).pipe(
-            catchError((error) => throwError(error)),
-            map((data: any) => data)
-        );
-    }
-
-    importCustomClearanceFromEcus() {
-        return this._api.post(`${environment.HOST.WEB_URL}/operation/api/${this.VERSION}/en-US/CustomsDeclaration/ImportClearancesFromEcus`, {}).pipe(
-            catchError((error) => throwError(error)),
-            map((data: any) => data)
-        );
-    }
-
-    deleteMultipleClearance(body: any[] = []) {
-        return this._api.put(`${environment.HOST.WEB_URL}/operation/api/${this.VERSION}/en-US/CustomsDeclaration/DeleteMultiple`, body).pipe(
-            catchError((error) => throwError(error)),
-            map((data: any) => data)
-        );
-    }
-
     getShipmentByPartnerOrService(partnerId: string, services: string[]) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetShipmentsCreditPayer`, { partner: partnerId, productServices: services }).pipe(
             map((data: any) => data)
@@ -110,7 +86,52 @@ export class DocumentationRepo {
 
     getSurchargeByHbl(type: string, hbId: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GetByHB`, { hbId: hbId, type: type });
+    }
 
+    getListContainersOfJob(data: any = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsMawbcontainer/Query`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    getShipmentCommonData() {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/Terminology/GetOPSShipmentCommonData`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    downloadcontainerfileExcel() {
+        return this._api.downloadfile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsMawbcontainer/downloadFileExcel`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    previewCDNote(data) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/PreviewOpsCdNote`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    previewPL(jobId, currency) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/PreviewFormPLsheet`, { jobId: jobId, currency: currency }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    importContainerExcel(data) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsMawbcontainer/Import`, data).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
     }
 
 }

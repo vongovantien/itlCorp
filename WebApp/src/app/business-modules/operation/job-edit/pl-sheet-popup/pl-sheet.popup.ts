@@ -2,7 +2,7 @@ import { Component, Input, ViewChild } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { Currency } from 'src/app/shared/models';
 import { catchError, finalize } from 'rxjs/operators';
-import { CatalogueRepo, OperationRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Crystal } from 'src/app/shared/models/report/crystal.model';
@@ -22,7 +22,7 @@ export class PlSheetPopupComponent extends PopupBase {
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
-        private _operationRepo: OperationRepo,
+        private _documentRepo: DocumentationRepo,
         private _progressService: NgProgress,
         private _toastService: ToastrService
     ) {
@@ -43,15 +43,13 @@ export class PlSheetPopupComponent extends PopupBase {
             .subscribe(
                 (res: any) => {
                     this.currencyList = res || [];
-                    console.log('sfsfsfsfsfsfs');
-                    console.log(this.currencyList);
                     this.selectedCurrency = this.currencyList.filter((item: any) => item.id === 'VND')[0];
                 },
             );
     }
     previewPL() {
         this._progressRef.start();
-        this._operationRepo.previewPL(this.jobId, this.selectedCurrency.id)
+        this._documentRepo.previewPL(this.jobId, this.selectedCurrency.id)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())

@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
-import { OperationRepo, CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, SystemRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { SystemConstants } from 'src/constants/system.const';
 import { DataService } from 'src/app/shared/services';
@@ -42,7 +42,7 @@ export class JobManagementFormSearchComponent extends AppForm {
     selectedPartner: any = {};
 
     constructor(
-        private _operationRepo: OperationRepo,
+        private _documentRepo: DocumentationRepo,
         private _fb: FormBuilder,
         private _dataService: DataService,
         private _sysRepo: SystemRepo,
@@ -71,7 +71,7 @@ export class JobManagementFormSearchComponent extends AppForm {
     }
 
     getCommondata() {
-        this._operationRepo.getShipmentCommonData()
+        this._documentRepo.getShipmentCommonData()
             .pipe(
                 catchError(this.catchError)
             ).subscribe(
