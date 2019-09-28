@@ -5,7 +5,7 @@ import { BaseService, SortService } from 'src/app/shared/services';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PopupBase } from 'src/app/popup.base';
 import { NgForm } from '@angular/forms';
-import { OperationRepo, CatalogueRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ContainerImportComponent } from './container-import/container-import.component';
 
@@ -39,7 +39,7 @@ export class ContainerListComponent extends PopupBase implements OnInit {
     private api_menu: API_MENU,
     private sortService: SortService,
     private _catalogueRepo: CatalogueRepo,
-    private _operationRepo: OperationRepo,
+    private _documentRepo: DocumentationRepo
   ) {
     super();
   }
@@ -58,7 +58,7 @@ export class ContainerListComponent extends PopupBase implements OnInit {
     }
   }
   getListContainersOfJob() {
-    this._operationRepo.getListContainersOfJob({ mblid: this.jobId })
+    this._documentRepo.getListContainersOfJob({ mblid: this.jobId })
       .pipe(
         catchError(this.catchError),
         finalize(() => {

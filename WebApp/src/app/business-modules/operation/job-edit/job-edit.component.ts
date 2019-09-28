@@ -114,7 +114,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         private api_menu: API_MENU,
         private route: ActivatedRoute,
         private router: Router,
-        private _operationRepo: OperationRepo,
         private _data: DataService,
         private systemRepo: SystemRepo,
         private _catalogueRepo: CatalogueRepo,
@@ -156,7 +155,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     getListContainersOfJob() {
-        this._operationRepo.getListContainersOfJob({ mblid: this.opsTransaction.id })
+        this._documentRepo.getListContainersOfJob({ mblid: this.opsTransaction.id })
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {

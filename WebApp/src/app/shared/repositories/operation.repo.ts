@@ -11,61 +11,11 @@ export class OperationRepo {
     constructor(protected _api: ApiService) {
     }
 
-    getListContainersOfJob(data: any = {}) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsMawbcontainer/Query`, data).pipe(
-            catchError((error) => throwError(error)),
-            map((res: any) => {
-                return res;
-            })
-        );
-        // return this._api.post(`localhost:44366/api/v1/vi/OpsTransaction/api/${this.VERSION}/vi/CsMawbcontainer/Query`, data).pipe(
-        //     catchError((error) => throwError(error)),
-        //     map((res: any) => {
-        //         return res;
-        //     })
-        // );
-
-    }
 
     getCustomDeclaration(jobNo: string) {
         return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/GetBy`, { jobNo: jobNo }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
-        );
-    }
-
-    getShipmentCommonData() {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/Terminology/GetOPSShipmentCommonData`).pipe(
-            catchError((error) => throwError(error)),
-            map((data: any) => data)
-        );
-    }
-    downloadcontainerfileExcel() {
-        return this._api.downloadfile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsMawbcontainer/downloadFileExcel`).pipe(
-            catchError((error) => throwError(error)),
-            map((data: any) => data)
-        );
-    }
-    importContainerExcel(data) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsMawbcontainer/Import`, data).pipe(
-            map((res: any) => {
-                return res;
-            })
-        );
-    }
-
-    previewCDNote(data) {
-        // return this._api.get(`${environment.HOST.DOCUMENTATION}/Catalogue/api/${this.VERSION}/en-US/CatCurrency/getAll`).pipe(
-        //     catchError((error) => throwError(error)),
-        //     map((data: any) => {
-        //         return data;
-        //     })
-        // );
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/PreviewOpsCdNote`, data).pipe(
-            catchError((error) => throwError(error)),
-            map((res: any) => {
-                return res;
-            })
         );
     }
 
@@ -140,12 +90,6 @@ export class OperationRepo {
 
     addOPSJob(body: any = {}) {
         return this._api.post(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/OpsTransaction/Add`, body);
-    }
-
-    previewPL(jobId, currency) {
-        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/OpsTransaction/PreviewFormPLsheet`, { jobId: jobId, currency: currency }).pipe(
-            map((data: any) => data)
-        );
     }
 
 }

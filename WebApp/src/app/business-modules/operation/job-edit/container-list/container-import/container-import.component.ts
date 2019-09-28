@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, Output, EventEmitter, Input } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
-import { OperationRepo } from 'src/app/shared/repositories';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { DocumentationRepo } from 'src/app/shared/repositories';
+import { catchError} from 'rxjs/operators';
 import { NgProgress } from '@ngx-progressbar/core';
 import { BaseService, SortService } from 'src/app/shared/services';
 import { API_MENU } from 'src/constants/api-menu.const';
@@ -37,10 +37,11 @@ export class ContainerImportComponent extends PopupBase implements OnInit {
     existedError: string = null;
     duplicatedError: string = null;
 
-    constructor(private operationRepo: OperationRepo,
+    constructor(
         private _progressService: NgProgress,
         private baseService: BaseService,
         private api_menu: API_MENU,
+        private _documentRepo: DocumentationRepo,
         private _sortService: SortService) {
         super();
         this._progressRef = this._progressService.ref();
@@ -82,7 +83,7 @@ export class ContainerImportComponent extends PopupBase implements OnInit {
         this.importedData = this._sortService.sort(this.importedData, sort, this.order);
     }
     downloadFile() {
-        this.operationRepo.downloadcontainerfileExcel()
+        this._documentRepo.downloadcontainerfileExcel()
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
@@ -101,7 +102,7 @@ export class ContainerImportComponent extends PopupBase implements OnInit {
             this.data.forEach(x => {
                 x.mblid = this.jobId;
             });
-            this.operationRepo.importContainerExcel(this.data)
+            this._documentRepo.importContainerExcel(this.data)
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: any) => {
