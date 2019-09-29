@@ -1,14 +1,10 @@
 ﻿using eFMS.API.System.DL.Models;
-using eFMS.IdentityServer.DL.Helpers;
 using eFMS.IdentityServer.DL.IService;
-using eFMS.IdentityServer.DL.Services;
-using eFMS.IdentityServer.Service.Models;
+using eFMS.IdentityServer.Helpers;
 using IdentityServer4.Models;
 using IdentityServer4.Validation;
-using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -24,8 +20,9 @@ namespace eFMS.IdentityServer
 
         public Task ValidateAsync(ResourceOwnerPasswordValidationContext context)
         {
-            //string passtest = SecurityHelper.DecryptText(context.Password);
-            var result = authenUser.Login(context.UserName, context.Password, out LoginReturnModel modelReturn);
+            RSAHelper cryption = new RSAHelper();
+            string password = cryption.Decrypt(context.Password);
+            var result = authenUser.Login(context.UserName, password, out LoginReturnModel modelReturn);
             var messageError = String.Empty;
             if(result == -2)
             {

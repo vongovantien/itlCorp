@@ -4,7 +4,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace eFMS.IdentityServer.DL.Helpers
+namespace eFMS.IdentityServer.Helpers
 {
     public class SecurityHelper
     {
