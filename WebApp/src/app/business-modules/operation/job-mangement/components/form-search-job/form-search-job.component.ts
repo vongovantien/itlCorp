@@ -60,6 +60,12 @@ export class JobManagementFormSearchComponent extends AppForm {
         this.filterTypes = [
             { title: 'Job Id', value: 'jobId' },
             { title: 'HBL', value: 'hbl' },
+            { title: 'Custom No', value: 'customno' },
+            { title: 'MBL', value: 'mbl' },
+            { title: 'Credit\/Debit\/Invoice\ No', value: 'code' },
+
+
+
         ];
         this.filterType.setValue(this.filterTypes[0]);
     }
@@ -128,7 +134,7 @@ export class JobManagementFormSearchComponent extends AppForm {
         this.configPartner.dataSource = data;
         this.configPartner.displayFields = [
             { field: 'taxCode', label: 'Taxcode' },
-            { field: 'partnerNameEn', label: 'Name' },
+            { field: 'shortName', label: 'Name' },
             { field: 'partnerNameVn', label: 'Customer Name' },
         ];
         this.configPartner.selectedDisplayFields = ['shortName'];
@@ -170,6 +176,9 @@ export class JobManagementFormSearchComponent extends AppForm {
             all: null,
             jobNo: this.filterType.value.value === 'jobId' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
             hwbno: this.filterType.value.value === 'hbl' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
+            mblno: this.filterType.value.value === 'mbl' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
+            clearanceNo: this.filterType.value.value === 'customno' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
+            creditDebitInvoice: this.filterType.value.value === 'code' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
             productService: !!this.productService.value ? this.productService.value.value : null,
             serviceMode: !!this.serviceMode.value ? this.serviceMode.value.value : null,
             shipmentMode: !!this.shipmentMode.value ? this.shipmentMode.value.value : null,
@@ -185,7 +194,10 @@ export class JobManagementFormSearchComponent extends AppForm {
         this.formSearch.reset();
         this.selectedPartner = {};
         this.filterType.setValue(this.filterTypes[0]);
-        this.onSearch.emit(<any>{});
+        //  this.onSearch.emit(<any>{});
+        // if(this.searchText.value == ''){
+        //     this.onSearch.emit(<any>{});
+        // }
     }
 }
 
@@ -202,5 +214,8 @@ interface ISearchDataShipment {
     shipmentMode: string;
     serviceDateFrom: string;
     serviceDateTo: string;
+    mblno: string;
+    clearanceNo: string;
+    creditDebitInvoice: string;
 }
 
