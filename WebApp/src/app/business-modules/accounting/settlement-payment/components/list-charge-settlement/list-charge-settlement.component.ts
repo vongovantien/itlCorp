@@ -9,6 +9,7 @@ import { SettlementTableSurchargeComponent } from '../table-surcharge/table-surc
 import { SettlementShipmentItemComponent } from '../shipment-item/shipment-item.component';
 import { SortService } from 'src/app/shared/services';
 import { ToastrService } from 'ngx-toastr';
+import { SettlementFormCopyPopupComponent } from '../popup/copy-settlement/copy-settlement.popup';
 
 @Component({
     selector: 'settle-payment-list-charge',
@@ -21,6 +22,8 @@ export class SettlementListChargeComponent extends AppList {
     @ViewChild(SettlementExistingChargePopupComponent, { static: true }) existingChargePopup: SettlementExistingChargePopupComponent;
     @ViewChild(SettlementFormChargePopupComponent, { static: false }) formChargePopup: SettlementFormChargePopupComponent;
     @ViewChild(SettlementPaymentManagementPopupComponent, { static: false }) paymentManagementPopup: SettlementPaymentManagementPopupComponent;
+    @ViewChild(SettlementFormCopyPopupComponent, { static: false }) copyChargePopup: SettlementFormCopyPopupComponent;
+
 
     @ViewChildren('tableSurcharge') tableSurchargeComponent: QueryList<SettlementTableSurchargeComponent>;
     @ViewChildren('headingShipmentGroup') headingShipmentGroup: QueryList<SettlementShipmentItemComponent>;
@@ -231,6 +234,10 @@ export class SettlementListChargeComponent extends AppList {
         }
 
         this.selectedIndexSurcharge = null;
+    }
+
+    showCopyCharge() {
+        this.copyChargePopup.show();
     }
 }
 

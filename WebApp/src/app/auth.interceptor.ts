@@ -16,12 +16,12 @@ export class AuthInterceptor implements HttpInterceptor {
         const authHeader = `Bearer ${localStorage.getItem('access_token')}`;
         if (environment.local) {
             if (!!this.authReq && this.authReq.url.includes("44369") || !!this.authReq && this.authReq.method === 'DELETE') {
-                this.authReq = req.clone({ headers: req.headers.set('Authorization', authHeader), url: req.url });
+                this.authReq = req.clone(Object.assign({}, req, { headers: req.headers.set('Authorization', authHeader), url: req.url }));
             } else {
-                this.authReq = req.clone({ headers: req.headers.delete('Authorization'), url: req.url });
+                this.authReq = req.clone(Object.assign({}, req, { headers: req.headers.delete('Authorization'), url: req.url }));
             }
         } else {
-            this.authReq = req.clone({ headers: req.headers.set('Authorization', authHeader), url: req.url });
+            this.authReq = req.clone(Object.assign({}, req, { headers: req.headers.set('Authorization', authHeader), url: req.url }));
         }
 
         return next.handle(this.authReq).pipe(

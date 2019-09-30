@@ -23,6 +23,16 @@
                             </span>
                         </span>
                     </button>
+                    <button type="button"
+                        class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                        (click)="showCopyCharge()">
+                        <span>
+                            <i class="la la-copy"></i>
+                            <span>
+                                Copy Charge
+                            </span>
+                        </span>
+                    </button>
                     <button type="button" class="btn btn-danger  m-btn--square m-btn--icon m-btn--uppercase"
                         (click)="deleteShipmentItem()">
                         <span>
@@ -160,3 +170,5 @@
 
 <form-charge-popup (onRequest)="onRequestSurcharge($event)" [state]="stateFormCharge"
     (onUpdateChange)="onUpdateRequestSurcharge($event)"></form-charge-popup>
+
+<copy-settlement-popup></copy-settlement-popup>

@@ -1,4 +1,4 @@
-<div class="modal existing-charge-popup" role="dialog" bsModal #popup="bs-modal" aria-hidden="true">
+<div class="modal existing-charge-popup m-animate-fade-in" role="dialog" bsModal #popup="bs-modal" aria-hidden="true">
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -53,7 +53,8 @@
                     <div class="table-wrapper m--margin-top-20">
                         <table class="table table-brand dataTable table-striped">
                             <thead>
-                                <tr app-table-header [headers]="headers" class="text-center" (onClick)="sortSurcharge($event)">
+                                <tr app-table-header [headers]="headers" class="text-center"
+                                    (onClick)="sortSurcharge($event)">
                                     <th class="first">
                                         <label class="m-checkbox">
                                             <input type="checkbox" [(ngModel)]="isCheckAll"
@@ -85,7 +86,8 @@
                                         <td>{{charge.settlementCode}}</td>
                                     </tr>
                                 </ng-container>
-                                <tr *ngIf="!isLoading && !charges.length" app-table-none-record [colspan]="headers.length + 1"></tr>
+                                <tr *ngIf="!isLoading && !charges.length" app-table-none-record
+                                    [colspan]="headers.length + 1"></tr>
                                 <tr *ngIf="isLoading" app-table-row-loading></tr>
                             </tbody>
                         </table>

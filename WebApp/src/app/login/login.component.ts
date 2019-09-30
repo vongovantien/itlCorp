@@ -69,7 +69,7 @@ export class LoginComponent {
             this.currenURL = this.route.snapshot.paramMap.get("url") || 'home/dashboard';
 
             await this.configureWithNewConfigApi();
-            const s = RSAHelper.serverEncode(this.password);
+            const passwordEncoded = RSAHelper.serverEncode(this.password);
             this.oauthService.fetchTokenUsingPasswordFlow(this.username, s) // * Request Access Token.
                 .then((resp: any) => {
                     return this.oauthService.loadUserProfile();
