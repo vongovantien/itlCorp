@@ -33,7 +33,7 @@ namespace eFMS.IdentityServer
                     new Claim(JwtClaimTypes.Email, user.Email),                   
                     new Claim(JwtClaimTypes.PreferredUserName,user.Username),
                     new Claim(JwtClaimTypes.PhoneNumber,user.Tel??""),
-                    new Claim("workplaceId",user.WorkPlaceId.ToString()??""),
+                    //new Claim("workplaceId",user.WorkPlaceId?.ToString()),
                     new Claim("userName", user.Username),
                     new Claim("employeeId", employee.Id)
                 };

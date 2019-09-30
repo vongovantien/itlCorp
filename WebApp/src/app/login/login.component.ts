@@ -9,6 +9,7 @@ import { NgForm } from '@angular/forms';
 import { authConfig } from '../shared/authenticate/authConfig';
 import { BaseService } from 'src/app/shared/services/base.service';
 import $ from 'jquery';
+import { RSAHelper } from 'src/helper/RSAHelper';
 
 @Component({
     selector: 'app-login',
@@ -66,30 +67,31 @@ export class LoginComponent {
         if (form.form.status !== "INVALID") {
             this.baseService.spinnerShow();
             this.currenURL = this.route.snapshot.paramMap.get("url") || 'home/dashboard';
-            await this.configureWithNewConfigApi();
 
-            this.oauthService.fetchTokenUsingPasswordFlow(this.username, this.password) // * Request Access Token.
+            await this.configureWithNewConfigApi();
+            const s = RSAHelper.serverEncode(this.password);
+            this.oauthService.fetchTokenUsingPasswordFlow(this.username, s) // * Request Access Token.
                 .then((resp: any) => {
                     return this.oauthService.loadUserProfile();
-            }).then(() => {
+                }).then(() => {
                     const userInfo: IUser = <any>this.oauthService.getIdentityClaims(); // * Get info User.
                     if (!!userInfo) {
                         localStorage.setItem("currently_userName", userInfo.preferred_username);
                         // localStorage.setItem("currently_userEmail", userInfo['email']);
-                    this.setupLocalInfo();
-                    this.rememberMe();
+                        this.setupLocalInfo();
+                        this.rememberMe();
 
-                    // * CURRENT_URL: url before into auth guard.
+                        // * CURRENT_URL: url before into auth guard.
                         if (this.currenURL.includes("login")) {
                             this.currenURL = "home/dashboard";
                         }
-                    this.router.navigateByUrl(this.currenURL);
-                    this.baseService.spinnerHide();
+                        this.router.navigateByUrl(this.currenURL);
+                        this.baseService.spinnerHide();
                         this.toastr.info("Welcome back, " + userInfo.userName.toUpperCase() + " !", "Login Success");
-                }
-            }).catch((err) => {
-                this.baseService.spinnerHide();
-            });
+                    }
+                }).catch((err) => {
+                    this.baseService.spinnerHide();
+                });
         }
     }
 
