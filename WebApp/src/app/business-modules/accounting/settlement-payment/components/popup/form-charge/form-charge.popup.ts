@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
-import { CatalogueRepo, AccoutingRepo, OperationRepo, SystemRepo, DocumentationRepo } from 'src/app/shared/repositories';
-import { takeUntil, debounceTime, switchMap, skip, distinctUntilChanged, catchError, map, take } from 'rxjs/operators';
+import { CatalogueRepo, AccoutingRepo, OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
+import { takeUntil, debounceTime, switchMap, skip, distinctUntilChanged, catchError, map } from 'rxjs/operators';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { CustomDeclaration, Surcharge } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
