@@ -273,12 +273,12 @@ export class BaseService implements ErrorHandler {
       this.errorToast(this.LANG.NOTIFI_MESS.CHECK_CONNECT, this.LANG.NOTIFI_MESS.UNKNOW_ERR);
     }
     if (error.status === 401) {
-      localStorage.clear();
-      this.router.navigateByUrl('/login');
-      this.reloadPage();
-      setTimeout(() => {
-        this.warningToast(this.LANG.NOTIFI_MESS.EXPIRED_SESSION_MESS, this.LANG.NOTIFI_MESS.EXPIRED_SESSION_TITLE);
-      }, 400);
+      // localStorage.clear();
+      // this.router.navigateByUrl('/login');
+      // this.reloadPage();
+      // setTimeout(() => {
+      //   this.warningToast(this.LANG.NOTIFI_MESS.EXPIRED_SESSION_MESS, this.LANG.NOTIFI_MESS.EXPIRED_SESSION_TITLE);
+      // }, 400);
     }
 
   }
