@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
+import { Component } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { SystemConstants } from 'src/constants/system.const';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -70,7 +70,7 @@ export class LoginComponent {
 
             await this.configureWithNewConfigApi();
             const s = RSAHelper.serverEncode(this.password);
-            this.oauthService.fetchTokenUsingPasswordFlow(this.username, s) // * Request Access Token.
+            this.oauthService.fetchTokenUsingPasswordFlow(this.username, this.password) // * Request Access Token.
                 .then((resp: any) => {
                     return this.oauthService.loadUserProfile();
                 }).then(() => {

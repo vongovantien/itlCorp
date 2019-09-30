@@ -4,16 +4,18 @@ import { SystemConstants } from 'src/constants/system.const';
 export class RSAHelper {
 
     public static encode(plainText: string, key: string): string {
-        if (((plainText == null ? null : plainText) || '') == '' || ((key == null ? null : plainText) || '') == '')
+        if (((plainText == null ? null : plainText) || '') === '' || ((key == null ? null : plainText) || '') === '') {
             return null;
+        }
         const decrypt = new JSEncryptModule.JSEncrypt();
         decrypt.setPublicKey(key);
         return decrypt.encrypt(plainText);
     }
 
     public static decode(encodingText: string, key): string {
-        if (((encodingText == null ? null : encodingText) || '') == '' || ((key == null ? null : key) || '') == '')
+        if (((encodingText == null ? null : encodingText) || '') === '' || ((key == null ? null : key) || '') === '') {
             return null;
+        }
         const decrypt = new JSEncryptModule.JSEncrypt();
         decrypt.setPrivateKey(key);
         return decrypt.decrypt(encodingText);
