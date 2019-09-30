@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { Currency } from 'src/app/shared/models';
 import { catchError, finalize } from 'rxjs/operators';
@@ -7,6 +7,9 @@ import { ReportPreviewComponent } from 'src/app/shared/common';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Crystal } from 'src/app/shared/models/report/crystal.model';
 import { ToastrService } from 'ngx-toastr';
+import { DomSanitizer } from '@angular/platform-browser';
+import { API_MENU } from 'src/constants/api-menu.const';
+import { ModalDirective } from 'ngx-bootstrap';
 
 @Component({
     selector: 'pl-sheet-popup',
@@ -16,6 +19,9 @@ import { ToastrService } from 'ngx-toastr';
 export class PlSheetPopupComponent extends PopupBase {
     @Input() jobId: string;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
+    @ViewChild('formPL', { static: false }) formPL: ElementRef;
+    @ViewChild("popupReport", { static: false }) popupReport: ModalDirective;
+
     selectedCurrency: Currency;
     currencyList: Currency[];
     dataReport: any = null;
@@ -24,7 +30,9 @@ export class PlSheetPopupComponent extends PopupBase {
         private _catalogueRepo: CatalogueRepo,
         private _documentRepo: DocumentationRepo,
         private _progressService: NgProgress,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private sanitizer: DomSanitizer,
+        private api_menu: API_MENU,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -47,6 +55,7 @@ export class PlSheetPopupComponent extends PopupBase {
                 },
             );
     }
+
     previewPL() {
         this._progressRef.start();
         this._documentRepo.previewPL(this.jobId, this.selectedCurrency.id)
@@ -60,13 +69,40 @@ export class PlSheetPopupComponent extends PopupBase {
                         this._toastService.error("This shipment must have to one at least charge to show report", '', { positionClass: 'toast-bottom-right' });
                         return;
                     }
-                    this.dataReport = res;
-                    setTimeout(() => {
-                        this.previewPopup.frm.nativeElement.submit();
-                        this.previewPopup.show();
-                    }, 1000);
+                    this.dataReport = JSON.stringify(res);
 
+                    setTimeout(() => {
+                        if (!this.popupReport.isShown) {
+                            this.popupReport.config = this.options;
+                            this.popupReport.show();
+                        }
+                        this.submitFormPreview();
+                    }, 1000);
                 },
             );
     }
+
+    get scr() {
+        // http://localhost:51830/Default.aspx
+        return this.sanitizer.bypassSecurityTrustResourceUrl(this.api_menu.Report);
+    }
+
+    ngAfterViewInit() {
+        if (!!this.dataReport) {
+            this.formPL.nativeElement.submit();
+        }
+    }
+
+    submitFormPreview() {
+        this.formPL.nativeElement.submit();
+    }
+
+    onSubmitForm(f) {
+        return true;
+    }
+
+    hidePreview() {
+        this.popupReport.hide();
+    }
+
 }
