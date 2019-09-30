@@ -32,6 +32,8 @@ namespace eFMS.API.Catalogue.Service.Models
         public virtual DbSet<CatCustomerPlace> CatCustomerPlace { get; set; }
         public virtual DbSet<CatDepartment> CatDepartment { get; set; }
         public virtual DbSet<CatPartner> CatPartner { get; set; }
+        public virtual DbSet<CatSaleMan> CatSaleMan { get; set; }
+
         public virtual DbSet<CatPartnerContact> CatPartnerContact { get; set; }
         public virtual DbSet<CatPartnerContract> CatPartnerContract { get; set; }
         public virtual DbSet<CatPartnerGroup> CatPartnerGroup { get; set; }
@@ -1042,6 +1044,13 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
             });
+
+            modelBuilder.Entity<CatSaleMan>(entity =>
+            {
+                entity.ToTable("catSaleMan");
+
+            });
+
 
             modelBuilder.Entity<CatPartnerContact>(entity =>
             {

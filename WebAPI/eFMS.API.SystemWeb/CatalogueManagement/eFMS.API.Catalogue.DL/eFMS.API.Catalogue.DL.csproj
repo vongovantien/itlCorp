@@ -34,9 +34,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="eFMS.API.Catalogue.Service">
-      <HintPath>..\bin\netcoreapp2.2\eFMS.API.Catalogue.Service.dll</HintPath>
-    </Reference>
     <Reference Include="eFMS.API.Common">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
     </Reference>
@@ -63,5 +60,9 @@
   <ItemGroup>
     <Folder Include="Helpers\" />
     <Folder Include="Models\Views\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\eFMS.API.Catalogue.DAL\eFMS.API.Catalogue.Service.csproj" />
   </ItemGroup>
 </Project>

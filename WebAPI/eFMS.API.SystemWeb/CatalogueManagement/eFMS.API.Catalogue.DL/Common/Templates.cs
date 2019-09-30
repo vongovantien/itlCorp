@@ -59,6 +59,13 @@ namespace eFMS.API.Catalogue.DL.Common
                 public static string ListName = "Partners";
             }
         }
+        public struct CatSaleMan
+        {
+            public struct NameCaching
+            {
+                public static string ListName = "SalesMan";
+            }
+        }
         public struct CatPlace
         {
             public static string ExelImportFileName = "Place";
