@@ -11,7 +11,24 @@ export class SystemConstants {
     // Security
     public static readonly SECRET_KEY = "ITL-$EFMS-&SECRET_KEY001";
     public static readonly USER_CLAIMS = 'id_token_claims_obj';
-
+    //RSA 512 = 64 bytes for plain text encode
+    public static readonly ENCRYPT_SERVER_PUBLIC_KEY: string =
+        `-----BEGIN PUBLIC KEY-----
+        MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJwRaef6v1122j4X4sRwF0JfUE+bD3gn
+        KlsgyabpcbrgAVUl3eMR2KQbZI26JBQU32paL3zgZZYIeVVGGSEfNYcCAwEAAQ==
+        -----END PUBLIC KEY-----
+        `;
+    public static readonly ENCRYPT_CLIENT_PRIVATE_KEY: string =
+        `-----BEGIN RSA PRIVATE KEY-----
+        MIIBOgIBAAJBAJwRaef6v1122j4X4sRwF0JfUE+bD3gnKlsgyabpcbrgAVUl3eMR
+        2KQbZI26JBQU32paL3zgZZYIeVVGGSEfNYcCAwEAAQJAMHrgUSV9KIVxCfTVhnvj
+        XcTJ59CdH4/bAm/O9EB0Cb5ra/J9RcavAg3oQvX9v89PFsBE8d4acEyN0nn9FYIk
+        8QIhANal3OkAO8qTos7dhKikIe+T64y4n9AUyDOZ0ZMPt9U7AiEAuiJ45uZBz+J8
+        U/xvUV05ZTYI4irmkabjSr/O981B7CUCIQC3rxqbneKM2chiRHiopESSM8BIHRpN
+        w+sLFV+d/L5xTwIgQRidP+N3UMTcxmKaa9I2qHblVHO8f2PmSdYbA/789yECIBhN
+        cEGqfwy0r/XiY3Vt/Jtez+FtJF072fmp14bEnygT
+        -----END RSA PRIVATE KEY-----
+        `;
     public static readonly DEFAULT_LANGUAGE: string = "en-US";
     public static readonly DEFAULT_HOME_PAGE: string = "/app/main/home";
 

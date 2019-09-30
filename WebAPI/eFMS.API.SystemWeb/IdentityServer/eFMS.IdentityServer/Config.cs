@@ -30,16 +30,10 @@ namespace eFMS.IdentityServer
                     SlidingRefreshTokenLifetime = slientRefreshToken,
                     RedirectUris = redirectUris,
                     AllowedCorsOrigins= originUris,
-                    //AllowedCorsOrigins = new List<string> {
-                    //    "http://localhost:4200",
-                    //    "http://test.efms.itlvn.com",
-                    //    "http://test.api-efms.itlvn.com",
-                    //    "http://staging.efms.itlvn.com",
-                    //    "http://staging.api-efms.itlvn.com" },
                     AlwaysIncludeUserClaimsInIdToken = true,
                     AllowedScopes =
                     {
-                        "openid", "profile", "offline_access", "efms_scope", "dnt_api"
+                        "openid", "profile", "offline_access", "efms_scope"
                     },
                 }
             };
@@ -50,7 +44,7 @@ namespace eFMS.IdentityServer
         {
             return new List<ApiResource>
             {
-                new ApiResource("dnt_api", "eFMS D&T API")
+                new ApiResource("efms_api", "eFMS D&T API")
                 {
                     ApiSecrets = { new Secret("secret".Sha256()) }
                 }

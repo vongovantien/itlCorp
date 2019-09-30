@@ -29,8 +29,8 @@ export class RSAHelper {
         return this.decode(encodingText, SystemConstants.SECRET_KEY);
     }
 
-    // public static serverEncode(plainText: string) {
-    //     return this.encode(plainText, SystemConstants.ENCRYPT_SERVER_PUBLIC_KEY);
-    // }
+    public static serverEncode(plainText: string) {
+        return this.encode(plainText, SystemConstants.ENCRYPT_SERVER_PUBLIC_KEY);
+    }
 
 }

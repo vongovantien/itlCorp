@@ -200,7 +200,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             contNo: data.contNo,
             note: data.notes,
             currency: data.currencyId || 'VND',
-            type: this.types[2],
+            type: this.types.filter(type => type.value === (data.typeOfFee || 'Other'))[0],
             unit: this.units.filter(unit => unit.id === data.unitId)[0],
             serieNo: data.seriesNo,
             invoiceDate: !!data.invoiceDate ? { startDate: new Date(data.invoiceDate), endDate: new Date(data.invoiceDate) } : null,
