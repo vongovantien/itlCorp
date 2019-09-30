@@ -87,7 +87,13 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Post(CatSaleManEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-
+            string messageDuplicate = string.Empty;
+            bool checkExist = catSaleManService.Any(x => x.Service == model.Service && x.Office == model.Office);
+            if (checkExist)
+            {
+                messageDuplicate = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
+                return BadRequest(new ResultHandle { Status = false, Message = messageDuplicate });
+            }
             var saleman = mapper.Map<CatSaleManModel>(model);
             var hs = catSaleManService.Add(saleman);
             var message = HandleError.GetMessage(hs, Crud.Insert);

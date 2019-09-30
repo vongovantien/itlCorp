@@ -1047,7 +1047,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
             modelBuilder.Entity<CatSaleMan>(entity =>
             {
-                entity.ToTable("catSaleMan");
+                entity.ToTable("catSaleman");
 
             });
 

@@ -67,10 +67,12 @@ namespace eFMS.API.Catalogue.DL.Services
         public HandleState Update(CatSaleManModel model)
         {
             var entity = mapper.Map<CatSaleMan>(model);
+            entity.UserModified = currentUser.UserID;
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
+
             if (hs.Success)
             {
-                cache.Remove(Templates.CatSaleMan.NameCaching.ListName);
+               // cache.Remove(Templates.CatSaleMan.NameCaching.ListName);
             }
             return hs;
         }
