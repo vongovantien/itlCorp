@@ -464,9 +464,9 @@ namespace eFMS.API.Accounting.DL.Services
                            Vatrate = sur.Vatrate,
                            Total = sur.Total != null ? sur.Total : 0,
                            PayerId = sur.PayerId,
-                           Payer = par.ShortName,
+                           Payer = (sur.Type == Constants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
                            PaymentObjectId = sur.PaymentObjectId,
-                           OBHPartnerName = pae.ShortName,
+                           OBHPartnerName = (sur.Type == Constants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),//pae.ShortName,
                            InvoiceNo = sur.InvoiceNo,
                            SeriesNo = sur.SeriesNo,
                            InvoiceDate = sur.InvoiceDate,
@@ -480,7 +480,7 @@ namespace eFMS.API.Accounting.DL.Services
             return data.ToList();
         }
 
-        public List<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo)
+        public IQueryable<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo)
         {
             var surcharge = csShipmentSurchargeRepo.Get();
             var charge = catChargeRepo.Get();
@@ -528,9 +528,9 @@ namespace eFMS.API.Accounting.DL.Services
                            Vatrate = sur.Vatrate,
                            Total = sur.Total != null ? sur.Total : 0,
                            PayerId = sur.PayerId,
-                           Payer = par.ShortName,
+                           Payer = (sur.Type == Constants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
                            PaymentObjectId = sur.PaymentObjectId,
-                           OBHPartnerName = pae.ShortName,
+                           OBHPartnerName = (sur.Type == Constants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),//pae.ShortName,
                            InvoiceNo = sur.InvoiceNo,
                            SeriesNo = sur.SeriesNo,
                            InvoiceDate = sur.InvoiceDate,
@@ -541,7 +541,7 @@ namespace eFMS.API.Accounting.DL.Services
                            TypeOfFee = sur.TypeOfFee
                        };
 
-            return data.OrderByDescending(x => x.JobId).ToList();
+            return data.OrderByDescending(x => x.JobId);
         }
 
         #endregion --- DETAILS SETTLEMENT PAYMENT ---
@@ -1175,7 +1175,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
         #endregion --- PREVIEW SETTLEMENT PAYMENT ---
 
-        #region APPROVAL SETTLEMENT PAYMENT
+        #region --- APPROVAL SETTLEMENT PAYMENT ---
 
         public HandleState InsertOrUpdateApprovalSettlement(AcctApproveSettlementModel settlement)
         {
@@ -1456,7 +1456,37 @@ namespace eFMS.API.Accounting.DL.Services
                        };
             return data.FirstOrDefault();
         }
-        #endregion APPROVAL SETTLEMENT PAYMENT
+        #endregion --- APPROVAL SETTLEMENT PAYMENT ---
+
+        #region --- COPY CHARGE ---        
+        /// <summary>
+        /// Lấy danh sách phí hiện trường dựa vào SettlementNo
+        /// </summary>
+        /// <param name="settlementNo"></param>
+        /// <returns></returns>
+        public List<ShipmentChargeSettlement> CopyChargeFromSettlementOldToSettlementNew(ShipmentsCopyCriteria criteria)
+        {
+            var chargesCopy = new List<ShipmentChargeSettlement>();
+            if (criteria.charges.Count == 0 || criteria.shipments.Count == 0) return chargesCopy;
+
+            foreach (var shipment in criteria.shipments)
+            {
+                foreach (var charge in criteria.charges)
+                {
+                    var chargeCopy = new ShipmentChargeSettlement();
+                    chargeCopy = charge;
+                    chargeCopy.Id = Guid.Empty;
+                    chargeCopy.JobId = shipment.JobId;
+                    chargeCopy.HBL = shipment.HBL;
+                    chargeCopy.MBL = shipment.MBL;
+                    chargeCopy.SettlementCode = null;
+
+                    chargesCopy.Add(chargeCopy);
+                }
+            }
+            return chargesCopy;
+        }
+        #endregion --- COPY CHARGE ---
 
         #region ----METHOD PRIVATE----
         private string CreateSettlementNo()

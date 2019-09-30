@@ -7,6 +7,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace eFMS.API.Accounting.DL.IService
 {
@@ -28,7 +29,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         List<ShipmentChargeSettlement> GetExistsCharge(string JobId, string HBL, string MBL);
 
-        List<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo);
+        IQueryable<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo);
 
         bool CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria);
 
@@ -45,5 +46,8 @@ namespace eFMS.API.Accounting.DL.IService
         AcctApproveSettlementModel GetInfoApproveSettlementBySettlementNo(string settlementNo);
 
         Crystal Preview(string settlementNo);
+
+        List<ShipmentChargeSettlement> CopyChargeFromSettlementOldToSettlementNew(ShipmentsCopyCriteria criteria);
+
     }
 }
