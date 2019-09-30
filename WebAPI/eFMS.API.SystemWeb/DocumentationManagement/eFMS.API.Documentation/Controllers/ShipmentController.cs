@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using eFMS.API.Documentation.DL.IService;
 using Microsoft.AspNetCore.Mvc;
 using SystemManagementAPI.Infrastructure.Middlewares;
@@ -41,10 +38,29 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(list);
         }
 
+        /// <summary>
+        /// get list shipment credit payer
+        /// </summary>
+        /// <param name="partner"></param>
+        /// <param name="productServices"></param>
+        /// <returns></returns>
         [HttpGet("GetShipmentsCreditPayer")]
         public IActionResult GetShipmentsCreditPayer(string partner, List<string> productServices)
         {
             var data = shipmentService.GetShipmentsCreditPayer(partner, productServices);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Get list shipment copy by search option and keywords
+        /// </summary>
+        /// <param name="searchOption"></param>
+        /// <param name="keywords"></param>
+        /// <returns></returns>
+        [HttpGet("GetShipmentsCopyListBySearchOption")]
+        public IActionResult GetShipmentsCopyListBySearchOption(string searchOption, List<string> keywords)
+        {
+            var data = shipmentService.GetListShipmentBySearchOptions(searchOption, keywords);
             return Ok(data);
         }
     }
