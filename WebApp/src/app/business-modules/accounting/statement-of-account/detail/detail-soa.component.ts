@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AccoutingRepo } from 'src/app/shared/repositories';
+import { AccountingRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { SOA } from 'src/app/shared/models';
@@ -27,7 +27,7 @@ export class StatementOfAccountDetailComponent extends AppList {
     dataExportSOA: ISOAExport;
     constructor(
         private _activedRoute: ActivatedRoute,
-        private _accoutingRepo: AccoutingRepo,
+        private _accoutingRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _sortService: SortService,
         private _router: Router,

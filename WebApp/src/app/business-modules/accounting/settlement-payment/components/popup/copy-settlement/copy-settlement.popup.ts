@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
+import { AccountingRepo } from 'src/app/shared/repositories';
+import { Charge, Surcharge } from 'src/app/shared/models';
+import { catchError, map } from 'rxjs/operators';
 
 @Component({
     selector: 'copy-settlement-popup',
@@ -10,8 +13,12 @@ export class SettlementFormCopyPopupComponent extends PopupBase {
     headerShipment: CommonInterface.IHeaderTable[];
 
     searchOptions: CommonInterface.ICommonTitleValue[];
+    charges: Surcharge[] = [];
+    settlementNo: string = '';
 
-    constructor() {
+    constructor(
+        private _accountingRepo: AccountingRepo
+    ) {
         super();
     }
 
@@ -59,6 +66,23 @@ export class SettlementFormCopyPopupComponent extends PopupBase {
 
     }
     checkUncheckAllCharge() {
+
+    }
+
+    searchShipment() {
+        if (!!this.settlementNo) {
+            this._accountingRepo.getListChargeSettlementBySettlementNo(this.settlementNo)
+                .pipe(
+                    catchError(this.catchError),
+                    map(response => (response || []).map((charge: Surcharge) => new Surcharge(charge)))
+                )
+                .subscribe(
+                    (res: any) => {
+                        this.charges = res;
+                        console.log(this.charges);
+                    }
+                );
+        }
 
     }
 }

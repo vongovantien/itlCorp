@@ -5,7 +5,7 @@ import { catchError, map } from "rxjs/operators";
 import { throwError, Observable } from "rxjs";
 
 @Injectable()
-export class AccoutingRepo{
+export class AccountingRepo {
 
     private VERSION: string = 'v1';
     constructor(protected _api: ApiService) {
@@ -275,6 +275,12 @@ export class AccoutingRepo{
 
     previewSettlementPayment(settlementNo: any) {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/Preview`, null, { settlementNo: settlementNo }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getListChargeSettlementBySettlementNo(settlementNo: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetListSceneChargeSettlementBySettlementNo`, { settlementNo: settlementNo }).pipe(
             map((data: any) => data)
         );
     }

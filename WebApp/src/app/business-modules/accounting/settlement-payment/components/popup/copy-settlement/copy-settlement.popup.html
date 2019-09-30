@@ -14,11 +14,19 @@
                             <label for="">Settlment ID: <span class="text-danger">(*)</span> </label>
                             <div class="form-inline row">
                                 <div class="col-5">
-                                    <input type="text" class="form-control w-100">
+                                    <input type="text" class="form-control w-100" [(ngModel)]="settlementNo"
+                                        name="settlementNo">
                                 </div>
                                 <div class="col-7">
-                                    <button
-                                        class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-left-10">Apply</button>
+                                    <button title="Search Shipment" (click)="searchShipment()"
+                                        class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-left-10">
+                                        <span class="mx-auto">
+                                            <i class="la la-search"></i>
+                                            <span class="">
+                                                Apply
+                                            </span>
+                                        </span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -42,43 +50,52 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr class="text-center" *ngFor="let item of [1,2,3,4,6,2,2,2,2,2,2];">
-                                            <td></td>
-                                            <td>
-                                                <span>Phí hoa hồng - Commission Fee</span>
-                                            </td>
-                                            <td>
-                                                <span>LOG1290/0001 - HBL 123123 - MBL 123123</span>
-                                            </td>
-                                            <td>
-                                                <span>1</span>
-                                            </td>
-                                            <td>
-                                                <span>Thùng</span>
-                                            </td>
-                                            <td>
-                                                <span>{{2022000 | number: '.0-3'}}</span>
-                                            </td>
-                                            <td>VND</td>
-                                            <td>
-                                                <span>{{2022000 | number: '.0-3'}}</span>
-                                            </td>
-                                            <td>
-                                                <span>{{2022000 | number: '.0-3'}}</span>
-                                            </td>
-                                            <td>
-                                                <span>ITL</span>
-                                            </td>
-                                            <td>
-                                                <span>ITL</span>
-                                            </td>
-                                            <td>
-                                                <span>10200202</span>
-                                            </td>
-                                            <td>
-                                                <span>SDASD_SDSD_SD</span>
-                                            </td>
-                                        </tr>
+                                        <ng-container *ngIf="!isLoading && !!charges.length">
+                                            <tr class="text-center"
+                                                *ngFor="let charge of charges; let i = index; trackBy: trackByFn">
+                                                <td></td>
+                                                <td>
+                                                    <span>{{charge.chargeName}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{charge.jobId}} - HBL {{charge.hbl}} - MBL
+                                                        {{charge.mbl}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{charge.quantity}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{charge.unitName}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{charge.unitPrice | number: '.0-3'}}</span>
+                                                </td>
+                                                <td>{{charge.currencyId}}</td>
+                                                <td>
+                                                    <span>{{charge.vatrate | number: '.0-3'}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{charge.total | number: '.0-3'}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{charge.payer}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{charge.obhPartnerName}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{charge.clearanceNo}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{charge.chargeCode}}</span>
+                                                </td>
+                                            </tr>
+                                        </ng-container>
+
+
+                                        <tr app-table-none-record *ngIf="!isLoading && !charges.length"></tr>
+                                        <tr app-table-row-loading *ngIf="isLoading"></tr>
+
                                     </tbody>
                                 </table>
                             </div>

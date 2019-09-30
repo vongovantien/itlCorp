@@ -45,7 +45,6 @@ export class ApiService {
         for (const file of files) {
             formData.append(name || file.name, file);
         }
-        console.log(formData);
         const params = new HttpParams();
         const options = {
             params: params,

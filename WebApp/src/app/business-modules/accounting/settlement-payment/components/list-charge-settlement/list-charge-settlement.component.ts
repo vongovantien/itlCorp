@@ -43,6 +43,8 @@ export class SettlementListChargeComponent extends AppList {
     TYPE: string = 'LIST';
     STATE: string = 'WRITE';  // * list'state READ/WRITE
 
+    isShowButtonCopyCharge: boolean = false;
+
     constructor(
         private _sortService: SortService,
         private _toastService: ToastrService

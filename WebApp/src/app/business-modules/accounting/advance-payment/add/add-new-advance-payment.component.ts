@@ -5,7 +5,7 @@ import { Currency } from 'src/app/shared/models';
 import { AdvancePaymentFormCreateComponent } from '../components/form-create-advance-payment/form-create-advance-payment.component';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
-import { AccoutingRepo } from 'src/app/shared/repositories';
+import { AccountingRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -22,7 +22,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
 
     constructor(
         private _toastService: ToastrService,
-        private _accoutingRepo: AccoutingRepo,
+        private _accoutingRepo: AccountingRepo,
         private _router: Router,
         private _progressService: NgProgress
 

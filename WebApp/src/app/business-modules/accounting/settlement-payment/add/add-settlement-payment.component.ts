@@ -4,7 +4,7 @@ import { Currency, Surcharge } from 'src/app/shared/models';
 import { SettlementListChargeComponent } from '../components/list-charge-settlement/list-charge-settlement.component';
 import { SettlementFormCreateComponent } from '../components/form-create-settlement/form-create-settlement.component';
 import { formatDate } from '@angular/common';
-import { AccoutingRepo } from 'src/app/shared/repositories';
+import { AccountingRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
@@ -21,7 +21,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
     @ViewChild(SettlementFormCreateComponent, { static: false }) formCreateSurcharge: SettlementFormCreateComponent;
 
     constructor(
-        private _accountingRepo: AccoutingRepo,
+        private _accountingRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _router: Router,
         private _progressService: NgProgress
@@ -31,7 +31,12 @@ export class SettlementPaymentAddNewComponent extends AppPage {
         this._progressRef = this._progressService.ref();
     }
 
-    ngOnInit() { }
+    ngOnInit() {
+    }
+
+    ngAfterViewInit() {
+        this.requestSurchargeListComponent.isShowButtonCopyCharge = true;
+    }
 
     onChangeCurrency(currency: Currency) {
         this.requestSurchargeListComponent.changeCurrency(currency);

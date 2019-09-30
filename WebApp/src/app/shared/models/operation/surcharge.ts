@@ -29,6 +29,18 @@ export class Surcharge {
     hblid: string = '';
     type: string = '';
     typeOfFee: string = '';
+
+    cdclosed: boolean = false;
+    creditNo: string = '';
+    debitNo: string = '';
+    objectBePaid: string = '';
+    paySoano: string = '';
+    payerId: string = '';
+    paymentObjectId: string = '';
+    paymentRequestType: string = '';
+    soaclosed: boolean = false;
+    soano: string = '';
+
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

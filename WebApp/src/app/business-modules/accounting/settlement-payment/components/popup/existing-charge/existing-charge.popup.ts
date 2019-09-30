@@ -3,7 +3,7 @@ import { PopupBase } from 'src/app/popup.base';
 import { SystemConstants } from 'src/constants/system.const';
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
 import { DataService, SortService } from 'src/app/shared/services';
-import { OperationRepo, AccoutingRepo, DocumentationRepo, CatalogueRepo } from 'src/app/shared/repositories';
+import { OperationRepo, AccountingRepo, DocumentationRepo, CatalogueRepo } from 'src/app/shared/repositories';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { Surcharge } from 'src/app/shared/models';
@@ -54,7 +54,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         private _dataService: DataService,
         private _catalogue: CatalogueRepo,
         private _catalogueRepo: CatalogueRepo,
-        private _accoutingRepo: AccoutingRepo,
+        private _accoutingRepo: AccountingRepo,
         private _sortService: SortService,
         private _toastService: ToastrService,
         private _documentRepo: DocumentationRepo

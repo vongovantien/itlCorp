@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
-import { CatalogueRepo, AccoutingRepo, OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, AccountingRepo, OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { takeUntil, debounceTime, switchMap, skip, distinctUntilChanged, catchError, map } from 'rxjs/operators';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { CustomDeclaration, Surcharge } from 'src/app/shared/models';
@@ -101,7 +101,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
 
     constructor(
         private _documentRepo: DocumentationRepo,
-        private _accoutingRepo: AccoutingRepo,
+        private _accoutingRepo: AccountingRepo,
         private _dataService: DataService,
         private _catalogueRepo: CatalogueRepo,
         private _operationRepo: OperationRepo,
