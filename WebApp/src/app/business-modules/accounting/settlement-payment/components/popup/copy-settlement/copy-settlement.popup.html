@@ -1,0 +1,57 @@
+<div class="modal existing-charge-popup m-animate-fade-in" role="dialog" bsModal #popup="bs-modal" aria-hidden="true">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Copy Charges</h5>
+                <button type="button" (click)="hide()" class="close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="">Settlment ID: <span class="text-danger">(*)</span> </label>
+                            <div class="form-inline row">
+                                <div class="col-5">
+                                    <input type="text" class="form-control">
+                                </div>
+                                <div class="col-7">
+                                    <button
+                                        class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-left-10">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="m--align-center m--margin-top-20">
+                            <button
+                                class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                                title="Save" (click)="submitCopyCharge()">
+                                <span>
+                                    <i class="la la-save"></i>
+                                    <span>
+                                        Copy Charge
+                                    </span>
+                                </span>
+                            </button>
+                            <button class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" title="Cancel"
+                                (click)="hide()">
+                                <span>
+                                    <i class="la la-ban"></i>
+                                    <span>
+                                        Cancel
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
