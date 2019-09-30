@@ -37,7 +37,28 @@
                     </span>
                 </button>
             </div>
+
+            <div class="modal fade" role="dialog" bsModal #popupReport="bs-modal" (onHide)="onHide($event)">
+                <div class="modal-dialog modal-report" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Preview</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                (click)="hidePreview()">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form #formPL method="POST" [action]="scr" (onsubmit)="onSubmitForm($event)"
+                                (ngSubmit)="onSubmitForm($event)" target="reportFrame">
+                                <input name="crystal" [value]="dataReport" type="hidden">
+                            </form>
+                            <iframe name="reportFrame" src="" type="application/pdf" height="1200px" width="100%"
+                                allowfullscreen frameborder="0"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-<app-report-preview [data]="dataReport"></app-report-preview>
