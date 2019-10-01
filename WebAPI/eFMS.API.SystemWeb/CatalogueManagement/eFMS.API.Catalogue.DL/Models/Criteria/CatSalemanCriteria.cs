@@ -12,6 +12,8 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public string Office { get; set; }
         public string Company { get; set; }
         public bool? Status { get; set; }
+        public string Description { get; set; }
+        public DateTime? EffectDate { get; set; }
         public string PartnerId { get; set; }
     }
 }

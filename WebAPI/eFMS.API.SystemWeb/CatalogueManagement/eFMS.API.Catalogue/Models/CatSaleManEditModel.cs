@@ -14,5 +14,7 @@ namespace eFMS.API.Catalogue.Models
         public string Service { get; set; }
         public bool? Status { get; set; }
         public string PartnerId { get; set; }
+        public DateTime? EffectDate { get; set; }
+        public string Description { get; set; }
     }
 }
