@@ -75,16 +75,13 @@
             </div>
             <div class="table-wrapper table-scrollable">
                 <table class="table table-hover table-brand dataTable">
-                    <thead>
-                        <tr class="text-center" app-table-header [headers]="headers"
-                            (onclick)="sortBy($event.sortField)">
-                            <th class="m--w-50 first table-actions-col">
-                                <label class="m-checkbox">
-                                    <input type="checkbox" [(ngModel)]="isCheckAll" (change)="checkUncheckAll()">
-                                    <span></span>
-                                </label>
-                            </th>
-                        </tr>
+                    <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
+                        <th class="m--w-50 first table-actions-col">
+                            <label class="m-checkbox">
+                                <input type="checkbox" [(ngModel)]="isCheckAll" (change)="checkUncheckAll()">
+                                <span></span>
+                            </label>
+                        </th>
                     </thead>
                     <tbody>
                         <tr *ngFor="let custom of listCustomDeclaration; let i = index; trackBy: trackByFn"

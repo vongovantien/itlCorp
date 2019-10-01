@@ -4,7 +4,7 @@ import { SettlementListChargeComponent } from '../components/list-charge-settlem
 import { SettlementFormCreateComponent } from '../components/form-create-settlement/form-create-settlement.component';
 import { Currency, Surcharge } from 'src/app/shared/models';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AccoutingRepo } from 'src/app/shared/repositories';
+import { AccountingRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { catchError, finalize } from 'rxjs/operators';
@@ -30,7 +30,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
 
     constructor(
         private _activedRouter: ActivatedRoute,
-        private _accoutingRepo: AccoutingRepo,
+        private _accoutingRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _router: Router,
         private _progressService: NgProgress
@@ -140,6 +140,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
                     // *SWITCH UI TO GROUP LIST SHIPMENT
                     this.requestSurchargeListComponent.TYPE = typeCharge; // ? GROUP/LIST
                     this.requestSurchargeListComponent.STATE = 'WRITE'; //  ? READ/WRITE
+                    this.requestSurchargeListComponent.isShowButtonCopyCharge = false;
 
                     if (this.requestSurchargeListComponent.groupShipments.length) {
                         this.requestSurchargeListComponent.openAllCharge.next(true);

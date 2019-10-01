@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
-import { CatalogueRepo, AccoutingRepo, OperationRepo, SystemRepo, DocumentationRepo } from 'src/app/shared/repositories';
-import { takeUntil, debounceTime, switchMap, skip, distinctUntilChanged, catchError, map, take } from 'rxjs/operators';
+import { CatalogueRepo, AccountingRepo, OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
+import { takeUntil, debounceTime, switchMap, skip, distinctUntilChanged, catchError, map } from 'rxjs/operators';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { CustomDeclaration, Surcharge } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
@@ -101,7 +101,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
 
     constructor(
         private _documentRepo: DocumentationRepo,
-        private _accoutingRepo: AccoutingRepo,
+        private _accoutingRepo: AccountingRepo,
         private _dataService: DataService,
         private _catalogueRepo: CatalogueRepo,
         private _operationRepo: OperationRepo,
@@ -200,7 +200,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             contNo: data.contNo,
             note: data.notes,
             currency: data.currencyId || 'VND',
-            type: this.types[2],
+            type: this.types.filter(type => type.value === (data.typeOfFee || 'Other'))[0],
             unit: this.units.filter(unit => unit.id === data.unitId)[0],
             serieNo: data.seriesNo,
             invoiceDate: !!data.invoiceDate ? { startDate: new Date(data.invoiceDate), endDate: new Date(data.invoiceDate) } : null,
@@ -426,7 +426,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     submit() {
         const body = new Surcharge({
             id: !!this.selectedSurcharge ? this.selectedSurcharge.id : '00000000-0000-0000-0000-000000000000',
-            hblid: this.selectedShipmentData.hblid,
+            hblid: !!this.selectedShipmentData ? this.selectedShipmentData.hblid : '00000000-0000-0000-0000-000000000000',
             type: this.selectedCharge.type === 'CREDIT' ? 'BUY' : 'OBH',
             chargeId: this.selectedCharge.id || '',
             chargeName: this.selectedCharge.chargeNameVn || '',

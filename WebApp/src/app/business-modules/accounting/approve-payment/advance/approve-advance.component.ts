@@ -1,7 +1,7 @@
 import { Component, ViewChild, TemplateRef } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
 import { AdvancePaymentListRequestComponent } from '../../advance-payment/components/list-advance-payment-request/list-advance-payment-request.component';
-import { AccoutingRepo } from 'src/app/shared/repositories';
+import { AccountingRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -34,7 +34,7 @@ export class ApproveAdvancePaymentComponent extends AppPage {
     comment: string = '';
 
     constructor(
-        private _accoutingRepo: AccoutingRepo,
+        private _accoutingRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _ngProgressService: NgProgress,
         private _activedRouter: ActivatedRoute,

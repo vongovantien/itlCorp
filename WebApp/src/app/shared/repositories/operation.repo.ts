@@ -88,9 +88,7 @@ export class OperationRepo {
         return this._api.put(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/OpsStageAssigned/Update`, body);
     }
 
-    addOPSJob(body: any = {}) {
-        return this._api.post(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/OpsTransaction/Add`, body);
-    }
+
 
 }
 

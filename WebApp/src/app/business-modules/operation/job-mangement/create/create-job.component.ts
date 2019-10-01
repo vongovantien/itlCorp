@@ -8,7 +8,7 @@ import { PartnerGroupEnum } from "src/app/shared/enums/partnerGroup.enum";
 import { NgForm } from "@angular/forms";
 import { Router } from "@angular/router";
 import { PlaceTypeEnum } from "src/app/shared/enums/placeType-enum";
-import { CatalogueRepo, OperationRepo } from "src/app/shared/repositories";
+import { CatalogueRepo, DocumentationRepo } from "src/app/shared/repositories";
 import { takeUntil, catchError, finalize } from "rxjs/operators";
 import { NgxSpinnerService } from "ngx-spinner";
 import { ToastrService } from "ngx-toastr";
@@ -61,10 +61,10 @@ export class JobManagementCreateJobComponent extends AppPage {
         private baseServices: BaseService,
         private api_menu: API_MENU,
         private router: Router,
-        private _operationRepo: OperationRepo,
         private spinner: NgxSpinnerService,
         private _toaster: ToastrService,
         private _catalogueRepo: CatalogueRepo,
+        private _documentRepo: DocumentationRepo
     ) {
         super();
         this.baseServices.dataStorage.subscribe(data => {
@@ -185,7 +185,7 @@ export class JobManagementCreateJobComponent extends AppPage {
                 const error = $("#add-new-ops-job-form").find("div.has-danger");
                 if (error.length === 0) {
                     this.OpsTransactionToAdd.serviceDate = this.selectedDate.startDate != null ? dataHelper.dateTimeToUTC(this.selectedDate.startDate) : null;
-                    this._operationRepo.addOPSJob(this.OpsTransactionToAdd).pipe(
+                    this._documentRepo.addOPSJob(this.OpsTransactionToAdd).pipe(
                         takeUntil(this.ngUnsubscribe),
                         catchError(this.catchError),
                         finalize(() => { this.spinner.hide(); })

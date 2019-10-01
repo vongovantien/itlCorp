@@ -1,6 +1,6 @@
 import { Component, ViewChild } from "@angular/core";
 import { ConfirmPopupComponent, InfoPopupComponent } from "src/app/shared/common/popup";
-import { AccoutingRepo } from "src/app/shared/repositories";
+import { AccountingRepo } from "src/app/shared/repositories";
 import { catchError, finalize } from "rxjs/operators";
 import { AppList } from "src/app/app.list";
 import { SOA } from "src/app/shared/models";
@@ -24,7 +24,7 @@ export class StatementOfAccountComponent extends AppList {
     messageDelete: string = '';
 
     constructor(
-        private _accoutingRepo: AccoutingRepo,
+        private _accoutingRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _sortService: SortService,
         private _progressService: NgProgress,

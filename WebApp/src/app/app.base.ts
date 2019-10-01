@@ -123,7 +123,7 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
     }
 
     downLoadFile(data: any, type: string, filename: string = 'undefine.xlsx') {
-        const blob: Blob = new Blob([data], {type: type});
+        const blob: Blob = new Blob([data], { type: type });
         const fileName: string = filename;
         const objectUrl: string = URL.createObjectURL(blob);
         const a: HTMLAnchorElement = document.createElement('a') as HTMLAnchorElement;
@@ -131,7 +131,7 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
         a.href = objectUrl;
         a.download = fileName;
         document.body.appendChild(a);
-        a.click();        
+        a.click();
 
         document.body.removeChild(a);
         URL.revokeObjectURL(objectUrl);

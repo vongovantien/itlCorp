@@ -1,10 +1,10 @@
 //scrollbar-sidebar
-.ps__rail-y>.ps__thumb-y,
-.ps__rail-y:hover>.ps__thumb-y,
-.ps__rail-y:focus>.ps__thumb-y,
+.ps__rail-y > .ps__thumb-y,
+.ps__rail-y:hover > .ps__thumb-y,
+.ps__rail-y:focus > .ps__thumb-y,
 .ps__rail-y.ps--clicking .ps__thumb-y {
     background-color: #3966b6 !important;
-    width: 3px !important;
+    width: 5px !important;
     opacity: 1;
 }
 
@@ -14,30 +14,30 @@
     }
 }
 
-perfect-scrollbar>.ps.ps--active-y>.ps__rail-y:hover,
-perfect-scrollbar>.ps.ps--active-y>.ps__rail-y.ps--clicking {
+perfect-scrollbar > .ps.ps--active-y > .ps__rail-y:hover,
+perfect-scrollbar > .ps.ps--active-y > .ps__rail-y.ps--clicking {
     width: 0 !important;
 }
 
-perfect-scrollbar>.ps.ps--scrolling-y>.ps__rail-y,
-perfect-scrollbar>.ps.ps--scrolling-x>.ps__rail-x {
+perfect-scrollbar > .ps.ps--scrolling-y > .ps__rail-y,
+perfect-scrollbar > .ps.ps--scrolling-x > .ps__rail-x {
     background-color: transparent !important;
 }
 
 .m-aside-menu--submenu-skin-dark {
-    .ps__rail-y>.ps__thumb-y,
-    .ps__rail-y:hover>.ps__thumb-y,
-    .ps__rail-y:focus>.ps__thumb-y,
+    .ps__rail-y > .ps__thumb-y,
+    .ps__rail-y:hover > .ps__thumb-y,
+    .ps__rail-y:focus > .ps__thumb-y,
     .ps__rail-y.ps--clicking .ps__thumb-y {
         background-color: #5f6386 !important;
         width: 5px !important;
     }
-    perfect-scrollbar>.ps.ps--active-y>.ps__rail-y:hover,
-    perfect-scrollbar>.ps.ps--active-y>.ps__rail-y.ps--clicking {
+    perfect-scrollbar > .ps.ps--active-y > .ps__rail-y:hover,
+    perfect-scrollbar > .ps.ps--active-y > .ps__rail-y.ps--clicking {
         width: 0 !important;
     }
-    perfect-scrollbar>.ps.ps--scrolling-y>.ps__rail-y,
-    perfect-scrollbar>.ps.ps--scrolling-x>.ps__rail-x {
+    perfect-scrollbar > .ps.ps--scrolling-y > .ps__rail-y,
+    perfect-scrollbar > .ps.ps--scrolling-x > .ps__rail-x {
         background-color: transparent !important;
     }
 }
@@ -49,7 +49,6 @@ section::-webkit-scrollbar {
     width: 3px;
     height: 7px;
 }
-
 
 /* Track */
 
@@ -63,7 +62,6 @@ section {
         background-color: #b3b3b3;
     }
 }
-
 
 /* Handle */
 
@@ -197,13 +195,13 @@ a {
 
 .c-button-actions,
 .form-actions {
-    >* {
-        +* {
+    > * {
+        + * {
             margin-left: 10px;
         }
     }
     .btn {
-        &+.btn {
+        & + .btn {
             margin-left: 10px;
         }
     }
@@ -233,7 +231,7 @@ a {
 .m-topbar .m-topbar__nav.m-nav .m-nav__item {
     padding: 0;
     position: relative;
-    >a {
+    > a {
         padding-left: 15px;
         padding-right: 15px;
     }
@@ -256,9 +254,9 @@ a {
 .m-aside-left--minimize .m-aside-menu.m-aside-menu--skin-dark,
 .m-aside-menu.m-aside-menu--skin-dark {
     .m-menu__nav--dropdown-submenu-arrow {
-        >.m-menu__item {
+        > .m-menu__item {
             &.m-menu__item--active {
-                >.m-menu__link {
+                > .m-menu__link {
                     background-color: #3966b6;
                     position: relative;
                     &:before {
@@ -303,6 +301,7 @@ a {
     width: 100%;
     display: block;
     overflow-x: auto;
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     -ms-overflow-style: -ms-autohiding-scrollbar;
 }
@@ -323,7 +322,7 @@ a {
                 border-top-color: #fff;
                 vertical-align: middle;
                 &:first-child {
-                    padding-left: 10px
+                    padding-left: 10px;
                 }
                 .m-checkbox,
                 .m-radio {
@@ -340,7 +339,7 @@ a {
                 content: "\f110";
             }
             &.collapse-panel-row {
-                >td {
+                > td {
                     padding: 0;
                 }
                 .detail-panel-block {
@@ -356,12 +355,12 @@ a {
                 }
             }
         }
-        &+tbody {
+        & + tbody {
             border-top: 0;
         }
         &.tbody-group {
-            &:nth-child(2n+1) {
-                >.collapse-toggle-row {
+            &:nth-child(2n + 1) {
+                > .collapse-toggle-row {
                     background-color: #fff;
                 }
             }
@@ -375,7 +374,7 @@ a {
                 vertical-align: middle;
                 background-color: #f2dedf;
                 &:first-child {
-                    padding-left: 10px
+                    padding-left: 10px;
                 }
             }
         }
@@ -457,14 +456,14 @@ a {
 
 .table-actions-col {
     .table-actions {
-        >* {
-            +* {
+        > * {
+            + * {
                 margin-left: 5px;
             }
         }
     }
     .btn {
-        &+.btn {
+        & + .btn {
             margin-left: 5px;
         }
         &.m-btn--icon.m-btn--icon-only {
@@ -483,21 +482,27 @@ table.dataTable {
             .sorting {
                 span {
                     padding-right: 16px;
-                    background: #3966b6 url(../app/component/datatable/images/sort_both.png) no-repeat center right;
+                    background: #3966b6
+                        url(../app/component/datatable/images/sort_both.png)
+                        no-repeat center right;
                     display: inline-block;
                 }
             }
             .sorting_asc {
                 span {
                     padding-right: 16px;
-                    background: #3966b6 url(../app/component/datatable/images/sort_asc.png) no-repeat center right;
+                    background: #3966b6
+                        url(../app/component/datatable/images/sort_asc.png)
+                        no-repeat center right;
                     display: inline-block;
                 }
             }
             .sorting_desc {
                 span {
                     padding-right: 16px;
-                    background: #3966b6 url(../app/component/datatable/images/sort_desc.png) no-repeat center right;
+                    background: #3966b6
+                        url(../app/component/datatable/images/sort_desc.png)
+                        no-repeat center right;
                     display: inline-block;
                 }
             }
@@ -508,21 +513,27 @@ table.dataTable {
             .sorting {
                 span {
                     padding-right: 16px;
-                    background: #f2dedf url(../app/component/datatable/images/sort_both_dark.png) no-repeat center right;
+                    background: #f2dedf
+                        url(../app/component/datatable/images/sort_both_dark.png)
+                        no-repeat center right;
                     display: inline-block;
                 }
             }
             .sorting_asc {
                 span {
                     padding-right: 16px;
-                    background: #f2dedf url(../app/component/datatable/images/sort_asc.png) no-repeat center right;
+                    background: #f2dedf
+                        url(../app/component/datatable/images/sort_asc.png)
+                        no-repeat center right;
                     display: inline-block;
                 }
             }
             .sorting_desc {
                 span {
                     padding-right: 16px;
-                    background: #f2dedf url(../app/component/datatable/images/sort_desc.png) no-repeat center right;
+                    background: #f2dedf
+                        url(../app/component/datatable/images/sort_desc.png)
+                        no-repeat center right;
                     display: inline-block;
                 }
             }
@@ -576,7 +587,7 @@ table.dataTable {
     }
     .c-button-actions {
         .btn {
-            &+.btn {
+            & + .btn {
                 margin-left: 10px;
             }
         }
@@ -599,7 +610,7 @@ table.dataTable {
     }
 }
 
-.modal-report{
+.modal-report {
     width: calc(100% - 1.75rem);
     max-width: 800px;
 }
@@ -735,7 +746,7 @@ table.dataTable {
         background-color: #fbb822;
     }
     .job-stage-item-actions {
-        >.btn {
+        > .btn {
             color: #747474;
         }
     }
@@ -761,7 +772,7 @@ table.dataTable {
 }
 
 .stage-item-info {
-    >i {
+    > i {
         margin-right: 3px;
     }
 }
@@ -859,7 +870,7 @@ table.dataTable {
             padding-left: 7px;
             position: relative;
             &:before {
-                content: '-';
+                content: "-";
                 width: 5px;
                 height: 1px;
                 display: inline-block;
@@ -885,7 +896,7 @@ table.dataTable {
 
 //detail job
 .job-notification-dropdown {
-    >.btn {
+    > .btn {
         padding-right: 30px;
     }
     .m-badge {
@@ -974,7 +985,7 @@ table.dataTable {
 
 .daterange-rtl {
     .md-drppicker {
-        &.double{
+        &.double {
             right: 0 !important;
         }
         left: auto !important;
@@ -1078,7 +1089,7 @@ table.dataTable {
 .pointer {
     cursor: pointer;
 }
-.text-underline{
+.text-underline {
     text-decoration: underline;
 }
 
@@ -1111,7 +1122,7 @@ table.dataTable {
         transition: 0.4s;
         &:before {
             position: absolute;
-            content: '';
+            content: "";
             height: 21px;
             width: 21px;
             left: 0px;
@@ -1145,9 +1156,22 @@ input:checked + .slider:before {
 }
 
 a:not([href]):not([tabindex]) {
-  color: #3966b6;
+    color: #3966b6;
 }
 
 .font-13 {
     font-size: 13px;
+}
+
+@for $i from 1 through 4 {
+    $num: $i * 5;
+    .border-radius-#{$num} {
+        border-radius: #{$num}px;
+    }
+}
+
+@for $i from 13 through 30 {
+    .font-#{$i} {
+        font-size: #{$i}px;
+    }
 }

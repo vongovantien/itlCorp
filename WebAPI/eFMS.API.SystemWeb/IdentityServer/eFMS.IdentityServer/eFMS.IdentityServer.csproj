@@ -16,6 +16,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="RSAKey\eFMS_RSA512.priv" />
+    <None Remove="RSAKey\eFMS_RSA512.pub" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="RSAKey\eFMS_RSA512.priv">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RSAKey\eFMS_RSA512.pub">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="wwwroot\" />
   </ItemGroup>
 

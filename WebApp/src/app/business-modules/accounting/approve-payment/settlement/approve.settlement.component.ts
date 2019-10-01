@@ -6,7 +6,7 @@ import { ReportPreviewComponent } from 'src/app/shared/common';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ISettlementPaymentData } from '../../settlement-payment/detail/detail-settlement-payment.component';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AccoutingRepo } from 'src/app/shared/repositories';
+import { AccountingRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { catchError } from 'rxjs/internal/operators/catchError';
@@ -41,7 +41,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
 
     constructor(
         private _activedRouter: ActivatedRoute,
-        private _accoutingRepo: AccoutingRepo,
+        private _accoutingRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _router: Router,
         private _progressService: NgProgress,

@@ -1,7 +1,7 @@
 import { Component, ViewChild, Output, EventEmitter } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
-import { AccoutingRepo, OperationRepo } from 'src/app/shared/repositories';
+import { AccountingRepo, OperationRepo } from 'src/app/shared/repositories';
 import { catchError, map } from 'rxjs/operators';
 import { CustomDeclaration, AdvancePaymentRequest } from 'src/app/shared/models';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
@@ -58,7 +58,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
 
     constructor(
         private _fb: FormBuilder,
-        private _accoutingRepo: AccoutingRepo,
+        private _accoutingRepo: AccountingRepo,
         private _operationRepo: OperationRepo
     ) {
         super();

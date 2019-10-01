@@ -65,7 +65,6 @@ const LIB = [
         RouterModule.forChild(routing),
         FormsModule,
         ReactiveFormsModule,
-        HttpClientModule,
         ...LIB
     ],
     exports: [],

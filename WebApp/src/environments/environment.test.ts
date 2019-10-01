@@ -10,8 +10,9 @@ export const environment = {
         CATALOGUE: "test.api-efms.itlvn.com/Catalogue",
         OPERATION: "test.api-efms.itlvn.com/Operation",
         SYSTEM: "test.api-efms.itlvn.com/System",
-        REPORT:"http://test.api-efms.itlvn.com/export",
-        DOCUMENTATIONLOCAL:"localhost:44366",
+        REPORT: "test.api-efms.itlvn.com/ReportPreview/Default.aspx",
+        EXPORT: "test.api-efms.itlvn.com/Export",
+        DOCUMENTATIONLOCAL: "localhost:44366",
         INDENTITY_SERVER_URL: "http://test.api-efms.itlvn.com/identityserver"
     },
 
