@@ -3,7 +3,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Copy Charges</h5>
-                <button type="button" (click)="hide()" class="close">
+                <button type="button" (click)="closePopup()" class="close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -13,12 +13,12 @@
                         <div class="form-group">
                             <label for="">Settlment ID: <span class="text-danger">(*)</span> </label>
                             <div class="form-inline row">
-                                <div class="col-5">
+                                <div class="col-4">
                                     <input type="text" class="form-control w-100" [(ngModel)]="settlementNo"
                                         name="settlementNo">
                                 </div>
-                                <div class="col-7">
-                                    <button title="Search Shipment" (click)="searchShipment()"
+                                <div class="col-8">
+                                    <button title="Search Shipment" (click)="searchCharge()"
                                         class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-left-10">
                                         <span class="mx-auto">
                                             <i class="la la-search"></i>
@@ -33,27 +33,38 @@
                     </div>
                 </div>
                 <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <input type="text" class="form-control border-radius-20" placeholder="Search charge"
+                                [(ngModel)]="keyword" name="keyword">
+                        </div>
+                    </div>
                     <div class="col-12">
                         <perfect-scrollbar style="max-height: 300px">
-                            <div class="table-wrapper table-scrollable h-50">
+                            <div class="table-wrapper h-50" [class.scrollable]="!!charges.length">
                                 <table class="table table-striped table-brand dataTable">
-                                    <thead>
-                                        <tr app-table-header [headers]="headersCharge" class="text-center"
-                                            (onClick)="sortSurcharge($event)">
-                                            <th class="first">
-                                                <label class="m-checkbox">
-                                                    <input type="checkbox" [(ngModel)]="isCheckAll"
-                                                        (change)="checkUncheckAllCharge()">
-                                                    <span></span>
-                                                </label>
-                                            </th>
-                                        </tr>
+                                    <thead app-table-header [headers]="headersCharge" (onClick)="sortSurcharge($event)">
+                                        <th class="first">
+                                            <label class="m-checkbox">
+                                                <input type="checkbox" [(ngModel)]="isCheckAll"
+                                                    (change)="checkUncheckAllCharge()">
+                                                <span></span>
+                                            </label>
+                                        </th>
                                     </thead>
                                     <tbody>
                                         <ng-container *ngIf="!isLoading && !!charges.length">
                                             <tr class="text-center"
-                                                *ngFor="let charge of charges; let i = index; trackBy: trackByFn">
-                                                <td></td>
+                                                *ngFor="let charge of charges | filter: keyword : ['jobId', 'hbl', 'mbl', 'chargeName', 'payer', 'obhPartnerName']; let i = index; trackBy: trackByFn">
+                                                <td class="table-actions-col">
+                                                    <div class="m-checkbox-list d-flex justify-content-center">
+                                                        <label class="m-checkbox">
+                                                            <input type="checkbox" (change)="onChangeCheckBoxCharge()"
+                                                                value="{{charge}}" [(ngModel)]="charge.isSelected">
+                                                            <span></span>
+                                                        </label>
+                                                    </div>
+                                                </td>
                                                 <td>
                                                     <span>{{charge.chargeName}}</span>
                                                 </td>
@@ -91,11 +102,9 @@
                                                 </td>
                                             </tr>
                                         </ng-container>
-
-
-                                        <tr app-table-none-record *ngIf="!isLoading && !charges.length"></tr>
+                                        <tr app-table-none-record *ngIf="!isLoading && !charges.length"
+                                            [colspan]="headersCharge.length + 1"></tr>
                                         <tr app-table-row-loading *ngIf="isLoading"></tr>
-
                                     </tbody>
                                 </table>
                             </div>
@@ -104,17 +113,22 @@
                 </div>
                 <div class="row  m--margin-top-20">
                     <div class="col-3">
-                        <div>Search Options</div>
+                        <div>
+                            <i class="la la-search align-middle text-success font-30"></i>
+                            <span class="text-underline font-weight-bold">Search Option</span>
+                        </div>
+
                         <div class="form-group">
-                            <select class="form-control">
+                            <select class="form-control" [(ngModel)]="selectedOption" name="selectedOption">
                                 <option [ngValue]="option" *ngFor="let option of searchOptions">{{option.title}}
                                 </option>
                             </select>
                         </div>
                         <div class="d-flex justify-content-around flex-column" style="height: 90%">
-                            <textarea name="" id="" cols="30" rows="12" class="form-control"></textarea>
+                            <textarea name="keywordSearchShipment" id="" cols="30" rows="12" class="form-control"
+                                [(ngModel)]="keywordSearchShipment"></textarea>
                             <button class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase"
-                                title="Add to copy list">
+                                title="Add to copy list" (click)="searchShipment()">
                                 <span class="mx-auto">
                                     <i class="la la-mail-forward"></i>
                                     <span class="">
@@ -125,43 +139,58 @@
                         </div>
                     </div>
                     <div class="col-9">
-                        <div>Copy Shipments List</div>
-                        <perfect-scrollbar style="max-height: 300px" class="m--margin-top-5">
+                        <div>
+                            <i class="la la-list-alt align-middle text-primary font-30"></i>
+                            <span class="text-underline font-weight-bold">Copy Shipment List</span>
+                        </div>
+                        <perfect-scrollbar style="max-height: 300px; background:#f4f5f8;" class="m--margin-top-5">
                             <div class="table-wrapper h-75">
                                 <table class="table table-striped table-brand dataTable">
-                                    <thead>
-                                        <tr app-table-header [headers]="headerShipment" class="text-center"
-                                            (onClick)="sortSurcharge($event)">
-                                            <th class="first">
-                                                <label class="m-checkbox">
-                                                    <input type="checkbox" [(ngModel)]="isCheckAll"
-                                                        (change)="checkUncheckAllCharge()">
-                                                    <span></span>
-                                                </label>
-                                            </th>
-                                        </tr>
+                                    <thead app-table-header [headers]="headerShipment" class="text-center"
+                                        (onClick)="sortShipment($event)">
+                                        <th class="first">
+                                            <label class="m-checkbox">
+                                                <input type="checkbox" [(ngModel)]="isCheckAllShipment"
+                                                    (change)="checkUncheckAllShipment()">
+                                                <span></span>
+                                            </label>
+                                        </th>
                                     </thead>
                                     <tbody>
-                                        <tr class="text-center" *ngFor="let item of [1,2,3,4,6,2,2,2,2,2,2];">
-                                            <td></td>
-                                            <td>
-                                                <span>1</span>
-                                            </td>
-                                            <td>
-                                                <span>LOG1290/0001 - HBL 123123 - MBL 123123</span>
-                                            </td>
-                                            <td>
-                                                <span>ITL</span>
-                                            </td>
-                                            <td>
-                                                <span>HBL 123123123</span>
-                                            </td>
-                                            <td>
-                                                <span>MBL 12312322</span>
-                                            </td>
-                                            <td>1000ADSDSA123</td>
-                                            <td>LCL Export</td>
-                                        </tr>
+                                        <ng-container
+                                            *ngFor="let shipment of shipments; let i = index; trackBy: trackByFn">
+                                            <tr class="text-center" *ngIf="!!shipments.length">
+                                                <td class="table-actions-col">
+                                                    <div class="m-checkbox-list d-flex justify-content-center">
+                                                        <label class="m-checkbox">
+                                                            <input type="checkbox" (change)="onChangeCheckBoxShipment()"
+                                                                value="{{shipment}}" [(ngModel)]="shipment.isSelected">
+                                                            <span></span>
+                                                        </label>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span> {{i + 1}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{shipment.jobId}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{shipment.customer}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{shipment.hbl}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{shipment.mbl}}</span>
+                                                </td>
+                                                <td>{{shipment.customNo}}</td>
+                                                <td class="text-primary">{{shipment.service}}</td>
+                                            </tr>
+                                        </ng-container>
+                                        <tr app-table-none-record *ngIf="!shipments.length"
+                                            [colspan]="headerShipment.length + 1"></tr>
+
                                     </tbody>
                                 </table>
                             </div>
@@ -184,7 +213,7 @@
                                 </span>
                             </button>
                             <button class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" title="Cancel"
-                                (click)="hide()">
+                                (click)="closePopup()">
                                 <span>
                                     <i class="la la-ban"></i>
                                     <span>

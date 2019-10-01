@@ -66,10 +66,8 @@
                         <div class="m-portlet__body">
                             <div class="table-wrapper table-scrollable" id="ops-job-list-table">
                                 <table class="table table-hover table-brand dataTable">
-                                    <thead>
-                                        <tr app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
-                                            <th class="table-actions-col no-sorting first"></th>
-                                        </tr>
+                                    <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
+                                        <th class="table-actions-col no-sorting first"></th>
                                     </thead>
                                     <tbody class="tbody-group">
                                         <ng-container *ngFor="let item of shipments; let i = index; trackBy: trackByFn">

@@ -426,7 +426,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     submit() {
         const body = new Surcharge({
             id: !!this.selectedSurcharge ? this.selectedSurcharge.id : '00000000-0000-0000-0000-000000000000',
-            hblid: this.selectedShipmentData.hblid,
+            hblid: !!this.selectedShipmentData ? this.selectedShipmentData.hblid : '00000000-0000-0000-0000-000000000000',
             type: this.selectedCharge.type === 'CREDIT' ? 'BUY' : 'OBH',
             chargeId: this.selectedCharge.id || '',
             chargeName: this.selectedCharge.chargeNameVn || '',

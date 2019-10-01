@@ -285,6 +285,12 @@ export class AccountingRepo {
         );
     }
 
+    copyChargeToShipment(body: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/CopyCharges`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }
 
 

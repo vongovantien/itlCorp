@@ -28,12 +28,10 @@
                     <perfect-scrollbar style="max-height: 900px">
                         <div class="table-wrapper" id="adv-payment-list-table">
                             <table class="table table-brand table-hover dataTable">
-                                <thead>
-                                    <tr class="text-center" app-table-header [headers]="headers"
-                                        (onClick)="sortBy($event.sortField ? $event.sortField : '')">
-                                        <th class="m--w-50 first">
-                                        </th>
-                                    </tr>
+                                <thead app-table-header [headers]="headers"
+                                    (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                                    <th class="m--w-50 first">
+                                    </th>
                                 </thead>
                                 <tbody class="tbody-group">
                                     <ng-container

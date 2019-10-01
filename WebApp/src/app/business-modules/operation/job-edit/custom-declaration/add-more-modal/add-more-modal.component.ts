@@ -248,7 +248,6 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
 
     }
     closepp(param: string) {
-        console.log(param);
         this.customNoSearch = param;
         this.getListCleranceNotImported();
     }

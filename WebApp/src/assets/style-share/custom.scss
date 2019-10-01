@@ -1162,3 +1162,16 @@ a:not([href]):not([tabindex]) {
 .font-13 {
     font-size: 13px;
 }
+
+@for $i from 1 through 4 {
+    $num: $i * 5;
+    .border-radius-#{$num} {
+        border-radius: #{$num}px;
+    }
+}
+
+@for $i from 13 through 30 {
+    .font-#{$i} {
+        font-size: #{$i}px;
+    }
+}
