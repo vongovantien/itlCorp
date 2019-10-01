@@ -1,10 +1,7 @@
 <div class="table-wrapper table-scrollable">
     <table class="table table-brand table-hover dataTable">
-        <thead>
-            <tr class="text-center">
-            <tr app-table-header [headers]="headers" class="text-center" (onClick)="sortSurcharge($event)">
-                <th class="first"> </th>
-            </tr>
+        <thead app-table-header [headers]="headers" class="text-center" (onClick)="sortSurcharge($event)">
+            <th class="first"> </th>
         </thead>
         <tbody class="tbody-group">
             <ng-container *ngFor="let surcharge of data.chargeSettlements; let i = index; trackBy: trackByFn">

@@ -19,8 +19,9 @@
             }
 
             tbody {
-                th, td {
-                    border1: 0;
+                th,
+                td {
+                    border: 0;
                 }
             }
         }
@@ -47,30 +48,32 @@
                     border-bottom: 0;
                     border-top: 0;
                 }
-            } 
+            }
 
             &.m-table--head-separator-#{$name} {
                 thead th {
                     border-top: 0;
                     border-bottom: 1px solid array-get($color, base);
                 }
-            }            
+            }
 
             tr.m-table__row--#{$name} {
-                th,td {
+                th,
+                td {
                     background: array-get($color, base);
                     color: array-get($color, inverse);
                     border-bottom: 0;
                     border-top: 0;
                 }
-            } 
+            }
 
             &.m-table--border-#{$name} {
                 &,
-                th, td {
+                th,
+                td {
                     border-color: array-get($color, base);
                 }
-            } 
+            }
         }
     }
 }

@@ -96,18 +96,14 @@
 
                 <div class="table-wrapper table-scrollable" *ngIf="TYPE === 'LIST'">
                     <table class="table table-brand table-hover dataTable table-striped">
-                        <thead>
-                            <tr app-table-header [headers]="headers" class="text-center"
-                                (onClick)="sortSurcharge($event)">
-                                <th class="m--w-50 first">
-                                    <label class="m-checkbox">
-                                        <input type="checkbox" [(ngModel)]="isCheckAll"
-                                            (change)="checkUncheckAllCharge()">
-                                        <span></span>
-                                    </label>
-                                </th>
-                                <th class="last"></th>
-                            </tr>
+                        <thead app-table-header [headers]="headers" (onClick)="sortSurcharge($event)">
+                            <th class="m--w-50 first">
+                                <label class="m-checkbox">
+                                    <input type="checkbox" [(ngModel)]="isCheckAll" (change)="checkUncheckAllCharge()">
+                                    <span></span>
+                                </label>
+                            </th>
+                            <th class="last"></th>
                         </thead>
                         <tbody class="tbody-group">
                             <ng-container

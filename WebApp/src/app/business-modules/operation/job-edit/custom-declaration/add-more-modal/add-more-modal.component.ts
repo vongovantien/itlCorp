@@ -248,8 +248,6 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
 
     }
     closepp(param: string) {
-        console.log(param);
-        debugger;
         this.customNoSearch = param;
         this.getListCleranceNotImported();
     }
@@ -280,7 +278,6 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
         }
     }
     getListCleranceNotImported() {
-        debugger;
         this.notImportedCustomClearances = [];
         this.isLoading = true;
         if (this.customNo.value != '') {
