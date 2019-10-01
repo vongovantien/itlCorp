@@ -354,6 +354,14 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetShipmentsCreditPayer(System.String,System.Collections.Generic.List{System.String})">
+            <summary>
+            get list shipment credit payer
+            </summary>
+            <param name="partner"></param>
+            <param name="productServices"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetShipmentsCopyListBySearchOption(System.String,System.Collections.Generic.List{System.String})">
             <summary>
             Get list shipment copy by search option and keywords
