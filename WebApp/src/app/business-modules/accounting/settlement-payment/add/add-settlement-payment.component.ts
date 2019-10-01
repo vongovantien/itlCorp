@@ -73,6 +73,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
                     } else {
                         this._toastService.warning(res.message);
                     }
+                    this.requestSurchargeListComponent.selectedIndexSurcharge = null;
                 }
             );
     }
@@ -103,6 +104,8 @@ export class SettlementPaymentAddNewComponent extends AppPage {
                     } else {
                         this._toastService.warning(res.message);
                     }
+                    this.requestSurchargeListComponent.selectedIndexSurcharge = null;
+
                 }
             );
     }

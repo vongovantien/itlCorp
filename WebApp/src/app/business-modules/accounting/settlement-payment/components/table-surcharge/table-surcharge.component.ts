@@ -5,7 +5,6 @@ import { Surcharge } from 'src/app/shared/models';
 @Component({
     selector: 'table-surcharge-settlement',
     templateUrl: './table-surcharge.component.html',
-    styleUrls: ['./table-surcharge.component.scss']
 })
 
 export class SettlementTableSurchargeComponent extends AppList {
