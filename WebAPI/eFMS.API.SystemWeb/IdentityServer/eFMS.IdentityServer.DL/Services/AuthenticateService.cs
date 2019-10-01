@@ -113,8 +113,9 @@ namespace eFMS.IdentityServer.DL.Services
                         return 1;
                     }
                 }
+                user = new SysUser { Username = username, Password = password, UserCreated = "admin" };
                 modelReturn = UpdateUserInfoFromLDAP(ldapInfo, user, true, null);
-                LogUserLogin(user, true ? modelReturn.workplaceId.ToString() : null);
+                LogUserLogin(user, true ? modelReturn.workplaceId?.ToString() : null);
                 return 1;
             }
             if (user == null)
