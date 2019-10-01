@@ -99,18 +99,22 @@ namespace eFMS.IdentityServer.DL.Services
                     break;
                 }
             }
-            var user = DataContext.Get(x => x.Username == username && BCrypt.Net.BCrypt.Verify(password, x.Password)).FirstOrDefault();
-            if (isAuthenticated && username.Contains("."))
+            var user = DataContext.Get(x => x.Username == username).FirstOrDefault();
+            if (isAuthenticated)
             {
                 if (user != null)
                 {
-                    employee = employeeRepository.Get(x => x.Id == user.EmployeeId).FirstOrDefault();
-                    modelReturn = SetLoginReturnModel(user, employee);
-                    LogUserLogin(user, true? employee.WorkPlaceId.ToString(): null);
-                    return 1;
+                    if(BCrypt.Net.BCrypt.Verify(password, user.Password))
+                    {
+                        employee = employeeRepository.Get(x => x.Id == user.EmployeeId).FirstOrDefault();
+                        modelReturn = UpdateUserInfoFromLDAP(ldapInfo, user, false, employee);
+                        //modelReturn = SetLoginReturnModel(user, employee);
+                        LogUserLogin(user, true ? employee.WorkPlaceId.ToString() : null);
+                        return 1;
+                    }
                 }
-                
-                modelReturn = AddUserFromLDAP(ldapInfo, username, password);
+                modelReturn = UpdateUserInfoFromLDAP(ldapInfo, user, true, null);
+                LogUserLogin(user, true ? modelReturn.workplaceId.ToString() : null);
                 return 1;
             }
             if (user == null)
@@ -136,9 +140,14 @@ namespace eFMS.IdentityServer.DL.Services
             };
             return userInfo;
         }
-        private LoginReturnModel AddUserFromLDAP(SearchResult ldapInfo, string userName, string password)
+        private SysEmployee MapUserInfoFromLDAP(SearchResult ldapInfo)
         {
             var ldapProperties = ldapInfo.Properties;
+            Guid? objId = null;
+            if (ldapProperties["objectguid"].Count != 0)
+            {
+                objId = new Guid(ldapProperties["objectguid"][0] as byte[]);
+            }
             var sysEmployee = new SysEmployee
             {
                 Id = Guid.NewGuid().ToString(),
@@ -147,13 +156,33 @@ namespace eFMS.IdentityServer.DL.Services
                 DatetimeCreated = DateTime.Now,
                 EmployeeNameEn = ldapProperties["displayname"][0].ToString(),
                 EmployeeNameVn = ldapProperties["name"][0].ToString(),
-                Tel = ldapProperties["telephonenumber"][0].ToString(),
-                HomePhone = ldapProperties["mobile"][0].ToString()
+                Tel = ldapProperties["telephonenumber"].Count == 0 ? null : ldapProperties["telephonenumber"][0].ToString(),
+                HomePhone = ldapProperties["mobile"][0].ToString(),
+                LdapObjectGuid = objId
             };
-            var newUser = new SysUser { Id = userName, Password = BCrypt.Net.BCrypt.HashPassword(password), EmployeeId = sysEmployee.Id, Username = userName };
-            DataContext.Add(newUser);
-            employeeRepository.Add(sysEmployee);
-            var modelReturn = new LoginReturnModel { idUser = newUser.Id, userName = newUser.Username, email = sysEmployee.Email };
+            return sysEmployee;
+        }
+        private LoginReturnModel UpdateUserInfoFromLDAP(SearchResult ldapInfo, SysUser user, bool isNew = false, SysEmployee employee = null)
+        {
+            LoginReturnModel modelReturn = null;
+            var sysEmployee = MapUserInfoFromLDAP(ldapInfo);
+            if(isNew == true)
+            {
+                var newUser = new SysUser { Id = user.Username, Password = BCrypt.Net.BCrypt.HashPassword(user.Password), EmployeeId = sysEmployee.Id, Username = user.Username };
+                DataContext.Add(newUser);
+                employeeRepository.Add(sysEmployee);
+                modelReturn = new LoginReturnModel { idUser = newUser.Id, userName = newUser.Username, email = sysEmployee.Email };
+            }
+            else
+            {
+                user.LdapObjectGuid = sysEmployee.LdapObjectGuid;
+                employee.LdapObjectGuid = sysEmployee.LdapObjectGuid;
+                employee.EmployeeNameEn = sysEmployee.EmployeeNameEn;
+                employee.Email = sysEmployee.Email;
+                DataContext.Update(user, x => x.Id == user.Id);
+                employeeRepository.Update(sysEmployee, x => x.Id == employee.Id);
+                modelReturn = new LoginReturnModel { idUser = user.Id, userName = user.Username, email = sysEmployee.Email };
+            }
             return modelReturn;
         }
         private void LogUserLogin(SysUser user, string workplaceId)
