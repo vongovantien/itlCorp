@@ -105,7 +105,7 @@ export class DocumentationRepo {
     }
 
     downloadcontainerfileExcel() {
-        return this._api.downloadfile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsMawbcontainer/downloadFileExcel`).pipe(
+        return this._api.downloadfile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsMawbcontainer/downloadFileExcel`, null).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

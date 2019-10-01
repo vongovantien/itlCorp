@@ -33,7 +33,7 @@ namespace eFMS.IdentityServer
                     AlwaysIncludeUserClaimsInIdToken = true,
                     AllowedScopes =
                     {
-                        "openid", "profile", "offline_access", "efms_scope"
+                        "openid", "profile", "offline_access", "efms_api"
                     },
                 }
             };
@@ -61,8 +61,8 @@ namespace eFMS.IdentityServer
                 new IdentityResource()
                 {
                     Name = "efms_scope",
-                    Description = "eFMS D&T API",
-                    DisplayName = "eFMS D&T API",
+                    Description = "eFMS API",
+                    DisplayName = "eFMS API",
                     UserClaims =
                     {
                         "userId","workplaceId","userName","email"

@@ -19,6 +19,6 @@ export const authConfig: AuthConfig = {
   sessionCheckIntervall: 2000,
   // set the scope for the permissions the client should request
   // The first three are defined by OIDC. The 4th is a usecase-specific one
-  scope: 'dnt_api profile efms_scope openid offline_access',
+  scope: 'openid profile offline_access efms_api',
   sessionChecksEnabled: true
 }

@@ -354,5 +354,13 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetShipmentsCopyListBySearchOption(System.String,System.Collections.Generic.List{System.String})">
+            <summary>
+            Get list shipment copy by search option and keywords
+            </summary>
+            <param name="searchOption"></param>
+            <param name="keywords"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>

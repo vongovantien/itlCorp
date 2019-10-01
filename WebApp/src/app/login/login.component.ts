@@ -70,7 +70,7 @@ export class LoginComponent {
 
             await this.configureWithNewConfigApi();
             const passwordEncoded = RSAHelper.serverEncode(this.password);
-            this.oauthService.fetchTokenUsingPasswordFlow(this.username, this.password) // * Request Access Token.
+            this.oauthService.fetchTokenUsingPasswordFlow(this.username, passwordEncoded) // * Request Access Token.
                 .then((resp: any) => {
                     return this.oauthService.loadUserProfile();
                 }).then(() => {
