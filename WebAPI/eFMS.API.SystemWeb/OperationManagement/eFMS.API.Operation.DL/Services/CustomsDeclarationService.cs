@@ -257,7 +257,7 @@ namespace eFMS.API.Operation.DL.Services
             }
 
             Func<CustomsDeclarationModel, bool> query = x => (x.PartnerTaxCode == customerNo)
-            && (keySearch != null && keySearch.Contains("ismultiple") ? clearanceNoArray.Contains(x.ClearanceNo) :
+            && (keySearch != null && keySearch.Contains("ismultiple") ? clearanceNoArray.Contains(x.ClearanceNo.ToLower()) :
             x.ClearanceNo.Contains(keySearch) || (x.Hblid != null && x.Hblid.ToLower().Contains(keySearch))
             || (x.ExportCountryCode != null && x.ExportCountryCode.ToLower().Contains(keySearch)) || (x.ImportCountryCode != null && x.ImportCountryCode.ToLower().Contains(keySearch)) || (x.CommodityCode != null && x.CommodityCode.ToLower().Contains(keySearch))
             || (x.Note != null && x.Note.ToLower().Contains(keySearch))|| (x.FirstClearanceNo != null && x.FirstClearanceNo.ToLower().Contains(keySearch)) || (x.QtyCont != null && x.QtyCont.ToString().Contains(keySearch)) || string.IsNullOrEmpty(keySearch));
