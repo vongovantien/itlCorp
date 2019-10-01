@@ -109,7 +109,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var dataList = new List<ShipmentsCopy>();
 
-            if (string.IsNullOrEmpty(searchOption) || keywords == null || keywords.Count == 0) return dataList;
+            if (string.IsNullOrEmpty(searchOption) || keywords == null || keywords.Count == 0 || keywords.Any(x => x == null)) return dataList;
 
             var surcharge = surCharge.Get();
             var cstran = csRepository.Get();
