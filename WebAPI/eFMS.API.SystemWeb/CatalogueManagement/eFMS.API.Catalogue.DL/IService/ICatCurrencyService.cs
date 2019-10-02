@@ -12,12 +12,12 @@ namespace eFMS.API.Catalogue.DL.IService
 {
     public interface ICatCurrencyService:IRepositoryBase<CatCurrency,CatCurrencyModel>
     {
-        List<CatCurrency> Paging(CatCurrrencyCriteria criteria, int pageNumber, int pageSize, out int rowsCount, out int totalPages);
+        IQueryable<CatCurrencyModel> GetAll();
+        IQueryable<CatCurrencyModel> Paging(CatCurrrencyCriteria criteria, int pageNumber, int pageSize, out int rowsCount, out int totalPages);
         HandleState Update(CatCurrencyModel model);
         HandleState Delete(string id);
 
-        IQueryable<CatCurrency> Query(CatCurrrencyCriteria criteria);
-        IQueryable<CatCurrency> GetAll();
+        IQueryable<CatCurrencyModel> Query(CatCurrrencyCriteria criteria);
 
 
     }

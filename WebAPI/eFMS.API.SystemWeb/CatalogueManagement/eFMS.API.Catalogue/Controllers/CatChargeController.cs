@@ -71,6 +71,17 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         /// <summary>
+        /// get charge by type
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        [HttpGet("GetBy")]
+        public IActionResult GetBy(string type)
+        {
+            var data = catChargeService.GetBy(type);
+            return Ok(data);
+        }
+        /// <summary>
         /// get charge by id
         /// </summary>
         /// <param name="id">id of data that need to retrieve</param>

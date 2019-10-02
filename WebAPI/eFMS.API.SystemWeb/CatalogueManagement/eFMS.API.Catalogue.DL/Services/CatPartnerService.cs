@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
@@ -27,11 +28,24 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IStringLocalizer stringLocalizer;
         private readonly IDistributedCache cache;
         private readonly ICurrentUser currentUser;
-        public CatPartnerService(IContextBase<CatPartner> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, IDistributedCache distributedCache, ICurrentUser user) : base(repository, mapper)
+        private readonly IContextBase<SysUser> sysUserRepository;
+        private readonly IContextBase<CatPlace> placeRepository;
+        private readonly IContextBase<CatCountry> countryRepository;
+        public CatPartnerService(IContextBase<CatPartner> repository, 
+            IMapper mapper, 
+            IStringLocalizer<LanguageSub> localizer, 
+            IDistributedCache distributedCache, 
+            ICurrentUser user,
+            IContextBase<SysUser> sysUserRepo,
+            IContextBase<CatPlace> placeRepo,
+            IContextBase<CatCountry> countryRepo) : base(repository, mapper)
         {
             stringLocalizer = localizer;
             cache = distributedCache;
             currentUser = user;
+            placeRepository = placeRepo;
+            sysUserRepository = sysUserRepo;
+            countryRepository = countryRepo;
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
             SetChildren<SysUser>("Id", "PersonIncharge");
@@ -157,7 +171,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 var partner = new CustomerPartnerViewModel
                 {
                     SalePersonId = item.Key,
-                    SalePersonName = item.Key != null ? ((eFMSDataContext)DataContext.DC).SysUser.First(x => x.Id == item.Key).Username : null,
+                    SalePersonName = item.Key != null ? sysUserRepository.First(x => x.Id == item.Key).Username : null,
                     CatPartnerModels = item.ToList(),
                     SumNumberPartner = item.Count()
                 };
@@ -168,11 +182,12 @@ namespace eFMS.API.Catalogue.DL.Services
         public List<CatPartnerViewModel> Query(CatPartnerCriteria criteria)
         {
             string partnerGroup = criteria != null? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup): null;
+            var sysUsers = sysUserRepository.Get();
             var partners = GetPartners().Where(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             var query = (from partner in partners
-                         join user in ((eFMSDataContext)DataContext.DC).SysUser on partner.UserCreated equals user.Id into userPartners
+                         join user in sysUsers on partner.UserCreated equals user.Id into userPartners
                          from y in userPartners.DefaultIfEmpty()
-                         join saleman in ((eFMSDataContext)DataContext.DC).SysUser on partner.SalePersonId equals saleman.Id into prods
+                         join saleman in sysUsers on partner.SalePersonId equals saleman.Id into prods
                          from x in prods.DefaultIfEmpty()
                          select new { user = y, partner, saleman = x }
                           );
@@ -226,7 +241,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             try
             {
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 foreach (var item in data)
                 {
                     var partner = mapper.Map<CatPartner>(item);
@@ -235,9 +250,11 @@ namespace eFMS.API.Catalogue.DL.Services
                     partner.DatetimeCreated = DateTime.Now;
                     partner.Id = partner.AccountNo = partner.TaxCode;
                     partner.Inactive = false;
-                    dc.CatPartner.Add(partner);
+                    //dc.CatPartner.Add(partner);
+                    DataContext.Add(partner, false);
                 }
-                dc.SaveChanges();
+                //dc.SaveChanges();
+                DataContext.SubmitChanges();
                 cache.Remove(Templates.CatPartner.NameCaching.ListName);
                 return new HandleState();
             }
@@ -248,17 +265,17 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         public List<CatPartnerImportModel> CheckValidImport(List<CatPartnerImportModel> list)
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var partners = GetPartners()?.ToList();
-            var users = dc.SysUser.ToList();
+            var users = sysUserRepository.Get().ToList();
             var countries = RedisCacheHelper.GetObject<List<CatCountry>>(cache, Templates.CatCountry.NameCaching.ListName)?.AsQueryable();
             if(countries == null)
             {
-                countries = dc.CatCountry;
+                countries = countryRepository.Get();
             }
-            var provinces = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province));
-            var branchs = dc.CatPlace.Where(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Branch));
-            var salemans = dc.SysUser;
+            var provinces = placeRepository.Get(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province));
+            var branchs = placeRepository.Get(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Branch));
+            var salemans = sysUserRepository.Get();
 
             var allGroup = DataEnums.PARTNER_GROUP;
             var partnerGroups = allGroup.Split(";");
@@ -490,5 +507,21 @@ namespace eFMS.API.Catalogue.DL.Services
             return query;
         }
 
+        public IQueryable<CatPartnerModel> GetBy(CatPartnerGroupEnum partnerGroup)
+        {
+            string group = PlaceTypeEx.GetPartnerGroup(partnerGroup);
+            var lstPartner = RedisCacheHelper.GetObject<List<CatPartner>>(cache, Templates.CatPartner.NameCaching.ListName);
+            IQueryable<CatPartner> data = null;
+            if (lstPartner != null)
+            {
+                data = lstPartner.Where(x => x.PartnerGroup == group).AsQueryable();
+            }
+            else
+            {
+                data = DataContext.Get(x => x.PartnerGroup == group);
+            }
+            if (data.Count() == 0) return null;
+            return data.ProjectTo<CatPartnerModel>(mapper.ConfigurationProvider);
+        }
     }
 }

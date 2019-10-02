@@ -2,6 +2,7 @@
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Service.Models;
+using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
@@ -14,6 +15,7 @@ namespace eFMS.API.Catalogue.DL.IService
     public interface ICatPartnerService : IRepositoryBase<CatPartner, CatPartnerModel>
     {
         IQueryable<CatPartner> GetPartners();
+        IQueryable<CatPartnerModel> GetBy(CatPartnerGroupEnum partnerGroup);
         List<CatPartnerViewModel> Query(CatPartnerCriteria criteria);
         List<CatPartnerViewModel> Paging(CatPartnerCriteria criteria, int page, int size, out int rowsCount);
         List<CustomerPartnerViewModel> PagingCustomer(CatPartnerCriteria criteria, int page, int size, out int rowsCount);
