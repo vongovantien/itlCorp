@@ -42,7 +42,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            var result = catUnitService.Get();
+            var result = catUnitService.GetAll();
             return Ok(result);
         }
 

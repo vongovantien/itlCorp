@@ -47,7 +47,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("getAll")]
         public IActionResult Get()
         {
-            var data = catCurrencyService.Get().OrderBy(x => x.CurrencyName);
+            var data = catCurrencyService.GetAll().OrderBy(x => x.CurrencyName);
             return Ok(data);
         }
 

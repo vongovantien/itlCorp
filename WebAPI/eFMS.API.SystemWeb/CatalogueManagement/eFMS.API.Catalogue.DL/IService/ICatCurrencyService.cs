@@ -17,6 +17,8 @@ namespace eFMS.API.Catalogue.DL.IService
         HandleState Delete(string id);
 
         IQueryable<CatCurrency> Query(CatCurrrencyCriteria criteria);
-        
+        IQueryable<CatCurrency> GetAll();
+
+
     }
 }

@@ -129,12 +129,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatCurrency> Query(CatCurrrencyCriteria criteria)
         {
-            IQueryable<CatCurrency> data = RedisCacheHelper.Get<CatCurrency>(cache, Templates.CatCurrency.NameCaching.ListName);
-            if(data == null)
-            {
-                RedisCacheHelper.SetObject(cache, Templates.CatCurrency.NameCaching.ListName, DataContext.Get());
-                data = RedisCacheHelper.Get<CatCurrency>(cache, Templates.CatCurrency.NameCaching.ListName);
-            }
+            var data = GetAll();
             var list = data.Where(x => x.Inactive == criteria.Inactive || criteria.Inactive == null);
             if (criteria.All == null)
             {
@@ -148,6 +143,17 @@ namespace eFMS.API.Catalogue.DL.Services
                                     || (x.CurrencyName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1);
             }
             return list;
+        }
+
+        public IQueryable<CatCurrency> GetAll()
+        {
+            IQueryable<CatCurrency> data = RedisCacheHelper.Get<CatCurrency>(cache, Templates.CatCurrency.NameCaching.ListName);
+            if (data == null)
+            {
+                RedisCacheHelper.SetObject(cache, Templates.CatCurrency.NameCaching.ListName, DataContext.Get());
+                data = RedisCacheHelper.Get<CatCurrency>(cache, Templates.CatCurrency.NameCaching.ListName);
+            }
+            return data;
         }
     }
 }
