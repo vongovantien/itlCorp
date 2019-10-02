@@ -70,7 +70,13 @@ export class SystemConstants {
         PARTNER: 'efms:partner',
         CURRENCY: 'efms:currency',
         SYSTEM_USER: 'efms:system-user',
-        CHARGE: 'efms:charge'
+        CHARGE: 'efms:charge',
+        UNIT: 'efms:unit',
+        CUSTOMER: 'efms:customer',
+        PORT: 'efms:port',
+        AGENT: 'efms:agent',
+        SUPPLIER: 'efms:supplier',
+        WAREHOUSE: 'efms:warehouse'
     };
 
 }

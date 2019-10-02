@@ -7,7 +7,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Add buying charge</h5>
-          <button type="button" class="close" aria-label="Close" (click)="close(addBuyingRateChargeFormOps); hide()">
+          <button type="button" class="close" aria-label="Close" (click)="close(addBuyingRateChargeFormOps);">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -200,8 +200,9 @@
                   <label class="form-control-label" for="">
                     Total
                   </label>
-                  <input currencyMask [options]="{align: 'left', precision: 2}" type="text" class="form-control m-input m-input--square" disabled
-                    name="BuyingRateChargeTotalNameOps" [(ngModel)]="buyingRateChargeToAdd.total">
+                  <input currencyMask [options]="{align: 'left', precision: 2}" type="text"
+                    class="form-control m-input m-input--square" disabled name="BuyingRateChargeTotalNameOps"
+                    [(ngModel)]="buyingRateChargeToAdd.total">
                 </div>
               </div>
             </div>
@@ -287,7 +288,7 @@
             </span>
           </button>
           <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-            (click)="close(addBuyingRateChargeFormOps); hide()">
+            (click)="close(addBuyingRateChargeFormOps)">
             <span>
               <i class="la la-ban"></i>
               <span>

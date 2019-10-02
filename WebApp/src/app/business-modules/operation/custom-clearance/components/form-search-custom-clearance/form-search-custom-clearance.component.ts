@@ -88,36 +88,22 @@ export class CustomClearanceFormSearchComponent extends AppForm {
     }
 
     getListUser() {
-        this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.users = res || [];
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)) {
+            this.users = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY) || [];
+            this.personalHandle.setValue(this.users.filter((user: User) => user.username === this.userLogged.id)[0]);
+        } else {
+            this._sysRepo.getListSystemUser()
+                .pipe(
+                    catchError(this.catchError),
+                    map((data: any[]) => data.map((item: any) => new User(item))),
+                )
+                .subscribe(
+                    (data: any) => {
+                        this.users = data || [];
                         this.personalHandle.setValue(this.users.filter((user: User) => user.username === this.userLogged.id)[0]);
-                    } else {
-                        this._sysRepo.getListSystemUser()
-                            .pipe(
-                                catchError(this.catchError),
-                                map((data: any[]) => data.map((item: any) => new User(item))),
-                            )
-                            .subscribe(
-                                (data: any) => {
-                                    this.users = data || [];
-                                    this.personalHandle.setValue(this.users.filter((user: User) => user.username === this.userLogged.id)[0]);
-                                },
-                                (errors: any) => {
-                                    this.handleError(errors, (data) => {
-                                        console.log(data);
-                                    });
-                                },
-                                () => { }
-                            );
-                    }
-                }
-            );
+                    },
+                );
+        }
     }
 
     searchCustomClearance() {

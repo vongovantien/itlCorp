@@ -155,11 +155,7 @@ export class CatalogueRepo {
                 })
             );
         } else {
-            return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace`).pipe(
-                map((res: any) => {
-                    return res;
-                })
-            );
+            this.getPlace();
         }
     }
 
@@ -169,5 +165,46 @@ export class CatalogueRepo {
                 return res;
             })
         );
+    }
+
+    getCountryByLanguage() {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCountry/GetByLanguage`).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    getProvinces() {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/GetProvinces`).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    getDistricts() {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/GetDistricts`).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    getPlace(body?: any) {
+        if (!!body) {
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/Query`, { body }).pipe(
+                map((res: any) => {
+                    return res;
+                })
+            );
+        } else {
+            return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace`).pipe(
+                map((res: any) => {
+                    return res;
+                })
+            );
+        }
+
     }
 }

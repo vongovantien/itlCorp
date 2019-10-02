@@ -99,26 +99,18 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     }
 
     getPartner() {
-        this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER)
-            .pipe(
-                takeUntil(this.ngUnsubscribe),
-                catchError(this.catchError)
-            )
-            .subscribe(
-                (data: any) => {
-                    if (!data) {
-                        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, inactive: false })
-                            .pipe(catchError(this.catchError))
-                            .subscribe(
-                                (dataPartner: any) => {
-                                    this.getPartnerData(dataPartner);
-                                },
-                            );
-                    } else {
-                        this.getPartnerData(data);
-                    }
-                }
-            );
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
+            this.getPartnerData(this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER));
+        } else {
+            this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, inactive: false })
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (dataPartner: any) => {
+                        this.getPartnerData(dataPartner);
+                    },
+                );
+
+        }
     }
 
     getPartnerData(data: any) {
@@ -166,50 +158,31 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     }
 
     getCurrency() {
-        this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)
-            .pipe(
-                takeUntil(this.ngUnsubscribe),
-                catchError(this.catchError)
-            )
-            .subscribe(
-                (data: any) => {
-                    if (!!data) {
-                        this.getCurrencyData(data);
-                    } else {
-                        this._catalogueRepo.getListCurrency()
-                            .pipe(catchError(this.catchError))
-                            .subscribe(
-                                (dataCurrency: any) => {
-                                    this.getCurrencyData(dataCurrency);
-                                },
-                            );
-                    }
-                }
-            );
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)) {
+            this.getCurrencyData(this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY));
+        } else {
+            this._catalogueRepo.getListCurrency()
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (dataCurrency: any) => {
+                        this.getCurrencyData(dataCurrency);
+                    },
+                );
+        }
     }
 
     getUser() {
-        this._dataService.getDataByKey(SystemConstants.CSTORAGE.SYSTEM_USER)
-            .pipe(
-                takeUntil(this.ngUnsubscribe),
-                catchError(this.catchError)
-            )
-            .subscribe(
-                (data: any) => {
-                    if (!!data) {
-                        this.getCurrencyUser(data);
-                    } else {
-                        this._sysRepo.getListSystemUser()
-                            .pipe(catchError(this.catchError))
-                            .subscribe(
-                                (dataUser: any) => {
-                                    this.getCurrencyUser(dataUser);
-                                },
-                            );
-                    }
-                }
-            );
-
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SYSTEM_USER)) {
+            this.getCurrencyUser(this._dataService.getDataByKey(SystemConstants.CSTORAGE.SYSTEM_USER));
+        } else {
+            this._sysRepo.getListSystemUser()
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (dataUser: any) => {
+                        this.getCurrencyUser(dataUser);
+                    },
+                );
+        }
     }
 
     getCharge() {
