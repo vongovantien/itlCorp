@@ -67,6 +67,20 @@ export class PartnerDataDetailComponent extends AppList {
 
     }
 
+    getService(): CommonInterface.ICommonTitleValue[] {
+        return [
+            { title: 'Air Import', value: 'Air Import' },
+            { title: 'Air Export', value: 'Air Export' },
+            { title: 'Sea FCL Export', value: 'Sea FCL Export' },
+            { title: 'Sea FCL Import', value: 'Sea FCL Import' },
+            { title: 'Sea LCL Export', value: 'Sea LCL Export' },
+            { title: 'Sea LCL Import', value: 'Sea LCL Import' },
+            { title: 'Sea Consol Export', value: 'Sea Consol Export' },
+            { title: 'Sea Consol Import', value: 'Sea Consol Import' },
+            { title: 'Custom Logistic', value: 'Custom Logisti' },
+        ];
+    }
+
     async ngOnInit() {
         this.headerSaleman = [
             { title: '', field: '', sortable: false },
