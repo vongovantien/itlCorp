@@ -357,27 +357,18 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     }
 
     getPartner() {
-        this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER)
-            .pipe(
-                takeUntil(this.ngUnsubscribe),
-                catchError(this.catchError)
-            )
-            .subscribe(
-                (data: any) => {
-                    if (!data) {
-                        this._catalogueRepo.getListPartner(null, null, { inactive: false })
-                            .pipe(catchError(this.catchError))
-                            .subscribe(
-                                (dataPartner: any) => {
-                                    this.getPartnerData(dataPartner);
-                                    this._dataService.setData(SystemConstants.CSTORAGE.PARTNER, dataPartner);
-                                },
-                            );
-                    } else {
-                        this.getPartnerData(data);
-                    }
-                }
-            );
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
+            this.getPartnerData(this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER));
+        } else {
+            this._catalogueRepo.getListPartner(null, null, { inactive: false })
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (dataPartner: any) => {
+                        this.getPartnerData(dataPartner);
+                        this._dataService.setData(SystemConstants.CSTORAGE.PARTNER, dataPartner);
+                    },
+                );
+        }
     }
 
     getPartnerData(data: any) {

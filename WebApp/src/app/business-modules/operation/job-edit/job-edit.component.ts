@@ -11,9 +11,9 @@ import { prepareNg2SelectData } from 'src/helper/data.helper';
 
 import { ChargeConstants } from 'src/constants/charge.const';
 import { ContainerListComponent } from './container-list/container-list.component';
-import { OperationRepo, SystemRepo, CatalogueRepo } from 'src/app/shared/repositories';
+import { SystemRepo, CatalogueRepo } from 'src/app/shared/repositories';
 import { AppPage } from "src/app/app.base";
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';
 import { CancelCreateJobPopupComponent } from './job-confirm-popup/cancel-create-job-popup/cancel-create-job-popup.component';
 import { CanNotDeleteJobPopupComponent } from './job-confirm-popup/can-not-delete-job-popup/can-not-delete-job-popup.component';
 import { ConfirmDeleteJobPopupComponent } from './job-confirm-popup/confirm-delete-job-popup/confirm-delete-job-popup.component';
@@ -25,6 +25,7 @@ import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
 import { CsShipmentSurcharge } from 'src/app/shared/models';
 import { NgProgress } from '@ngx-progressbar/core';
 import { DocumentationRepo } from 'src/app/shared/repositories/documentation.repo';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
@@ -118,7 +119,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         private systemRepo: SystemRepo,
         private _catalogueRepo: CatalogueRepo,
         private _ngProgressService: NgProgress,
-        private _documentRepo: DocumentationRepo
+        private _documentRepo: DocumentationRepo,
     ) {
         super();
 
@@ -126,26 +127,24 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     ngOnInit() {
-
+        this.getShipmentCommonData();
+        this.getUnits();
+        this.getListCurrencies();
+        this.getListBuyingRateCharges();
+        this.getListSellingRateCharges();
+        this.getListOBHCharges();
+        this.getCustomers();
+        this.getPorts();
+        this.getSuppliers();
+        this.getAgents();
+        this.getBillingOps();
+        this.getWarehouses();
+        this.getCommodityGroup();
+        this.getListPackageTypes();
         this.route.params.subscribe((params: any) => {
             this.tab = 'job-edit';
             this.tabCharge = 'buying';
-            this.getShipmentCommonData();
-            this.getUnits();
-            this.getPartners();
-            this.getListCurrencies();
-            this.getCurrencies();
-            this.getListBuyingRateCharges();
-            this.getListSellingRateCharges();
-            this.getListOBHCharges();
-            this.getCustomers();
-            this.getPorts();
-            this.getSuppliers();
-            this.getAgents();
-            this.getBillingOps();
-            this.getWarehouses();
-            this.getCommodityGroup();
-            this.getListPackageTypes();
+
             if (!!params && !!params.id) {
                 this.jobId = params.id;
                 this.getShipmentDetails(params.id);
@@ -232,27 +231,19 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         if (this.lstMasterContainers.length === 0) {
             this.lstMasterContainers.push(this.popupContainerList.initNewContainer());
         }
-        this.popupContainerList.show({ backdrop: 'static' });
+        this.popupContainerList.show();
     }
 
     getListPackageTypes() {
         this._catalogueRepo.getUnit({ unitType: 'package' })
             .pipe(
                 catchError(this.catchError),
-                finalize(() => {
-                    this.isLoading = false;
-                    if (this.listPackageTypes != null) {
-                        this.packageTypes = dataHelper.prepareNg2SelectData(this.listPackageTypes, 'id', 'unitNameEn');
-                    }
-                })
+                finalize(() => { this.isLoading = false; })
             )
             .subscribe(
                 (res: any) => {
-                    this.listPackageTypes = res;
+                    this.packageTypes = dataHelper.prepareNg2SelectData(this.listPackageTypes, 'id', 'unitNameEn');
                 },
-                (errors: any) => {
-                },
-                () => { }
             );
     }
 
@@ -264,8 +255,9 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     // -------------    End Container   -------------------//
 
     getWarehouses() {
-        this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { placeType: PlaceTypeEnum.Warehouse, inactive: false }).subscribe((res: any) => {
+        this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Warehouse, inactive: false }).subscribe((res: any) => {
             this.warehouses = res;
+            this._data.setDataService(SystemConstants.CSTORAGE.WAREHOUSE, this.warehouses);
         });
     }
 
@@ -326,7 +318,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                 finalize(() => this._progressRef.complete())
             ).subscribe(
                 (responses: any) => {
-
                     this.productServices = dataHelper.prepareNg2SelectData(responses.productServices, 'value', 'displayName');
                     this.serviceModes = dataHelper.prepareNg2SelectData(responses.serviceModes, 'value', 'displayName');
                     this.shipmentModes = dataHelper.prepareNg2SelectData(responses.shipmentModes, 'value', 'displayName');
@@ -334,31 +325,40 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             );
     }
 
-    private getPorts() {
-        this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { placeType: PlaceTypeEnum.Port, inactive: false }).subscribe((res: any) => {
-            this.ports = res;
-        });
+    getPorts() {
+        this._catalogueRepo.getListPort({ placeType: PlaceTypeEnum.Port, inactive: false })
+            .subscribe((res: any) => {
+                this.ports = res;
+                this._data.setDataService(SystemConstants.CSTORAGE.PORT, this.ports);
+            });
     }
 
-    private getCustomers() {
-        this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.CUSTOMER, all: null }).subscribe((res: any) => {
-            this.customers = res;
-        });
+    getCustomers() {
+        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.CUSTOMER, all: null })
+            .subscribe((res: any) => {
+                this.customers = res;
+                this._data.setDataService(SystemConstants.CSTORAGE.CUSTOMER, this.customers);
+            });
     }
 
-    private getSuppliers() {
-        this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.CARRIER, inactive: false, all: null }).subscribe((res: any) => {
-            this.suppliers = res;
-        });
+    getSuppliers() {
+        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.CARRIER, inactive: false, all: null })
+            .subscribe((res: any) => {
+                this.suppliers = res;
+                this._data.setDataService(SystemConstants.CSTORAGE.SUPPLIER, this.suppliers);
+            });
     }
 
-    private getAgents() {
-        this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.AGENT, inactive: false, all: null }).subscribe((res: any) => {
-            this.agents = res;
-        });
+    getAgents() {
+        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.AGENT, inactive: false, all: null })
+            .subscribe((res: any) => {
+                this.agents = res;
+                this._data.setDataService(SystemConstants.CSTORAGE.AGENT, this.agents);
+            });
+
     }
 
-    private getBillingOps() {
+    getBillingOps() {
         this.systemRepo.getListSystemUser()
             .pipe(
                 catchError(this.catchError),
@@ -367,6 +367,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                 (responses: any) => {
                     this.billingOps = responses;
                     this.salemans = responses;
+
+                    this._data.setDataService(SystemConstants.CSTORAGE.SYSTEM_USER, responses);
                 },
             );
     }
@@ -374,69 +376,51 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     public getListBuyingRateCharges() {
         this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'CREDIT', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
             this.lstBuyingRateChargesComboBox = res['data'];
-            // this._data.setData('buyingCharges', this.lstBuyingRateChargesComboBox);
+            this._data.setDataService('buyingCharges', this.lstBuyingRateChargesComboBox);
         });
     }
 
     public getListSellingRateCharges() {
         this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'DEBIT', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
             this.lstSellingRateChargesComboBox = res['data'];
-            // this._data.setData('sellingCharges', this.lstSellingRateChargesComboBox);
+            this._data.setDataService('sellingCharges', this.lstSellingRateChargesComboBox);
         });
     }
 
     public getListOBHCharges() {
         this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'OBH', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
             this.lstOBHChargesComboBox = res['data'];
-            // this._data.setData('obhCharges', this.lstOBHChargesComboBox);
+            this._data.setDataService('obhCharges', this.lstOBHChargesComboBox);
         });
 
     }
 
-    public getPartners() {
-        this._data.getDataByKey('lstPartners')
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (data: any) => {
-                    this.lstPartners = data;
-                }
-            );
-    }
-
-    public getUnits() {
+    getUnits() {
         this._catalogueRepo.getUnit().pipe(
             catchError(this.catchError),
             finalize(() => this._progressRef.complete())
         ).subscribe(
             (responses: any) => {
                 this.lstUnits = responses;
+
+                this._data.setDataService(SystemConstants.CSTORAGE.UNIT, responses || []);
             },
         );
     }
 
-    public getListCurrencies() {
+    getListCurrencies() {
         this._catalogueRepo.getCurrency()
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
             ).subscribe(
                 (responses: any) => {
-
-                    this._data.setData('lstCurrencies', responses);
+                    this._data.setDataService(SystemConstants.CSTORAGE.CURRENCY, responses || []);
                     this.lstCurrencies = prepareNg2SelectData(responses, "id", "id");
                 },
             );
     }
 
-    getCurrencies(isAddNew = true) {
-        if (isAddNew === true) {
-            this._catalogueRepo.getCurrencyBy({ inactive: false })
-                .subscribe((res: any) => { this.lstCurrencies = prepareNg2SelectData(res, "id", "id"); });
-        } else {
-            this._catalogueRepo.getListAllCountry()
-                .subscribe((res: any) => { this.lstCurrencies = prepareNg2SelectData(res, "id", "id"); });
-        }
-    }
 
     onSaveBuyingRate(event) {
         if (event === true) {
@@ -455,15 +439,13 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
 
-    private totalProfit() {
+    totalProfit() {
         this.totalProfitUSD = this.totalSellingUSD - this.totalBuyingUSD - this.totalLogisticChargeUSD;
         this.totalProfitLocal = this.totalSellingLocal - this.totalBuyingLocal - this.totalLogisticChargeLocal;
     }
 
-    /**
-     * Calculate total cost for all buying charges 
-     */
-    private totalBuyingCharge() {
+
+    totalBuyingCharge() {
         this.totalBuyingUSD = 0;
         this.totalBuyingLocal = 0;
         if (this.ListBuyingRateCharges.length > 0) {
@@ -478,10 +460,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         }
     }
 
-    /**
-    * Calculate total cost for all selling charges 
-    */
-    private totalSellingCharge() {
+
+    totalSellingCharge() {
         this.totalSellingUSD = 0;
         this.totalSellingLocal = 0;
         if (this.ListSellingRateCharges.length > 0) {
@@ -495,10 +475,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         }
     }
 
-    /**
-    * Calculate total cost for all obh charges 
-    */
-    private totalOBHCharge() {
+    totalOBHCharge() {
         this.totalOBHUSD = 0;
         this.totalOBHLocal = 0;
         if (this.ListOBHCharges.length > 0) {
@@ -541,10 +518,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this.getSurCharges('OBH');
     }
 
-
-    /**
-     * get custom clearances
-     */
     getCustomClearances() {
         this.baseServices.setData("CurrentOpsTransaction", this.opsTransaction);
     }
@@ -555,11 +528,10 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             this.getShipmentDetails(this.jobId);
             this.getAllSurCharges();
         }
-        // this.router.navigate([`home/operation/job-edit/${this.jobId}`], {queryParams: {tab: this.tab}});
     }
 
     onOpePLPrint() {
-        this.plSheetPopup.show({ backdrop: 'static' });
+        this.plSheetPopup.show();
     }
 
     selectTabCharge(tabName: string) {

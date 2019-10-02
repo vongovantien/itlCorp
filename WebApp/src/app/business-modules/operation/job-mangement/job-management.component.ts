@@ -18,16 +18,6 @@ export class JobManagementComponent extends AppList implements OnInit {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
 
-    jobStatusConts = {
-        overdued: JobConstants.Overdued,
-        processing: JobConstants.Processing,
-        inSchedule: JobConstants.InSchedule,
-        pending: JobConstants.Pending,
-        finish: JobConstants.Finish,
-        canceled: JobConstants.Canceled,
-        warning: JobConstants.Warning
-    };
-
     shipments: Shipment[] = [];
     selectedShipment: Shipment = null;
 
@@ -101,10 +91,8 @@ export class JobManagementComponent extends AppList implements OnInit {
                     finalize(() => { this._progressRef.complete(); this.isLoading = false; })
                 ).subscribe(
                     (res: CustomDeclaration[]) => {
-                        if (!!res) {
-                            this.customClearances = res.map((item: CustomDeclaration) => new CustomDeclaration(item));
-                            this.shipments[indexsShipment].customClearances = this.customClearances;
-                        }
+                        this.customClearances = (res || []).map((item: CustomDeclaration) => new CustomDeclaration(item));
+                        this.shipments[indexsShipment].customClearances = this.customClearances;
                     },
                 );
         }

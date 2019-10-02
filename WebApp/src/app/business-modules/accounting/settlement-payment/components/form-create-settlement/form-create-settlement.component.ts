@@ -4,7 +4,7 @@ import { User, Currency } from 'src/app/shared/models';
 import { BaseService, DataService } from 'src/app/shared/services';
 import { AbstractControl, FormGroup, FormBuilder } from '@angular/forms';
 import { SystemConstants } from 'src/constants/system.const';
-import { takeUntil, catchError, distinctUntilChanged, map } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, map } from 'rxjs/operators';
 import { CatalogueRepo } from 'src/app/shared/repositories';
 
 @Component({
@@ -51,7 +51,7 @@ export class SettlementFormCreateComponent extends AppForm {
         this.form = this._fb.group({
             'settlementNo': [{ value: null, disabled: true }],
             'requester': [{ value: null, disabled: true }],
-            'requestDate': [{startDate: new Date(), endDate: new Date()}],
+            'requestDate': [{ startDate: new Date(), endDate: new Date() }],
             'paymentMethod': [],
             'amount': [{ value: null, disabled: true }],
             'currency': [],
@@ -68,11 +68,11 @@ export class SettlementFormCreateComponent extends AppForm {
         this.note = this.form.controls['note'];
 
         this.currency.valueChanges.pipe(
-                distinctUntilChanged((prev, curr) => prev.id === curr.id),
-                map((data: any) => data)
-            ).subscribe((value: Currency) => {
-                this.onChangeCurrency.emit(value);
-            });
+            distinctUntilChanged((prev, curr) => prev.id === curr.id),
+            map((data: any) => data)
+        ).subscribe((value: Currency) => {
+            this.onChangeCurrency.emit(value);
+        });
     }
 
     getUserLogged() {
@@ -81,29 +81,19 @@ export class SettlementFormCreateComponent extends AppForm {
     }
 
     getCurrency() {
-        this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.currencyList = res || [];
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)) {
+            this.currencyList = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY) || [];
+            this.currency.setValue(this.currencyList.filter((item: Currency) => item.id === 'VND')[0]);
+        } else {
+            this._catalogue.getListCurrency()
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (data: any) => {
+                        this.currencyList = data || [];
                         this.currency.setValue(this.currencyList.filter((item: Currency) => item.id === 'VND')[0]);
-                    } else {
-                        this._catalogue.getListCurrency()
-                            .pipe(catchError(this.catchError))
-                            .subscribe(
-                                (data: any) => {
-                                    this.currencyList = data || [];
-                                    this.currency.setValue(this.currencyList.filter((item: Currency) => item.id === 'VND')[0]);
-                                    // this._dataService.setData(SystemConstants.CSTORAGE.CURRENCY, data);
-
-                                },
-                            );
-                    }
-                }
-            );
+                    },
+                );
+        }
     }
 
     initBasicData() {

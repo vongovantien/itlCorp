@@ -1,9 +1,9 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { SystemConstants } from 'src/constants/system.const';
-import { takeUntil, catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';
 import { DataService, SortService } from 'src/app/shared/services';
-import { OperationRepo, AccountingRepo, DocumentationRepo, CatalogueRepo } from 'src/app/shared/repositories';
+import { AccountingRepo, DocumentationRepo, CatalogueRepo } from 'src/app/shared/repositories';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { Surcharge } from 'src/app/shared/models';
@@ -79,26 +79,17 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     }
 
     getPartner() {
-        this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER)
-            .pipe(
-                takeUntil(this.ngUnsubscribe),
-                catchError(this.catchError)
-            )
-            .subscribe(
-                (data: any) => {
-                    if (!data) {
-                        this._catalogue.getListPartner(null, null, { inactive: false })
-                            .pipe(catchError(this.catchError))
-                            .subscribe(
-                                (dataPartner: any) => {
-                                    this.getPartnerData(dataPartner);
-                                },
-                            );
-                    } else {
-                        this.getPartnerData(data);
-                    }
-                }
-            );
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
+            this.getPartnerData(this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER));
+        } else {
+            this._catalogue.getListPartner(null, null, { inactive: false })
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (dataPartner: any) => {
+                        this.getPartnerData(dataPartner);
+                    },
+                );
+        }
     }
 
     getPartnerData(data: any) {

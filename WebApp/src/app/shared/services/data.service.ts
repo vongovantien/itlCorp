@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, take, skip } from 'rxjs/operators';
 @Injectable({ providedIn: 'root' })
 export class DataService {
 
     private messageSource = new BehaviorSubject({ "default": "hello world !" });
     currentMessage = this.messageSource.asObservable();
+    data: Object = {};
 
     constructor() {
     }
@@ -14,18 +15,16 @@ export class DataService {
         this.messageSource.next({ ...this.messageSource.value, [key]: value });
     }
 
-    getData(): Observable<any> {
-        return this.messageSource.pipe(
-            map((data: any) => data)
-        );
+
+    getDataByKey(key: string) {
+        if (!!key && this.data.hasOwnProperty(key)) {
+            return this.data[key];
+        } else {
+            return null;
+        }
     }
 
-    getDataByKey(key: string): Observable<any> {
-        return this.messageSource.pipe(
-            map((data: any) => data[key] || null)
-        );
+    setDataService(key, newData: any) {
+        this.data = Object.assign({}, this.data, { [key]: newData });
     }
-
-
-
 }

@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
 import { Currency, Surcharge } from 'src/app/shared/models';
 import { SettlementListChargeComponent } from '../components/list-charge-settlement/list-charge-settlement.component';
@@ -17,14 +17,15 @@ import { NgProgress } from '@ngx-progressbar/core';
 
 export class SettlementPaymentAddNewComponent extends AppPage {
 
-    @ViewChild(SettlementListChargeComponent, { static: true }) requestSurchargeListComponent: SettlementListChargeComponent;
+    @ViewChild(SettlementListChargeComponent, { static: false }) requestSurchargeListComponent: SettlementListChargeComponent;
     @ViewChild(SettlementFormCreateComponent, { static: false }) formCreateSurcharge: SettlementFormCreateComponent;
 
     constructor(
         private _accountingRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _router: Router,
-        private _progressService: NgProgress
+        private _progressService: NgProgress,
+        private cdRef: ChangeDetectorRef
     ) {
         super();
 
@@ -32,10 +33,12 @@ export class SettlementPaymentAddNewComponent extends AppPage {
     }
 
     ngOnInit() {
+
     }
 
     ngAfterViewInit() {
         this.requestSurchargeListComponent.isShowButtonCopyCharge = true;
+        this.cdRef.detectChanges(); // * Force to update view
     }
 
     onChangeCurrency(currency: Currency) {
