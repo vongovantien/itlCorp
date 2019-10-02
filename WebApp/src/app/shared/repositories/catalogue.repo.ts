@@ -3,12 +3,13 @@ import { ApiService } from "../services";
 import { environment } from "src/environments/environment";
 import { throwError } from "rxjs";
 import { catchError, map } from "rxjs/operators";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 
 @Injectable()
 export class CatalogueRepo {
 
     private VERSION: string = 'v1';
-    constructor(protected _api: ApiService) {
+    constructor(protected _api: ApiService, private _httpClient: HttpClient) {
     }
 
     getCurrencyBy(data: any = {}) {
@@ -128,6 +129,20 @@ export class CatalogueRepo {
             );
         }
     }
+
+    getListSaleman(partnerId: string) {
+        // const header: HttpHeaders = new HttpHeaders();
+        return this._api.get(`${environment.HOST.CatalogueLocal}/api/${this.VERSION}/en-US/CatSaleMan/GetBy`, { partnerId: partnerId })
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => data)
+            );
+        // return this._httpClient.get(`${environment.HOST.CatalogueLocal}/api/${this.VERSION}/en-US/CatSaleMan/GetBy`, { params: { partnerId: partnerId } }).pipe(
+        //     catchError((error) => throwError(error)),
+        //     map((data: any) => data)
+        // );
+    }
+
 
     getListService() {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/GetListServices`)

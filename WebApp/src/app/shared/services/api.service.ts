@@ -34,7 +34,7 @@ export class ApiService {
             .post(this.setUrl(url), data, {
                 params,
                 headers: Object.assign({}, this._headers, headers)
-            })
+            });
     }
 
     postFile(url: string, files: any, name: string = null) {
@@ -45,7 +45,6 @@ export class ApiService {
         for (const file of files) {
             formData.append(name || file.name, file);
         }
-        console.log(formData);
         const params = new HttpParams();
         const options = {
             params: params,
@@ -64,9 +63,15 @@ export class ApiService {
                 headers: Object.assign({}, this._headers, headers)
             });
     }
-    downloadfile(url: string) {
-        return this._http.get(this.setUrl(url), { responseType: 'blob' });
+
+    downloadfile(url: string, data?: any, params?: any, headers?: any) {
+        return this._http.post(this.setUrl(url), data, {
+            params,
+            headers: Object.assign({}, this._headers, headers),
+            responseType: 'arraybuffer'
+        });
     }
+
     get(url: string = '', params?: any, headers: any = {}) {
         return this._http.get(this.setUrl(url), { params, headers });
     }

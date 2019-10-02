@@ -18,6 +18,6 @@ namespace eFMS.API.Catalogue.DL.IService
         List<CatSaleManViewModel> Paging(CatSaleManCriteria criteria, int page, int size, out int rowsCount);
         HandleState Delete(string id);
         HandleState Update(CatSaleManModel model);
-
+        List<CatSaleManModel> GetBy(string partnerId);
     }
 }

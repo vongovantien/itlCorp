@@ -1,10 +1,9 @@
-<ng-content select="th.first"></ng-content>
-
-<th *ngFor="let header of headers; let i = index; trackBy: trackByFn" [ngStyle]="{ 'min-width.px': header.width }"
-    [class]="sortClass(header.sortable ? header.field : '')" (click)="sortBy(header.sortable ? header.field : '')">
-    <span>{{header.title}}</span>
-    <span class="sort-indicator"></span>
-</th>
-
-<ng-content select="th.last"></ng-content>
-
+<tr class="text-center">
+    <ng-content select="th.first"></ng-content>
+    <th *ngFor="let header of headers; let i = index; trackBy: trackByFn" [ngStyle]="{ 'min-width.px': header.width }"
+        [class]="sortClass(header.sortable ? header.field : '')" (click)="sortBy(header.sortable ? header.field : '')">
+        <span>{{header.title}}</span>
+        <span class="sort-indicator"></span>
+    </th>
+    <ng-content select="th.last"></ng-content>
+</tr>

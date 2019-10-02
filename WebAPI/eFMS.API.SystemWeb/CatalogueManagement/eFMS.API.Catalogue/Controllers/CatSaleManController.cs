@@ -74,10 +74,22 @@ namespace eFMS.API.Catalogue.Controllers
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
         }
+        /// <summary>
+        /// get the list of saleman by partner id
+        /// </summary>
+        /// <param name="partnerId">partnerId that want to retrieve saleman</param>
+        /// <returns></returns>
+
+        [HttpGet("GetBy")]
+        public IActionResult GetBy(string partnerId)
+        {
+            var results = catSaleManService.GetBy(partnerId);
+            return Ok(results);
+        }
 
 
         /// <summary>
-        /// add new partner
+        /// add new saleman
         /// </summary>
         /// <param name="model">object to add</param>
         /// <returns></returns>

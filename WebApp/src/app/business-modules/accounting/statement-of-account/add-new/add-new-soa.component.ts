@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, finalize } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
-import { CatalogueRepo, AccoutingRepo, DocumentationRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, AccountingRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { SortService, DataService } from 'src/app/shared/services';
 import { StatementOfAccountAddChargeComponent } from '../components/poup/add-charge/add-charge.popup';
 import { ToastrService } from 'ngx-toastr';
@@ -37,7 +37,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
 
     constructor(
         private _sortService: SortService,
-        private _accountRepo: AccoutingRepo,
+        private _accountRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _router: Router,
         private _documentRepo: DocumentationRepo

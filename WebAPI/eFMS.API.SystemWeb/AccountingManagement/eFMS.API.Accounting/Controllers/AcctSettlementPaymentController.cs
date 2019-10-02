@@ -114,7 +114,7 @@ namespace eFMS.API.Accounting.Controllers
             if (settlement != null)
             {
                 chargeGrpSettlement = acctSettlementPaymentService.GetListShipmentSettlementBySettlementNo(settlement.SettlementNo);
-                chargeNoGrpSettlement = acctSettlementPaymentService.GetListShipmentChargeSettlementNoGroup(settlement.SettlementNo);
+                chargeNoGrpSettlement = acctSettlementPaymentService.GetListShipmentChargeSettlementNoGroup(settlement.SettlementNo).ToList();
             }
             var data = new { settlement = settlement, chargeGrpSettlement = chargeGrpSettlement, chargeNoGrpSettlement = chargeNoGrpSettlement };
             return Ok(data);
@@ -497,6 +497,32 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult Preview(string settlementNo)
         {
             var data = acctSettlementPaymentService.Preview(settlementNo);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Get list scene charge of settlement by settlementNo
+        /// </summary>
+        /// <param name="settlementNo">settlementNo that want to retrieve list scene charge</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetListSceneChargeSettlementBySettlementNo")]
+        public IActionResult GetListSceneChargeSettlementBySettlementNo(string settlementNo)
+        {
+            var data = acctSettlementPaymentService.GetListShipmentChargeSettlementNoGroup(settlementNo).Where(x => x.IsFromShipment == false);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Copy Charge from Settlement old to settlement new
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("CopyCharges")]
+        public IActionResult CopyCharges(ShipmentsCopyCriteria criteria)
+        {
+            var data = acctSettlementPaymentService.CopyChargeFromSettlementOldToSettlementNew(criteria);
             return Ok(data);
         }
     }

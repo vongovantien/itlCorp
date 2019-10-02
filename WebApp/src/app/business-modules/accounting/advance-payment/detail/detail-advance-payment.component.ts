@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AccoutingRepo } from 'src/app/shared/repositories';
+import { AccountingRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { AdvancePayment, Currency } from 'src/app/shared/models';
 import { AdvancePaymentFormCreateComponent } from '../components/form-create-advance-payment/form-create-advance-payment.component';
@@ -30,7 +30,7 @@ export class AdvancePaymentDetailComponent extends AppPage {
     dataReport: any = null;
     constructor(
         private _activedRouter: ActivatedRoute,
-        private _accoutingRepo: AccoutingRepo,
+        private _accoutingRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _router: Router,
         private _progressService: NgProgress

@@ -7,11 +7,13 @@ import { throwError } from "rxjs";
 @Injectable()
 export class DocumentationRepo {
 
-    private MODULE: string = 'Documentation';
     private VERSION: string = 'v1';
     constructor(protected _api: ApiService) {
     }
 
+    addOPSJob(body: any = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/Add`, body);
+    }
 
     getListShipment(page?: number, size?: number, body = {}) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/Paging`, body, {
@@ -105,7 +107,7 @@ export class DocumentationRepo {
     }
 
     downloadcontainerfileExcel() {
-        return this._api.downloadfile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsMawbcontainer/downloadFileExcel`).pipe(
+        return this._api.downloadfile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsMawbcontainer/downloadFileExcel`, null).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -131,6 +133,12 @@ export class DocumentationRepo {
             map((res: any) => {
                 return res;
             })
+        );
+    }
+
+    getShipmentBySearchOption(searchOption: string, keywords: string[] = []) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetShipmentsCopyListBySearchOption`, { searchOption: searchOption, keywords: keywords }).pipe(
+            map((data: any) => data)
         );
     }
 

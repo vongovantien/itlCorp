@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
-import { AccoutingRepo } from 'src/app/shared/repositories';
+import { AccountingRepo } from 'src/app/shared/repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { catchError, finalize } from 'rxjs/operators';
 
@@ -12,7 +12,7 @@ import { catchError, finalize } from 'rxjs/operators';
 export class SettlementPaymentManagementPopupComponent extends PopupBase {
     data: IPaymentManagement = null;
     constructor(
-        private _accountingRepo: AccoutingRepo,
+        private _accountingRepo: AccountingRepo,
         private _progressService: NgProgress,
     ) {
         super();

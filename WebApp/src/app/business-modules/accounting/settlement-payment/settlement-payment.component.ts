@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
-import { AccoutingRepo } from 'src/app/shared/repositories';
+import { AccountingRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
 import { SortService, BaseService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -32,7 +32,7 @@ export class SettlementPaymentComponent extends AppList {
     dataReport: any = null;
 
     constructor(
-        private _accoutingRepo: AccoutingRepo,
+        private _accoutingRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _sortService: SortService,
         private _progressService: NgProgress,

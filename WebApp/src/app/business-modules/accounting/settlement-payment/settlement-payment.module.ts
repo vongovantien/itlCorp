@@ -21,6 +21,7 @@ import { SettlementTableSurchargeComponent } from './components/table-surcharge/
 import { SettlementPaymentDetailComponent } from './detail/detail-settlement-payment.component';
 import { ApporveSettlementPaymentComponent } from '../approve-payment/settlement/approve.settlement.component';
 import { ShareApprovePaymentModule } from '../approve-payment/components/share-approve-payment.module';
+import { SettlementFormCopyPopupComponent } from './components/popup/copy-settlement/copy-settlement.popup';
 
 const routing: Routes = [
     {
@@ -51,7 +52,8 @@ const COMPONENT = [
     SettlementExistingChargePopupComponent,
     SettlementFormChargePopupComponent,
     SettlementShipmentItemComponent,
-    SettlementTableSurchargeComponent 
+    SettlementTableSurchargeComponent,
+    SettlementFormCopyPopupComponent
 ];
 
 const customCurrencyMaskConfig = {

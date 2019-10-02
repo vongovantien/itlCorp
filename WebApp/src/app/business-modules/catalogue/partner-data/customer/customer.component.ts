@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
+import { AppList } from 'src/app/app.list';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
@@ -9,37 +10,61 @@ import { PaginationComponent } from 'src/app/shared/common/pagination/pagination
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
+import { NgProgress } from '@ngx-progressbar/core';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { SystemConstants } from 'src/constants/system.const';
+import { CatalogueRepo } from 'src/app/shared/repositories';
+import { catchError, finalize, map, } from 'rxjs/operators';
 import * as lodash from 'lodash';
+
 
 @Component({
   selector: 'app-customer',
   templateUrl: './customer.component.html',
   styleUrls: ['./customer.component.scss']
 })
-export class CustomerComponent implements OnInit {
-  customers: any;
+export class CustomerComponent extends AppList {
+  customers: Partner[] = [];
   pager: PagerSetting = PAGINGSETTING;
   partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
   criteria: any = { partnerGroup: PartnerGroupEnum.CUSTOMER };
+  saleMans: any[] = [];
+  headerSaleman: CommonInterface.IHeaderTable[];
   @ViewChild(PaginationComponent, { static: false }) child;
   @Output() deleteConfirm = new EventEmitter<Partner>();
   @Output() detail = new EventEmitter<any>();
-  constructor(private baseService: BaseService,
+  constructor(
+    private baseService: BaseService,
     private excelService: ExcelService,
     private api_menu: API_MENU,
-    private sortService: SortService) { }
+    private _progressService: NgProgress,
+    private sortService: SortService,
+    private _catalogueRepo: CatalogueRepo,
+  ) {
+    super();
+    this._progressRef = this._progressService.ref();
+    this.requestSort = this.sortCustomers;
+
+  }
+
 
   ngOnInit() {
+    this.headerSaleman = [
+      { title: 'service', field: 'service', sortable: true },
+      { title: 'office', field: 'office', sortable: true },
+      { title: 'company', field: 'company', sortable: true },
+      { title: 'status', field: 'status', sortable: true },
+      { title: 'createDate', field: 'createDate', sortable: true }
+    ];
   }
   async getPartnerData(pager: PagerSetting, criteria?: any) {
     if (criteria != undefined) {
       this.criteria = criteria;
     }
-    let responses = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.customerPaging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, false, true);
-    this.customers = responses.data;
+    const responses = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.paging + "?page=" + pager.currentPage + "&size=" + pager.pageSize, this.criteria, false, true);
+    this.customers = (responses.data || []).map(i => new Partner(i));
+    console.log(this.customers);
     this.pager.totalItems = responses.totalItems;
   }
   showConfirmDelete(item) {
@@ -48,6 +73,26 @@ export class CustomerComponent implements OnInit {
   showDetail(item) {
     this.detail.emit(item);
   }
+
+  showSaleman(partnerId: string, indexs: number) {
+    if (!!this.customers[indexs].saleManRequests.length) {
+      this.saleMans = this.customers[indexs].saleManRequests;
+    } else {
+      this._progressRef.start();
+      this._catalogueRepo.getListSaleman(partnerId)
+        .pipe(
+          catchError(this.catchError),
+          finalize(() => this._progressRef.complete())
+        ).subscribe(
+          (res: any[]) => {
+            this.saleMans = res || [];
+            console.log(this.saleMans);
+            this.customers[indexs].saleManRequests = this.saleMans;
+          },
+        );
+    }
+  }
+
 
   async exportCustomers() {
     var customers = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.query, this.criteria);
@@ -110,13 +155,8 @@ export class CustomerComponent implements OnInit {
     this.excelService.generateExcel(exportModel);
   }
 
-  isDesc = true;
-  sortKey: string = "id";
-  sort(property) {
-    this.isDesc = !this.isDesc;
-    this.sortKey = property;
-    this.customers.forEach(element => {
-      element.catPartnerModels = this.sortService.sort(element.catPartnerModels, property, this.isDesc)
-    });
+
+  sortCustomers(sort: string): void {
+    this.customers = this.sortService.sort(this.customers, sort, this.order);
   }
 }

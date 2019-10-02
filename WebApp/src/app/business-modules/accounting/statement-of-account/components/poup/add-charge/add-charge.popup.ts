@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
-import { AccoutingRepo } from 'src/app/shared/repositories';
+import { AccountingRepo } from 'src/app/shared/repositories';
 import { SOASearchCharge, Charge } from 'src/app/shared/models';
 
 import _includes from 'lodash/includes';
@@ -64,7 +64,7 @@ export class StatementOfAccountAddChargeComponent extends PopupBase {
     commodityGroup: any[] = [];
 
     constructor(
-        private _accoutingRepo: AccoutingRepo,
+        private _accoutingRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _sortService: SortService
     ) {

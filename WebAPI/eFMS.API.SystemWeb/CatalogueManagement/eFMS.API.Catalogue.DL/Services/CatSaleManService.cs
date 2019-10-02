@@ -49,6 +49,16 @@ namespace eFMS.API.Catalogue.DL.Services
             return results;
         }
 
+        public List<CatSaleManModel> GetBy(string partnerId)
+        {
+            List<CatSaleManModel> results = null;
+            //var data = DataContext.Get(x => x.JobNo == jobNo);
+            var data = GetSaleMan().Where(x => x.PartnerId == partnerId);
+            if (data.Count() == 0) return results;
+            results = mapper.Map<List<CatSaleManModel>>(data);
+            return results;
+        }
+
         #region CRUD
         public override HandleState Add(CatSaleManModel entity)
         {

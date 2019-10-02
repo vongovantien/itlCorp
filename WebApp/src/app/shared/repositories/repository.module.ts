@@ -1,14 +1,14 @@
 import { NgModule } from '@angular/core';
-import { CatalogueRepo, AccoutingRepo, OperationRepo, SystemRepo, DocumentationRepo, ReportRepo } from '.';
+import { CatalogueRepo, AccountingRepo, OperationRepo, SystemRepo, DocumentationRepo, ExportRepo } from '.';
 
 @NgModule({
     providers: [
         SystemRepo,
-        AccoutingRepo,
+        AccountingRepo,
         OperationRepo,
         CatalogueRepo,
         DocumentationRepo,
-        ReportRepo
+        ExportRepo,
     ],
 })
 export class RepositoryModule {

@@ -21,5 +21,4 @@ export const authConfig: AuthConfig = {
   // The first three are defined by OIDC. The 4th is a usecase-specific one
   scope: 'openid profile offline_access efms_api',
   sessionChecksEnabled: true
-
 }

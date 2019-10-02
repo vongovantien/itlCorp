@@ -28,10 +28,8 @@
 </div>
 <div class="table-wrapper table-scrollable" style="max-height: 300px">
     <table class="table table-brand dataTable">
-        <thead class="">
-            <tr app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
-                <th class="first"></th>
-            </tr>
+        <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
+            <th class="first"></th>
         </thead>
         <tbody>
             <ng-container *ngIf="!!data.length">
