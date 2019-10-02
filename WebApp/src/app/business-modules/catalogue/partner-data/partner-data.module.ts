@@ -17,12 +17,14 @@ import { ShipperComponent } from './shipper/shipper.component';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 
 const routing: Routes = [
     { path: '', component: PartnerComponent, data: { name: "Partner Data", level: 2 } },
     { path: 'import', component: PartnerDataImportComponent, data: { name: "Partner Data Import", level: 3 } },
     { path: 'addnew', component: PartnerDataAddnewComponent, data: { name: "Partner Data Addnew", level: 3 } },
-    { path: 'detail', component: PartnerDataDetailComponent, data: { name: "Partner Data Details", level: 3 } },
+    { path: 'detail/:id', component: PartnerDataDetailComponent, data: { name: "Partner Data Details", level: 3 } },
 ]
 @NgModule({
     imports: [
@@ -31,7 +33,9 @@ const routing: Routes = [
         RouterModule.forChild(routing),
         NgProgressModule,
         FormsModule,
-        SelectModule
+        SelectModule,
+        NgxDaterangepickerMd,
+        PaginationModule.forRoot()
     ],
     exports: [],
     declarations: [

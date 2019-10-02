@@ -4,9 +4,10 @@ export class Saleman {
     office: string = '';
     company: string = '';
     service: string = '';
-    partnerID: string = '';
+    partnerId: string = '';
     createDate: string = '';
     status?: boolean = false;
+    description: string = '';
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

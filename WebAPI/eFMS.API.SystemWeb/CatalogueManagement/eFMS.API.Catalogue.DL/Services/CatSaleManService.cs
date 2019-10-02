@@ -53,7 +53,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             List<CatSaleManModel> results = null;
             //var data = DataContext.Get(x => x.JobNo == jobNo);
-            var data = GetSaleMan().Where(x => x.PartnerId == partnerId);
+            var data = GetSaleMan().Where(x => x.PartnerId.Trim() == partnerId);
             if (data.Count() == 0) return results;
             results = mapper.Map<List<CatSaleManModel>>(data);
             return results;

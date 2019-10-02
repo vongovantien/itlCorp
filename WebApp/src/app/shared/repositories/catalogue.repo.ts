@@ -134,7 +134,6 @@ export class CatalogueRepo {
         // const header: HttpHeaders = new HttpHeaders();
         return this._api.get(`${environment.HOST.CatalogueLocal}/api/${this.VERSION}/en-US/CatSaleMan/GetBy`, { partnerId: partnerId })
             .pipe(
-                catchError((error) => throwError(error)),
                 map((data: any) => data)
             );
         // return this._httpClient.get(`${environment.HOST.CatalogueLocal}/api/${this.VERSION}/en-US/CatSaleMan/GetBy`, { params: { partnerId: partnerId } }).pipe(
@@ -184,5 +183,21 @@ export class CatalogueRepo {
                 return res;
             })
         );
+    }
+
+    getListSaleManDetail(page?: number, size?: number, body: any = {}) {
+        if (!!page && !!size) {
+            return this._api.post(`${environment.HOST.CatalogueLocal}/api/${this.VERSION}/en-US/CatSaleMan/paging`, body, {
+                page: '' + page,
+                size: '' + size
+            }).pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => data)
+            );
+        } else {
+            return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan`).pipe(
+                map((data: any) => data)
+            );
+        }
     }
 }

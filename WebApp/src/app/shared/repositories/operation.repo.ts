@@ -62,7 +62,7 @@ export class OperationRepo {
     }
 
     getListNotImportToJob(strKeySearch: string, customerNo: string, isImported: boolean, page: number, size: number) {
-        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/CustomDeclaration`, { keySearch: strKeySearch, customerNo: customerNo, imporTed: isImported, page: page, size: size }).pipe(
+        return this._api.get(`${environment.HOST.DOCUMENTATIONLOCAL}/api/${this.VERSION}/vi/CustomsDeclaration/CustomDeclaration`, { keySearch: strKeySearch, customerNo: customerNo, imporTed: isImported, page: page, size: size }).pipe(
             map((data: any) => data)
         );
     }

@@ -609,6 +609,118 @@
             </div>
             <!--end::m-portlet -->
 
+            <div class="m-portlet m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
+                <div class="alert-block__heading">
+                    <h3 class="alert-block__title">Sale Man</h3>
+                </div>
+                <div class="m-portlet__body">
+                    <!--begin: Datatable -->
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <div class="m-input-icon m-input-icon--right">
+                                    <input type="text" class="form-control m-input m-input--square" placeholder="Search"
+                                        [(ngModel)]="keyword" name=keyword>
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-search"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-8 m--align-right">
+                            <div class="form-group">
+                                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                    data-toggle="modal" data-target="#assign-select-supplier-modal">
+                                    <span>
+                                        <i class="la la-plus"></i>
+                                        <span>
+                                            add new
+                                        </span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="table-wrapper text-center" id="">
+                        <table class="table table-striped table-brand dataTable">
+                            <thead app-table-header [headers]="headerSaleman" (onClick)="sortBySaleMan($event)">
+                            </thead>
+                            <tbody>
+                                <ng-container *ngIf="!!saleMandetail && !isLoading ;">
+                                    <tr
+                                        *ngFor="let sale of saleMandetail | filter : keyword : ['company','saleman_ID','service','office']; let i = index; trackBy: trackByFn">
+                                        <td class="table-actions-col">
+                                            <div class="table-actions" style="width: 50px">
+                                                <button type="button"
+                                                    class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                    title="Remove" data-toggle="modal"
+                                                    data-target="#confirm-delete-modal">
+                                                    <i class="la la-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span>{{sale.saleman_ID}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{sale.service}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{sale.office}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{sale.company}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{sale.status}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{sale.modifiedDate  | date: 'dd/MM/yyyy'}}</span>
+                                        </td>
+                                    </tr>
+
+                                </ng-container>
+                                <tr *ngIf="!isLoading && saleMandetail.length == 0" app-table-none-record>
+                                </tr>
+                                <tr *ngIf="!isLoading  && !saleMandetail" app-table-none-record></tr>
+                                <tr *ngIf="isLoading" app-table-row-loading></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--end: Datatable -->
+                    <!--begin::pagination-->
+                    <div class="pagination-nav">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="tatable__pager-size">
+                                    <div class="select-box">
+                                        <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
+                                            (change)="selectPageSize(pageSize, dataSearchSaleman)" name="pagesize">
+                                            <ng-container
+                                                *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
+                                                <option [ngValue]="item">{{item}} line / screen</option>
+                                            </ng-container>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6" *ngIf="totalItems > pageSize">
+                                <div class="float-right">
+                                    <pagination [boundaryLinks]="true" [totalItems]="totalItems"
+                                        [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)" [(ngModel)]="page"
+                                        name="page">
+                                    </pagination>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::pagination-->
+                </div>
+            </div>
+
             <!--begin:: form-actions-->
             <div class="form-actions">
                 <div class="row">
@@ -690,3 +802,106 @@
     </div>
 </div> -->
 <!--end::confirm-delete-modal-->
+
+<!--begin::assign-select-supplier-modal-->
+<div class="modal fade" id="assign-select-supplier-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Sale Man</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="m-form m-form--state">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Sale Man</label>
+                                <select class="form-control m-input m-input--square">
+                                    <option value="Option 1"> Lorem ipsum dolor </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Service</label>
+                                <select class="form-control m-input m-input--square">
+                                    <option value="Option 1"> Lorem ipsum dolor </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Office</label>
+                                <select class="form-control m-input m-input--square">
+                                    <option value="Option 1"> Lorem ipsum dolor </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Status</label>
+                                <select class="form-control m-input m-input--square">
+                                    <option value="Option 1"> Lorem ipsum dolor </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Effective Date
+                                </label>
+                                <div class="m-input-icon m-input-icon--right down">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                        [singleDatePicker]="true" name="singledater" readonly />
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer m--align-center">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    data-toggle="modal" data-dismiss="modal" data-target="#confirm-assign-modal">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            save
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal"
+                    style="margin-left: 10px;">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!--end::assign-select-supplier-modal-->

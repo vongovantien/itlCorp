@@ -83,7 +83,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("GetBy")]
         public IActionResult GetBy(string partnerId)
         {
-            var results = catSaleManService.GetBy(partnerId);
+            var results = catSaleManService.GetBy(partnerId.Trim());
             return Ok(results);
         }
 
