@@ -16,7 +16,7 @@ namespace eFMS.API.Catalogue.DL.IService
         IQueryable<CatSaleMan> GetSaleMan();
         List<CatSaleManViewModel> Query(CatSaleManCriteria criteria);
         List<CatSaleManViewModel> Paging(CatSaleManCriteria criteria, int page, int size, out int rowsCount);
-        HandleState Delete(string id);
+        HandleState Delete(Guid id);
         HandleState Update(CatSaleManModel model);
         List<CatSaleManModel> GetBy(string partnerId);
     }

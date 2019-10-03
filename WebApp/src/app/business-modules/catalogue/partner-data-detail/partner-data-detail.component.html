@@ -632,7 +632,7 @@
                         <div class="col-lg-8 m--align-right">
                             <div class="form-group">
                                 <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                                    data-toggle="modal" data-target="#assign-select-supplier-modal">
+                                    data-toggle="modal" data-target="#saleman-modal">
                                     <span>
                                         <i class="la la-plus"></i>
                                         <span>
@@ -656,14 +656,15 @@
                                             <div class="table-actions" style="width: 50px">
                                                 <button type="button"
                                                     class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                    title="Remove" data-toggle="modal"
-                                                    data-target="#confirm-delete-modal">
+                                                    title="Remove" data-toggle="modal" (click)="deleteSaleman(sale)">
                                                     <i class="la la-trash"></i>
                                                 </button>
                                             </div>
                                         </td>
                                         <td>
-                                            <span>{{sale.saleman_ID}}</span>
+                                            <span><a style="cursor:pointer;"
+                                                    (click)="showDetailSaleMan(sale)">{{sale.saleman_ID}}</a>
+                                            </span>
                                         </td>
                                         <td>
                                             <span>{{sale.service}}</span>
@@ -803,105 +804,240 @@
 </div> -->
 <!--end::confirm-delete-modal-->
 
-<!--begin::assign-select-supplier-modal-->
-<div class="modal fade" id="assign-select-supplier-modal" data-backdrop="static" role="dialog" aria-labelledby=""
-    aria-hidden="true">
+<!--begin::saleman-->
+<div class="modal fade" id="saleman-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add Sale Man</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="m-form m-form--state">
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label>Sale Man</label>
-                                <select class="form-control m-input m-input--square">
-                                    <option value="Option 1"> Lorem ipsum dolor </option>
-                                </select>
+        <form name="formAddEdit" #formAddEdit="ngForm" novalidate (ngSubmit)="formAddEdit.form.valid">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Sale Man</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="m-form m-form--state">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && strSalemanCurrent.trim().length==0 }">
+                                    <label>Sale Man <span class="m--font-danger">(*)</span></label>
+                                    <app-combo-grid-virtual-scroll [selectedDisplayFields]="['username']"
+                                        (itemSelected)="strSalemanCurrent=$event.username" [dataSources]="users"
+                                        [displayFields]="[{'field':'username','label':'Username'},{'field':'employeeNameEn','label':'Name EN'}]">
+                                    </app-combo-grid-virtual-scroll>
+                                    <div class="form-control-feedback"
+                                        *ngIf="formAddEdit.submitted && strSalemanCurrent.trim().length==0">
+                                        Sale Man is required
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label>Service</label>
-                                <select class="form-control m-input m-input--square">
-                                    <option value="Option 1"> Lorem ipsum dolor </option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label>Office</label>
-                                <select class="form-control m-input m-input--square">
-                                    <option value="Option 1"> Lorem ipsum dolor </option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label>Status</label>
-                                <select class="form-control m-input m-input--square">
-                                    <option value="Option 1"> Lorem ipsum dolor </option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Effective Date
-                                </label>
-                                <div class="m-input-icon m-input-icon--right down">
-                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                        [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                        [singleDatePicker]="true" name="singledater" readonly />
-                                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                                        <span>
-                                            <i class="la la-calendar"></i>
-                                        </span>
-                                    </span>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Service <span class="m--font-danger">(*)</span></label>
+                                    <select [(ngModel)]="selectedService" name="service" class="form-control">
+                                        <option *ngFor="let service of services" [ngValue]="service">{{service.text}}
+                                        </option>
+                                    </select>
+
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label>Description</label>
-                                <textarea class="form-control"></textarea>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && strOfficeCurrent.trim().length==0 }">
+                                    <label>Office <span class="m--font-danger">(*)</span></label>
+                                    <app-combo-grid-virtual-scroll [selectedDisplayFields]="['abbrCompany']"
+                                        (itemSelected)="strOfficeCurrent=$event.abbrCompany" [dataSources]="offices"
+                                        [displayFields]="[{'field':'branchNameEn','label':'Name Abbr'},{'field':'abbrCompany','label':'Name Abbr'}]">
+                                    </app-combo-grid-virtual-scroll>
+                                    <div class="form-control-feedback"
+                                        *ngIf="formAddEdit.submitted && strOfficeCurrent.trim().length==0">
+                                        Office is required
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Status <span class="m--font-danger">(*)</span></label>
+                                    <select [(ngModel)]="selectedStatus" name="status" class="form-control">
+                                        <option *ngFor="let status of status" [ngValue]="status">{{status.title}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Effective Date
+                                    </label>
+                                    <div class="m-input-icon m-input-icon--right down">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [autoApply]="true"
+                                            [(ngModel)]="saleManToAdd.effectdate"
+                                            [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                            [singleDatePicker]="true" name="singledater" readonly />
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Description</label>
+                                    <textarea [(ngModel)]="saleManToAdd.description" name="description"
+                                        class="form-control"></textarea>
+                                </div>
                             </div>
                         </div>
                     </div>
+
                 </div>
-
-            </div>
-            <div class="modal-footer m--align-center">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                    data-toggle="modal" data-dismiss="modal" data-target="#confirm-assign-modal">
-                    <span>
-                        <i class="la la-save"></i>
+                <div class="modal-footer m--align-center">
+                    <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="onCreateSaleman()">
                         <span>
-                            save
+                            <i class="la la-save"></i>
+                            <span>
+                                save
+                            </span>
                         </span>
-                    </span>
-                </button>
-                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal"
-                    style="margin-left: 10px;">
-                    <span>
-                        <i class="la la-ban"></i>
+                    </button>
+                    <button type="" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal"
+                        style="margin-left: 10px;">
                         <span>
-                            cancel
+                            <i class="la la-ban"></i>
+                            <span>
+                                cancel
+                            </span>
                         </span>
-                    </span>
-                </button>
+                    </button>
+                </div>
             </div>
-        </div>
-
+        </form>
     </div>
 </div>
-<!--end::assign-select-supplier-modal-->
+<!--end::saleman-modal-->
+
+<div class="modal fade" id="saleman-detail-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <form name="formDetail" #formAddEdit="ngForm" novalidate>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detail</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="m-form m-form--state">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Sale Man <span class="m--font-danger">(*)</span></label>
+                                    <app-combo-grid-virtual-scroll [selectedDisplayFields]="['username']"
+                                        (itemSelected)="strSalemanCurrent=$event.username" [dataSources]="users"
+                                        [displayFields]="[{'field':'username','label':'Username'},{'field':'employeeNameEn','label':'Name EN'}]">
+                                    </app-combo-grid-virtual-scroll>
+
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Service <span class="m--font-danger">(*)</span></label>
+                                    <select [(ngModel)]="selectedService" name="service" class="form-control">
+                                        <option *ngFor="let service of services" [ngValue]="service">{{service.text}}
+                                        </option>
+                                    </select>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && strOfficeCurrent.trim().length==0 }">
+                                    <label>Office <span class="m--font-danger">(*)</span></label>
+                                    <app-combo-grid-virtual-scroll [selectedDisplayFields]="['abbrCompany']"
+                                        (itemSelected)="strOfficeCurrent=$event.abbrCompany" [dataSources]="offices"
+                                        [displayFields]="[{'field':'branchNameEn','label':'Name Abbr'},{'field':'abbrCompany','label':'Name Abbr'}]">
+                                    </app-combo-grid-virtual-scroll>
+
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Status <span class="m--font-danger">(*)</span></label>
+                                    <select [(ngModel)]="selectedStatus" name="status" class="form-control">
+                                        <option *ngFor="let status of status" [ngValue]="status">{{status.title}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Effective Date
+                                    </label>
+                                    <div class="m-input-icon m-input-icon--right down">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [autoApply]="true"
+                                            [(ngModel)]="saleMantoView.effectdate"
+                                            [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
+                                            [singleDatePicker]="true" name="singledater" readonly />
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Description</label>
+                                    <textarea [(ngModel)]="saleMantoView.description" name="description"
+                                        class="form-control"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer m--align-center">
+                    <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="onCreateSaleman()">
+                        <span>
+                            <i class="la la-ban"></i>
+                            <span>
+                                Delete
+                            </span>
+                        </span>
+                    </button>
+                    <button type="" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal"
+                        style="margin-left: 10px;">
+                        <span>
+                            <i class="la la-ban"></i>
+                            <span>
+                                cancel
+                            </span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!--end::saleman-modal-->
+
+
+<confirm-popup (onSubmit)="onDeleteSaleman()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>

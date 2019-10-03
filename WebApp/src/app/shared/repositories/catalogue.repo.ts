@@ -142,9 +142,24 @@ export class CatalogueRepo {
         // );
     }
 
+    deleteSaleman(id: string) {
+        return this._api.delete(`${environment.HOST.CatalogueLocal}/api/${this.VERSION}/vi/CatSaleMan/${id}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
 
     getListService() {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/GetListServices`)
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => data)
+            );
+    }
+
+    getListBranch() {
+        return this._api.get(`${environment.HOST.CatalogueLocal}/api/${this.VERSION}/en-US/CatBranch/GetListBranch`)
             .pipe(
                 catchError((error) => throwError(error)),
                 map((data: any) => data)
@@ -182,6 +197,13 @@ export class CatalogueRepo {
             map((res: any) => {
                 return res;
             })
+        );
+    }
+
+
+    createSaleman(body: any = {}) {
+        return this._api.post(`${environment.HOST.CatalogueLocal}/api/${this.VERSION}/vi/CatSaleMan/Add`, body).pipe(
+            map((data: any) => data)
         );
     }
 

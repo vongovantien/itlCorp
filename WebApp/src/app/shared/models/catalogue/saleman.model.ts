@@ -8,6 +8,8 @@ export class Saleman {
     createDate: string = '';
     status?: boolean = false;
     description: string = '';
+    effectdate: any = '';
+
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

@@ -12,6 +12,9 @@ import { catchError, finalize } from "rxjs/operators";
 import { AppList } from "src/app/app.list";
 import { Saleman } from 'src/app/shared/models/catalogue/saleman.model';
 import { async } from '@angular/core/testing';
+import { formatDate } from '@angular/common';
+import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
+declare var $: any;
 
 @Component({
     selector: 'app-partner-data-detail',
@@ -22,7 +25,6 @@ export class PartnerDataDetailComponent extends AppList {
     departments: any[];
     users: any[] = [];
     departmentActive: any[] = [];
-
     partner: Partner = new Partner();
     parentCustomers: any[];
     parentCustomerActive: any[] = [];
@@ -46,6 +48,21 @@ export class PartnerDataDetailComponent extends AppList {
     titleConfirmDelete = "You want to delete this Partner?";
     saleMandetail: any[] = [];
     headerSaleman: CommonInterface.IHeaderTable[];
+    services: any[] = [];
+    status: CommonInterface.ICommonTitleValue[] = [];
+    offices: any[] = [];
+    saleManToAdd: Saleman = new Saleman();
+    strOfficeCurrent: any = '';
+    strSalemanCurrent: any = '';
+    selectedStatus: any = {};
+    selectedService: any = {};
+    deleteMessage: string = '';
+    selectedSaleman: Saleman = null;
+    saleMantoView: Saleman = new Saleman();
+
+
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
+    @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild('formAddEdit', { static: false }) form: NgForm;
     @ViewChild('chooseBillingCountry', { static: false }) public chooseBillingCountry: SelectComponent;
     @ViewChild('chooseBillingProvince', { static: false }) public chooseBillingProvince: SelectComponent;
@@ -64,20 +81,42 @@ export class PartnerDataDetailComponent extends AppList {
         this.requestList = this.getSalemanPagingByPartnerId;
     }
     getDataCombobox() {
-
+        this.status = this.getStatus();
+        this.selectedStatus = this.status[1];
+        this.getService();
+        this.getOffice();
     }
 
-    getService(): CommonInterface.ICommonTitleValue[] {
+    getService() {
+        this._catalogueRepo.getListService()
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.services = this.utility.prepareNg2SelectData(res, 'value', 'displayName');
+                        this.selectedService = this.services[0];
+                    }
+                },
+            );
+    }
+
+
+    getOffice() {
+        this._catalogueRepo.getListBranch()
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.offices = res;
+                    }
+                },
+            );
+    }
+
+    getStatus(): CommonInterface.ICommonTitleValue[] {
         return [
-            { title: 'Air Import', value: 'Air Import' },
-            { title: 'Air Export', value: 'Air Export' },
-            { title: 'Sea FCL Export', value: 'Sea FCL Export' },
-            { title: 'Sea FCL Import', value: 'Sea FCL Import' },
-            { title: 'Sea LCL Export', value: 'Sea LCL Export' },
-            { title: 'Sea LCL Import', value: 'Sea LCL Import' },
-            { title: 'Sea Consol Export', value: 'Sea Consol Export' },
-            { title: 'Sea Consol Import', value: 'Sea Consol Import' },
-            { title: 'Custom Logistic', value: 'Custom Logisti' },
+            { title: 'Active', value: true },
+            { title: 'Inactive', value: false },
         ];
     }
 
@@ -101,7 +140,7 @@ export class PartnerDataDetailComponent extends AppList {
                 this.getSalemanPagingByPartnerId(this.dataSearchSaleman);
             }
         });
-
+        this.getDataCombobox();
 
     }
     async getParnerDetails() {
@@ -172,6 +211,7 @@ export class PartnerDataDetailComponent extends AppList {
             this.departments = respones.map(x => ({ "text": x.name, "id": x.id }));
         }
     }
+
     async getParentCustomers() {
         let respones = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: 3 });
         if (respones != null) {
@@ -408,6 +448,31 @@ export class PartnerDataDetailComponent extends AppList {
         this.value = value;
     }
 
+    deleteSaleman(saleman: Saleman) {
+
+        this.selectedSaleman = new Saleman(saleman);
+        this.deleteMessage = `Do you want to delete sale man ${saleman.saleman_ID}?`;
+        this.confirmDeleteJobPopup.show();
+    }
+
+    onDeleteSaleman() {
+        this._catalogueRepo.deleteSaleman(this.selectedSaleman.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this.confirmDeleteJobPopup.hide();
+                })
+            ).subscribe(
+                (respone: CommonInterface.IResult) => {
+                    if (respone.status) {
+                        this.toastr.success(respone.message, 'Delete Success !');
+                        this.getSalemanPagingByPartnerId(this.dataSearchSaleman);
+                    }
+                },
+            );
+
+    }
+
     getSalemanPagingByPartnerId(dataSearchSaleman?: any) {
         this.isLoading = true;
         this._catalogueRepo.getListSaleManDetail(this.page, this.pageSize, Object.assign({}, dataSearchSaleman, { partnerId: this.partner.id }))
@@ -416,7 +481,6 @@ export class PartnerDataDetailComponent extends AppList {
                 finalize(() => { this.isLoading = false; })
             ).subscribe(
                 (res: any) => {
-                    debugger;
                     this.saleMandetail = (res.data || []).map((item: Saleman) => new Saleman(item));
                     console.log(this.saleMandetail);
                     if (this.saleMandetail.length > 0) {
@@ -434,6 +498,43 @@ export class PartnerDataDetailComponent extends AppList {
             );
     }
 
+
+    onCreateSaleman() {
+        if (this.strSalemanCurrent.length > 0 && this.strOfficeCurrent.length > 0) {
+            const body = {
+                saleman_Id: this.strSalemanCurrent,
+                office: this.strOfficeCurrent,
+                company: this.strOfficeCurrent,
+                partnerId: this.partner.id,
+                effecdate: this.saleManToAdd.effectdate == null ? null : formatDate(this.saleManToAdd.effectdate.startDate, 'yyyy-MM-dd', 'en'),
+                description: this.saleManToAdd.description,
+                status: this.selectedStatus.value,
+                service: this.selectedService.id
+
+            };
+            this._catalogueRepo.createSaleman(body)
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (res: any) => {
+                        if (res.status) {
+                            $('#saleman-modal').modal('hide');
+                            this.getSalemanPagingByPartnerId(this.dataSearchSaleman);
+
+                        }
+
+                    },
+                );
+        }
+        else {
+
+        }
+    }
+
+    showDetailSaleMan(saleman: Saleman) {
+        $('#saleman-detail-modal').modal('show');
+        this.saleMantoView.description = saleman.description;
+        this.saleMantoView.effectdate = saleman.effectdate;
+    }
 
     sortBySaleMan(sortData: CommonInterface.ISortData): void {
         if (!!sortData.sortField) {

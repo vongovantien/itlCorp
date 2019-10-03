@@ -35,6 +35,8 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<CatPartnerModel, CatPartner>();
             CreateMap<CatSaleManModel, CatSaleMan>();
             CreateMap<CatSaleManEditModel, CatSaleManModel>();
+            CreateMap<SysBranch, CatBranchModel>();
+
 
 
         }

@@ -68,7 +68,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Add(saleMan);
             if (hs.Success)
             {
-                cache.Remove(Templates.CatSaleMan.NameCaching.ListName);
+               // cache.Remove(Templates.CatSaleMan.NameCaching.ListName);
                 //RedisCacheHelper.SetObject(cache, Templates.CatSaleMan.NameCaching.ListName, DataContext.Get().ToList());
             }
             return hs;
@@ -86,13 +86,13 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             return hs;
         }
-        public HandleState Delete(string id)
+        public HandleState Delete(Guid id)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
+            //ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
-                cache.Remove(Templates.CatSaleMan.NameCaching.ListName);
+                //cache.Remove(Templates.CatSaleMan.NameCaching.ListName);
             }
             return hs;
         }
@@ -105,20 +105,20 @@ namespace eFMS.API.Catalogue.DL.Services
                         select new { saleman };
             if (criteria.All == null)
             {
-                query = query.Where(x => ((x.saleman.Id ?? "").IndexOf(criteria.Id ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           && (x.saleman.Company ?? "").IndexOf(criteria.Company ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                query = query.Where(x => 
+                           (x.saleman.Company ?? "").IndexOf(criteria.Company ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.saleman.Office ?? "").IndexOf(criteria.Office ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.saleman.Status == criteria.Status || criteria.Status == null)
-                           ));
+                           );
             }
             else
             {
-                query = query.Where(x => ((x.saleman.Id ?? "").IndexOf(criteria.Id ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                            || (x.saleman.Company ?? "").IndexOf(criteria.Company ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                query = query.Where(x =>
+                             (x.saleman.Company ?? "").IndexOf(criteria.Company ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                             || (x.saleman.Office ?? "").IndexOf(criteria.Office ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                             || (x.saleman.Status == criteria.Status || criteria.Status == null)
                             || (x.saleman.PartnerId == criteria.PartnerId)
-                            ));
+                            );
             }
             if (query.Count() == 0) return null;
             List<CatSaleManViewModel> results = new List<CatSaleManViewModel>();

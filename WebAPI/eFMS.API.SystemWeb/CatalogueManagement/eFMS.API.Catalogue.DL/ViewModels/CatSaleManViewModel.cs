@@ -13,6 +13,7 @@ namespace eFMS.API.Catalogue.DL.ViewModels
         public bool? Status { get; set; }
         public string PartnerId { get; set; }
         public string Service { get; set; }
+        public string Description { get; set; }
         public DateTime? CreateDate { get; set; }
     }
 }

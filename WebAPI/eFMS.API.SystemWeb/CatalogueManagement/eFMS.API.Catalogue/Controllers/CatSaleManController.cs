@@ -27,6 +27,7 @@ namespace eFMS.API.Catalogue.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatSaleManService catSaleManService;
+
         private readonly IMapper mapper;
         public CatSaleManController(IStringLocalizer<LanguageSub> localizer, ICatSaleManService service, IMapper iMapper)
         {
@@ -46,6 +47,8 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(results);
         }
 
+
+ 
         /// <summary>
         /// get the list of sale man
         /// </summary>
@@ -95,12 +98,11 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Add")]
-        [Authorize]
         public IActionResult Post(CatSaleManEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
             string messageDuplicate = string.Empty;
-            bool checkExist = catSaleManService.Any(x => x.Service == model.Service && x.Office == model.Office);
+            bool checkExist = catSaleManService.Any(x => x.Service == model.Service && x.Saleman_ID == model.Saleman_ID && x.Office == model.Office);
             if (checkExist)
             {
                 messageDuplicate = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
@@ -129,7 +131,7 @@ namespace eFMS.API.Catalogue.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
             var saleman = mapper.Map<CatSaleManModel>(model);
-            saleman.Id = id;
+            saleman.Id = new Guid(id);
             var hs = catSaleManService.Update(saleman);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -146,8 +148,8 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="id">id of data that need to delete</param>
         /// <returns></returns>
         [HttpDelete("{id}")]
-        [Authorize]
-        public IActionResult Delete(string id)
+
+        public IActionResult Delete(Guid id)
         {
             var hs = catSaleManService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);

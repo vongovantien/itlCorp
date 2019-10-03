@@ -8,7 +8,7 @@ namespace eFMS.API.Catalogue.Service.Models
         {
             
         }
-        public string Id { get; set; }
+        public Guid Id { get; set; }
         public string Saleman_ID { get; set; }
         public string Office { get; set; }
         public string Company { get; set; }

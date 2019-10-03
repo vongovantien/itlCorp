@@ -6,7 +6,6 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
 {
     public class CatSaleManCriteria
     {
-        public string Id { get; set; }
         public string All { get; set; }
         public string Saleman_ID { get; set; }
         public string Office { get; set; }
