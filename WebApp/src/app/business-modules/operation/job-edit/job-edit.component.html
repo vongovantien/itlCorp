@@ -16,7 +16,7 @@
         </div>
         <div class="c-button-actions">
             <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                (click)="confirmDelete()">
+                (click)="checkDelete()">
                 <span>
                     <i class="la la-trash"></i>
                     <span>
@@ -62,7 +62,7 @@
                                             </button>
                                             <button type="button"
                                                 class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                                                (click)="cancelCreatJob()">
+                                                (click)="confirmCancelJob()">
                                                 <span>
                                                     <i class="la la-ban"></i>
                                                     <span>
@@ -519,7 +519,7 @@
                                                                 #sumPackages="ngModel">
                                                             <div class="input-group-prepend">
                                                                 <ng-select [allowClear]="false" [items]="packageTypes"
-                                                                    [active]="packagesUnitActive" [disabled]="disabled"
+                                                                    [active]="packagesUnitActive"
                                                                     (selected)="opsTransaction.packageTypeId = $event.id"
                                                                     (removed)="opsTransaction.packageTypeId = null"
                                                                     placeholder="">
@@ -597,7 +597,6 @@
                                                 </div>
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
@@ -746,13 +745,12 @@
 <app-container-list [jobId]="jobId" [lstMasterContainers]='lstMasterContainers'
     (outputContainers)="saveContainers($event)" *ngIf="jobId && lstMasterContainers"></app-container-list>
 
-<app-cancel-create-job-popup></app-cancel-create-job-popup>
-
-<app-can-not-delete-job-popup></app-can-not-delete-job-popup>
-
-<app-confirm-delete-job-popup (onSubmit)="deleteJob()" [jobNo]="opsTransaction.jobNo" *ngIf="opsTransaction">
-</app-confirm-delete-job-popup>
-
-<app-confirm-cancel-job-popup></app-confirm-cancel-job-popup>
-
 <pl-sheet-popup [jobId]="jobId"></pl-sheet-popup>
+
+<confirm-popup #confirmCancelUpdate (onSubmit)="onCancelUpdateJob()"
+    [body]="'Unsaved data will be lost. Are you sure want to leave?'" [labelConfirm]="'Yes'"></confirm-popup>
+
+<confirm-popup *ngIf="!!opsTransaction" #confirmDelete (onSubmit)="onDeleteJob()" [body]="deleteMessage">
+</confirm-popup>
+
+<info-popup #notAllowDelete [body]="'You are not allow to delete this job'"></info-popup>

@@ -12,10 +12,6 @@ import { OpsModuleStageManagementAddStagePopupComponent } from './stage-manageme
 import { NotSelectedAlertModalComponent } from './credit-debit-note/ops-module-credit-debit-note-addnew/not-selected-alert-modal/not-selected-alert-modal.component';
 import { ChangePartnerConfirmModalComponent } from './credit-debit-note/ops-module-credit-debit-note-addnew/change-partner-confirm-modal/change-partner-confirm-modal.component';
 import { ContainerListComponent } from './container-list/container-list.component';
-import { CancelCreateJobPopupComponent } from './job-confirm-popup/cancel-create-job-popup/cancel-create-job-popup.component';
-import { CanNotDeleteJobPopupComponent } from './job-confirm-popup/can-not-delete-job-popup/can-not-delete-job-popup.component';
-import { ConfirmCancelJobPopupComponent } from './job-confirm-popup/confirm-cancel-job-popup/confirm-cancel-job-popup.component';
-import { ConfirmDeleteJobPopupComponent } from './job-confirm-popup/confirm-delete-job-popup/confirm-delete-job-popup.component';
 import { AddBuyingRatePopupComponent } from './charge-list/add-buying-rate-popup/add-buying-rate-popup.component';
 import { EditBuyingRatePopupComponent } from './charge-list/edit-buying-rate-popup/edit-buying-rate-popup.component';
 import { AddSellingRatePopupComponent } from './charge-list/add-selling-rate-popup/add-selling-rate-popup.component';
@@ -57,7 +53,7 @@ const LIB = [
     SelectModule,
     TabsModule.forRoot(),
     ModalModule.forRoot(),
-    DragDropModule 
+    DragDropModule
 ];
 
 const COMPONENTS = [
@@ -106,10 +102,6 @@ const customCurrencyMaskConfig = {
         NotSelectedAlertModalComponent,
         ChangePartnerConfirmModalComponent,
         ContainerListComponent,
-        CancelCreateJobPopupComponent,
-        CanNotDeleteJobPopupComponent,
-        ConfirmCancelJobPopupComponent,
-        ConfirmDeleteJobPopupComponent,
 
         AddBuyingRatePopupComponent,
         EditBuyingRatePopupComponent,

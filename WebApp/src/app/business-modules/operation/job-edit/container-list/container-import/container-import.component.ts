@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, Output, EventEmitter, Input } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { catchError} from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { NgProgress } from '@ngx-progressbar/core';
 import { BaseService, SortService } from 'src/app/shared/services';
 import { API_MENU } from 'src/constants/api-menu.const';
@@ -66,6 +66,7 @@ export class ContainerImportComponent extends PopupBase implements OnInit {
             { title: 'Unit', field: 'unitOfMeasureName', sortable: true },
         ];
     }
+
     reset() {
         this.data = null;
         this.importedData = [];
@@ -75,13 +76,16 @@ export class ContainerImportComponent extends PopupBase implements OnInit {
         this.duplicatedError = null;
         this.existedError = null;
     }
+
     close() {
         this.reset();
         this.hide();
     }
+
     sortLocal(sort: string): void {
         this.importedData = this._sortService.sort(this.importedData, sort, this.order);
     }
+
     downloadFile() {
         this._documentRepo.downloadcontainerfileExcel()
             .pipe(catchError(this.catchError))
@@ -93,6 +97,7 @@ export class ContainerImportComponent extends PopupBase implements OnInit {
                 () => { }
             );
     }
+
     async import() {
         if (this.data == null) { return; }
         if (this.totalInvalidRow > 0) {
@@ -119,6 +124,7 @@ export class ContainerImportComponent extends PopupBase implements OnInit {
                 );
         }
     }
+
     hideInvalid() {
         this.page = 0;
         const end = this.page + (this.pageSize - 1);
@@ -133,6 +139,7 @@ export class ContainerImportComponent extends PopupBase implements OnInit {
             this.importedData = inValidItems.slice(this.page, end);
         }
     }
+
     chooseFile(file: Event) {
         if (file.target['files'] == null) { return; }
         this._progressRef.start();
@@ -157,6 +164,7 @@ export class ContainerImportComponent extends PopupBase implements OnInit {
             }, err => {
             });
     }
+
     getData() {
         this.totalItems = this.data.length;
         this.page = 0;

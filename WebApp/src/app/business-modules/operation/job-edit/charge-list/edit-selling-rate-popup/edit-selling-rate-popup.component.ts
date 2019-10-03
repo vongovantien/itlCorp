@@ -5,11 +5,11 @@ import { PopupBase } from 'src/app/popup.base';
 import { NgForm } from '@angular/forms';
 import { DataService, BaseService } from 'src/app/shared/services';
 import { API_MENU } from 'src/constants/api-menu.const';
-import cloneDeep from 'lodash/cloneDeep';
 import { ChargeConstants } from 'src/constants/charge.const';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
 import * as dataHelper from 'src/helper/data.helper';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'app-edit-selling-rate-popup',
@@ -35,28 +35,29 @@ export class EditSellingRatePopupComponent extends PopupBase implements OnInit, 
     }
 
     ngOnInit() {
-        this._data.currentMessage.subscribe(message => {
-            if (message['sellingCharges'] != null) {
-                this.lstSellingRateChargesComboBox = cloneDeep(message['sellingCharges']);
-            } else {
-                this.getListSellingRateCharges();
-            }
-            if (message['lstUnits'] != null) {
-                this.lstUnits = cloneDeep(message['lstUnits']);
-            } else {
-                this.getUnits();
-            }
-            if (message['lstPartners'] != null) {
-                this.lstPartners = cloneDeep(message['lstPartners']);
-            } else {
-                this.getPartners();
-            }
-            if (message['lstCurrencies'] != null) {
-                this.lstCurrencies = prepareNg2SelectData(cloneDeep(message['lstCurrencies']), "id", "id");
-            } else {
-                this.getCurrencies();
-            }
-        });
+        if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)) {
+            this.lstCurrencies = prepareNg2SelectData(this._data.getDataByKey(SystemConstants.CSTORAGE.CURRENCY), "id", "id");
+        } else {
+            this.getCurrencies();
+        }
+
+        if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.UNIT)) {
+            this.lstUnits = this._data.getDataByKey(SystemConstants.CSTORAGE.UNIT);
+        } else {
+            this.getUnits();
+        }
+
+        if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
+            this.lstPartners = this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER);
+        } else {
+            this.getPartners();
+        }
+
+        if (!!this._data.getDataByKey("sellingCharges")) {
+            this.lstSellingRateChargesComboBox = this._data.getDataByKey('sellingCharges');
+        } else {
+            this.getListSellingRateCharges();
+        }
     }
 
     ngOnChanges() {
@@ -113,31 +114,27 @@ export class EditSellingRatePopupComponent extends PopupBase implements OnInit, 
         this.sellingRateChargeToEdit = null;
     }
 
-    public getListSellingRateCharges() {
+    getListSellingRateCharges() {
         this.baseServices.post(this.api_menu.Catalogue.Charge.query, { type: 'DEBIT', serviceTypeId: ChargeConstants.CL_CODE }).subscribe((res: any) => {
             this.lstSellingRateChargesComboBox = res;
         });
     }
 
-    public getUnits() {
+    getUnits() {
         this.baseServices.post(this.api_menu.Catalogue.Unit.getAllByQuery, {}).subscribe((data: any) => {
             this.lstUnits = data;
         });
     }
 
-    public getPartners() {
+    getPartners() {
         this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.ALL }).subscribe((res: any) => {
             this.lstPartners = res;
         });
     }
 
-    public getCurrencies() {
+    getCurrencies() {
         this.baseServices.post(this.api_menu.Catalogue.Currency.getAllByQuery, { inactive: false }).subscribe((res: any) => {
             this.lstCurrencies = prepareNg2SelectData(res, "id", "id");
         });
-    }
-
-    public typed(value: any): void {
-        console.log('New search input: ', value);
     }
 }

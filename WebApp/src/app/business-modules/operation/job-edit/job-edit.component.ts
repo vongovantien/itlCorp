@@ -8,24 +8,18 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { NgForm } from '@angular/forms';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
-
 import { ChargeConstants } from 'src/constants/charge.const';
 import { ContainerListComponent } from './container-list/container-list.component';
 import { SystemRepo, CatalogueRepo } from 'src/app/shared/repositories';
 import { AppPage } from "src/app/app.base";
 import { catchError, finalize } from 'rxjs/operators';
-import { CancelCreateJobPopupComponent } from './job-confirm-popup/cancel-create-job-popup/cancel-create-job-popup.component';
-import { CanNotDeleteJobPopupComponent } from './job-confirm-popup/can-not-delete-job-popup/can-not-delete-job-popup.component';
-import { ConfirmDeleteJobPopupComponent } from './job-confirm-popup/confirm-delete-job-popup/confirm-delete-job-popup.component';
-
 import { DataService } from 'src/app/shared/services';
-
-import { ConfirmCancelJobPopupComponent } from './job-confirm-popup/confirm-cancel-job-popup/confirm-cancel-job-popup.component';
 import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
 import { CsShipmentSurcharge } from 'src/app/shared/models';
 import { NgProgress } from '@ngx-progressbar/core';
 import { DocumentationRepo } from 'src/app/shared/repositories/documentation.repo';
 import { SystemConstants } from 'src/constants/system.const';
+import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
@@ -34,17 +28,16 @@ import { SystemConstants } from 'src/constants/system.const';
 export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit {
 
     @ViewChild(ContainerListComponent, { static: false }) popupContainerList: ContainerListComponent;
-    @ViewChild(CancelCreateJobPopupComponent, { static: false }) cancelCreateJobPopup: CancelCreateJobPopupComponent;
-    @ViewChild(CanNotDeleteJobPopupComponent, { static: false }) canNotDeleteJobPopup: CanNotDeleteJobPopupComponent;
-    @ViewChild(ConfirmDeleteJobPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmDeleteJobPopupComponent;
-    @ViewChild(ConfirmCancelJobPopupComponent, { static: false }) confirmCancelJobPopup: ConfirmCancelJobPopupComponent;
     @ViewChild(PlSheetPopupComponent, { static: false }) plSheetPopup: PlSheetPopupComponent;
+
+    @ViewChild('confirmCancelUpdate', { static: false }) confirmCancelJobPopup: ConfirmPopupComponent;
+    @ViewChild('notAllowDelete', { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
+    @ViewChild('confirmDelete', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
 
     opsTransaction: OpsTransaction = null;
     productServices: any[] = [];
     serviceDate: any;
     finishDate: any;
-    exchangeRateDate: any;
     serviceModes: any[] = [];
     shipmentModes: any[] = [];
     customers: any[] = [];
@@ -59,14 +52,12 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     productServiceActive: any[] = [];
     serviceModeActive: any[] = [];
     shipmentModeActive: any[] = [];
-    searchcontainer: string = '';
     lstMasterContainers: any[];
     commodityGroupActive: any[] = [];
 
     lstBuyingRateChargesComboBox: any[] = [];
     lstSellingRateChargesComboBox: any[] = [];
     lstOBHChargesComboBox: any[] = [];
-    lstPartners: any[] = [];
     lstUnits: any[] = [];
     lstCurrencies: any[] = [];
 
@@ -95,7 +86,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     totalOBHUSD: number = 0;
     totalOBHLocal: number = 0;
 
-    listContainerType: any[] = [];
 
     listPackageTypes: any[];
     packageTypes: any[] = [];
@@ -103,13 +93,10 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     tab: string = '';
     tabCharge: string = '';
     jobId: string = '';
-
-    items: Array<string> = ['option 1', 'option 2', 'option 3', 'option 4',
-        'option 5', 'option 6', 'option 7'];
+    deleteMessage: string = '';
 
     packagesUnitActive = [];
 
-    disabled: boolean = false;
 
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU,
@@ -120,6 +107,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         private _catalogueRepo: CatalogueRepo,
         private _ngProgressService: NgProgress,
         private _documentRepo: DocumentationRepo,
+        private _router: Router,
     ) {
         super();
 
@@ -163,7 +151,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             )
             .subscribe(
                 (res: any) => {
-                    this.lstMasterContainers = res;
+                    this.lstMasterContainers = res || [];
                 },
                 (errors: any) => {
                 },
@@ -171,25 +159,34 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             );
     }
 
-    async confirmDelete() {
-        const respone = await this.baseServices.getAsync(this.api_menu.Documentation.Operation.checkAllowDelete + this.opsTransaction.id, false, true);
-        if (respone === true) {
-            this.confirmDeleteJobPopup.show();
-        } else {
-            this.canNotDeleteJobPopup.show();
-        }
+    checkDelete() {
+        this._documentRepo.checkShipmentAllowToDelete(this.opsTransaction.id)
+            .subscribe(
+                (respone: boolean) => {
+                    if (respone === true) {
+                        this.deleteMessage = `Do you want to delete job No <span class="font-weight-bold">${this.opsTransaction.jobNo}</span>?`;
+                        this.confirmDeleteJobPopup.show();
+                    } else {
+                        this.canNotDeleteJobPopup.show();
+                    }
+                }
+            );
     }
 
-    async deleteJob() {
-        const respone = await this.baseServices.deleteAsync(this.api_menu.Documentation.Operation.delete + this.opsTransaction.id, true, true);
-        if (respone.status) {
-            this.confirmDeleteJobPopup.hide();
-            this.router.navigate(["/home/operation/job-management"]);
-        }
+    onDeleteJob() {
+        this._documentRepo.deleteShipment(this.opsTransaction.id)
+            .subscribe(
+                (response: CommonInterface.IResult) => {
+                    if (response.status) {
+                        this.confirmDeleteJobPopup.hide();
+                        this.router.navigate(["/home/operation/job-management"]);
+                    }
+                }
+            );
     }
 
-    cancelCreatJob() {
-        this.cancelCreateJobPopup.show();
+    onCancelUpdateJob() {
+        this._router.navigate(["home/operation/job-management"]);
     }
 
     confirmCancelJob() {
@@ -252,7 +249,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this.getListContainersOfJob();
         this.getShipmentDetails(this.opsTransaction.id);
     }
-    // -------------    End Container   -------------------//
 
     getWarehouses() {
         this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Warehouse, inactive: false }).subscribe((res: any) => {
@@ -262,7 +258,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     getCommodityGroup() {
-        this._catalogueRepo.getCommodityGroup()
+        this._catalogueRepo.getCommodityGroup({})
             .pipe()
             .subscribe(
                 (res: any) => {
@@ -337,7 +333,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.CUSTOMER, all: null })
             .subscribe((res: any) => {
                 this.customers = res;
-                this._data.setDataService(SystemConstants.CSTORAGE.CUSTOMER, this.customers);
+                this._data.setDataService(SystemConstants.CSTORAGE.PARTNER, this.customers);
             });
     }
 
@@ -438,12 +434,10 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         }
     }
 
-
     totalProfit() {
         this.totalProfitUSD = this.totalSellingUSD - this.totalBuyingUSD - this.totalLogisticChargeUSD;
         this.totalProfitLocal = this.totalSellingLocal - this.totalBuyingLocal - this.totalLogisticChargeLocal;
     }
-
 
     totalBuyingCharge() {
         this.totalBuyingUSD = 0;
@@ -459,7 +453,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             });
         }
     }
-
 
     totalSellingCharge() {
         this.totalSellingUSD = 0;

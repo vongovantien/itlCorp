@@ -29,8 +29,8 @@ export class CatalogueRepo {
         );
     }
 
-    getCommondity() {
-        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommonity/Query`, {}).pipe(
+    getCommondity(body?: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommonity/Query`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => {
                 return data;
@@ -38,8 +38,8 @@ export class CatalogueRepo {
         );
     }
 
-    getCommodityGroup() {
-        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommodityGroup/Query`, {}).pipe(
+    getCommodityGroup(body?: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommodityGroup/Query`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => {
                 return data;

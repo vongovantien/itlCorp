@@ -10,6 +10,8 @@ import { ToastrService } from 'ngx-toastr';
 import { DomSanitizer } from '@angular/platform-browser';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { ModalDirective } from 'ngx-bootstrap';
+import { DataService } from 'src/app/shared/services';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'pl-sheet-popup',
@@ -33,13 +35,19 @@ export class PlSheetPopupComponent extends PopupBase {
         private _toastService: ToastrService,
         private sanitizer: DomSanitizer,
         private api_menu: API_MENU,
+        private _dataService: DataService
     ) {
         super();
         this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
-        this.getCurrency();
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)) {
+            this.currencyList = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY) || [];
+            this.selectedCurrency = this.currencyList.filter((item: any) => item.id === 'VND')[0];
+        } else {
+            this.getCurrency();
+        }
     }
 
     getCurrency() {

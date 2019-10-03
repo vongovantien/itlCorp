@@ -61,7 +61,7 @@
                                         sellingRateChargeToEdit.objectBePaid==='CUSTOMER'? sellingRateChargeToEdit.paymentObjectId=opsTransaction.customerId:null;
                                         sellingRateChargeToEdit.objectBePaid==='OTHER'? sellingRateChargeToEdit.paymentObjectId=null:null;"
                     (removed)="sellingRateChargeToEdit.objectBePaid=null;sellingRateChargeToEdit.paymentObjectId=null;"
-                    (typed)="typed($event)" placeholder="Select filter">
+                    placeholder="Select filter">
                   </ng-select>
 
                   <div class="form-control-feedback"
@@ -203,8 +203,9 @@
                   <label class="form-control-label" for="">
                     Total
                   </label>
-                  <input currencyMask [options]="{align: 'left', precision: 2}" type="text" class="form-control m-input m-input--square" disabled
-                    name="SellingRateChargeTotalNameOps" [(ngModel)]="sellingRateChargeToEdit.total">
+                  <input currencyMask [options]="{align: 'left', precision: 2}" type="text"
+                    class="form-control m-input m-input--square" disabled name="SellingRateChargeTotalNameOps"
+                    [(ngModel)]="sellingRateChargeToEdit.total">
                 </div>
               </div>
             </div>

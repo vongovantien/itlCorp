@@ -9,7 +9,6 @@ import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
 import { DataService } from 'src/app/shared/services';
-import cloneDeep from 'lodash/cloneDeep';
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { SystemConstants } from 'src/constants/system.const';
 
@@ -64,30 +63,6 @@ export class AddBuyingRatePopupComponent extends PopupBase implements OnInit, On
         } else {
             this.getListBuyingRateCharges();
         }
-
-        // this._data.getData().subscribe(message => {
-        //     if (message['buyingCharges'] != null) {
-        //         this.lstBuyingRateChargesComboBox = cloneDeep(message['buyingCharges']);
-        //     } else {
-        //         this.getListBuyingRateCharges();
-        //     }
-        //     if (message['lstUnits'] != null) {
-        //         this.lstUnits = cloneDeep(message['lstUnits']);
-        //     } else {
-        //         this.getUnits();
-        //     }
-        //     if (message['lstPartners'] != null) {
-        //         this.lstPartners = cloneDeep(message['lstPartners']);
-        //     } else {
-        //         this.getPartners();
-        //     }
-
-        //     if (!!message[SystemConstants.CSTORAGE.CURRENCY]) {
-        //         this.lstCurrencies = prepareNg2SelectData(cloneDeep(message[SystemConstants.CSTORAGE.CURRENCY]), "id", "id");
-        //     } else {
-        //         this.getCurrencies();
-        //     }
-        // });
     }
 
     calculateTotalEachBuying() {
