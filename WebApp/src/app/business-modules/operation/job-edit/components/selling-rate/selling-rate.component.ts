@@ -6,10 +6,11 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import cloneDeep from 'lodash/cloneDeep';
 import { EditSellingRatePopupComponent } from '../../charge-list/edit-selling-rate-popup/edit-selling-rate-popup.component';
 import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSurcharge';
-import { BaseService, SortService } from 'src/app/shared/services';
+import { BaseService, SortService, DataService } from 'src/app/shared/services';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDetails.model';
 import { OpsModuleCreditDebitNoteDetailComponent } from '../../credit-debit-note/ops-module-credit-debit-note-detail/ops-module-credit-debit-note-detail.component';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'job-management-selling-rate',
@@ -36,7 +37,8 @@ export class JobManagementSellingRateComponent extends AppList {
     constructor(
         private baseServices: BaseService,
         private api_menu: API_MENU,
-        private sortService: SortService
+        private sortService: SortService,
+        private _data: DataService
 
     ) {
         super();
@@ -68,8 +70,12 @@ export class JobManagementSellingRateComponent extends AppList {
 
     prepareEditCharge(charge: CsShipmentSurcharge) {
         this.SellingRateChargeToEdit = charge;
+        if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
+            this.lstPartners = this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER);
+        }
         if (this.SellingRateChargeToEdit) {
             setTimeout(() => {
+                this.editSellingRatePopup.lstPartners = this.lstPartners;
                 this.editSellingRatePopup.show({ backdrop: 'static' });
             }, 100);
         }

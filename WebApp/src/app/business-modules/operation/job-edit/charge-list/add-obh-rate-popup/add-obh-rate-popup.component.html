@@ -27,9 +27,9 @@
                                               obhChargeToAdd.unitPrice=$event.unitPrice;
                                               obhChargeToAdd.vatrate = $event.vatrate;
                                               selectedOBHChargeCode.value=$event.code;
-                                              obhChargeToAdd.currencyId=$event.currency;
+                                              obhChargeToAdd.currencyId=$event.currencyId;
                                               currentSelectedCharge=$event.code;
-                                              currentActiveItemDefault=[{ id: $event.currency, text: $event.currency }];
+                                              currentActiveItemDefault=[{ id: $event.currencyId, text: $event.currencyId }];
                                               calculateTotalEachOBH()" [selectedDisplayFields]="['chargeNameEn']"
                     [dataSources]="lstOBHChargesComboBox"
                     [displayFields]="[{'field':'code','label':'Charge Code'},{'field':'chargeNameEn','label':'Name EN'},{'field':'chargeNameVn','label':'Name VN'}]">

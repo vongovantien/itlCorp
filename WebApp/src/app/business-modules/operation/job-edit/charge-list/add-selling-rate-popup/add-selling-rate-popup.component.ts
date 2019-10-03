@@ -50,9 +50,10 @@ export class AddSellingRatePopupComponent extends PopupBase {
             this.getUnits();
         }
 
-        // if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
-        //     this.lstPartners = this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER);
-        // } else {
+        if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
+            this.lstPartners = this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER);
+        }
+        // else {
         //     this.getPartners();
         // }
 

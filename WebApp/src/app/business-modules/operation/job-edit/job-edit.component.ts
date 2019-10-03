@@ -154,6 +154,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                 this.buyingRateManagement.lstPartners = res;
                 this.sellingRateManagement.lstPartners = res;
                 this.obhRateManagement.lstPartners = res;
+                this._data.setDataService(SystemConstants.CSTORAGE.PARTNER, res);
             });
     }
     getListContainersOfJob() {
@@ -348,7 +349,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CUSTOMER)
             .subscribe((res: any) => {
                 this.customers = res;
-                this._data.setDataService(SystemConstants.CSTORAGE.PARTNER, this.customers);
+                this._data.setDataService(SystemConstants.CSTORAGE.CUSTOMER, this.customers);
             });
     }
 

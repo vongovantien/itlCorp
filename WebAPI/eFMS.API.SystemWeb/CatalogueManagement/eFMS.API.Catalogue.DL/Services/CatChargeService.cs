@@ -151,13 +151,15 @@ namespace eFMS.API.Catalogue.DL.Services
         public List<CatCharge> Query(CatChargeCriteria criteria)
         {
             var list = DataContext.Where(x => x.Inactive == criteria.Inactive || criteria.Inactive == null);
+            var currencies = currencyRepository.Get();
+            var units = unitRepository.Get();
             if(criteria.All == null)
             {
                 list = list.Where(x => ((x.ChargeNameEn ?? "").IndexOf(criteria.ChargeNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                 && ((x.ChargeNameVn ?? "").IndexOf(criteria.ChargeNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                 && ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                && ((x.Type??"").IndexOf(criteria.Type??"",StringComparison.OrdinalIgnoreCase)>=0)
-                && ((x.ServiceTypeId??"").IndexOf(criteria.ServiceTypeId ??"",StringComparison.OrdinalIgnoreCase)>=0));
+                && ((x.Type ?? "").IndexOf(criteria.Type ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                && ((x.ServiceTypeId ?? "").IndexOf(criteria.ServiceTypeId ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
             }
             else
             {

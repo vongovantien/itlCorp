@@ -23,7 +23,7 @@ export class EditSellingRatePopupComponent extends PopupBase implements OnInit, 
     isDisplay: boolean = true;
     lstSellingRateChargesComboBox: any[] = [];
     lstUnits: any[] = [];
-    lstPartners: any[] = [];
+    @Input() lstPartners: any[] = [];
     lstCurrencies: any[] = [];
     sellingRateChargeActive: any[] = [];
     exchangeRateDate: any;
@@ -49,9 +49,10 @@ export class EditSellingRatePopupComponent extends PopupBase implements OnInit, 
 
         if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
             this.lstPartners = this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER);
-        } else {
-            this.getPartners();
         }
+        // else {
+        //     this.getPartners();
+        // }
 
         if (!!this._data.getDataByKey("sellingCharges")) {
             this.lstSellingRateChargesComboBox = this._data.getDataByKey('sellingCharges');
@@ -126,11 +127,11 @@ export class EditSellingRatePopupComponent extends PopupBase implements OnInit, 
         });
     }
 
-    getPartners() {
-        this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.ALL }).subscribe((res: any) => {
-            this.lstPartners = res;
-        });
-    }
+    // getPartners() {
+    //     this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.ALL }).subscribe((res: any) => {
+    //         this.lstPartners = res;
+    //     });
+    // }
 
     getCurrencies() {
         this.baseServices.post(this.api_menu.Catalogue.Currency.getAllByQuery, { inactive: false }).subscribe((res: any) => {

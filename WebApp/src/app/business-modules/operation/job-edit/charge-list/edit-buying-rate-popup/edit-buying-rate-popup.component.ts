@@ -22,7 +22,7 @@ export class EditBuyingRatePopupComponent extends PopupBase implements OnInit, O
 
     isDisplay: boolean = true;
     lstBuyingRateChargesComboBox: any[] = [];
-    lstPartners: any[] = [];
+    @Input() lstPartners: any[] = [];
     lstUnits: any[] = [];
     lstCurrencies: any[] = [];
     currentActiveItemDefault: any[] = [];
@@ -60,11 +60,11 @@ export class EditBuyingRatePopupComponent extends PopupBase implements OnInit, O
             this.getUnits();
         }
 
-        if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
-            this.lstPartners = this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER);
-        } else {
-            this.getPartners();
-        }
+        // if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
+        //     this.lstPartners = this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER);
+        // } else {
+        //     this.getPartners();
+        // }
 
         if (!!this._data.getDataByKey("buyingCharges")) {
             this.lstBuyingRateChargesComboBox = this._data.getDataByKey('buyingCharges');
@@ -135,11 +135,11 @@ export class EditBuyingRatePopupComponent extends PopupBase implements OnInit, O
         });
     }
 
-    getPartners() {
-        this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.ALL, inactive: false }).subscribe((res: any) => {
-            this.lstPartners = res;
-        });
-    }
+    // getPartners() {
+    //     this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.ALL, inactive: false }).subscribe((res: any) => {
+    //         this.lstPartners = res;
+    //     });
+    // }
 
     getCurrencies() {
         this.baseServices.post(this.api_menu.Catalogue.Currency.getAllByQuery, { inactive: false }).subscribe((res: any) => {

@@ -102,7 +102,7 @@
     </table>
 </div>
 
-<app-edit-buying-rate-popup [buyingRateChargeToEdit]="BuyingRateChargeToEdit"
+<app-edit-buying-rate-popup [buyingRateChargeToEdit]="BuyingRateChargeToEdit" [lstPartners]="lstPartners"
     (outputEditBuying)="onSaveBuyingRate($event)"></app-edit-buying-rate-popup>
 
 <confirm-popup [title]="'Delete Charge'" [body]="'Are you sure want to delete this Charge?'"

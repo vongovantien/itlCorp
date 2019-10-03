@@ -106,8 +106,8 @@
     (outputAddSelling)="onSaveNewSellingRate($event)">
 </app-add-selling-rate-popup>
 
-<app-edit-selling-rate-popup [opsTransaction]="opsTransaction" [sellingRateChargeToEdit]="SellingRateChargeToEdit"
-    (outputEditSelling)="onSaveSellingRate()">
+<app-edit-selling-rate-popup [opsTransaction]="opsTransaction" [lstPartners]="lstPartners"
+    [sellingRateChargeToEdit]="SellingRateChargeToEdit" (outputEditSelling)="onSaveSellingRate()">
 </app-edit-selling-rate-popup>
 
 <confirm-popup [title]="'Delete Charge'" [body]="'Are you sure want to delete this Charge?'"

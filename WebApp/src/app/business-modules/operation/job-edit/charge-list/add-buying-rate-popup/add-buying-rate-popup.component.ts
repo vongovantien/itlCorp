@@ -52,9 +52,10 @@ export class AddBuyingRatePopupComponent extends PopupBase implements OnInit, On
             this.getUnits();
         }
 
-        // if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
-        //     this.lstPartners = this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER);
-        // } else {
+        if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
+            this.lstPartners = this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER);
+        }
+        // else {
         //     this.getPartners();
         // }
 

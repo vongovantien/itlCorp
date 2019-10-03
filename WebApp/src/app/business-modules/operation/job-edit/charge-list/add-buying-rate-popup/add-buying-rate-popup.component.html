@@ -31,9 +31,9 @@
                                             buyingRateChargeToAdd.vatrate=$event.vatrate;
                                             selectedBuyingChargeCode.value=$event.code;
                                             currentSelectedCharge=$event.code;
-                                            buyingRateChargeToAdd.currencyId = $event.currency;
-                                            currentActiveItemDefault=[{ id: $event.currency, text: $event.currency }];
-                                            buyingRateChargeToAdd.currencyId=$event.currency;
+                                            buyingRateChargeToAdd.currencyId = $event.currencyId;
+                                            currentActiveItemDefault=[{ id: $event.currencyId, text: $event.currencyId }];
+                                            buyingRateChargeToAdd.currencyId=$event.currencyId;
                                             calculateTotalEachBuying();" [selectedDisplayFields]="['chargeNameEn']"
                     [dataSources]="lstBuyingRateChargesComboBox"
                     [displayFields]="[{'field':'code','label':'Charge Code'},{'field':'chargeNameEn','label':'Name EN'},{'field':'chargeNameVn','label':'Name VN'}]">

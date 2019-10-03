@@ -24,7 +24,7 @@ export class EditObhRatePopupComponent extends PopupBase implements OnInit, OnCh
     lstOBHChargesComboBox: any[] = [];
     lstCurrencies: any[] = [];
     lstUnits: any[] = [];
-    lstPartners: any[] = [];
+    @Input() lstPartners: any[] = [];
     currentActiveItemDefault: any[] = [];
     obhChargeActive: any[] = [];
     exchangeRateDate: any;
@@ -51,9 +51,10 @@ export class EditObhRatePopupComponent extends PopupBase implements OnInit, OnCh
 
         if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
             this.lstPartners = this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER);
-        } else {
-            this.getPartners();
         }
+        // else {
+        //     this.getPartners();
+        // }
 
         if (!!this._data.getDataByKey("obhCharges")) {
             this.lstOBHChargesComboBox = this._data.getDataByKey('obhCharges');
@@ -143,10 +144,10 @@ export class EditObhRatePopupComponent extends PopupBase implements OnInit, OnCh
         });
     }
 
-    getPartners() {
-        this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.ALL }).subscribe((res: any) => {
-            this.lstPartners = res;
-        });
-    }
+    // getPartners() {
+    //     this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.ALL }).subscribe((res: any) => {
+    //         this.lstPartners = res;
+    //     });
+    // }
 
 }
