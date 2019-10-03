@@ -87,7 +87,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     }
 
     getCommondity() {
-        this._catalogueRepo.getCommodityGroup()
+        this._catalogueRepo.getCommodityGroup({})
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
@@ -353,7 +353,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 strCharges: this.selectedCharges.map((item: any) => item.code).toString(),
                 note: this.note,
                 serviceTypeId: !!this.selectedService.length ? this.mapServiceId(this.selectedService[0].id) : this.mapServiceId('All'),
-                commodityGroupId: !!this.commodity ? this.commodity.id : null
+                commodityGroupId: !!this.commodity ? this.commodity.id : null,
+                strServices: this.selectedService[0].id === 'All' ? '' : this.selectedService.map(service => service.id).toString()
             };
             this.dataSearch = new SOASearchCharge(body);
             this.onApply.emit(this.dataSearch);
