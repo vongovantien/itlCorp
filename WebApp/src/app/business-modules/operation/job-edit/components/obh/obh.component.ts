@@ -25,6 +25,7 @@ export class JobManagementOBHComponent extends AppList {
     @Output() onChange: EventEmitter<any> = new EventEmitter<any>();
     @Input() data: any = [];
     @Input() opsTransaction: OpsTransaction = null;
+    lstPartners: any[] = [];
 
     headers: CommonInterface.IHeaderTable[];
     chargeIdToDelete: string = null;

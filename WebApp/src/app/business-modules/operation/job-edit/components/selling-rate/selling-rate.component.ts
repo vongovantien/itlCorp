@@ -27,6 +27,7 @@ export class JobManagementSellingRateComponent extends AppList {
     @Input() opsTransaction: OpsTransaction = null;
     @Output() onChange: EventEmitter<any> = new EventEmitter<any>();
 
+    lstPartners: any[];
     headers: CommonInterface.IHeaderTable[];
     chargeIdToDelete: string = null;
     SellingRateChargeToEdit: CsShipmentSurcharge = null;

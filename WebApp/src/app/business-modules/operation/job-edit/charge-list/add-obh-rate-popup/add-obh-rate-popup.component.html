@@ -22,17 +22,17 @@
                   </label>
 
                   <app-combo-grid-virtual-scroll [isTooltip]="true"
-                    [currentActiveItemId]="{field:'charge.id',value:obhChargeToAdd.chargeId}" (itemSelected)="obhChargeToAdd.chargeId=$event.charge.id;
-                                              obhChargeToAdd.unitId=$event.charge.unitId;
-                                              obhChargeToAdd.unitPrice=$event.charge.unitPrice;
-                                              obhChargeToAdd.vatrate = $event.charge.vatrate;
-                                              selectedOBHChargeCode.value=$event.charge.code;
+                    [currentActiveItemId]="{field:'id',value:obhChargeToAdd.chargeId}" (itemSelected)="obhChargeToAdd.chargeId=$event.id;
+                                              obhChargeToAdd.unitId=$event.unitId;
+                                              obhChargeToAdd.unitPrice=$event.unitPrice;
+                                              obhChargeToAdd.vatrate = $event.vatrate;
+                                              selectedOBHChargeCode.value=$event.code;
                                               obhChargeToAdd.currencyId=$event.currency;
-                                              currentSelectedCharge=$event.charge.code;
+                                              currentSelectedCharge=$event.code;
                                               currentActiveItemDefault=[{ id: $event.currency, text: $event.currency }];
-                                              calculateTotalEachOBH()"
-                    [selectedDisplayFields]="['charge.chargeNameEn']" [dataSources]="lstOBHChargesComboBox"
-                    [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
+                                              calculateTotalEachOBH()" [selectedDisplayFields]="['chargeNameEn']"
+                    [dataSources]="lstOBHChargesComboBox"
+                    [displayFields]="[{'field':'code','label':'Charge Code'},{'field':'chargeNameEn','label':'Name EN'},{'field':'chargeNameVn','label':'Name VN'}]">
                   </app-combo-grid-virtual-scroll>
 
                   <div class="form-control-feedback"
@@ -194,7 +194,8 @@
                   <label class="form-control-label" for="">
                     Total
                   </label>
-                  <input currencyMask [options]="{align: 'left', precision: 2}" type="text" class="form-control m-input m-input--square" disabled name="OBHChargeTotalNameOps"
+                  <input currencyMask [options]="{align: 'left', precision: 2}" type="text"
+                    class="form-control m-input m-input--square" disabled name="OBHChargeTotalNameOps"
                     [(ngModel)]="obhChargeToAdd.total">
                 </div>
               </div>

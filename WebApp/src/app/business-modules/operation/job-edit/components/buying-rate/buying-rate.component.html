@@ -110,5 +110,6 @@
 
 <app-ops-module-credit-debit-note-detail [CDNoteDetails]="CDNoteDetails"></app-ops-module-credit-debit-note-detail>
 
-<app-add-buying-rate-popup [opsTransaction]="opsTransaction" (outputAddBuying)="onSaveNewBuyingRate($event)">
+<app-add-buying-rate-popup [opsTransaction]="opsTransaction" [lstPartners]="lstPartners"
+    (outputAddBuying)="onSaveNewBuyingRate($event)">
 </app-add-buying-rate-popup>

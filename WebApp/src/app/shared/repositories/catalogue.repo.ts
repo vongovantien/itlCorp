@@ -214,4 +214,11 @@ export class CatalogueRepo {
         }
 
     }
+    getCharges(body?: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/Query`, body).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
 }

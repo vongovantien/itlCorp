@@ -55,7 +55,7 @@ export class JobManagementCreateJobComponent extends AppPage {
 
     isDisplay: boolean = true;
 
-    commonityGroup: any[] = [];
+    commodityGroups: any[] = [];
 
     constructor(
         private baseServices: BaseService,
@@ -166,12 +166,12 @@ export class JobManagementCreateJobComponent extends AppPage {
     }
 
     getCommodityGroup() {
-        this._catalogueRepo.getCommodityGroup()
+        this._catalogueRepo.getCommodityGroup({})
             .pipe()
             .subscribe(
                 (res: any) => {
-                    this.commonityGroup = res;
-                    this.commonityGroup = dataHelper.prepareNg2SelectData(this.commonityGroup,
+                    this.commodityGroups = res;
+                    this.commodityGroups = dataHelper.prepareNg2SelectData(this.commodityGroups,
                         "id",
                         "groupNameEn"
                     );

@@ -137,7 +137,8 @@
 </div>
 
 
-<app-add-obh-rate-popup [opsTransaction]="opsTransaction" (outputAddOBH)="onSaveNewOBHRate($event)">
+<app-add-obh-rate-popup [opsTransaction]="opsTransaction" [lstPartners]="lstPartners"
+    (outputAddOBH)="onSaveNewOBHRate($event)">
 </app-add-obh-rate-popup>
 
 <app-edit-obh-rate-popup [opsTransaction]="opsTransaction" [obhChargeToEdit]="OBHChargeToEdit"

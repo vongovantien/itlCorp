@@ -631,18 +631,21 @@
                                 <div class="tab-content" id="">
                                     <div class="tab-pane fade show active" id="buying-rate" role="tabpanel">
                                         <job-management-buying-rate [data]="ListBuyingRateCharges"
-                                            [opsTransaction]="opsTransaction" (onChange)="onSaveBuyingRate($event)">
+                                            *ngIf="opsTransaction" [opsTransaction]="opsTransaction"
+                                            (onChange)="onSaveBuyingRate($event)">
                                         </job-management-buying-rate>
                                     </div>
                                     <div class="tab-pane fade" id="selling-rate" role="tabpanel">
                                         <job-management-selling-rate [data]="ListSellingRateCharges"
-                                            [opsTransaction]="opsTransaction" (onChange)="onSaveSellingRate($event)">
+                                            *ngIf="opsTransaction" [opsTransaction]="opsTransaction"
+                                            (onChange)="onSaveSellingRate($event)">
                                         </job-management-selling-rate>
                                     </div>
 
                                     <div class="tab-pane fade" id="obh-charge" role="tabpanel">
                                         <job-management-obh [data]="ListOBHCharges" [opsTransaction]="opsTransaction"
-                                            (onChange)="onSaveOHBRate($event)"></job-management-obh>
+                                            *ngIf="opsTransaction" (onChange)="onSaveOHBRate($event)">
+                                        </job-management-obh>
                                     </div>
                                 </div>
                             </div>
