@@ -105,7 +105,7 @@ export class EditObhRatePopupComponent extends PopupBase implements OnInit, OnCh
         this.hide();
 
         this.currentActiveItemDefault = [];
-        this.obhChargeToEdit = null;
+        // this.obhChargeToEdit = null;
     }
 
     getListOBHCharges() {

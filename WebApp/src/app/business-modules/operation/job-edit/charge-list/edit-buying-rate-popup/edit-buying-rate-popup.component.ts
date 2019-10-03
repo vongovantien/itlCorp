@@ -15,7 +15,7 @@ import { SystemConstants } from 'src/constants/system.const';
     selector: 'app-edit-buying-rate-popup',
     templateUrl: './edit-buying-rate-popup.component.html'
 })
-export class EditBuyingRatePopupComponent extends PopupBase implements OnInit, OnChanges {
+export class EditBuyingRatePopupComponent extends PopupBase {
     @Input() opsTransaction: OpsTransaction = null;
     @Input() buyingRateChargeToEdit: CsShipmentSurcharge = null;
     @Output() outputEditBuying = new EventEmitter<any>();
@@ -86,7 +86,7 @@ export class EditBuyingRatePopupComponent extends PopupBase implements OnInit, O
         this.hide();
 
         this.currentActiveItemDefault = [];
-        this.buyingRateChargeToEdit = null;
+        // this.buyingRateChargeToEdit = null;
     }
 
     calculateTotalEachBuying() {
