@@ -65,5 +65,6 @@ namespace eFMS.API.Accounting.DL.Common
         #endregion -- STATUS SOA --
 
         public static readonly string CURRENCY_LOCAL = "VND";
+        public static readonly string CURRENCY_USD = "USD";
     }
 }

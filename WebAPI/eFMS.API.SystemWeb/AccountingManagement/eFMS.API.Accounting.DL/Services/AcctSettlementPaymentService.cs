@@ -90,6 +90,24 @@ namespace eFMS.API.Accounting.DL.Services
         #region --- LIST SETTLEMENT PAYMENT ---
         public List<AcctSettlementPaymentResult> Paging(AcctSettlementPaymentCriteria criteria, int page, int size, out int rowsCount)
         {
+            var data = QueryData(criteria);
+
+            //Phân trang
+            rowsCount = (data.Count() > 0) ? data.Count() : 0;
+            if (size > 0)
+            {
+                if (page < 1)
+                {
+                    page = 1;
+                }
+                data = data.Skip((page - 1) * size).Take(size);
+            }
+
+            return data.ToList();
+        }
+
+        public IQueryable<AcctSettlementPaymentResult> QueryData(AcctSettlementPaymentCriteria criteria)
+        {
             var settlement = DataContext.Get();
             var approveSettle = acctApproveSettlementRepo.Get(x => x.IsDeputy == false);
             var user = sysUserRepo.Get();
@@ -158,10 +176,10 @@ namespace eFMS.API.Accounting.DL.Services
                             !string.IsNullOrEmpty(criteria.Requester) ?
                             (
                                     set.Requester == criteria.Requester
-                                ||  (apr.Manager == criteria.Requester && apr.ManagerAprDate != null)
-                                ||  (apr.Accountant == criteria.Requester && apr.AccountantAprDate != null)
-                                ||  (apr.ManagerApr == criteria.Requester && apr.ManagerAprDate != null)
-                                ||  (apr.AccountantApr == criteria.Requester && apr.AccountantAprDate != null)
+                                || (apr.Manager == criteria.Requester && apr.ManagerAprDate != null)
+                                || (apr.Accountant == criteria.Requester && apr.AccountantAprDate != null)
+                                || (apr.ManagerApr == criteria.Requester && apr.ManagerAprDate != null)
+                                || (apr.AccountantApr == criteria.Requester && apr.AccountantAprDate != null)
                             )
                             :
                                 1 == 1
@@ -235,19 +253,7 @@ namespace eFMS.API.Accounting.DL.Services
                 DatetimeModified = s.Key.DatetimeModified
             }
             ).OrderByDescending(orb => orb.DatetimeModified);
-
-            //Phân trang
-            rowsCount = (data.Count() > 0) ? data.Count() : 0;
-            if (size > 0)
-            {
-                if (page < 1)
-                {
-                    page = 1;
-                }
-                data = data.Skip((page - 1) * size).Take(size);
-            }
-
-            return data.ToList();
+            return data;
         }
 
         public List<ShipmentOfSettlementResult> GetShipmentOfSettlements(string settlementNo)
@@ -854,6 +860,11 @@ namespace eFMS.API.Accounting.DL.Services
 
                 settlement.DatetimeModified = DateTime.Now;
                 settlement.UserModified = userCurrent;
+                //Cập nhật lại Status Approval là NEW nếu Status Approval hiện tại là DENIED
+                if (settlementCurrent.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
+                {
+                    settlement.StatusApproval = Constants.STATUS_APPROVAL_NEW;
+                }
 
                 var hs = DataContext.Update(settlement, x => x.Id == settlement.Id);
                 if (hs.Success)
@@ -1524,26 +1535,31 @@ namespace eFMS.API.Accounting.DL.Services
 
         private decimal GetRateCurrencyExchange(List<CatCurrencyExchange> currencyExchange, string currencyFrom, string currencyTo)
         {
+            if (currencyExchange.Count == 0) return 0;
+
+            currencyFrom = currencyFrom.Trim();
+            currencyTo = currencyTo.Trim();
+
             if (currencyFrom != currencyTo)
             {
-                var get1 = currencyExchange.Where(x => x.CurrencyFromId == currencyFrom && x.CurrencyToId == currencyTo).OrderByDescending(x => x.Rate).FirstOrDefault();
+                var get1 = currencyExchange.Where(x => x.CurrencyFromId.Trim() == currencyFrom && x.CurrencyToId.Trim() == currencyTo).OrderByDescending(x => x.Rate).FirstOrDefault();
                 if (get1 != null)
                 {
                     return get1.Rate;
                 }
                 else
                 {
-                    var get2 = currencyExchange.Where(x => x.CurrencyFromId == currencyTo && x.CurrencyToId == currencyFrom).OrderByDescending(x => x.Rate).FirstOrDefault();
+                    var get2 = currencyExchange.Where(x => x.CurrencyFromId.Trim() == currencyTo && x.CurrencyToId.Trim() == currencyFrom).OrderByDescending(x => x.Rate).FirstOrDefault();
                     if (get2 != null)
                     {
                         return 1 / get2.Rate;
                     }
                     else
                     {
-                        var get3 = currencyExchange.Where(x => x.CurrencyFromId == currencyFrom || x.CurrencyFromId == currencyTo).OrderByDescending(x => x.Rate).ToList();
+                        var get3 = currencyExchange.Where(x => x.CurrencyFromId.Trim() == currencyFrom || x.CurrencyFromId.Trim() == currencyTo).OrderByDescending(x => x.Rate).ToList();
                         if (get3.Count > 1)
                         {
-                            if (get3[0].CurrencyFromId == currencyFrom && get3[1].CurrencyFromId == currencyTo)
+                            if (get3[0].CurrencyFromId.Trim() == currencyFrom && get3[1].CurrencyFromId.Trim() == currencyTo)
                             {
                                 return get3[0].Rate / get3[1].Rate;
                             }

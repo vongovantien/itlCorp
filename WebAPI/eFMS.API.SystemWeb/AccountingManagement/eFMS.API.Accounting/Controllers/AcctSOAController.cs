@@ -46,12 +46,12 @@ namespace eFMS.API.Accounting.Controllers
         /// get the list of SOA
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
-        public IActionResult Get()
-        {
-            var results = acctSOAService.Get();
-            return Ok(results);
-        }
+        //[HttpGet]
+        //public IActionResult Get()
+        //{
+        //    var results = acctSOAService.Get();
+        //    return Ok(results);
+        //}
 
         /// <summary>
         /// add new SOA
@@ -69,6 +69,7 @@ namespace eFMS.API.Accounting.Controllers
             model.DatetimeCreated = DateTime.Now;
             model.DatetimeModified = DateTime.Now;
             model.UserCreated = model.UserModified = currentUser.UserID;
+            model.Currency = model.Currency.Trim();
 
             var hs = acctSOAService.AddSOA(model);
 
@@ -130,7 +131,7 @@ namespace eFMS.API.Accounting.Controllers
         {
             if (string.IsNullOrEmpty(currencyLocal))
                 currencyLocal = Constants.CURRENCY_LOCAL;
-            var results = acctSOAService.GetBySoaNoAndCurrencyLocal(soaNo, currencyLocal);
+            var results = acctSOAService.GetDetailBySoaNoAndCurrencyLocal(soaNo, currencyLocal);//acctSOAService.GetBySoaNoAndCurrencyLocal(soaNo, currencyLocal);
             return Ok(results);
         }
 
@@ -138,12 +139,12 @@ namespace eFMS.API.Accounting.Controllers
         /// get list services
         /// </summary>
         /// <returns></returns>
-        [HttpGet("GetListServices")]
-        public IActionResult GetListServices()
-        {
-            var results = acctSOAService.GetListServices();
-            return Ok(results);
-        }
+        //[HttpGet("GetListServices")]
+        //public IActionResult GetListServices()
+        //{
+        //    var results = acctSOAService.GetListServices();
+        //    return Ok(results);
+        //}
 
         /// <summary>
         /// get list status of soa
@@ -170,6 +171,7 @@ namespace eFMS.API.Accounting.Controllers
 
             model.DatetimeModified = DateTime.Now;
             model.UserModified = currentUser.UserID;
+            model.Currency = model.Currency.Trim();
 
             var hs = acctSOAService.UpdateSOA(model);
 
@@ -191,7 +193,7 @@ namespace eFMS.API.Accounting.Controllers
         [Route("GetShipmentsAndCDdNotesNotExistInResultFilter")]
         public ActionResult GetShipmentsAndCDdNotesNotExistInResultFilter(MoreChargeShipmentCriteria criteria)
         {
-            var data = acctSOAService.GetListMoreChargeByCondition(criteria);
+            var data = acctSOAService.GetListMoreCharge(criteria);//acctSOAService.GetListMoreChargeByCondition(criteria);
             
             //Danh sách shipment
             var listShipment = data
@@ -228,7 +230,7 @@ namespace eFMS.API.Accounting.Controllers
         [Route("GetListMoreChargeByCondition")]
         public IActionResult GetListMoreChargeByCondition(MoreChargeShipmentCriteria criteria)
         {
-            var data = acctSOAService.GetListMoreChargeByCondition(criteria);
+            var data = acctSOAService.GetListMoreCharge(criteria);//acctSOAService.GetListMoreChargeByCondition(criteria);
             return Ok(data);
         }
 
@@ -259,5 +261,56 @@ namespace eFMS.API.Accounting.Controllers
             var data = acctSOAService.GetDataExportSOABySOANo(soaNo, currencyLocal);
             return Ok(data);
         }
+
+        /// <summary>
+        /// Data Export Details SOA
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("ExportDetailSOA")]
+        public IActionResult ExportDetailSOA(ExportDetailSOACriteria criteria)
+        {
+            if (string.IsNullOrEmpty(criteria.currencyLocal))
+                criteria.currencyLocal = Constants.CURRENCY_LOCAL;
+            var data = acctSOAService.GetDataExportSOABySOANo(criteria.soaNo, criteria.currencyLocal);
+            return Ok(data);
+        }
+
+        //[HttpGet("GetChargeShipmentDocAndOperation")]
+        //public IActionResult GetChargeShipmentDocAndOperation()
+        //{
+        //    var data = acctSOAService.GetChargeShipmentDocAndOperation();
+        //    return Ok(data);
+        //}
+
+        /// <summary>
+        /// Get list charge shipment by conditions
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("ListChargeShipment")]
+        public ChargeShipmentResult ListChargeShipment(ChargeShipmentCriteria criteria)
+        {
+            if (string.IsNullOrEmpty(criteria.CurrencyLocal))
+                criteria.CurrencyLocal = Constants.CURRENCY_LOCAL;
+            var data = acctSOAService.GetListChargeShipment(criteria);
+            return data;
+        }
+
+        /// <summary>
+        /// get list soa by conditions
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("QueryData")]
+        public IActionResult QueryData(AcctSOACriteria criteria)
+        {
+            var data = acctSOAService.GetListSOA(criteria);
+            return Ok(data);
+        }
+
+
     }
 }
