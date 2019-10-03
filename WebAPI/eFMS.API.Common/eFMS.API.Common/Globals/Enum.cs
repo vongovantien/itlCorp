@@ -36,6 +36,12 @@
         CARRIER = 10,
         AIRSHIPSUP = 11
     }
+    public enum CatChargeType
+    {
+        CREDIT = 1,
+        DEBIT = 2,
+        OBH = 3
+    }
     public enum Crud
     {
         Get,

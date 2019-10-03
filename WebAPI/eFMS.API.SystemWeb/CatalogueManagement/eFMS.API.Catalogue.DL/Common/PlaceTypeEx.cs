@@ -53,6 +53,25 @@ namespace eFMS.API.Catalogue.DL.Common
             }
             return result;
         }
+        public static string GetChargeType(CatChargeType type)
+        {
+            string result = "";
+            switch (type)
+            {
+                case CatChargeType.CREDIT:
+                    result = "CREDIT";
+                    break;
+                case CatChargeType.DEBIT:
+                    result = "DEBIT";
+                    break;
+                case CatChargeType.OBH:
+                    result = "OBH";
+                    break;
+                default:
+                    break;
+            }
+            return result;
+        }
         public static string GetPartnerGroup(CatPartnerGroupEnum partnerGroup)
         {
             string result = "";

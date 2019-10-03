@@ -514,11 +514,11 @@ namespace eFMS.API.Catalogue.DL.Services
             IQueryable<CatPartner> data = null;
             if (lstPartner != null)
             {
-                data = lstPartner.Where(x => x.PartnerGroup == group).AsQueryable();
+                data = lstPartner.Where(x => (x.PartnerGroup ?? "").IndexOf(group ?? "", StringComparison.OrdinalIgnoreCase) >= 0).AsQueryable();
             }
             else
             {
-                data = DataContext.Get(x => x.PartnerGroup == group);
+                data = DataContext.Get(x => (x.PartnerGroup ?? "").IndexOf(group ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             }
             if (data.Count() == 0) return null;
             return data.ProjectTo<CatPartnerModel>(mapper.ConfigurationProvider);

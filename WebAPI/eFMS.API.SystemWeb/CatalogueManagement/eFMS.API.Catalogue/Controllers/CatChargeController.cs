@@ -73,12 +73,13 @@ namespace eFMS.API.Catalogue.Controllers
         /// <summary>
         /// get charge by type
         /// </summary>
-        /// <param name="type"></param>
+        /// <param name="type">type=1: CREDIT, 2: DEBIT, 3: OBH</param>
         /// <returns></returns>
         [HttpGet("GetBy")]
-        public IActionResult GetBy(string type)
+        public IActionResult GetBy(CatChargeType type)
         {
-            var data = catChargeService.GetBy(type);
+            string chargeType = PlaceTypeEx.GetChargeType(type);
+            var data = catChargeService.GetBy(chargeType);
             return Ok(data);
         }
         /// <summary>
