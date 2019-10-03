@@ -4,6 +4,7 @@ using eFMS.API.Accounting.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace eFMS.API.Accounting.DL.IService
 {
@@ -11,7 +12,7 @@ namespace eFMS.API.Accounting.DL.IService
     {
         HandleState AddSOA(AcctSoaModel model);
 
-        List<AcctSOAResult> Paging(AcctSOACriteria criteria, int page, int size, out int rowsCount);
+        IQueryable<AcctSOAResult> Paging(AcctSOACriteria criteria, int page, int size, out int rowsCount);
 
         HandleState UpdateSOASurCharge(string soaNo);
 
@@ -30,5 +31,15 @@ namespace eFMS.API.Accounting.DL.IService
         AcctSOADetailResult AddMoreCharge(AddMoreChargeCriteria criteria);
 
         ExportSOADetailResult GetDataExportSOABySOANo(string soaNo, string currencyLocal);
+
+        IQueryable<ChargeSOAResult> GetChargeShipmentDocAndOperation();
+
+        ChargeShipmentResult GetListChargeShipment(ChargeShipmentCriteria criteria);
+
+        IQueryable<ChargeShipmentModel> GetListMoreCharge(MoreChargeShipmentCriteria criteria);
+
+        AcctSOADetailResult GetDetailBySoaNoAndCurrencyLocal(string soaNo, string currencyLocal);
+
+        IQueryable<AcctSOAResult> GetListSOA(AcctSOACriteria criteria);
     }
 }

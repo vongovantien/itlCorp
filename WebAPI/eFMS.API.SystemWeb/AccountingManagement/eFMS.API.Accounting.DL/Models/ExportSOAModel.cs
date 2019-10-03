@@ -10,7 +10,7 @@ namespace eFMS.API.Accounting.DL.Models
         public string CustomerName { get; set; }
         public string TaxCode { get; set; }
         public string CustomerAddress { get; set; }
-        public DateTime ServiceDate { get; set; }
+        public DateTime? ServiceDate { get; set; }
         public string JobId { get; set; }
         public string HBL { get; set; }
         public string MBL { get; set; }
