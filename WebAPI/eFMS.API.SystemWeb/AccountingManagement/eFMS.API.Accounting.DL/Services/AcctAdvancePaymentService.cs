@@ -68,6 +68,24 @@ namespace eFMS.API.Accounting.DL.Services
 
         public List<AcctAdvancePaymentResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount)
         {
+            var data = QueryData(criteria);
+
+            //Phân trang
+            rowsCount = (data.Count() > 0) ? data.Count() : 0;
+            if (size > 0)
+            {
+                if (page < 1)
+                {
+                    page = 1;
+                }
+                data = data.Skip((page - 1) * size).Take(size);
+            }
+
+            return data.ToList();
+        }
+
+        public IQueryable<AcctAdvancePaymentResult> QueryData(AcctAdvancePaymentCriteria criteria)
+        {
             var advance = DataContext.Get();
             var request = acctAdvanceRequestRepo.Get();
             var approveAdvance = acctApproveAdvanceRepo.Get(x => x.IsDeputy == false);
@@ -115,10 +133,10 @@ namespace eFMS.API.Accounting.DL.Services
                             !string.IsNullOrEmpty(criteria.Requester) ?
                             (
                                     ad.Requester == criteria.Requester
-                                ||  (apr.Manager == criteria.Requester && apr.ManagerAprDate != null)
-                                ||  (apr.Accountant == criteria.Requester && apr.AccountantAprDate != null)
-                                ||  (apr.ManagerApr == criteria.Requester && apr.ManagerAprDate != null)
-                                ||  (apr.AccountantApr == criteria.Requester && apr.AccountantAprDate != null)
+                                || (apr.Manager == criteria.Requester && apr.ManagerAprDate != null)
+                                || (apr.Accountant == criteria.Requester && apr.AccountantAprDate != null)
+                                || (apr.ManagerApr == criteria.Requester && apr.ManagerAprDate != null)
+                                || (apr.AccountantApr == criteria.Requester && apr.AccountantAprDate != null)
                             )
                             :
                                 1 == 1
@@ -221,19 +239,7 @@ namespace eFMS.API.Accounting.DL.Services
                 StatusApprovalName = Common.CustomData.StatusApproveAdvance.Where(x => x.Value == s.Key.StatusApproval).Select(x => x.DisplayName).FirstOrDefault()
             }
             ).OrderByDescending(orb => orb.DatetimeModified);
-
-            //Phân trang
-            rowsCount = (data.Count() > 0) ? data.Count() : 0;
-            if (size > 0)
-            {
-                if (page < 1)
-                {
-                    page = 1;
-                }
-                data = data.Skip((page - 1) * size).Take(size);
-            }
-
-            return data.ToList();
+            return data;
         }
 
         public string GetAdvanceStatusPayment(string advanceNo)
@@ -503,6 +509,11 @@ namespace eFMS.API.Accounting.DL.Services
 
                 advance.DatetimeModified = DateTime.Now;
                 advance.UserModified = userCurrent;
+                //Cập nhật lại Status Approval là NEW nếu Status Approval hiện tại là DENIED
+                if (advanceCurrent.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
+                {
+                    advance.StatusApproval = Constants.STATUS_APPROVAL_NEW;
+                }
 
                 var hs = DataContext.Update(advance, x => x.Id == advance.Id);
 
