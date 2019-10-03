@@ -122,10 +122,10 @@ export class StatementOfAccountEditComponent extends AppList {
                         serviceTypeId: this.soa.serviceTypeId,
                         chargeShipments: this.soa.chargeShipments,
                         note: this.soa.note,
-                        commodityGroupId: this.soa.commodityGroupId
+                        commodityGroupId: this.soa.commodityGroupId,
+                        strServices: this.soa.serviceTypeId.replace(new RegExp(";", 'g'), ",")
                     };
                     this.dataSearch = new SOASearchCharge(datSearchMoreCharge);
-
                 },
             );
     }
