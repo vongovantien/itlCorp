@@ -330,7 +330,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     getCustomers() {
-        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.CUSTOMER, all: null })
+        this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CUSTOMER)
             .subscribe((res: any) => {
                 this.customers = res;
                 this._data.setDataService(SystemConstants.CSTORAGE.PARTNER, this.customers);
@@ -338,7 +338,12 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     getSuppliers() {
-        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.CARRIER, inactive: false, all: null })
+        // this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.CARRIER, inactive: false, all: null })
+        //     .subscribe((res: any) => {
+        //         this.suppliers = res;
+        //         this._data.setDataService(SystemConstants.CSTORAGE.SUPPLIER, this.suppliers);
+        //     });
+        this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CARRIER)
             .subscribe((res: any) => {
                 this.suppliers = res;
                 this._data.setDataService(SystemConstants.CSTORAGE.SUPPLIER, this.suppliers);
@@ -346,12 +351,16 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     getAgents() {
-        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.AGENT, inactive: false, all: null })
+        // this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.AGENT, inactive: false, all: null })
+        //     .subscribe((res: any) => {
+        //         this.agents = res;
+        //         this._data.setDataService(SystemConstants.CSTORAGE.AGENT, this.agents);
+        //     });
+        this._catalogueRepo.getPartnersByType(PartnerGroupEnum.AGENT)
             .subscribe((res: any) => {
                 this.agents = res;
                 this._data.setDataService(SystemConstants.CSTORAGE.AGENT, this.agents);
             });
-
     }
 
     getBillingOps() {

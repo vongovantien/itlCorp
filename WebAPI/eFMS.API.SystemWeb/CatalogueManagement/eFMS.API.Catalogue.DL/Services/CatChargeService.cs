@@ -14,6 +14,7 @@ using Microsoft.Extensions.Localization;
 using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
+using AutoMapper.QueryableExtensions;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -21,10 +22,23 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
-        public CatChargeService(IContextBase<CatCharge> repository,IMapper mapper, IStringLocalizer<LanguageSub> localizer, ICurrentUser user) :base(repository,mapper)
+        private readonly IContextBase<CatChargeDefaultAccount> chargeDefaultRepository;
+        private readonly IContextBase<CatCurrency> currencyRepository;
+        private readonly IContextBase<CatUnit> unitRepository;
+        public CatChargeService(IContextBase<CatCharge> repository,
+            IMapper mapper, 
+            IStringLocalizer<LanguageSub> localizer, 
+            ICurrentUser user,
+            IContextBase<CatChargeDefaultAccount> chargeDefaultRepo,
+            IContextBase<CatCurrency> currencyRepo,
+            IContextBase<CatUnit> unitRepo
+            ) :base(repository,mapper)
         {
             stringLocalizer = localizer;
+            chargeDefaultRepository = chargeDefaultRepo;
+            currencyRepository = currencyRepo;
             currentUser = user;
+            unitRepository = unitRepo;
             SetChildren<CsShipmentSurcharge>("Id", "ChargeId");
         }
 
@@ -38,7 +52,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             try
             {
-                DataContext.Add(model.Charge);
+                DataContext.Add(model.Charge, false);
 
                 foreach (var x in model.ListChargeDefaultAccount)
                 {
@@ -46,9 +60,12 @@ namespace eFMS.API.Catalogue.DL.Services
                     x.Inactive = false;
                     x.UserCreated = x.UserModified = currentUser.UserID;
                     x.DatetimeCreated = DateTime.Now;
-                    ((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Add(x);
-                    ((eFMSDataContext)DataContext.DC).SaveChanges();
+                    chargeDefaultRepository.Add(x, false);
+                    //((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Add(x);
+                    //((eFMSDataContext)DataContext.DC).SaveChanges();
                 }
+                chargeDefaultRepository.SubmitChanges();
+                DataContext.SubmitChanges();
                 var hs = new HandleState();
                 return hs;
             }
@@ -66,14 +83,17 @@ namespace eFMS.API.Catalogue.DL.Services
             model.Charge.DatetimeModified = DateTime.Now;
             try
             {
-                DataContext.Update(model.Charge, x => x.Id == model.Charge.Id);
-                foreach(var x in model.ListChargeDefaultAccount)
+                DataContext.Update(model.Charge, x => x.Id == model.Charge.Id, false);
+                foreach(var item in model.ListChargeDefaultAccount)
                 {
-                    x.UserModified = currentUser.UserID;
-                    x.DatetimeModified = DateTime.Now;
-                    ((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Update(x);
-                    ((eFMSDataContext)DataContext.DC).SaveChanges();
+                    item.UserModified = currentUser.UserID;
+                    item.DatetimeModified = DateTime.Now;
+                    chargeDefaultRepository.Update(item, x => x.Id == item.Id, false);
+                    //((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Update(x);
+                    //((eFMSDataContext)DataContext.DC).SaveChanges();
                 }
+                chargeDefaultRepository.SubmitChanges();
+                DataContext.SubmitChanges();
                 var hs = new HandleState();
                 return hs;
             }
@@ -89,7 +109,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             CatChargeAddOrUpdateModel returnCharge = new CatChargeAddOrUpdateModel();
             var charge = DataContext.Get(x => x.Id == id).FirstOrDefault();
-            var listChargeDefault = ((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Where(x => x.ChargeId == id).ToList();
+            var listChargeDefault = chargeDefaultRepository.Get(x => x.ChargeId == id).ToList();
             returnCharge.Charge = charge;
             returnCharge.ListChargeDefaultAccount = listChargeDefault;
             return returnCharge;
@@ -117,10 +137,10 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             foreach(var charge in list)
             {
-                var currency = ((eFMSDataContext)DataContext.DC).CatCurrency.Where(x => x.Id == charge.CurrencyId).FirstOrDefault();
-                var unit = ((eFMSDataContext)DataContext.DC).CatUnit.Where(x => x.Id == charge.UnitId).FirstOrDefault();
+                var currency = currencyRepository.Get(x => x.Id == charge.CurrencyId).FirstOrDefault();
+                var unit = unitRepository.Get(x => x.Id == charge.UnitId).FirstOrDefault();
                 //var listServices = charge.ServiceTypeId.Split(";");
-                var chargeDefaultAccounts = ((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Where(x => x.ChargeId == charge.Id).ToList();
+                var chargeDefaultAccounts = chargeDefaultRepository.Get(x => x.ChargeId == charge.Id).ToList();
                 var obj = new { currency = currency?.Id, unit = unit?.Code, charge, chargeDefaultAccounts };
                 listReturn.Add(obj);
             }
@@ -158,13 +178,15 @@ namespace eFMS.API.Catalogue.DL.Services
                 var hs = DataContext.Delete(x => x.Id == id, false);
                 if (hs.Success)
                 {
-                    var listChargeDefaultAccount = ((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Where(x => x.ChargeId == id).ToList();
+                    var listChargeDefaultAccount = chargeDefaultRepository.Get(x => x.ChargeId == id).ToList();
                     foreach (var item in listChargeDefaultAccount)
                     {
-                        ((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Remove(item);
+                        //((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Remove(item);
+                        chargeDefaultRepository.Delete(x => x.Id == item.Id, false);
                     }
                 }
-                ((eFMSDataContext)DataContext.DC).SaveChanges();
+                chargeDefaultRepository.SubmitChanges();
+                DataContext.SubmitChanges();
                 return hs;
 
             }
@@ -178,8 +200,10 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatChargeImportModel> CheckValidImport(List<CatChargeImportModel> list)
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var charges = dc.CatCharge.ToList();
+            //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var charges = DataContext.Get().ToList();
+            var units = unitRepository.Get().ToList();
+            var currencies = currencyRepository.Get().ToList();
             list.ForEach(item =>
             {
                 if (string.IsNullOrEmpty(item.ChargeNameEn))
@@ -213,7 +237,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    var unit = dc.CatUnit.FirstOrDefault(x => x.Code.ToLower() == item.UnitCode.ToLower());
+                    var unit = units.FirstOrDefault(x => x.Code.ToLower() == item.UnitCode.ToLower());
                     if(unit == null)
                     {
                         item.UnitCode = stringLocalizer[LanguageSub.MSG_CHARGE_UNIT_NOT_FOUND];
@@ -236,7 +260,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 if (!string.IsNullOrEmpty(item.CurrencyId))
                 {
-                    var currency = dc.CatCurrency.FirstOrDefault(x => x.Id == item.CurrencyId);
+                    var currency = currencies.FirstOrDefault(x => x.Id == item.CurrencyId);
                     if (currency == null)
                     {
                         item.CurrencyId = stringLocalizer[LanguageSub.MSG_CHARGE_CURRENCY_NOT_FOUND];
@@ -281,7 +305,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             try
             {
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                // eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 foreach(var item in data)
                 {
                     var charge = new CatCharge
@@ -300,9 +324,10 @@ namespace eFMS.API.Catalogue.DL.Services
                         UserCreated = currentUser.UserID,
                         UserModified = currentUser.UserID
                     };
-                    dc.CatCharge.Add(charge);
+                    //dc.CatCharge.Add(charge);
+                    DataContext.Add(charge, false);
                 }
-                dc.SaveChanges();
+                DataContext.SubmitChanges();
                 return new HandleState();
             }
             catch(Exception ex)
@@ -338,6 +363,13 @@ namespace eFMS.API.Catalogue.DL.Services
         public object GetListService()
         {
             return API.Common.Globals.CustomData.Services;
+        }
+
+        public IQueryable<CatChargeModel> GetBy(string type)
+        {
+            var data = DataContext.Get(x => x.Type == type);
+            if (data == null) return null;
+            return data.ProjectTo<CatChargeModel>(mapper.ConfigurationProvider);
         }
     }
 }

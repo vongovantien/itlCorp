@@ -20,16 +20,23 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
-        public CatChargeDefaultService(IContextBase<CatChargeDefaultAccount> repository,IMapper mapper, IStringLocalizer<LanguageSub> localizer, ICurrentUser user) : base(repository, mapper)
+        private readonly IContextBase<CatCharge> chargeRepository;
+        public CatChargeDefaultService(IContextBase<CatChargeDefaultAccount> repository, 
+            IContextBase<CatCharge> chargeRepo,
+            IMapper mapper, 
+            IStringLocalizer<LanguageSub> localizer, 
+            ICurrentUser user) : base(repository, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
+            chargeRepository = chargeRepo;
         }
 
         public List<CatChargeDefaultAccountImportModel> CheckValidImport(List<CatChargeDefaultAccountImportModel> list)
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var defaultAccount = dc.CatChargeDefaultAccount.ToList();
+            //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var defaultAccount = DataContext.Get().ToList();
+            var chargeDefaults = chargeRepository.Get().ToList();
             list.ForEach(item =>
             {
                 if (string.IsNullOrEmpty(item.ChargeCode))
@@ -39,7 +46,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    var charge = dc.CatCharge.FirstOrDefault(x => x.Code == item.ChargeCode);
+                    var charge = chargeDefaults.FirstOrDefault(x => x.Code == item.ChargeCode);
                     if (charge == null)
                     {
                         item.ChargeCode = string.Format(stringLocalizer[LanguageSub.MSG_CHARGE_DEFAULT_CODE_NOT_FOUND], item.ChargeCode);
@@ -79,10 +86,12 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             try
             {
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                var charges = chargeRepository.Get().ToList();
+                var chargeDefaults = DataContext.Get().ToList();
                 foreach(var item in data)                {
-                    var charge = dc.CatCharge.FirstOrDefault(x => x.Code == item.ChargeCode);
-                    var listChargeDefaultAcc = dc.CatChargeDefaultAccount.Where(x => x.ChargeId == charge.Id).ToList();
+                    var charge = charges.FirstOrDefault(x => x.Code == item.ChargeCode);
+                    var listChargeDefaultAcc = chargeDefaults.Where(x => x.ChargeId == charge.Id).ToList();
                     var defaultAccount = new CatChargeDefaultAccount
                     {
                         ChargeId = charge.Id,
@@ -100,11 +109,11 @@ namespace eFMS.API.Catalogue.DL.Services
                     {
                         if (acc.Type != defaultAccount.Type)
                         {
-                            dc.CatChargeDefaultAccount.Add(defaultAccount);
+                            DataContext.Add(defaultAccount, false);
                         }
                     }
                 }
-                dc.SaveChanges();
+                DataContext.SubmitChanges();
                 return new HandleState();
             }
             catch(Exception ex)

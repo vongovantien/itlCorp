@@ -82,7 +82,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             IQueryable<CatCommodityModel> results = null;
             var commodities = GetCommodities(criteria);
-            var catCommonityGroups = ((eFMSDataContext)DataContext.DC).CatCommodityGroup;
+            var catCommonityGroups = catCommonityGroupRepo.Get();
             var query = from com in commodities
                         join grCom in catCommonityGroups on com.CommodityGroupId equals grCom.Id into grpComs
                         from grp in grpComs.DefaultIfEmpty()
@@ -170,7 +170,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             try
             {
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 foreach (var item in data)
                 {
                     var commodity = new CatCommodity
@@ -184,9 +184,11 @@ namespace eFMS.API.Catalogue.DL.Services
                         DatetimeModified = DateTime.Now,
                         UserCreated = currentUser.UserID
                     };
-                    dc.CatCommodity.Add(commodity);
+                    DataContext.Add(commodity);
+                    //dc.CatCommodity.Add(commodity);
                 }
-                dc.SaveChanges();
+                //dc.SaveChanges();
+                DataContext.SubmitChanges();
                 cache.Remove(Templates.CatCommodity.NameCaching.ListName);
                 return new HandleState();
             }
@@ -197,9 +199,9 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         public List<CommodityImportModel> CheckValidImport(List<CommodityImportModel> list)
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var commodities = dc.CatCommodity.ToList();
-            var commodityGroups = dc.CatCommodityGroup.ToList();
+            //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            var commodities = DataContext.Get().ToList();
+            var commodityGroups = catCommonityGroupRepo.Get().ToList();
             list.ForEach(item =>
             {
                 if (string.IsNullOrEmpty(item.Code))
