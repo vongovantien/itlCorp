@@ -17,7 +17,7 @@
   "MSG_HBNO_EXISTED": "MAWB đã tồn tại",
   "MSG_NOT_ALLOW_DELETED": "This shipment has payment informations. Not allow deleted",
   "MSG_CLEARANCENO_EXISTED": "Custom No [{0}] existed ! Please recheck it?",
-  "MSG_CLEARANCE_CONVERT_TO_JOB": "List of clearances convert to list of jobs successfully!!!",
+  "MSG_CLEARANCE_CARGOTYPE_MUST_HAVE_SERVICE_TYPE": "Cargo type must have service type",
 
   "MSG_MAWBCONTAINER_CONTAINERTYPE_EMPTY": "Container type name is empty",
   "MSG_MAWBCONTAINER_CONTAINERTYPE_NOT_FOUND": "Container type name '{0}' not found",
