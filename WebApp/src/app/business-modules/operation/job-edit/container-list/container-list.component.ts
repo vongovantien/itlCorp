@@ -112,6 +112,7 @@ export class ContainerListComponent extends PopupBase implements OnInit {
                     this.hide();
                 }
             } else {
+                this.isDisableSave = false;
                 this.baseServices.errorToast("Current container must be save!!!");
             }
         }
