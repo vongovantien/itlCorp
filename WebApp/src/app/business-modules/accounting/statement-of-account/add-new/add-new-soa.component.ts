@@ -60,7 +60,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
             { title: 'Services Date', field: 'serviceDate', sortable: true },
             { title: 'Note', field: 'note', sortable: true },
         ];
-
     }
 
     addMoreCharge() {
@@ -136,6 +135,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
 
     updateDataSearch(key: string, data: any) {
         this.dataSearch[key] = data;
+        console.log(this.dataSearch);
     }
 
     searchChargeWithDataSearch(dataSearch: any) {

@@ -2,7 +2,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
 import { Charge, SOASearchCharge } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
-import { takeUntil, catchError } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { formatDate } from '@angular/common';
 import _includes from 'lodash/includes';
@@ -18,6 +18,7 @@ import { ToastrService } from 'ngx-toastr';
 
 export class StatementOfAccountFormCreateComponent extends AppPage {
     @Output() onApply: EventEmitter<any> = new EventEmitter<any>();
+    @Output() onChange: EventEmitter<any> = new EventEmitter<any>();
 
     configPartner: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
@@ -231,6 +232,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
     updateDataSearch(key: string, data: any) {
         this.dataSearch[key] = data;
+        this.onChange.emit({ key: key, data: data });
     }
 
     onSelectDataFormInfo(data: any, type: string) {

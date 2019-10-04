@@ -1,7 +1,8 @@
 <app-sub-header></app-sub-header>
 
 <div class="m-content add-new-soa-wp">
-    <soa-form-create (onApply)="searchChargeWithDataSearch($event)"></soa-form-create>
+    <soa-form-create (onApply)="searchChargeWithDataSearch($event)"
+        (onChange)="updateDataSearch($event.key, $event.data)"></soa-form-create>
 
     <div class="m-portlet">
         <div class="m-portlet__body">
