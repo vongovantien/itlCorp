@@ -5,7 +5,7 @@ import { CatalogueRoutingModule } from './catalogue-routing.module';
   imports: [
     CatalogueRoutingModule,
   ],
-  declarations:[],
+  declarations: [],
   bootstrap: []
 })
 export class CatalogueModule { }

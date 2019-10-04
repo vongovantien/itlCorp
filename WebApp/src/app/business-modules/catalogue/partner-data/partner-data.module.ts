@@ -4,10 +4,10 @@ import { PartnerComponent } from './partner.component';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { Routes, RouterModule } from '@angular/router';
-import { PartnerDataImportComponent } from '../partner-data-import/partner-data-import.component';
+import { PartnerDataImportComponent } from './import/partner-data-import.component';
 import { AllPartnerComponent } from './all/all-partner.component';
-import { PartnerDataAddnewComponent } from '../partner-data-addnew/partner-data-addnew.component';
-import { PartnerDataDetailComponent } from '../partner-data-detail/partner-data-detail.component';
+import { PartnerDataAddnewComponent } from './addnew/partner-data-addnew.component';
+import { PartnerDataDetailComponent } from './detail/partner-data-detail.component';
 import { CustomerComponent } from './customer/customer.component';
 import { AgentComponent } from './agent/agent.component';
 import { CarrierComponent } from './carrier/carrier.component';
@@ -19,6 +19,8 @@ import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { SalemanPopupComponent } from './components/saleman-popup.component';
+import { ModalModule } from 'ngx-bootstrap';
 
 const routing: Routes = [
     { path: '', component: PartnerComponent, data: { name: "Partner Data", level: 2 } },
@@ -35,7 +37,8 @@ const routing: Routes = [
         FormsModule,
         SelectModule,
         NgxDaterangepickerMd,
-        PaginationModule.forRoot()
+        PaginationModule.forRoot(),
+        ModalModule.forRoot()
     ],
     exports: [],
     declarations: [
@@ -50,6 +53,7 @@ const routing: Routes = [
         ConsigneeComponent,
         AirShipSupComponent,
         ShipperComponent,
+        SalemanPopupComponent
 
     ],
     providers: [],

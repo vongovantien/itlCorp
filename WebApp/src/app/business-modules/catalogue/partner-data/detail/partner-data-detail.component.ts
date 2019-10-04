@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { ToastrService } from 'ngx-toastr';
@@ -60,7 +60,7 @@ export class PartnerDataDetailComponent extends AppList {
     selectedSaleman: Saleman = null;
     saleMantoView: Saleman = new Saleman();
 
-
+    @Output() isCloseModal = new EventEmitter();
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild('formAddEdit', { static: false }) form: NgForm;
@@ -119,6 +119,8 @@ export class PartnerDataDetailComponent extends AppList {
             { title: 'Inactive', value: false },
         ];
     }
+
+
 
     async ngOnInit() {
         this.headerSaleman = [

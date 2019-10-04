@@ -578,7 +578,7 @@
             </div>
             <!--end::m-portlet -->
 
-            <div class="m-portlet m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
+            <div class="m-portlet m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered" *ngIf="isShowSaleMan">
                 <div class="alert-block__heading">
                     <h3 class="alert-block__title">Sale Man</h3>
                 </div>
@@ -601,11 +601,11 @@
                         <div class="col-lg-8 m--align-right">
                             <div class="form-group">
                                 <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                                    data-toggle="modal" data-target="#saleman-modal">
+                                    data-toggle="modal" (click)='showPopupSaleman()'>
                                     <span>
                                         <i class="la la-plus"></i>
                                         <span>
-                                            add new
+                                            Add new
                                         </span>
                                     </span>
                                 </button>
@@ -661,33 +661,6 @@
                         </table>
                     </div>
                     <!--end: Datatable -->
-                    <!--begin::pagination-->
-                    <div class="pagination-nav">
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="tatable__pager-size">
-                                    <div class="select-box">
-                                        <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
-                                            (change)="selectPageSize(pageSize, dataSearchSaleman)" name="pagesize">
-                                            <ng-container
-                                                *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
-                                                <option [ngValue]="item">{{item}} line / screen</option>
-                                            </ng-container>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6" *ngIf="totalItems > pageSize">
-                                <div class="float-right">
-                                    <pagination [boundaryLinks]="true" [totalItems]="totalItems"
-                                        [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)" [(ngModel)]="page"
-                                        name="page">
-                                    </pagination>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!--end::pagination-->
                 </div>
             </div>
             <!--begin:: form-actions-->
@@ -716,3 +689,4 @@
     </div>
     <!--end::m-content of Partner-data-addnew-->
 </form>
+<app-saleman-popup (isCloseModal)="closepp($event)"></app-saleman-popup>
