@@ -157,6 +157,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                 this._data.setDataService(SystemConstants.CSTORAGE.PARTNER, res);
             });
     }
+
     getListContainersOfJob() {
         this._documentRepo.getListContainersOfJob({ mblid: this.opsTransaction.id })
             .pipe(
@@ -320,7 +321,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
                     }
                 },
             );
-        this.baseServices.setData("CurrentOpsTransaction", this.opsTransaction);
     }
 
     getShipmentCommonData() {

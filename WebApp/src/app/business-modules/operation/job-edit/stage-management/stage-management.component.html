@@ -1,14 +1,15 @@
 <!--begin:: m-portlet-->
 <div class="m-portlet">
     <div class="m-portlet__body">
-        <div class="row">
+        <div class="row" *ngIf="!!data">
             <div class="col-md-4 m--margin-bottom-10">
                 <span class="m--font-bolder">Estimated Begin Date:</span>
                 <span class="m--font-brand m--margin-left-5">{{data.serviceDate | date:'dd/MM/yyyy'}}</span>
             </div>
             <div class="col-md-4 m--margin-bottom-10">
                 <span class="m--font-bolder">Estimated Finish Date:</span>
-                <span class="m--font-brand m--margin-left-5">{{!!data.finishDate ? (data.finishDate | date: 'dd/MM/yyyy') : '-'}}</span>
+                <span
+                    class="m--font-brand m--margin-left-5">{{!!data.finishDate ? (data.finishDate | date: 'dd/MM/yyyy') : '-'}}</span>
             </div>
             <div class="col-md-4 m--margin-bottom-10">
                 <span class="m--font-bolder">Job Status:</span>
@@ -21,7 +22,8 @@
                 <div class="col-lg-4 order-2 order-lg-1">
                     <div class="form-group">
                         <div class="m-input-icon m-input-icon--left">
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Search..." [(ngModel)]="keyword" name="keyword" (ngModelChange)="onSearching($event)">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Search..."
+                                [(ngModel)]="keyword" name="keyword" (ngModelChange)="onSearching($event)">
                             <span class="m-input-icon__icon m-input-icon__icon--left">
                                 <span>
                                     <i class="la la-search"></i>
@@ -31,7 +33,8 @@
                     </div>
                 </div>
                 <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
-                    <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)="openPopUpCreateStage()">
+                    <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="openPopUpCreateStage()">
                         <span>
                             <i class="la la-plus"></i>
                             <span>
@@ -86,7 +89,8 @@
                 <tbody class="tbody-group">
                     <tr *ngFor="let stage of stages; let i = index" class="font-15">
                         <td class="table-actions-col no-sorting">
-                            <button (click)="getDetail(stage.id)" type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit">
+                            <button (click)="getDetail(stage.id)" type="button"
+                                class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit">
                                 <i class="la la-edit"></i>
                             </button>
                         </td>
@@ -136,7 +140,8 @@
 </div>
 
 <!-- modal add stage -->
-<add-stage-popup [stages]="stageAvailable" [stageSelected]="stages" [id]="jobId" (onSuccess)="onAddSuccess()"></add-stage-popup>
+<add-stage-popup [stages]="stageAvailable" [stageSelected]="stages" [id]="jobId" (onSuccess)="onAddSuccess()">
+</add-stage-popup>
 
 <!-- modal stage detail -->
 <detail-stage-popup [data]="selectedStage" (onSuccess)="onAddSuccess()"></detail-stage-popup>
