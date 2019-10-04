@@ -21,7 +21,7 @@ export class AddObhRatePopupComponent extends PopupBase implements OnInit {
     currentActiveItemDefault: any[] = [];
     obhChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
     lstOBHChargesComboBox: any[] = [];
-    lstPartners: any[] = [];
+    @Input() lstPartners: any[] = [];
     lstUnits: any[] = [];
     lstCurrencies: any[] = [];
     currentSelectedCharge: string = null;
@@ -49,9 +49,10 @@ export class AddObhRatePopupComponent extends PopupBase implements OnInit {
 
         if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
             this.lstPartners = this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER);
-        } else {
-            this.getPartners();
         }
+        // else {
+        //     this.getPartners();
+        // }
 
         if (!!this._data.getDataByKey("obhCharges")) {
             this.lstOBHChargesComboBox = this._data.getDataByKey('obhCharges');

@@ -23,7 +23,7 @@ export class AddSellingRatePopupComponent extends PopupBase {
     sellingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
 
     currentActiveItemDefault: any[] = [];
-    lstPartners: any[] = [];
+    @Input() lstPartners: any[] = [];
     lstUnits: any[] = [];
     lstCurrencies: any[] = [];
     currentSelectedCharge: string = null;
@@ -52,9 +52,10 @@ export class AddSellingRatePopupComponent extends PopupBase {
 
         if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
             this.lstPartners = this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER);
-        } else {
-            this.getPartners();
         }
+        // else {
+        //     this.getPartners();
+        // }
 
         if (!!this._data.getDataByKey("sellingCharges")) {
             this.lstSellingRateChargesComboBox = this._data.getDataByKey('sellingCharges');
@@ -111,11 +112,11 @@ export class AddSellingRatePopupComponent extends PopupBase {
         this.sellingRateChargeToAdd.total = Number(total.toFixed(2));
     }
 
-    getPartners() {
-        this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.ALL, inactive: false }).subscribe((res: any) => {
-            this.lstPartners = res;
-        });
-    }
+    // getPartners() {
+    //     this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.ALL, inactive: false }).subscribe((res: any) => {
+    //         this.lstPartners = res;
+    //     });
+    // }
 
     getUnits() {
         this.baseServices.post(this.api_menu.Catalogue.Unit.getAllByQuery, { inactive: false }).subscribe((data: any) => {

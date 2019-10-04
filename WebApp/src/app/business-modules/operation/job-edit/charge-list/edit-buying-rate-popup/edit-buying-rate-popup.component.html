@@ -30,15 +30,14 @@
                   </label>
 
                   <app-combo-grid-virtual-scroll [height]="150" [isTooltip]="true"
-                    [currentActiveItemId]="{field:'charge.id',value:buyingRateChargeToEdit.chargeId}" (itemSelected)="buyingRateChargeToEdit.chargeId=$event.charge.id;
-                                        buyingRateChargeToEdit.unitId=$event.charge.unitId;
-                                        buyingRateChargeToEdit.unitPrice=$event.charge.unitPrice;
-                                        buyingRateChargeToEdit.vatrate=$event.charge.vatrate;
-                                            selectedBuyingChargeCode.value=$event.charge.code;
-                                            calculateTotalEachBuying();"
-                    [selectedDisplayFields]="['charge.chargeNameEn']" [dataSources]="lstBuyingRateChargesComboBox"
-                    [disabled]="buyingRateChargeToEdit.cdno"
-                    [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
+                    [currentActiveItemId]="{field:'id',value:buyingRateChargeToEdit.chargeId}" (itemSelected)="buyingRateChargeToEdit.chargeId=$event.id;
+                                        buyingRateChargeToEdit.unitId=$event.unitId;
+                                        buyingRateChargeToEdit.unitPrice=$event.unitPrice;
+                                        buyingRateChargeToEdit.vatrate=$event.vatrate;
+                                            selectedBuyingChargeCode.value=$event.code;
+                                            calculateTotalEachBuying();" [selectedDisplayFields]="['chargeNameEn']"
+                    [dataSources]="lstBuyingRateChargesComboBox" [disabled]="buyingRateChargeToEdit.cdno"
+                    [displayFields]="[{'field':'code','label':'Charge Code'},{'field':'chargeNameEn','label':'Name EN'},{'field':'chargeNameVn','label':'Name VN'}]">
                   </app-combo-grid-virtual-scroll>
 
                   <div class="form-control-feedback"

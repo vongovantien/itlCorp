@@ -86,7 +86,14 @@ export class CatalogueRepo {
         }
 
     }
-
+    getPartnersByType(type) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetBy`, { partnerGroup: type }).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
     getListPartner(page?: number, size?: number, data?: any) {
         if (!!page && !!size) {
             return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/paging`, {}, {
@@ -206,5 +213,12 @@ export class CatalogueRepo {
             );
         }
 
+    }
+    getCharges(body?: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/Query`, body).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
     }
 }

@@ -2,13 +2,14 @@ import { Component, ViewChild, Output, EventEmitter, Input } from '@angular/core
 import { AppList } from 'src/app/app.list';
 import { AddObhRatePopupComponent } from '../../charge-list/add-obh-rate-popup/add-obh-rate-popup.component';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
-import { BaseService, SortService } from 'src/app/shared/services';
+import { BaseService, SortService, DataService } from 'src/app/shared/services';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDetails.model';
 import { OpsModuleCreditDebitNoteDetailComponent } from '../../credit-debit-note/ops-module-credit-debit-note-detail/ops-module-credit-debit-note-detail.component';
 import cloneDeep from 'lodash/cloneDeep';
 import { EditObhRatePopupComponent } from '../../charge-list/edit-obh-rate-popup/edit-obh-rate-popup.component';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'job-management-obh',
@@ -25,6 +26,7 @@ export class JobManagementOBHComponent extends AppList {
     @Output() onChange: EventEmitter<any> = new EventEmitter<any>();
     @Input() data: any = [];
     @Input() opsTransaction: OpsTransaction = null;
+    lstPartners: any[] = [];
 
     headers: CommonInterface.IHeaderTable[];
     chargeIdToDelete: string = null;
@@ -34,7 +36,8 @@ export class JobManagementOBHComponent extends AppList {
     constructor(
         private baseServices: BaseService,
         private api_menu: API_MENU,
-        private sortService: SortService
+        private sortService: SortService,
+        private _data: DataService
     ) {
         super();
         this.requestSort = this.sortOBHRateCharges;
@@ -74,8 +77,12 @@ export class JobManagementOBHComponent extends AppList {
 
     prepareEditCharge(charge: any) {
         this.OBHChargeToEdit = charge;
+        if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
+            this.lstPartners = this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER);
+        }
         if (this.OBHChargeToEdit) {
             setTimeout(() => {
+                this.editOHBRatePopup.lstPartners = this.lstPartners;
                 this.editOHBRatePopup.show();
             }, 100);
         }

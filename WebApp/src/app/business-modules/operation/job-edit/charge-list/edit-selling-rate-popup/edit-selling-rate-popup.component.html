@@ -25,15 +25,14 @@
                   </label>
 
                   <app-combo-grid-virtual-scroll [isTooltip]="true"
-                    [currentActiveItemId]="{field:'charge.id',value:sellingRateChargeToEdit.chargeId}" (itemSelected)="sellingRateChargeToEdit.chargeId=$event.charge.id;
-                                        sellingRateChargeToEdit.unitId=$event.charge.unitId;
-                                        sellingRateChargeToEdit.unitPrice=$event.charge.unitPrice;
-                                        sellingRateChargeToEdit.vatrate=$event.charge.vatrate;
-                                        selectedSellingChargeCode.value=$event.charge.code;
-                                            calculateTotalEachSelling();"
-                    [selectedDisplayFields]="['charge.chargeNameEn']" [dataSources]="lstSellingRateChargesComboBox"
-                    [disabled]="sellingRateChargeToEdit.cdno"
-                    [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
+                    [currentActiveItemId]="{field:'id',value:sellingRateChargeToEdit.chargeId}" (itemSelected)="sellingRateChargeToEdit.chargeId=$event.id;
+                                        sellingRateChargeToEdit.unitId=$event.unitId;
+                                        sellingRateChargeToEdit.unitPrice=$event.unitPrice;
+                                        sellingRateChargeToEdit.vatrate=$event.vatrate;
+                                        selectedSellingChargeCode.value=$event.code;
+                                            calculateTotalEachSelling();" [selectedDisplayFields]="['chargeNameEn']"
+                    [dataSources]="lstSellingRateChargesComboBox" [disabled]="sellingRateChargeToEdit.cdno"
+                    [displayFields]="[{'field':'code','label':'Charge Code'},{'field':'chargeNameEn','label':'Name EN'},{'field':'chargeNameVn','label':'Name VN'}]">
                   </app-combo-grid-virtual-scroll>
 
                   <div class="form-control-feedback"

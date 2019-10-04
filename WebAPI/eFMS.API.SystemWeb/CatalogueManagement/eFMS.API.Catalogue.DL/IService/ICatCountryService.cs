@@ -14,7 +14,7 @@ namespace eFMS.API.Catalogue.DL.IService
     public interface ICatCountryService : IRepositoryBase<CatCountry, CatCountryModel>
     {
         List<CatCountryViewModel> GetByLanguage();
-        List<CatCountry> GetCountries(CatCountryCriteria criteria, int page, int size, out int rowsCount);
+        IQueryable<CatCountryModel> GetCountries(CatCountryCriteria criteria, int page, int size, out int rowsCount);
         IQueryable<CatCountry> Query(CatCountryCriteria criteria);
         List<CatCountryImportModel> CheckValidImport(List<CatCountryImportModel> list);
         HandleState Import(List<CatCountryImportModel> data);

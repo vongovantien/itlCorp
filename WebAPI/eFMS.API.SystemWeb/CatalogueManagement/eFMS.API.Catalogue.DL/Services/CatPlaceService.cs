@@ -140,7 +140,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<sp_GetCatPlace> Query(CatPlaceCriteria criteria)
         {
             string placetype = PlaceTypeEx.GetPlaceType(criteria.PlaceType);
-            var list = GetView(placetype);
+            var list = GetBy(placetype);
             IQueryable<sp_GetCatPlace> results = null;
             if (criteria.All == null)
             {
@@ -188,6 +188,32 @@ namespace eFMS.API.Catalogue.DL.Services
             return results;
         }
 
+        private IQueryable<sp_GetCatPlace> GetBy(string placeTypeID)
+        {
+            IQueryable<sp_GetCatPlace> data = null;
+            //var data = GetView(placeTypeID);
+            data = RedisCacheHelper.Get<sp_GetCatPlace>(cache, Templates.CatPlace.NameCaching.ListName);
+            if (string.IsNullOrEmpty(placeTypeID))
+            {
+                if (data == null)
+                {
+                    data = GetView(placeTypeID).AsQueryable();
+                    RedisCacheHelper.SetObject(cache, Templates.CatPlace.NameCaching.ListName, data);
+                }
+            }
+            else
+            {
+                if(data == null)
+                {
+                    data = GetView(placeTypeID).AsQueryable();
+                }
+                else
+                {
+                    data = data.Where(x => x.PlaceTypeID == placeTypeID);
+                }
+            }
+            return data;
+        }
         private IQueryable<CatPlaceViewModel> GetCulturalData(IQueryable<sp_GetCatPlace> list)
         {
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;

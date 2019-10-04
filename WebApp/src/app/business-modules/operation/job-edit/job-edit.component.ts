@@ -20,6 +20,9 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { DocumentationRepo } from 'src/app/shared/repositories/documentation.repo';
 import { SystemConstants } from 'src/constants/system.const';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
+import { JobManagementBuyingRateComponent } from './components/buying-rate/buying-rate.component';
+import { JobManagementSellingRateComponent } from './components/selling-rate/selling-rate.component';
+import { JobManagementOBHComponent } from './components/obh/obh.component';
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
@@ -29,7 +32,9 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
     @ViewChild(ContainerListComponent, { static: false }) popupContainerList: ContainerListComponent;
     @ViewChild(PlSheetPopupComponent, { static: false }) plSheetPopup: PlSheetPopupComponent;
-
+    @ViewChild(JobManagementBuyingRateComponent, { static: false }) buyingRateManagement: JobManagementBuyingRateComponent;
+    @ViewChild(JobManagementSellingRateComponent, { static: false }) sellingRateManagement: JobManagementSellingRateComponent;
+    @ViewChild(JobManagementOBHComponent, { static: false }) obhRateManagement: JobManagementOBHComponent;
     @ViewChild('confirmCancelUpdate', { static: false }) confirmCancelJobPopup: ConfirmPopupComponent;
     @ViewChild('notAllowDelete', { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild('confirmDelete', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
@@ -96,7 +101,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     deleteMessage: string = '';
 
     packagesUnitActive = [];
-
+    //lstPartners: any[] = [];
 
     constructor(private baseServices: BaseService,
         private api_menu: API_MENU,
@@ -129,6 +134,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this.getWarehouses();
         this.getCommodityGroup();
         this.getListPackageTypes();
+        this.getPartners();
         this.route.params.subscribe((params: any) => {
             this.tab = 'job-edit';
             this.tabCharge = 'buying';
@@ -140,7 +146,17 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         });
 
     }
-
+    getPartners() {
+        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, inactive: false })
+            .subscribe((res: any) => {
+                console.log('this is partners');
+                // this.lstPartners = res;
+                this.buyingRateManagement.lstPartners = res;
+                this.sellingRateManagement.lstPartners = res;
+                this.obhRateManagement.lstPartners = res;
+                this._data.setDataService(SystemConstants.CSTORAGE.PARTNER, res);
+            });
+    }
     getListContainersOfJob() {
         this._documentRepo.getListContainersOfJob({ mblid: this.opsTransaction.id })
             .pipe(
@@ -330,15 +346,15 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     getCustomers() {
-        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.CUSTOMER, all: null })
+        this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CUSTOMER)
             .subscribe((res: any) => {
                 this.customers = res;
-                this._data.setDataService(SystemConstants.CSTORAGE.PARTNER, this.customers);
+                this._data.setDataService(SystemConstants.CSTORAGE.CUSTOMER, this.customers);
             });
     }
 
     getSuppliers() {
-        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.CARRIER, inactive: false, all: null })
+        this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CARRIER)
             .subscribe((res: any) => {
                 this.suppliers = res;
                 this._data.setDataService(SystemConstants.CSTORAGE.SUPPLIER, this.suppliers);
@@ -346,12 +362,11 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     getAgents() {
-        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.AGENT, inactive: false, all: null })
+        this._catalogueRepo.getPartnersByType(PartnerGroupEnum.AGENT)
             .subscribe((res: any) => {
                 this.agents = res;
                 this._data.setDataService(SystemConstants.CSTORAGE.AGENT, this.agents);
             });
-
     }
 
     getBillingOps() {
@@ -370,25 +385,50 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     public getListBuyingRateCharges() {
-        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'CREDIT', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
-            this.lstBuyingRateChargesComboBox = res['data'];
-            this._data.setDataService('buyingCharges', this.lstBuyingRateChargesComboBox);
-        });
+        this._catalogueRepo.getCharges({ inactive: false, type: 'CREDIT', serviceTypeId: ChargeConstants.CL_CODE })
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (responses: any) => {
+                    this.lstBuyingRateChargesComboBox = responses;
+                    this._data.setDataService('buyingCharges', this.lstBuyingRateChargesComboBox);
+                },
+            );
     }
 
     public getListSellingRateCharges() {
-        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'DEBIT', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
-            this.lstSellingRateChargesComboBox = res['data'];
-            this._data.setDataService('sellingCharges', this.lstSellingRateChargesComboBox);
-        });
+        // this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'DEBIT', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
+        //     this.lstSellingRateChargesComboBox = res['data'];
+        //     this._data.setDataService('sellingCharges', this.lstSellingRateChargesComboBox);
+        // });
+        this._catalogueRepo.getCharges({ inactive: false, type: 'DEBIT', serviceTypeId: ChargeConstants.CL_CODE })
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (responses: any) => {
+                    this.lstSellingRateChargesComboBox = responses;
+                    this._data.setDataService('sellingCharges', this.lstSellingRateChargesComboBox);
+                },
+            );
     }
 
     public getListOBHCharges() {
-        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'OBH', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
-            this.lstOBHChargesComboBox = res['data'];
-            this._data.setDataService('obhCharges', this.lstOBHChargesComboBox);
-        });
-
+        // this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'OBH', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
+        //     this.lstOBHChargesComboBox = res['data'];
+        //     this._data.setDataService('obhCharges', this.lstOBHChargesComboBox);
+        // });
+        this._catalogueRepo.getCharges({ inactive: false, type: 'OBH', serviceTypeId: ChargeConstants.CL_CODE })
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (responses: any) => {
+                    this.lstOBHChargesComboBox = responses;
+                    this._data.setDataService('obhCharges', this.lstOBHChargesComboBox);
+                },
+            );
     }
 
     getUnits() {

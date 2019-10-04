@@ -22,7 +22,7 @@ export class AddBuyingRatePopupComponent extends PopupBase implements OnInit, On
 
     buyingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
     lstBuyingRateChargesComboBox: any[] = [];
-    lstPartners: any[] = [];
+    @Input() lstPartners: any[] = [];
     lstUnits: any[] = [];
     lstCurrencies: any[] = [];
     currentActiveItemDefault: { id: null, text: null }[] = [];
@@ -54,9 +54,10 @@ export class AddBuyingRatePopupComponent extends PopupBase implements OnInit, On
 
         if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
             this.lstPartners = this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER);
-        } else {
-            this.getPartners();
         }
+        // else {
+        //     this.getPartners();
+        // }
 
         if (!!this._data.getDataByKey("buyingCharges")) {
             this.lstBuyingRateChargesComboBox = this._data.getDataByKey('buyingCharges');

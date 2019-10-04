@@ -25,18 +25,18 @@
                     </small>
                   </label>
                   <app-combo-grid-virtual-scroll [isTooltip]="true"
-                    [currentActiveItemId]="{field:'charge.id',value:buyingRateChargeToAdd.chargeId}" (itemSelected)="buyingRateChargeToAdd.chargeId=$event.charge.id;
-                                            buyingRateChargeToAdd.unitId=$event.charge.unitId;
-                                            buyingRateChargeToAdd.unitPrice=$event.charge.unitPrice;
-                                            buyingRateChargeToAdd.vatrate=$event.charge.vatrate;
-                                            selectedBuyingChargeCode.value=$event.charge.code;
-                                            currentSelectedCharge=$event.charge.code;
-                                            buyingRateChargeToAdd.currencyId = $event.currency;
-                                            currentActiveItemDefault=[{ id: $event.currency, text: $event.currency }];
-                                            buyingRateChargeToAdd.currencyId=$event.currency;
-                                            calculateTotalEachBuying();"
-                    [selectedDisplayFields]="['charge.chargeNameEn']" [dataSources]="lstBuyingRateChargesComboBox"
-                    [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
+                    [currentActiveItemId]="{field:'id',value:buyingRateChargeToAdd.chargeId}" (itemSelected)="buyingRateChargeToAdd.chargeId=$event.id;
+                                            buyingRateChargeToAdd.unitId=$event.unitId;
+                                            buyingRateChargeToAdd.unitPrice=$event.unitPrice;
+                                            buyingRateChargeToAdd.vatrate=$event.vatrate;
+                                            selectedBuyingChargeCode.value=$event.code;
+                                            currentSelectedCharge=$event.code;
+                                            buyingRateChargeToAdd.currencyId = $event.currencyId;
+                                            currentActiveItemDefault=[{ id: $event.currencyId, text: $event.currencyId }];
+                                            buyingRateChargeToAdd.currencyId=$event.currencyId;
+                                            calculateTotalEachBuying();" [selectedDisplayFields]="['chargeNameEn']"
+                    [dataSources]="lstBuyingRateChargesComboBox"
+                    [displayFields]="[{'field':'code','label':'Charge Code'},{'field':'chargeNameEn','label':'Name EN'},{'field':'chargeNameVn','label':'Name VN'}]">
                   </app-combo-grid-virtual-scroll>
                   <div class="form-control-feedback"
                     *ngIf="addBuyingRateChargeFormOps.submitted && buyingRateChargeToAdd.chargeId==null">

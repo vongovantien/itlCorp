@@ -176,7 +176,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             try
             {
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 foreach(var item in data)
                 {
                     var commodityGroup = new CatCommodityGroup
@@ -188,9 +188,9 @@ namespace eFMS.API.Catalogue.DL.Services
                         UserCreated = currentUser.UserID,
                         UserModified = currentUser.UserID
                     };
-                    dc.CatCommodityGroup.Add(commodityGroup);
+                    DataContext.Add(commodityGroup, false);
                 }
-                dc.SaveChanges();
+                DataContext.SubmitChanges();
                 return new HandleState();
             }
             catch(Exception ex)
