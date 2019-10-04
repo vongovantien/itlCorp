@@ -66,7 +66,6 @@ export class AddObhRatePopupComponent extends PopupBase implements OnInit {
         this.obhChargeToAdd = new CsShipmentSurcharge();
         this.currentActiveItemDefault = [];
         this.currentSelectedCharge = null;
-        // this.hide();
     }
 
     calculateTotalEachOBH(isEdit: boolean = false) {

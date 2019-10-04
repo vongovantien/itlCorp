@@ -108,7 +108,6 @@ export class AddBuyingRatePopupComponent extends PopupBase implements OnInit, On
         this.buyingRateChargeToAdd.objectBePaid = null;
         this.buyingRateChargeToAdd.paymentObjectId = null;
         this.objectBePaidActive = [];
-        this.hide();
     }
 
     getListBuyingRateCharges() {
