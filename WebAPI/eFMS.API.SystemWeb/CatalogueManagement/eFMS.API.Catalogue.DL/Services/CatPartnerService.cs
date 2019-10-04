@@ -27,11 +27,18 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IStringLocalizer stringLocalizer;
         private readonly IDistributedCache cache;
         private readonly ICurrentUser currentUser;
-        public CatPartnerService(IContextBase<CatPartner> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, IDistributedCache distributedCache, ICurrentUser user) : base(repository, mapper)
+        private readonly IContextBase<CatSaleman> salemanRepository;
+        public CatPartnerService(IContextBase<CatPartner> repository, 
+            IMapper mapper, 
+            IStringLocalizer<LanguageSub> localizer, 
+            IDistributedCache distributedCache, 
+            ICurrentUser user,
+            IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
         {
             stringLocalizer = localizer;
             cache = distributedCache;
             currentUser = user;
+            salemanRepository = salemanRepo;
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
             SetChildren<SysUser>("Id", "PersonIncharge");
@@ -75,12 +82,29 @@ namespace eFMS.API.Catalogue.DL.Services
             partner.DatetimeModified = DateTime.Now;
             partner.UserCreated = partner.UserModified = currentUser.UserID;
             partner.Inactive = false;
-            var hs = DataContext.Add(partner);
+            if(partner.InternalReferenceNo != null)
+            {
+                partner.Id = partner.InternalReferenceNo + "." + partner.TaxCode;
+            }
+            else
+            {
+                partner.Id = partner.TaxCode;
+            }
+            var hs = DataContext.Add(partner, false);
             if (hs.Success)
             {
                 cache.Remove(Templates.CatPartner.NameCaching.ListName);
                 //RedisCacheHelper.SetObject(cache, Templates.CatPartner.NameCaching.ListName, DataContext.Get().ToList());
+                var salemans = mapper.Map<List<CatSaleman>>(entity.SaleMans);
+                salemans.ForEach(x => {
+                    x.PartnerId = partner.Id;
+                    x.CreateDate = DateTime.Now;
+                    x.UserCreated = currentUser.UserID;
+                });
+                salemanRepository.Add(salemans, false);
             }
+            DataContext.SubmitChanges();
+            salemanRepository.SubmitChanges();
             return hs;
         }
         public HandleState Update(CatPartnerModel model)

@@ -53,7 +53,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             services.AddTransient<ICatChargeDefaultAccountService, CatChargeDefaultService>();
             services.AddTransient<ICatCurrencyService, CatCurrencyService>();
             services.AddTransient<ICatCurrencyExchangeService, CatCurrencyExchangeService>();
-            services.AddTransient<ICatSaleManService, CatSaleManService>();
+            services.AddTransient<ICatSaleManService, CatSalemanService>();
 
         }
 

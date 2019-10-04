@@ -11,11 +11,11 @@ using System.Text;
 
 namespace eFMS.API.Catalogue.DL.IService
 {
-    public interface ICatSaleManService : IRepositoryBase<CatSaleMan, CatSaleManModel>
+    public interface ICatSaleManService : IRepositoryBase<CatSaleman, CatSaleManModel>
     {
-        IQueryable<CatSaleMan> GetSaleMan();
-        List<CatSaleManViewModel> Query(CatSaleManCriteria criteria);
-        List<CatSaleManViewModel> Paging(CatSaleManCriteria criteria, int page, int size, out int rowsCount);
+        IQueryable<CatSaleman> GetSaleMan();
+        List<CatSaleManViewModel> Query(CatSalemanCriteria criteria);
+        List<CatSaleManViewModel> Paging(CatSalemanCriteria criteria, int page, int size, out int rowsCount);
         HandleState Delete(Guid id);
         HandleState Update(CatSaleManModel model);
         List<CatSaleManModel> GetBy(string partnerId);

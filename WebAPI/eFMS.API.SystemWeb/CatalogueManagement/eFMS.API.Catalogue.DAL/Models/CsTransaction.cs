@@ -54,6 +54,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public DateTime? LockedDate { get; set; }
         public string TransactionType { get; set; }
         public string UserCreated { get; set; }
+        public bool? IsLocked { get; set; }
         public DateTime? CreatedDate { get; set; }
         public string UserModified { get; set; }
         public DateTime? ModifiedDate { get; set; }
