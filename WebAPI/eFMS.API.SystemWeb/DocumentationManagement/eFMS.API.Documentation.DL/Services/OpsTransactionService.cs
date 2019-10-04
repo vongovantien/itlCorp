@@ -322,7 +322,7 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        private string SetProductServiveShipment(OpsTransactionClearanceModel model)
+        private string SetProductServiceShipment(OpsTransactionClearanceModel model)
         {
             string productService = string.Empty;
             if (model.CustomsDeclaration.ServiceType == "Sea")
@@ -358,10 +358,15 @@ namespace eFMS.API.Documentation.DL.Services
                     result = new HandleState(stringLocalizer[LanguageSub.MSG_CLEARANCENO_EXISTED, model.CustomsDeclaration.ClearanceNo].Value);
                     return result;
                 }
-                string productService = SetProductServiveShipment(model);
-                if(productService == null)
+                string productService = SetProductServiceShipment(model);
+                if (model.CustomsDeclaration.CargoType == null && model.CustomsDeclaration.ServiceType == "Sea")
                 {
-                    result = new HandleState(stringLocalizer[LanguageSub.MSG_CLEARANCENO_CARGOTYPE_NOT_ALLOW_EMPTY].Value);
+                    result = new HandleState(stringLocalizer[LanguageSub.MSG_CLEARANCE_CARGOTYPE_NOT_ALLOW_EMPTY].Value);
+                    return result;
+                }
+                if (productService == null)
+                {
+                    result = new HandleState(stringLocalizer[LanguageSub.MSG_CLEARANCE_CARGOTYPE_MUST_HAVE_SERVICE_TYPE].Value);
                     return result;
                 }
                 if (model.CustomsDeclaration.JobNo == null)
@@ -466,10 +471,15 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             item.OpsTransaction.CurrentStatus = TermData.Processing;
                         }
-                        string productService = SetProductServiveShipment(item);
+                        string productService = SetProductServiceShipment(item);
+                        if (item.CustomsDeclaration.CargoType == null && item.CustomsDeclaration.ServiceType == "Sea")
+                        {
+                            result = new HandleState(stringLocalizer[LanguageSub.MSG_CLEARANCE_CARGOTYPE_NOT_ALLOW_EMPTY].Value);
+                            return result;
+                        }
                         if (productService == null)
                         {
-                            result = new HandleState(stringLocalizer[LanguageSub.MSG_CLEARANCENO_CARGOTYPE_NOT_ALLOW_EMPTY].Value);
+                            result = new HandleState(stringLocalizer[LanguageSub.MSG_CLEARANCE_CARGOTYPE_MUST_HAVE_SERVICE_TYPE].Value);
                             return result;
                         }
                         item.OpsTransaction.ProductService = productService;
