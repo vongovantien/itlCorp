@@ -1,7 +1,8 @@
 <app-sub-header></app-sub-header>
 
 <div class="m-content add-new-soa-wp">
-    <soa-form-create (onApply)="searchChargeWithDataSearch($event)"></soa-form-create>
+    <soa-form-create (onApply)="searchChargeWithDataSearch($event)"
+        (onChange)="updateDataSearch($event.key, $event.data)"></soa-form-create>
 
     <div class="m-portlet">
         <div class="m-portlet__body">
@@ -102,10 +103,10 @@
                                     <span>{{charge.customNo}}</span>
                                 </td>
                                 <td>
-                                    <span>{{charge.debit}}</span>
+                                    <span>{{charge.debit | number: '.0-3'}}</span>
                                 </td>
                                 <td>
-                                    <span>{{charge.credit}}</span>
+                                    <span>{{charge.credit | number: '.0-3'}}</span>
                                 </td>
                                 <td>
                                     <span>{{charge.currency}}</span>

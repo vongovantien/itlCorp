@@ -18,6 +18,7 @@ import { PaginationComponent, TableLayoutComponent, InputTableLayoutComponent, B
 import { CollapseModule } from "ngx-bootstrap/collapse";
 import { UploadAlertComponent } from './common/popup/upload-alert/upload-alert.component';
 import { TooltipModule } from "ngx-bootstrap/tooltip";
+import { LoadModuleDirective } from "./directives/load-module.directive";
 
 const Libary = [
   ModalModule,
@@ -74,7 +75,8 @@ const APP_DIRECTIVES = [
   EcusSpecicalCharacterAllowSpaceDirective,
   EcusSpecicalCharacterNoSpaceDirective,
   DecimalNumberGreaterThan0Directive,
-  ClickOutSideDirective
+  ClickOutSideDirective,
+  LoadModuleDirective
 ];
 @NgModule({
   imports: [

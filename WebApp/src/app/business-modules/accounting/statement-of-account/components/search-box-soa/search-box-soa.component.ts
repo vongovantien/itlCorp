@@ -152,7 +152,7 @@ export class StatementOfAccountSearchComponent extends AppPage {
         this.currentUser = null;
         this.selectedStatus = null;
         this.selectedRange = null;
-
+        this.selectedCurrency = null;
         // ? search again!
         this.onSearch.emit({});
     }

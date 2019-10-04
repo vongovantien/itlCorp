@@ -2,8 +2,8 @@ import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, finalize } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
-import { CatalogueRepo, AccountingRepo, DocumentationRepo } from 'src/app/shared/repositories';
-import { SortService, DataService } from 'src/app/shared/services';
+import { AccountingRepo } from 'src/app/shared/repositories';
+import { SortService } from 'src/app/shared/services';
 import { StatementOfAccountAddChargeComponent } from '../components/poup/add-charge/add-charge.popup';
 import { ToastrService } from 'ngx-toastr';
 import { SOASearchCharge } from 'src/app/shared/models';
@@ -40,7 +40,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
         private _accountRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _router: Router,
-        private _documentRepo: DocumentationRepo
     ) {
         super();
         this.requestSort = this.sortLocal;
@@ -61,7 +60,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
             { title: 'Services Date', field: 'serviceDate', sortable: true },
             { title: 'Note', field: 'note', sortable: true },
         ];
-
     }
 
     addMoreCharge() {
@@ -137,12 +135,13 @@ export class StatementOfAccountAddnewComponent extends AppList {
 
     updateDataSearch(key: string, data: any) {
         this.dataSearch[key] = data;
+        console.log(this.dataSearch);
     }
 
     searchChargeWithDataSearch(dataSearch: any) {
         this.isLoading = true;
         this.dataSearch = dataSearch;
-        this._documentRepo.getListChargeShipment(dataSearch)
+        this._accountRepo.getListChargeShipment(dataSearch)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this.isLoading = false; })

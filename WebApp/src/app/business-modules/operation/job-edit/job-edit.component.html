@@ -729,16 +729,21 @@
                     </div>
                 </tab>
                 <tab heading="Custom declaration" (selectTab)="selectTab($event,'custom-declaration')">
-                    <app-billing-custom-declaration *ngIf="tab === 'custom-declaration'" [currentJob]="opsTransaction">
-                    </app-billing-custom-declaration>
+                    <ng-container *ngIf="tab === 'custom-declaration'" loadModule="cd">
+                    </ng-container>
+                    <!-- <app-billing-custom-declaration *ngIf="tab === 'custom-declaration'" [currentJob]="opsTransaction">
+                    </app-billing-custom-declaration> -->
                 </tab>
                 <tab heading="Credit Note & Debit Note" (selectTab)="selectTab($event,'cre-debit-note')">
-                    <app-ops-module-credit-debit-note *ngIf="tab === 'cre-debit-note'" [currentJob]="opsTransaction">
-                    </app-ops-module-credit-debit-note>
+                    <ng-container *ngIf="tab === 'cre-debit-note'" loadModule="cdNote">
+                    </ng-container>
+                    <!-- <app-ops-module-credit-debit-note *ngIf="tab === 'cre-debit-note'" [currentJob]="opsTransaction">
+                    </app-ops-module-credit-debit-note> -->
                 </tab>
                 <tab heading="Stage management" [active]="tab === 'stage'" (selectTab)="selectTab($event, 'stage')">
-                    <app-ops-module-stage-management *ngIf="tab === 'stage'" [data]="opsTransaction">
-                    </app-ops-module-stage-management>
+                    <ng-container *ngIf="tab === 'stage'" loadModule="stageManagement"></ng-container>
+                    <!-- <app-ops-module-stage-management *ngIf="tab === 'stage'" [data]="opsTransaction">
+                    </app-ops-module-stage-management> -->
                 </tab>
             </tabset>
         </div>

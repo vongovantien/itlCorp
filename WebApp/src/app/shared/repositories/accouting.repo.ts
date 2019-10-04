@@ -291,6 +291,12 @@ export class AccountingRepo {
         );
     }
 
+    getListChargeShipment(body: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AcctSOA/ListChargeShipment`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }
 
 

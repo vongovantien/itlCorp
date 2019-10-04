@@ -9,10 +9,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <!--begin::Form-->
                 <div class="m-form m-form--state">
-                    <!--begin::m-portlet -->
-                    <!--begin: Search Form -->
                     <div class="m-form m-form--label-align-right">
                         <div class="row align-items-center">
                             <div class="col-lg-4 order-2 order-lg-1">
@@ -31,16 +28,12 @@
                             </div>
                         </div>
                     </div>
-                    <!--end: Search Form -->
-                    <!--begin: Datatable-->
                     <div class="table-wrapper fit-height-div">
                         <table class="table table-striped table-brand dataTable">
                             <thead>
                                 <tr>
                                     <th class="table-actions-col no-sorting">
                                         <label class="m-checkbox">
-                                            <!-- <input type="checkbox" name="" class="all-charges-select"
-                                                    (change)="selectAllCharges($event)"> -->
                                             <input type="checkbox" [checked]="checkAllCharge"
                                                 (change)="checkAllCharge=!checkAllCharge; checkAllChange()">
                                             <span></span>
@@ -110,9 +103,6 @@
                                                 </label>
                                             </div>
                                         </td>
-                                        <!-- <td>
-                                                    <span>{{item.hwbno}}</span>
-                                                </td> -->
                                         <td>
                                             <span>{{charge.chargeCode}}</span>
                                         </td>
@@ -151,10 +141,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <!--end: Datatable-->
-                    <!--end::m-portlet -->
                 </div>
-                <!--end::Form-->
             </div>
             <div class="modal-footer m--align-center">
                 <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="addCharges()">

@@ -112,7 +112,7 @@ export class EditSellingRatePopupComponent extends PopupBase implements OnInit, 
         form.onReset();
         this.resetDisplay();
         this.hide();
-        this.sellingRateChargeToEdit = null;
+        // this.sellingRateChargeToEdit = null;
     }
 
     getListSellingRateCharges() {
