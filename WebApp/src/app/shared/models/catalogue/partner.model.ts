@@ -53,6 +53,7 @@ export class Partner {
     inactiveOn?: string = '';
     workPlaceId: string = '';
     userCreatedName: string = '';
+    internalReferenceNo: string = '';
     saleManRequests: SaleManRequest[] = [];
 
     constructor(data?: any) {

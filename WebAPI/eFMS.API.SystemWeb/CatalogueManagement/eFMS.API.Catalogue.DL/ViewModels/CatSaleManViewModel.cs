@@ -14,6 +14,11 @@ namespace eFMS.API.Catalogue.DL.ViewModels
         public string PartnerId { get; set; }
         public string Service { get; set; }
         public string Description { get; set; }
+        public DateTime? EffectDate { get; set; }
         public DateTime? CreateDate { get; set; }
+        public string UserCreated { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public string UserModified { get; set; }
+
     }
 }

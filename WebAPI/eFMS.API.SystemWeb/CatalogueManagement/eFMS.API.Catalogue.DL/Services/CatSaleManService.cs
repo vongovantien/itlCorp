@@ -64,7 +64,8 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var saleMan = mapper.Map<CatSaleMan>(entity);
             saleMan.CreateDate = DateTime.Now;
-            saleMan.Status = false;
+            saleMan.UserCreated = "Admin";
+
             var hs = DataContext.Add(saleMan);
             if (hs.Success)
             {

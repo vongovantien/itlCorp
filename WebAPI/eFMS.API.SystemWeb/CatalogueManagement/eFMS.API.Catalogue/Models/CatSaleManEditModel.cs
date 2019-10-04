@@ -16,5 +16,6 @@ namespace eFMS.API.Catalogue.Models
         public string PartnerId { get; set; }
         public DateTime? EffectDate { get; set; }
         public string Description { get; set; }
+        public string UserCreated { get; set; }
     }
 }

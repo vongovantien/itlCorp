@@ -9,13 +9,21 @@ import { SelectComponent } from 'ng2-select';
 import { SortService } from 'src/app/shared/services/sort.service';
 import * as dataHelper from 'src/helper/data.helper';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
+import { Saleman } from 'src/app/shared/models/catalogue/saleman.model';
+import { CatalogueRepo } from 'src/app/shared/repositories';
+import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
+import { catchError, finalize } from "rxjs/operators";
+import { AppList } from 'src/app/app.list';
+import { ToastrService } from 'ngx-toastr';
+import { formatDate } from '@angular/common';
 
+declare var $: any;
 @Component({
   selector: 'app-partner-data-addnew',
   templateUrl: './partner-data-addnew.component.html',
   styleUrls: ['./partner-data-addnew.component.scss']
 })
-export class PartnerDataAddnewComponent implements OnInit {
+export class PartnerDataAddnewComponent extends AppList {
   activeNg: boolean = true;
   partner: Partner = new Partner();
   partnerGroups: any;
@@ -31,6 +39,20 @@ export class PartnerDataAddnewComponent implements OnInit {
   isRequiredSaleman = false;
   employee: any = {};
   users: any[] = [];
+  saleMandetail: any[] = [];
+  headerSaleman: CommonInterface.IHeaderTable[];
+  services: any[] = [];
+  status: CommonInterface.ICommonTitleValue[] = [];
+  offices: any[] = [];
+  saleManToAdd: Saleman = new Saleman();
+  strOfficeCurrent: any = '';
+  strSalemanCurrent: any = '';
+  selectedStatus: any = {};
+  selectedService: any = {};
+  deleteMessage: string = '';
+  selectedSaleman: Saleman = null;
+  saleMantoView: Saleman = new Saleman();
+  dataSearchSaleman: any = {};
   @ViewChild('formAddEdit', { static: false }) form: NgForm;
   @ViewChild('chooseBillingCountry', { static: false }) public chooseBillingCountry: SelectComponent;
   @ViewChild('chooseBillingProvince', { static: false }) public chooseBillingProvince: SelectComponent;
@@ -40,12 +62,18 @@ export class PartnerDataAddnewComponent implements OnInit {
   @ViewChild('chooseDepartment', { static: false }) public chooseDepartment: SelectComponent;
   @ViewChild('chooseAccountRef', { static: false }) public chooseAccountRef: SelectComponent;
   @ViewChild('chooseWorkplace', { static: false }) public chooseWorkplace: SelectComponent;
-
+  @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
+  @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
   constructor(private route: ActivatedRoute,
     private baseService: BaseService,
     private api_menu: API_MENU,
     private router: Router,
-    private sortService: SortService) { }
+    private _catalogueRepo: CatalogueRepo,
+    private sortService: SortService,
+    private toastr: ToastrService,
+  ) {
+    super();
+  }
 
   ngOnInit() {
     this.route.params.subscribe(prams => {
@@ -368,4 +396,110 @@ export class PartnerDataAddnewComponent implements OnInit {
   public refreshValue(value: any): void {
     this.value = value;
   }
+
+  deleteSaleman(saleman: Saleman) {
+
+    this.selectedSaleman = new Saleman(saleman);
+    this.deleteMessage = `Do you want to delete sale man ${saleman.saleman_ID}?`;
+    this.confirmDeleteJobPopup.show();
+  }
+
+  onDeleteSaleman() {
+    this.baseService.spinnerShow();
+    this._catalogueRepo.deleteSaleman(this.selectedSaleman.id)
+      .pipe(
+        catchError(this.catchError),
+        finalize(() => {
+          this.confirmDeleteJobPopup.hide();
+        })
+      ).subscribe(
+        (respone: CommonInterface.IResult) => {
+          if (respone.status) {
+            this.baseService.spinnerHide();
+            this.toastr.success(respone.message, 'Delete Success !');
+            $('#saleman-detail-modal').modal('hide');
+            this.getSalemanPagingByPartnerId(this.dataSearchSaleman);
+
+          }
+        },
+      );
+
+  }
+
+  getSalemanPagingByPartnerId(dataSearchSaleman?: any) {
+    this.isLoading = true;
+    this._catalogueRepo.getListSaleManDetail(this.page, this.pageSize, Object.assign({}, dataSearchSaleman, { partnerId: this.partner.id }))
+      .pipe(
+        catchError(this.catchError),
+        finalize(() => { this.isLoading = false; })
+      ).subscribe(
+        (res: any) => {
+          this.saleMandetail = (res.data || []).map((item: Saleman) => new Saleman(item));
+          console.log(this.saleMandetail);
+          if (this.saleMandetail.length > 0) {
+            for (let it of this.saleMandetail) {
+              if (it.status === true) {
+                it.status = "Active";
+              }
+              else {
+                it.status = "InActive";
+              }
+            }
+          }
+          this.totalItems = res.totalItems || 0;
+        },
+      );
+  }
+
+
+  onCreateSaleman(ngform: NgForm) {
+    if (this.strSalemanCurrent.length > 0) {
+      this.baseService.spinnerShow();
+      const body = {
+        saleman_Id: this.strSalemanCurrent,
+        office: this.strOfficeCurrent,
+        company: this.strOfficeCurrent,
+        partnerId: this.partner.id,
+        effectdate: this.saleManToAdd.effectDate == null ? null : formatDate(this.saleManToAdd.effectDate.startDate, 'yyyy-MM-dd', 'en'),
+        description: this.saleManToAdd.description,
+        status: this.selectedStatus.value,
+        service: this.selectedService.id
+
+      };
+      this._catalogueRepo.createSaleman(body)
+        .pipe(catchError(this.catchError))
+        .subscribe(
+          (res: any) => {
+            if (res.status) {
+              this.baseService.spinnerHide();
+              $('#saleman-modal').modal('hide');
+              this.getSalemanPagingByPartnerId(this.dataSearchSaleman);
+
+            }
+
+          },
+        );
+    }
+  }
+
+  showDetailSaleMan(saleman: Saleman) {
+    $('#saleman-detail-modal').modal('show');
+    this.saleMantoView.description = saleman.description;
+    this.saleMantoView.effectDate = saleman.effectDate == null ? null : formatDate(saleman.effectDate, 'yyyy-MM-dd', 'en');
+    this.saleMantoView.statusString = saleman.status === true ? 'Active' : 'Inactive';
+    this.saleMantoView.office = saleman.office;
+    this.saleMantoView.service = saleman.service;
+    this.saleMantoView.saleman_ID = saleman.saleman_ID;
+    this.saleMantoView.id = saleman.id;
+    this.saleMantoView.createDate = saleman.createDate;
+    this.saleMantoView.userCreated = saleman.userCreated;
+    this.saleMantoView.userCreated = saleman.userCreated;
+  }
+
+  sortBySaleMan(sortData: CommonInterface.ISortData): void {
+    if (!!sortData.sortField) {
+      this.saleMandetail = this.sortService.sort(this.saleMandetail, sortData.sortField, sortData.order);
+    }
+  }
+
 }

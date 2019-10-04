@@ -456,6 +456,7 @@ export class PartnerDataDetailComponent extends AppList {
     }
 
     onDeleteSaleman() {
+        this.baseService.spinnerShow();
         this._catalogueRepo.deleteSaleman(this.selectedSaleman.id)
             .pipe(
                 catchError(this.catchError),
@@ -465,8 +466,11 @@ export class PartnerDataDetailComponent extends AppList {
             ).subscribe(
                 (respone: CommonInterface.IResult) => {
                     if (respone.status) {
+                        this.baseService.spinnerHide();
                         this.toastr.success(respone.message, 'Delete Success !');
+                        $('#saleman-detail-modal').modal('hide');
                         this.getSalemanPagingByPartnerId(this.dataSearchSaleman);
+
                     }
                 },
             );
@@ -486,10 +490,10 @@ export class PartnerDataDetailComponent extends AppList {
                     if (this.saleMandetail.length > 0) {
                         for (let it of this.saleMandetail) {
                             if (it.status === true) {
-                                it.status = "Actived";
+                                it.status = "Active";
                             }
                             else {
-                                it.status = "Active";
+                                it.status = "InActive";
                             }
                         }
                     }
@@ -499,14 +503,15 @@ export class PartnerDataDetailComponent extends AppList {
     }
 
 
-    onCreateSaleman() {
-        if (this.strSalemanCurrent.length > 0 && this.strOfficeCurrent.length > 0) {
+    onCreateSaleman(ngform: NgForm) {
+        if (this.strSalemanCurrent.length > 0) {
+            this.baseService.spinnerShow();
             const body = {
                 saleman_Id: this.strSalemanCurrent,
                 office: this.strOfficeCurrent,
                 company: this.strOfficeCurrent,
                 partnerId: this.partner.id,
-                effecdate: this.saleManToAdd.effectdate == null ? null : formatDate(this.saleManToAdd.effectdate.startDate, 'yyyy-MM-dd', 'en'),
+                effectdate: this.saleManToAdd.effectDate == null ? null : formatDate(this.saleManToAdd.effectDate.startDate, 'yyyy-MM-dd', 'en'),
                 description: this.saleManToAdd.description,
                 status: this.selectedStatus.value,
                 service: this.selectedService.id
@@ -517,6 +522,7 @@ export class PartnerDataDetailComponent extends AppList {
                 .subscribe(
                     (res: any) => {
                         if (res.status) {
+                            this.baseService.spinnerHide();
                             $('#saleman-modal').modal('hide');
                             this.getSalemanPagingByPartnerId(this.dataSearchSaleman);
 
@@ -525,15 +531,20 @@ export class PartnerDataDetailComponent extends AppList {
                     },
                 );
         }
-        else {
-
-        }
     }
 
     showDetailSaleMan(saleman: Saleman) {
         $('#saleman-detail-modal').modal('show');
         this.saleMantoView.description = saleman.description;
-        this.saleMantoView.effectdate = saleman.effectdate;
+        this.saleMantoView.effectDate = saleman.effectDate == null ? null : formatDate(saleman.effectDate, 'yyyy-MM-dd', 'en');
+        this.saleMantoView.statusString = saleman.status === true ? 'Active' : 'Inactive';
+        this.saleMantoView.office = saleman.office;
+        this.saleMantoView.service = saleman.service;
+        this.saleMantoView.saleman_ID = saleman.saleman_ID;
+        this.saleMantoView.id = saleman.id;
+        this.saleMantoView.createDate = saleman.createDate;
+        this.saleMantoView.userCreated = saleman.userCreated;
+        this.saleMantoView.userCreated = saleman.userCreated;
     }
 
     sortBySaleMan(sortData: CommonInterface.ISortData): void {

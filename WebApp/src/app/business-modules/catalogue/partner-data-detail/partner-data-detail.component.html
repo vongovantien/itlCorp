@@ -877,7 +877,7 @@
                                     <div class="m-input-icon m-input-icon--right down">
                                         <input type="text" class="form-control m-input m-input--square"
                                             ngxDaterangepickerMd [autoApply]="true"
-                                            [(ngModel)]="saleManToAdd.effectdate"
+                                            [(ngModel)]="saleManToAdd.effectDate"
                                             [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
                                             [singleDatePicker]="true" name="singledater" readonly />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
@@ -901,7 +901,7 @@
                 </div>
                 <div class="modal-footer m--align-center">
                     <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                        (click)="onCreateSaleman()">
+                        (click)="onCreateSaleman(formAddEdit)">
                         <span>
                             <i class="la la-save"></i>
                             <span>
@@ -928,7 +928,7 @@
 <div class="modal fade" id="saleman-detail-modal" data-backdrop="static" role="dialog" aria-labelledby=""
     aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
-        <form name="formDetail" #formAddEdit="ngForm" novalidate>
+        <form name="formDetail" #formDetail="ngForm" novalidate>
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Detail</h5>
@@ -941,44 +941,35 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    <label>Sale Man <span class="m--font-danger">(*)</span></label>
-                                    <app-combo-grid-virtual-scroll [selectedDisplayFields]="['username']"
-                                        (itemSelected)="strSalemanCurrent=$event.username" [dataSources]="users"
-                                        [displayFields]="[{'field':'username','label':'Username'},{'field':'employeeNameEn','label':'Name EN'}]">
-                                    </app-combo-grid-virtual-scroll>
+                                    <label>Sale Man</label>
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        [(ngModel)]="saleMantoView.saleman_ID" name="inpsaleman" readonly />
 
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    <label>Service <span class="m--font-danger">(*)</span></label>
-                                    <select [(ngModel)]="selectedService" name="service" class="form-control">
-                                        <option *ngFor="let service of services" [ngValue]="service">{{service.text}}
-                                        </option>
-                                    </select>
+                                    <label>Service</label>
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        [(ngModel)]="saleMantoView.service" name="inpservice" readonly />
 
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-lg-6">
-                                <div class="form-group"
-                                    [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && strOfficeCurrent.trim().length==0 }">
-                                    <label>Office <span class="m--font-danger">(*)</span></label>
-                                    <app-combo-grid-virtual-scroll [selectedDisplayFields]="['abbrCompany']"
-                                        (itemSelected)="strOfficeCurrent=$event.abbrCompany" [dataSources]="offices"
-                                        [displayFields]="[{'field':'branchNameEn','label':'Name Abbr'},{'field':'abbrCompany','label':'Name Abbr'}]">
-                                    </app-combo-grid-virtual-scroll>
+                                <div class="form-group">
+                                    <label>Office</label>
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        [(ngModel)]="saleMantoView.office" name="inpoffice" readonly />
 
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    <label>Status <span class="m--font-danger">(*)</span></label>
-                                    <select [(ngModel)]="selectedStatus" name="status" class="form-control">
-                                        <option *ngFor="let status of status" [ngValue]="status">{{status.title}}
-                                        </option>
-                                    </select>
+                                    <label>Status</label>
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        [(ngModel)]="saleMantoView.statusString" name="inpstatus" readonly />
                                 </div>
                             </div>
                         </div>
@@ -990,15 +981,20 @@
                                     </label>
                                     <div class="m-input-icon m-input-icon--right down">
                                         <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [autoApply]="true"
-                                            [(ngModel)]="saleMantoView.effectdate"
-                                            [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                            [singleDatePicker]="true" name="singledater" readonly />
+                                            [(ngModel)]="saleMantoView.effectDate" name="singledater" readonly />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
                                             <span>
                                                 <i class="la la-calendar"></i>
                                             </span>
                                         </span>
+                                    </div>
+                                    <div class="m--margin-top-10 m--margin-bottom-5">
+                                        <span class="m--font-bolder">Create:</span>
+                                        <span
+                                            class="m--font-brand m--margin-left-5">{{ saleMantoView.createDate | date: 'dd/MM/yyyy HH:mm:ss'}}</span>
+                                        <span class="m--font-bolder m--margin-left-5">by</span>
+                                        <span
+                                            class="m--font-brand m--margin-left-5">{{saleMantoView.userCreated}}</span>
                                     </div>
                                 </div>
                             </div>
@@ -1014,8 +1010,8 @@
 
                 </div>
                 <div class="modal-footer m--align-center">
-                    <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                        (click)="onCreateSaleman()">
+                    <button type="" (click)="deleteSaleman(saleMantoView)"
+                        class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                         <span>
                             <i class="la la-ban"></i>
                             <span>

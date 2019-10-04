@@ -19,5 +19,8 @@ namespace eFMS.API.Catalogue.Service.Models
         public string Description { get; set; }
         public DateTime? CreateDate { get; set; }
         public string UserModified { get; set; }
+        public string UserCreated { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+
     }
 }
