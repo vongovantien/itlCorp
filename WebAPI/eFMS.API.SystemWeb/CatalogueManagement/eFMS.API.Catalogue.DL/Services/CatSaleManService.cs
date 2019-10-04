@@ -6,7 +6,6 @@ using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common.Helpers;
-using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -19,23 +18,23 @@ using System.Linq;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
-    public class CatSaleManService : RepositoryBase<CatSaleMan, CatSaleManModel>, ICatSaleManService
+    public class CatSalemanService : RepositoryBase<CatSaleman, CatSaleManModel>, ICatSaleManService
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly IDistributedCache cache;
         private readonly ICurrentUser currentUser;
 
-        public CatSaleManService(IContextBase<CatSaleMan> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, IDistributedCache distributedCache, ICurrentUser user) : base(repository, mapper)
+        public CatSalemanService(IContextBase<CatSaleman> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, IDistributedCache distributedCache, ICurrentUser user) : base(repository, mapper)
         {
             stringLocalizer = localizer;
             cache = distributedCache;
             currentUser = user;
         }
 
-        public IQueryable<CatSaleMan> GetSaleMan()
+        public IQueryable<CatSaleman> GetSaleMan()
         {
-            var lstSaleMan = RedisCacheHelper.GetObject<List<CatSaleMan>>(cache, Templates.CatSaleMan.NameCaching.ListName);
-            IQueryable<CatSaleMan> data = null;
+            var lstSaleMan = RedisCacheHelper.GetObject<List<CatSaleman>>(cache, Templates.CatSaleMan.NameCaching.ListName);
+            IQueryable<CatSaleman> data = null;
             if (lstSaleMan != null)
             {
                 data = lstSaleMan.AsQueryable();
@@ -62,44 +61,29 @@ namespace eFMS.API.Catalogue.DL.Services
         #region CRUD
         public override HandleState Add(CatSaleManModel entity)
         {
-            var saleMan = mapper.Map<CatSaleMan>(entity);
+            var saleMan = mapper.Map<CatSaleman>(entity);
             saleMan.CreateDate = DateTime.Now;
             saleMan.UserCreated = "Admin";
 
             var hs = DataContext.Add(saleMan);
-            if (hs.Success)
-            {
-               // cache.Remove(Templates.CatSaleMan.NameCaching.ListName);
-                //RedisCacheHelper.SetObject(cache, Templates.CatSaleMan.NameCaching.ListName, DataContext.Get().ToList());
-            }
             return hs;
         }
 
         public HandleState Update(CatSaleManModel model)
         {
-            var entity = mapper.Map<CatSaleMan>(model);
+            var entity = mapper.Map<CatSaleman>(model);
             entity.UserModified = currentUser.UserID;
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
-
-            if (hs.Success)
-            {
-               // cache.Remove(Templates.CatSaleMan.NameCaching.ListName);
-            }
             return hs;
         }
         public HandleState Delete(Guid id)
         {
-            //ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = DataContext.Delete(x => x.Id == id);
-            if (hs.Success)
-            {
-                //cache.Remove(Templates.CatSaleMan.NameCaching.ListName);
-            }
             return hs;
         }
         #endregion
 
-        public List<CatSaleManViewModel> Query(CatSaleManCriteria criteria)
+        public List<CatSaleManViewModel> Query(CatSalemanCriteria criteria)
         {
             var salesMan = GetSaleMan().Where(x => x.PartnerId == criteria.PartnerId);
             var query = from saleman in salesMan
@@ -131,7 +115,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return results;
         }
 
-        public List<CatSaleManViewModel> Paging(CatSaleManCriteria criteria, int page, int size, out int rowsCount)
+        public List<CatSaleManViewModel> Paging(CatSalemanCriteria criteria, int page, int size, out int rowsCount)
         {
             List<CatSaleManViewModel> results = null;
             var list = Query(criteria);

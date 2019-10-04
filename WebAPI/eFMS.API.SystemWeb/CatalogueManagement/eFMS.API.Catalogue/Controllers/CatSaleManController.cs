@@ -56,7 +56,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Query")]
-        public IActionResult Get(CatSaleManCriteria criteria)
+        public IActionResult Get(CatSalemanCriteria criteria)
         {
             var results = catSaleManService.Query(criteria);
             return Ok(results);
@@ -71,7 +71,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
-        public IActionResult Get(CatSaleManCriteria criteria, int page, int size)
+        public IActionResult Get(CatSalemanCriteria criteria, int page, int size)
         {
             var data = catSaleManService.Paging(criteria, page, size, out int rowCount);
             var result = new { data, totalItems = rowCount, page, size };
@@ -102,7 +102,7 @@ namespace eFMS.API.Catalogue.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
             string messageDuplicate = string.Empty;
-            bool checkExist = catSaleManService.Any(x => x.Service == model.Service && x.Saleman_ID == model.Saleman_ID && x.Office == model.Office);
+            bool checkExist = catSaleManService.Any(x => x.Service == model.Service && x.SaleManId == model.Saleman_ID && x.Office == model.Office);
             if (checkExist)
             {
                 messageDuplicate = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;

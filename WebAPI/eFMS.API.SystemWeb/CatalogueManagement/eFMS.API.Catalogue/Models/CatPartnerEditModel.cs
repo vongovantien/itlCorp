@@ -1,4 +1,5 @@
-﻿using eFMS.API.Common.Globals;
+﻿using eFMS.API.Catalogue.DL.Models;
+using eFMS.API.Common.Globals;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,5 +62,7 @@ namespace eFMS.API.Catalogue.Models
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
         public Guid? WorkPlaceId { get; set; }
+        public string InternalReferenceNo { get; set; }
+        public List<CatSaleManEditModel> SaleMans { get; set; }
     }
 }

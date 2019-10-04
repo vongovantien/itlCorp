@@ -5,7 +5,7 @@ using System.Text;
 
 namespace eFMS.API.Catalogue.DL.Models
 {
-    public class CatSaleManModel : CatSaleMan
+    public class CatSaleManModel : CatSaleman
     {
 
     }
