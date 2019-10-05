@@ -9,7 +9,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { language } from 'src/languages/language.en';
 import { NgProgress, NgProgressComponent } from '@ngx-progressbar/core';
-declare var $: any;
+import { InfoPopupComponent } from 'src/app/shared/common/popup';
 @Component({
   selector: 'app-stage-import',
   templateUrl: './stage-import.component.html',
@@ -34,12 +34,18 @@ export class StageImportComponent implements OnInit {
   @ViewChild(PaginationComponent, { static: false }) child: any;
   @ViewChild('form', { static: false }) form: any;
   @ViewChild(NgProgressComponent, { static: false }) progressBar: NgProgressComponent;
+  @ViewChild(InfoPopupComponent, { static: false }) invaliDataAlert: InfoPopupComponent;
+
+  isDesc = true;
+  sortKey: string;
+  inputFile: string;
+
   ngOnInit() {
     this.pager.totalItems = 0;
   }
 
   chooseFile(file: Event) {
-    if (file.target['files'] == null) return;
+    if (file.target['files'] == null) { return; }
     this.progressBar.start();
     this.baseService.uploadfile(this.menu_api.Catalogue.Stage_Management.uploadExel, file.target['files'], "uploadedFile")
       .subscribe(res => {
@@ -70,16 +76,12 @@ export class StageImportComponent implements OnInit {
       this.pager = this.pagingService.getPager(this.data.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
       this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
       this.pagedItems = this.data.slice(this.pager.startIndex, this.pager.endIndex + 1);
-    }
-    else {
+    } else {
       this.pager = this.pagingService.getPager(this.inValidItems.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
       this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
       this.pagedItems = this.inValidItems.slice(this.pager.startIndex, this.pager.endIndex + 1);
     }
   }
-
-  isDesc = true;
-  sortKey: string;
   sort(property: string) {
     this.isDesc = !this.isDesc;
     this.sortKey = property;
@@ -87,13 +89,12 @@ export class StageImportComponent implements OnInit {
   }
 
   hideInvalid() {
-    if (this.data == null) return;
+    if (this.data == null) { return; }
     this.isShowInvalid = !this.isShowInvalid;
     this.sortKey = '';
     if (this.isShowInvalid) {
       this.pager.totalItems = this.data.length;
-    }
-    else {
+    } else {
       this.inValidItems = this.data.filter(x => !x.isValid);
       this.pager.totalItems = this.inValidItems.length;
     }
@@ -102,13 +103,12 @@ export class StageImportComponent implements OnInit {
 
 
   async import() {
-    if (this.data == null) return;
+    if (this.data == null) { return; }
     if (this.totalRows - this.totalValidRows > 0) {
-      $('#upload-alert-modal').modal('show');
-    }
-    else {
-      let validItems = this.data.filter(x => x.isValid);
-      var response = await this.baseService.postAsync(this.menu_api.Catalogue.Stage_Management.import, validItems);
+      this.invaliDataAlert.show();
+    } else {
+      const validItems = this.data.filter(x => x.isValid);
+      const response = await this.baseService.postAsync(this.menu_api.Catalogue.Stage_Management.import, validItems, true, true);
       if (response) {
         this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
         this.pager.totalItems = 0;
@@ -124,7 +124,7 @@ export class StageImportComponent implements OnInit {
   reset() {
     this.data = null;
     this.pagedItems = null;
-    $("#inputFile").val('');
+    this.inputFile = null;
     this.pager.totalItems = 0;
   }
 

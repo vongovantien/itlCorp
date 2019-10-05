@@ -23,10 +23,6 @@ using eFMS.API.Common;
 using System.IO;
 using System.Reflection;
 using System;
-using ITL.NetCore.Connection.Caching;
-using static eFMS.API.Catalogue.DL.Common.Templates;
-using Microsoft.Extensions.Caching.Distributed;
-using eFMS.API.Catalogue.Infrastructure.Common;
 
 namespace eFMS.API.Catalogue.Infrastructure
 {
@@ -41,7 +37,6 @@ namespace eFMS.API.Catalogue.Infrastructure
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-            //services.AddSingleton(typeof(ICacheServiceBase<>), typeof(CacheServiceBase<>));
 
             services.AddTransient<ICurrentUser, CurrentUser>();
             services.AddTransient<ICatBranchService, CatBranchService>();
@@ -58,9 +53,6 @@ namespace eFMS.API.Catalogue.Infrastructure
             services.AddTransient<ICatChargeDefaultAccountService, CatChargeDefaultService>();
             services.AddTransient<ICatCurrencyService, CatCurrencyService>();
             services.AddTransient<ICatCurrencyExchangeService, CatCurrencyExchangeService>();
-            services.AddSingleton<ICacheServiceBase<List<CatUnit>>>(x =>
-                new CacheServiceBase<List<CatUnit>>(x.GetRequiredService<IDistributedCache>()
-                , Enum.GetName(typeof(CacheEntity), CacheEntity.catUnit)));
         }
 
         public static IServiceCollection AddCulture(this IServiceCollection services, IConfiguration configuration)

@@ -489,7 +489,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         {
                             item.ProvinceId = province.Id;
 
-                            var district = districts.FirstOrDefault(i => i.Code.ToLower() == item.Code);
+                            var district = districts.FirstOrDefault(i => i.Code.ToLower() == item.Code.ToLower());
                             if (district != null)
                             {
                                 item.Code = string.Format(stringLocalizer[LanguageSub.MSG_PLACE_CODE_EXISTED], item.Code);

@@ -4,8 +4,9 @@ import { CatalogueRoutingModule } from './catalogue-routing.module';
 @NgModule({
   imports: [
     CatalogueRoutingModule,
+
   ],
-  declarations:[],
+  declarations: [],
   bootstrap: []
 })
 export class CatalogueModule { }
