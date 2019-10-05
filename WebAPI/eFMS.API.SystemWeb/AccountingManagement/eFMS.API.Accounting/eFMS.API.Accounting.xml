@@ -297,6 +297,20 @@
             <param name="model">object to add</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.UpdateSOA(eFMS.API.Accounting.DL.Models.AcctSoaModel)">
+            <summary>
+            Update SOA
+            </summary>
+            <param name="model">object to update</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.Delete(System.String)">
+            <summary>
+            delete an existed item
+            </summary>
+            <param name="soaNo">soaNo of existed item that want to delete</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.Paging(eFMS.API.Accounting.DL.Models.Criteria.AcctSOACriteria,System.Int32,System.Int32)">
             <summary>
             get and paging the list of SOA by conditions
@@ -306,11 +320,11 @@
             <param name="pageSize">number items per page</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.Delete(System.String)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.QueryData(eFMS.API.Accounting.DL.Models.Criteria.AcctSOACriteria)">
             <summary>
-            delete an existed item
+            get list soa by conditions
             </summary>
-            <param name="soaNo">soaNo of existed item that want to delete</param>
+            <param name="criteria">search conditions</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.GetBySoaNoAndCurrencyLocal(System.String,System.String)">
@@ -325,13 +339,6 @@
             <summary>
             get list status of soa
             </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.UpdateSOA(eFMS.API.Accounting.DL.Models.AcctSoaModel)">
-            <summary>
-            Update SOA
-            </summary>
-            <param name="model">object to update</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.GetShipmentsAndCDdNotesNotExistInResultFilter(eFMS.API.Accounting.DL.Models.Criteria.MoreChargeShipmentCriteria)">
@@ -374,13 +381,6 @@
             <summary>
             Get list charge shipment by conditions
             </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.QueryData(eFMS.API.Accounting.DL.Models.Criteria.AcctSOACriteria)">
-            <summary>
-            get list soa by conditions
-            </summary>
-            <param name="criteria">search conditions</param>
             <returns></returns>
         </member>
     </members>

@@ -5,15 +5,12 @@ using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Service.Contexts;
 using eFMS.API.Accounting.Service.Models;
-using eFMS.API.Accounting.Service.ViewModels;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
-using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
 
 namespace eFMS.API.Accounting.DL.Services
@@ -58,14 +55,28 @@ namespace eFMS.API.Accounting.DL.Services
             catPartnerRepo = catPartner;
         }
 
+        #region -- Insert & Update SOA
         public HandleState AddSOA(AcctSoaModel model)
         {
             try
             {
+                var userCurrent = currentUser.UserID;
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+
+                model.Status = Constants.STATUS_SOA_NEW;
+                model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
+                model.UserCreated = model.UserModified = userCurrent;
+                model.Currency = model.Currency.Trim();
+
+                //Tính phí AmountDebit, AmountCredit của SOA (tỉ giá được exchange dựa vào ngày Modified của SOA, nếu tìm ko thấy sẽ lấy ngày mới nhất)
+                var amountDebitCreditShipment = GetDebitCreditAmountAndTotalShipment(model);
+                model.TotalShipment = amountDebitCreditShipment.TotalShipment;
+                model.DebitAmount = amountDebitCreditShipment.DebitAmount;
+                model.CreditAmount = amountDebitCreditShipment.CreditAmount;
+
                 var soa = mapper.Map<AcctSoa>(model);
                 soa.Soano = model.Soano = CreateSoaNo();
-                //var hs = dc.AcctSoa.Add(soa);
+
                 var hs = DataContext.Add(soa);
 
                 if (hs.Success)
@@ -87,7 +98,7 @@ namespace eFMS.API.Accounting.DL.Services
                         surchargeCredit.ForEach(a =>
                             {
                                 a.PaySoano = soa.Soano;
-                                a.UserModified = currentUser.UserID;
+                                a.UserModified = userCurrent;
                                 a.DatetimeModified = a.ExchangeDate = DateTime.Now;
                             }
                         );
@@ -101,7 +112,7 @@ namespace eFMS.API.Accounting.DL.Services
                         surchargeDebit.ForEach(a =>
                             {
                                 a.Soano = soa.Soano;
-                                a.UserModified = currentUser.UserID;
+                                a.UserModified = userCurrent;
                                 a.DatetimeModified = a.ExchangeDate = DateTime.Now;
                             }
                         );
@@ -118,12 +129,147 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
+        public HandleState UpdateSOA(AcctSoaModel model)
+        {
+            try
+            {
+                var userCurrent = currentUser.UserID;
+                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+
+                //Gỡ bỏ các charge có SOANo = model.Soano và PaySOANo = model.Soano
+                UpdateSOASurCharge(model.Soano);
+
+                model.DatetimeModified = DateTime.Now;
+                model.UserModified = userCurrent;
+                model.Currency = model.Currency.Trim();
+
+                //Tính phí AmountDebit, AmountCredit của SOA (tỉ giá được exchange dựa vào ngày Modified của SOA, nếu tìm ko thấy sẽ lấy ngày mới nhất)
+                var amountDebitCreditShipment = GetDebitCreditAmountAndTotalShipment(model);
+                model.TotalShipment = amountDebitCreditShipment.TotalShipment;
+                model.DebitAmount = amountDebitCreditShipment.DebitAmount;
+                model.CreditAmount = amountDebitCreditShipment.CreditAmount;
+
+                var soa = mapper.Map<AcctSoa>(model);
+                //Update các thông tin của SOA
+                var hs = DataContext.Update(soa, x => x.Id == soa.Id);
+
+                if (hs.Success)
+                {
+                    //Lấy ra những charge có type là BUY hoặc OBH-BUY mà chưa tồn tại trong 1 SOA nào cả
+                    var surchargeCredit = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
+                                                                   && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == Constants.TYPE_CHARGE_BUY || c.type == Constants.TYPE_CHARGE_OBH_BUY))
+                                                                   && (x.Soano == null || x.Soano == "")).ToList();
+
+                    //Lấy ra những charge có type là SELL hoặc OBH-SELL mà chưa tồn tại trong 1 SOA nào cả
+                    var surchargeDebit = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
+                                                                   && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == Constants.TYPE_CHARGE_SELL || c.type == Constants.TYPE_CHARGE_OBH_SELL))
+                                                                   && (x.Soano == null || x.Soano == "")).ToList();
+
+                    if (surchargeCredit.Count() > 0)
+                    {
+                        //Update PaySOANo cho CsShipmentSurcharge có type BUY hoặc OBH-BUY(Payer)
+                        //Change request: Cập nhật lại ngày ExchangeDate (23/09/2019)
+                        surchargeCredit.ForEach(a =>
+                        {
+                            a.PaySoano = soa.Soano;
+                            a.UserModified = userCurrent;
+                            a.DatetimeModified = a.ExchangeDate = DateTime.Now;
+                        }
+                        );
+                        dc.CsShipmentSurcharge.UpdateRange(surchargeCredit);
+                    }
+
+                    if (surchargeDebit.Count() > 0)
+                    {
+                        //Update SOANo cho CsShipmentSurcharge có type là SELL hoặc OBH-SELL(Receiver)
+                        //Change request: Cập nhật lại ngày ExchangeDate (23/09/2019)
+                        surchargeDebit.ForEach(a =>
+                        {
+                            a.Soano = soa.Soano;
+                            a.UserModified = userCurrent;
+                            a.DatetimeModified = a.ExchangeDate = DateTime.Now;
+                        }
+                        );
+                        dc.CsShipmentSurcharge.UpdateRange(surchargeDebit);
+                    }
+
+                }
+                dc.SaveChanges();
+
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                var hs = new HandleState(ex.Message);
+                return hs;
+            }
+        }
+
+        public HandleState UpdateSOASurCharge(string soaNo)
+        {
+            try
+            {
+                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                var surcharge = csShipmentSurchargeRepo.Get(x => x.Soano == soaNo || x.PaySoano == soaNo).ToList();
+                if (surcharge.Count() > 0)
+                {
+                    //Update SOANo = NULL & PaySOANo = NULL to CsShipmentSurcharge
+                    surcharge.ForEach(a =>
+                    {
+                        a.Soano = null;
+                        a.PaySoano = null;
+                        a.UserModified = currentUser.UserID;
+                        a.DatetimeModified = DateTime.Now;
+                    }
+                    );
+                    dc.CsShipmentSurcharge.UpdateRange(surcharge);
+                    dc.SaveChanges();
+                }
+
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                var hs = new HandleState(ex.Message);
+                return hs;
+            }
+        }
+
+        private AcctSoa GetDebitCreditAmountAndTotalShipment(AcctSoaModel model)
+        {
+            //Tính phí AmountDebit, AmountCredit của SOA (tỉ giá được exchange dựa vào ngày Modified của SOA, nếu tìm ko thấy sẽ lấy ngày mới nhất)
+            //Lấy danh sách Currency Exchange của ngày hiện tại
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+            var charge = GetChargeShipmentDocAndOperation().Where(x => model.Surcharges.Where(c => c.surchargeId == x.ID && c.type == x.Type).Any());
+            var today = DateTime.Now;
+            var query = charge.Select(chg => new
+            {
+                AmountDebit = (GetRateCurrencyExchange(today, chg.Currency, model.Currency) > 0
+                            ?
+                                GetRateCurrencyExchange(today, chg.Currency, model.Currency)
+                            :
+                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, model.Currency)) * (chg.Debit != null ? chg.Debit.Value : 0),
+                AmountCredit = (GetRateCurrencyExchange(today, chg.Currency, model.Currency) > 0
+                            ?
+                                GetRateCurrencyExchange(today, chg.Currency, model.Currency)
+                            :
+                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, model.Currency)) * (chg.Credit != null ? chg.Credit.Value : 0),
+            });
+            //Count number shipment (HBL)
+            var totalShipment = charge.Select(s => s.HBL).Distinct().Count();
+            //Debit Amount
+            var debitAmount = query.Sum(s => s.AmountDebit);
+            //Credit Amount
+            var creditAmount = query.Sum(s => s.AmountCredit);
+            return new AcctSoa { TotalShipment = totalShipment, DebitAmount = debitAmount, CreditAmount = creditAmount };
+        }
+
         private string CreateSoaNo()
         {
             var prefix = (DateTime.Now.Year.ToString()).Substring(2, 2);
             string stt;
             //Lấy ra dòng cuối cùng của table acctSOA
-            var rowLast = DataContext.Get().LastOrDefault(); //dc.AcctSoa.LastOrDefault();
+            var rowLast = DataContext.Get().LastOrDefault();
             if (rowLast == null)
             {
                 stt = "00001";
@@ -145,26 +291,9 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return prefix + stt;
         }
+        #endregion -- Insert & Update SOA      
 
-        public IQueryable<AcctSOAResult> Paging(AcctSOACriteria criteria, int page, int size, out int rowsCount)
-        {
-            var data = GetListSOA(criteria); //GetListAcctSOA(criteria).AsQueryable();
-            rowsCount = (data.Count() > 0) ? data.Count() : 0;
-            if (size > 0)
-            {
-                if (page < 1)
-                {
-                    page = 1;
-                }
-                data = data.Skip((page - 1) * size).Take(size);
-            }
-
-            //var dataMap = mapper.Map<List<spc_GetListAcctSOAByMaster>, List<AcctSOAResult>>(data.ToList());
-            //return dataMap;
-            return data;
-        }
-
-        private List<spc_GetListAcctSOAByMaster> GetListAcctSOA(AcctSOACriteria criteria)
+        /*private List<spc_GetListAcctSOAByMaster> GetListAcctSOA(AcctSOACriteria criteria)
         {
             DbParameter[] parameters =
             {
@@ -178,39 +307,8 @@ namespace eFMS.API.Accounting.DL.Services
                 SqlParam.GetParameter("currencyLocal", criteria.CurrencyLocal)
             };
             return ((eFMSDataContext)DataContext.DC).ExecuteProcedure<spc_GetListAcctSOAByMaster>(parameters);
-        }
-
-        public HandleState UpdateSOASurCharge(string soaNo)
-        {
-            try
-            {
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-                var surcharge = csShipmentSurchargeRepo.Get(x => x.Soano == soaNo || x.PaySoano == soaNo).ToList();
-                if (surcharge.Count() > 0)
-                {
-                    //Update SOANo = NULL & PaySOANo = NULL to CsShipmentSurcharge
-                    surcharge.ForEach(a =>
-                        {
-                            a.Soano = null;
-                            a.PaySoano = null;
-                            a.UserModified = currentUser.UserID;
-                            a.DatetimeModified = DateTime.Now;
-                        }
-                    );
-                    dc.CsShipmentSurcharge.UpdateRange(surcharge);
-                    dc.SaveChanges();
-                }
-
-                return new HandleState();
-            }
-            catch (Exception ex)
-            {
-                var hs = new HandleState(ex.Message);
-                return hs;
-            }
-        }
-
-        public AcctSOADetailResult GetBySoaNoAndCurrencyLocal(string soaNo, string currencyLocal)
+        }*/
+        /*public AcctSOADetailResult GetBySoaNoAndCurrencyLocal(string soaNo, string currencyLocal)
         {
             var criteria = new AcctSOACriteria
             {
@@ -233,9 +331,8 @@ namespace eFMS.API.Accounting.DL.Services
             dataMapSOA.ServicesNameSoa = GetInfoServiceOfSoa(soaNo).ToString();
 
             return dataMapSOA;
-        }
-
-        private List<spc_GetListChargeShipmentMasterBySOANo> GetSpcChargeShipmentBySOANo(string soaNo, string currencyLocal)
+        }*/
+        /*private List<spc_GetListChargeShipmentMasterBySOANo> GetSpcChargeShipmentBySOANo(string soaNo, string currencyLocal)
         {
             DbParameter[] parameters =
             {
@@ -243,24 +340,17 @@ namespace eFMS.API.Accounting.DL.Services
                 SqlParam.GetParameter("soaNo", soaNo)
             };
             return ((eFMSDataContext)DataContext.DC).ExecuteProcedure<spc_GetListChargeShipmentMasterBySOANo>(parameters);
-        }
-
-        public object GetListServices()
+        }*/
+        /*public object GetListServices()
         {
             return CustomData.Services;
-        }
-
-        public object GetListStatusSoa()
-        {
-            return CustomData.StatusSoa;
-        }
-
+        }*/
         /// <summary>
         /// Lấy thông tin các ServiceName của SOA
         /// </summary>
         /// <param name="soaNo">SOANo</param>
         /// <returns></returns>
-        public string GetInfoServiceOfSoa(string soaNo)
+        /*public string GetInfoServiceOfSoa(string soaNo)
         {
             var serviceTypeId = DataContext.Get(x => x.Soano == soaNo).FirstOrDefault()?.ServiceTypeId;
 
@@ -286,75 +376,8 @@ namespace eFMS.API.Accounting.DL.Services
                 serviceName = (serviceName + ")").Replace(";)", "");
             }
             return serviceName;
-        }
-
-        public HandleState UpdateSOA(AcctSoaModel model)
-        {
-            try
-            {
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-
-                //Gỡ bỏ các charge có SOANo = model.Soano và PaySOANo = model.Soano
-                UpdateSOASurCharge(model.Soano);
-
-                var soa = mapper.Map<AcctSoa>(model);
-                //Update các thông tin của SOA
-                //var hs = dc.AcctSoa.Update(soa);
-                var hs = DataContext.Update(soa, x => x.Id == soa.Id);
-
-                if (hs.Success)
-                {
-                    //Lấy ra những charge có type là BUY hoặc OBH-BUY mà chưa tồn tại trong 1 SOA nào cả
-                    var surchargeCredit = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
-                                                                   && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == Constants.TYPE_CHARGE_BUY || c.type == Constants.TYPE_CHARGE_OBH_BUY))
-                                                                   && (x.Soano == null || x.Soano == "")).ToList();
-
-                    //Lấy ra những charge có type là SELL hoặc OBH-SELL mà chưa tồn tại trong 1 SOA nào cả
-                    var surchargeDebit = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
-                                                                   && model.Surcharges.Any(c => c.surchargeId == x.Id && (c.type == Constants.TYPE_CHARGE_SELL || c.type == Constants.TYPE_CHARGE_OBH_SELL))
-                                                                   && (x.Soano == null || x.Soano == "")).ToList();
-
-                    if (surchargeCredit.Count() > 0)
-                    {
-                        //Update PaySOANo cho CsShipmentSurcharge có type BUY hoặc OBH-BUY(Payer)
-                        //Change request: Cập nhật lại ngày ExchangeDate (23/09/2019)
-                        surchargeCredit.ForEach(a =>
-                        {
-                            a.PaySoano = soa.Soano;
-                            a.UserModified = currentUser.UserID;
-                            a.DatetimeModified = a.ExchangeDate = DateTime.Now;
-                        }
-                        );
-                        dc.CsShipmentSurcharge.UpdateRange(surchargeCredit);
-                    }
-
-                    if (surchargeDebit.Count() > 0)
-                    {
-                        //Update SOANo cho CsShipmentSurcharge có type là SELL hoặc OBH-SELL(Receiver)
-                        //Change request: Cập nhật lại ngày ExchangeDate (23/09/2019)
-                        surchargeDebit.ForEach(a =>
-                        {
-                            a.Soano = soa.Soano;
-                            a.UserModified = currentUser.UserID;
-                            a.DatetimeModified = a.ExchangeDate = DateTime.Now;
-                        }
-                        );
-                        dc.CsShipmentSurcharge.UpdateRange(surchargeDebit);
-                    }
-
-                }
-                dc.SaveChanges();
-
-                return new HandleState();
-            }
-            catch (Exception ex)
-            {
-                var hs = new HandleState(ex.Message);
-                return hs;
-            }
-        }
-
-        public List<ChargeShipmentModel> GetListMoreChargeByCondition(MoreChargeShipmentCriteria criteria)
+        }*/
+        /*public List<ChargeShipmentModel> GetListMoreChargeByCondition(MoreChargeShipmentCriteria criteria)
         {
             var moreChargeShipmentList = GetSpcMoreChargeShipmentByCondition(criteria);
 
@@ -374,9 +397,8 @@ namespace eFMS.API.Accounting.DL.Services
             var dataMapMoreChargeShipment = mapper.Map<List<spc_GetListMoreChargeMasterByCondition>, List<ChargeShipmentModel>>(charges);
 
             return dataMapMoreChargeShipment;
-        }
-
-        private List<spc_GetListMoreChargeMasterByCondition> GetSpcMoreChargeShipmentByCondition(MoreChargeShipmentCriteria criteria)
+        }*/
+        /*private List<spc_GetListMoreChargeMasterByCondition> GetSpcMoreChargeShipmentByCondition(MoreChargeShipmentCriteria criteria)
         {
             DbParameter[] parameters =
             {
@@ -398,48 +420,8 @@ namespace eFMS.API.Accounting.DL.Services
                 SqlParam.GetParameter("strServices", criteria.StrServices)
             };
             return ((eFMSDataContext)DataContext.DC).ExecuteProcedure<spc_GetListMoreChargeMasterByCondition>(parameters);
-        }
-
-        public AcctSOADetailResult AddMoreCharge(AddMoreChargeCriteria criteria)
-        {
-            var data = new AcctSOADetailResult();
-            if (criteria != null)
-            {
-                if (criteria.ChargeShipmentsCurrent != null)
-                {
-                    if (criteria.ChargeShipmentsAddMore != null)
-                    {
-                        foreach (var item in criteria.ChargeShipmentsAddMore)
-                        {
-                            criteria.ChargeShipmentsCurrent.Add(item);
-                        }
-                    }
-                    data.Shipment = criteria.ChargeShipmentsCurrent.Where(x => x.HBL != null).GroupBy(x => x.HBL).Count();
-                    data.TotalCharge = criteria.ChargeShipmentsCurrent.Count();
-                    data.ChargeShipments = criteria.ChargeShipmentsCurrent;
-                    data.AmountDebitLocal = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountDebitLocal);
-                    data.AmountCreditLocal = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountCreditLocal);
-                    data.AmountDebitUSD = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountDebitUSD);
-                    data.AmountCreditUSD = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountCreditUSD);
-                }
-            }
-            return data;
-        }
-
-        public ExportSOADetailResult GetDataExportSOABySOANo(string soaNo, string currencyLocal)
-        {
-            var data = GetDateExportDetailSOA(soaNo);//GetSpcDataExportSOABySOANo(soaNo, currencyLocal);
-            //var dataMap = mapper.Map<List<spc_GetDataExportSOABySOANo>, List<ExportSOAModel>>(data);
-            var result = new ExportSOADetailResult
-            {
-                ListCharges = data.ToList(),
-                TotalDebitExchange = data.Where(x => x.DebitExchange != null).Sum(x => x.DebitExchange),
-                TotalCreditExchange = data.Where(x => x.CreditExchange != null).Sum(x => x.CreditExchange)
-            };
-            return result;
-        }
-
-        private List<spc_GetDataExportSOABySOANo> GetSpcDataExportSOABySOANo(string soaNo, string currencyLocal)
+        }*/
+        /*private List<spc_GetDataExportSOABySOANo> GetSpcDataExportSOABySOANo(string soaNo, string currencyLocal)
         {
             DbParameter[] parameters =
             {
@@ -447,9 +429,16 @@ namespace eFMS.API.Accounting.DL.Services
                 SqlParam.GetParameter("currencyLocal", currencyLocal)
             };
             return ((eFMSDataContext)DataContext.DC).ExecuteProcedure<spc_GetDataExportSOABySOANo>(parameters);
-        }
+        }*/
 
-        #region -- --
+        #region -- List Status SOA --
+        public object GetListStatusSoa()
+        {
+            return CustomData.StatusSoa;
+        }
+        #endregion -- List Status SOA --
+
+        #region -- Get Rate Exchange --
         private decimal GetRateLatestCurrencyExchange(List<CatCurrencyExchange> currencyExchange, string currencyFrom, string currencyTo)
         {
             if (currencyExchange.Count == 0) return 0;
@@ -544,12 +533,13 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return 1;
         }
+        #endregion -- Get Rate Exchange --
 
         #region -- Get Data Charge Master --
         private IQueryable<ChargeSOAResult> GetChargeBuySell()
         {
             //Chỉ lấy những phí từ shipment (IsFromShipment = true)
-            var surcharge = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == true && (x.Type == "BUY" || x.Type == "SELL"));
+            var surcharge = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == true && (x.Type == Constants.TYPE_CHARGE_BUY || x.Type == Constants.TYPE_CHARGE_SELL));
             var opst = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED);
             var csTrans = csTransactionRepo.Get();
             var csTransDe = csTransactionDetailRepo.Get();
@@ -577,9 +567,9 @@ namespace eFMS.API.Accounting.DL.Services
                                    HBL = (cstd.Hwbno != null ? cstd.Hwbno : ops.Hwbno),
                                    MBL = (cstd.Mawb != null ? cstd.Mawb : ops.Mblno),
                                    Type = sur.Type,
-                                   Debit = sur.Type == "SELL" ? (decimal?)sur.Total : null,
-                                   Credit = sur.Type == "BUY" ? (decimal?)sur.Total : null,
-                                   SOANo = sur.Type == "SELL" ? sur.Soano : sur.PaySoano,
+                                   Debit = sur.Type == Constants.TYPE_CHARGE_SELL ? (decimal?)sur.Total : null,
+                                   Credit = sur.Type == Constants.TYPE_CHARGE_BUY ? (decimal?)sur.Total : null,
+                                   SOANo = sur.Type == Constants.TYPE_CHARGE_SELL ? sur.Soano : sur.PaySoano,
                                    IsOBH = false,
                                    Currency = sur.CurrencyId,
                                    InvoiceNo = sur.InvoiceNo,
@@ -588,14 +578,14 @@ namespace eFMS.API.Accounting.DL.Services
                                    ServiceDate = ops.Hblid == sur.Hblid ? ops.ServiceDate :
                                    (cst.TransactionType == "AI" || cst.TransactionType == "SFI" || cst.TransactionType == "SLI" || cst.TransactionType == "SCI" ? cst.Eta : cst.Etd),
                                    CreatedDate = ops.Hblid == sur.Hblid ? ops.CreatedDate : cst.CreatedDate,
-                                   InvoiceIssuedDate = sur.Type == "SELL" ? debitN.DatetimeCreated : creditN.DatetimeCreated,
+                                   InvoiceIssuedDate = sur.Type == Constants.TYPE_CHARGE_SELL ? debitN.DatetimeCreated : creditN.DatetimeCreated,
                                    TransactionType = cst.TransactionType,
                                    UserCreated = ops.Hblid == sur.Hblid ? ops.UserCreated : cst.UserCreated,
                                    Quantity = sur.Quantity,
                                    UnitId = sur.UnitId,
                                    UnitPrice = sur.UnitPrice,
                                    VATRate = sur.Vatrate,
-                                   CreditDebitNo = sur.Type == "SELL" ? sur.DebitNo : sur.CreditNo,
+                                   CreditDebitNo = sur.Type == Constants.TYPE_CHARGE_SELL ? sur.DebitNo : sur.CreditNo,
                                    DatetimeModified = sur.DatetimeModified,
                                    CommodityGroupID = ops.CommodityGroupId,
                                    Service = ops.Hblid == sur.Hblid ? "CL" : cst.TransactionType
@@ -607,7 +597,7 @@ namespace eFMS.API.Accounting.DL.Services
         private IQueryable<ChargeSOAResult> GetChargeOBHSell()
         {
             //Chỉ lấy những phí từ shipment (IsFromShipment = true)
-            var surcharge = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == true && x.Type == "OBH");
+            var surcharge = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == true && x.Type == Constants.TYPE_CHARGE_OBH);
             var opst = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED);
             var csTrans = csTransactionRepo.Get();
             var csTransDe = csTransactionDetailRepo.Get();
@@ -661,7 +651,7 @@ namespace eFMS.API.Accounting.DL.Services
         private IQueryable<ChargeSOAResult> GetChargeOBHBuy()
         {
             //Chỉ lấy những phí từ shipment (IsFromShipment = true)
-            var surcharge = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == true && x.Type == "OBH");
+            var surcharge = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == true && x.Type == Constants.TYPE_CHARGE_OBH);
             var opst = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED);
             var csTrans = csTransactionRepo.Get();
             var csTransDe = csTransactionDetailRepo.Get();
@@ -737,6 +727,7 @@ namespace eFMS.API.Accounting.DL.Services
             //OBH Payer (BUY - Credit)
             var queryObhBuy = GetChargeOBHBuy();
 
+            //Merge data
             var dataMerge = queryBuySell.Union(queryObhBuy).Union(queryObhSell);
 
             var queryData = from data in dataMerge
@@ -796,13 +787,13 @@ namespace eFMS.API.Accounting.DL.Services
                 && chg.IsOBH == (criteria.IsOBH == true ? chg.IsOBH : criteria.IsOBH)
             );
 
-            if(string.IsNullOrEmpty(criteria.DateType) || criteria.DateType == "CreatedDate")
+            if (string.IsNullOrEmpty(criteria.DateType) || criteria.DateType == "CreatedDate")
             {
                 charge = charge.Where(chg =>
-                    chg.CreatedDate.HasValue ? chg.CreatedDate.Value.Date  >= criteria.FromDate.Date && chg.CreatedDate.Value.Date <= criteria.ToDate.Date : 1 == 2
+                    chg.CreatedDate.HasValue ? chg.CreatedDate.Value.Date >= criteria.FromDate.Date && chg.CreatedDate.Value.Date <= criteria.ToDate.Date : 1 == 2
                 );
             }
-            else if(criteria.DateType == "ServiceDate")
+            else if (criteria.DateType == "ServiceDate")
             {
                 charge = charge.Where(chg =>
                     chg.ServiceDate.HasValue ? chg.ServiceDate.Value.Date >= criteria.FromDate.Date && chg.ServiceDate.Value.Date <= criteria.ToDate.Date : 1 == 2
@@ -818,79 +809,79 @@ namespace eFMS.API.Accounting.DL.Services
             if (!string.IsNullOrEmpty(criteria.Type))
             {
                 charge = charge.Where(chg =>
-                       (criteria.Type == "Debit" || chg.Type == "OBH-SELL") ? chg.Debit.HasValue : 
-                       ((criteria.Type == "Credit" || chg.Type == "OBH-BUY") ? chg.Credit.HasValue : (chg.Debit.HasValue || chg.Credit.HasValue))
+                       (criteria.Type == "Debit" || chg.Type == Constants.TYPE_CHARGE_OBH_SELL) ? chg.Debit.HasValue :
+                       ((criteria.Type == "Credit" || chg.Type == Constants.TYPE_CHARGE_OBH_BUY) ? chg.Credit.HasValue : (chg.Debit.HasValue || chg.Credit.HasValue))
                 );
             }
 
-            if (!string.IsNullOrEmpty(criteria.StrCreators) || criteria.StrCreators == "All")
+            if (!string.IsNullOrEmpty(criteria.StrCreators) && criteria.StrCreators != "All")
             {
                 var listCreator = criteria.StrCreators.Split(',').Where(x => x.ToString() != "").ToList();
                 charge = charge.Where(chg => listCreator.Contains(chg.UserCreated));
             }
 
-            if (!string.IsNullOrEmpty(criteria.StrCharges) || criteria.StrCharges == "All")
+            if (!string.IsNullOrEmpty(criteria.StrCharges) && criteria.StrCharges != "All")
             {
                 var listCharge = criteria.StrCharges.Split(',').Where(x => x.ToString() != "").ToList();
                 charge = charge.Where(chg => listCharge.Contains(chg.ChargeCode));
             }
 
-            if(!string.IsNullOrEmpty(criteria.StrServices) || criteria.StrServices == "All")
+            if (!string.IsNullOrEmpty(criteria.StrServices) && criteria.StrServices != "All")
             {
                 var listService = criteria.StrServices.Split(',').Where(x => x.ToString() != "").ToList();
                 charge = charge.Where(chg => listService.Contains(chg.Service));
             }
 
-            if(criteria.CommodityGroupID != null)
+            if (criteria.CommodityGroupID != null)
             {
                 charge = charge.Where(chg => criteria.CommodityGroupID == chg.CommodityGroupID);
             }
 
             var query = charge.Select(chg => new ChargeShipmentModel
-                        {
-                            ID = chg.ID,
-                            ChargeCode = chg.ChargeCode,
-                            ChargeName = chg.ChargeName,
-                            JobId = chg.JobId,
-                            HBL = chg.HBL,
-                            MBL = chg.MBL,
-                            CustomNo = chg.CustomNo,
-                            Type = chg.Type,
-                            InvoiceNo = chg.InvoiceNo,
-                            ServiceDate = chg.ServiceDate,
-                            Note = chg.Note,
-                            Debit = chg.Debit,
-                            Credit = chg.Credit,
-                            Currency = chg.Currency,
-                            CurrencyToLocal = criteria.CurrencyLocal,
-                            CurrencyToUSD = Constants.CURRENCY_USD,
-                            AmountDebitLocal =
+            {
+                ID = chg.ID,
+                ChargeCode = chg.ChargeCode,
+                ChargeName = chg.ChargeName,
+                JobId = chg.JobId,
+                HBL = chg.HBL,
+                MBL = chg.MBL,
+                CustomNo = chg.CustomNo,
+                Type = chg.Type,
+                InvoiceNo = chg.InvoiceNo,
+                ServiceDate = chg.ServiceDate,
+                Note = chg.Note,
+                Debit = chg.Debit,
+                Credit = chg.Credit,
+                Currency = chg.Currency,
+                CurrencyToLocal = criteria.CurrencyLocal,
+                CurrencyToUSD = Constants.CURRENCY_USD,
+                AmountDebitLocal =
                             (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, criteria.CurrencyLocal) > 0
                             ?
                                 GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, criteria.CurrencyLocal)
                             :
                                 GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, criteria.CurrencyLocal)) * (chg.Debit != null ? chg.Debit.Value : 0),
-                            AmountCreditLocal =
+                AmountCreditLocal =
                             (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, criteria.CurrencyLocal) > 0
                             ?
                                 GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, criteria.CurrencyLocal)
                             :
                                 GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, criteria.CurrencyLocal)) * (chg.Credit != null ? chg.Credit.Value : 0),
-                            AmountDebitUSD =
+                AmountDebitUSD =
                             (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, Constants.CURRENCY_USD) > 0
                             ?
                                 GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, Constants.CURRENCY_USD)
                             :
                                 GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, Constants.CURRENCY_USD)) * (chg.Debit != null ? chg.Debit.Value : 0),
-                            AmountCreditUSD =
+                AmountCreditUSD =
                             (GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, Constants.CURRENCY_USD) > 0
                             ?
                                 GetRateCurrencyExchange(chg.CreatedDate, chg.Currency, Constants.CURRENCY_USD)
                             :
                                 GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, Constants.CURRENCY_USD)) * (chg.Credit != null ? chg.Credit.Value : 0),
-                            SOANo = chg.SOANo,
-                            DatetimeModifiedSurcharge = chg.DatetimeModified
-                        });
+                SOANo = chg.SOANo,
+                DatetimeModifiedSurcharge = chg.DatetimeModified
+            });
             query = query.OrderByDescending(x => x.DatetimeModifiedSurcharge);
             return query;
         }
@@ -912,7 +903,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
         #endregion -- Get List Charges Shipment By Criteria --
 
-        #region -- Get List More Charges Shipment By Criteria --
+        #region -- Get List More Charges & Add More Charge Shipment By Criteria --
         private IQueryable<ChargeShipmentModel> GetMoreChargesShipmentByCriteria(MoreChargeShipmentCriteria criteria)
         {
             //Lấy danh sách Currency Exchange của ngày hiện tại
@@ -946,18 +937,18 @@ namespace eFMS.API.Accounting.DL.Services
             if (!string.IsNullOrEmpty(criteria.Type))
             {
                 charge = charge.Where(chg =>
-                       (criteria.Type == "Debit" || chg.Type == "OBH-SELL") ? chg.Debit.HasValue :
-                       ((criteria.Type == "Credit" || chg.Type == "OBH-BUY") ? chg.Credit.HasValue : (chg.Debit.HasValue || chg.Credit.HasValue))
+                       (criteria.Type == "Debit" || chg.Type == Constants.TYPE_CHARGE_OBH_SELL) ? chg.Debit.HasValue :
+                       ((criteria.Type == "Credit" || chg.Type == Constants.TYPE_CHARGE_OBH_BUY) ? chg.Credit.HasValue : (chg.Debit.HasValue || chg.Credit.HasValue))
                 );
             }
 
-            if (!string.IsNullOrEmpty(criteria.StrCreators) || criteria.StrCreators == "All")
+            if (!string.IsNullOrEmpty(criteria.StrCreators) && criteria.StrCreators != "All")
             {
                 var listCreator = criteria.StrCreators.Split(',').Where(x => x.ToString() != "").ToList();
                 charge = charge.Where(chg => listCreator.Contains(chg.UserCreated));
             }
 
-            if (!string.IsNullOrEmpty(criteria.StrCharges) || criteria.StrCharges == "All")
+            if (!string.IsNullOrEmpty(criteria.StrCharges) && criteria.StrCharges != "All")
             {
                 var listCharge = criteria.StrCharges.Split(',').Where(x => x.ToString() != "").ToList();
                 charge = charge.Where(chg => listCharge.Contains(chg.ChargeCode));
@@ -983,7 +974,7 @@ namespace eFMS.API.Accounting.DL.Services
                 charge = charge.Where(chg => chg.CreditDebitNo == criteria.CDNote);
             }
 
-            if (!string.IsNullOrEmpty(criteria.StrServices) ||criteria.StrServices == "All")
+            if (!string.IsNullOrEmpty(criteria.StrServices) && criteria.StrServices != "All")
             {
                 var listService = criteria.StrServices.Split(',').Where(x => x.ToString() != "").ToList();
                 charge = charge.Where(chg => listService.Contains(chg.Service));
@@ -1050,7 +1041,7 @@ namespace eFMS.API.Accounting.DL.Services
             List<Surcharge> Surcharges = new List<Surcharge>();
             if (criteria.ChargeShipments != null)
             {
-                foreach (var item in criteria.ChargeShipments.Where(x => x.SOANo == null || x.SOANo == "").ToList())
+                foreach (var item in criteria.ChargeShipments.Where(x => string.IsNullOrEmpty(x.SOANo)).ToList())
                 {
                     Surcharges.Add(new Surcharge { surchargeId = item.ID, type = item.Type });
                 }
@@ -1061,89 +1052,65 @@ namespace eFMS.API.Accounting.DL.Services
                                                          && !Surcharges.Where(c => c.surchargeId == x.ID && c.type == x.Type).Any());
             return charge;
         }
-        #endregion -- Get List More Charges Shipment By Criteria --
 
-        #region -- Get List SOA By Criteria --
-        private IQueryable<AcctSOAResult> QueryDataListSOA(IQueryable<ChargeSOAResult> charge, IQueryable<AcctSoa> soa, string currencyLocal)
+        public AcctSOADetailResult AddMoreCharge(AddMoreChargeCriteria criteria)
+        {
+            var data = new AcctSOADetailResult();
+            if (criteria != null)
+            {
+                if (criteria.ChargeShipmentsCurrent != null)
+                {
+                    if (criteria.ChargeShipmentsAddMore != null)
+                    {
+                        foreach (var item in criteria.ChargeShipmentsAddMore)
+                        {
+                            criteria.ChargeShipmentsCurrent.Add(item);
+                        }
+                    }
+                    data.Shipment = criteria.ChargeShipmentsCurrent.Where(x => x.HBL != null).GroupBy(x => x.HBL).Count();
+                    data.TotalCharge = criteria.ChargeShipmentsCurrent.Count();
+                    data.ChargeShipments = criteria.ChargeShipmentsCurrent;
+                    data.AmountDebitLocal = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountDebitLocal);
+                    data.AmountCreditLocal = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountCreditLocal);
+                    data.AmountDebitUSD = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountDebitUSD);
+                    data.AmountCreditUSD = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountCreditUSD);
+                }
+            }
+            return data;
+        }
+        #endregion -- Get List More Charges & Add More Charge Shipment By Criteria --
+
+        #region -- Get List & Paging SOA By Criteria --
+        private IQueryable<AcctSOAResult> QueryDataListSOA(IQueryable<ChargeSOAResult> charge, IQueryable<AcctSoa> soa)
         {
             //Lấy danh sách Currency Exchange của ngày hiện tại
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
             var partner = catPartnerRepo.Get();
-            var query = from s in soa
-                        join chg in charge on s.Soano equals chg.SOANo into chg2
-                        from chg in chg2.DefaultIfEmpty()
-                        select new AcctSOAResult
-                        {
-                            Id = s.Id,
-                            Soano = s.Soano,
-                            HBL = chg.HBL,
-                            Customer = s.Customer,
-                            Currency = s.Currency,
-                            CreditAmount = (GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency) > 0
-                            ?
-                                GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency)
-                            :
-                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, s.Currency)) * (chg.Credit != null ? chg.Credit.Value : 0),
-                            DebitAmount = (GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency) > 0
-                            ?
-                                GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency)
-                            :
-                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, s.Currency)) * (chg.Debit != null ? chg.Debit.Value : 0),
-                            Status = s.Status,
-                            DatetimeCreated = s.DatetimeCreated,
-                            UserCreated = s.UserCreated,
-                            DatetimeModified = s.DatetimeModified,
-                            UserModified = s.UserModified,
-                        };
-            var grpData = query.GroupBy(x => new {
-                x.Id,
-                x.Soano,
-                x.Customer,
-                x.Currency,
-                x.Status,
-                x.DatetimeCreated,
-                x.DatetimeModified,
-                x.UserCreated,
-                x.UserModified,
-            }).Select(x => new AcctSOAResult
-            {
-                Id = x.Key.Id,
-                Soano = x.Key.Soano,
-                Shipment = x.Select(s => s.HBL).Distinct().Count(),
-                Currency = x.Key.Currency,
-                CreditAmount = x.Sum(s => s.CreditAmount),
-                DebitAmount = x.Sum(s => s.DebitAmount),
-                Status = x.Key.Status,
-                DatetimeCreated = x.Key.DatetimeCreated,
-                UserCreated = x.Key.UserCreated,
-                DatetimeModified = x.Key.DatetimeModified,
-                UserModified = x.Key.UserModified,
-            });
-
-            var resultData = from grp in grpData
-                             join pat in partner on grp.Customer equals pat.Id into pat2
+            var resultData = from s in soa
+                             join pat in partner on s.Customer equals pat.Id into pat2
                              from pat in pat2.DefaultIfEmpty()
                              select new AcctSOAResult
                              {
-                                 Id = grp.Id,
-                                 Soano = grp.Soano,
-                                 Shipment = grp.Shipment,
+                                 Id = s.Id,
+                                 Soano = s.Soano,
+                                 Shipment = s.TotalShipment,
                                  PartnerName = pat.ShortName,
-                                 Currency = grp.Currency.Trim(),
-                                 CreditAmount = grp.CreditAmount,
-                                 DebitAmount = grp.DebitAmount,
-                                 Status = grp.Status,
-                                 DatetimeCreated = grp.DatetimeCreated,
-                                 UserCreated = grp.UserCreated,
-                                 DatetimeModified = grp.DatetimeModified,
-                                 UserModified = grp.UserModified,
+                                 Currency = s.Currency.Trim(),
+                                 CreditAmount = s.CreditAmount,
+                                 DebitAmount = s.DebitAmount,
+                                 TotalAmount = s.DebitAmount - s.CreditAmount,
+                                 Status = s.Status,
+                                 DatetimeCreated = s.DatetimeCreated,
+                                 UserCreated = s.UserCreated,
+                                 DatetimeModified = s.DatetimeModified,
+                                 UserModified = s.UserModified,
                              };
-            return resultData;
+            return resultData.OrderByDescending(x => x.DatetimeModified);
         }
 
         public IQueryable<AcctSOAResult> GetListSOA(AcctSOACriteria criteria)
         {
-            var charge = GetChargeShipmentDocAndOperation();
+            //Chỉ lấy ra những charge có SOANo (Để hạn chế việc join & get data không cần thiết)
+            var charge = GetChargeShipmentDocAndOperation().Where(x => !string.IsNullOrEmpty(x.SOANo));
             var soa = DataContext.Get();
 
             if (!string.IsNullOrEmpty(criteria.StrCodes))
@@ -1151,11 +1118,11 @@ namespace eFMS.API.Accounting.DL.Services
                 var listCode = criteria.StrCodes.Split(',').Where(x => x.ToString() != "").ToList();
                 List<string> refNo = new List<string>();
                 refNo = (from s in soa
-                        join chg in charge on s.Soano equals chg.SOANo into chg2
-                        from chg in chg2.DefaultIfEmpty()
-                        where
-                            listCode.Contains(s.Soano) || listCode.Contains(chg.JobId) || listCode.Contains(chg.MBL) || listCode.Contains(chg.HBL)
-                        select s.Soano).ToList();
+                         join chg in charge on s.Soano equals chg.SOANo into chg2
+                         from chg in chg2.DefaultIfEmpty()
+                         where
+                             listCode.Contains(s.Soano) || listCode.Contains(chg.JobId) || listCode.Contains(chg.MBL) || listCode.Contains(chg.HBL)
+                         select s.Soano).ToList();
                 soa = soa.Where(x => refNo.Contains(x.Soano));
             }
 
@@ -1171,7 +1138,7 @@ namespace eFMS.API.Accounting.DL.Services
                 );
             }
 
-            if(!string.IsNullOrEmpty(criteria.SoaStatus))
+            if (!string.IsNullOrEmpty(criteria.SoaStatus))
             {
                 soa = soa.Where(x => x.Status == criteria.SoaStatus);
             }
@@ -1181,138 +1148,78 @@ namespace eFMS.API.Accounting.DL.Services
                 soa = soa.Where(x => x.Currency == criteria.SoaCurrency);
             }
 
-            if(!string.IsNullOrEmpty(criteria.SoaUserCreate))
+            if (!string.IsNullOrEmpty(criteria.SoaUserCreate))
             {
                 soa = soa.Where(x => x.UserCreated == criteria.SoaUserCreate);
             }
 
-            var dataResult = QueryDataListSOA(charge, soa, criteria.CurrencyLocal);
+            var dataResult = QueryDataListSOA(charge, soa);
             return dataResult;
         }
-        #endregion -- Get List SOA By Criteria --
+
+        public IQueryable<AcctSOAResult> Paging(AcctSOACriteria criteria, int page, int size, out int rowsCount)
+        {
+            var data = GetListSOA(criteria); //GetListAcctSOA(criteria).AsQueryable();
+            rowsCount = (data.Count() > 0) ? data.Count() : 0;
+            if (size > 0)
+            {
+                if (page < 1)
+                {
+                    page = 1;
+                }
+                data = data.Skip((page - 1) * size).Take(size);
+            }
+
+            //var dataMap = mapper.Map<List<spc_GetListAcctSOAByMaster>, List<AcctSOAResult>>(data.ToList());
+            //return dataMap;
+            return data;
+        }
+        #endregion -- Get List & Paging SOA By Criteria --
 
         #region -- Details Soa --
-        private AcctSOADetailResult GetSoaBySoaNo(string soaNo, string currencyLocal)
+        private AcctSOADetailResult GetSoaBySoaNo(string soaNo)
         {
-            //Lấy danh sách Currency Exchange của ngày hiện tại
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
-            var charge = GetChargeShipmentDocAndOperation();
             var soa = DataContext.Get(x => x.Soano == soaNo);
-            var partner = catPartnerRepo.Get();
-            var query = from s in soa
-                        join chg in charge on s.Soano equals chg.SOANo into chg2
-                        from chg in chg2.DefaultIfEmpty()
-                        select new AcctSOADetailResult
-                        {
-                            Id = s.Id,
-                            Soano = s.Soano,
-                            HBL = chg.HBL,
-                            Customer = s.Customer,
-                            Currency = s.Currency,
-                            CreditAmount = (GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency) > 0
-                            ?
-                                GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency)
-                            :
-                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, s.Currency)) * (chg.Credit != null ? chg.Credit.Value : 0),
-                            DebitAmount = (GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency) > 0
-                            ?
-                                GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency)
-                            :
-                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, s.Currency)) * (chg.Debit != null ? chg.Debit.Value : 0),
-                            Status = s.Status,
-                            DatetimeCreated = s.DatetimeCreated,
-                            UserCreated = s.UserCreated,
-                            DatetimeModified = s.DatetimeModified,
-                            UserModified = s.UserModified,
-                            SoaformDate = s.SoaformDate,
-                            SoatoDate = s.SoatoDate,
-                            Note = s.Note,
-                            Type = s.Type,
-                            Obh = s.Obh,
-                            ServiceTypeId = s.ServiceTypeId,
-                            DateType = s.DateType,
-                            CreatorShipment = s.CreatorShipment
-                        };
-            var grpData = query.GroupBy(x => new {
-                x.Id,
-                x.Soano,
-                x.Customer,
-                x.Currency,
-                x.Status,
-                x.DatetimeCreated,
-                x.DatetimeModified,
-                x.UserCreated,
-                x.UserModified,
-                x.SoaformDate,
-                x.SoatoDate,
-                x.Note,
-                x.Type,
-                x.Obh,
-                x.ServiceTypeId,
-                x.DateType,
-                x.CreatorShipment
-            }).Select(x => new AcctSOADetailResult
-            {
-                Id = x.Key.Id,
-                Soano = x.Key.Soano,
-                Shipment = x.Select(s => s.HBL).Distinct().Count(),
-                Currency = x.Key.Currency,
-                CreditAmount = x.Sum(s => s.CreditAmount),
-                DebitAmount = x.Sum(s => s.DebitAmount),
-                Status = x.Key.Status,
-                DatetimeCreated = x.Key.DatetimeCreated,
-                UserCreated = x.Key.UserCreated,
-                DatetimeModified = x.Key.DatetimeModified,
-                UserModified = x.Key.UserModified,
-                SoaformDate = x.Key.SoaformDate,
-                SoatoDate = x.Key.SoatoDate,
-                Note = x.Key.Note,
-                Type = x.Key.Type,
-                Obh = x.Key.Obh,
-                ServiceTypeId = x.Key.ServiceTypeId,
-                Customer = x.Key.Customer,
-                DateType = x.Key.DateType,
-                CreatorShipment = x.Key.CreatorShipment
-            });
-
-            var resultData = from grp in grpData
-                             join pat in partner on grp.Customer equals pat.Id into pat2
+            var partner = catPartnerRepo.Get();            
+            var resultData = from s in soa
+                             join pat in partner on s.Customer equals pat.Id into pat2
                              from pat in pat2.DefaultIfEmpty()
                              select new AcctSOADetailResult
                              {
-                                 Id = grp.Id,
-                                 Soano = grp.Soano,
-                                 Shipment = grp.Shipment,
+                                 Id = s.Id,
+                                 Soano = s.Soano,
+                                 Shipment = s.TotalShipment,
                                  PartnerName = pat.PartnerNameEn,
-                                 Currency = grp.Currency,
-                                 CreditAmount = grp.CreditAmount,
-                                 DebitAmount = grp.DebitAmount,
-                                 Status = grp.Status,
-                                 DatetimeCreated = grp.DatetimeCreated,
-                                 UserCreated = grp.UserCreated,
-                                 DatetimeModified = grp.DatetimeModified,
-                                 UserModified = grp.UserModified,
-                                 SoaformDate = grp.SoaformDate,
-                                 SoatoDate = grp.SoatoDate,
-                                 Note = grp.Note,
-                                 Type = grp.Type,
-                                 Obh = grp.Obh,
-                                 ServiceTypeId = grp.ServiceTypeId,
-                                 Customer = grp.Customer,
-                                 DateType = grp.DateType,
-                                 CreatorShipment = grp.CreatorShipment
+                                 Currency = s.Currency,
+                                 CreditAmount = s.CreditAmount,
+                                 DebitAmount = s.DebitAmount,
+                                 TotalAmount = s.DebitAmount - s.CreditAmount,
+                                 Status = s.Status,
+                                 DatetimeCreated = s.DatetimeCreated,
+                                 UserCreated = s.UserCreated,
+                                 DatetimeModified = s.DatetimeModified,
+                                 UserModified = s.UserModified,
+                                 SoaformDate = s.SoaformDate,
+                                 SoatoDate = s.SoatoDate,
+                                 Note = s.Note,
+                                 Type = s.Type,
+                                 Obh = s.Obh,
+                                 ServiceTypeId = s.ServiceTypeId,
+                                 Customer = s.Customer,
+                                 DateType = s.DateType,
+                                 CreatorShipment = s.CreatorShipment
                              };
             return resultData.FirstOrDefault();
-        } 
+        }
 
-        private IQueryable<ChargeShipmentModel> GetListChargeOfSoa(string soaNo, string currencyLocal)
+        private IQueryable<ChargeShipmentModel> GetListChargeOfSoa(IQueryable<ChargeSOAResult> charge, List<CatCurrencyExchange> currencyExchange, string soaNo, string currencyLocal)
         {
             //Lấy danh sách Currency Exchange của ngày hiện tại
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
-            var charge = GetChargeShipmentDocAndOperation();
+            //var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+            //var charge = GetChargeShipmentDocAndOperation().Where(x => x.SOANo == soaNo);
             var query = from chg in charge
-                        where chg.SOANo == soaNo
-                        select new ChargeShipmentModel {
+                        select new ChargeShipmentModel
+                        {
                             SOANo = chg.SOANo,
                             ID = chg.ID,
                             ChargeCode = chg.ChargeCode,
@@ -1356,18 +1263,25 @@ namespace eFMS.API.Accounting.DL.Services
 
         public AcctSOADetailResult GetDetailBySoaNoAndCurrencyLocal(string soaNo, string currencyLocal)
         {
-            var chargeShipments = GetListChargeOfSoa(soaNo, currencyLocal).ToList();
             var data = new AcctSOADetailResult();
-            data = GetSoaBySoaNo(soaNo, currencyLocal);
+            var soaDetail = GetSoaBySoaNo(soaNo);
+            if (soaDetail == null)
+            {
+                return data;
+            }
+            //Lấy danh sách Currency Exchange của ngày hiện tại
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+            //Chỉ lấy ra những charge có SOANo == soaNo (Để hạn chế việc join & get data không cần thiết)
+            var charge = GetChargeShipmentDocAndOperation().Where(x => x.SOANo == soaNo);
+            var chargeShipments = GetListChargeOfSoa(charge, currencyExchange, soaNo, currencyLocal).ToList();
+            data = soaDetail;
             data.ChargeShipments = chargeShipments;
             data.AmountDebitLocal = Math.Round(chargeShipments.Sum(x => x.AmountDebitLocal), 3);
             data.AmountCreditLocal = Math.Round(chargeShipments.Sum(x => x.AmountCreditLocal), 3);
             data.AmountDebitUSD = Math.Round(chargeShipments.Sum(x => x.AmountDebitUSD), 3);
             data.AmountCreditUSD = Math.Round(chargeShipments.Sum(x => x.AmountCreditUSD), 3);
-
             //Thông tin các Service Name của SOA
             data.ServicesNameSoa = GetServiceNameOfSoa(data.ServiceTypeId).ToString();
-
             return data;
         }
 
@@ -1398,12 +1312,13 @@ namespace eFMS.API.Accounting.DL.Services
         }
         #endregion --Details Soa--
 
+        #region -- Data Export Details --
         public IQueryable<ExportSOAModel> GetDateExportDetailSOA(string soaNo)
         {
             //Lấy danh sách Currency Exchange của ngày hiện tại
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
             var soa = DataContext.Get(x => x.Soano == soaNo);
-            var charge = GetChargeShipmentDocAndOperation();
+            var charge = GetChargeShipmentDocAndOperation().Where(x => x.SOANo == soaNo);
             var partner = catPartnerRepo.Get();
             var query = from s in soa
                         join chg in charge on s.Soano equals chg.SOANo into chg2
@@ -1437,10 +1352,24 @@ namespace eFMS.API.Accounting.DL.Services
                             ?
                                 GetRateCurrencyExchange(s.DatetimeModified, chg.Currency, s.Currency)
                             :
-                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, s.Currency)) * (chg.Debit != null ? chg.Debit.Value : 0),                           
+                                GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, s.Currency)) * (chg.Debit != null ? chg.Debit.Value : 0),
                         };
             return query;
         }
-        #endregion -- --
+
+        public ExportSOADetailResult GetDataExportSOABySOANo(string soaNo, string currencyLocal)
+        {
+            var data = GetDateExportDetailSOA(soaNo);//GetSpcDataExportSOABySOANo(soaNo, currencyLocal);
+            //var dataMap = mapper.Map<List<spc_GetDataExportSOABySOANo>, List<ExportSOAModel>>(data);
+            var result = new ExportSOADetailResult
+            {
+                ListCharges = data.ToList(),
+                TotalDebitExchange = data.Where(x => x.DebitExchange != null).Sum(x => x.DebitExchange),
+                TotalCreditExchange = data.Where(x => x.CreditExchange != null).Sum(x => x.CreditExchange)
+            };
+            return result;
+        }
+        #endregion -- Data Export Details --
+
     }
 }
