@@ -11,6 +11,9 @@ namespace eFMS.API.Accounting.Service.Models
         public DateTime? SoatoDate { get; set; }
         public string DateType { get; set; }
         public string Currency { get; set; }
+        public int? TotalShipment { get; set; }
+        public decimal? CreditAmount { get; set; }
+        public decimal? DebitAmount { get; set; }
         public string Status { get; set; }
         public string Note { get; set; }
         public string Customer { get; set; }

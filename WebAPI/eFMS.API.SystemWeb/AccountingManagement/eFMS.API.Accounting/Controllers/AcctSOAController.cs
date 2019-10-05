@@ -5,7 +5,6 @@ using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using System;
 using System.Linq;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Accounting.DL.Common;
@@ -46,12 +45,12 @@ namespace eFMS.API.Accounting.Controllers
         /// get the list of SOA
         /// </summary>
         /// <returns></returns>
-        //[HttpGet]
-        //public IActionResult Get()
-        //{
-        //    var results = acctSOAService.Get();
-        //    return Ok(results);
-        //}
+        /*[HttpGet]
+        public IActionResult Get()
+        {
+            var results = acctSOAService.Get();
+            return Ok(results);
+        }*/
 
         /// <summary>
         /// add new SOA
@@ -65,12 +64,6 @@ namespace eFMS.API.Accounting.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            model.Status = Constants.STATUS_SOA_NEW;
-            model.DatetimeCreated = DateTime.Now;
-            model.DatetimeModified = DateTime.Now;
-            model.UserCreated = model.UserModified = currentUser.UserID;
-            model.Currency = model.Currency.Trim();
-
             var hs = acctSOAService.AddSOA(model);
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
@@ -83,17 +76,25 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         /// <summary>
-        /// get and paging the list of SOA by conditions
+        /// Update SOA
         /// </summary>
-        /// <param name="criteria">search conditions</param>
-        /// <param name="pageNumber">page to retrieve data</param>
-        /// <param name="pageSize">number items per page</param>
+        /// <param name="model">object to update</param>
         /// <returns></returns>
-        [HttpPost("Paging")]
-        public IActionResult Paging(AcctSOACriteria criteria, int pageNumber, int pageSize)
+        [HttpPut]
+        [Route("Update")]
+        [Authorize]
+        public IActionResult UpdateSOA(AcctSoaModel model)
         {
-            var data = acctSOAService.Paging(criteria, pageNumber, pageSize, out int totalItems);
-            var result = new { data, totalItems, pageNumber, pageSize };
+            if (!ModelState.IsValid) return BadRequest();
+
+            var hs = acctSOAService.UpdateSOA(model);
+
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
             return Ok(result);
         }
 
@@ -121,6 +122,34 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         /// <summary>
+        /// get and paging the list of SOA by conditions
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <param name="pageNumber">page to retrieve data</param>
+        /// <param name="pageSize">number items per page</param>
+        /// <returns></returns>
+        [HttpPost("Paging")]
+        public IActionResult Paging(AcctSOACriteria criteria, int pageNumber, int pageSize)
+        {
+            var data = acctSOAService.Paging(criteria, pageNumber, pageSize, out int totalItems);
+            var result = new { data, totalItems, pageNumber, pageSize };
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// get list soa by conditions
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("QueryData")]
+        public IActionResult QueryData(AcctSOACriteria criteria)
+        {
+            var data = acctSOAService.GetListSOA(criteria);
+            return Ok(data);
+        }
+
+        /// <summary>
         /// get SOA by soaNo and currencyLocal
         /// </summary>
         /// <param name="soaNo">soaNo that want to retrieve SOA</param>
@@ -139,12 +168,12 @@ namespace eFMS.API.Accounting.Controllers
         /// get list services
         /// </summary>
         /// <returns></returns>
-        //[HttpGet("GetListServices")]
-        //public IActionResult GetListServices()
-        //{
-        //    var results = acctSOAService.GetListServices();
-        //    return Ok(results);
-        //}
+        /*[HttpGet("GetListServices")]
+        public IActionResult GetListServices()
+        {
+            var results = acctSOAService.GetListServices();
+            return Ok(results);
+        }*/
 
         /// <summary>
         /// get list status of soa
@@ -155,33 +184,6 @@ namespace eFMS.API.Accounting.Controllers
         {
             var results = acctSOAService.GetListStatusSoa();
             return Ok(results);
-        }
-
-        /// <summary>
-        /// Update SOA
-        /// </summary>
-        /// <param name="model">object to update</param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("Update")]
-        [Authorize]
-        public IActionResult UpdateSOA(AcctSoaModel model)
-        {
-            if (!ModelState.IsValid) return BadRequest();
-
-            model.DatetimeModified = DateTime.Now;
-            model.UserModified = currentUser.UserID;
-            model.Currency = model.Currency.Trim();
-
-            var hs = acctSOAService.UpdateSOA(model);
-
-            var message = HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
-            if (!hs.Success)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
         }
 
         /// <summary>
@@ -277,12 +279,12 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
-        //[HttpGet("GetChargeShipmentDocAndOperation")]
-        //public IActionResult GetChargeShipmentDocAndOperation()
-        //{
-        //    var data = acctSOAService.GetChargeShipmentDocAndOperation();
-        //    return Ok(data);
-        //}
+        /*[HttpGet("GetChargeShipmentDocAndOperation")]
+        public IActionResult GetChargeShipmentDocAndOperation()
+        {
+            var data = acctSOAService.GetChargeShipmentDocAndOperation();
+            return Ok(data);
+        }*/
 
         /// <summary>
         /// Get list charge shipment by conditions
@@ -297,20 +299,6 @@ namespace eFMS.API.Accounting.Controllers
             var data = acctSOAService.GetListChargeShipment(criteria);
             return data;
         }
-
-        /// <summary>
-        /// get list soa by conditions
-        /// </summary>
-        /// <param name="criteria">search conditions</param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("QueryData")]
-        public IActionResult QueryData(AcctSOACriteria criteria)
-        {
-            var data = acctSOAService.GetListSOA(criteria);
-            return Ok(data);
-        }
-
-
+        
     }
 }
