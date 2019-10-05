@@ -119,15 +119,18 @@ namespace eFMS.API.Shipment.Infrastructure
                                 Description = "eFMS Document API Document"
                             });
                     }
-                    //options.DocumentFilter<SwaggerAddEnumDescriptions>();
-
-                    options.AddSecurityDefinition("oauth2", new OAuth2Scheme
-                    {
-                        Flow = "implicit", // just get token via browser (suitable for swagger SPA)
-                        AuthorizationUrl = "",
-                        Scopes = new Dictionary<string, string> { { "apimobile", "Catalogue API" } }
-                    });
                     options.DocumentFilter<SwaggerAddEnumDescriptions>();
+                    var security = new Dictionary<string, IEnumerable<string>>{
+                        { "Bearer", new string[] { }},
+                    };
+
+                    options.AddSecurityDefinition("Bearer", new ApiKeyScheme
+                    {
+                        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                        Name = "Authorization",
+                        In = "header",
+                        Type = "apiKey"
+                    });
                     options.OperationFilter<AuthorizeCheckOperationFilter>(); // Required to use access token
                 });
             return services;

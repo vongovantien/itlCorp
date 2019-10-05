@@ -120,11 +120,16 @@ namespace eFMS.API.Operation.Infrastructure
                     }
                     options.DocumentFilter<SwaggerAddEnumDescriptions>();
 
-                    options.AddSecurityDefinition("oauth2", new OAuth2Scheme
+                    var security = new Dictionary<string, IEnumerable<string>>{
+                        { "Bearer", new string[] { }},
+                    };
+
+                    options.AddSecurityDefinition("Bearer", new ApiKeyScheme
                     {
-                        Flow = "implicit", // just get token via browser (suitable for swagger SPA)
-                        AuthorizationUrl = "",
-                        Scopes = new Dictionary<string, string> { { "apimobile", "Operation API" } }
+                        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                        Name = "Authorization",
+                        In = "header",
+                        Type = "apiKey"
                     });
                     options.OperationFilter<AuthorizeCheckOperationFilter>(); // Required to use access token
                 });
