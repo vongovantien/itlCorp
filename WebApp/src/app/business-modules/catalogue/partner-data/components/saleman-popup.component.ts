@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewChild, Output, EventEmitter, Input } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { ToastrService } from 'ngx-toastr';
@@ -10,25 +10,35 @@ import { catchError } from "rxjs/operators";
 import { Saleman } from 'src/app/shared/models/catalogue/saleman.model';
 import { PopupBase } from 'src/app/popup.base';
 import { formatDate } from '@angular/common';
+
 @Component({
     selector: 'app-saleman-popup',
     templateUrl: './saleman-popup.component.html',
 })
 
 export class SalemanPopupComponent extends PopupBase {
-    @Output() isCloseModal = new EventEmitter();
-    saleMandetail: any[] = [];
+    @Output() onCreate = new EventEmitter();
+
+    saleMans: Saleman[] = [];
     headerSaleman: CommonInterface.IHeaderTable[];
     services: any[] = [];
     status: CommonInterface.ICommonTitleValue[] = [];
     offices: any[] = [];
     selectedService: any = {};
     saleManToAdd: Saleman = new Saleman();
-    strSalemanCurrent: any = '';
+    strSalemanCurrent: any = {};
     strOfficeCurrent: any = '';
     selectedStatus: any = {};
     users: any[] = [];
     isSave: boolean = false;
+    isExistedSaleman: boolean = false;
+    isDup: boolean = false;
+    saleManToView: Saleman = new Saleman();
+    isDetail: boolean = false;
+    selectedDataSaleMan: any;
+    selectedDataOffice: any;
+
+    @Input() popupData: Saleman;
 
 
     constructor(
@@ -42,18 +52,38 @@ export class SalemanPopupComponent extends PopupBase {
 
         super();
     }
-
     ngOnInit() {
         this.getComboboxData();
+        console.log(this.saleManToView);
     }
+
+    showSaleman(saleman: Saleman) {
+        this.isDetail = true;
+        this.saleManToView = saleman;
+        console.log(this.saleManToView);
+    }
+
+    resetForm() {
+        this.strSalemanCurrent = {};
+        this.saleManToAdd = new Saleman();
+        this.saleManToAdd.saleman_ID = {};
+
+    }
+    closePoup() {
+        this.isDetail = false;
+        this.hide();
+
+    }
+
     getComboboxData(): any {
         this.getSalemans();
         this.getService();
         this.getOffice();
         this.status = this.getStatus();
         this.selectedStatus = this.status[1];
-
     }
+
+
 
     getService() {
         this._catalogueRepo.getListService()
@@ -70,12 +100,16 @@ export class SalemanPopupComponent extends PopupBase {
 
     ApplyToList() {
         this.isSave = true;
-        if (this.strSalemanCurrent.length > 0 && this.strOfficeCurrent.length > 0) {
-            this.OnCreate();
-            console.log(this.saleManToAdd);
-            this.isCloseModal.emit(this.saleManToAdd);
-            this.hide();
-        }
+        this.OnCreate();
+
+        // if (this.saleManToAdd.saleman_ID.length > 0 && this.saleManToAdd.office.length > 0) {
+        //     this.OnCreate();
+        // if (!this.isDup) {
+        //     this.onCreate.emit(this.saleManToAdd);
+        //     this.hide();
+        // }
+
+        // }
 
     }
 
@@ -105,16 +139,31 @@ export class SalemanPopupComponent extends PopupBase {
         }
     }
 
-    OnCreate() {
-        let salemaneffectdate = this.saleManToAdd.effectDate == null ? null : formatDate(this.saleManToAdd.effectDate.startDate, 'yyyy-MM-dd', 'en');
-        this.saleManToAdd = new Saleman();
-        this.saleManToAdd.company = this.strOfficeCurrent;
-        this.saleManToAdd.office = this.strOfficeCurrent;
-        this.saleManToAdd.effectDate = salemaneffectdate;
-        this.saleManToAdd.status = this.selectedStatus.value;
-        this.saleManToAdd.partnerId = null;
-        this.saleManToAdd.saleman_ID = this.strSalemanCurrent;
-        this.saleManToAdd.service = this.selectedService.id;
+
+    onSelectSaleMan(saleMan: any) {
+        this.strSalemanCurrent = { field: 'username', value: saleMan.username };
+        this.selectedDataSaleMan = saleMan;
     }
 
+
+    onSelectOffice(office: any) {
+        this.strOfficeCurrent = { field: 'abbrCompany', value: office.abbrCompany };
+        this.selectedDataOffice = office;
+    }
+    OnCreate() {
+        const salemaneffectdate = this.saleManToAdd.effectDate == null ? null : formatDate(this.saleManToAdd.effectDate.startDate, 'yyyy-MM-dd', 'en');
+
+        const saleMane: any = {
+            company: this.saleManToAdd.office,
+            office: this.saleManToAdd.office,
+            effectDate: salemaneffectdate,
+            status: this.selectedStatus.value,
+            partnerId: null,
+            saleman_ID: this.selectedDataSaleMan.username,
+            service: this.selectedService.id,
+
+        };
+        this.saleManToAdd = new Saleman(saleMane);
+        this.onCreate.emit(this.saleManToAdd);
+    }
 }

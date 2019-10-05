@@ -689,4 +689,4 @@
     </div>
     <!--end::m-content of Partner-data-addnew-->
 </form>
-<app-saleman-popup (isCloseModal)="closepp($event)"></app-saleman-popup>
+<app-saleman-popup [popupData]="saleMantoView" (onCreate)="closepp($event)"></app-saleman-popup>

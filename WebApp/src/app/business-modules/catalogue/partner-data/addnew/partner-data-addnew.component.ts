@@ -54,7 +54,7 @@ export class PartnerDataAddnewComponent extends AppList {
     isRequiredSaleman = false;
     employee: any = {};
     users: any[] = [];
-    saleMandetail: any = [];
+    saleMandetail: any[] = [];
     headerSaleman: CommonInterface.IHeaderTable[];
     services: any[] = [];
     status: CommonInterface.ICommonTitleValue[] = [];
@@ -72,6 +72,9 @@ export class PartnerDataAddnewComponent extends AppList {
     salemanTemp: Array<Object> = [];
 
     list: any[] = [];
+
+    isDup: boolean = false;
+
     constructor(private route: ActivatedRoute,
         private baseService: BaseService,
         private api_menu: API_MENU,
@@ -82,12 +85,24 @@ export class PartnerDataAddnewComponent extends AppList {
     ) {
         super();
     }
+
     closepp(param: SalemanAdd) {
         this.saleManToAdd = param;
-        this.saleMandetail.push(this.saleManToAdd);
+        this.poupSaleman.isDetail = false;
+        this.isDup = this.saleMandetail.some((saleMane: Saleman) => (saleMane.saleman_ID === this.saleManToAdd.saleman_ID && saleMane.office === this.saleManToAdd.office));
+
+        if (this.isDup) {
+            console.log("dup");
+        } else {
+            this.saleMandetail.push(this.saleManToAdd);
+            this.poupSaleman.hide();
+            console.log(this.saleMandetail)
+        }
     }
 
     showPopupSaleman() {
+        this.poupSaleman.resetForm();
+        this.poupSaleman.isSave = false;
         this.poupSaleman.show();
     }
 
@@ -392,9 +407,12 @@ export class PartnerDataAddnewComponent extends AppList {
     }
     checkRequireSaleman(partnerGroup: string): boolean {
         this.isShowSaleMan = false;
-        if (partnerGroup.includes('CUSTOMER')) {
-            this.isShowSaleMan = true;
+        if (partnerGroup != null) {
+            if (partnerGroup.includes('CUSTOMER')) {
+                this.isShowSaleMan = true;
+            }
         }
+
         else {
             this.isShowSaleMan = false;
         }
@@ -559,17 +577,29 @@ export class PartnerDataAddnewComponent extends AppList {
     }
 
     showDetailSaleMan(saleman: Saleman) {
-        $('#saleman-detail-modal').modal('show');
-        this.saleMantoView.description = saleman.description;
-        this.saleMantoView.effectDate = saleman.effectDate == null ? null : formatDate(saleman.effectDate, 'yyyy-MM-dd', 'en');
-        this.saleMantoView.statusString = saleman.status === true ? 'Active' : 'Inactive';
-        this.saleMantoView.office = saleman.office;
-        this.saleMantoView.service = saleman.service;
-        this.saleMantoView.saleman_ID = saleman.saleman_ID;
-        this.saleMantoView.id = saleman.id;
-        this.saleMantoView.createDate = saleman.createDate;
-        this.saleMantoView.userCreated = saleman.userCreated;
-        this.saleMantoView.userCreated = saleman.userCreated;
+        this.poupSaleman.show();
+        const saleMane: any = {
+            description: saleman.description,
+            office: saleman.office,
+            effectDate: saleman.effectDate,
+            status: saleman.status === true ? 'Active' : 'Inactive',
+            partnerId: null,
+            saleman_ID: saleman.saleman_ID,
+            service: saleman.service,
+            createDate: saleman.createDate
+
+        };
+        this.poupSaleman.showSaleman(saleMane);
+        // this.saleMantoView.description = saleman.description;
+        // this.saleMantoView.effectDate = saleman.effectDate == null ? null : formatDate(saleman.effectDate, 'yyyy-MM-dd', 'en');
+        // this.saleMantoView.statusString = saleman.status === true ? 'Active' : 'Inactive';
+        // this.saleMantoView.office = saleman.office;
+        // this.saleMantoView.service = saleman.service;
+        // this.saleMantoView.saleman_ID = saleman.saleman_ID;
+        // this.saleMantoView.id = saleman.id;
+        // this.saleMantoView.createDate = saleman.createDate;
+        // this.saleMantoView.userCreated = saleman.userCreated;
+        // this.saleMantoView.userCreated = saleman.userCreated;
     }
 
     sortBySaleMan(sortData: CommonInterface.ISortData): void {
