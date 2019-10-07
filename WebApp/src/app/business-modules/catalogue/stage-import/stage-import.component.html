@@ -19,8 +19,9 @@
         <div class="row">
           <div class="col-lg-4">
             <form #form>
-              <input type="file" id="inputFile" class="form-control m-input m-input--square" placeholder="" (change)="chooseFile($event)"
-                onclick="this.value=null;" accept=".xlsx">
+              <input type="file" id="inputFile" class="form-control m-input m-input--square" placeholder=""
+                (change)="chooseFile($event)" onclick="this.value=inputFile=null;" [(ngModel)]="inputFile"
+                accept=".xlsx">
             </form>
             <span class="m-form__help">
               <a class="btn-link" href="javascript:void(0)" (click)="downloadSample()">Download sample</a>
@@ -47,7 +48,8 @@
           </div>
         </div>
         <div class="form-actions m--margin-top-5 m--align-right">
-          <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="hideInvalid()">
+          <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+            (click)="hideInvalid()">
             <span>
               <span *ngIf="isShowInvalid">
                 Show invalid rows
@@ -65,7 +67,8 @@
               </span>
             </span>
           </button>
-          <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" routerLink="/home/catalogue/stage-management">
+          <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase"
+            routerLink="/home/catalogue/stage-management">
             <span>
               <i class="la la-ban"></i>
               <span>
@@ -81,7 +84,7 @@
   <!--end::m-portlet-->
   <!--begin:: m-portlet-->
   <div class="m-portlet" style="position: relative">
-      <ng-progress [thick]="true" [color]="'#2ea2f4'" [spinner]="true"></ng-progress>
+    <ng-progress [thick]="true" [color]="'#2ea2f4'" [spinner]="true"></ng-progress>
     <div class="m-portlet__body">
       <!--begin: Datatable -->
       <div class="table-wrapper" id="">
@@ -91,19 +94,23 @@
               <th>
                 <span>No.</span>
               </th>
-              <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'departmentId'), 'sorting_desc': (!isDesc && sortKey == 'departmentId') }"
+              <th class="sorting"
+                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'departmentId'), 'sorting_desc': (!isDesc && sortKey == 'departmentId') }"
                 (click)="sort('departmentId')">
                 <span>Department ID</span>
               </th>
-              <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'code'), 'sorting_desc': (!isDesc && sortKey == 'code') }"
+              <th class="sorting"
+                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'code'), 'sorting_desc': (!isDesc && sortKey == 'code') }"
                 (click)="sort('code')">
                 <span>Code</span>
               </th>
-              <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'stageNameVn'), 'sorting_desc': (!isDesc && sortKey == 'stageNameVn') }"
+              <th class="sorting"
+                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'stageNameVn'), 'sorting_desc': (!isDesc && sortKey == 'stageNameVn') }"
                 (click)="sort('stageNameVn')">
                 <span>Name(Local)</span>
               </th>
-              <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'stageNameEn'), 'sorting_desc': (!isDesc && sortKey == 'stageNameEn') }"
+              <th class="sorting"
+                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'stageNameEn'), 'sorting_desc': (!isDesc && sortKey == 'stageNameEn') }"
                 (click)="sort('stageNameEn')">
                 <span>Name(EN)</span>
               </th>
@@ -131,7 +138,8 @@
                 </td>
                 <td>
                   <span *ngIf="item.code.split('|').length == 1">{{ item.code }}</span>
-                  <span class="m--font-danger" *ngIf="item.code.split('|').length > 1">{{ item.code.split('|')[0] }}</span>
+                  <span class="m--font-danger"
+                    *ngIf="item.code.split('|').length > 1">{{ item.code.split('|')[0] }}</span>
                 </td>
                 <td>
                   <span *ngIf="item.stageNameVn.split('|').length == 1">{{ item.stageNameVn }}</span>
@@ -200,31 +208,6 @@
 </div>
 <!--end::m-content-->
 <!--begin::modal-->
-<div class="modal fade" id="upload-alert-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
-  <div class="modal-dialog modal-sm" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Notification</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="confirm-text-block">
-          <span>There are invalid data. Please check Import!</span>
-        </div>
-      </div>
-      <div class="modal-footer m--align-center c-button-actions">
-        <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
-          <span>
-            <i class="la la-ban"></i>
-            <span>
-              OK
-            </span>
-          </span>
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
+<info-popup [body]="'There are invalid data. Please check Import!'" [title]="'Notification'" [label]="'Ok'">
+</info-popup>
 <!--end::modal-->

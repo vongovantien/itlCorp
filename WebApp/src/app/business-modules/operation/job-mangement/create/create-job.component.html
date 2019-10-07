@@ -270,8 +270,10 @@
                                         <label class="form-control-label">
                                             Commonity Group
                                         </label>
-                                        <ng-select [allowClear]="true" [items]="commonityGroup" (data)="refreshValue($event)"
-                                            (selected)="OpsTransactionToAdd.commodityGroupId = $event.id" (removed)="OpsTransactionToAdd.commodityGroupId = ''"
+                                        <ng-select [allowClear]="true" [items]="commodityGroups"
+                                            (data)="refreshValue($event)"
+                                            (selected)="OpsTransactionToAdd.commodityGroupId = $event.id"
+                                            (removed)="OpsTransactionToAdd.commodityGroupId = ''"
                                             (typed)="typed($event)" placeholder="Select Commonity Group">
                                         </ng-select>
                                     </div>

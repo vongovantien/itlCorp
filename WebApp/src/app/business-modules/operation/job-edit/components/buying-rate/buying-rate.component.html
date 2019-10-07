@@ -102,7 +102,7 @@
     </table>
 </div>
 
-<app-edit-buying-rate-popup [buyingRateChargeToEdit]="BuyingRateChargeToEdit"
+<app-edit-buying-rate-popup [buyingRateChargeToEdit]="BuyingRateChargeToEdit" [lstPartners]="lstPartners"
     (outputEditBuying)="onSaveBuyingRate($event)"></app-edit-buying-rate-popup>
 
 <confirm-popup [title]="'Delete Charge'" [body]="'Are you sure want to delete this Charge?'"
@@ -110,5 +110,6 @@
 
 <app-ops-module-credit-debit-note-detail [CDNoteDetails]="CDNoteDetails"></app-ops-module-credit-debit-note-detail>
 
-<app-add-buying-rate-popup [opsTransaction]="opsTransaction" (outputAddBuying)="onSaveNewBuyingRate($event)">
+<app-add-buying-rate-popup [opsTransaction]="opsTransaction" [lstPartners]="lstPartners"
+    (outputAddBuying)="onSaveNewBuyingRate($event)">
 </app-add-buying-rate-popup>

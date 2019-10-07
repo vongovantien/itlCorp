@@ -9,7 +9,8 @@ import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
 import { DataService } from 'src/app/shared/services';
-import cloneDeep from 'lodash/cloneDeep';
+import { CatalogueRepo } from 'src/app/shared/repositories';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'app-add-buying-rate-popup',
@@ -21,7 +22,7 @@ export class AddBuyingRatePopupComponent extends PopupBase implements OnInit, On
 
     buyingRateChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
     lstBuyingRateChargesComboBox: any[] = [];
-    lstPartners: any[] = [];
+    @Input() lstPartners: any[] = [];
     lstUnits: any[] = [];
     lstCurrencies: any[] = [];
     currentActiveItemDefault: { id: null, text: null }[] = [];
@@ -33,33 +34,36 @@ export class AddBuyingRatePopupComponent extends PopupBase implements OnInit, On
     constructor(
         private baseServices: BaseService,
         private api_menu: API_MENU,
-        private _data: DataService) {
+        private _data: DataService,
+        private _catalogueRepo: CatalogueRepo) {
         super();
     }
 
     ngOnInit() {
-        this._data.currentMessage.subscribe(message => {
-            if (message['buyingCharges'] != null) {
-                this.lstBuyingRateChargesComboBox = cloneDeep(message['buyingCharges']);
-            } else {
-                this.getListBuyingRateCharges();
-            }
-            if (message['lstUnits'] != null) {
-                this.lstUnits = cloneDeep(message['lstUnits']);
-            } else {
-                this.getUnits();
-            }
-            if (message['lstPartners'] != null) {
-                this.lstPartners = cloneDeep(message['lstPartners']);
-            } else {
-                this.getPartners();
-            }
-            if (message['lstCurrencies'] != null) {
-                this.lstCurrencies = prepareNg2SelectData(cloneDeep(message['lstCurrencies']), "id", "id");
-            } else {
-                this.getCurrencies();
-            }
-        });
+        if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)) {
+            this.lstCurrencies = prepareNg2SelectData(this._data.getDataByKey(SystemConstants.CSTORAGE.CURRENCY), "id", "id");
+        } else {
+            this.getCurrencies();
+        }
+
+        if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.UNIT)) {
+            this.lstUnits = this._data.getDataByKey(SystemConstants.CSTORAGE.UNIT);
+        } else {
+            this.getUnits();
+        }
+
+        if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
+            this.lstPartners = this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER);
+        }
+        // else {
+        //     this.getPartners();
+        // }
+
+        if (!!this._data.getDataByKey("buyingCharges")) {
+            this.lstBuyingRateChargesComboBox = this._data.getDataByKey('buyingCharges');
+        } else {
+            this.getListBuyingRateCharges();
+        }
     }
 
     calculateTotalEachBuying() {
@@ -106,29 +110,32 @@ export class AddBuyingRatePopupComponent extends PopupBase implements OnInit, On
         this.objectBePaidActive = [];
     }
 
-    public getListBuyingRateCharges() {
+    getListBuyingRateCharges() {
         this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'CREDIT', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
             this.lstBuyingRateChargesComboBox = res['data'];
             // this._data.setData('buyingCharges', this.lstBuyingRateChargesComboBox);
         });
     }
 
-    public getPartners() {
-        this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.ALL, inactive: false }).subscribe((res: any) => {
-            this.lstPartners = res;
-        });
+    getPartners() {
+        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, inactive: false })
+            .subscribe((res: any) => {
+                this.lstPartners = res;
+            });
     }
 
-    public getUnits() {
-        this.baseServices.post(this.api_menu.Catalogue.Unit.getAllByQuery, { inactive: false }).subscribe((data: any) => {
-            this.lstUnits = data;
-        });
+    getUnits() {
+        this._catalogueRepo.getUnit({ inactive: false })
+            .subscribe((data: any) => {
+                this.lstUnits = data;
+            });
     }
 
-    public getCurrencies() {
-        this.baseServices.post(this.api_menu.Catalogue.Currency.getAllByQuery, { inactive: false }).subscribe((res: any) => {
-            this.lstCurrencies = prepareNg2SelectData(res, "id", "id");
-        });
+    getCurrencies() {
+        this._catalogueRepo.getCurrency()
+            .subscribe((res: any) => {
+                this.lstCurrencies = prepareNg2SelectData(res, "id", "id");
+            });
     }
 
 }

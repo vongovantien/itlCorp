@@ -5,11 +5,11 @@ import { PopupBase } from 'src/app/popup.base';
 import { DataService, BaseService } from 'src/app/shared/services';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { ChargeConstants } from 'src/constants/charge.const';
-import cloneDeep from 'lodash/cloneDeep';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { NgForm } from '@angular/forms';
 import * as dataHelper from 'src/helper/data.helper';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'app-edit-obh-rate-popup',
@@ -19,11 +19,12 @@ export class EditObhRatePopupComponent extends PopupBase implements OnInit, OnCh
     @Input() opsTransaction: OpsTransaction = null;
     @Input() obhChargeToEdit: CsShipmentSurcharge = null;
     @Output() outputEditOBH = new EventEmitter<any>();
+
     isDisplay: boolean = true;
     lstOBHChargesComboBox: any[] = [];
     lstCurrencies: any[] = [];
     lstUnits: any[] = [];
-    lstPartners: any[] = [];
+    @Input() lstPartners: any[] = [];
     currentActiveItemDefault: any[] = [];
     obhChargeActive: any[] = [];
     exchangeRateDate: any;
@@ -36,28 +37,30 @@ export class EditObhRatePopupComponent extends PopupBase implements OnInit, OnCh
     }
 
     ngOnInit() {
-        this._data.currentMessage.subscribe(message => {
-            if (message['obhCharges'] != null) {
-                this.lstOBHChargesComboBox = cloneDeep(message['obhCharges']);
-            } else {
-                this.getListOBHCharges();
-            }
-            if (message['lstUnits'] != null) {
-                this.lstUnits = cloneDeep(message['lstUnits']);
-            } else {
-                this.getUnits();
-            }
-            if (message['lstPartners'] != null) {
-                this.lstPartners = cloneDeep(message['lstPartners']);
-            } else {
-                this.getPartners();
-            }
-            if (message['lstCurrencies'] != null) {
-                this.lstCurrencies = prepareNg2SelectData(cloneDeep(message['lstCurrencies']), "id", "id");
-            } else {
-                this.getCurrencies();
-            }
-        });
+        if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)) {
+            this.lstCurrencies = prepareNg2SelectData(this._data.getDataByKey(SystemConstants.CSTORAGE.CURRENCY), "id", "id");
+        } else {
+            this.getCurrencies();
+        }
+
+        if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.UNIT)) {
+            this.lstUnits = this._data.getDataByKey(SystemConstants.CSTORAGE.UNIT);
+        } else {
+            this.getUnits();
+        }
+
+        if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
+            this.lstPartners = this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER);
+        }
+        // else {
+        //     this.getPartners();
+        // }
+
+        if (!!this._data.getDataByKey("obhCharges")) {
+            this.lstOBHChargesComboBox = this._data.getDataByKey('obhCharges');
+        } else {
+            this.getListOBHCharges();
+        }
     }
 
     ngOnChanges() {
@@ -96,16 +99,17 @@ export class EditObhRatePopupComponent extends PopupBase implements OnInit, OnCh
             }
         }, 300);
     }
+
     closeChargeForm(form: NgForm) {
         form.onReset();
         this.resetDisplay();
         this.hide();
 
         this.currentActiveItemDefault = [];
-        this.obhChargeToEdit = null;
+        // this.obhChargeToEdit = null;
     }
 
-    public getListOBHCharges() {
+    getListOBHCharges() {
         this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'OBH', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
             this.lstOBHChargesComboBox = res['data'];
         });
@@ -128,25 +132,22 @@ export class EditObhRatePopupComponent extends PopupBase implements OnInit, OnCh
         }, 50);
     }
 
-    public getCurrencies() {
+    getCurrencies() {
         this.baseServices.post(this.api_menu.Catalogue.Currency.getAllByQuery, { inactive: false }).subscribe((res: any) => {
             this.lstCurrencies = prepareNg2SelectData(res, "id", "id");
         });
     }
 
-    public getUnits() {
+    getUnits() {
         this.baseServices.post(this.api_menu.Catalogue.Unit.getAllByQuery, {}).subscribe((data: any) => {
             this.lstUnits = data;
         });
     }
 
-    public getPartners() {
-        this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.ALL }).subscribe((res: any) => {
-            this.lstPartners = res;
-        });
-    }
+    // getPartners() {
+    //     this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.ALL }).subscribe((res: any) => {
+    //         this.lstPartners = res;
+    //     });
+    // }
 
-    public typed(value: any): void {
-        console.log('New search input: ', value);
-    }
 }

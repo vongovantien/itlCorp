@@ -137,11 +137,11 @@
 </div>
 
 
-<app-add-obh-rate-popup [opsTransaction]="opsTransaction" (outputAddOBH)="onSaveNewOBHRate($event)">
-</app-add-obh-rate-popup>
+<app-add-obh-rate-popup [opsTransaction]="opsTransaction" [lstPartners]="lstPartners"
+    (outputAddOBH)="onSaveNewOBHRate($event)"></app-add-obh-rate-popup>
 
 <app-edit-obh-rate-popup [opsTransaction]="opsTransaction" [obhChargeToEdit]="OBHChargeToEdit"
-    (outputEditBuying)="onSaveOHBRate($event)">
+    [lstPartners]="lstPartners" (outputEditBuying)="onSaveOHBRate($event)">
 </app-edit-obh-rate-popup>
 
 <confirm-popup [title]="'Delete Charge'" [body]="'Are you sure want to delete this Charge?'"

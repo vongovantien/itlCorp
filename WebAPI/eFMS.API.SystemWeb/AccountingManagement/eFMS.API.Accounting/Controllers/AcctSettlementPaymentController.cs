@@ -64,6 +64,19 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         /// <summary>
+        /// get list settlement payment by conditions
+        /// </summary>
+        /// <param name="criteria">search conditions</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("QueryData")]
+        public IActionResult QueryData(AcctSettlementPaymentCriteria criteria)
+        {
+            var data = acctSettlementPaymentService.QueryData(criteria);
+            return Ok(data);
+        }
+
+        /// <summary>
         /// Get list shipment of settlement payment list by settlementNo
         /// </summary>
         /// <param name="settlementNo">settlementNo that want to retrieve Settlement Payment</param>

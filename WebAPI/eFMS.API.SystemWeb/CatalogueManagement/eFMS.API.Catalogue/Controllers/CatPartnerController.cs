@@ -71,6 +71,18 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         /// <summary>
+        /// get partners by partner group
+        /// </summary>
+        /// <param name="partnerGroup"></param>
+        /// <returns></returns>
+        [HttpGet("GetBy")]
+        public IActionResult GetBy(CatPartnerGroupEnum partnerGroup)
+        {
+            var results = catPartnerService.GetBy(partnerGroup);
+            return Ok(results);
+        }
+
+        /// <summary>
         /// get and paging the list of commodities by partners
         /// </summary>
         /// <param name="criteria">search conditions</param>

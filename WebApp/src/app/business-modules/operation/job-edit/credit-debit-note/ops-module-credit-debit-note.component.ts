@@ -9,13 +9,15 @@ import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mo
 import { AppPage } from 'src/app/app.base';
 import { OpsModuleCreditDebitNoteAddnewComponent } from './ops-module-credit-debit-note-addnew/ops-module-credit-debit-note-addnew.component';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, takeUntil, tap, switchMap } from 'rxjs/operators';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { OpsModuleCreditDebitNoteDetailComponent } from './ops-module-credit-debit-note-detail/ops-module-credit-debit-note-detail.component';
 import { OpsModuleCreditDebitNoteEditComponent } from './ops-module-credit-debit-note-edit/ops-module-credit-debit-note-edit.component';
 import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDetails.model';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { SortService } from 'src/app/shared/services';
+import { ActivatedRoute } from '@angular/router';
+import { NgProgress } from '@ngx-progressbar/core';
 
 @Component({
     selector: 'app-ops-module-credit-debit-note',
@@ -41,33 +43,59 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
     isDesc = true;
     sortKey: string = '';
 
+    jobId: string = '';
+
     constructor(
         private baseServices: BaseService,
         private api_menu: API_MENU,
         private _spinner: NgxSpinnerService,
         private _documentRepo: DocumentationRepo,
-        private sortService: SortService
+        private sortService: SortService,
+        private _activedRouter: ActivatedRoute,
+        private _ngProgressService: NgProgress,
+
     ) {
         super();
+        this._progressRef = this._ngProgressService.ref();
+
     }
 
     ngOnInit() {
-        this.CurrentHBID = this.currentJob.hblid;
-        this.subscribe = <any>this.baseServices.dataStorage.subscribe(data => {
-            this.STORAGE_DATA = data;
-            if (this.STORAGE_DATA.isNewCDNote !== undefined) {
-                this.IsNewCDNote = this.STORAGE_DATA.isNewCDNote;
-                if (this.IsNewCDNote === true) {
-                    this.getAllCDNote();
-                }
-            } else {
-                this.getAllCDNote();
+        this._activedRouter.params.subscribe((param: { id: string }) => {
+            if (!!param.id) {
+                this.jobId = param.id;
+                this.getShipmentDetails(this.jobId);
             }
         });
+
     }
 
-    ngOnDestroy(): void {
-        this.subscribe.unsubscribe();
+    getShipmentDetails(id: any) {
+        this._progressRef.start();
+        this._documentRepo.getDetailShipment(id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete()),
+                tap((response: any) => {
+
+                }),
+            ).subscribe(
+                (response: any) => {
+                    this.currentJob = response;
+                    this.CurrentHBID = this.currentJob.hblid;
+                    this.baseServices.dataStorage.subscribe(data => {
+                        this.STORAGE_DATA = data;
+                        if (this.STORAGE_DATA.isNewCDNote !== undefined) {
+                            this.IsNewCDNote = this.STORAGE_DATA.isNewCDNote;
+                            if (this.IsNewCDNote === true) {
+                                this.getAllCDNote();
+                            }
+                        } else {
+                            this.getAllCDNote();
+                        }
+                    });
+                },
+            );
     }
 
     openPopUpCreateCDNote() {
@@ -229,7 +257,7 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
             this.confirmDeletePopup.hide();
         }
     }
-   
+
     sort(property) {
         this.isDesc = !this.isDesc;
         this.sortKey = property;

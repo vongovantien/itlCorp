@@ -122,57 +122,40 @@ export class StatementOfAccountEditComponent extends AppList {
                         serviceTypeId: this.soa.serviceTypeId,
                         chargeShipments: this.soa.chargeShipments,
                         note: this.soa.note,
-                        commodityGroupId: this.soa.commodityGroupId
+                        commodityGroupId: this.soa.commodityGroupId,
+                        strServices: this.soa.serviceTypeId.replace(new RegExp(";", 'g'), ",")
                     };
                     this.dataSearch = new SOASearchCharge(datSearchMoreCharge);
-
                 },
             );
     }
 
     getCurrency() {
-        this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)
-            .pipe(
-                takeUntil(this.ngUnsubscribe),
-                catchError(this.catchError)
-            )
-            .subscribe(
-                (data: any) => {
-                    if (!!data) {
-                        this.currencyList = data;
-                    } else {
-                        this._sysRepo.getListCurrency()
-                            .pipe(catchError(this.catchError))
-                            .subscribe(
-                                (dataCurrency: any) => {
-                                    this.currencyList = dataCurrency;
-                                },
-                            );
-                    }
-                }
-            );
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)) {
+            this.currencyList = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY);
+        } else {
+            this._sysRepo.getListCurrency()
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (dataCurrency: any) => {
+                        this.currencyList = dataCurrency;
+                    },
+                );
+        }
     }
 
     getListCharge() {
-        this._dataService.getDataByKey(SystemConstants.CSTORAGE.CHARGE)
-            .pipe(
-                takeUntil(this.ngUnsubscribe),
-                catchError(this.catchError)
-            )
-            .subscribe(
-                (data: any) => {
-                    if (!!data) {
-                        this.getDataCharge(data);
-                    } else {
-                        this._sysRepo.getListCharge()
-                            .pipe(catchError(this.catchError))
-                            .subscribe((dataCharge: any) => {
-                                this.getDataCharge(dataCharge);
-                            },
-                            );
-                    }
-                }
-            );
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CHARGE)) {
+
+            this.getDataCharge(this._dataService.getDataByKey(SystemConstants.CSTORAGE.CHARGE));
+        } else {
+            this._sysRepo.getListCharge()
+                .pipe(catchError(this.catchError))
+                .subscribe((dataCharge: any) => {
+                    this.getDataCharge(dataCharge);
+                },
+                );
+        }
     }
 
     getDataCharge(data: any) {

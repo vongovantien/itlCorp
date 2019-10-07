@@ -56,7 +56,7 @@ export class JobManagementFormSearchComponent extends AppForm {
         this.getPartner();
         this.getUser();
         this.getCommondata();
-        
+
         this.filterTypes = [
             { title: 'Job Id', value: 'jobId' },
             { title: 'HBL', value: 'hbl' },
@@ -84,50 +84,33 @@ export class JobManagementFormSearchComponent extends AppForm {
     }
 
     getPartner() {
-        this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER)
-            .pipe(
-                takeUntil(this.ngUnsubscribe),
-                catchError(this.catchError)
-            )
-            .subscribe(
-                (data: any) => {
-                    if (!data) {
-                        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, inactive: false })
-                            .pipe(catchError(this.catchError))
-                            .subscribe(
-                                (dataPartner: any) => {
-                                    this.getPartnerData(dataPartner);
-                                },
-                            );
-                    } else {
-                        this.getPartnerData(data);
-                    }
-                }
-            );
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
+            this.getPartnerData(this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER));
+
+        } else {
+            this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, inactive: false })
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (dataPartner: any) => {
+                        this.getPartnerData(dataPartner);
+                    },
+                );
+        }
     }
 
     getUser() {
-        this._dataService.getDataByKey(SystemConstants.CSTORAGE.SYSTEM_USER)
-            .pipe(
-                takeUntil(this.ngUnsubscribe),
-                catchError(this.catchError)
-            )
-            .subscribe(
-                (data: any) => {
-                    if (!!data) {
-                        this.users = data;
-                    } else {
-                        this._sysRepo.getListSystemUser()
-                            .pipe(catchError(this.catchError))
-                            .subscribe(
-                                (dataUser: any) => {
-                                    this.users = dataUser;
-                                },
-                            );
-                    }
-                }
-            );
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SYSTEM_USER)) {
+            this.users = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SYSTEM_USER);
 
+        } else {
+            this._sysRepo.getListSystemUser()
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (dataUser: any) => {
+                        this.users = dataUser;
+                    },
+                );
+        }
     }
 
     getPartnerData(data: any) {

@@ -16,7 +16,7 @@
         </div>
         <div class="c-button-actions">
             <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                (click)="confirmDelete()">
+                (click)="checkDelete()">
                 <span>
                     <i class="la la-trash"></i>
                     <span>
@@ -62,7 +62,7 @@
                                             </button>
                                             <button type="button"
                                                 class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                                                (click)="cancelCreatJob()">
+                                                (click)="confirmCancelJob()">
                                                 <span>
                                                     <i class="la la-ban"></i>
                                                     <span>
@@ -519,7 +519,7 @@
                                                                 #sumPackages="ngModel">
                                                             <div class="input-group-prepend">
                                                                 <ng-select [allowClear]="false" [items]="packageTypes"
-                                                                    [active]="packagesUnitActive" [disabled]="disabled"
+                                                                    [active]="packagesUnitActive"
                                                                     (selected)="opsTransaction.packageTypeId = $event.id"
                                                                     (removed)="opsTransaction.packageTypeId = null"
                                                                     placeholder="">
@@ -597,7 +597,6 @@
                                                 </div>
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
@@ -632,18 +631,21 @@
                                 <div class="tab-content" id="">
                                     <div class="tab-pane fade show active" id="buying-rate" role="tabpanel">
                                         <job-management-buying-rate [data]="ListBuyingRateCharges"
-                                            [opsTransaction]="opsTransaction" (onChange)="onSaveBuyingRate($event)">
+                                            *ngIf="opsTransaction" [opsTransaction]="opsTransaction"
+                                            (onChange)="onSaveBuyingRate($event)">
                                         </job-management-buying-rate>
                                     </div>
                                     <div class="tab-pane fade" id="selling-rate" role="tabpanel">
                                         <job-management-selling-rate [data]="ListSellingRateCharges"
-                                            [opsTransaction]="opsTransaction" (onChange)="onSaveSellingRate($event)">
+                                            *ngIf="opsTransaction" [opsTransaction]="opsTransaction"
+                                            (onChange)="onSaveSellingRate($event)">
                                         </job-management-selling-rate>
                                     </div>
 
                                     <div class="tab-pane fade" id="obh-charge" role="tabpanel">
                                         <job-management-obh [data]="ListOBHCharges" [opsTransaction]="opsTransaction"
-                                            (onChange)="onSaveOHBRate($event)"></job-management-obh>
+                                            *ngIf="opsTransaction" (onChange)="onSaveOHBRate($event)">
+                                        </job-management-obh>
                                     </div>
                                 </div>
                             </div>
@@ -727,16 +729,21 @@
                     </div>
                 </tab>
                 <tab heading="Custom declaration" (selectTab)="selectTab($event,'custom-declaration')">
-                    <app-billing-custom-declaration *ngIf="tab === 'custom-declaration'" [currentJob]="opsTransaction">
-                    </app-billing-custom-declaration>
+                    <ng-container *ngIf="tab === 'custom-declaration'" loadModule="cd">
+                    </ng-container>
+                    <!-- <app-billing-custom-declaration *ngIf="tab === 'custom-declaration'" [currentJob]="opsTransaction">
+                    </app-billing-custom-declaration> -->
                 </tab>
                 <tab heading="Credit Note & Debit Note" (selectTab)="selectTab($event,'cre-debit-note')">
-                    <app-ops-module-credit-debit-note *ngIf="tab === 'cre-debit-note'" [currentJob]="opsTransaction">
-                    </app-ops-module-credit-debit-note>
+                    <ng-container *ngIf="tab === 'cre-debit-note'" loadModule="cdNote">
+                    </ng-container>
+                    <!-- <app-ops-module-credit-debit-note *ngIf="tab === 'cre-debit-note'" [currentJob]="opsTransaction">
+                    </app-ops-module-credit-debit-note> -->
                 </tab>
                 <tab heading="Stage management" [active]="tab === 'stage'" (selectTab)="selectTab($event, 'stage')">
-                    <app-ops-module-stage-management *ngIf="tab === 'stage'" [data]="opsTransaction">
-                    </app-ops-module-stage-management>
+                    <ng-container *ngIf="tab === 'stage'" loadModule="stageManagement"></ng-container>
+                    <!-- <app-ops-module-stage-management *ngIf="tab === 'stage'" [data]="opsTransaction">
+                    </app-ops-module-stage-management> -->
                 </tab>
             </tabset>
         </div>
@@ -746,13 +753,12 @@
 <app-container-list [jobId]="jobId" [lstMasterContainers]='lstMasterContainers'
     (outputContainers)="saveContainers($event)" *ngIf="jobId && lstMasterContainers"></app-container-list>
 
-<app-cancel-create-job-popup></app-cancel-create-job-popup>
-
-<app-can-not-delete-job-popup></app-can-not-delete-job-popup>
-
-<app-confirm-delete-job-popup (onSubmit)="deleteJob()" [jobNo]="opsTransaction.jobNo" *ngIf="opsTransaction">
-</app-confirm-delete-job-popup>
-
-<app-confirm-cancel-job-popup></app-confirm-cancel-job-popup>
-
 <pl-sheet-popup [jobId]="jobId"></pl-sheet-popup>
+
+<confirm-popup #confirmCancelUpdate (onSubmit)="onCancelUpdateJob()"
+    [body]="'Unsaved data will be lost. Are you sure want to leave?'" [labelConfirm]="'Yes'"></confirm-popup>
+
+<confirm-popup *ngIf="!!opsTransaction" #confirmDelete (onSubmit)="onDeleteJob()" [body]="deleteMessage">
+</confirm-popup>
+
+<info-popup #notAllowDelete [body]="'You are not allow to delete this job'"></info-popup>

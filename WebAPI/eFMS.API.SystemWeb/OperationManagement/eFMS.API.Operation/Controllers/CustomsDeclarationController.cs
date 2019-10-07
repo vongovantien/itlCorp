@@ -86,11 +86,14 @@ namespace eFMS.API.Operation.Controllers
         }
 
         /// <summary>
-        /// search customdeclareation by customNo
+        /// 
         /// </summary>
-        /// <param name="criteria"></param>
+        /// <param name="keySearch"></param>
+        /// <param name="customerNo"></param>
+        /// <param name="imporTed"></param>
+        /// <param name="page"></param>
+        /// <param name="size"></param>
         /// <returns></returns>
-
         [HttpGet("CustomDeclaration")]
         public IActionResult GetCustomDeclaration(string keySearch, string customerNo,bool imporTed, int page, int size)
         {

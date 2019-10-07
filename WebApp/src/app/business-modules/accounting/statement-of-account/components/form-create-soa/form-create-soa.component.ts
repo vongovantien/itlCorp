@@ -2,7 +2,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
 import { Charge, SOASearchCharge } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
-import { takeUntil, catchError } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { formatDate } from '@angular/common';
 import _includes from 'lodash/includes';
@@ -18,6 +18,7 @@ import { ToastrService } from 'ngx-toastr';
 
 export class StatementOfAccountFormCreateComponent extends AppPage {
     @Output() onApply: EventEmitter<any> = new EventEmitter<any>();
+    @Output() onChange: EventEmitter<any> = new EventEmitter<any>();
 
     configPartner: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
@@ -87,7 +88,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     }
 
     getCommondity() {
-        this._catalogueRepo.getCommodityGroup()
+        this._catalogueRepo.getCommodityGroup({})
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
@@ -99,26 +100,18 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     }
 
     getPartner() {
-        this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER)
-            .pipe(
-                takeUntil(this.ngUnsubscribe),
-                catchError(this.catchError)
-            )
-            .subscribe(
-                (data: any) => {
-                    if (!data) {
-                        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, inactive: false })
-                            .pipe(catchError(this.catchError))
-                            .subscribe(
-                                (dataPartner: any) => {
-                                    this.getPartnerData(dataPartner);
-                                },
-                            );
-                    } else {
-                        this.getPartnerData(data);
-                    }
-                }
-            );
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
+            this.getPartnerData(this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER));
+        } else {
+            this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, inactive: false })
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (dataPartner: any) => {
+                        this.getPartnerData(dataPartner);
+                    },
+                );
+
+        }
     }
 
     getPartnerData(data: any) {
@@ -166,50 +159,31 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     }
 
     getCurrency() {
-        this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)
-            .pipe(
-                takeUntil(this.ngUnsubscribe),
-                catchError(this.catchError)
-            )
-            .subscribe(
-                (data: any) => {
-                    if (!!data) {
-                        this.getCurrencyData(data);
-                    } else {
-                        this._catalogueRepo.getListCurrency()
-                            .pipe(catchError(this.catchError))
-                            .subscribe(
-                                (dataCurrency: any) => {
-                                    this.getCurrencyData(dataCurrency);
-                                },
-                            );
-                    }
-                }
-            );
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)) {
+            this.getCurrencyData(this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY));
+        } else {
+            this._catalogueRepo.getListCurrency()
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (dataCurrency: any) => {
+                        this.getCurrencyData(dataCurrency);
+                    },
+                );
+        }
     }
 
     getUser() {
-        this._dataService.getDataByKey(SystemConstants.CSTORAGE.SYSTEM_USER)
-            .pipe(
-                takeUntil(this.ngUnsubscribe),
-                catchError(this.catchError)
-            )
-            .subscribe(
-                (data: any) => {
-                    if (!!data) {
-                        this.getCurrencyUser(data);
-                    } else {
-                        this._sysRepo.getListSystemUser()
-                            .pipe(catchError(this.catchError))
-                            .subscribe(
-                                (dataUser: any) => {
-                                    this.getCurrencyUser(dataUser);
-                                },
-                            );
-                    }
-                }
-            );
-
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SYSTEM_USER)) {
+            this.getCurrencyUser(this._dataService.getDataByKey(SystemConstants.CSTORAGE.SYSTEM_USER));
+        } else {
+            this._sysRepo.getListSystemUser()
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (dataUser: any) => {
+                        this.getCurrencyUser(dataUser);
+                    },
+                );
+        }
     }
 
     getCharge() {
@@ -258,6 +232,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
     updateDataSearch(key: string, data: any) {
         this.dataSearch[key] = data;
+        this.onChange.emit({ key: key, data: data });
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -380,7 +355,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 strCharges: this.selectedCharges.map((item: any) => item.code).toString(),
                 note: this.note,
                 serviceTypeId: !!this.selectedService.length ? this.mapServiceId(this.selectedService[0].id) : this.mapServiceId('All'),
-                commodityGroupId: !!this.commodity ? this.commodity.id : null
+                commodityGroupId: !!this.commodity ? this.commodity.id : null,
+                strServices: this.selectedService[0].id === 'All' ? '' : this.selectedService.map(service => service.id).toString()
             };
             this.dataSearch = new SOASearchCharge(body);
             this.onApply.emit(this.dataSearch);

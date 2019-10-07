@@ -1,15 +1,15 @@
 import { Component, Input, ViewChild, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
-import { BaseService, SortService } from 'src/app/shared/services';
+import { BaseService, SortService, DataService } from 'src/app/shared/services';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSurcharge';
-import cloneDeep from 'lodash/cloneDeep';
 import { EditBuyingRatePopupComponent } from '../../charge-list/edit-buying-rate-popup/edit-buying-rate-popup.component';
 import { OpsModuleCreditDebitNoteDetailComponent } from '../../credit-debit-note/ops-module-credit-debit-note-detail/ops-module-credit-debit-note-detail.component';
 import { AcctCDNoteDetails } from 'src/app/shared/models/document/acctCDNoteDetails.model';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { AddBuyingRatePopupComponent } from '../../charge-list/add-buying-rate-popup/add-buying-rate-popup.component';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'job-management-buying-rate',
@@ -25,6 +25,7 @@ export class JobManagementBuyingRateComponent extends AppList {
     @Output() onChange: EventEmitter<any> = new EventEmitter<any>();
     @Input() data: any = [];
     @Input() opsTransaction: OpsTransaction = null;
+    lstPartners: any[];
     headers: CommonInterface.IHeaderTable[];
 
     chargeIdToDelete: string = '';
@@ -34,7 +35,8 @@ export class JobManagementBuyingRateComponent extends AppList {
     constructor(
         private baseServices: BaseService,
         private api_menu: API_MENU,
-        private sortService: SortService
+        private sortService: SortService,
+        private _data: DataService
 
     ) {
         super();
@@ -77,7 +79,11 @@ export class JobManagementBuyingRateComponent extends AppList {
 
     prepareEditCharge(charge: any) {
         this.BuyingRateChargeToEdit = charge;
+        if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
+            this.lstPartners = this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER);
+        }
         setTimeout(() => {
+            this.editBuyingRatePopup.lstPartners = this.lstPartners;
             this.editBuyingRatePopup.show();
         }, 100);
     }

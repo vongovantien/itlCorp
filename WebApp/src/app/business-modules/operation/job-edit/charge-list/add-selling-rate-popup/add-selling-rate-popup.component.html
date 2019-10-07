@@ -24,17 +24,17 @@
                   </label>
 
                   <app-combo-grid-virtual-scroll [isTooltip]="true"
-                    [currentActiveItemId]="{field:'charge.id',value:sellingRateChargeToAdd.chargeId}" (itemSelected)="sellingRateChargeToAdd.chargeId=$event.charge.id;
-                                        sellingRateChargeToAdd.unitId=$event.charge.unitId;
-                                        sellingRateChargeToAdd.unitPrice=$event.charge.unitPrice;
-                                        sellingRateChargeToAdd.vatrate=$event.charge.vatrate;
-                                        selectedSellingChargeCode.value=$event.charge.code;
-                                        sellingRateChargeToAdd.currencyId=$event.currency;
-                                        currentSelectedCharge=$event.charge.code;
-                                        currentActiveItemDefault=[{ id: $event.currency, text: $event.currency }];
-                                        calculateTotalEachSelling ();"
-                    [selectedDisplayFields]="['charge.chargeNameEn']" [dataSources]="lstSellingRateChargesComboBox"
-                    [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
+                    [currentActiveItemId]="{field:'id',value:sellingRateChargeToAdd.chargeId}" (itemSelected)="sellingRateChargeToAdd.chargeId=$event.id;
+                                        sellingRateChargeToAdd.unitId=$event.unitId;
+                                        sellingRateChargeToAdd.unitPrice=$event.unitPrice;
+                                        sellingRateChargeToAdd.vatrate=$event.vatrate;
+                                        selectedSellingChargeCode.value=$event.code;
+                                        sellingRateChargeToAdd.currencyId=$event.currencyId;
+                                        currentSelectedCharge=$event.code;
+                                        currentActiveItemDefault=[{ id: $event.currencyId, text: $event.currencyId }];
+                                        calculateTotalEachSelling ();" [selectedDisplayFields]="['chargeNameEn']"
+                    [dataSources]="lstSellingRateChargesComboBox"
+                    [displayFields]="[{'field':'code','label':'Charge Code'},{'field':'chargeNameEn','label':'Name EN'},{'field':'chargeNameVn','label':'Name VN'}]">
                   </app-combo-grid-virtual-scroll>
 
 
@@ -61,7 +61,7 @@
                                         sellingRateChargeToAdd.objectBePaid==='CUSTOMER'? sellingRateChargeToAdd.paymentObjectId=opsTransaction.customerId:null;
                                         sellingRateChargeToAdd.objectBePaid==='OTHER'? sellingRateChargeToAdd.paymentObjectId=null:null;"
                     (removed)="sellingRateChargeToAdd.objectBePaid=null;sellingRateChargeToAdd.paymentObjectId=null;"
-                    (typed)="typed($event)" placeholder="Select filter">
+                    placeholder="Select filter">
                   </ng-select>
 
                   <div class="form-control-feedback"
@@ -77,7 +77,7 @@
                     Partner name <span class="m--font-danger">(*)</span>
                   </label>
                   <app-combo-grid-virtual-scroll [disabled]="sellingRateChargeToAdd.objectBePaid!=='OTHER'"
-                    [currentActiveItemId]="{field:'id',value:sellingRateChargeToAdd.paymentObjectId}"
+                    [height]="150" [currentActiveItemId]="{field:'id',value:sellingRateChargeToAdd.paymentObjectId}"
                     (itemSelected)="sellingRateChargeToAdd.paymentObjectId = $event.id"
                     (remove)="sellingRateChargeToAdd.paymentObjectId=null" [selectedDisplayFields]="['shortName']"
                     [dataSources]="lstPartners"
@@ -201,8 +201,9 @@
                   <label class="form-control-label" for="">
                     Total
                   </label>
-                  <input currencyMask [options]="{align: 'left', precision: 2}" type="text" class="form-control m-input m-input--square" disabled
-                    name="SellingRateChargeTotalNameOps" [(ngModel)]="sellingRateChargeToAdd.total">
+                  <input currencyMask [options]="{align: 'left', precision: 2}" type="text"
+                    class="form-control m-input m-input--square" disabled name="SellingRateChargeTotalNameOps"
+                    [(ngModel)]="sellingRateChargeToAdd.total">
                 </div>
               </div>
             </div>

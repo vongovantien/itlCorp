@@ -149,7 +149,6 @@
                         <div class="control-editable"
                           [ngClass]="{ 'has-danger': containerMasterForm.submitted && container.containerTypeId == null && container.verifying}">
                           <ng-select [allowClear]="true" [items]="containerTypes" #containerSelect id="containerSelect"
-                            (data)="refreshValue($event)"
                             (selected)="container.containerTypeId = $event.id;container.containerTypeName = $event.text"
                             (removed)="container.containerTypeId = null;container.containerTypeName = null"
                             [active]="container.containerTypeActive" placeholder="Select filter">
@@ -212,7 +211,7 @@
                       </td>
                       <td class="">
                         <div class="control-editable">
-                          <ng-select [allowClear]="true" [items]="packageTypes" (data)="refreshValue($event)"
+                          <ng-select [allowClear]="true" [items]="packageTypes"
                             (selected)="container.packageTypeId = $event.id; container.packageTypeName = $event.text"
                             (removed)="container.packageTypeId = null; container.packageTypeName = null"
                             [active]="container.packageTypeActive" placeholder="Select filter">

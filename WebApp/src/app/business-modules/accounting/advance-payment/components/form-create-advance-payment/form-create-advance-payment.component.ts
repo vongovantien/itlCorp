@@ -1,8 +1,8 @@
-import { Component, Output, EventEmitter, Input } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { User, Currency } from 'src/app/shared/models';
 import { BaseService, DataService } from 'src/app/shared/services';
 import { CatalogueRepo } from 'src/app/shared/repositories';
-import { catchError, takeUntil, distinctUntilChanged, map } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, map } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
 import { FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
 import { SystemConstants } from 'src/constants/system.const';
@@ -108,7 +108,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
 
     }
 
-    
+
     getMethod(): CommonInterface.ICommonTitleValue[] {
         return [
             { title: 'Cash', value: 'Cash' },
@@ -122,27 +122,19 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     }
 
     getCurrency() {
-        this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.currencyList = res || [];
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)) {
+            this.currencyList = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY) || [];
+            this.currency.setValue(this.currencyList.filter((item: Currency) => item.id === 'VND')[0]);
+        } else {
+            this._catalogueRepo.getListCurrency()
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (data: any) => {
+                        this.currencyList = data || [];
                         this.currency.setValue(this.currencyList.filter((item: Currency) => item.id === 'VND')[0]);
-                    } else {
-                        this._catalogueRepo.getListCurrency()
-                            .pipe(catchError(this.catchError))
-                            .subscribe(
-                                (data: any) => {
-                                    this.currencyList = data || [];
-                                    this.currency.setValue(this.currencyList.filter((item: Currency) => item.id === 'VND')[0]);
-                                },
-                            );
-                    }
-                }
-            );
+                    },
+                );
+        }
     }
 
     changeCurrency(currency: Currency) {

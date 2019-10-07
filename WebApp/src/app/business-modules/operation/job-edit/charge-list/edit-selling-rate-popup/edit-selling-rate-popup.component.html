@@ -25,15 +25,14 @@
                   </label>
 
                   <app-combo-grid-virtual-scroll [isTooltip]="true"
-                    [currentActiveItemId]="{field:'charge.id',value:sellingRateChargeToEdit.chargeId}" (itemSelected)="sellingRateChargeToEdit.chargeId=$event.charge.id;
-                                        sellingRateChargeToEdit.unitId=$event.charge.unitId;
-                                        sellingRateChargeToEdit.unitPrice=$event.charge.unitPrice;
-                                        sellingRateChargeToEdit.vatrate=$event.charge.vatrate;
-                                        selectedSellingChargeCode.value=$event.charge.code;
-                                            calculateTotalEachSelling();"
-                    [selectedDisplayFields]="['charge.chargeNameEn']" [dataSources]="lstSellingRateChargesComboBox"
-                    [disabled]="sellingRateChargeToEdit.cdno"
-                    [displayFields]="[{'field':'charge.code','label':'Charge Code'},{'field':'charge.chargeNameEn','label':'Name EN'},{'field':'charge.chargeNameVn','label':'Name VN'}]">
+                    [currentActiveItemId]="{field:'id',value:sellingRateChargeToEdit.chargeId}" (itemSelected)="sellingRateChargeToEdit.chargeId=$event.id;
+                                        sellingRateChargeToEdit.unitId=$event.unitId;
+                                        sellingRateChargeToEdit.unitPrice=$event.unitPrice;
+                                        sellingRateChargeToEdit.vatrate=$event.vatrate;
+                                        selectedSellingChargeCode.value=$event.code;
+                                            calculateTotalEachSelling();" [selectedDisplayFields]="['chargeNameEn']"
+                    [dataSources]="lstSellingRateChargesComboBox" [disabled]="sellingRateChargeToEdit.cdno"
+                    [displayFields]="[{'field':'code','label':'Charge Code'},{'field':'chargeNameEn','label':'Name EN'},{'field':'chargeNameVn','label':'Name VN'}]">
                   </app-combo-grid-virtual-scroll>
 
                   <div class="form-control-feedback"
@@ -61,7 +60,7 @@
                                         sellingRateChargeToEdit.objectBePaid==='CUSTOMER'? sellingRateChargeToEdit.paymentObjectId=opsTransaction.customerId:null;
                                         sellingRateChargeToEdit.objectBePaid==='OTHER'? sellingRateChargeToEdit.paymentObjectId=null:null;"
                     (removed)="sellingRateChargeToEdit.objectBePaid=null;sellingRateChargeToEdit.paymentObjectId=null;"
-                    (typed)="typed($event)" placeholder="Select filter">
+                    placeholder="Select filter">
                   </ng-select>
 
                   <div class="form-control-feedback"
@@ -203,8 +202,9 @@
                   <label class="form-control-label" for="">
                     Total
                   </label>
-                  <input currencyMask [options]="{align: 'left', precision: 2}" type="text" class="form-control m-input m-input--square" disabled
-                    name="SellingRateChargeTotalNameOps" [(ngModel)]="sellingRateChargeToEdit.total">
+                  <input currencyMask [options]="{align: 'left', precision: 2}" type="text"
+                    class="form-control m-input m-input--square" disabled name="SellingRateChargeTotalNameOps"
+                    [(ngModel)]="sellingRateChargeToEdit.total">
                 </div>
               </div>
             </div>

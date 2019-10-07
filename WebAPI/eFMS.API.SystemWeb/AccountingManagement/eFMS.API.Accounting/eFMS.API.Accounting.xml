@@ -4,901 +4,383 @@
         <name>eFMS.API.Accounting</name>
     </assembly>
     <members>
-        <member name="T:eFMS.API.Accounting.Controllers.CatAreaController">
+        <member name="T:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController">
             <summary>
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatAreaController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Accounting.DL.Common.LanguageSub},eFMS.API.Accounting.DL.IService.ICatAreaService)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Accounting.DL.Common.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctAdvancePaymentService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
             <summary>
-            constructor
+            Contructor
             </summary>
-            <param name="localizer">inject interface IStringLocalizer</param>
-            <param name="service">inject interface ICatAreaService</param>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatAreaController.Get">
-            <summary>
-            get the list of areas
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatAreaController.GetByLanguage">
-            <summary>
-            get the list of areas by culture current language
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatChargeController.Get(eFMS.API.Accounting.DL.Models.Criteria.CatChargeCriteria,System.Int32,System.Int32)">
-            <summary>
-            get and paging the list of charges by conditions
-            </summary>
-            <param name="criteria">search conditions</param>
-            <param name="pageNumber">page to retrieve data</param>
-            <param name="pageSize">number items per page</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatChargeController.Get(eFMS.API.Accounting.DL.Models.Criteria.CatChargeCriteria)">
-            <summary>
-            get the list of charges by conditions
-            </summary>
-            <param name="criteria">search conditions</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatChargeController.Get(System.Guid)">
-            <summary>
-            get charge by id
-            </summary>
-            <param name="id">id of data that need to retrieve</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatChargeController.All">
-            <summary>
-            get all charges
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatChargeController.Add(eFMS.API.Accounting.DL.Models.CatChargeAddOrUpdateModel)">
-            <summary>
-            add a new charge
-            </summary>
-            <param name="model">object data to add</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatChargeController.Update(eFMS.API.Accounting.DL.Models.CatChargeAddOrUpdateModel)">
-            <summary>
-            update an existed item
-            </summary>
-            <param name="model">object to update</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatChargeController.Delete(System.Guid)">
-            <summary>
-            delete an existed item
-            </summary>
-            <param name="id">id of data that need to delete</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatChargeController.UploadFile(Microsoft.AspNetCore.Http.IFormFile)">
-            <summary>
-            read charge data from file excel 
-            </summary>
-            <param name="uploadedFile">file to read data</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatChargeController.Import(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.CatChargeImportModel})">
-            <summary>
-            import list charge into database
-            </summary>
-            <param name="data">list of data</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatChargeController.DownloadExcel">
-            <summary>
-            download exel from server
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatChargeDefaultAccountController.Get">
-            <summary>
-            get all charge default
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatChargeDefaultAccountController.Add(eFMS.API.Accounting.DL.Models.CatChargeDefaultAccountModel)">
-            <summary>
-            add new charge default
-            </summary>
-            <param name="model">object to add</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatChargeDefaultAccountController.Update(eFMS.API.Accounting.DL.Models.CatChargeDefaultAccountModel)">
-            <summary>
-            update an existed item
-            </summary>
-            <param name="model"></param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatChargeDefaultAccountController.Delete(System.Int32)">
-            <summary>
-            delete an existed item
-            </summary>
-            <param name="id">id of data that need to delete</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatChargeDefaultAccountController.UploadFile(Microsoft.AspNetCore.Http.IFormFile)">
-            <summary>
-            read charge default data from file excel 
-            </summary>
-            <param name="uploadedFile">file to read data</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatChargeDefaultAccountController.Import(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.CatChargeDefaultAccountImportModel})">
-            <summary>
-            import list charge default into database
-            </summary>
-            <param name="data">list of data</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatChargeDefaultAccountController.DownloadExcel">
-            <summary>
-            download exel from server
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="T:eFMS.API.Accounting.Controllers.CatCommodityGroupController">
-            <summary>
-            A base class for an MVC controller without view support.
-            </summary>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCommodityGroupController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Accounting.DL.Common.LanguageSub},eFMS.API.Accounting.DL.IService.ICatCommodityGroupService,AutoMapper.IMapper,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
-            <summary>
-            constructor
-            </summary>
-            <param name="localizer">inject interface IStringLocalizer</param>
-            <param name="service">inject interface ICatCommodityGroupService</param>
-            <param name="iMapper">inject interface IMapper</param>
+            <param name="localizer"></param>
+            <param name="service"></param>
             <param name="user"></param>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCommodityGroupController.Get(eFMS.API.Accounting.DL.Models.Criteria.CatCommodityGroupCriteria)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.Paging(eFMS.API.Accounting.DL.Models.Criteria.AcctAdvancePaymentCriteria,System.Int32,System.Int32)">
             <summary>
-            get the list of commodities by conditions
-            </summary>
-            <param name="criteria">search conditions</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCommodityGroupController.Get(eFMS.API.Accounting.DL.Models.Criteria.CatCommodityGroupCriteria,System.Int32,System.Int32)">
-            <summary>
-            get and paging the list of commodities by conditions
-            </summary>
-            <param name="criteria">search conditions</param>
-            <param name="page">page to retrieve data</param>
-            <param name="size">number items per page</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCommodityGroupController.GetByLanguage">
-            <summary>
-            get all commodities by current language
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCommodityGroupController.Get(System.Int16)">
-            <summary>
-            get commodity by id
-            </summary>
-            <param name="id">id of data that need to retrieve</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCommodityGroupController.Post(eFMS.API.Accounting.Models.CatCommodityGroupEditModel)">
-            <summary>
-            add new commodity
-            </summary>
-            <param name="model">object to add</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCommodityGroupController.Put(System.Int16,eFMS.API.Accounting.Models.CatCommodityGroupEditModel)">
-            <summary>
-            update an existed item
-            </summary>
-            <param name="id">id of data that need to retrieve</param>
-            <param name="model">object to update</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCommodityGroupController.Delete(System.Int16)">
-            <summary>
-            delete an existed item
-            </summary>
-            <param name="id">id of data that need to delete</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCommodityGroupController.UploadFile(Microsoft.AspNetCore.Http.IFormFile)">
-            <summary>
-            read commodity group data from file excel
-            </summary>
-            <param name="uploadedFile">file to read data</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCommodityGroupController.Import(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.CommodityGroupImportModel})">
-            <summary>
-            import list commodity groups into database
-            </summary>
-            <param name="data">list of data</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCommodityGroupController.DownloadExcel">
-            <summary>
-            download exel from server
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="T:eFMS.API.Accounting.Controllers.CatCommonityController">
-            <summary>
-            A base class for an MVC controller without view support.
-            </summary>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCommonityController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Accounting.DL.Common.LanguageSub},eFMS.API.Accounting.DL.IService.ICatCommodityService,AutoMapper.IMapper)">
-            <summary>
-            constructor
-            </summary>
-            <param name="localizer">inject interface IStringLocalizer</param>
-            <param name="service">inject interface ICatAreaService</param>
-            <param name="iMapper">inject interface IMapper</param>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCommonityController.GetAll">
-            <summary>
-            get all data
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCommonityController.Get(eFMS.API.Accounting.DL.Models.Criteria.CatCommodityCriteria)">
-            <summary>
-            get the list of commodities
-            </summary>
-            <param name="criteria">search conditions</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCommonityController.Get(eFMS.API.Accounting.DL.Models.Criteria.CatCommodityCriteria,System.Int32,System.Int32)">
-            <summary>
-            get and paging the list of commodities by conditions
-            </summary>
-            <param name="criteria">search conditions</param>
-            <param name="page">page to retrieve data</param>
-            <param name="size">number items per page</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCommonityController.Get(System.Int16)">
-            <summary>
-            get commodity by id
-            </summary>
-            <param name="id">id of data that need to retrieve</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCommonityController.Post(eFMS.API.Accounting.Models.CatCommodityEditModel)">
-            <summary>
-            add a new commodity
-            </summary>
-            <param name="model">object to add</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCommonityController.Put(System.Int16,eFMS.API.Accounting.Models.CatCommodityEditModel)">
-            <summary>
-            update an existed item
-            </summary>
-            <param name="id">id of data that need to retrieve</param>
-            <param name="model">object to update</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCommonityController.Delete(System.Int16)">
-            <summary>
-            delete an existed item
-            </summary>
-            <param name="id">id of data that need to delete</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCommonityController.UploadFile(Microsoft.AspNetCore.Http.IFormFile)">
-            <summary>
-            read commodities data from file excel
-            </summary>
-            <param name="uploadedFile">file to read data</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCommonityController.Import(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.CommodityImportModel})">
-            <summary>
-            import list commodities into database
-            </summary>
-            <param name="data"></param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCommonityController.DownloadExcel">
-            <summary>
-            download exel from server
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="T:eFMS.API.Accounting.Controllers.CatCountryController">
-            <summary>
-            A base class for an MVC controller without view support.
-            </summary>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCountryController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Accounting.DL.Common.LanguageSub},eFMS.API.Accounting.DL.IService.ICatCountryService)">
-            <summary>
-            constructor
-            </summary>
-            <param name="localizer">inject IStringLocalizer</param>
-            <param name="service">inject ICatCountryService serrvice</param>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCountryController.Get(eFMS.API.Accounting.DL.Models.Criteria.CatCountryCriteria,System.Int32,System.Int32)">
-            <summary>
-            get and paging the list of countries by conditions
-            </summary>
-            <param name="criteria">search conditions</param>
-            <param name="page">page to retrieve data</param>
-            <param name="size">number items per page</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCountryController.Get(eFMS.API.Accounting.DL.Models.Criteria.CatCountryCriteria)">
-            <summary>
-            get the list of countries
-            </summary>
-            <param name="criteria">search conditions</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCountryController.Get(System.Int32)">
-            <summary>
-            get country by id
-            </summary>
-            <param name="id">id of data that need to retrieve</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCountryController.GetAll">
-            <summary>
-            get all data
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCountryController.Add(eFMS.API.Accounting.DL.Models.CatCountryModel)">
-            <summary>
-            add new country
-            </summary>
-            <param name="catCountry">object to add</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCountryController.Update(eFMS.API.Accounting.DL.Models.CatCountryModel)">
-            <summary>
-            update an existed country
-            </summary>
-            <param name="catCountry">object to update</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCountryController.Delete(System.Int16)">
-            <summary>
-            delete an existed country
-            </summary>
-            <param name="id">id of data that need to delete</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCountryController.GetByLanguage">
-            <summary>
-            get all countries by current language
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCountryController.DownloadExcel">
-            <summary>
-            download exel file from server
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCountryController.UpLoadFile(Microsoft.AspNetCore.Http.IFormFile)">
-            <summary>
-            read a file excel
-            </summary>
-            <param name="uploadedFile"></param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCountryController.Import(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.CatCountryImportModel})">
-            <summary>
-            import list countries
-            </summary>
-            <param name="data"></param>
-            <returns></returns>
-        </member>
-        <member name="T:eFMS.API.Accounting.Controllers.CatCurrencyController">
-            <summary>
-            A base class for an MVC controller without view support.
-            </summary>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCurrencyController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Accounting.DL.Common.LanguageSub},eFMS.API.Accounting.DL.IService.ICatCurrencyService)">
-            <summary>
-            
-            </summary>
-            <param name="localizer">inject interface IStringLocalizer</param>
-            <param name="service">inject interface ICatCurrencyService</param>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCurrencyController.Get">
-            <summary>
-            get the list of all currencies
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCurrencyController.Get(System.String)">
-            <summary>
-            get commodity by id
-            </summary>
-            <param name="id">id of data that need to retrieve</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCurrencyController.Get(eFMS.API.Accounting.DL.Models.Criteria.CatCurrrencyCriteria,System.Int32,System.Int32)">
-            <summary>
-            get and paging the list of currencies by conditions
-            </summary>
-            <param name="criteria">search conditions</param>
-            <param name="page">page to retrieve data</param>
-            <param name="size">number items per page</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCurrencyController.Get(eFMS.API.Accounting.DL.Models.Criteria.CatCurrrencyCriteria)">
-            <summary>
-            get the list of currencies
-            </summary>
-            <param name="criteria">search conditions</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCurrencyController.Post(eFMS.API.Accounting.DL.Models.CatCurrencyModel)">
-            <summary>
-            add new currency
-            </summary>
-            <param name="model">object to add</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCurrencyController.Put(eFMS.API.Accounting.DL.Models.CatCurrencyModel)">
-            <summary>
-            update an existed item
-            </summary>
-            <param name="model">model to update</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCurrencyController.Delete(System.String)">
-            <summary>
-            delete an existed item
-            </summary>
-            <param name="id">id of data that want to delete</param>
-            <returns></returns>
-        </member>
-        <member name="T:eFMS.API.Accounting.Controllers.CatCurrencyExchangeController">
-            <summary>
-            A base class for an MVC controller without view support.
-            </summary>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCurrencyExchangeController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Accounting.DL.Common.LanguageSub},eFMS.API.Accounting.DL.IService.ICatCurrencyExchangeService,AutoMapper.IMapper,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
-            <summary>
-            constructor
-            </summary>
-            <param name="localizer">inject interface IStringLocalizer</param>
-            <param name="service">inject interface ICatCurrencyExchangeService</param>
-            <param name="imapper">inject interface IMapper</param>
-            <param name="user">inject interface ICurrentUser</param>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCurrencyExchangeController.GetExchangeRateHistory(eFMS.API.Accounting.DL.Models.Criteria.CatCurrencyExchangeCriteria,System.Int32,System.Int32)">
-            <summary>
-            get and paging currency exchage rate
-            </summary>
-            <param name="criteria">search conditions</param>
-            <param name="page">page to retrieve dat</param>
-            <param name="size">number items per page</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCurrencyExchangeController.GetCurrencies">
-            <summary>
-            get currnecy
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCurrencyExchangeController.GetNewest(System.String)">
-            <summary>
-            get newest exchage rate
-            </summary>
-            <param name="currencyToId"></param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCurrencyExchangeController.GetExchangeRates(System.DateTime,System.String,System.String)">
-            <summary>
-            get exchange rate by condition
-            </summary>
-            <param name="date"></param>
-            <param name="localCurrency"></param>
-            <param name="fromCurrency"></param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCurrencyExchangeController.Get(System.Int32)">
-            <summary>
-            get data by id
-            </summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCurrencyExchangeController.Put(eFMS.API.Accounting.DL.Models.CatCurrencyExchangeEditModel)">
-            <summary>
-            update exchange rate
-            </summary>
-            <param name="model"></param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCurrencyExchangeController.Put(System.Int32,eFMS.API.Accounting.DL.Models.CatCurrencyExchangeModel)">
-            <summary>
-            
-            </summary>
-            <param name="id"></param>
-            <param name="model"></param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCurrencyExchangeController.Delete(System.Int32)">
-            <summary>
-            delete an existed item
-            </summary>
-            <param name="id">id of data that need to delete</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatCurrencyExchangeController.RemoveExchangeCurrency(System.String)">
-            <summary>
-            remove an exchange rate
-            </summary>
-            <param name="currencyFrom"></param>
-            <returns></returns>
-        </member>
-        <member name="T:eFMS.API.Accounting.Controllers.CatPartnerController">
-            <summary>
-            A base class for an MVC controller without view support.
-            </summary>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPartnerController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Accounting.DL.Common.LanguageSub},eFMS.API.Accounting.DL.IService.ICatPartnerService,AutoMapper.IMapper)">
-            <summary>
-            constructor
-            </summary>
-            <param name="localizer">inject interface IStringLocalizer</param>
-            <param name="service">inject interface ICatPartnerService</param>
-            <param name="iMapper">inject interface IMapper</param>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPartnerController.GetAll">
-            <summary>
-            get all partners
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPartnerController.Get(eFMS.API.Accounting.DL.Models.Criteria.CatPartnerCriteria)">
-            <summary>
-            get the list of partners
-            </summary>
-            <param name="criteria">search conditions</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPartnerController.Get(eFMS.API.Accounting.DL.Models.Criteria.CatPartnerCriteria,System.Int32,System.Int32)">
-            <summary>
-            get and paging the list of commodities by partners
-            </summary>
-            <param name="criteria">search conditions</param>
-            <param name="page">page to retrieve data</param>
-            <param name="size">number items per page</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPartnerController.GetCustomer(eFMS.API.Accounting.DL.Models.Criteria.CatPartnerCriteria,System.Int32,System.Int32)">
-            <summary>
-            et and paging the list of partners by conditions
-            </summary>
-            <param name="criteria">search conditions</param>
-            <param name="page">page to retrieve data</param>
-            <param name="size">number items per page</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPartnerController.Get(System.String)">
-            <summary>
-            get partner by id
-            </summary>
-            <param name="id">id of data that need to retrieve</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPartnerController.Post(eFMS.API.Accounting.Models.CatPartnerEditModel)">
-            <summary>
-            add new partner
-            </summary>
-            <param name="model">object to add</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPartnerController.Put(System.String,eFMS.API.Accounting.Models.CatPartnerEditModel)">
-            <summary>
-            update an existed item
-            </summary>
-            <param name="id">id of data that need to update</param>
-            <param name="model">object to update</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPartnerController.Delete(System.String)">
-            <summary>
-            delete an existed item
-            </summary>
-            <param name="id">id of data that need to delete</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPartnerController.GetDepartments">
-            <summary>
-            get department
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPartnerController.Import(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.CatPartnerImportModel})">
-            <summary>
-            import list partner
-            </summary>
-            <param name="data"></param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPartnerController.DownloadExcel">
-            <summary>
-            download file excel from server
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPartnerController.UploadFile(Microsoft.AspNetCore.Http.IFormFile)">
-            <summary>
-            read data from file excel
-            </summary>
-            <param name="uploadedFile"></param>
-            <returns></returns>
-        </member>
-        <member name="T:eFMS.API.Accounting.Controllers.CatPlaceController">
-            <summary>
-            A base class for an MVC controller without view support.
-            </summary>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPlaceController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Accounting.DL.Common.LanguageSub},eFMS.API.Accounting.DL.IService.ICatPlaceService,AutoMapper.IMapper)">
-            <summary>
-            constructor
-            </summary>
-            <param name="localizer">inject interface IStringLocalizer</param>
-            <param name="service">inject interface ICatPlaceService</param>
-            <param name="iMapper">inject interface IMapper</param>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPlaceController.Get">
-            <summary>
-            get all places
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPlaceController.Get(eFMS.API.Accounting.DL.Models.Criteria.CatPlaceCriteria)">
-            <summary>
-            get the list of all places
-            </summary>
-            <param name="criteria">search conditions</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPlaceController.Get(eFMS.API.Accounting.DL.Models.Criteria.CatPlaceCriteria,System.Int32,System.Int32)">
-            <summary>
-            get and paging the list of places by conditions
-            </summary>
-            <param name="criteria">search conditions</param>
-            <param name="page">page to retrieve data</param>
-            <param name="size">number items per page</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPlaceController.Get(System.Guid)">
-            <summary>
-            get place by id
-            </summary>
-            <param name="id">id to retrieve data</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPlaceController.GetProvinces(System.Nullable{System.Int16})">
-            <summary>
-            get the list of provinces by country
-            </summary>
-            <param name="countryId">country id</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPlaceController.GetDistricts(System.Nullable{System.Guid})">
-            <summary>
-            get the list of districts by province
-            </summary>
-            <param name="provinceId">province id</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPlaceController.GetModeOfTransport">
-            <summary>
-            get the list of mode
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPlaceController.Post(eFMS.API.Accounting.Models.CatPlaceEditModel)">
-            <summary>
-            add new place
-            </summary>
-            <param name="model">object to add</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPlaceController.Put(System.Guid,eFMS.API.Accounting.Models.CatPlaceEditModel)">
-            <summary>
-            update an existed item
-            </summary>
-            <param name="id">id of data that want to update</param>
-            <param name="model">object to update</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPlaceController.Delete(System.Guid)">
-            <summary>
-            delete an existed item
-            </summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPlaceController.DownloadExcel(eFMS.API.Common.Globals.CatPlaceTypeEnum)">
-            <summary>
-            download an excel file from server
-            </summary>
-            <param name="type">type of partner</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPlaceController.UpLoadFile(Microsoft.AspNetCore.Http.IFormFile,eFMS.API.Common.Globals.CatPlaceTypeEnum)">
-            <summary>
-            read data from excel file
-            </summary>
-            <param name="uploadedFile">file upload</param>
-            <param name="type"></param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatPlaceController.Import(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.CatPlaceImportModel})">
-            <summary>
-            import partner data
-            </summary>
-            <param name="data">data to import</param>
-            <returns></returns>
-        </member>
-        <member name="T:eFMS.API.Accounting.Controllers.CatStageController">
-            <summary>
-            A base class for an MVC controller without view support.
-            </summary>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatStageController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Accounting.DL.Common.LanguageSub},eFMS.API.Accounting.DL.IService.ICatStageService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,Microsoft.Extensions.Caching.Distributed.IDistributedCache)">
-            <summary>
-            constructor
-            </summary>
-            <param name="localizer">inject IStringLocalizer service</param>
-            <param name="service">inject ICatStageService service</param>
-            <param name="user">inject ICurrentUser service</param>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatStageController.GetAll">
-            <summary>
-            get all
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatStageController.Get(eFMS.API.Accounting.DL.Models.Criteria.CatStageCriteria,System.Int32,System.Int32)">
-            <summary>
-            get and paging the list of stages by conditions
+            get and paging the list of Advance Payment by conditions
             </summary>
             <param name="criteria">search conditions</param>
             <param name="pageNumber">page to retrieve data</param>
             <param name="pageSize">number items per page</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatStageController.Get(eFMS.API.Accounting.DL.Models.Criteria.CatStageCriteria)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.QueryData(eFMS.API.Accounting.DL.Models.Criteria.AcctAdvancePaymentCriteria)">
             <summary>
-            get the list of stages
+            get list advance payment by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.GetGrpRequestsByAdvanceNo(System.String)">
+            <summary>
+            Get Group Requests by AdvanceNo
+            </summary>
+            <param name="advanceNo">advanceNo that want to retrieve Advance Request</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.GetGrpRequestsByAdvanceId(System.Guid)">
+            <summary>
+            Get Group Requests by AdvanceId
+            </summary>
+            <param name="advanceId">advanceId that want to retrieve Advance Request</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.GetShipments">
+            <summary>
+            Get shipments (JobId, HBL, MBL) from shipment documentation and shipment operation
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.Add(eFMS.API.Accounting.DL.Models.AcctAdvancePaymentModel)">
+            <summary>
+            add new advance payment (include advance request)
+            </summary>
+            <param name="model">object to add</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.CheckShipmentsExistInAdvancePayment(eFMS.API.Accounting.DL.Models.Criteria.ShipmentAdvancePaymentCriteria)">
+            <summary>
+            Check shipment exists in advance payment
             </summary>
             <param name="criteria"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatStageController.Get(System.Int32)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.Delete(System.String)">
             <summary>
-            get stage by id
+            delete an advance payment existed item
             </summary>
-            <param name="id"></param>
+            <param name="advanceNo">advanceNo of existed item that want to delete</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatStageController.AddStage(eFMS.API.Accounting.DL.Models.CatStageModel)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.GetAdvancePaymentByAdvanceNo(System.String)">
             <summary>
-            add new stage
+            Get Advance Payment by AdvanceNo
             </summary>
-            <param name="catStageModel">object to add</param>
+            <param name="advanceNo">advanceNo that want to retrieve Advance Payment</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatStageController.UpdateStage(eFMS.API.Accounting.DL.Models.CatStageModel)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.GetAdvancePaymentByAdvanceId(System.Guid)">
             <summary>
-            update an existed item
+            Get Advance Payment by AdvanceId
             </summary>
-            <param name="catStageModel">object to update</param>
+            <param name="advanceId">advanceId that want to retrieve Advance Payment</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatStageController.DeleteStage(System.Int32)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.Update(eFMS.API.Accounting.DL.Models.AcctAdvancePaymentModel)">
             <summary>
-            delete an existed item
-            </summary>
-            <param name="id">id of item that want to delete</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatStageController.UploadFile(Microsoft.AspNetCore.Http.IFormFile)">
-            <summary>
-            read data of file excel
-            </summary>
-            <param name="uploadedFile">file to upload</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatStageController.Import(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.CatStageImportModel})">
-            <summary>
-            import list of stages
-            </summary>
-            <param name="data"></param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatStageController.DownloadExcel">
-            <summary>
-            download a file excel from server
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="T:eFMS.API.Accounting.Controllers.CatUnitController">
-            <summary>
-            A base class for an MVC controller without view support.
-            </summary>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatUnitController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Accounting.DL.Common.LanguageSub},eFMS.API.Accounting.DL.IService.ICatUnitService)">
-            <summary>
-            constructor
-            </summary>
-            <param name="localizer">inject IStringLocalizer service</param>
-            <param name="service">inject ICatUnitService service</param>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatUnitController.Get">
-            <summary>
-            get all units
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatUnitController.GetUnitTypes">
-            <summary>
-            get all unit types
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatUnitController.Get(eFMS.API.Accounting.DL.Models.Criteria.CatUnitCriteria)">
-            <summary>
-            get the list of units
-            </summary>
-            <param name="criteria">search conditions</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatUnitController.Get(eFMS.API.Accounting.DL.Models.Criteria.CatUnitCriteria,System.Int32,System.Int32)">
-            <summary>
-            get and paging the list of units by conditions
-            </summary>
-            <param name="criteria">search conditions</param>
-            <param name="page">page to retrieve data</param>
-            <param name="size">number items per page</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatUnitController.Get(System.Int32)">
-            <summary>
-            get unit by id
-            </summary>
-            <param name="id">id of data that need to retrieve</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatUnitController.Post(eFMS.API.Accounting.DL.Models.CatUnitModel)">
-            <summary>
-            add new unit
-            </summary>
-            <param name="model">object to delete</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatUnitController.Put(eFMS.API.Accounting.DL.Models.CatUnitModel)">
-            <summary>
-            update an existed item
+            Update Advance Payment
             </summary>
             <param name="model">object to update</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.CatUnitController.Delete(System.Int16)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.PreviewAdvancePaymentRequest(System.Guid)">
+            <summary>
+            Preview Advance Payment Request By Advance Id
+            </summary>
+            <param name="advanceId">advanceId that want to retrieve preview advance payment request</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.PreviewAdvancePaymentRequest(eFMS.API.Accounting.DL.Models.AcctAdvancePaymentModel)">
+            <summary>
+            Preview Advance Payment Request
+            </summary>
+            <param name="advance"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.SaveAndSendRequest(eFMS.API.Accounting.DL.Models.AcctAdvancePaymentModel)">
+            <summary>
+            Save and Send Request
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.UpdateApprove(System.Guid)">
+            <summary>
+            Update Approve Advance
+            </summary>
+            <param name="advanceId">advanceId that want to retrieve Update Approve</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.DeniedApprove(System.Guid,System.String)">
+            <summary>
+            Denie Approve Advance
+            </summary>
+            <param name="advanceId">advanceId that want to retrieve Denie Approve</param>
+            <param name="comment">comment reason that want to retrieve Denie Approve</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.GetInfoApproveAdvanceByAdvanceNo(System.String)">
+            <summary>
+            Get information approve advance by advanceNo
+            </summary>
+            <param name="advanceNo">advanceNo that want to retrieve approve advance</param>
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Accounting.DL.Common.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctSettlementPaymentService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,AutoMapper.IMapper)">
+            <summary>
+            Contructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="service"></param>
+            <param name="user"></param>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.Paging(eFMS.API.Accounting.DL.Models.Criteria.AcctSettlementPaymentCriteria,System.Int32,System.Int32)">
+            <summary>
+            get and paging the list of Settlement Payment by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
+            <param name="pageNumber">page to retrieve data</param>
+            <param name="pageSize">number items per page</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.QueryData(eFMS.API.Accounting.DL.Models.Criteria.AcctSettlementPaymentCriteria)">
+            <summary>
+            get list settlement payment by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetShipmentOfSettlements(System.String)">
+            <summary>
+            Get list shipment of settlement payment list by settlementNo
+            </summary>
+            <param name="settlementNo">settlementNo that want to retrieve Settlement Payment</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.Delete(System.String)">
+            <summary>
+            delete an settlement payment existed item
+            </summary>
+            <param name="settlementNo">settlementNo of existed item that want to delete</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetDetailSettlementPaymentById(System.Guid)">
+            <summary>
+            Get details settlement payment by settlementId
+            </summary>
+            <param name="settlementId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetPaymentManagementByShipment(System.String,System.String,System.String)">
+            <summary>
+            Get Payment Management By Shipment
+            </summary>
+            <param name="JobId"></param>
+            <param name="MBL"></param>
+            <param name="HBL"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetExistsCharge(System.String,System.String,System.String)">
+            <summary>
+            Get exists charge by shipment
+            </summary>
+            <param name="JobId"></param>
+            <param name="HBL"></param>
+            <param name="MBL"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.CheckDuplicateShipmentSettlement(eFMS.API.Accounting.DL.Models.Criteria.CheckDuplicateShipmentSettlementCriteria)">
+            <summary>
+            Check duplicate shipment settlement
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.Add(eFMS.API.Accounting.DL.Models.SettlementPayment.CreateUpdateSettlementModel)">
+            <summary>
+            add new settlement payment
+            </summary>
+            <param name="model">object to add</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.Update(eFMS.API.Accounting.DL.Models.SettlementPayment.CreateUpdateSettlementModel)">
+            <summary>
+            Update Settlement Payment
+            </summary>
+            <param name="model">object to update</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.SaveAndSendRequest(eFMS.API.Accounting.DL.Models.SettlementPayment.CreateUpdateSettlementModel)">
+            <summary>
+            Save and Send Request
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.UpdateApprove(System.Guid)">
+            <summary>
+            Update Approve Settlement
+            </summary>
+            <param name="settlementId">settlementId that want to retrieve Update Approve</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.DeniedApprove(System.Guid,System.String)">
+            <summary>
+            Denie Approve Settlement
+            </summary>
+            <param name="settlementId">settlementId that want to retrieve Denie Approve</param>
+            <param name="comment">comment reason that want to retrieve Denie Approve</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetInfoApproveSettlementBySettlementNo(System.String)">
+            <summary>
+            Get information approve settlement by settlementNo
+            </summary>
+            <param name="settlementNo">settlementNo that want to retrieve approve settlement</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.Preview(System.String)">
+            <summary>
+            Preview Settlement 
+            </summary>
+            <param name="settlementNo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetListSceneChargeSettlementBySettlementNo(System.String)">
+            <summary>
+            Get list scene charge of settlement by settlementNo
+            </summary>
+            <param name="settlementNo">settlementNo that want to retrieve list scene charge</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.CopyCharges(eFMS.API.Accounting.DL.Models.Criteria.ShipmentsCopyCriteria)">
+            <summary>
+            Copy Charge from Settlement old to settlement new
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.Accounting.Controllers.AcctSOAController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Accounting.DL.Common.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctSOAService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+            <summary>
+            constructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="service"></param>
+            <param name="user"></param>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.AddNew(eFMS.API.Accounting.DL.Models.AcctSoaModel)">
+            <summary>
+            add new SOA
+            </summary>
+            <param name="model">object to add</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.UpdateSOA(eFMS.API.Accounting.DL.Models.AcctSoaModel)">
+            <summary>
+            Update SOA
+            </summary>
+            <param name="model">object to update</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.Delete(System.String)">
             <summary>
             delete an existed item
             </summary>
-            <param name="id">id of data that want to delete</param>
+            <param name="soaNo">soaNo of existed item that want to delete</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.Paging(eFMS.API.Accounting.DL.Models.Criteria.AcctSOACriteria,System.Int32,System.Int32)">
+            <summary>
+            get and paging the list of SOA by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
+            <param name="pageNumber">page to retrieve data</param>
+            <param name="pageSize">number items per page</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.QueryData(eFMS.API.Accounting.DL.Models.Criteria.AcctSOACriteria)">
+            <summary>
+            get list soa by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.GetBySoaNoAndCurrencyLocal(System.String,System.String)">
+            <summary>
+            get SOA by soaNo and currencyLocal
+            </summary>
+            <param name="soaNo">soaNo that want to retrieve SOA</param>
+            <param name="currencyLocal">currencyLocal that want to retrieve SOA</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.GetListStatusSoa">
+            <summary>
+            get list status of soa
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.GetShipmentsAndCDdNotesNotExistInResultFilter(eFMS.API.Accounting.DL.Models.Criteria.MoreChargeShipmentCriteria)">
+            <summary>
+            Get list shipment(JobId, HBL, MBL) and list CDNotes(CreditDebitNo) not exist in result filter
+            </summary>
+            <param name="criteria">search conditions</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.GetListMoreChargeByCondition(eFMS.API.Accounting.DL.Models.Criteria.MoreChargeShipmentCriteria)">
+            <summary>
+            get list more charge not exists in list charge on form Info
+            </summary>
+            <param name="criteria">search conditions</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.AddMoreCharge(eFMS.API.Accounting.DL.Models.Criteria.AddMoreChargeCriteria)">
+            <summary>
+            add more charge
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.GetDataExportSOABySOANo(System.String,System.String)">
+            <summary>
+            Export SOA detail by SOANo
+            </summary>
+            <param name="soaNo">soaNo that want to retrieve SOA</param>
+            <param name="currencyLocal">currencyLocal that want to retrieve SOA</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.ExportDetailSOA(eFMS.API.Accounting.DL.Models.Criteria.ExportDetailSOACriteria)">
+            <summary>
+            Data Export Details SOA
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.ListChargeShipment(eFMS.API.Accounting.DL.Models.Criteria.ChargeShipmentCriteria)">
+            <summary>
+            Get list charge shipment by conditions
+            </summary>
             <returns></returns>
         </member>
     </members>

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { API_MENU } from 'src/constants/api-menu.const';
@@ -8,19 +8,21 @@ import { PagingService } from 'src/app/shared/services/paging-service';
 import { SystemConstants } from 'src/constants/system.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { AddMoreModalComponent } from './add-more-modal/add-more-modal.component';
-import { OperationRepo } from 'src/app/shared/repositories';
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
+import { catchError, finalize, takeUntil, switchMap, tap } from 'rxjs/operators';
 import { AppPage } from 'src/app/app.base';
+import { ActivatedRoute } from '@angular/router';
+import { NgProgress } from '@ngx-progressbar/core';
 
 @Component({
     selector: 'app-billing-custom-declaration',
     templateUrl: './billing-custom-declaration.component.html',
-    styleUrls: ['./billing-custom-declaration.component.scss']
 })
 export class BillingCustomDeclarationComponent extends AppPage implements OnInit {
 
     @ViewChild(AddMoreModalComponent, { static: false }) poupAddMore: AddMoreModalComponent;
-    @Input() currentJob: OpsTransaction;
+    jobId: string = '';
+    currentJob: OpsTransaction;
 
     notImportedCustomClearances: any[];
     customClearances: any[];
@@ -36,21 +38,50 @@ export class BillingCustomDeclarationComponent extends AppPage implements OnInit
     isDesc = true;
     sortKey: string = "";
 
-    constructor(private baseServices: BaseService,
+    constructor(
+        private baseServices: BaseService,
         private api_menu: API_MENU,
         private pagerService: PagingService,
         private sortService: SortService,
-        private _operationRepo: OperationRepo) {
+        private _documentRepo: DocumentationRepo,
+        private _operationRepo: OperationRepo,
+        private _activedRouter: ActivatedRoute,
+        private _ngProgressService: NgProgress,
+
+    ) {
         super();
+        this._progressRef = this._ngProgressService.ref();
+
     }
 
     ngOnInit() {
-        this.pagerMaster.currentPage = 1;
-        this.pagerMaster.totalItems = 0;
-        if (this.currentJob != null) {
-            this.getCustomClearanesOfJob(this.currentJob.jobNo);
-            this.getListCleranceNotImported();
-        }
+        this._activedRouter.params.subscribe((param: { id: string }) => {
+            if (!!param.id) {
+                this.jobId = param.id;
+                this.pagerMaster.currentPage = 1;
+                this.pagerMaster.totalItems = 0;
+                this.getShipmentDetails(this.jobId);
+            }
+        });
+    }
+
+    getShipmentDetails(id: any) {
+        this._progressRef.start();
+        this._documentRepo.getDetailShipment(id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete()),
+                tap((response: any) => {
+                    this.currentJob = response;
+                }),
+                switchMap(() => // * get list cd imported in job
+                    this._operationRepo.getListImportedInJob(this.currentJob.jobNo)
+                )
+            ).subscribe(
+                (response: any) => {
+                    this.getListCleranceNotImported();
+                },
+            );
     }
 
     getCustomClearanesOfJob(jobNo: string) {

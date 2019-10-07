@@ -15,6 +15,8 @@ namespace eFMS.API.Accounting.DL.IService
     {
         List<AcctSettlementPaymentResult> Paging(AcctSettlementPaymentCriteria criteria, int page, int size, out int rowsCount);
 
+        IQueryable<AcctSettlementPaymentResult> QueryData(AcctSettlementPaymentCriteria criteria);
+
         List<ShipmentOfSettlementResult> GetShipmentOfSettlements(string settlementNo);
 
         HandleState DeleteSettlementPayment(string settlementNo);

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
@@ -52,6 +53,7 @@ namespace eFMS.API.Catalogue.DL.Services
             if (hs.Success)
             {
                 cache.Remove(Templates.CatCountry.NameCaching.ListName);
+                RedisCacheHelper.SetObject(cache, Templates.CatCountry.NameCaching.ListName, DataContext.Get());
             }
             return hs;
         }
@@ -68,6 +70,7 @@ namespace eFMS.API.Catalogue.DL.Services
             if (hs.Success)
             {
                 cache.Remove(Templates.CatCountry.NameCaching.ListName);
+                RedisCacheHelper.SetObject(cache, Templates.CatCountry.NameCaching.ListName, DataContext.Get());
             }
             return hs;
         }
@@ -78,6 +81,7 @@ namespace eFMS.API.Catalogue.DL.Services
             if (hs.Success)
             {
                 cache.Remove(Templates.CatCountry.NameCaching.ListName);
+                RedisCacheHelper.SetObject(cache, Templates.CatCountry.NameCaching.ListName, DataContext.Get());
             }
             return hs;
         }
@@ -94,10 +98,10 @@ namespace eFMS.API.Catalogue.DL.Services
             return GetDataByLanguage(data);
         }
         
-        public List<CatCountry> GetCountries(CatCountryCriteria criteria, int page, int size, out int rowsCount)
+        public IQueryable<CatCountryModel> GetCountries(CatCountryCriteria criteria, int page, int size, out int rowsCount)
         {
-            List<CatCountry> returnList = null;
-            var data = Query(criteria);
+            IQueryable<CatCountryModel> returnList = null;
+            var data = GetBy(criteria);
             rowsCount = data.Count();
             if (rowsCount == 0)
                 return returnList;
@@ -108,7 +112,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     page = 1;
                 }
-                returnList = data.Skip((page - 1) * size).Take(size).ToList();
+                returnList = data.Skip((page - 1) * size).Take(size).ProjectTo<CatCountryModel>(mapper.ConfigurationProvider);
             }
             return returnList;        
         }
@@ -188,8 +192,13 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatCountry> Query(CatCountryCriteria criteria)
         {
-            IQueryable <CatCountry> data = RedisCacheHelper.Get<CatCountry>(cache, Templates.CatCountry.NameCaching.ListName);
-            IQueryable<CatCountry> returnList = null;
+            IQueryable<CatCountry> data = GetBy(criteria);
+            if (data == null) return null;
+            return data.ProjectTo<CatCountryModel>(mapper.ConfigurationProvider);
+        }
+
+        private IQueryable<CatCountry> GetBy(CatCountryCriteria criteria)
+        {
             Expression<Func<CatCountry, bool>> query = null;
             if (criteria.condition == SearchCondition.AND)
             {
@@ -202,25 +211,19 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 query = x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                                 || (x.NameEn ?? "").IndexOf(criteria.NameEn ?? "null", StringComparison.OrdinalIgnoreCase) > -1
-                                                                || (x.NameVn ?? "").IndexOf(criteria.NameVn ?? "null", StringComparison.OrdinalIgnoreCase) > - 1)
+                                                                || (x.NameVn ?? "").IndexOf(criteria.NameVn ?? "null", StringComparison.OrdinalIgnoreCase) > -1)
                                                                 && (x.Inactive == criteria.Inactive || criteria.Inactive == null);
             }
-            returnList = Query(data, query);
-
-            return returnList;
-        }
-
-        private IQueryable<CatCountry> Query(IQueryable<CatCountry>  dataFromCache, Expression<Func<CatCountry, bool>> query)
-        {
-            if (dataFromCache == null)
+            IQueryable<CatCountry> data = RedisCacheHelper.Get<CatCountry>(cache, Templates.CatCountry.NameCaching.ListName);
+            if (data == null)
             {
-                RedisCacheHelper.SetObject(cache, Templates.CatCountry.NameCaching.ListName, DataContext.Get());
-                return DataContext.Get(query);
+                data = DataContext.Get(query);
             }
             else
             {
-                return dataFromCache.Where(query);
+                data = data.Where(query);
             }
+            return data;
         }
 
         private List<CatCountryViewModel> GetDataByLanguage(IQueryable<CatCountry> data)

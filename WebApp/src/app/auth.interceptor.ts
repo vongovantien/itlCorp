@@ -3,7 +3,6 @@ import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
-import { environment } from 'src/environments/environment';
 
 @Injectable({
     providedIn: 'root'
@@ -23,9 +22,15 @@ export class AuthInterceptor implements HttpInterceptor {
         // } else {
         //     this.authReq = req.clone(Object.assign({}, req, { headers: req.headers.set('Authorization', authHeader), url: req.url }));
         // }
-        this.authReq = req.clone(Object.assign({}, req, { url: req.url }));
+        this.authReq = req.clone(Object.assign({}, req, { headers: req.headers.set('Authorization', authHeader), url: req.url }));
+
         return next.handle(this.authReq).pipe(
             catchError((error: HttpErrorResponse) => {
+                switch (error.status) {
+                    case 401:
+                        window.location.href = '/login';
+                        break;
+                }
                 let errorMessage = '';
                 let title = '';
                 if (error.error instanceof ErrorEvent) {

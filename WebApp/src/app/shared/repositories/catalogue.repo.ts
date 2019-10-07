@@ -30,8 +30,8 @@ export class CatalogueRepo {
         );
     }
 
-    getCommondity() {
-        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommonity/Query`, {}).pipe(
+    getCommondity(body?: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommonity/Query`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => {
                 return data;
@@ -39,8 +39,8 @@ export class CatalogueRepo {
         );
     }
 
-    getCommodityGroup() {
-        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommodityGroup/Query`, {}).pipe(
+    getCommodityGroup(body?: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCommodityGroup/Query`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => {
                 return data;
@@ -51,7 +51,7 @@ export class CatalogueRepo {
 
     getUnit(body?: any) {
         if (!!body) {
-            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatUnit/Query`, { body }).pipe(
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatUnit/Query`, body).pipe(
                 map((res: any) => {
                     return res;
                 })
@@ -87,7 +87,14 @@ export class CatalogueRepo {
         }
 
     }
-
+    getPartnersByType(type) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetBy`, { partnerGroup: type }).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
     getListPartner(page?: number, size?: number, data?: any) {
         if (!!page && !!size) {
             return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/paging`, {}, {
@@ -178,7 +185,51 @@ export class CatalogueRepo {
 
     getListPort(body?: any) {
         if (!!body) {
-            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/Query`, { body }).pipe(
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/Query`, body).pipe(
+                map((res: any) => {
+                    return res;
+                })
+            );
+        } else {
+            this.getPlace();
+        }
+    }
+
+    getListAllCountry() {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCountry/getAll`).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    getCountryByLanguage() {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCountry/GetByLanguage`).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    getProvinces() {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/GetProvinces`).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    getDistricts() {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/GetDistricts`).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    getPlace(body?: any) {
+        if (!!body) {
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/Query`, body).pipe(
                 map((res: any) => {
                     return res;
                 })
@@ -190,10 +241,10 @@ export class CatalogueRepo {
                 })
             );
         }
-    }
 
-    getListAllCountry() {
-        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCountry/getAll`).pipe(
+    }
+    getCharges(body?: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/Query`, body).pipe(
             map((res: any) => {
                 return res;
             })

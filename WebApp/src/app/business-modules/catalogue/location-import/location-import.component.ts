@@ -9,8 +9,8 @@ import { ActivatedRoute } from '@angular/router';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { NgProgressComponent } from '@ngx-progressbar/core';
 import { PagingService, BaseService, SortService } from 'src/app/shared/services';
+import { InfoPopupComponent } from 'src/app/shared/common/popup';
 
-declare var $: any;
 @Component({
   selector: 'app-location-import',
   templateUrl: './location-import.component.html',
@@ -25,10 +25,14 @@ export class LocationImportComponent implements OnInit {
   isShowInvalid: boolean = true;
   pager: PagerSetting = PAGINGSETTING;
   type: string;
+  inputFile: string;
+  isDesc = true;
+  sortKey: string;
 
   @ViewChild('form', { static: false }) form: any;
   @ViewChild(PaginationComponent, { static: false }) child: any;
   @ViewChild(NgProgressComponent, { static: false }) progressBar: NgProgressComponent;
+  @ViewChild(InfoPopupComponent, { static: false }) invaliDataAlert: InfoPopupComponent;
   constructor(
     private pagingService: PagingService,
     private baseService: BaseService,
@@ -41,25 +45,25 @@ export class LocationImportComponent implements OnInit {
     this.pager.totalItems = 0;
     this.route.queryParams.subscribe(prams => {
       console.log(prams["type"]);
-      if (prams.type != undefined) {
+      if (prams.type !== undefined) {
         this.type = prams.type;
       }
     });
   }
   chooseFile(file: Event) {
-    if (file.target['files'] == null) return;
+    if (file.target['files'] == null) { return; }
     this.progressBar.start();
     let url = '';
-    if (this.type == 'province') {
+    if (this.type === 'province') {
       url = this.api_menu.Catalogue.CatPlace.uploadExel + "?type=" + PlaceTypeEnum.Province;
     }
-    if (this.type == 'district') {
+    if (this.type === 'district') {
       url = this.api_menu.Catalogue.CatPlace.uploadExel + "?type=" + PlaceTypeEnum.District;
     }
-    if (this.type == 'ward') {
+    if (this.type === 'ward') {
       url = this.api_menu.Catalogue.CatPlace.uploadExel + "?type=" + PlaceTypeEnum.Ward;
     }
-    if (this.type == 'country') {
+    if (this.type === 'country') {
       url = this.api_menu.Catalogue.Country.uploadExel;
     }
     this.baseService.uploadfile(url, file.target['files'], "uploadedFile")
@@ -84,19 +88,19 @@ export class LocationImportComponent implements OnInit {
   async downloadSample() {
     let url = '';
     let fileName = 'ImportTemplate.xlsx';
-    if (this.type == 'province') {
+    if (this.type === 'province') {
       url = this.api_menu.Catalogue.CatPlace.downloadExcel + "?type=" + PlaceTypeEnum.Province;
       fileName = "Province" + fileName;
     }
-    if (this.type == 'district') {
+    if (this.type === 'district') {
       url = this.api_menu.Catalogue.CatPlace.downloadExcel + "?type=" + PlaceTypeEnum.District;
       fileName = "District" + fileName;
     }
-    if (this.type == 'ward') {
+    if (this.type === 'ward') {
       url = this.api_menu.Catalogue.CatPlace.downloadExcel + "?type=" + PlaceTypeEnum.Ward;
       fileName = "Ward" + fileName;
     }
-    if (this.type == 'country') {
+    if (this.type === 'country') {
       url = this.api_menu.Catalogue.Country.downloadExcel;
       fileName = "Country" + fileName;
     }
@@ -110,47 +114,43 @@ export class LocationImportComponent implements OnInit {
       this.pager = this.pagingService.getPager(this.data.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
       this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
       this.pagedItems = this.data.slice(this.pager.startIndex, this.pager.endIndex + 1);
-    }
-    else {
+    } else {
       this.pager = this.pagingService.getPager(this.inValidItems.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
       this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
       this.pagedItems = this.inValidItems.slice(this.pager.startIndex, this.pager.endIndex + 1);
     }
   }
   hideInvalid() {
-    if (this.data == null) return;
+    if (this.data == null) { return; }
     this.isShowInvalid = !this.isShowInvalid;
-    //this.sortKey = '';
     if (this.isShowInvalid) {
       this.pager.totalItems = this.data.length;
-    }
-    else {
+    } else {
       this.inValidItems = this.data.filter(x => !x.isValid);
       this.pager.totalItems = this.inValidItems.length;
     }
     this.child.setPage(this.pager.currentPage);
   }
   async import() {
-    if (this.data == null) return;
+    if (this.data == null) { return; }
     if (this.totalRows - this.totalValidRows > 0) {
-      $('#upload-alert-modal').modal('show');
-    }
-    else {
-      let data = this.data.filter(x => x.isValid);
+      this.invaliDataAlert.show();
+    } else {
+      const data = this.data.filter(x => x.isValid);
       let url = '';
-      if (this.type == 'province') {
+      if (this.type === 'province') {
         url = this.api_menu.Catalogue.CatPlace.import + "?type=" + PlaceTypeEnum.Province;
       }
-      if (this.type == 'district') {
+      if (this.type === 'district') {
         url = this.api_menu.Catalogue.CatPlace.import + "?type=" + PlaceTypeEnum.District;
       }
-      if (this.type == 'ward') {
+      if (this.type === 'ward') {
         url = this.api_menu.Catalogue.CatPlace.import + "?type=" + PlaceTypeEnum.Ward;
       }
-      if (this.type == 'country') {
+      if (this.type === 'country') {
         url = this.api_menu.Catalogue.Country.import;
       }
-      var response = await this.baseService.postAsync(url, data);
+      const response = await this.baseService.postAsync(url, data);
       if (response) {
         this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
         this.pager.totalItems = 0;
@@ -162,14 +162,9 @@ export class LocationImportComponent implements OnInit {
   reset() {
     this.data = null;
     this.pagedItems = null;
-    $("#inputFile").val('');
-    //this.form.nativeElement.onReset();
+    this.inputFile = null;
     this.pager.totalItems = 0;
   }
-
-
-  isDesc = true;
-  sortKey: string;
   sort(property: string) {
     this.isDesc = !this.isDesc;
     this.sortKey = property;

@@ -25,7 +25,6 @@
                         </div>
                     </td>
                     <ng-container *ngFor="let map of columnMaps">
-                        <!-- {{ record[map.primaryKey] }} -->
                         <td [ctStyleCell]="record[map.primaryKey]" *ngIf="map.isShow">
                             <app-input-table-layout [item]="record" [column]="map"></app-input-table-layout>
                         </td>

@@ -3,11 +3,12 @@ import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mo
 import { PopupBase } from 'src/app/popup.base';
 import { NgForm } from '@angular/forms';
 import { CsShipmentSurcharge } from 'src/app/shared/models/document/csShipmentSurcharge';
-import { BaseService } from 'src/app/shared/services';
+import { BaseService, DataService } from 'src/app/shared/services';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { ChargeConstants } from 'src/constants/charge.const';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { prepareNg2SelectData } from 'src/helper/data.helper';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'app-add-obh-rate-popup',
@@ -20,7 +21,7 @@ export class AddObhRatePopupComponent extends PopupBase implements OnInit {
     currentActiveItemDefault: any[] = [];
     obhChargeToAdd: CsShipmentSurcharge = new CsShipmentSurcharge();
     lstOBHChargesComboBox: any[] = [];
-    lstPartners: any[] = [];
+    @Input() lstPartners: any[] = [];
     lstUnits: any[] = [];
     lstCurrencies: any[] = [];
     currentSelectedCharge: string = null;
@@ -28,14 +29,36 @@ export class AddObhRatePopupComponent extends PopupBase implements OnInit {
     invoiceDate: any;
 
     constructor(private baseServices: BaseService,
+        private _data: DataService,
         private api_menu: API_MENU) {
         super();
     }
 
     ngOnInit() {
-        this.getListOBHCharges();
-        this.getPartners();
-        this.getUnits();
+        if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)) {
+            this.lstCurrencies = prepareNg2SelectData(this._data.getDataByKey(SystemConstants.CSTORAGE.CURRENCY), "id", "id");
+        } else {
+            this.getCurrencies();
+        }
+
+        if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.UNIT)) {
+            this.lstUnits = this._data.getDataByKey(SystemConstants.CSTORAGE.UNIT);
+        } else {
+            this.getUnits();
+        }
+
+        if (!!this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
+            this.lstPartners = this._data.getDataByKey(SystemConstants.CSTORAGE.PARTNER);
+        }
+        // else {
+        //     this.getPartners();
+        // }
+
+        if (!!this._data.getDataByKey("obhCharges")) {
+            this.lstOBHChargesComboBox = this._data.getDataByKey('obhCharges');
+        } else {
+            this.getListOBHCharges();
+        }
     }
 
     close(form: NgForm) {
@@ -43,8 +66,8 @@ export class AddObhRatePopupComponent extends PopupBase implements OnInit {
         this.obhChargeToAdd = new CsShipmentSurcharge();
         this.currentActiveItemDefault = [];
         this.currentSelectedCharge = null;
-        // this.hide();
     }
+
     calculateTotalEachOBH(isEdit: boolean = false) {
         let total = 0;
         if (this.obhChargeToAdd.vatrate >= 0) {
@@ -79,31 +102,27 @@ export class AddObhRatePopupComponent extends PopupBase implements OnInit {
         }, 300);
     }
 
-    public getListOBHCharges() {
+    getListOBHCharges() {
         this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'OBH', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
             this.lstOBHChargesComboBox = res['data'];
         });
     }
 
-    public getPartners() {
+    getPartners() {
         this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.ALL, inactive: false }).subscribe((res: any) => {
             this.lstPartners = res;
         });
     }
 
-    public getUnits() {
+    getUnits() {
         this.baseServices.post(this.api_menu.Catalogue.Unit.getAllByQuery, { inactive: false }).subscribe((data: any) => {
             this.lstUnits = data;
         });
     }
 
-    public getCurrencies() {
+    getCurrencies() {
         this.baseServices.post(this.api_menu.Catalogue.Currency.getAllByQuery, { inactive: false }).subscribe((res: any) => {
             this.lstCurrencies = prepareNg2SelectData(res, "id", "id");
         });
-    }
-
-    public typed(value: any): void {
-        console.log('New search input: ', value);
     }
 }
