@@ -10,7 +10,6 @@ using eFMS.API.Operation.DL.IService;
 using eFMS.API.Operation.DL.Models;
 using eFMS.API.Operation.Infrastructure.Common;
 using eFMS.API.Operation.Infrastructure.Middlewares;
-using eFMS.API.Operation.Resources;
 using eFMS.API.Operation.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
@@ -42,7 +41,7 @@ namespace eFMS.API.Operation.Controllers
         /// <param name="service"></param>
         /// <param name="iMapper"></param>
         /// <param name="user"></param>
-        public OpsStageAssignedController(IStringLocalizer<Resources.LanguageSub> localizer, 
+        public OpsStageAssignedController(IStringLocalizer<LanguageSub> localizer, 
             IOpsStageAssignedService service, 
             IMapper iMapper,
             ICurrentUser user)
@@ -81,12 +80,38 @@ namespace eFMS.API.Operation.Controllers
         /// get list of stages that not assigned to a job
         /// </summary>
         /// <param name="jobId"></param>
+        /// <param name="departmentStage"></param>
         /// <returns></returns>
         [HttpGet("GetNotAssigned")]
-        public IActionResult GetNotAssigned(Guid jobId)
+        public IActionResult GetNotAssigned(Guid jobId, int? departmentStage)
         {
-            var results = opsStageAssignedService.GetNotAssigned(jobId);
+            var results = opsStageAssignedService.GetNotAssigned(jobId, departmentStage);
             return Ok(results);
+        }
+
+        /// <summary>
+        /// add new stage to shipment
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("Add")]
+        public IActionResult Add(OpsStageAssignedEditModel model)
+        {
+            string message = string.Empty;
+            if (!ModelState.IsValid) return BadRequest();
+            if (opsStageAssignedService.Any(x => x.JobId == model.JobId && x.StageId == model.StageId && x.MainPersonInCharge == model.MainPersonInCharge))
+            {
+                message = stringLocalizer[LanguageSub.MSG_STAGE_ASSIGNED_EXISTED].Value;
+                return BadRequest(new ResultHandle { Status = false, Message = message });
+            }
+            var hs = opsStageAssignedService.Add(model);
+            message = HandleError.GetMessage(hs, Crud.Insert);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
 
         /// <summary>

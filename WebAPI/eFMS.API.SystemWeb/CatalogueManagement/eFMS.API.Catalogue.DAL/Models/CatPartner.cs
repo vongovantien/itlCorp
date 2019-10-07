@@ -63,6 +63,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
+        public string InternalReferenceNo { get; set; }
 
         public virtual ICollection<CatPartnerContact> CatPartnerContact { get; set; }
     }

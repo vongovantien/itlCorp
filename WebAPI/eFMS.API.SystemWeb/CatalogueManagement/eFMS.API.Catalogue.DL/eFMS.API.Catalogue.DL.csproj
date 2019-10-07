@@ -32,6 +32,7 @@
     <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="1.1.2" />
     <PackageReference Include="mongocsharpdriver" Version="2.7.2" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.5.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -43,9 +44,6 @@
     </Reference>
     <Reference Include="eFMS.IdentityServer.DL">
       <HintPath>..\bin\netcoreapp2.2\eFMS.IdentityServer.DL.dll</HintPath>
-    </Reference>
-    <Reference Include="eFMS.IdentityServer.Service">
-      <HintPath>..\bin\netcoreapp2.2\eFMS.IdentityServer.Service.dll</HintPath>
     </Reference>
     <Reference Include="ITL.NetCore.Common">
       <HintPath>..\bin\netcoreapp2.2\ITL.NetCore.Common.dll</HintPath>

@@ -1,0 +1,201 @@
+<div class="modal fade" id="confirm-delete-modal" role="dialog" bsModal #popup="bs-modal">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" *ngIf="!isDetail">Add sale man</h5>
+                <h5 class="modal-title" *ngIf="isDetail">Detail</h5>
+
+                <button type="button" class="close" aria-label="Close" (click)=closePoup()>
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" *ngIf="!isDetail">
+                <div class="m-form m-form--state">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger':  isSave && (!strSalemanCurrent || !strSalemanCurrent.value )}">
+                                <label>Sale Man <span class="m--font-danger">(*)</span></label>
+                                <app-combo-grid-virtual-scroll [selectedDisplayFields]="['username']"
+                                    [currentActiveItemId]="strSalemanCurrent" (itemSelected)="onSelectSaleMan($event)"
+                                    [dataSources]="users"
+                                    [displayFields]="[{'field':'username','label':'Username'},{'field':'employeeNameEn','label':'Name EN'}]">
+                                </app-combo-grid-virtual-scroll>
+                                <div class="form-control-feedback"
+                                    *ngIf="isSave && (!strSalemanCurrent || !strSalemanCurrent.value )">
+                                    Sale Man is required
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Service <span class="m--font-danger">(*)</span></label>
+                                <select [(ngModel)]="selectedService" name="service" class="form-control">
+                                    <option *ngFor="let service of services" [ngValue]="service">
+                                        {{service.text}}
+                                    </option>
+                                </select>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': isSave && saleManToAdd.office.trim().length==0 }">
+                                <label>Office <span class="m--font-danger">(*)</span></label>
+                                <app-combo-grid-virtual-scroll [selectedDisplayFields]="['abbrCompany']"
+                                    [currentActiveItemId]="strOfficeCurrent" (itemSelected)="onSelectOffice($event)"
+                                    (itemSelected)="saleManToAdd.office=$event.abbrCompany" [dataSources]="offices"
+                                    [displayFields]="[{'field':'branchNameEn','label':'Name Abbr'},{'field':'abbrCompany','label':'Name Abbr'}]">
+                                </app-combo-grid-virtual-scroll>
+                                <div class="form-control-feedback"
+                                    *ngIf=" isSave &&  saleManToAdd.office.trim().length==0">
+                                    Office is required
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Status <span class="m--font-danger">(*)</span></label>
+                                <select [(ngModel)]="selectedStatus" name="status" class="form-control">
+                                    <option *ngFor="let status of status" [ngValue]="status">{{status.title}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Effective Date
+                                </label>
+                                <div class="m-input-icon m-input-icon--right down">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [autoApply]="true" [(ngModel)]="saleManToAdd.effectDate"
+                                        [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
+                                        name="singledater" readonly />
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group" [ngClass]="{ 'm-form__group has-danger': isDup}">
+                                <div class="form-control-feedback" *ngIf="isDup">
+                                    Sale Man with service is duplicate
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea [(ngModel)]="saleManToAdd.description" name="description"
+                                    class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-body" *ngIf="isDetail">
+                <div class="m-form m-form--state">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Sale Man <span class="m--font-danger">(*)</span></label>
+                                <input type="text" class="form-control m-input m-input--square" name="saleman"
+                                    [(ngModel)]="saleManToView.saleman_ID" readonly />
+
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Service <span class="m--font-danger">(*)</span></label>
+                                <input type="text" class="form-control m-input m-input--square" name="office"
+                                    [(ngModel)]="saleManToView.service" readonly />
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Office <span class=" m--font-danger"></span></label>
+                                <input type="text" class="form-control m-input m-input--square" name="office"
+                                    [(ngModel)]="saleManToView.office" readonly />
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Status <span class="m--font-danger"></span></label>
+                                <input type="text" class="form-control m-input m-input--square" name="status"
+                                    [(ngModel)]="saleManToView.status" readonly />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Effective Date
+                                </label>
+                                <div class="m-input-icon m-input-icon--right down">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [autoApply]="true" [(ngModel)]="saleManToView.effectDate"
+                                        [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
+                                        name="singledater" readonly />
+                                </div>
+                            </div>
+                            <div class="m--margin-top-10 m--margin-bottom-5" *ngIf="isDetail">
+                                <span class="m--font-bolder">Create:</span>
+                                <span
+                                    class="m--font-brand m--margin-left-5">{{ saleManToView.createDate | date: 'dd/MM/yyyy HH:mm:ss'}}</span>
+                                <span class="m--font-bolder m--margin-left-5">by</span>
+                                <span class="m--font-brand m--margin-left-5">{{saleManToView.userCreated}}</span>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea [(ngModel)]="saleManToView.description" name="description"
+                                    class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <button type="" *ngIf="!isDetail" (click)="ApplyToList()"
+                    class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            save
+                        </span>
+                    </span>
+                </button>
+                <button type="" *ngIf="isDetail" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            delete
+                        </span>
+                    </span>
+                </button>
+                <button type="" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="closePoup()"
+                    style="margin-left: 10px;">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

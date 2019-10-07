@@ -6,7 +6,7 @@ using System.Text;
 
 namespace eFMS.API.System.DL.Models
 {
-    public class SysUserModel: SysUser
+    public class UserModel: SysUser
     {
     }
 }

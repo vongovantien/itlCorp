@@ -27,6 +27,6 @@ namespace eFMS.IdentityServer.DL.UserManager
         public string EmployeeID => currentUser.FirstOrDefault(x => x.Type == "employeeId").Value;
         public string UserName => currentUser.FirstOrDefault(x => x.Type == "userName").Value;
 
-        public SysEmployeeModel CurrentEmployee => employeeService.First(x => x.Id == EmployeeID);
+        public EmployeeModel CurrentEmployee => employeeService.First(x => x.Id == EmployeeID);
     }
 }

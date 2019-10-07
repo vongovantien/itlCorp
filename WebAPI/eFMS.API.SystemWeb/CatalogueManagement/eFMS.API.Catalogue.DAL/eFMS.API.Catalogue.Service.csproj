@@ -22,6 +22,10 @@
   <ItemGroup>
     <Compile Remove="Helpers\ChangeTrackerHelper.cs" />
     <Compile Remove="Helpers\MongoDbHelper.cs" />
+    <Compile Remove="Models\AcctAdvancePayment.cs" />
+    <Compile Remove="Models\AcctAdvanceRequest.cs" />
+    <Compile Remove="Models\AcctApproveAdvance.cs" />
+    <Compile Remove="Models\AcctApproveSettlement.cs" />
     <Compile Remove="Models\eFMSDataContext.cs" />
   </ItemGroup>
 

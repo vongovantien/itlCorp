@@ -15,6 +15,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public string BranchNameVn { get; set; }
         public string BranchNameEn { get; set; }
         public short? Buid { get; set; }
+        public string ManagerId { get; set; }
         public string AddressVn { get; set; }
         public string AddressEn { get; set; }
         public short? CountryId { get; set; }

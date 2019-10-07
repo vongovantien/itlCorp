@@ -175,7 +175,7 @@ export class PartnerComponent implements OnInit {
   }
   showDetail(event) {
     this.partner = event;
-    this.router.navigate(["/home/catalogue/partner-data/detail", { id: this.partner.id }]);
+    this.router.navigate([`/home/catalogue/partner-data/detail/${this.partner.id}`]);
   }
   async onDelete(event) {
     if (event) {

@@ -7,5 +7,6 @@ namespace eFMS.API.Catalogue.DL.Models
 {
     public class CatBranchModel: CatBranch
     {
+        public string AbbrCompany { get; set; }
     }
 }

@@ -53,6 +53,9 @@ export class Partner {
     inactiveOn?: string = '';
     workPlaceId: string = '';
     userCreatedName: string = '';
+    internalReferenceNo: string = '';
+    saleManRequests: SaleManRequest[] = [];
+    saleMans: SaleManRequest[] = [];
 
     constructor(data?: any) {
         const self = this;
@@ -60,6 +63,22 @@ export class Partner {
             if (self.hasOwnProperty(key)) {
                 self[key] = data[key];
             }
+
         }
     }
+}
+
+
+export class SaleManRequest {
+    id: string = "00000000-0000-0000-0000-000000000000";
+    saleman_id: string = '';
+    office: string = '';
+    company: string = '';
+    service: number = 0;
+    partnerId: string = '';
+    effectDate: string = '';
+    description: string = '';
+    status: boolean = false;
+    createDate: string = '';
+    userModified: string = '';
 }
