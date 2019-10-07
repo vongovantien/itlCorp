@@ -77,19 +77,6 @@ namespace eFMS.API.System.Controllers
             }
             return Ok(result);
         }
-        [HttpPost]
-        [Route("login")]
-        public IActionResult Login(LoginModel loginModel)
-        {
-            var result = sysUserService.Login(loginModel.username, loginModel.password);
-            if (!result.status)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
-            
-        }
-
         private string CheckExist(string id)
         {
             string message = string.Empty;

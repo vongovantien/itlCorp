@@ -18,7 +18,7 @@ using System.IO;
 
 namespace eFMS.IdentityServer.DL.Services
 {
-    public class AuthenticateService : RepositoryBase<SysUser, SysUserModel>, IAuthenUserService
+    public class AuthenticateService : RepositoryBase<SysUser, UserModel>, IAuthenUserService
     {
         protected ISysUserLogService userLogService;
         readonly LDAPConfig ldap;
@@ -33,12 +33,12 @@ namespace eFMS.IdentityServer.DL.Services
             employeeRepository = employeeRepo;
         }
 
-        public SysUserViewModel GetUserById(string id)
+        public UserViewModel GetUserById(string id)
         {
             var data = ((eFMSDataContext)DataContext.DC).SysEmployee.Join(((eFMSDataContext)DataContext.DC).SysUser, x => x.Id, y => y.EmployeeId,
                 (x, y) => new { x, y }).FirstOrDefault(x => x.y.Id == id);
             if (data == null) return null;
-            var result = new SysUserViewModel();
+            var result = new UserViewModel();
             result.Id = data.y.Id;
             result.Username = data.y.Username;
             //result.UserGroupId = data.y.UserGroupId;

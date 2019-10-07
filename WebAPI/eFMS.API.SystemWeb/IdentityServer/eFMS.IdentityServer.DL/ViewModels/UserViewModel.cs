@@ -4,7 +4,7 @@ using System.Text;
 
 namespace eFMS.API.System.DL.ViewModels
 {
-    public class SysUserViewModel
+    public class UserViewModel
     {
         public string Id { get; set; }
         public string Username { get; set; }
