@@ -398,7 +398,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-4">
+                        <!-- <div class="col-lg-4">
                             <div class="form-group">
                                 <div class="form-group"
                                     [ngClass]="{ 'm-form__group has-danger': (partner.salePersonId == null && isRequiredSaleman) }">
@@ -417,7 +417,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                         <div class="col-lg-4">
                             <div class="form-group">
@@ -650,7 +650,7 @@
                                         </td>
                                         <td>
                                             <span><a style="cursor:pointer;"
-                                                    (click)="showDetailSaleMan(sale)">{{sale.saleman_ID}}</a>
+                                                    (click)="showDetailSaleMan(sale,i)">{{sale.saleman_ID}}</a>
                                             </span>
                                         </td>
                                         <td>
@@ -707,5 +707,7 @@
     </div>
     <!--end::m-content of Partner-data-addnew-->
 </form>
-<app-saleman-popup [popupData]="saleMantoView" (onCreate)="closepp($event)"></app-saleman-popup>
+<app-saleman-popup [popupData]="saleMantoView" (onCreate)="closepp($event)"
+    (onDelete)="closeppAndDeleteSaleman($event)">
+</app-saleman-popup>
 <confirm-popup (onSubmit)="onDeleteSaleman()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>

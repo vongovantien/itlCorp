@@ -90,15 +90,21 @@ export class PartnerDataAddnewComponent extends AppList {
     closepp(param: SalemanAdd) {
         this.saleManToAdd = param;
         this.poupSaleman.isDetail = false;
-        this.isDup = this.saleMandetail.some((saleMane: Saleman) => (saleMane.saleman_ID === this.saleManToAdd.saleman_ID && saleMane.office === this.saleManToAdd.office));
+        this.isDup = this.saleMandetail.some((saleMane: Saleman) => (saleMane.service === this.saleManToAdd.service && saleMane.office === this.saleManToAdd.office));
 
         if (this.isDup) {
             console.log("dup");
+            this.toastr.error('Duplicate service, office with sale man!');
         } else {
             this.saleMandetail.push(this.saleManToAdd);
             this.poupSaleman.hide();
             console.log(this.saleMandetail);
         }
+    }
+
+    closeppAndDeleteSaleman(index: any) {
+        this.index = index;
+        this.deleteSaleman(this.index);
     }
 
     showPopupSaleman() {
@@ -118,7 +124,7 @@ export class PartnerDataAddnewComponent extends AppList {
 
     deleteSaleman(index: any) {
         this.index = index;
-        this.deleteMessage = `Do you want to delete sale man`;
+        this.deleteMessage = `Do you want to delete sale man  ${this.saleMandetail[index].saleman_ID}?`;
         this.confirmDeleteJobPopup.show();
     }
 
@@ -315,8 +321,16 @@ export class PartnerDataAddnewComponent extends AppList {
         }
         if (this.form.valid) {
             this.partner.accountNo = this.partner.id = this.partner.taxCode;
-            if (this.isRequiredSaleman && this.partner.salePersonId != null) {
+            if (this.saleMandetail.length === 0) {
+                if (this.isShowSaleMan) {
+                    this.toastr.error('Please add saleman and service for customer!');
+                    return;
+                }
+            }
+
+            if (this.isRequiredSaleman) {
                 // this.addNew();
+                this.partner.salePersonId = this.saleMans[0].id;
                 this.onCreatePartner();
             }
             else {
@@ -610,8 +624,9 @@ export class PartnerDataAddnewComponent extends AppList {
         }
     }
 
-    showDetailSaleMan(saleman: Saleman) {
+    showDetailSaleMan(saleman: Saleman, index: any) {
         this.poupSaleman.show();
+        this.poupSaleman.index = index;
         const saleMane: any = {
             description: saleman.description,
             office: saleman.office,
