@@ -17,10 +17,10 @@ namespace eFMS.API.System.DL.Services
 {
     public class SysBuService : RepositoryBase<SysBu, SysBuModel>, ISysBuService
     {
-        //private readonly ICurrentUser currentUser; // TODO
-        public SysBuService(IContextBase<SysBu> repository, IMapper mapper) : base(repository, mapper)
+        private readonly ICurrentUser currentUser;
+        public SysBuService(IContextBase<SysBu> repository, IMapper mapper, ICurrentUser user) : base(repository, mapper)
         {
-            //currentUser = user; // TODO
+            currentUser = user;
         }
 
         public IQueryable<SysBuModel> GetAll()
@@ -80,8 +80,7 @@ namespace eFMS.API.System.DL.Services
 
         public HandleState Update(SysBuAddModel model)
         {
-            //var userCurrent = currentUser.UserID;
-            var userCurrent ="admin"; // TODO
+            var userCurrent = currentUser.UserID;
 
             try
             {
@@ -115,7 +114,7 @@ namespace eFMS.API.System.DL.Services
         {
             try
             {
-                ChangeTrackerHelper.currentUser = "admin"; // TODO
+                ChangeTrackerHelper.currentUser = currentUser.UserID;
 
                 var hs = DataContext.Delete(x => x.Id == id);
                 return hs;
@@ -131,16 +130,18 @@ namespace eFMS.API.System.DL.Services
         {
             try
             {
-                var userCurrent = "admin";
-                var SysBu = new SysBuModel();
+                var userCurrent = currentUser.UserID;
 
-                SysBu.Code = model.CompanyCode;
-                SysBu.BunameAbbr = model.CompanyNameVn;
-                SysBu.BunameVn = model.CompanyNameVn;
-                SysBu.BunameEn = model.CompanyNameEn;
-                SysBu.Website = model.Website;
-                SysBu.Inactive = model.Status;
-                SysBu.LogoPath = model.PhotoUrl;
+                var SysBu = new SysBuModel
+                {
+                    Code = model.CompanyCode,
+                    BunameAbbr = model.CompanyNameVn,
+                    BunameVn = model.CompanyNameVn,
+                    BunameEn = model.CompanyNameEn,
+                    Website = model.Website,
+                    Inactive = model.Status,
+                    LogoPath = model.PhotoUrl
+                };
 
                 SysBu.DatetimeCreated = SysBu.DatetimeModified = DateTime.Now;
                 SysBu.UserCreated = SysBu.UserModified = userCurrent;

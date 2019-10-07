@@ -18,6 +18,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using eFMS.API.System.Infrastructure.Filters;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.System.Infrastructure
 {
@@ -38,6 +39,8 @@ namespace eFMS.API.System.Infrastructure
             services.AddTransient<ISysUserService, SysUserService>();
             services.AddTransient<ISysEmployeeService, SysEmployeeService>();
             services.AddTransient<ISysBuService, SysBuService>();
+            services.AddTransient<ICurrentUser, CurrentUser>();
+
 
         }
         public static IServiceCollection AddCulture(this IServiceCollection services, IConfiguration configuration)
