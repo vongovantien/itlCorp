@@ -29,6 +29,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IDistributedCache cache;
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysUser> sysUserRepository;
+        private readonly IContextBase<CatSaleman> salemanRepository;
         private readonly IContextBase<CatPlace> placeRepository;
         private readonly IContextBase<CatCountry> countryRepository;
         public CatPartnerService(IContextBase<CatPartner> repository, 
@@ -38,12 +39,14 @@ namespace eFMS.API.Catalogue.DL.Services
             ICurrentUser user,
             IContextBase<SysUser> sysUserRepo,
             IContextBase<CatPlace> placeRepo,
-            IContextBase<CatCountry> countryRepo) : base(repository, mapper)
+            IContextBase<CatCountry> countryRepo,
+IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
         {
             stringLocalizer = localizer;
             cache = distributedCache;
             currentUser = user;
             placeRepository = placeRepo;
+            salemanRepository = salemanRepo;
             sysUserRepository = sysUserRepo;
             countryRepository = countryRepo;
             SetChildren<CsTransaction>("Id", "ColoaderId");
@@ -87,14 +90,32 @@ namespace eFMS.API.Catalogue.DL.Services
             var partner = mapper.Map<CatPartner>(entity);
             partner.DatetimeCreated = DateTime.Now;
             partner.DatetimeModified = DateTime.Now;
-            partner.UserCreated = partner.UserModified = currentUser.UserID;
+            //partner.UserCreated = partner.UserModified = currentUser.UserID;
+            partner.UserCreated = partner.UserModified = "admin";
             partner.Inactive = false;
-            var hs = DataContext.Add(partner);
+            if(!String.IsNullOrEmpty(partner.InternalReferenceNo))
+            {
+                partner.Id =  partner.TaxCode + "." + partner.InternalReferenceNo;
+            }
+            else
+            {
+                partner.Id = partner.TaxCode;
+            }
+            var hs = DataContext.Add(partner, false);
             if (hs.Success)
             {
                 cache.Remove(Templates.CatPartner.NameCaching.ListName);
                 //RedisCacheHelper.SetObject(cache, Templates.CatPartner.NameCaching.ListName, DataContext.Get().ToList());
+                var salemans = mapper.Map<List<CatSaleman>>(entity.SaleMans);
+                salemans.ForEach(x => {
+                    x.PartnerId = partner.Id;
+                    x.CreateDate = DateTime.Now;
+                    //x.UserCreated = currentUser.UserID;
+                });
+                salemanRepository.Add(salemans, false);
             }
+            DataContext.SubmitChanges();
+            salemanRepository.SubmitChanges();
             return hs;
         }
         public HandleState Update(CatPartnerModel model)

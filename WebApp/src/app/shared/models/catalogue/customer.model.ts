@@ -1,4 +1,4 @@
-export class Partner {
+export class Customer {
     id: string = '';
     partnerGroup: string = '';
     partnerNameVn: string = '';
@@ -53,9 +53,7 @@ export class Partner {
     inactiveOn?: string = '';
     workPlaceId: string = '';
     userCreatedName: string = '';
-    internalReferenceNo: string = '';
     saleManRequests: SaleManRequest[] = [];
-    saleMans: SaleManRequest[] = [];
 
     constructor(data?: any) {
         const self = this;

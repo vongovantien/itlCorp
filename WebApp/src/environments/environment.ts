@@ -1,7 +1,7 @@
 
 export const environment = {
     production: false,
-    local: false,
+    local: true,
     HOST: {
         WEB_URL: "test.api-efms.itlvn.com",
         ACCOUNTING: "test.api-efms.itlvn.com/Accounting",
@@ -10,8 +10,9 @@ export const environment = {
         OPERATION: "test.api-efms.itlvn.com/Operation",
         SYSTEM: "test.api-efms.itlvn.com/System",
         REPORT: "localhost:63492",
+        DOCUMENTATIONLOCAL: "localhost:44366",
+        CatalogueLocal: "localhost:44361",
         EXPORT: "test.api-efms.itlvn.com/Export",
-        DOCUMENTATIONLOCAL: "localhost:44365",
         INDENTITY_SERVER_URL: "http://test.api-efms.itlvn.com/identityserver"
     },
 };

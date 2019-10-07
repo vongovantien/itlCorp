@@ -22,12 +22,16 @@ namespace eFMS.API.Catalogue.Service.Models
         public bool? KickBack { get; set; }
         public DateTime? ExchangeDate { get; set; }
         public string Notes { get; set; }
-        public string DocNo { get; set; }
         public string SettlementCode { get; set; }
         public string Csidsettlement { get; set; }
         public string CsstatusSettlement { get; set; }
         public DateTime? CsdateSettlement { get; set; }
         public string InvoiceNo { get; set; }
+        public DateTime? InvoiceDate { get; set; }
+        public string SeriesNo { get; set; }
+        public string PaymentRequestType { get; set; }
+        public string ClearanceNo { get; set; }
+        public string ContNo { get; set; }
         public string PaymentRefNo { get; set; }
         public string AccountantId { get; set; }
         public DateTime? AccountantDate { get; set; }
@@ -53,6 +57,8 @@ namespace eFMS.API.Catalogue.Service.Models
         public string DebitNo { get; set; }
         public string Soano { get; set; }
         public string PaySoano { get; set; }
+        public bool? IsFromShipment { get; set; }
+        public string TypeOfFee { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }

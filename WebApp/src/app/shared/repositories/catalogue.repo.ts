@@ -3,12 +3,13 @@ import { ApiService } from "../services";
 import { environment } from "src/environments/environment";
 import { throwError } from "rxjs";
 import { catchError, map } from "rxjs/operators";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 
 @Injectable()
 export class CatalogueRepo {
 
     private VERSION: string = 'v1';
-    constructor(protected _api: ApiService) {
+    constructor(protected _api: ApiService, private _httpClient: HttpClient) {
     }
 
     getCurrencyBy(data: any = {}) {
@@ -136,8 +137,36 @@ export class CatalogueRepo {
         }
     }
 
+    getListSaleman(partnerId: string) {
+        // const header: HttpHeaders = new HttpHeaders();
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/GetBy`, { partnerId: partnerId })
+            .pipe(
+                map((data: any) => data)
+            );
+        // return this._httpClient.get(`${environment.HOST.CatalogueLocal}/api/${this.VERSION}/en-US/CatSaleMan/GetBy`, { params: { partnerId: partnerId } }).pipe(
+        //     catchError((error) => throwError(error)),
+        //     map((data: any) => data)
+        // );
+    }
+
+    deleteSaleman(id: string) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatSaleMan/${id}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+
     getListService() {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/GetListServices`)
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => data)
+            );
+    }
+
+    getListBranch() {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatBranch/GetListBranch`)
             .pipe(
                 catchError((error) => throwError(error)),
                 map((data: any) => data)
@@ -220,5 +249,33 @@ export class CatalogueRepo {
                 return res;
             })
         );
+    }
+
+    createPartner(body: any = {}) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/Add`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    createSaleman(body: any = {}) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatSaleMan/Add`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getListSaleManDetail(page?: number, size?: number, body: any = {}) {
+        if (!!page && !!size) {
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/paging`, body, {
+                page: '' + page,
+                size: '' + size
+            }).pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => data)
+            );
+        } else {
+            return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan`).pipe(
+                map((data: any) => data)
+            );
+        }
     }
 }

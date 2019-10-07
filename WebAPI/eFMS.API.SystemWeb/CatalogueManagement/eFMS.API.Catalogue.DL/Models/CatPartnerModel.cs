@@ -7,5 +7,6 @@ namespace eFMS.API.Catalogue.DL.Models
 {
     public class CatPartnerModel: CatPartner
     {
+        public List<CatSaleManModel> SaleMans { get; set; }
     }
 }

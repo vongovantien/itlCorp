@@ -5,8 +5,8 @@ using System.Text;
 
 namespace eFMS.API.Catalogue.DL.Models
 {
-    public class CatBranchModel: CatBranch
+    public class CatSaleManModel : CatSaleman
     {
-        public string AbbrCompany { get; set; }
+
     }
 }
