@@ -1,8 +1,6 @@
 import { Component, OnInit, Output, EventEmitter, AfterViewInit } from '@angular/core';
 import { Router, NavigationEnd, NavigationStart, } from '@angular/router';
 import { language } from 'src/languages/language.en';
-import { BaseService } from 'src/app/shared/services/base.service';
-import $ from 'jquery';
 
 @Component({
   selector: 'app-page-sidebar',
@@ -64,7 +62,7 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
         if (event instanceof NavigationStart) {
           // start loading pages
         }
-        if (event instanceof NavigationEnd) {          
+        if (event instanceof NavigationEnd) {
           // end of loading paegs
           setTimeout(() => {
             //  this.highLightMenu(); 
@@ -81,14 +79,14 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
    * MENU COMPONENTS DEFINITION
    */
   open_sub_menu(index: number) {
- 
+
     /**
      * Close current parent group
      */
     if (this.previous_menu_index != null) {
-      var previous_menu = document.getElementById('parent-'+this.previous_menu_index.toString());
+      var previous_menu = document.getElementById('parent-' + this.previous_menu_index.toString());
       if (index != this.previous_menu_index) {
-        previous_menu.classList.remove('m-menu__item--open');  
+        previous_menu.classList.remove('m-menu__item--open');
       }
     }
 
@@ -98,18 +96,18 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
     /**
      * If parent group is closing then open but close 
      */
-    var parentMenu = document.getElementById('parent-'+index.toString());
+    var parentMenu = document.getElementById('parent-' + index.toString());
     if (parentMenu.classList.contains('m-menu__item--open')) {
       parentMenu.classList.remove('m-menu__item--open');
     } else {
       parentMenu.classList.add('m-menu__item--open');
     }
-       
+
   }
 
   sub_menu_click(sub_menu_name: string, parrent_index: number, children_index: number) {
-    var current_parent = document.getElementById('parent-'+parrent_index.toString());
-    var current_children = document.getElementById('children-'+parrent_index.toString() + '-' + children_index.toString());
+    var current_parent = document.getElementById('parent-' + parrent_index.toString());
+    var current_children = document.getElementById('children-' + parrent_index.toString() + '-' + children_index.toString());
 
     if (this.previous_children != null) {
       this.previous_children.classList.remove('m-menu__item--active');

@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { CompanyInfoComponent } from './company-info/company-info.component';
 import { DepartmentComponent } from './department/department.component';
 import { GroupComponent } from './group/group.component';
 import { PermissionComponent } from './permission/permission.component';
@@ -14,8 +13,7 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
-    path: 'company-info',
-    component: CompanyInfoComponent
+    path: 'company', loadChildren: () => import('./company/company-infomation.module').then(m => m.CompanyInfomationModule),
   },
   {
     path: 'department',
