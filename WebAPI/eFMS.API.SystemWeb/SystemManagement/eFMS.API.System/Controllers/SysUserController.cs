@@ -43,12 +43,7 @@ namespace eFMS.API.System.Controllers
             return Ok(results);
         }
 
-        [HttpGet]
-        [Route("GetById/{id}")]
-        public SysUserViewModel GetUserById(string id)
-        {
-            return sysUserService.GetUserById(id);
-        }
+
         [HttpPost]
         [Route("Paging")]
         public IActionResult Paging(SysUserCriteria criteria, int page, int size)
@@ -77,18 +72,7 @@ namespace eFMS.API.System.Controllers
             }
             return Ok(result);
         }
-        [HttpPost]
-        [Route("login")]
-        public IActionResult Login(LoginModel loginModel)
-        {
-            var result = sysUserService.Login(loginModel.username, loginModel.password);
-            if (!result.status)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
-            
-        }
+        
 
         private string CheckExist(string id)
         {

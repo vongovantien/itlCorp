@@ -16,6 +16,7 @@ namespace eFMS.API.System.Infrastructure
             CreateMap<SysUserGroupEditModel, SysUserGroupModel>();
             CreateMap<SysUserGroupModel, SysUserViewModel>();
             CreateMap<SysUser, SysUserViewModel>();
+            CreateMap<SysBu, SysBuModel>();
         }
     }
 }

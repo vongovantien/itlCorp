@@ -4,5 +4,10 @@
         <name>eFMS.API.System</name>
     </assembly>
     <members>
+        <member name="T:eFMS.API.System.Controllers.SysBuController">
+            <summary>
+            
+            </summary>
+        </member>
     </members>
 </doc>

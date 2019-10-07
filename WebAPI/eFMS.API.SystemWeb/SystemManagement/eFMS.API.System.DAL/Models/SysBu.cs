@@ -14,12 +14,14 @@ namespace eFMS.API.System.Service.Models
         public string Code { get; set; }
         public string BunameVn { get; set; }
         public string BunameEn { get; set; }
+        public string BunameAbbr { get; set; }
         public string DescriptionVn { get; set; }
         public string DescriptionEn { get; set; }
         public string AddressVn { get; set; }
         public string AddressEn { get; set; }
         public string AreaId { get; set; }
         public short? CountryId { get; set; }
+        public string ManagerId { get; set; }
         public string Tel { get; set; }
         public string Fax { get; set; }
         public string Email { get; set; }
@@ -31,6 +33,7 @@ namespace eFMS.API.System.Service.Models
         public string AccountName { get; set; }
         public string BankName { get; set; }
         public string BankAddress { get; set; }
+        public string LogoPath { get; set; }
         public byte[] Logo { get; set; }
         public string Tax { get; set; }
         public string TaxAccount { get; set; }

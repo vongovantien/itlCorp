@@ -5,15 +5,11 @@ namespace eFMS.API.System.Service.Models
 {
     public partial class SysBranch
     {
-        public SysBranch()
-        {
-            CatDepartment = new HashSet<CatDepartment>();
-        }
-
         public Guid Id { get; set; }
         public string BranchNameVn { get; set; }
         public string BranchNameEn { get; set; }
         public short? Buid { get; set; }
+        public string ManagerId { get; set; }
         public string AddressVn { get; set; }
         public string AddressEn { get; set; }
         public short? CountryId { get; set; }
@@ -34,6 +30,5 @@ namespace eFMS.API.System.Service.Models
         public DateTime? DatetimeCreated { get; set; }
 
         public virtual SysBu Bu { get; set; }
-        public virtual ICollection<CatDepartment> CatDepartment { get; set; }
     }
 }
