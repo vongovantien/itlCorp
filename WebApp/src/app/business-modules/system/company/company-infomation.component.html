@@ -1,3 +1,30 @@
-<p>
-  company-info works!
-</p>
+<div class="company-infomation-page">
+    <app-sub-header>
+        <div class="c-button-actions">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                [routerLink]="'/home/accounting/advance-payment/new'">
+                <span>
+                    <i class="la la-plus"></i>
+                    <span>
+                        add new
+                    </span>
+                </span>
+            </button>
+            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-upload"></i>
+                    <span>
+                        export
+                    </span>
+                </span>
+            </button>
+        </div>
+    </app-sub-header>
+    <div class="m-content">
+        <!-- <form-search-company></form-search-company> -->
+        <div class="m-portlet">
+            <div class="m-porlet__body">
+            </div>
+        </div>
+    </div>
+</div>

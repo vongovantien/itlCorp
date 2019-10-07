@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ComanyInfomationComponent } from './company-infomation.component';
+import { CompanyInfomationFormSearchComponent } from './components/form-search-company/form-search-company.component';
 
 const routing: Routes = [
     {
@@ -17,7 +18,8 @@ const routing: Routes = [
 
 @NgModule({
     declarations: [
-        ComanyInfomationComponent
+        ComanyInfomationComponent,
+        CompanyInfomationFormSearchComponent
     ],
     imports: [
         CommonModule,
