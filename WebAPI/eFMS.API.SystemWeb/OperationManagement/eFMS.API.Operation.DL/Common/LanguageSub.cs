@@ -44,5 +44,7 @@
         public static readonly string MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS = "MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS";
         public static readonly string MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_NO_DATA = "MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_NO_DATA";
         #endregion
+
+        public static readonly string MSG_STAGE_ASSIGNED_EXISTED = "MSG_STAGE_ASSIGNED_EXISTED";
     }
 }

@@ -38,6 +38,19 @@ namespace eFMS.API.Operation.DL.Services
             opsTransRepository = opsTransRepo;
         }
 
+        public HandleState Add(OpsStageAssignedEditModel model)
+        {
+            var assignedItem = mapper.Map<OpsStageAssigned>(model);
+            assignedItem.Id = Guid.NewGuid();
+            assignedItem.Status = Constants.InSchedule;
+            assignedItem.CreatedDate = assignedItem.ModifiedDate = DateTime.Now;
+            assignedItem.UserCreated = currentUser.UserID;
+            var orderNumberProcess = DataContext.Count(x => x.JobId == model.JobId);
+            assignedItem.OrderNumberProcessed = orderNumberProcess + 1;
+            var hs = DataContext.Add(assignedItem);
+            return hs;
+        }
+
         public HandleState AddMultipleStage(List<OpsStageAssignedEditModel> models, Guid jobId)
         {
             var result = new HandleState();
@@ -113,11 +126,15 @@ namespace eFMS.API.Operation.DL.Services
             return results;
         }
 
-        public List<OpsStageAssignedModel> GetNotAssigned(Guid jobId)
+        public List<OpsStageAssignedModel> GetNotAssigned(Guid jobId, int? departmentStage)
         {
             var data = DataContext.Get(x => x.JobId == jobId);
             var stages = catStageApi.GetAll().Result;
             if (stages == null) return null;
+            if(departmentStage != null)
+            {
+                stages = stages.Where(x => x.DepartmentId == departmentStage).ToList();
+            }
             var results = stages.Where(x => !data.Any(assigned => assigned.StageId == x.Id))
                 .Select(x => new OpsStageAssignedModel {
                     Id = Guid.Empty,
