@@ -10,7 +10,7 @@ using System.Text;
 
 namespace eFMS.IdentityServer.DL.Services
 {
-    public class SysEmployeeService :  RepositoryBase<SysEmployee, SysEmployeeModel>, ISysEmployeeService
+    public class SysEmployeeService :  RepositoryBase<SysEmployee, EmployeeModel>, ISysEmployeeService
     {
         public SysEmployeeService(IContextBase<SysEmployee> repository, IMapper mapper) : base(repository, mapper)
         {

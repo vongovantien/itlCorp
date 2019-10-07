@@ -206,11 +206,10 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
             var sysUsers = sysUserRepository.Get();
             var partners = GetPartners().Where(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             var query = (from partner in partners
-                         join user in sysUsers on partner.UserCreated equals user.Id into userPartners
-                         from y in userPartners.DefaultIfEmpty()
+                         join user in sysUsers on partner.UserCreated equals user.Id
                          join saleman in sysUsers on partner.SalePersonId equals saleman.Id into prods
                          from x in prods.DefaultIfEmpty()
-                         select new { user = y, partner, saleman = x }
+                         select new { user, partner, saleman = x }
                           );
             if (criteria.All == null)
             {
@@ -222,7 +221,7 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
                            && (x.partner.TaxCode ?? "").IndexOf(criteria.TaxCode ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.Tel ?? "").IndexOf(criteria.Tel ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.Fax ?? "").IndexOf(criteria.Fax ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           //&& (x.user.Username ?? "").IndexOf(criteria.UserCreated ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                           && (x.user.Username ?? "").IndexOf(criteria.UserCreated ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.AccountNo ?? "").IndexOf(criteria.AccountNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.Inactive == criteria.Inactive || criteria.Inactive == null)
                            ));
@@ -239,7 +238,7 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
                            || (x.partner.TaxCode ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            || (x.partner.Tel ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            || (x.partner.Fax ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           //|| (x.user.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                           || (x.user.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            || (x.partner.AccountNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            )
                            && (x.partner.Inactive == criteria.Inactive || criteria.Inactive == null));

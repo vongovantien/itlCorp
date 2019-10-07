@@ -10,6 +10,6 @@ namespace eFMS.IdentityServer.DL.UserManager
         string UserID { get; }
         string EmployeeID { get; }
         string UserName { get; }
-        SysEmployeeModel CurrentEmployee { get; }
+        EmployeeModel CurrentEmployee { get; }
     }
 }
