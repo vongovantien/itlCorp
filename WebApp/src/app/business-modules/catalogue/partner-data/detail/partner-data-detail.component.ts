@@ -59,6 +59,7 @@ export class PartnerDataDetailComponent extends AppList {
     deleteMessage: string = '';
     selectedSaleman: Saleman = null;
     saleMantoView: Saleman = new Saleman();
+    isShowSaleMan: boolean = false;
 
     @Output() isCloseModal = new EventEmitter();
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
@@ -141,6 +142,7 @@ export class PartnerDataDetailComponent extends AppList {
                 await this.getParnerDetails();
                 this.getSalemanPagingByPartnerId(this.dataSearchSaleman);
             }
+
         });
         this.getDataCombobox();
 
@@ -158,6 +160,7 @@ export class PartnerDataDetailComponent extends AppList {
         if (index > -1) { this.salemanActive = [this.saleMans.find(x => x.id === this.partner.salePersonId)]; }
         if (this.partner.partnerGroup.includes('CUSTOMER')) {
             this.isRequiredSaleman = true;
+            this.isShowSaleMan = true;
         }
         console.log(this.isRequiredSaleman);
         console.log(this.partner.salePersonId);
@@ -281,12 +284,19 @@ export class PartnerDataDetailComponent extends AppList {
             return;
         }
         if (this.form.valid) {
-            this.partner.accountNo = this.partner.id = this.partner.taxCode;
-            if (this.isRequiredSaleman && this.partner.salePersonId != null) {
+            // this.partner.accountNo = this.partner.id = this.partner.taxCode;
+            if (this.saleMandetail.length === 0) {
+                if (this.isShowSaleMan) {
+                    this.toastr.error('Please add saleman and service for customer!');
+                    return;
+                }
+            }
+            if (this.isRequiredSaleman) {
+                this.partner.salePersonId = this.saleMans[0].id;
                 this.update();
             }
             else {
-                if (this.isRequiredSaleman == false) {
+                if (this.isRequiredSaleman === false) {
                     this.partner.accountNo = this.partner.id = this.partner.taxCode;
                     this.update();
                 }
@@ -378,6 +388,15 @@ export class PartnerDataDetailComponent extends AppList {
         }
     }
     checkRequireSaleman(partnerGroup: string): boolean {
+        this.isShowSaleMan = false;
+        if (partnerGroup != null) {
+            if (partnerGroup.includes('CUSTOMER')) {
+                this.isShowSaleMan = true;
+            }
+        }
+        else {
+            this.isShowSaleMan = false;
+        }
         if (partnerGroup == null) {
             return false;
         } else if (partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')) {
@@ -520,7 +539,9 @@ export class PartnerDataDetailComponent extends AppList {
 
             };
             this._catalogueRepo.createSaleman(body)
-                .pipe(catchError(this.catchError))
+                .pipe(catchError(this.catchError), finalize(() => {
+                    this.baseService.spinnerHide();
+                }))
                 .subscribe(
                     (res: any) => {
                         if (res.status) {

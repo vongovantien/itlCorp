@@ -47,8 +47,8 @@
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square" placeholder=""
                                     name="partnerAccountNo" autocomplete="nope" minlength="3" disabled
-                                    [(ngModel)]="partner.accountNo" #partnerAccountNo="ngModel"
-                                    (change)="partner.accountNo = partner.taxCode.trim()"
+                                    [(ngModel)]="partner.id" #partnerAccountNo="ngModel"
+                                    (change)="partner.id = partner.taxCode.trim()"
                                     [ngClass]="{ 'm-input--square': formAddEdit.submitted && partnerAccountNo.invalid }"
                                     required>
                                 <div class="form-control-feedback"
@@ -114,6 +114,16 @@
                                     Partner Name Abreviation is required
                                 </div>
                             </div>
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    A/C Ref
+                                </label>
+                                <ng-select [allowClear]="true" [active]="parentCustomerActive" [items]="parentCustomers"
+                                    (data)="refreshValue($event)" name="partnerAccountRef"
+                                    (selected)="partner.parentId = $event.id" (removed)="partner.parentId = null"
+                                    placeholder="Select A/C Ref">
+                                </ng-select>
+                            </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
@@ -133,9 +143,6 @@
                                     Partner Tax Code is required and must be number
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="col-lg-4">
                             <div class="form-group"
                                 [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && partner.partnerGroup == null }">
                                 <label class="form-control-label" for="">
@@ -151,7 +158,35 @@
                                     Category is required
                                 </div>
                             </div>
+
                         </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Internal Reference No
+                                </label>
+                                <input type="text" [(ngModel)]="partner.internalReferenceNo" name="internalReferenceNo"
+                                    readonly="readonly" class="form-control m-input m-input--square" />
+                            </div>
+                        </div>
+
+                        <!-- <div class="col-lg-4">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': formAddEdit.submitted && partner.partnerGroup == null }">
+                                <label class="form-control-label" for="">
+                                    Category <span class="m--font-danger">(*)</span>
+                                </label>
+                                <ng-select [multiple]="true" *ngIf="activeNg" [active]="partnerGroupActives"
+                                    [items]="partnerGroups" (data)="refreshValue($event)"
+                                    (selected)="selected($event, 'category')" (removed)="removed($event,'category')"
+                                    placeholder="Select partner group">
+                                </ng-select>
+                                <div class="form-control-feedback"
+                                    *ngIf="formAddEdit.submitted && partner.partnerGroup == null">
+                                    Category is required
+                                </div>
+                            </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
@@ -383,7 +418,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-4">
+                        <!-- <div class="col-lg-4">
                             <div class="form-group">
                                 <div class="form-group"
                                     [ngClass]="{ 'm-form__group has-danger': (partner.salePersonId == null && isRequiredSaleman) }">
@@ -404,7 +439,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label class="form-control-label" for="">
@@ -473,7 +508,7 @@
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <!-- <div class="form-group">
                                 <label class="form-control-label" for="">
                                     A/C Ref
                                 </label>
@@ -482,7 +517,7 @@
                                     (selected)="partner.parentId = $event.id" (removed)="partner.parentId = null"
                                     placeholder="Select A/C Ref">
                                 </ng-select>
-                            </div>
+                            </div> -->
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
@@ -609,7 +644,7 @@
             </div>
             <!--end::m-portlet -->
 
-            <div class="m-portlet m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered">
+            <div class="m-portlet m-portlet--danger m-portlet--head-solid-bg m-portlet--bordered" *ngIf="isShowSaleMan">
                 <div class="alert-block__heading">
                     <h3 class="alert-block__title">Sale Man</h3>
                 </div>

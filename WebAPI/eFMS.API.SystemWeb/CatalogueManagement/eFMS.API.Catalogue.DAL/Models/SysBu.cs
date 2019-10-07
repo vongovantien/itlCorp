@@ -10,7 +10,7 @@ namespace eFMS.API.Catalogue.Service.Models
             SysBranch = new HashSet<SysBranch>();
         }
 
-        public short Id { get; set; }
+        public Guid Id { get; set; }
         public string Code { get; set; }
         public string BunameVn { get; set; }
         public string BunameEn { get; set; }

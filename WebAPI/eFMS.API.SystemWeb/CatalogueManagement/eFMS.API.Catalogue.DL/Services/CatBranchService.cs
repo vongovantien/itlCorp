@@ -35,6 +35,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var lstOfficeCompany = from b in dc.SysBranch
                                    join bu in dc.SysBu on b.Buid equals bu.Id
                                    select new {b, AbbrCompany = bu.Code };
+
             foreach (var item in lstOfficeCompany)
             {
                 
