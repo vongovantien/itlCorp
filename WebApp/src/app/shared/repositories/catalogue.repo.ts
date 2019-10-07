@@ -200,6 +200,11 @@ export class CatalogueRepo {
         );
     }
 
+    createPartner(body: any = {}) {
+        return this._api.post(`${environment.HOST.CatalogueLocal}/api/${this.VERSION}/vi/CatPartner/Add`, body).pipe(
+            map((data: any) => data)
+        );
+    }
 
     createSaleman(body: any = {}) {
         return this._api.post(`${environment.HOST.CatalogueLocal}/api/${this.VERSION}/vi/CatSaleMan/Add`, body).pipe(

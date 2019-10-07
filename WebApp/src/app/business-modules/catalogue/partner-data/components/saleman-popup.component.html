@@ -45,6 +45,7 @@
                                 [ngClass]="{ 'm-form__group has-danger': isSave && saleManToAdd.office.trim().length==0 }">
                                 <label>Office <span class="m--font-danger">(*)</span></label>
                                 <app-combo-grid-virtual-scroll [selectedDisplayFields]="['abbrCompany']"
+                                    [currentActiveItemId]="strOfficeCurrent" (itemSelected)="onSelectOffice($event)"
                                     (itemSelected)="saleManToAdd.office=$event.abbrCompany" [dataSources]="offices"
                                     [displayFields]="[{'field':'branchNameEn','label':'Name Abbr'},{'field':'abbrCompany','label':'Name Abbr'}]">
                                 </app-combo-grid-virtual-scroll>
@@ -148,7 +149,15 @@
                                         name="singledater" readonly />
                                 </div>
                             </div>
+                            <div class="m--margin-top-10 m--margin-bottom-5" *ngIf="isDetail">
+                                <span class="m--font-bolder">Create:</span>
+                                <span
+                                    class="m--font-brand m--margin-left-5">{{ saleManToView.createDate | date: 'dd/MM/yyyy HH:mm:ss'}}</span>
+                                <span class="m--font-bolder m--margin-left-5">by</span>
+                                <span class="m--font-brand m--margin-left-5">{{saleManToView.userCreated}}</span>
+                            </div>
                         </div>
+
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label>Description</label>

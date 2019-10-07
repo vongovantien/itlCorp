@@ -55,6 +55,7 @@ export class Partner {
     userCreatedName: string = '';
     internalReferenceNo: string = '';
     saleManRequests: SaleManRequest[] = [];
+    saleMans: SaleManRequest[] = [];
 
     constructor(data?: any) {
         const self = this;

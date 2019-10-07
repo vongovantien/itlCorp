@@ -80,11 +80,12 @@ namespace eFMS.API.Catalogue.DL.Services
             var partner = mapper.Map<CatPartner>(entity);
             partner.DatetimeCreated = DateTime.Now;
             partner.DatetimeModified = DateTime.Now;
-            partner.UserCreated = partner.UserModified = currentUser.UserID;
+            //partner.UserCreated = partner.UserModified = currentUser.UserID;
+            partner.UserCreated = partner.UserModified = "admin";
             partner.Inactive = false;
-            if(partner.InternalReferenceNo != null)
+            if(!String.IsNullOrEmpty(partner.InternalReferenceNo))
             {
-                partner.Id = partner.InternalReferenceNo + "." + partner.TaxCode;
+                partner.Id =  partner.TaxCode + "." + partner.InternalReferenceNo;
             }
             else
             {
@@ -99,7 +100,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 salemans.ForEach(x => {
                     x.PartnerId = partner.Id;
                     x.CreateDate = DateTime.Now;
-                    x.UserCreated = currentUser.UserID;
+                    //x.UserCreated = currentUser.UserID;
                 });
                 salemanRepository.Add(salemans, false);
             }

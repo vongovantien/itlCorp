@@ -1,7 +1,7 @@
 export class Saleman {
     id: string = '';
     saleman_ID: any = '';
-    office: string = '';
+    office: any = '';
     company: string = '';
     service: string = '';
     partnerId: string = '';

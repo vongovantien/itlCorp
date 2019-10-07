@@ -7,7 +7,7 @@ namespace eFMS.API.Catalogue.Models
 {
     public class CatSaleManEditModel
     {
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
         public string Saleman_ID { get; set; }
         public string Office { get; set; }
         public string Company { get; set; }

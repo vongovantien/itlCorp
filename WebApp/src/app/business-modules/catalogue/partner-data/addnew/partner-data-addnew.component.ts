@@ -69,7 +69,8 @@ export class PartnerDataAddnewComponent extends AppList {
     saleMantoView: Saleman = new Saleman();
     dataSearchSaleman: any = {};
     isShowSaleMan: boolean = false;
-    salemanTemp: Array<Object> = [];
+    index: number = 0;
+
 
     list: any[] = [];
 
@@ -96,7 +97,7 @@ export class PartnerDataAddnewComponent extends AppList {
         } else {
             this.saleMandetail.push(this.saleManToAdd);
             this.poupSaleman.hide();
-            console.log(this.saleMandetail)
+            console.log(this.saleMandetail);
         }
     }
 
@@ -104,6 +105,21 @@ export class PartnerDataAddnewComponent extends AppList {
         this.poupSaleman.resetForm();
         this.poupSaleman.isSave = false;
         this.poupSaleman.show();
+    }
+
+    onDeleteSaleman() {
+        this.saleMandetail.splice(this.index, 1);
+        this.confirmDeleteJobPopup.hide();
+        this.toastr.success('Delete Success !');
+    }
+    // deleteSaleMan(index: any) {
+    //     this.saleMandetail.splice(index, 1);
+    // }
+
+    deleteSaleman(index: any) {
+        this.index = index;
+        this.deleteMessage = `Do you want to delete sale man`;
+        this.confirmDeleteJobPopup.show();
     }
 
     ngOnInit() {
@@ -300,17 +316,20 @@ export class PartnerDataAddnewComponent extends AppList {
         if (this.form.valid) {
             this.partner.accountNo = this.partner.id = this.partner.taxCode;
             if (this.isRequiredSaleman && this.partner.salePersonId != null) {
-                this.addNew();
+                // this.addNew();
+                this.onCreatePartner();
             }
             else {
-                if (this.isRequiredSaleman == false) {
-                    this.addNew();
+                if (this.isRequiredSaleman === false) {
+                    // this.addNew();
+                    this.onCreatePartner();
                 }
             }
         }
     }
     addNew(): any {
         this.baseService.spinnerShow();
+        this.partner.saleManRequests = this.saleMandetail;
         this.baseService.post(this.api_menu.Catalogue.PartnerData.add, this.partner).subscribe((response: any) => {
             this.baseService.spinnerHide();
             this.baseService.successToast(response.message);
@@ -321,6 +340,27 @@ export class PartnerDataAddnewComponent extends AppList {
             this.baseService.handleError(err);
         });
     }
+
+    onCreatePartner() {
+        this.baseService.spinnerShow();
+        this.partner.saleMans = this.saleMandetail;
+        this._catalogueRepo.createPartner(this.partner)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (res.status) {
+                        this.baseService.spinnerHide();
+                        this.baseService.successToast(res.message);
+                        this.router.navigate(["/home/catalogue/partner-data"]);
+
+                    }
+
+                }, err => {
+                    this.baseService.spinnerHide();
+                    this.baseService.handleError(err);
+                });
+    }
+
 
     resetForm(): any {
         this.form.onReset();
@@ -491,34 +531,28 @@ export class PartnerDataAddnewComponent extends AppList {
         this.value = value;
     }
 
-    deleteSaleman(saleman: Saleman) {
 
-        this.selectedSaleman = new Saleman(saleman);
-        this.deleteMessage = `Do you want to delete sale man ${saleman.saleman_ID}?`;
-        this.confirmDeleteJobPopup.show();
-    }
+    // onDeleteSaleman() {
+    //     this.baseService.spinnerShow();
+    //     this._catalogueRepo.deleteSaleman(this.selectedSaleman.id)
+    //         .pipe(
+    //             catchError(this.catchError),
+    //             finalize(() => {
+    //                 this.confirmDeleteJobPopup.hide();
+    //             })
+    //         ).subscribe(
+    //             (respone: CommonInterface.IResult) => {
+    //                 if (respone.status) {
+    //                     this.baseService.spinnerHide();
+    //                     this.toastr.success(respone.message, 'Delete Success !');
+    //                     $('#saleman-detail-modal').modal('hide');
+    //                     this.getSalemanPagingByPartnerId(this.dataSearchSaleman);
 
-    onDeleteSaleman() {
-        this.baseService.spinnerShow();
-        this._catalogueRepo.deleteSaleman(this.selectedSaleman.id)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this.confirmDeleteJobPopup.hide();
-                })
-            ).subscribe(
-                (respone: CommonInterface.IResult) => {
-                    if (respone.status) {
-                        this.baseService.spinnerHide();
-                        this.toastr.success(respone.message, 'Delete Success !');
-                        $('#saleman-detail-modal').modal('hide');
-                        this.getSalemanPagingByPartnerId(this.dataSearchSaleman);
+    //                 }
+    //             },
+    //         );
 
-                    }
-                },
-            );
-
-    }
+    // }
 
     getSalemanPagingByPartnerId(dataSearchSaleman?: any) {
         this.isLoading = true;

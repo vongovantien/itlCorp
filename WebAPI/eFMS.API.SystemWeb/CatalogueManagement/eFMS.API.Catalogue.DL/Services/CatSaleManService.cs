@@ -42,7 +42,7 @@ namespace eFMS.API.Catalogue.DL.Services
             else
             {
                 data = DataContext.Get();
-                RedisCacheHelper.SetObject(cache, Templates.CatSaleMan.NameCaching.ListName, data);
+                //RedisCacheHelper.SetObject(cache, Templates.CatSaleMan.NameCaching.ListName, data);
             }
             var results = data?.Select(x => mapper.Map<CatSaleManModel>(x));
             return results;

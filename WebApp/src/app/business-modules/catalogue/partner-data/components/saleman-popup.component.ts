@@ -65,8 +65,10 @@ export class SalemanPopupComponent extends PopupBase {
 
     resetForm() {
         this.strSalemanCurrent = {};
+        this.strOfficeCurrent = {};
         this.saleManToAdd = new Saleman();
         this.saleManToAdd.saleman_ID = {};
+        this.saleManToAdd.office = {};
 
     }
     closePoup() {
@@ -139,11 +141,11 @@ export class SalemanPopupComponent extends PopupBase {
         }
     }
 
-
     onSelectSaleMan(saleMan: any) {
         this.strSalemanCurrent = { field: 'username', value: saleMan.username };
         this.selectedDataSaleMan = saleMan;
     }
+
 
 
     onSelectOffice(office: any) {
@@ -161,7 +163,7 @@ export class SalemanPopupComponent extends PopupBase {
             partnerId: null,
             saleman_ID: this.selectedDataSaleMan.username,
             service: this.selectedService.id,
-
+            createDate: new Date()
         };
         this.saleManToAdd = new Saleman(saleMane);
         this.onCreate.emit(this.saleManToAdd);
