@@ -16,8 +16,7 @@ const routes: Routes = [
     path: 'company', loadChildren: () => import('./company/company-information.module').then(m => m.CompanyInformationModule),
   },
   {
-    path: 'department',
-    component: DepartmentComponent
+    path: 'department', loadChildren: () => import('./department/department.module').then(m => m.DepartmentModule),
   },
   {
     path: 'group',

@@ -13,6 +13,6 @@ import { DepartmentComponent } from './department/department.component';
     CommonModule,
     SystemRoutingModule,
   ],
-  declarations: [UserManagementComponent, GroupComponent, RoleComponent, PermissionComponent, DepartmentComponent]
+  declarations: [UserManagementComponent, GroupComponent, RoleComponent, PermissionComponent, CompanyInfoComponent, DepartmentComponent]
 })
 export class SystemModule { }
