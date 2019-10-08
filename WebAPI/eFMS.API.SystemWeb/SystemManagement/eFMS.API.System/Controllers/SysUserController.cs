@@ -73,7 +73,6 @@ namespace eFMS.API.System.Controllers
             return Ok(result);
         }
         
-
         private string CheckExist(string id)
         {
             string message = string.Empty;

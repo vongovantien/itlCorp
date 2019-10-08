@@ -1,22 +1,29 @@
 <div class="m-portlet form-sarch-company-wrapper">
     <div class="m-portlet__body">
-        <form action="" class="form">
-            <div class="form-group">
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">
-                            Action
-                        </button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item">Action</a>
-                            <a class="dropdown-item">Another action</a>
-                            <a class="dropdown-item">Something else here</a>
+        <div class="m-form">
+            <!-- <div class="row">
+                <div class="col">
+                    <form action="" class="form">
+                        <div class="input-group row">
+                            <select [(ngModel)]="selectedType" name="type" class="form-control col-1">
+                                <option *ngFor="let type of types" [ngValue]="type">{{type.title}}</option>
+                            </select>
+
+                            <input type="text" class="form-control" aria-label="Text input with dropdown button">
+                            <div class="input-group-append">
+                                <app-default-button [buttonSetting]="searchlButtonSetting" (click)="onSeach()">
+                                </app-default-button>
+                            </div>
                         </div>
-                    </div>
-                    <input type="text" class="form-control" aria-label="Text input with dropdown button">
+                    </form>
                 </div>
-            </div>
-        </form>
+                <div class="col-md-auto">
+                    <app-default-button [buttonSetting]="resetButtonSetting" (click)="onReset()">
+                    </app-default-button>
+                </div>
+            </div> -->
+            <app-search-options [configSearch]="configSearch" (search)="search($event)"
+                (reset_search)="onReset($event)"></app-search-options>
+        </div>
     </div>
 </div>

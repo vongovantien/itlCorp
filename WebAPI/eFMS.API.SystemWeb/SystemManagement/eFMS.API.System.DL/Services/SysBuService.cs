@@ -17,10 +17,10 @@ namespace eFMS.API.System.DL.Services
 {
     public class SysBuService : RepositoryBase<SysBu, SysBuModel>, ISysBuService
     {
-        private readonly ICurrentUser currentUser;
-        public SysBuService(IContextBase<SysBu> repository, IMapper mapper, ICurrentUser user) : base(repository, mapper)
+        //private readonly ICurrentUser currentUser;
+        public SysBuService(IContextBase<SysBu> repository, IMapper mapper) : base(repository, mapper)
         {
-            currentUser = user;
+            //currentUser = user;
         }
 
         public IQueryable<SysBuModel> GetAll()
@@ -73,14 +73,14 @@ namespace eFMS.API.System.DL.Services
                 bu = bu.Where(x => x.BunameVn == criteria.Keyword);
             }
 
-            var responseData = mapper.Map<List<SysBuModel>>(bu); // maping BU sang SysBuModel ( hoặc object # => define trong Mapper.cs);
+            var responseData = mapper.Map<List<SysBuModel>>(bu).ToList(); // maping BU sang SysBuModel ( hoặc object # => define trong Mapper.cs);
 
             return responseData;
         }
 
         public HandleState Update(SysBuAddModel model)
         {
-            var userCurrent = currentUser.UserID;
+            var userCurrent = "admin";
 
             try
             {
@@ -110,11 +110,11 @@ namespace eFMS.API.System.DL.Services
             }
         }
 
-        public HandleState Delete(int id)
+        public HandleState Delete(Guid id)
         {
             try
             {
-                ChangeTrackerHelper.currentUser = currentUser.UserID;
+                ChangeTrackerHelper.currentUser = "admin";
 
                 var hs = DataContext.Delete(x => x.Id == id);
                 return hs;
@@ -130,8 +130,8 @@ namespace eFMS.API.System.DL.Services
         {
             try
             {
-                var userCurrent = currentUser.UserID;
-
+                var userCurrent = "admin";
+                
                 var SysBu = new SysBuModel
                 {
                     Code = model.CompanyCode,
@@ -140,7 +140,8 @@ namespace eFMS.API.System.DL.Services
                     BunameEn = model.CompanyNameEn,
                     Website = model.Website,
                     Inactive = model.Status,
-                    LogoPath = model.PhotoUrl
+                    LogoPath = model.PhotoUrl,
+                    Id = Guid.NewGuid()
                 };
 
                 SysBu.DatetimeCreated = SysBu.DatetimeModified = DateTime.Now;

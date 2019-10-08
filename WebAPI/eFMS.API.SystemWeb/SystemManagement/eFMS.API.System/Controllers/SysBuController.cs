@@ -68,9 +68,11 @@ namespace eFMS.API.System.Controllers
         public IActionResult Add(SysBuAddModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-
-            //var sysBu = mapper.Map<SysBuModel>(model);
-
+            var checkExistMessage = CheckExistCode(model.CompanyCode);
+            if (checkExistMessage.Length > 0)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+            }
             var hs = sysBuService.Add(model);
 
             var message = HandleError.GetMessage(hs, Infrastructure.Common.Crud.Insert);
@@ -83,14 +85,26 @@ namespace eFMS.API.System.Controllers
             return Ok(result);
         }
 
+        [HttpGet]
+        [Route("{id}")]
+        public IActionResult GetBy(Guid id)
+        {
+            var result = sysBuService.First(x => x.Id == id);
+            if (result == null)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = "Không tìm thấy Company", Data = result });
+            }
+            else
+            {
+                return Ok(new ResultHandle { Status = true, Message = "Success", Data = result });
+            }
+        }
+
         [HttpPut]
         [Route("Update")]
         public IActionResult Update(SysBuAddModel model)
         {
-
             if (!ModelState.IsValid) return BadRequest();
-
-            //var sysBu = mapper.Map<SysBuModel>(model);
 
             var hs = sysBuService.Update(model);
 
@@ -107,7 +121,7 @@ namespace eFMS.API.System.Controllers
         [HttpDelete]
         [Route("Delete")]
         //[Authorize]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(Guid id)
         {
             var hs = sysBuService.Delete(id);
             var message = HandleError.GetMessage(hs, Infrastructure.Common.Crud.Delete);
@@ -119,5 +133,17 @@ namespace eFMS.API.System.Controllers
             return Ok(result);
         }
 
+        private string CheckExistCode(string Code)
+        {
+            string message = string.Empty;
+            if (Code != "" || Code != null)
+            {
+                if (sysBuService.Any(x => (x.Code == Code)))
+                {
+                    message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
+                }
+            }
+            return message;
+        }
     }
 }

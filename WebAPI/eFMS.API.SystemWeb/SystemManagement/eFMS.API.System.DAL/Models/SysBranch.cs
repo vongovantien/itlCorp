@@ -8,7 +8,8 @@ namespace eFMS.API.System.Service.Models
         public Guid Id { get; set; }
         public string BranchNameVn { get; set; }
         public string BranchNameEn { get; set; }
-        public short? Buid { get; set; }
+        public string ShortName { get; set; }
+        public Guid Buid { get; set; }
         public string ManagerId { get; set; }
         public string AddressVn { get; set; }
         public string AddressEn { get; set; }
@@ -25,6 +26,7 @@ namespace eFMS.API.System.Service.Models
         public bool Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
         public byte[] Logo { get; set; }
+        public string SwiftCode { get; set; }
         public string Code { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }

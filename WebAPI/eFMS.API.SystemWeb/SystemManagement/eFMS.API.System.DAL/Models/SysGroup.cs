@@ -25,7 +25,6 @@ namespace eFMS.API.System.Service.Models
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
 
-        public virtual CatDepartment Department { get; set; }
         public virtual ICollection<SysGroupRole> SysGroupRole { get; set; }
         public virtual ICollection<SysUserGroup> SysUserGroup { get; set; }
     }
