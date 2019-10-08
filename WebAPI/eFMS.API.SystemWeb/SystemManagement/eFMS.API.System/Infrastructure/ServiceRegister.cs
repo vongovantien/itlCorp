@@ -37,6 +37,9 @@ namespace eFMS.API.System.Infrastructure
             services.AddTransient<ICatDepartmentService, CatDepartmentService>();
             services.AddTransient<ISysUserService, SysUserService>();
             services.AddTransient<ISysEmployeeService, SysEmployeeService>();
+            services.AddTransient<ISysBranchService, SysBranchService>();
+
+
         }
         public static IServiceCollection AddCulture(this IServiceCollection services, IConfiguration configuration)
         {

@@ -4,5 +4,47 @@
         <name>eFMS.API.System</name>
     </assembly>
     <members>
+        <member name="M:eFMS.API.System.Controllers.SysOfficeController.GetAll">
+            <summary>
+            get all data
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.System.Controllers.SysOfficeController.Paging(eFMS.API.System.DL.Models.Criteria.SysBranchCriteria,System.Int32,System.Int32)">
+            <summary>
+            get and paging the list of branch
+            </summary>
+            <param name="criteria">search conditions</param>
+            <param name="page">page to retrieve data</param>
+            <param name="size">number items per page</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.System.Controllers.SysOfficeController.Get(eFMS.API.System.DL.Models.Criteria.SysBranchCriteria)">
+            <summary>
+            get the list of branch
+            </summary>
+        </member>
+        <member name="M:eFMS.API.System.Controllers.SysOfficeController.Delete(System.Guid)">
+            <summary>
+            delete an existed item
+            </summary>
+            <param name="id">id of data that need to delete</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.System.Controllers.SysOfficeController.Put(System.Guid,eFMS.API.System.Models.SysBranchEditModel)">
+            <summary>
+            update an existed item
+            </summary>
+            <param name="id">id of data that need to update</param>
+            <param name="model">object to update</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.System.Controllers.SysOfficeController.Post(eFMS.API.System.Models.SysBranchEditModel)">
+            <summary>
+            add new partner
+            </summary>
+            <param name="model">object to add</param>
+            <returns></returns>
+        </member>
     </members>
 </doc>

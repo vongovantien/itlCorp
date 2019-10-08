@@ -88,10 +88,10 @@ namespace eFMS.API.System.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.Branch)
-                    .WithMany(p => p.CatDepartment)
-                    .HasForeignKey(d => d.BranchId)
-                    .HasConstraintName("FK_catDepartment_sysBranch");
+                //entity.HasOne(d => d.Branch)
+                //    .WithMany(p => p.CatDepartment)
+                //    .HasForeignKey(d => d.BranchId)
+                //    .HasConstraintName("FK_catDepartment_sysBranch");
             });
 
             modelBuilder.Entity<CatPlace>(entity =>
@@ -250,10 +250,10 @@ namespace eFMS.API.System.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.Bu)
-                    .WithMany(p => p.SysBranch)
-                    .HasForeignKey(d => d.Buid)
-                    .HasConstraintName("FK_sysBranch_sysBU");
+                //entity.HasOne(d => d.Bu)
+                //    .WithMany(p => p.SysBranch)
+                //    .HasForeignKey(d => d.Buid)
+                //    .HasConstraintName("FK_sysBranch_sysBU");
             });
 
             modelBuilder.Entity<SysBu>(entity =>

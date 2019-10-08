@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
-namespace eFMS.API.System.Service.Models
+namespace eFMS.API.System.DL.ViewModels
 {
-    public partial class SysBranch
+    public class SysBranchViewModel
     {
-        public SysBranch()
-        {
-            //CatDepartment = new HashSet<CatDepartment>();
-        }
-
         public Guid Id { get; set; }
         public string BranchNameVn { get; set; }
         public string BranchNameEn { get; set; }
@@ -34,8 +30,5 @@ namespace eFMS.API.System.Service.Models
         public DateTime? DatetimeCreated { get; set; }
         public string SwiftCode { get; set; }
         public string ShortName { get; set; }
-
-        //public virtual SysBu Bu { get; set; }
-        //public virtual ICollection<CatDepartment> CatDepartment { get; set; }
     }
 }

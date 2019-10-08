@@ -9,5 +9,6 @@ namespace eFMS.API.System.DL.IService
 {
     public interface ICatBranchService : IRepositoryBase<CatBranch, CatBranchModel>
     {
+
     }
 }

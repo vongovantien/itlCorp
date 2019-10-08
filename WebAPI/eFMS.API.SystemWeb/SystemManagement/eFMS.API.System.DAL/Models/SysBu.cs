@@ -7,10 +7,10 @@ namespace eFMS.API.System.Service.Models
     {
         public SysBu()
         {
-            SysBranch = new HashSet<SysBranch>();
+            //SysBranch = new HashSet<SysBranch>();
         }
 
-        public short Id { get; set; }
+        public Guid Id { get; set; }
         public string Code { get; set; }
         public string BunameVn { get; set; }
         public string BunameEn { get; set; }
@@ -41,6 +41,6 @@ namespace eFMS.API.System.Service.Models
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
 
-        public virtual ICollection<SysBranch> SysBranch { get; set; }
+        //public virtual ICollection<SysBranch> SysBranch { get; set; }
     }
 }

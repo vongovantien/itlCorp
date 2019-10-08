@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace eFMS.API.System.Service.Models
+namespace eFMS.API.System.Models
 {
-    public partial class SysBranch
+    public class SysBranchEditModel
     {
-        public SysBranch()
-        {
-            //CatDepartment = new HashSet<CatDepartment>();
-        }
-
-        public Guid Id { get; set; }
         public string BranchNameVn { get; set; }
         public string BranchNameEn { get; set; }
         public Guid Buid { get; set; }
@@ -34,8 +30,5 @@ namespace eFMS.API.System.Service.Models
         public DateTime? DatetimeCreated { get; set; }
         public string SwiftCode { get; set; }
         public string ShortName { get; set; }
-
-        //public virtual SysBu Bu { get; set; }
-        //public virtual ICollection<CatDepartment> CatDepartment { get; set; }
     }
 }
