@@ -137,18 +137,20 @@ namespace eFMS.API.Documentation.DL.Services
                             Customer = cus.ShortName,
                             HBL = (ops.Hwbno == null ? cstd.Hwbno : ops.Hwbno),
                             MBL = (ops.Mblno == null ? cstd.Mawb : ops.Mblno),
+                            HBLID = (ops.Hblid == null ? cstd.Id : ops.Hblid),
                             CustomNo = sur.ClearanceNo,
                             Service = (ops.JobNo == null ? cst.TransactionType : "CL"),
                         };
 
             var listShipment = query.Where(x => x.JobId != null && x.HBL != null && x.MBL != null)
-                            .GroupBy(x => new { x.JobId, x.Customer, x.MBL, x.HBL, x.CustomNo, x.Service })
+                            .GroupBy(x => new { x.JobId, x.Customer, x.MBL, x.HBL, x.HBLID, x.CustomNo, x.Service })
                             .Select(s => new ShipmentsCopy
                             {
                                 JobId = s.Key.JobId,
                                 Customer = s.Key.Customer,
                                 MBL = s.Key.MBL,
                                 HBL = s.Key.HBL,
+                                HBLID = s.Key.HBLID,
                                 CustomNo = s.Key.CustomNo,
                                 Service = s.Key.Service
                             });
@@ -160,6 +162,7 @@ namespace eFMS.API.Documentation.DL.Services
                 Customer = x.Customer,
                 MBL = x.MBL,
                 HBL = x.HBL,
+                HBLID = x.HBLID,
                 CustomNo = x.CustomNo,
                 Service = CustomData.Services.Where(s => s.Value == x.Service).FirstOrDefault()?.DisplayName
             }).ToList();

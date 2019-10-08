@@ -5,8 +5,9 @@ import { catchError, finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { NgProgress } from '@ngx-progressbar/core';
-import { FormGroup, FormBuilder, AbstractControl } from '@angular/forms';
+import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { BaseService } from 'src/app/shared/services';
+import { Department } from 'src/app/shared/models/system/department';
 
 @Component({
     selector: 'app-department-new',
@@ -21,7 +22,12 @@ export class DepartmentAddNewComponent extends AppPage {
     nameAbbr: AbstractControl;
     office: AbstractControl;
     status: AbstractControl;
-    
+    statusList: CommonInterface.ICommonTitleValue[] = [];
+    officeList: CommonInterface.ICommonTitleValue[] = [];
+
+    isValidForm: boolean = false;
+    isSubmited: boolean = false;
+
     constructor(
         //private _accountingRepo: AccountingRepo,
         private _toastService: ToastrService,
@@ -37,18 +43,39 @@ export class DepartmentAddNewComponent extends AppPage {
     }
 
     ngOnInit() {
-        this.initForm();
         this.initDataInform();
+        this.initForm();
     }
 
     initForm() {
         this.formAdd = this._fb.group({
-            departmentCode: [],
-            nameEn: [],
-            nameLocal: [],
-            nameAbbr: [], 
-            office: [],
-            status: []   
+            departmentCode: ['',
+                Validators.compose([
+                    Validators.required,
+                    Validators.maxLength(50)
+                ])
+            ],
+            nameEn: ['',
+                Validators.compose([
+                    Validators.required
+                ])
+            ],
+            nameLocal: ['',
+                Validators.compose([
+                    Validators.required
+                ])
+            ],
+            nameAbbr: ['',
+                Validators.compose([
+                    Validators.required
+                ])
+            ],
+            office: ['',
+                Validators.compose([
+                    Validators.required
+                ])
+            ],
+            status: [this.statusList[0]]
         });
 
         this.departmentCode = this.formAdd.controls['departmentCode'];
@@ -60,9 +87,7 @@ export class DepartmentAddNewComponent extends AppPage {
     }
 
     initDataInform() {
-        // this.statusApprovals = this.getStatusApproval();
-        // this.statusPayments = this.getStatusPayment();
-        
+        this.statusList = this.getStatus();
     }
 
     ngAfterViewInit() {
@@ -71,6 +96,28 @@ export class DepartmentAddNewComponent extends AppPage {
     }
 
     saveDepartment() {
+        this.isSubmited = true;
+        if (this.formAdd.valid) {
+            const dept: Department = {
+                id: 0,
+                code: this.departmentCode.value,
+                deptName: this.nameLocal.value,
+                deptNameEn: this.nameEn.value,
+                deptNameAbbr: this.nameAbbr.value,
+                office: this.office.value.value,
+                company: '',
+                status: this.status.value.value,
+                managerId: '',
+                userCreated: '',
+                datetimeCreated: '',
+                userModified: '',
+                datetimeModified: '',
+                inactive: '',
+                inactiveOn: ''
+            };
+            console.log(dept);
+        }
+
         // if (!this.requestSurchargeListComponent.surcharges.length) {
         //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
         //     return;
@@ -105,15 +152,18 @@ export class DepartmentAddNewComponent extends AppPage {
         //         }
         //     );
     }
-   
+
+    getStatus(): CommonInterface.ICommonTitleValue[] {
+        return [
+            { title: 'Active', value: true },
+            { title: 'Inactive', value: false }
+        ];
+    }
 
     back() {
         this._router.navigate(['home/system/department']);
     }
 
 }
-// interface IDataDepartment {
-//     settlement: any;
-//     shipmentCharge: Surcharge[];
-// }
+
 

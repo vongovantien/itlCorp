@@ -261,7 +261,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Add")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Add(CreateUpdateSettlementModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -281,7 +281,6 @@ namespace eFMS.API.Accounting.Controllers
                         CustomNo = item.ClearanceNo,
                         InvoiceNo = item.InvoiceNo,
                         ContNo = item.ContNo,
-                        JobNo = item.JobId
                     };
                     if (acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment))
                     {
@@ -339,7 +338,6 @@ namespace eFMS.API.Accounting.Controllers
                         CustomNo = item.ClearanceNo,
                         InvoiceNo = item.InvoiceNo,
                         ContNo = item.ContNo,
-                        JobNo = item.JobId
                     };
                     if (acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment))
                     {

@@ -10,7 +10,7 @@ export class Department {
     managerId: string = '';
     userCreated: string = '';
     datetimeCreated: string = '';
-    userModified: string = ''
+    userModified: string = '';
     datetimeModified: string = '';
     inactive: string = '';
     inactiveOn: string = '';   

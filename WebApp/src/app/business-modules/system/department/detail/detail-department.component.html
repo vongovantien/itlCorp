@@ -1,6 +1,6 @@
 <app-sub-header></app-sub-header>
 <div class="m-content">
-    <div class="m-form">
+    <div class="m-form m-form--state">
         <div class="m-portlet">
             <div class="row m--padding-top-10">
                 <div class="col-6">
@@ -9,7 +9,8 @@
                 <div class="col-6">
                     <div class="m--align-right">
                         <button type="button"
-                            class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
+                            class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                            (click)="updateDepartment()">
                             <span>
                                 <i class="la la-save"></i>
                                 <span>
@@ -32,51 +33,89 @@
             </div>
             <hr />
             <div class="m-portlet__body">
-                <!-- <form>
+                <form [formGroup]="formDetail">
                     <div class="row">
                         <div class="col-4">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': (departmentCode.dirty && !departmentCode.valid) || (isSubmited && !departmentCode.valid)}">
                                 <label class="form-control-label">
                                     Department Code:
+                                    <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square"
                                     placeholder="Department code" formControlName="departmentCode">
+                                <div class="form-control-feedback"
+                                    *ngIf="isSubmited && (departmentCode.errors | equalError: 'required') || (departmentCode.errors | equalError: 'required') && departmentCode.dirty">
+                                    Department code is required!
+                                </div>
+                                <div class="form-control-feedback"
+                                    *ngIf="departmentCode.errors | equalError: 'maxlength'">
+                                    Max length must be greater 2
+                                </div>
                             </div>
                         </div>
                         <div class="col-4">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': (nameEn.dirty && !nameEn.valid) || (isSubmited && !nameEn.valid)}">
                                 <label class="form-control-label">
                                     Name EN:
+                                    <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square" placeholder="Name EN"
                                     formControlName="nameEn">
+                                <div class="form-control-feedback"
+                                    *ngIf="isSubmited && (nameEn.errors | equalError: 'required') || (nameEn.errors | equalError: 'required') && nameEn.dirty">
+                                    Name EN is required!
+                                </div>
                             </div>
                         </div>
                         <div class="col-4">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': (nameLocal.dirty && !nameLocal.valid) || (isSubmited && !nameLocal.valid)}">
                                 <label class="form-control-label">
                                     Name Local:
+                                    <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square" placeholder="Name Local"
                                     formControlName="nameLocal">
+                                <div class="form-control-feedback"
+                                    *ngIf="isSubmited && (nameLocal.errors | equalError: 'required') || (nameLocal.errors | equalError: 'required') && nameLocal.dirty">
+                                    Name Local is required!
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-4">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': (nameAbbr.dirty && !nameAbbr.valid) || (isSubmited && !nameAbbr.valid)}">
                                 <label class="form-control-label">
                                     Name Abbr:
+                                    <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square" placeholder="Name Abbr"
                                     formControlName="nameAbbr">
+                                <div class="form-control-feedback"
+                                    *ngIf="isSubmited && (nameAbbr.errors | equalError: 'required') || (nameAbbr.errors | equalError: 'required') && nameAbbr.dirty">
+                                    Name Abbr is required!
+                                </div>
                             </div>
                         </div>
                         <div class="col-4">
-                            <div class="form-group">
-                                <label class="form-control-label">Office</label>
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': (office.dirty && !office.valid) || (isSubmited && !office.valid)}">
+                                <label class="form-control-label">
+                                    Office
+                                    <span class="text-danger">*</span>
+                                </label>
                                 <select formControlName="office" class="form-control">
+                                    <option *ngFor="let office of statusList" [ngValue]="office">{{office.title}}
+                                    </option>
                                 </select>
+                                <div class="form-control-feedback"
+                                    *ngIf="isSubmited && (office.errors | equalError: 'required') || (office.errors | equalError: 'required') && office.dirty">
+                                    Office is required!
+                                </div>
                             </div>
                         </div>
                         <div class="col-4">
@@ -84,8 +123,8 @@
                                 <label class="form-control-label">
                                     Company:
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Company"
-                                    formControlName="company">
+                                <input type="text" class="form-control m-input m-input--square" disabled
+                                    placeholder="Company" formControlName="company">
                             </div>
                         </div>
                     </div>
@@ -94,11 +133,21 @@
                             <div class="form-group">
                                 <label class="form-control-label">Status</label>
                                 <select formControlName="status" class="form-control">
+                                    <option *ngFor="let status of statusList" [ngValue]="status">{{status.title}}
+                                    </option>
                                 </select>
                             </div>
                         </div>
                     </div>
-                </form> -->
+                    <div class="row">
+                        <div class="col-6">
+                            Created: By
+                        </div>
+                        <div class="col-6">
+                            Modified: By
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -119,8 +168,7 @@
         <div class="tab-content job-tab-content" id="jobTabContent">
             <div class="tab-pane fade show active" id="job-tableview-tab" role="tabpanel" aria-labelledby="">
                 List Group
-
-                <div class="m-portlet__body">
+                <!-- <div class="m-portlet__body">
                     <div class="table-wrapper table-scrollable" id="ops-job-list-table">
                         <table class="table table-hover table-brand dataTable">
                             <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
@@ -261,8 +309,8 @@
                         </div>
                     </div>
 
-                </div>
-            </div> -->
+                </div> -->
+            </div>
         </div>
 
         <div class="tab-pane fade" id="job-stageview-tab" role="tabpanel" aria-labelledby="">
