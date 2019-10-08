@@ -45,6 +45,7 @@ namespace CommonInterface {
     export interface IValueDisplay {
         value: string;
         displayName: string;
+        fieldName?: string;
     }
 
     export interface ISortData {

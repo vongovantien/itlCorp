@@ -99,7 +99,7 @@ export const language = {
         { name: "Role", route_child: "role", display: true },
         { name: "Permission", route_child: "permission", display: true },
         { name: "Department", route_child: "department", display: true },
-        { name: "Company Informations", route_child: "company", display: true }
+        { name: "Company", route_child: "company", display: true }
       ]
     },
 

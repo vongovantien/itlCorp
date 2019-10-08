@@ -40,6 +40,7 @@ namespace eFMS.API.System.Infrastructure
 
             services.AddTransient<ICurrentUser, CurrentUser>();
             services.AddTransient<ISysUserService, SysUserService>();
+            services.AddTransient<ISysBuService, SysBuService>();
         }
 
         public static IServiceCollection AddCulture(this IServiceCollection services, IConfiguration configuration)

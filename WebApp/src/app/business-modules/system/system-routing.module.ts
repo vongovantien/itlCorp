@@ -13,7 +13,7 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
-    path: 'company', loadChildren: () => import('./company/company-infomation.module').then(m => m.CompanyInfomationModule),
+    path: 'company', loadChildren: () => import('./company/company-information.module').then(m => m.CompanyInformationModule),
   },
   {
     path: 'department',

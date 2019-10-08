@@ -13,7 +13,7 @@ export const language = {
    * @param route_child : route of component , example  : 'http://test.efms.itlvn.com/vi/#/home/catalogue/ware-house' 
    * @param display : If true, component will display on menu in page-sidebar, none display if false  
   */
-  Menu : [  
+  Menu: [
     {
       parent_name: "Danh Mục",
       icon: "icon-books",
@@ -21,122 +21,122 @@ export const language = {
       display_child: false,
       childs: [
 
-        { name: "Kho", route_child: "ware-house",display:true },
-        { name: "Cửa Khẩu", route_child: "port-index",display:true },
+        { name: "Kho", route_child: "ware-house", display: true },
+        { name: "Cửa Khẩu", route_child: "port-index", display: true },
         // { name: "Port Index Import", route_child: "port-index-import" },
-        { name: "Dữ Liệu Đối Tác", route_child: "partner-data",display:true },
-        { name: "Hàng Hóa", route_child: "commodity",display:true },
-        { name: "Commodity Import", route_child: "commodity-import",display:false },
-        { name: "Commodity Group Import", route_child: "commodity-group-import",display:false },
-        { name: "Quản Lí Stage", route_child: "stage-management",display:true },
-        { name: "Import Stage", route_child: "stage-import" , display:false},
-        { name: "Đơn Vị", route_child: "unit" ,display:true},
-        { name: "Địa Điểm", route_child: "location",display:true },
-        { name: "Phí", route_child: "charge" ,display:true},
-        { name: "Import Charge", route_child: "charge-import",display:false },
-        { name: "Import Account Voucher", route_child: "charge-import-account-voucher",display:false },
-        { name: "Tiền Tệ", route_child: "currency",display:true }
+        { name: "Dữ Liệu Đối Tác", route_child: "partner-data", display: true },
+        { name: "Hàng Hóa", route_child: "commodity", display: true },
+        { name: "Commodity Import", route_child: "commodity-import", display: false },
+        { name: "Commodity Group Import", route_child: "commodity-group-import", display: false },
+        { name: "Quản Lí Stage", route_child: "stage-management", display: true },
+        { name: "Import Stage", route_child: "stage-import", display: false },
+        { name: "Đơn Vị", route_child: "unit", display: true },
+        { name: "Địa Điểm", route_child: "location", display: true },
+        { name: "Phí", route_child: "charge", display: true },
+        { name: "Import Charge", route_child: "charge-import", display: false },
+        { name: "Import Account Voucher", route_child: "charge-import-account-voucher", display: false },
+        { name: "Tiền Tệ", route_child: "currency", display: true }
       ]
     },
-   
+
     {
       parent_name: "Hoạt Động",
       icon: "icon-cogs",
       route_parent: "/home/operation/",
       display_child: false,
       childs: [
-        { name: "Quản Lý Job", route_child: "job-management",display:true  },
-        { name: "Điều Phối", route_child: "assigment",display:true  },
-        { name: "Điều Phối Xe", route_child: "trucking-assigment",display:true  },
-        { name: "Custom Clearance", route_child: "custom-clearance",display:true }
+        { name: "Quản Lý Job", route_child: "job-management", display: true },
+        { name: "Điều Phối", route_child: "assigment", display: true },
+        { name: "Điều Phối Xe", route_child: "trucking-assigment", display: true },
+        { name: "Custom Clearance", route_child: "custom-clearance", display: true }
       ]
     },
-   
+
     {
       parent_name: "Chứng Từ",
       icon: "icon-file-text2",
       route_parent: "/home/documentation/",
       display_child: false,
       childs: [
-        { name: "Inland Trucking", route_child: "inland-trucking",display:true  },
-        { name: "Air Export", route_child: "air-export",display:true  },
-        { name: "Air Import", route_child: "air-import",display:true  },
-        { name: "Sea Consol Export", route_child: "sea-consol-export",display:true  },
-        { name: "Sea Consol Import", route_child: "sea-consol-import",display:true  },
-        { name: "Sea FCL Export", route_child: "sea-fcl-export",display:true  },
-        { name: "Sea FCL Export Create", route_child: "sea-fcl-export-create",display:false },
-        { name: "Sea FCL Import", route_child: "sea-fcl-import",display:true  },
-        { name: "Sea LCL Export", route_child: "sea-lcl-export",display:true  },
-        { name: "Sea LCL Import", route_child: "sea-lcl-import",display:true  },
+        { name: "Inland Trucking", route_child: "inland-trucking", display: true },
+        { name: "Air Export", route_child: "air-export", display: true },
+        { name: "Air Import", route_child: "air-import", display: true },
+        { name: "Sea Consol Export", route_child: "sea-consol-export", display: true },
+        { name: "Sea Consol Import", route_child: "sea-consol-import", display: true },
+        { name: "Sea FCL Export", route_child: "sea-fcl-export", display: true },
+        { name: "Sea FCL Export Create", route_child: "sea-fcl-export-create", display: false },
+        { name: "Sea FCL Import", route_child: "sea-fcl-import", display: true },
+        { name: "Sea LCL Export", route_child: "sea-lcl-export", display: true },
+        { name: "Sea LCL Import", route_child: "sea-lcl-import", display: true },
         { name: "Sea LCL Import", route_child: "sea-lcl-import" }
       ]
     },
-   
+
     {
       parent_name: "Kế Toán",
       icon: "icon-calculator",
       route_parent: "/home/accounting/",
       display_child: false,
       childs: [
-        { name: "Account Receivable Payable", route_child: "account-receivable-payable",display:true  },
-        { name: "Advance Payment", route_child: "advance-payment",display:true  },
-        { name: "Settlement Payment", route_child: "settlement-payment",display:true  },
-        { name: "Statement of Account", route_child: "statement-of-account",display:true  }
+        { name: "Account Receivable Payable", route_child: "account-receivable-payable", display: true },
+        { name: "Advance Payment", route_child: "advance-payment", display: true },
+        { name: "Settlement Payment", route_child: "settlement-payment", display: true },
+        { name: "Statement of Account", route_child: "statement-of-account", display: true }
       ]
     },
-    
+
     {
       parent_name: "Hệ Thống",
       icon: "icon-database",
       route_parent: "/home/system/",
       display_child: false,
       childs: [
-        { name: "Quản Lý Người Dùng", route_child: "user-management",display:true  },
-        { name: "Nhóm Người Dùng", route_child: "group",display:true  },
-        { name: "Vai Trò", route_child: "role",display:true  },
-        { name: "Quyền", route_child: "permission",display:true  },
-        { name: "Bộ Phận", route_child: "department",display:true  },
-        { name: "Thông Tin Công Ty", route_child: "company-info",display:true  }
+        { name: "Quản Lý Người Dùng", route_child: "user-management", display: true },
+        { name: "Nhóm Người Dùng", route_child: "group", display: true },
+        { name: "Vai Trò", route_child: "role", display: true },
+        { name: "Quyền", route_child: "permission", display: true },
+        { name: "Bộ Phận", route_child: "department", display: true },
+        { name: "Công Ty", route_child: "company-info", display: true }
       ]
     },
-   
+
     {
       parent_name: "Công Cụ - Cài Đặt",
       icon: "icon-wrench",
       route_parent: "/home/tool/",
       display_child: false,
       childs: [
-        { name: "Định Nghĩa ID", route_child: "id-definition",display:true  },
-        { name: "Thuế Quan", route_child: "tariff",display:true  },
-        { name: "Tỉ Giá", route_child: "exchange-rate",display:true  },
-        { name: "Ecus Connection", route_child: "ecus-connection",display:true  },
-        { name: "KPI", route_child: "kpi",display:true  },
-        { name: "Nhà Cung Cấp", route_child: "supplier",display:true  },
-        { name: "Truy Xuất Lịch Sử", route_child: "log-viewer",display:true  }
+        { name: "Định Nghĩa ID", route_child: "id-definition", display: true },
+        { name: "Thuế Quan", route_child: "tariff", display: true },
+        { name: "Tỉ Giá", route_child: "exchange-rate", display: true },
+        { name: "Ecus Connection", route_child: "ecus-connection", display: true },
+        { name: "KPI", route_child: "kpi", display: true },
+        { name: "Nhà Cung Cấp", route_child: "supplier", display: true },
+        { name: "Truy Xuất Lịch Sử", route_child: "log-viewer", display: true }
 
       ]
     },
-    
+
     {
       parent_name: "Báo Cáo",
       icon: "icon-stats-bars",
       route_parent: "/home/report/",
       display_child: false,
       childs: [
-        { name: "Báo Cáo P/L", route_child: "pl-report",display:true  },
-        { name: "Báo Cáo Hiệu Suất", route_child: "performance-report",display:true  },
-        { name: "Tổng Quan Lô Hàng", route_child: "shipment-overview",display:true  }
+        { name: "Báo Cáo P/L", route_child: "pl-report", display: true },
+        { name: "Báo Cáo Hiệu Suất", route_child: "performance-report", display: true },
+        { name: "Tổng Quan Lô Hàng", route_child: "shipment-overview", display: true }
       ]
     },
-    
+
     {
       parent_name: "Designs Zone",
       icon: "icon-format_paint",
       route_parent: "/home/designs-zone/",
       display_child: false,
       childs: [
-        { name: "Form", route_child: "form",display:true  },
-        { name: "Table", route_child: "table",display:true  }
+        { name: "Form", route_child: "form", display: true },
+        { name: "Table", route_child: "table", display: true }
       ]
     }
   ],
@@ -154,7 +154,7 @@ export const language = {
       allowSearch: true,
       dataType: "text",
       required: true,
-      lookup:''
+      lookup: ''
     },
     {
       primaryKey: 'nameEN',
@@ -238,15 +238,15 @@ export const language = {
     }
   ],
   NOTIFI_MESS: {
-    DOWNLOAD_ERR:"Lỗi Tải Xuống",
-    FILE_NOT_FOUND:"Không Tìm Thấy Tệp !",
-    UNKNOW_ERR:"Lỗi",
+    DOWNLOAD_ERR: "Lỗi Tải Xuống",
+    FILE_NOT_FOUND: "Không Tìm Thấy Tệp !",
+    UNKNOW_ERR: "Lỗi",
     SERVER_ERR_TITLE: "Lỗi Máy Chủ",
     CLIENT_ERR_TITLE: "Yêu Cầu Không Hợp Lệ",
     EXPIRED_SESSION_TITLE: "Hết Phiên Đăng Nhập",
-    CHECK_CONNECT:"Vui Lòng Kiểm Tra Kết Nối !",
+    CHECK_CONNECT: "Vui Lòng Kiểm Tra Kết Nối !",
     EXPIRED_SESSION_MESS: "Vui Lòng Đăng Nhập Để Tiếp Tục !",
     EXPORT_SUCCES: "Xuất Tệp Thành Công !",
-    IMPORT_SUCCESS:"Tải Tệp Lên Thành Công !"
+    IMPORT_SUCCESS: "Tải Tệp Lên Thành Công !"
   }
 }
