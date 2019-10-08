@@ -128,7 +128,7 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
-                    .ValueGeneratedNever();
+                    .HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.AddressEn)
                     .HasColumnName("Address_EN")
@@ -187,6 +187,14 @@ namespace eFMS.API.System.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.ShortName)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SwiftCode)
+                    .HasMaxLength(400)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Taxcode)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -206,6 +214,7 @@ namespace eFMS.API.System.Service.Models
                 entity.HasOne(d => d.Bu)
                     .WithMany(p => p.SysBranch)
                     .HasForeignKey(d => d.Buid)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_sysBranch_sysBU");
             });
 
@@ -213,7 +222,9 @@ namespace eFMS.API.System.Service.Models
             {
                 entity.ToTable("sysBU");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.AccountName).HasMaxLength(4000);
 

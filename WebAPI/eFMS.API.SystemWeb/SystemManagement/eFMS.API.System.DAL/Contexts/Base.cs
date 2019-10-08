@@ -1,16 +1,18 @@
 ﻿using eFMS.API.System.Service.Models;
-using eFMS.API.System.Service.Models;
+using eFMS.API.Common;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Options;
 
 namespace eFMS.API.System.Service.Contexts
 {
     public class Base<T> : ContextBase<T>
         where T : class, new()
     {
-        public Base(): base()
+        public Base(IOptions<Settings> settings) : base()
         {
-            //ConfigDataContext<eFMSDataContext>("Server=192.168.7.88;Database=eFMSTest;User ID=sa;Password=P@ssw0rd;");
-            ConfigDataContext<eFMSDataContext>(DbHelper.DbHelper.ConnectionString);
+            ConfigDataContext<eFMSDataContext>(settings.Value.eFMSConnection);
+            DbHelper.DbHelper.ConnectionString = settings.Value.eFMSConnection;
+            DbHelper.DbHelper.MongoDBConnectionString = settings.Value.MongoConnection;
         }
     }
 }

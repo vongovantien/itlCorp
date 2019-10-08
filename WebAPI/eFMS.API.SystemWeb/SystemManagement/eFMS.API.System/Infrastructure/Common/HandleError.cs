@@ -1,24 +1,19 @@
-﻿using ITL.NetCore.Common;
+﻿using eFMS.API.System.DL.Common;
+using eFMS.API.Common.Globals;
+using ITL.NetCore.Common;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using SystemManagementAPI.Resources;
 
 namespace eFMS.API.System.Infrastructure.Common
 {
-    public enum Crud
-    {
-        Get,
-        Insert,
-        Update,
-        Delete
-    }
     public static class HandleError
     {
         public static string GetMessage(HandleState hs, Crud crud)
         {
-            string message = LanguageSub.MSG_DATA_NOT_FOUND;
+            string message = string.Empty;
+            if (hs.Exception != null)
+            {
+                message = hs.Exception.Message;
+            }
             switch (hs.Code)
             {
                 case 200:
