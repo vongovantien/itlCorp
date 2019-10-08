@@ -26,7 +26,7 @@ namespace eFMS.API.System.DL.Services
         public IQueryable<SysBuModel> GetAll()
         {
             var bu = DataContext.Get();
-            return bu.ProjectTo<SysBuModel>(mapper.ConfigurationProvider); ;
+            return bu.ProjectTo<SysBuModel>(mapper.ConfigurationProvider);
         }
 
         public List<SysBuModel> Paging(SysBuCriteria criteria, int page, int size, out int rowsCount)

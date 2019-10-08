@@ -11,10 +11,10 @@ import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-company-info',
-    templateUrl: './company-infomation.component.html',
-    styleUrls: ['./company-infomation.component.scss']
+    templateUrl: './company-information.component.html',
+    styleUrls: ['./company-information.component.scss']
 })
-export class ComanyInfomationComponent extends AppList {
+export class ComanyInformationComponent extends AppList {
 
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
 
@@ -44,8 +44,10 @@ export class ComanyInfomationComponent extends AppList {
             { title: 'Website', field: 'code' },
             { title: 'Status', field: 'code' },
         ];
-
-        this.searchCompany({ type: 'All' });
+        this.dataSearch = {
+            type: 'All'
+        };
+        this.searchCompany(this.dataSearch);
     }
 
     onSearchCompany(dataSearch: any) {
@@ -70,7 +72,6 @@ export class ComanyInfomationComponent extends AppList {
                 (res: any) => {
                     this.totalItems = res.totalItems || 0;
                     this.companies = res.data;
-
                     console.log(this.companies);
                 },
             );

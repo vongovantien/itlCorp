@@ -5,7 +5,7 @@ import { AppForm } from 'src/app/app.form';
     selector: 'form-search-company',
     templateUrl: './form-search-company.component.html',
 })
-export class CompanyInfomationFormSearchComponent extends AppForm {
+export class CompanyInformationFormSearchComponent extends AppForm {
 
     @Output() onSearch: EventEmitter<ISearchCompany> = new EventEmitter<ISearchCompany>();
 
