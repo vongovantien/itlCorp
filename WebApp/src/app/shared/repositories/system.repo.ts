@@ -11,6 +11,28 @@ export class SystemRepo {
     constructor(private _api: ApiService) {
     }
 
+    getListOffices(page?: number, size?: number) {
+        if (!!page && !!size) {
+            return this._api.post(`${environment.HOST.SystemLocal}/api/${this.VERSION}/en-US/SysOffice/paging`, {}, {
+                page: '' + page,
+                size: '' + size
+            }).pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => {
+                    return data;
+                })
+            );
+        } else {
+            return this._api.get(`${environment.HOST.SystemLocal}/api/${this.VERSION}/en-US/SysOffice/getAll`).pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => {
+                    return data;
+                })
+            );
+        }
+
+    }
+
     getListSystemUser() {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUser`).pipe(
             catchError((error) => throwError(error)),
@@ -20,7 +42,7 @@ export class SystemRepo {
         );
     }
 
-   
+
 
 }
 

@@ -6,16 +6,20 @@ import { UserManagementComponent } from './user-management/user-management.compo
 import { GroupComponent } from './group/group.component';
 import { RoleComponent } from './role/role.component';
 import { PermissionComponent } from './permission/permission.component';
-import { DepartmentComponent } from './department/department.component';
 import { CompanyInfoComponent } from './company-info/company-info.component';
 import { SharedModule } from '../../shared/shared.module';
+import { OfficeAddNewComponent } from './office/addnew/office.addnew.component';
+import { OfficeComponent } from './office/office.component';
+import { OfficeDetailsComponent } from './office/details/office-details.component';
+import { DepartmentComponent } from './department/department.component';
+
 
 @NgModule({
   imports: [
     CommonModule,
     SystemRoutingModule,
-    // SharedModule
+    SharedModule
   ],
-  declarations: [UserManagementComponent, GroupComponent, RoleComponent, PermissionComponent, DepartmentComponent, CompanyInfoComponent]
+  declarations: [UserManagementComponent, DepartmentComponent, GroupComponent, RoleComponent, PermissionComponent, CompanyInfoComponent,]
 })
 export class SystemModule { }

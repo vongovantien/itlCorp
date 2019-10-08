@@ -7,7 +7,7 @@ namespace eFMS.API.System.Service.Models
     {
         public CatDepartment()
         {
-            SysGroup = new HashSet<SysGroup>();
+            //SysGroup = new HashSet<SysGroup>();
         }
 
         public int Id { get; set; }
@@ -23,7 +23,7 @@ namespace eFMS.API.System.Service.Models
         public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
 
-        public virtual SysBranch Branch { get; set; }
-        public virtual ICollection<SysGroup> SysGroup { get; set; }
+        //public virtual SysBranch Branch { get; set; }
+        //public virtual ICollection<SysGroup> SysGroup { get; set; }
     }
 }
