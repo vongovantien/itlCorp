@@ -18,8 +18,7 @@ const routes: Routes = [
     component: CompanyInfoComponent
   },
   {
-    path: 'department',
-    component: DepartmentComponent
+    path: 'department', loadChildren: () => import('./department/department.module').then(m => m.DepartmentModule),
   },
   {
     path: 'group',

@@ -261,7 +261,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Add")]
-        [Authorize]
+        //[Authorize]
         public IActionResult Add(CreateUpdateSettlementModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -280,7 +280,8 @@ namespace eFMS.API.Accounting.Controllers
                         Partner = item.Type.Equals(Constants.TYPE_CHARGE_BUY) ? item.PaymentObjectId : item.PayerId,
                         CustomNo = item.ClearanceNo,
                         InvoiceNo = item.InvoiceNo,
-                        ContNo = item.ContNo
+                        ContNo = item.ContNo,
+                        JobNo = item.JobId
                     };
                     if (acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment))
                     {
@@ -337,7 +338,8 @@ namespace eFMS.API.Accounting.Controllers
                         Partner = item.Type.Equals(Constants.TYPE_CHARGE_BUY) ? item.PaymentObjectId : item.PayerId,
                         CustomNo = item.ClearanceNo,
                         InvoiceNo = item.InvoiceNo,
-                        ContNo = item.ContNo
+                        ContNo = item.ContNo,
+                        JobNo = item.JobId
                     };
                     if (acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment))
                     {

@@ -1,0 +1,88 @@
+<app-sub-header></app-sub-header>
+<div class="m-content">
+    <div class="m-portlet">
+        <div class="m-form">
+            <div class="m-portlet__body">
+                <form [formGroup]="formAdd">
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    Department Code:
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square"
+                                    placeholder="Department code" formControlName="departmentCode">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    Name EN:
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Name EN"
+                                    formControlName="nameEn">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    Name Local:
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Name Local"
+                                    formControlName="nameLocal">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    Name Abbr:
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Name Abbr"
+                                    formControlName="nameAbbr">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label class="form-control-label">Office</label>
+                                <select formControlName="office" class="form-control">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label class="form-control-label">Status</label>
+                                <select formControlName="status" class="form-control">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="m--align-right">
+                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10" (click)="saveDepartment()">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Save
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10" (click)="back()">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            Cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

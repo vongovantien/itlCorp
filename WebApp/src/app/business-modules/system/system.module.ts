@@ -16,6 +16,6 @@ import { SharedModule } from '../../shared/shared.module';
     SystemRoutingModule,
     // SharedModule
   ],
-  declarations: [UserManagementComponent, GroupComponent, RoleComponent, PermissionComponent, DepartmentComponent, CompanyInfoComponent]
+  declarations: [UserManagementComponent, GroupComponent, RoleComponent, PermissionComponent, CompanyInfoComponent]
 })
 export class SystemModule { }

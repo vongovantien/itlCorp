@@ -764,21 +764,40 @@ namespace eFMS.API.Accounting.DL.Services
         #region -- INSERT & UPDATE SETTLEMENT PAYMENT --
         public bool CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria)
         {
+            //Kiem tra Shipment đã tồn tại trong surcharge hay chưa
+            var shipmentOperaExists = (from sur in csShipmentSurchargeRepo.Get()
+                                       join ops in opsTransactionRepo.Get() on sur.Hblid equals ops.Hblid into ops2
+                                       from ops in ops2.DefaultIfEmpty()
+                                       where ops.JobNo == criteria.JobNo
+                                       select ops.JobNo).Any();
+            var shipmentDocExists = (from sur in csShipmentSurchargeRepo.Get()
+                                     join cstd in csTransactionDetailRepo.Get() on sur.Hblid equals cstd.Id into csd
+                                     from cstd in csd.DefaultIfEmpty()
+                                     join cst in csTransactionRepo.Get() on cstd.JobId equals cst.Id into cs
+                                     from cst in cs.DefaultIfEmpty()
+                                     where cst.JobNo == criteria.JobNo
+                                     select cst.JobNo).Any();
+
             var result = false;
             if (criteria.SurchargeID == Guid.Empty)
             {
-                result = csShipmentSurchargeRepo.Get(x =>
-                       x.ChargeId == criteria.ChargeID
-                    && x.Hblid == criteria.HBLID
-                    && (criteria.TypeCharge == Constants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == Constants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : 1 == 1))
-                    && (string.IsNullOrEmpty(criteria.CustomNo) ? 1 == 1 : x.ClearanceNo == criteria.CustomNo)
-                    && (string.IsNullOrEmpty(criteria.InvoiceNo) ? 1 == 1 : x.InvoiceNo == criteria.InvoiceNo)
-                    && (string.IsNullOrEmpty(criteria.ContNo) ? 1 == 1 : x.ContNo == criteria.ContNo)
-                    ).Any();
+                if (shipmentOperaExists == true || shipmentDocExists == true)
+                {
+                    result = csShipmentSurchargeRepo.Get(x =>
+                           x.ChargeId == criteria.ChargeID
+                        && x.Hblid == criteria.HBLID
+                        && (criteria.TypeCharge == Constants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == Constants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : 1 == 1))
+                        && (string.IsNullOrEmpty(criteria.CustomNo) ? 1 == 1 : x.ClearanceNo == criteria.CustomNo)
+                        && (string.IsNullOrEmpty(criteria.InvoiceNo) ? 1 == 1 : x.InvoiceNo == criteria.InvoiceNo)
+                        && (string.IsNullOrEmpty(criteria.ContNo) ? 1 == 1 : x.ContNo == criteria.ContNo)
+                        ).Any();
+                }
             }
             else
             {
-                result = csShipmentSurchargeRepo.Get(x =>
+                if (shipmentOperaExists == true || shipmentDocExists == true)
+                {
+                    result = csShipmentSurchargeRepo.Get(x =>
                        x.Id != criteria.SurchargeID
                     && x.ChargeId == criteria.ChargeID
                     && x.Hblid == criteria.HBLID
@@ -787,6 +806,7 @@ namespace eFMS.API.Accounting.DL.Services
                     && (string.IsNullOrEmpty(criteria.InvoiceNo) ? 1 == 1 : x.InvoiceNo == criteria.InvoiceNo)
                     && (string.IsNullOrEmpty(criteria.ContNo) ? 1 == 1 : x.ContNo == criteria.ContNo)
                     ).Any();
+                }
             }
             return result;
         }
