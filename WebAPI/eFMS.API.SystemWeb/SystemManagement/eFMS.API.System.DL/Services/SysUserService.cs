@@ -9,18 +9,15 @@ using System.Collections.Generic;
 using System.Linq;
 using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.Service.Models;
-using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.System.DL.Services
 {
     public class SysUserService : RepositoryBase<SysUser, SysUserModel>, ISysUserService
     {
         private readonly IContextBase<SysEmployee> employeeRepository;
-        private readonly ICurrentUser currentUser;
         public SysUserService(IContextBase<SysUser> repository, IMapper mapper, 
-            IContextBase<SysEmployee> employeeRepo, ICurrentUser currUser) : base(repository, mapper)
+            IContextBase<SysEmployee> employeeRepo) : base(repository, mapper)
         {
-            currentUser = currUser;
             employeeRepository = employeeRepo;
         }
 

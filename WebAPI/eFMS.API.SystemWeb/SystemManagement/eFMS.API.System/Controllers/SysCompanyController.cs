@@ -8,7 +8,6 @@ using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.System.Infrastructure.Middlewares;
-using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 
@@ -26,7 +25,6 @@ namespace eFMS.API.System.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ISysCompanyService sysCompanyService;
         private readonly IMapper mapper;
-        private readonly ICurrentUser currentUser;
   
         public SysBuController(IStringLocalizer<LanguageSub> localizer, ISysCompanyService sysCompanyService, 
             IMapper mapper
