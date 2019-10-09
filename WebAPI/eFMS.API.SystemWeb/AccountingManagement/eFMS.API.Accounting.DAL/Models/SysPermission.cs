@@ -13,7 +13,7 @@ namespace eFMS.API.Accounting.Service.Models
         public short Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public bool? Inactive { get; set; }
+        public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }

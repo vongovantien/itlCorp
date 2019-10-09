@@ -24,48 +24,48 @@ namespace eFMS.API.System.Controllers
     public class SysBuController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly ISysBuService sysBuService;
+        private readonly ISysCompanyService sysCompanyService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
-
-        public SysBuController(IStringLocalizer<LanguageSub> localizer, ISysBuService sysBuService, 
-            IMapper mapper,
-            ICurrentUser currUser)
+  
+        public SysBuController(IStringLocalizer<LanguageSub> localizer, ISysCompanyService sysCompanyService, 
+            IMapper mapper
+            )
         {
             stringLocalizer = localizer;
-            this.sysBuService = sysBuService;
+            this.sysCompanyService = sysCompanyService;
             this.mapper = mapper;
-            currentUser = currUser;
+            //currentUser = currUser;
         }
 
 
         [HttpGet]
         public IActionResult Get()
         {
-            var response = sysBuService.Get();
+            var response = sysCompanyService.Get();
             return Ok(response);
         }
 
         [HttpPost]
         [Route("Query")]
-        public IActionResult Get(SysBuCriteria search)
+        public IActionResult Get(SysCompanyCriteria search)
         {
-            var results = sysBuService.Query(search);
+            var results = sysCompanyService.Query(search);
             return Ok(results);
         }
 
         [HttpPost]
         [Route("Paging")]
-        public IActionResult Paging(SysBuCriteria search, int page, int size)
+        public IActionResult Paging(SysCompanyCriteria search, int page, int size)
         {
-            var data = sysBuService.Paging(search, page, size, out int rowCount);
+            var data = sysCompanyService.Paging(search, page, size, out int rowCount);
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
         }
 
         [HttpPost]
         [Route("Add")]
-        public IActionResult Add(SysBuAddModel model)
+        public IActionResult Add(SysCompanyAddModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
             var checkExistMessage = CheckExistCode(model.CompanyCode);
@@ -73,7 +73,7 @@ namespace eFMS.API.System.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            var hs = sysBuService.Add(model);
+            var hs = sysCompanyService.Add(model);
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
 
@@ -89,7 +89,7 @@ namespace eFMS.API.System.Controllers
         [Route("{id}")]
         public IActionResult GetBy(Guid id)
         {
-            var result = sysBuService.First(x => x.Id == id);
+            var result = sysCompanyService.First(x => x.Id == id);
             if (result == null)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = "Không tìm thấy Company", Data = result });
@@ -102,11 +102,11 @@ namespace eFMS.API.System.Controllers
 
         [HttpPut]
         [Route("Update")]
-        public IActionResult Update(SysBuAddModel model)
+        public IActionResult Update(SysCompanyAddModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            var hs = sysBuService.Update(model);
+            var hs = sysCompanyService.Update(model);
 
             var message = HandleError.GetMessage(hs, Crud.Update);
 
@@ -123,7 +123,7 @@ namespace eFMS.API.System.Controllers
         //[Authorize]
         public IActionResult Delete(Guid id)
         {
-            var hs = sysBuService.Delete(id);
+            var hs = sysCompanyService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -138,7 +138,7 @@ namespace eFMS.API.System.Controllers
             string message = string.Empty;
             if (Code != "" || Code != null)
             {
-                if (sysBuService.Any(x => (x.Code == Code)))
+                if (sysCompanyService.Any(x => (x.Code == Code)))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }

@@ -15,11 +15,11 @@ export class CompanyInformationFormAddComponent extends AppForm {
     bunameEn: AbstractControl;
     bunameAbbr: AbstractControl;
     website: AbstractControl;
-    inactive: AbstractControl;
+    active: AbstractControl;
 
     types: CommonInterface.ICommonTitleValue[] = [
-        { title: 'Active', value: false },
-        { title: 'Inactive', value: true },
+        { title: 'Active', value: true },
+        { title: 'Inactive', value: false },
     ];
     photoUrl: string = '';
 
@@ -40,7 +40,7 @@ export class CompanyInformationFormAddComponent extends AppForm {
             bunameEn: [],
             bunameAbbr: [],
             website: [],
-            inactive: [this.types[0]],
+            active: [this.types[0]],
         });
 
         this.code = this.formGroup.controls['code'];
@@ -48,7 +48,7 @@ export class CompanyInformationFormAddComponent extends AppForm {
         this.bunameEn = this.formGroup.controls['bunameEn'];
         this.bunameAbbr = this.formGroup.controls['bunameAbbr'];
         this.website = this.formGroup.controls['website'];
-        this.inactive = this.formGroup.controls['inactive'];
+        this.active = this.formGroup.controls['active'];
     }
 }
 
@@ -58,5 +58,5 @@ export interface IFormAddCompany {
     bunameEn: string;
     bunameAbbr: string;
     website: string;
-    inactive: boolean;
+    active: boolean;
 }

@@ -7,5 +7,6 @@ namespace eFMS.API.System.DL.Models
 {
     public class CatDepartmentModel: CatDepartment
     {
+        public string OfficeName { get; set; }
     }
 }

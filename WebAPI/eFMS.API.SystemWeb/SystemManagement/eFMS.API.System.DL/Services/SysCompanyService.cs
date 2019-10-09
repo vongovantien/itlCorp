@@ -15,21 +15,21 @@ using ITL.NetCore.Connection.EF;
 
 namespace eFMS.API.System.DL.Services
 {
-    public class SysBuService : RepositoryBase<SysBu, SysBuModel>, ISysBuService
+    public class SysCompanyService : RepositoryBase<SysCompany, SysCompanyModel>, ISysCompanyService
     {
         //private readonly ICurrentUser currentUser;
-        public SysBuService(IContextBase<SysBu> repository, IMapper mapper) : base(repository, mapper)
+        public SysCompanyService(IContextBase<SysCompany> repository, IMapper mapper) : base(repository, mapper)
         {
             //currentUser = user;
         }
 
-        public IQueryable<SysBuModel> GetAll()
+        public IQueryable<SysCompanyModel> GetAll()
         {
             var bu = DataContext.Get();
-            return bu.ProjectTo<SysBuModel>(mapper.ConfigurationProvider);
+            return bu.ProjectTo<SysCompanyModel>(mapper.ConfigurationProvider);
         }
 
-        public List<SysBuModel> Paging(SysBuCriteria criteria, int page, int size, out int rowsCount)
+        public List<SysCompanyModel> Paging(SysCompanyCriteria criteria, int page, int size, out int rowsCount)
         {
             var data = Query(criteria);
 
@@ -45,11 +45,11 @@ namespace eFMS.API.System.DL.Services
             return data;
         }
 
-        public List<SysBuModel> Query(SysBuCriteria criteria)
+        public List<SysCompanyModel> Query(SysCompanyCriteria criteria)
         {
 
-            var bu = DataContext.Get(); // tạo đối tượng context cho table SysBu.
-            var result = bu.Where(x => x.Inactive == false);
+            var bu = DataContext.Get(); // tạo đối tượng context cho table SysCompany.
+            var result = bu.Where(x => x.Active == true);
 
             if (criteria.Type == "All")
             {
@@ -73,32 +73,32 @@ namespace eFMS.API.System.DL.Services
                 bu = bu.Where(x => x.BunameVn == criteria.Keyword);
             }
 
-            var responseData = mapper.Map<List<SysBuModel>>(bu).ToList(); // maping BU sang SysBuModel ( hoặc object # => define trong Mapper.cs);
+            var responseData = mapper.Map<List<SysCompanyModel>>(bu).ToList(); // maping BU sang SysCompanyModel ( hoặc object # => define trong Mapper.cs);
 
             return responseData;
         }
 
-        public HandleState Update(SysBuAddModel model)
+        public HandleState Update(SysCompanyAddModel model)
         {
             var userCurrent = "admin";
 
             try
             {
-                var sysBuCurrent = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
-                sysBuCurrent.DatetimeCreated = sysBuCurrent.DatetimeCreated;
-                sysBuCurrent.UserCreated = sysBuCurrent.UserCreated;
+                var SysCompanyCurrent = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+                SysCompanyCurrent.DatetimeCreated = SysCompanyCurrent.DatetimeCreated;
+                SysCompanyCurrent.UserCreated = SysCompanyCurrent.UserCreated;
 
-                sysBuCurrent.DatetimeModified = DateTime.Now;
-                sysBuCurrent.UserModified = userCurrent;
-                sysBuCurrent.LogoPath = model.PhotoUrl;
-                sysBuCurrent.Inactive = model.Status;
-                sysBuCurrent.Code = model.CompanyCode; 
-                sysBuCurrent.Website = model.Website;
-                sysBuCurrent.BunameAbbr = model.CompanyNameAbbr;
-                sysBuCurrent.BunameEn = model.CompanyNameEn;
-                sysBuCurrent.BunameVn = model.CompanyNameVn;
+                SysCompanyCurrent.DatetimeModified = DateTime.Now;
+                SysCompanyCurrent.UserModified = userCurrent;
+                SysCompanyCurrent.LogoPath = model.PhotoUrl;
+                SysCompanyCurrent.Active = model.Status;
+                SysCompanyCurrent.Code = model.CompanyCode; 
+                SysCompanyCurrent.Website = model.Website;
+                SysCompanyCurrent.BunameAbbr = model.CompanyNameAbbr;
+                SysCompanyCurrent.BunameEn = model.CompanyNameEn;
+                SysCompanyCurrent.BunameVn = model.CompanyNameVn;
 
-                DataContext.Update(sysBuCurrent, x => x.Id == model.Id);
+                DataContext.Update(SysCompanyCurrent, x => x.Id == model.Id);
 
                 var hs = new HandleState();
                 return hs;
@@ -126,28 +126,28 @@ namespace eFMS.API.System.DL.Services
             }
         }
 
-        public HandleState Add(SysBuAddModel model)
+        public HandleState Add(SysCompanyAddModel model)
         {
             try
             {
                 var userCurrent = "admin";
                 
-                var SysBu = new SysBuModel
+                var SysCompany = new SysCompanyModel
                 {
                     Code = model.CompanyCode,
                     BunameAbbr = model.CompanyNameVn,
                     BunameVn = model.CompanyNameVn,
                     BunameEn = model.CompanyNameEn,
                     Website = model.Website,
-                    Inactive = model.Status,
+                    Active = model.Status,
                     LogoPath = model.PhotoUrl,
                     Id = Guid.NewGuid()
                 };
 
-                SysBu.DatetimeCreated = SysBu.DatetimeModified = DateTime.Now;
-                SysBu.UserCreated = SysBu.UserModified = userCurrent;
+                SysCompany.DatetimeCreated = SysCompany.DatetimeModified = DateTime.Now;
+                SysCompany.UserCreated = SysCompany.UserModified = userCurrent;
 
-                DataContext.Add(SysBu);
+                DataContext.Add(SysCompany);
 
                 var hs = new HandleState();
                 return hs;
