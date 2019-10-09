@@ -58,8 +58,8 @@ namespace eFMS.IdentityServer.DL.Services
             result.Email = employee?.Email;
             result.Photo = employee?.Photo;
             result.EmpPhotoSize = employee?.EmpPhotoSize;
-            var inActive = (user.Inactive == null || user.Inactive == true ) ? true : false;
-            result.InActive = inActive;
+            var active = (user.Active == null || user.Active == true ) ? true : false;
+            result.Active = active;
             return result;
         }
         private string Signature(string password)
@@ -109,13 +109,13 @@ namespace eFMS.IdentityServer.DL.Services
                         employee = employeeRepository.Get(x => x.Id == user.EmployeeId).FirstOrDefault();
                         modelReturn = UpdateUserInfoFromLDAP(ldapInfo, user, false, employee);
                         //modelReturn = SetLoginReturnModel(user, employee);
-                        LogUserLogin(user, true ? employee.WorkPlaceId.ToString() : null);
+                        LogUserLogin(user, employee.WorkPlaceId);
                         return 1;
                     }
                 }
                 user = new SysUser { Username = username, Password = password, UserCreated = "admin" };
                 modelReturn = UpdateUserInfoFromLDAP(ldapInfo, user, true, null);
-                LogUserLogin(user, true ? modelReturn.workplaceId?.ToString() : null);
+                LogUserLogin(user, modelReturn.workplaceId);
                 return 1;
             }
             if (user == null)
@@ -125,7 +125,7 @@ namespace eFMS.IdentityServer.DL.Services
             }
             employee = employeeRepository.Get(x => x.Id == user.EmployeeId).FirstOrDefault();
             modelReturn = SetLoginReturnModel(user, employee);
-            LogUserLogin(user, true ? employee.WorkPlaceId.ToString() : null);
+            LogUserLogin(user, employee.WorkPlaceId);
             return 1;
         }
         private LoginReturnModel SetLoginReturnModel(SysUser user, SysEmployee employee)
@@ -135,7 +135,7 @@ namespace eFMS.IdentityServer.DL.Services
                 userName = user.Username,
                 email = employee?.Email,
                 idUser = user.Id,
-                workplaceId = employee?.Id,
+                workplaceId = employee?.WorkPlaceId,
                 status = true,
                 message = "Login successfull !"
             };
@@ -186,7 +186,7 @@ namespace eFMS.IdentityServer.DL.Services
             }
             return modelReturn;
         }
-        private void LogUserLogin(SysUser user, string workplaceId)
+        private void LogUserLogin(SysUser user, Guid? workplaceId)
         {
             var userLog = new SysUserLogModel
             {
