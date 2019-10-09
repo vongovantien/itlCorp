@@ -51,5 +51,14 @@ export class SystemRepo {
         );
     }
 
+    getDepartment(page?: number, size?: number, body: any = {}){
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/paging`, body, {
+            page: '' + page,
+            size: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }
 

@@ -239,7 +239,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             //Tính phí AmountDebit, AmountCredit của SOA (tỉ giá được exchange dựa vào ngày Modified của SOA, nếu tìm ko thấy sẽ lấy ngày mới nhất)
             //Lấy danh sách Currency Exchange của ngày hiện tại
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+            var currencyExchange = catCurrencyExchangeRepo.Get(x =>  x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
             var charge = GetChargeShipmentDocAndOperation().Where(x => model.Surcharges.Where(c => c.surchargeId == x.ID && c.type == x.Type).Any());
             var today = DateTime.Now;
             var query = charge.Select(chg => new
@@ -488,7 +488,7 @@ namespace eFMS.API.Accounting.DL.Services
         private decimal GetRateCurrencyExchange(DateTime? datetime, string currencyFrom, string currencyTo)
         {
             if (datetime == null) return 0;
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == datetime.Value.Date);
+            var currencyExchange = catCurrencyExchangeRepo.Get(x =>  x.DatetimeModified.Value.Date == datetime.Value.Date);
 
             if (currencyExchange.Count() == 0) return 0;
 
@@ -779,7 +779,7 @@ namespace eFMS.API.Accounting.DL.Services
         private IQueryable<ChargeShipmentModel> GetChargesShipmentByCriteria(ChargeShipmentCriteria criteria)
         {
             //Lấy danh sách Currency Exchange của ngày hiện tại
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+            var currencyExchange = catCurrencyExchangeRepo.Get(x =>  x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
 
             var charge = GetChargeShipmentDocAndOperation().Where(chg =>
                     string.IsNullOrEmpty(chg.SOANo)
@@ -1270,7 +1270,7 @@ namespace eFMS.API.Accounting.DL.Services
                 return data;
             }
             //Lấy danh sách Currency Exchange của ngày hiện tại
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+            var currencyExchange = catCurrencyExchangeRepo.Get(x =>  x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
             //Chỉ lấy ra những charge có SOANo == soaNo (Để hạn chế việc join & get data không cần thiết)
             var charge = GetChargeShipmentDocAndOperation().Where(x => x.SOANo == soaNo);
             var chargeShipments = GetListChargeOfSoa(charge, currencyExchange, soaNo, currencyLocal).ToList();
@@ -1316,7 +1316,7 @@ namespace eFMS.API.Accounting.DL.Services
         public IQueryable<ExportSOAModel> GetDateExportDetailSOA(string soaNo)
         {
             //Lấy danh sách Currency Exchange của ngày hiện tại
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+            var currencyExchange = catCurrencyExchangeRepo.Get(x =>  x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
             var soa = DataContext.Get(x => x.Soano == soaNo);
             var charge = GetChargeShipmentDocAndOperation().Where(x => x.SOANo == soaNo);
             var partner = catPartnerRepo.Get();

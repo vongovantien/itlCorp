@@ -17,5 +17,6 @@ namespace eFMS.API.Accounting.Service.Models
         public DateTime? CreateDate { get; set; }
         public string UserModified { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public string UserCreated { get; set; }
     }
 }

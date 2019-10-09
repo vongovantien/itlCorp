@@ -33,7 +33,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<SysUserGroup> sysUserGroupRepo;
         readonly IContextBase<CatDepartment> catDepartmentRepo;
         readonly IContextBase<SysGroup> sysGroupRepo;
-        readonly IContextBase<SysBranch> sysBranchRepo;
+        readonly IContextBase<SysOffice> SysOfficeRepo;
 
         public AcctAdvancePaymentService(IContextBase<AcctAdvancePayment> repository,
             IMapper mapper,
@@ -49,7 +49,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysUserGroup> sysUserGroup,
             IContextBase<CatDepartment> catDepartment,
             IContextBase<SysGroup> sysGroup,
-            IContextBase<SysBranch> sysBranch) : base(repository, mapper)
+            IContextBase<SysOffice> SysOffice) : base(repository, mapper)
         {
             currentUser = user;
             webUrl = url;
@@ -63,7 +63,7 @@ namespace eFMS.API.Accounting.DL.Services
             sysUserGroupRepo = sysUserGroup;
             catDepartmentRepo = catDepartment;
             sysGroupRepo = sysGroup;
-            sysBranchRepo = sysBranch;
+            SysOfficeRepo = SysOffice;
         }
 
         public List<AcctAdvancePaymentResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount)
@@ -994,7 +994,7 @@ namespace eFMS.API.Accounting.DL.Services
         //Đang gán cứng BrandId của Branch ITL HCM (27d26acb-e247-47b7-961e-afa7b3d7e11e)
         private string GetBUHeadId(string idBranch = "27d26acb-e247-47b7-961e-afa7b3d7e11e")
         {
-            var buHeadId = sysBranchRepo.Get(x => x.Id == Guid.Parse(idBranch)).FirstOrDefault().ManagerId;
+            var buHeadId = SysOfficeRepo.Get(x => x.Id == Guid.Parse(idBranch)).FirstOrDefault().ManagerId;
             return buHeadId;
         }
 
