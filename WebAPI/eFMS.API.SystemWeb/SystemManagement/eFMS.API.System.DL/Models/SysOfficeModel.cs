@@ -5,7 +5,8 @@ using System.Text;
 
 namespace eFMS.API.System.DL.Models
 {
-    public class SysBuModel: SysBu
+    public class SysOfficeModel : SysOffice
     {
+
     }
 }

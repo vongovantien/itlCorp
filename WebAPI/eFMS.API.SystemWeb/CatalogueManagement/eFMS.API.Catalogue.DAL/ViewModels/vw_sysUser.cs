@@ -18,8 +18,8 @@ namespace eFMS.API.Catalogue.Service.ViewModels
         public Nullable<DateTime> DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public Nullable<DateTime> DatetimeModified { get; set; }
-        public bool Inactive { get; set; }
-        public Nullable<DateTime> InactiveOn { get; set; }
+        public bool Active { get; set; }
+        public Nullable<DateTime> ActiveOn { get; set; }
         public string ID { get; set; }
         public string EmployeeID { get; set; }
         public string EmployeeName_VN { get; set; }

@@ -59,7 +59,7 @@ namespace eFMS.API.Catalogue.DL.Services
             entity.Id = Guid.NewGuid();
             entity.UserCreated = entity.UserModified = currentUser.UserID;
             entity.DatetimeCreated = entity.DatetimeModified = DateTime.Now;
-            entity.Inactive = false;
+            entity.Active = true;
             var result = DataContext.Add(entity, true);
             if (result.Success)
             {
@@ -72,9 +72,9 @@ namespace eFMS.API.Catalogue.DL.Services
             var entity = mapper.Map<CatPlace>(model);
             entity.DatetimeModified = DateTime.Now;
             entity.UserModified = currentUser.UserID;
-            if (entity.Inactive == true)
+            if (entity.Active == true)
             {
-                entity.InactiveOn = DateTime.Now;
+                entity.ActiveOn = DateTime.Now;
             }
             var result = DataContext.Update(entity, x => x.Id == model.Id);
             if (result.Success)
@@ -161,7 +161,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                     && ((x.ModeOfTransport ?? "").IndexOf(criteria.ModeOfTransport ?? "", StringComparison.OrdinalIgnoreCase) > -1)
                                     && (x.AreaNameEN ?? "").IndexOf(criteria.AreaNameEN ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                     && (x.AreaNameVN ?? "").IndexOf(criteria.AreaNameVN ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                    && (x.Inactive == criteria.Inactive || criteria.Inactive == null)
+                                    && (x.Active == criteria.Active || criteria.Active == null)
                     ).AsQueryable();
             }
             else
@@ -182,7 +182,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                    || ((x.ModeOfTransport ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
                                    )
                                    //&& ((x.PlaceTypeID ?? "").IndexOf(placetype ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                   && (x.Inactive == criteria.Inactive || criteria.Inactive == null)
+                                   && (x.Active == criteria.Active || criteria.Active == null)
                                    ).AsQueryable();
             }
             return results;
@@ -242,8 +242,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     DatetimeCreated = x.DatetimeCreated,
                     UserModified = x.UserModified,
                     DatetimeModified = x.DatetimeModified,
-                    Inactive = x.Inactive,
-                    InactiveOn = x.InactiveOn,
+                    Active = x.Active,
+                    ActiveOn = x.ActiveOn,
                     CountryName = x.CountryNameVN,
                     AreaName = x.AreaNameVN,
                     LocalAreaName = x.LocalAreaNameVN
@@ -274,8 +274,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     DatetimeCreated = x.DatetimeCreated,
                     UserModified = x.UserModified,
                     DatetimeModified = x.DatetimeModified,
-                    Inactive = x.Inactive,
-                    InactiveOn = x.InactiveOn,
+                    Active = x.Active,
+                    ActiveOn = x.ActiveOn,
                     CountryName = x.CountryNameEN,
                     AreaName = x.AreaNameEN,
                     LocalAreaName = x.LocalAreaNameEN
@@ -731,8 +731,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 foreach (var item in data)
                 {
-                    bool inactive = string.IsNullOrEmpty(item.Status) ? false : (item.Status.Trim().ToLower() == "inactive" ? true : false);
-                    DateTime? inactiveDate = inactive == false ? null : (DateTime?)DateTime.Now;
+                    bool Active = string.IsNullOrEmpty(item.Status) ? false : (item.Status.Trim().ToLower() == "Active" ? true : false);
+                    DateTime? ActiveDate = Active == false ? null : (DateTime?)DateTime.Now;
                     var catPlace = new CatPlace
                     {   Id = Guid.NewGuid(),
                         Code = item.Code,
@@ -746,8 +746,8 @@ namespace eFMS.API.Catalogue.DL.Services
                         UserCreated = currentUser.UserID,
                         UserModified = currentUser.UserID,
                         PlaceTypeId = item.PlaceTypeId,
-                        Inactive = inactive,
-                        InactiveOn = inactiveDate,
+                        Active = Active,
+                        ActiveOn = ActiveDate,
                         ModeOfTransport = item.ModeOfTransport,
                         AreaId = item.AreaId
                     };

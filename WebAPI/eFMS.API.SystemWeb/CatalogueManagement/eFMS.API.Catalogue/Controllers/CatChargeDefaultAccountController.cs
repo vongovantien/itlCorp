@@ -73,7 +73,7 @@ namespace eFMS.API.Catalogue.Controllers
             var catChargeDefaultAccount = mapper.Map<CatChargeDefaultAccountModel>(model);
             catChargeDefaultAccount.UserCreated = catChargeDefaultAccount.UserModified = currentUser.UserID;
             catChargeDefaultAccount.DatetimeCreated = DateTime.Now;
-            catChargeDefaultAccount.Inactive = false;
+            catChargeDefaultAccount.Active = true;
             var hs = catChargeDefaultAccountService.Add(catChargeDefaultAccount);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

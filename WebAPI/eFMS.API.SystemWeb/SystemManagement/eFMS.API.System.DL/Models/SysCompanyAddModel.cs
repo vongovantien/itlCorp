@@ -5,7 +5,7 @@ using System.Text;
 
 namespace eFMS.API.System.DL.Models
 {
-    public class SysBuAddModel
+    public class SysCompanyAddModel
     {
         public Guid Id { get; set; }
         [Required]

@@ -110,7 +110,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var exchanges = DataContext.Get(x => (x.CurrencyToId ?? "").IndexOf(criteria.LocalCurrencyId ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                                 && (x.DatetimeCreated >= criteria.FromDate || criteria.FromDate == null)
                                 && (x.DatetimeCreated <= criteria.ToDate || criteria.ToDate == null)
-                                && (x.Inactive == criteria.Inactive || criteria.Inactive == null));
+                                && (x.Active == criteria.Active || criteria.Active == null));
             var data = (from ex in exchanges
                         join u in users on ex.UserCreated equals u.ID into grpUsers
                         from user in grpUsers.DefaultIfEmpty()
@@ -118,7 +118,7 @@ namespace eFMS.API.Catalogue.DL.Services
             //var data = Get(x => (x.CurrencyToId ?? "").IndexOf(criteria.LocalCurrencyId ?? "", StringComparison.OrdinalIgnoreCase) >= 0
             //                    && (x.DatetimeCreated >= criteria.FromDate || criteria.FromDate == null)
             //                    && (x.DatetimeCreated <= criteria.ToDate || criteria.ToDate == null)
-            //                    && (x.Inactive == criteria.Inactive || criteria.Inactive == null))
+            //                    && (x.Active == criteria.Active || criteria.Active == null))
             //                    .Join(users, x => x.UserCreated, y => y.ID, (x, y) => new { x, y })
             //                    .OrderByDescending(x => x.x.DatetimeCreated);
             var dateCreateds = data.GroupBy(x => x.ex.DatetimeCreated.Value.Date)
@@ -164,7 +164,7 @@ namespace eFMS.API.Catalogue.DL.Services
             list = list.Where(x => (x.CurrencyToId ?? "").IndexOf(criteria.LocalCurrencyId ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                                 && (x.DatetimeCreated >= criteria.FromDate || criteria.FromDate == null)
                                 && (x.DatetimeCreated <= criteria.ToDate || criteria.ToDate ==  null)
-                                && (x.Inactive == criteria.Inactive || criteria.Inactive == null)
+                                && (x.Active == criteria.Active || criteria.Active == null)
                 ).ToList();
             return list;
         }
@@ -174,13 +174,13 @@ namespace eFMS.API.Catalogue.DL.Services
             try
             {
                 var rates = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => x.CurrencyFromId == currencyFrom
-                                            && x.Inactive == false);
+                                            && x.Active == false);
                 foreach (var item in rates)
                 {
                     item.UserModified = currentUser;
                     item.DatetimeModified = DateTime.Now;
-                    item.Inactive = true;
-                    item.InactiveOn = DateTime.Now;
+                    item.Active = true;
+                    item.ActiveOn = DateTime.Now;
                     ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Update(item);
                 }
                 DataContext.DC.SaveChanges();
@@ -203,7 +203,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     rate = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.FirstOrDefault(x => x.DatetimeCreated.Value.Date == DateTime.Now.Date 
                                 && x.CurrencyFromId == item.CurrencyFromId 
                                 && x.CurrencyToId == model.CurrencyToId
-                                && x.Inactive == null);
+                                && x.Active == null);
                     if (rate != null)
                     {
                         if(item.IsUpdate == true)
@@ -221,7 +221,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             CurrencyFromId = item.CurrencyFromId,
                             CurrencyToId = model.CurrencyToId,
                             Rate = item.Rate,
-                            Inactive = false,
+                            Active = false,
                             UserCreated = model.UserModified,
                             DatetimeCreated = DateTime.Now,
                             UserModified = model.UserModified,

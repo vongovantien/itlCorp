@@ -53,8 +53,8 @@ namespace eFMS.API.Catalogue.DL.Services
                         DatetimeCreated = item.DatetimeCreated,
                         UserModified = item.UserModified,
                         DatetimeModified = item.DatetimeModified,
-                        Inactive = item.Inactive,
-                        InactiveOn = item.InactiveOn
+                        Active = item.Active,
+                        ActiveOn = item.ActiveOn
                     };
                     results.Add(group);
                 }
@@ -71,8 +71,8 @@ namespace eFMS.API.Catalogue.DL.Services
                         DatetimeCreated = item.DatetimeCreated,
                         UserModified = item.UserModified,
                         DatetimeModified = item.DatetimeModified,
-                        Inactive = item.Inactive,
-                        InactiveOn = item.InactiveOn
+                        Active = item.Active,
+                        ActiveOn = item.ActiveOn
                     };
                     results.Add(group);
                 }
@@ -100,7 +100,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatCommodityGroupModel> Query(CatCommodityGroupCriteria criteria)
         {
-            IQueryable<CatCommodityGroupModel> results = Get(x => x.Inactive == criteria.Inactive || criteria.Inactive == null);
+            IQueryable<CatCommodityGroupModel> results = Get(x => x.Active == criteria.Active || criteria.Active == null);
             if (criteria.All == null)
             {
                 results = Get(x =>((x.GroupNameEn ?? "").IndexOf(criteria.GroupNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -183,7 +183,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     {
                         GroupNameEn = item.GroupNameEn,
                         GroupNameVn = item.GroupNameVn,
-                        Inactive = item.Status.ToLower() != "active",
+                        Active = item.Status.ToLower() != "active",
                         DatetimeCreated = DateTime.Now,
                         UserCreated = currentUser.UserID,
                         UserModified = currentUser.UserID

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eFMS.API.System.Service.Models
+namespace eFMS.API.Catalogue.Service.Models
 {
-    public partial class SysBu
+    public partial class SysCompany
     {
-        public SysBu()
+        public SysCompany()
         {
-            SysBranch = new HashSet<SysBranch>();
+            SysOffice = new HashSet<SysOffice>();
         }
 
         public Guid Id { get; set; }
@@ -41,9 +41,9 @@ namespace eFMS.API.System.Service.Models
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
-        public bool? Inactive { get; set; }
-        public DateTime? InactiveOn { get; set; }
+        public bool? Active { get; set; }
+        public DateTime? ActiveOn { get; set; }
 
-        public virtual ICollection<SysBranch> SysBranch { get; set; }
+        public virtual ICollection<SysOffice> SysOffice { get; set; }
     }
 }

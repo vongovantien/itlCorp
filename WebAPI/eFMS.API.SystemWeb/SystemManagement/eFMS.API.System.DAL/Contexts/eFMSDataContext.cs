@@ -1,6 +1,5 @@
 ﻿using eFMS.API.System.Service.Models;
 using eFMS.API.Common.NoSql;
-using eFMS.API.System.Service.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 

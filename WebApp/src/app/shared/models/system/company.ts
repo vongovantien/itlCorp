@@ -11,7 +11,7 @@ export class Company {
     datetimeCreated: string = '';
     userModified: string = '';
     datetimeModified: string = '';
-    inactive: boolean = false;
+    active: boolean = true;
     sysBranch: any[] = [];
     constructor(data?: any) {
         const self = this;

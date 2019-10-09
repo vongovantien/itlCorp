@@ -11,6 +11,6 @@ namespace eFMS.IdentityServer.Service.Models
         public string ComputerName { get; set; }
         public DateTime LoggedInOn { get; set; }
         public DateTime? LoggedOffOn { get; set; }
-        public string WorkPlaceId { get; set; }
+        public Guid? WorkPlaceId { get; set; }
     }
 }

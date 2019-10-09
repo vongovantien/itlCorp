@@ -32,8 +32,8 @@ namespace eFMS.API.Catalogue.DL.Services
             List<CatBranchModel> results = new List<CatBranchModel>();
 
             //var lstBranch = DataContext.Get();
-            var lstOfficeCompany = from b in dc.SysBranch
-                                   join bu in dc.SysBu on b.Buid equals bu.Id
+            var lstOfficeCompany = from b in dc.SysOffice
+                                   join bu in dc.SysCompany on b.Buid equals bu.Id
                                    select new {b, AbbrCompany = bu.Code };
             foreach (var item in lstOfficeCompany)
             {
