@@ -70,8 +70,8 @@ namespace eFMS.API.Catalogue.DL.Services
                         DatetimeCreated = item.DatetimeCreated,
                         UserModified = item.UserModified,
                         DatetimeModified = item.DatetimeModified,
-                        Inactive = item.Inactive,
-                        InactiveOn = item.InactiveOn
+                        Active = item.Active,
+                        ActiveOn = item.ActiveOn
                     };
                     results.Add(area);
                 }
@@ -88,8 +88,8 @@ namespace eFMS.API.Catalogue.DL.Services
                         DatetimeCreated = item.DatetimeCreated,
                         UserModified = item.UserModified,
                         DatetimeModified = item.DatetimeModified,
-                        Inactive = item.Inactive,
-                        InactiveOn = item.InactiveOn
+                        Active = item.Active,
+                        ActiveOn = item.ActiveOn
                     };
                     results.Add(area);
                 }

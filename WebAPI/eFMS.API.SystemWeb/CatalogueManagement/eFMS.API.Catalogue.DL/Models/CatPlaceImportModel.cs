@@ -25,8 +25,8 @@ namespace eFMS.API.Catalogue.DL.Models
         public string ModeOfTransport { get; set; }
         public string PlaceTypeId { get; set; }
         public string Note { get; set; }
-        public bool? Inactive { get; set; }
-        public DateTime? InactiveOn { get; set; }
+        public bool? Active { get; set; }
+        public DateTime? ActiveOn { get; set; }
         public bool IsValid { get; set; }
         public string Status { get; set; }
     }

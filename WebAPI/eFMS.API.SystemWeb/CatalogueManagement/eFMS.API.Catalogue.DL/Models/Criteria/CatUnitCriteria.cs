@@ -16,8 +16,8 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
-        public bool? Inactive { get; set; }
-        public DateTime? InactiveOn { get; set; }
+        public bool? Active { get; set; }
+        public DateTime? ActiveOn { get; set; }
         public string DescriptionEn { get; set; }
         public string DescriptionVn { get; set; }
     }

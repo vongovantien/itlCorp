@@ -28,8 +28,8 @@ namespace eFMS.API.Catalogue.Service.Models
         public string BankAccountUsd { get; set; }
         public string BankName { get; set; }
         public string BankAddress { get; set; }
-        public bool Inactive { get; set; }
-        public DateTime? InactiveOn { get; set; }
+        public bool Active { get; set; }
+        public DateTime? ActiveOn { get; set; }
         public byte[] Logo { get; set; }
         public string Code { get; set; }
         public string UserCreated { get; set; }

@@ -96,7 +96,8 @@ export const language = {
         { name: "Vai Trò", route_child: "role", display: true },
         { name: "Quyền", route_child: "permission", display: true },
         { name: "Bộ Phận", route_child: "department", display: true },
-        { name: "Công Ty", route_child: "company-info", display: true }
+        { name: "Thông Tin Công Ty", route_child: "company-info", display: true },
+        { name: "Chi nhánh", route_child: "office", display: true }
       ]
     },
 

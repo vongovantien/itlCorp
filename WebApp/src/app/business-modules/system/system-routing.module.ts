@@ -33,7 +33,10 @@ const routes: Routes = [
   {
     path: 'user-management',
     component: UserManagementComponent
-  }
+  },
+  {
+    path: 'office', loadChildren: () => import('./office/office.module').then(m => m.OfficeModule),
+  },
 ];
 
 @NgModule({

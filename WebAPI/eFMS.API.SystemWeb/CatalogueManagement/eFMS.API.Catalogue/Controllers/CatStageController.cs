@@ -117,7 +117,7 @@ namespace eFMS.API.Catalogue.Controllers
         {
             catStageModel.DatetimeCreated = catStageModel.DatetimeModified = DateTime.Now;
             catStageModel.UserCreated = currentUser.UserID;
-            catStageModel.Inactive = false;
+            catStageModel.Active = true;
             var hs = catStageService.Add(catStageModel);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

@@ -6,12 +6,15 @@ import { UserManagementComponent } from './user-management/user-management.compo
 import { GroupComponent } from './group/group.component';
 import { RoleComponent } from './role/role.component';
 import { PermissionComponent } from './permission/permission.component';
+import { SharedModule } from '../../shared/shared.module';
 import { DepartmentComponent } from './department/department.component';
+
 
 @NgModule({
   imports: [
     CommonModule,
     SystemRoutingModule,
+    SharedModule
   ],
   declarations: [UserManagementComponent, GroupComponent, RoleComponent, PermissionComponent]
 })

@@ -1,0 +1,15 @@
+﻿using System;
+
+namespace eFMS.API.System.DL.Models.Criteria
+{
+    public class SysOfficeCriteria
+    {
+        public string All { get; set; }
+        public string Code { get; set; }
+        public string BranchNameEn { get; set; }
+        public string BranchNameVn { get; set; }
+        public string ShortName { get; set; }
+        public string TaxCode { get; set; }
+        public Guid Buid { get; set; }
+    }
+}

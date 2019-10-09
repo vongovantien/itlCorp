@@ -24,7 +24,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             Expression<Func<CatPlaceTypeModel, bool>> query = x => (x.NameVn ?? "").Contains(criteria.NameVn ?? "")
                                              && (x.NameEn ?? "").Contains(criteria.NameEn ?? "")
-                                             && (x.Inactive == criteria.Inactive || criteria.Inactive == null);
+                                             && (x.Active == criteria.Active || criteria.Active == null);
             var results = base.Get(query);
             if (!string.IsNullOrEmpty(orderByProperty) && (isAscendingOrder || !isAscendingOrder))
             {
