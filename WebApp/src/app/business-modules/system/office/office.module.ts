@@ -11,9 +11,10 @@ import { OfficeDetailsComponent } from './details/office-details.component';
 
 
 const routing: Routes = [
-    { path: ':id', component: OfficeDetailsComponent, data: { name: "Edit Office", level: 3 } },
+
     { path: '', component: OfficeComponent, data: { name: "Office", level: 2 } },
     { path: 'addnew', component: OfficeAddNewComponent, data: { name: "Addnew Office", level: 3 } },
+    { path: ':id', component: OfficeDetailsComponent, data: { name: "Edit Office", level: 3 } },
 
 ];
 

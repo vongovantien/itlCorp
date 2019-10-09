@@ -8,9 +8,6 @@ import { RoleComponent } from './role/role.component';
 import { PermissionComponent } from './permission/permission.component';
 import { CompanyInfoComponent } from './company-info/company-info.component';
 import { SharedModule } from '../../shared/shared.module';
-import { OfficeAddNewComponent } from './office/addnew/office.addnew.component';
-import { OfficeComponent } from './office/office.component';
-import { OfficeDetailsComponent } from './office/details/office-details.component';
 import { DepartmentComponent } from './department/department.component';
 
 
@@ -20,6 +17,6 @@ import { DepartmentComponent } from './department/department.component';
     SystemRoutingModule,
     SharedModule
   ],
-  declarations: [UserManagementComponent, DepartmentComponent, GroupComponent, RoleComponent, PermissionComponent, CompanyInfoComponent,]
+  declarations: [UserManagementComponent, DepartmentComponent, GroupComponent, RoleComponent, PermissionComponent, CompanyInfoComponent]
 })
 export class SystemModule { }
