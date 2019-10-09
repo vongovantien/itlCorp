@@ -60,7 +60,7 @@ namespace eFMS.API.Catalogue.Models
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public bool? Inactive { get; set; }
-        public DateTime? InInActiveOn { get; set; }
+        public DateTime? InActiveOn { get; set; }
         public Guid? WorkPlaceId { get; set; }
         public string InternalReferenceNo { get; set; }
         public List<CatSaleManEditModel> SaleMans { get; set; }
