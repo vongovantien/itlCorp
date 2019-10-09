@@ -35,11 +35,12 @@ namespace eFMS.API.System.Infrastructure
             services.AddTransient<IStringLocalizerFactory, JsonStringLocalizerFactory>();
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+
             services.AddTransient<ISysUserService, SysUserService>();
             services.AddTransient<ISysOfficeService, SysOfficeService>();
             services.AddTransient<ISysCompanyService, SysCompanyService>();
             services.AddTransient<ICatDepartmentService, CatDepartmentService>();
+            services.AddTransient<ISysGroupService, SysGroupService>();
         }
 
         public static IServiceCollection AddCulture(this IServiceCollection services, IConfiguration configuration)

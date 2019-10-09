@@ -51,7 +51,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public Nullable<DateTime> CreatedDate { get; set; }
         public string UserModified { get; set; }
         public Nullable<DateTime> ModifiedDate { get; set; }
-        public Nullable<bool> Inactive { get; set; }
+        public Nullable<bool> Active { get; set; }
         //public Nullable<System.DateTime> InactiveOn { get; set; }
         public string InactiveOn { get; set; }
         public string SupplierName { get; set; }
