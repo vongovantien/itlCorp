@@ -41,7 +41,7 @@ export class CompanyInformationAddComponent extends AppPage {
             companyNameAbbr: this.formAdd.bunameAbbr.value,
             website: this.formAdd.website.value,
             photoUrl: 'https://picsum.photos/id/457/400/400', // TODO lấy url hình
-            status: this.formAdd.inactive.value.value,
+            status: this.formAdd.active.value.value,
             photoName: 'https://picsum.photos/id/457/400/400',
         };
         this._systemRepo.addNewCompany(body)

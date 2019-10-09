@@ -40,13 +40,13 @@
                                         *ngFor="let company of companies; let i = index; trackBy: trackByFn">
                                         <td>
                                             <div class="m-checkbox-list d-flex align-items-center">
-                                                <ng-container *ngIf="company.inactive">
+                                                <ng-container *ngIf="!company.active">
                                                     <a title="Delete" class="pointer"
                                                         (click)="showDeletePopup(company)">
                                                         <i class="la la-trash text-danger"></i>
                                                     </a>
                                                 </ng-container>
-                                                <span [class.m--margin-left-20]="!company.inactive">
+                                                <span [class.m--margin-left-20]="!company.active">
                                                     <a title="Detail" class="pointer" [routerLink]="company.id">
                                                         <i class="la la-file-text-o"></i>
                                                     </a>
@@ -67,8 +67,8 @@
                                                     [src]="company.logoPath">
                                             </div>
                                         </td>
-                                        <td [ngClass]="company.inactive ? 'text-danger' : 'text-success'">
-                                            {{company.inactive ? 'Inactive' : 'Active'}}</td>
+                                        <td [ngClass]="!company.active ? 'text-danger' : 'text-success'">
+                                            {{company.active ? 'Active' : 'Inactive'}}</td>
                                     </tr>
                                 </ng-container>
                                 <tr *ngIf="!isLoading && !companies.length" app-table-none-record

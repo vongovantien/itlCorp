@@ -20,7 +20,7 @@ export class CompanyInformationDetailComponent extends AppPage {
         bunameVn: '',
         bunameAbbr: '',
         website: '',
-        inactive: false
+        active: true
     };
     companyId: string = '';
 
@@ -34,8 +34,6 @@ export class CompanyInformationDetailComponent extends AppPage {
     ) {
         super();
         this._progressRef = this._progressService.ref();
-
-
     }
 
     ngOnInit(): void {
@@ -67,15 +65,20 @@ export class CompanyInformationDetailComponent extends AppPage {
                         this.formData.bunameEn = res.data.bunameEn;
                         this.formData.bunameVn = res.data.bunameVn;
                         this.formData.website = res.data.website;
-                        this.formData.inactive = res.data.inactive;
+                        this.formData.active = res.data.active;
 
                         this.formAddCompany.photoUrl = this.company.logoPath;
                         this.formAddCompany.formGroup.patchValue(this.formData);
-                        this.formAddCompany.inactive.setValue(this.formAddCompany.types.filter(i => i.value === res.data.inactive)[0]);
+                        this.formAddCompany.active.setValue(this.formAddCompany.types.filter(i => i.value === res.data.active)[0]);
                         console.log(res.data);
                     }
+                },
+                (errors: any) => { },
+                () => {
+                    this._progressRef.complete();
                 }
             );
+
     }
 
     viewForm() {
