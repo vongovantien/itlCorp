@@ -1,12 +1,12 @@
 export class Currency {
   id: string = '';
   currencyName: string = '';
-  isDefault: boolean = false;
+  isDefault: boolean = true;
   userCreated: string = '';
   datetimeCreated: string = '';
   userModified: string;
   datetimeModified: string = '';
-  inactive: boolean = false;
+  active: boolean = true;
   inactiveOn: string = '';
 
   constructor(data?: any) {

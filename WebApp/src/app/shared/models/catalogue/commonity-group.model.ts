@@ -7,6 +7,6 @@ export class CommodityGroup {
     datetimeCreated?: Date;
     userModified?: string;
     datetimeModified?: Date;
-    inactive: boolean;
+    active: boolean;
     inactiveOn?: Date;
 }

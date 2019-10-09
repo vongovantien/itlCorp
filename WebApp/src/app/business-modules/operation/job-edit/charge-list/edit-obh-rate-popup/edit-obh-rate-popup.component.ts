@@ -110,7 +110,7 @@ export class EditObhRatePopupComponent extends PopupBase implements OnInit, OnCh
     }
 
     getListOBHCharges() {
-        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'OBH', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
+        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { active: true, type: 'OBH', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
             this.lstOBHChargesComboBox = res['data'];
         });
     }
@@ -133,7 +133,7 @@ export class EditObhRatePopupComponent extends PopupBase implements OnInit, OnCh
     }
 
     getCurrencies() {
-        this.baseServices.post(this.api_menu.Catalogue.Currency.getAllByQuery, { inactive: false }).subscribe((res: any) => {
+        this.baseServices.post(this.api_menu.Catalogue.Currency.getAllByQuery, { active: true }).subscribe((res: any) => {
             this.lstCurrencies = prepareNg2SelectData(res, "id", "id");
         });
     }

@@ -9,6 +9,12 @@
 
     <ng-container *ngIf="column.dataType == 'boolean'">
         <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
+            <input type="checkbox" disabled [checked]="!item[column.primaryKey]">
+            <span></span>
+        </label>
+    </ng-container>
+    <ng-container *ngIf="column.dataType == 'boolean2'">
+        <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
             <input type="checkbox" disabled [checked]="item[column.primaryKey]">
             <span></span>
         </label>

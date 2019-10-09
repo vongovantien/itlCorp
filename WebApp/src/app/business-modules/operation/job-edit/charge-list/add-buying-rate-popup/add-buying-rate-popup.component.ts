@@ -111,21 +111,21 @@ export class AddBuyingRatePopupComponent extends PopupBase implements OnInit, On
     }
 
     getListBuyingRateCharges() {
-        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'CREDIT', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
+        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { active: true, type: 'CREDIT', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
             this.lstBuyingRateChargesComboBox = res['data'];
             // this._data.setData('buyingCharges', this.lstBuyingRateChargesComboBox);
         });
     }
 
     getPartners() {
-        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, inactive: false })
+        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, active: true })
             .subscribe((res: any) => {
                 this.lstPartners = res;
             });
     }
 
     getUnits() {
-        this._catalogueRepo.getUnit({ inactive: false })
+        this._catalogueRepo.getUnit({ active: true })
             .subscribe((data: any) => {
                 this.lstUnits = data;
             });

@@ -49,7 +49,7 @@ export class Customer {
     datetimeCreated: string = '';
     userModified: string = '';
     datetimeModified: string = '';
-    inactive?: boolean = false;
+    active?: boolean = true;
     inactiveOn?: string = '';
     workPlaceId: string = '';
     userCreatedName: string = '';

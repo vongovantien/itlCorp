@@ -12,8 +12,8 @@ export class Department {
     datetimeCreated: string = '';
     userModified: string = '';
     datetimeModified: string = '';
-    active: string = '';
-    inactiveOn: string = '';   
+    active: any = true;
+    inactiveOn: string = '';
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

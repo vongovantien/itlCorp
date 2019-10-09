@@ -13,7 +13,6 @@ import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 @Component({
     selector: 'app-custom-clearance-edit',
     templateUrl: './custom-clearance-edit.component.html',
-    styleUrls: ['./custom-clearance-edit.component.scss']
 })
 export class CustomClearanceEditComponent implements OnInit {
     customDeclaration: CustomClearance = new CustomClearance();

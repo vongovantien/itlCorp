@@ -249,9 +249,9 @@ export class ContainerListComponent extends PopupBase implements OnInit {
                 this.weightMesurements = dataHelper.prepareNg2SelectData(this.listWeightMesurements, 'id', 'unitNameEn');
             } else {
                 if (this.lstMasterContainers[index]["id"] != null) {
-                    const contTypes = this.listContainerType.filter(x => x.inactive === false);
-                    const packs = this.listPackageTypes.filter(x => x.inactive === false);
-                    const weights = this.listWeightMesurements.filter(x => x.inactive === false);
+                    const contTypes = this.listContainerType.filter(x => x.active === true);
+                    const packs = this.listPackageTypes.filter(x => x.active === true);
+                    const weights = this.listWeightMesurements.filter(x => x.active === true);
                     this.containerTypes = dataHelper.prepareNg2SelectData(contTypes, 'id', 'unitNameEn');
                     this.packageTypes = dataHelper.prepareNg2SelectData(packs, 'id', 'unitNameEn');
                     this.weightMesurements = dataHelper.prepareNg2SelectData(weights, 'id', 'unitNameEn');
@@ -283,7 +283,7 @@ export class ContainerListComponent extends PopupBase implements OnInit {
     }
 
     getComodities() {
-        this._catalogueRepo.getCommondity({ inactive: null, all: null })
+        this._catalogueRepo.getCommondity({ active: true, all: null })
             .pipe()
             .subscribe(
                 (responses: any) => {

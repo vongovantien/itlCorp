@@ -1,4 +1,4 @@
-export class PortIndex { 
+export class PortIndex {
     id: number;
     code: string;
     nameEn: string;
@@ -9,5 +9,5 @@ export class PortIndex {
     areaName: string;
     modeOfTransport: string;
     placeType: number;
-    inactive?: boolean;
+    active?: boolean;
 }

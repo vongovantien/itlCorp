@@ -103,25 +103,25 @@ export class AddObhRatePopupComponent extends PopupBase implements OnInit {
     }
 
     getListOBHCharges() {
-        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'OBH', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
+        this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { active: true, type: 'OBH', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
             this.lstOBHChargesComboBox = res['data'];
         });
     }
 
     getPartners() {
-        this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.ALL, inactive: false }).subscribe((res: any) => {
+        this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.ALL, active: true }).subscribe((res: any) => {
             this.lstPartners = res;
         });
     }
 
     getUnits() {
-        this.baseServices.post(this.api_menu.Catalogue.Unit.getAllByQuery, { inactive: false }).subscribe((data: any) => {
+        this.baseServices.post(this.api_menu.Catalogue.Unit.getAllByQuery, { active: true }).subscribe((data: any) => {
             this.lstUnits = data;
         });
     }
 
     getCurrencies() {
-        this.baseServices.post(this.api_menu.Catalogue.Currency.getAllByQuery, { inactive: false }).subscribe((res: any) => {
+        this.baseServices.post(this.api_menu.Catalogue.Currency.getAllByQuery, { active: true }).subscribe((res: any) => {
             this.lstCurrencies = prepareNg2SelectData(res, "id", "id");
         });
     }

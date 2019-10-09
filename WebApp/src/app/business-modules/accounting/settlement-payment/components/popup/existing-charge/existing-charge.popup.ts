@@ -82,7 +82,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
             this.getPartnerData(this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER));
         } else {
-            this._catalogue.getListPartner(null, null, { inactive: false })
+            this._catalogue.getListPartner(null, null, { active: true })
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (dataPartner: any) => {
