@@ -7,198 +7,24 @@
     </div>
 </div>
 <!--end:: subheader-->
+<form-add-office></form-add-office>
 
-<div class="m-content">
-    <form novalidate #addOfficeForm="ngForm">
-        <div class="m-form m-form--state">
-            <div class="m-portlet">
-                <div class="m-portlet__body">
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Office Code <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" required minlength="3" maxlength="10" name="code"
-                                    class="form-control m-input m-input--square" placeholder="Please Enter Office Code">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Name EN <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" required minlength="3" maxlength="10" name="nameen"
-                                    class="form-control m-input m-input--square" placeholder="Please Enter Name EN">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Name Local <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" required minlength="3" maxlength="10" name="namevn"
-                                    class="form-control m-input m-input--square" placeholder="Please Enter Name Local">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Name Abbr <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" required minlength="3" maxlength="10" name="nameabbr"
-                                    class="form-control m-input m-input--square" placeholder="Please Enter Name Abbr">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Address EN <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" required minlength="3" maxlength="10" name="addressen"
-                                    class="form-control m-input m-input--square" placeholder="Please Enter Address EN">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Address Local <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" required minlength="3" maxlength="10" name="addresslocal"
-                                    class="form-control m-input m-input--square"
-                                    placeholder="Please Enter Address Local">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Tax Code <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" required minlength="3" maxlength="10" name="taxcode"
-                                    class="form-control m-input m-input--square" placeholder="Please Enter Tax Code">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Work Phone <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" required minlength="3" maxlength="10" name="workphone"
-                                    class="form-control m-input m-input--square" placeholder="Please Enter Work Phone">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Email <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" required minlength="3" maxlength="10" name="email"
-                                    class="form-control m-input m-input--square" placeholder="Please Enter Email">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Fax <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" required minlength="3" maxlength="10" name="faxx"
-                                    class="form-control m-input m-input--square" placeholder="Please Enter Fax">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label">
-                                    Company <span class="m--font-danger">(*)</span>
-                                </label>
-                                <ng-select [allowClear]="true" placeholder="Select Company">
-                                </ng-select>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Bank Account No <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" required minlength="3" maxlength="10" name="bankaccountno"
-                                    class="form-control m-input m-input--square"
-                                    placeholder="Please Enter Bank Account No">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label">
-                                    Bank Account Name <span class="m--font-danger">(*)</span>
-                                </label>
-                                <ng-select [allowClear]="true" placeholder="Select Bank Account Name">
-                                </ng-select>
-                            </div>
-
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Swift Code <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" required minlength="3" maxlength="10" name="swiftcode"
-                                    class="form-control m-input m-input--square"
-                                    placeholder="Please Enter Bank Swift Code">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Bank Address <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" required minlength="3" maxlength="10" name="bankaddress"
-                                    class="form-control m-input m-input--square"
-                                    placeholder="Please Enter Bank Address">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label">
-                                    Status <span class="m--font-danger">(*)</span>
-                                </label>
-                                <ng-select [allowClear]="true" placeholder="Select Status">
-                                </ng-select>
-                            </div>
-                        </div>
-                    </div>
-
-
-                </div>
-
-
-            </div>
-            <div class="form-actions m--align-right">
-                <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                    <span>
-                        <i class="la la la-save"></i>
-                        <span>
-                            save
-                        </span>
-                    </span>
-                </button>
-                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase"
-                    routerLink="/home/system/department">
-                    <span>
-                        <i class="la la-ban"></i>
-                        <span>
-                            cancel
-                        </span>
-                    </span>
-                </button>
-            </div>
+<div class="row">
+    <div class="col-12">
+        <div class="text-center">
+            <button (click)="create()" type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-save"></i>
+                    <span> Save </span>
+                </span>
+            </button>
+            <button routerLink="/home/system/office" type="button"
+                class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase m--margin-left-20">
+                <span>
+                    <i class="la la-ban"></i>
+                    <span> Cancel </span>
+                </span>
+            </button>
         </div>
-    </form>
+    </div>
 </div>

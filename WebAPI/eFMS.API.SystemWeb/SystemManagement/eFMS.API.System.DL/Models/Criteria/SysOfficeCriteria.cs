@@ -10,6 +10,9 @@ namespace eFMS.API.System.DL.Models.Criteria
         public string BranchNameVn { get; set; }
         public string ShortName { get; set; }
         public string TaxCode { get; set; }
+        public bool? Active { get; set; }
         public Guid Buid { get; set; }
+        public string CompanyName { get; set; }
+
     }
 }

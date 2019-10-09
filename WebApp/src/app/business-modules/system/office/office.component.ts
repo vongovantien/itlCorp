@@ -17,7 +17,7 @@ export class OfficeComponent extends AppList implements OnInit {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     headers: CommonInterface.IHeaderTable[];
     offices: Office[] = [];
-
+    criteria: any = {};
     importButtonSetting: ButtonModalSetting = {
         typeButton: ButtonType.import
     };
@@ -50,11 +50,11 @@ export class OfficeComponent extends AppList implements OnInit {
     ngOnInit() {
         this.headers = [
             { title: 'Office Code', field: 'code', sortable: true },
-            { title: 'Name EN', field: 'branchName_EN', sortable: true },
-            { title: 'Name Local', field: 'branchName_VN', sortable: true },
+            { title: 'Name EN', field: 'branchNameEn', sortable: true },
+            { title: 'Name Local', field: 'branchNameVn', sortable: true },
             { title: 'Name Abbr', field: 'shortName', sortable: true },
-            { title: 'Address EN', field: 'address_EN', sortable: true },
-            { title: 'Address Local', field: 'address_VN', sortable: true },
+            { title: 'Address EN', field: 'addressEn', sortable: true },
+            { title: 'Address Local', field: 'addressVn', sortable: true },
             { title: 'TaxCode', field: 'taxcode', sortable: true },
             { title: 'Company', field: 'companyName', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
@@ -63,27 +63,66 @@ export class OfficeComponent extends AppList implements OnInit {
         this.dataSearch = {
             type: 'All'
         };
-        this.searchOffice(this.dataSearch);
+        this.criteria.all = null;
+        this.searchOffice(this.criteria);
 
     }
 
     onSearchOffice(dataSearch: any) {
         this.dataSearch = dataSearch;
-        this.searchOffice(this.dataSearch);
+        this.criteria = {};
+        if (this.dataSearch.type === 'All') {
+            this.criteria.all = this.dataSearch.keyword;
+        }
+        else {
+            this.criteria.all = null;
+        }
+        if (this.dataSearch.type === 'Code') {
+
+            this.criteria.Code = this.dataSearch.keyword;
+        }
+        if (this.dataSearch.type === 'NameEn') {
+            this.criteria.BranchNameEn = this.dataSearch.keyword;
+        }
+        if (this.dataSearch.type === 'NameVn') {
+            this.criteria.BranchNameVn = this.dataSearch.keyword;
+        }
+        if (this.dataSearch.type === 'NameAbbr') {
+            this.criteria.ShortName = this.dataSearch.keyword;
+        }
+        if (this.dataSearch.type === 'Taxcode') {
+            this.criteria.TaxCode = this.dataSearch.keyword;
+        }
+        if (this.dataSearch.type === 'Company') {
+            this.criteria.CompanyName = this.dataSearch.keyword;
+        }
+
+
+        this.searchOffice(this.criteria);
+
     }
 
     searchOffice(dataSearch?: any) {
         this.isLoading = true;
         this._progressRef.start();
-        this._systemRepo.getOffice(this.page, this.pageSize, Object.assign({}, dataSearch))
+        this._systemRepo.getOffice(this.page, this.pageSize, Object.assign({}, this.criteria))
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
                 map((data: any) => {
+                    if (data.data != null) {
+                        return {
+                            data: data.data.map((item: any) => new Office(item)),
+                            totalItems: data.totalItems,
+                        };
+                    }
                     return {
-                        data: data.data.map((item: any) => new Office(item)),
-                        totalItems: data.totalItems,
+                        data: new Office(),
+                        totalItems: 0,
                     };
+
+
+
                 })
             ).subscribe(
                 (res: any) => {

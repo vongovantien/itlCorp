@@ -25,18 +25,65 @@
                         <th class="m--w-50 first">
                         </th>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="8">
-                                <div class="no-data">
-                                    <i class="flaticon-coins"></i>
-                                    <span class="no-data-text">No records found</span>
-                                </div>
-                            </td>
+                    <tbody class="tbody-group">
+                        <ng-container *ngIf="!isLoading && !!offices.length">
+                            <tr class="text-center" *ngFor="let office of offices; let i = index; trackBy: trackByFn">
+                                <td>
+                                    <div class="m-checkbox-list d-flex align-items-center">
+                                        <ng-container>
+                                            <a title="Delete" class="pointer" (click)="showDeletePopup(office)">
+                                                <i class="la la-trash text-danger"></i>
+                                            </a>
+                                        </ng-container>
+                                        <span [class.m--margin-left-20]="!office.status">
+                                            <a title="Detail" class="pointer" [routerLink]="office.id">
+                                                <i class="la la-file-text-o"></i>
+                                            </a>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>{{office.code}}</td>
+                                <td>{{office.branchNameEn}}</td>
+                                <td>{{office.branchNameVn}}</td>
+                                <td>{{office.shortName}}</td>
+                                <td>{{office.addressEn}}</td>
+                                <td>{{office.addressVn}}</td>
+                                <td>{{office.taxcode}}</td>
+                                <td>{{office.companyName}}</td>
+                                <td [ngClass]="office.active ? 'text-danger' : 'text-success'">
+                                    {{office.active ? 'Inactive' : 'Active'}}</td>
+                            </tr>
+                        </ng-container>
+                        <tr *ngIf="!isLoading && !offices.length" app-table-none-record [colspan]="headers.length + 1">
                         </tr>
+                        <tr *ngIf="isLoading" app-table-row-loading></tr>
                     </tbody>
                 </table>
             </div>
+            <div class="pagination-nav ">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="tatable__pager-size">
+                            <div class="select-box">
+                                <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
+                                    (change)="selectPageSize(pageSize, dataSearch)" name="pagesize">
+                                    <ng-container *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
+                                        <option [ngValue]="item">{{item}} line / screen</option>
+                                    </ng-container>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6" *ngIf="totalItems > pageSize">
+                        <div class="float-right">
+                            <pagination [boundaryLinks]="true" [totalItems]="totalItems" [itemsPerPage]="pageSize"
+                                (pageChanged)="pageChanged($event)" [(ngModel)]="page">
+                            </pagination>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>

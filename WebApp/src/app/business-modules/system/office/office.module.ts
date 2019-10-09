@@ -3,12 +3,16 @@ import { OfficeComponent } from './office.component';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { SelectModule } from 'ng2-select';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { Routes, RouterModule } from '@angular/router';
 import { OfficeAddNewComponent } from './addnew/office.addnew.component';
 import { OfficeDetailsComponent } from './details/office-details.component';
 import { OfficeFormSearchComponent } from './components/form-search-office/form-search-office.component';
+import { OfficeFormAddComponent } from './components/form-add-office/form-add-office.component';
+
+import { PaginationModule, TabsModule } from 'ngx-bootstrap';
+
 
 
 const routing: Routes = [
@@ -26,10 +30,13 @@ const routing: Routes = [
         SelectModule,
         FormsModule,
         NgProgressModule,
+        PaginationModule,
+        TabsModule,
+        ReactiveFormsModule,
         RouterModule.forChild(routing)
     ],
     exports: [],
-    declarations: [OfficeComponent, OfficeAddNewComponent, OfficeDetailsComponent, OfficeFormSearchComponent],
+    declarations: [OfficeComponent, OfficeAddNewComponent, OfficeDetailsComponent, OfficeFormSearchComponent, OfficeFormAddComponent],
     providers: [],
 })
 export class OfficeModule { }

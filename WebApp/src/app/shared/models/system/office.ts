@@ -1,13 +1,13 @@
 export class Office {
     id: string = '';
     code: string = ''
-    branchname_Vn: string = '';
-    branchname_En: string = '';
+    branchNameVn: string = '';
+    branchNameEn: string = '';
     shortName: string = '';
-    address_Vn: string = '';
-    address_En: string = '';
+    addressVn: string = '';
+    addressEn: string = '';
     taxcode: string = '';
-    companyname: string = '';
+    companyName: string = '';
     active: boolean = false;
 
     constructor(data?: any) {
