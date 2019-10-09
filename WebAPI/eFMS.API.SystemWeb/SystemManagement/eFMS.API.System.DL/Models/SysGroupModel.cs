@@ -1,17 +1,19 @@
-﻿using System;
+﻿using eFMS.API.System.Service.Models;
+using System;
 using System.Collections.Generic;
+using System.Text;
 
-namespace eFMS.API.Documentation.Service.Models
+namespace eFMS.API.System.DL.Models
 {
-    public partial class CatStage
+    public class SysGroupModel
     {
-        public int Id { get; set; }
+        public short Id { get; set; }
         public string Code { get; set; }
-        public string StageNameVn { get; set; }
-        public string StageNameEn { get; set; }
+        public string Name { get; set; }
         public int? DepartmentId { get; set; }
-        public string DescriptionVn { get; set; }
-        public string DescriptionEn { get; set; }
+        public short ParentId { get; set; }
+        public string ManagerId { get; set; }
+        public string Decription { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }

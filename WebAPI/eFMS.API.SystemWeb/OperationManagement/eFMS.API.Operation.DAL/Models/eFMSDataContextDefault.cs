@@ -64,7 +64,7 @@ namespace eFMS.API.Operation.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.Inactive).HasDefaultValueSql("((0))");
+                entity.Property(e => e.Active).HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
@@ -391,7 +391,7 @@ namespace eFMS.API.Operation.Service.Models
                     .HasColumnName("DBUsername")
                     .HasMaxLength(100);
 
-                entity.Property(e => e.Inactive).HasDefaultValueSql("((0))");
+                entity.Property(e => e.Active).HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.InactiveOn).HasMaxLength(10);
 
@@ -472,7 +472,7 @@ namespace eFMS.API.Operation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Inactive).HasDefaultValueSql("((0))");
+                entity.Property(e => e.Active).HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
@@ -526,7 +526,7 @@ namespace eFMS.API.Operation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Inactive).HasDefaultValueSql("((0))");
+                entity.Property(e => e.Active).HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 

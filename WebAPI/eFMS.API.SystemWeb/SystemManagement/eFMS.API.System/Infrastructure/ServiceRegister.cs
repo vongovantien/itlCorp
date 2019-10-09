@@ -5,7 +5,6 @@ using Microsoft.Extensions.Localization;
 using LocalizationCultureCore.StringLocalizer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.Extensions.Configuration;
 using System.Globalization;
 using Microsoft.AspNetCore.Builder;
@@ -22,9 +21,7 @@ using System.IO;
 using System.Reflection;
 using System;
 using eFMS.API.System.DL.Services;
-using eFMS.IdentityServer.DL.Services;
 using eFMS.API.System.DL.IService;
-using eFMS.IdentityServer.DL.IService;
 
 namespace eFMS.API.System.Infrastructure
 {
@@ -38,14 +35,12 @@ namespace eFMS.API.System.Infrastructure
             services.AddTransient<IStringLocalizerFactory, JsonStringLocalizerFactory>();
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
-            services.AddTransient<ICurrentUser, CurrentUser>();
             services.AddTransient<ISysUserService, SysUserService>();
-            services.AddTransient<ISysEmployeeService, SysEmployeeService>();
             services.AddTransient<ISysOfficeService, SysOfficeService>();
             services.AddTransient<ISysCompanyService, SysCompanyService>();
             services.AddTransient<ICatDepartmentService, CatDepartmentService>();
+            services.AddTransient<ISysGroupService, SysGroupService>();
         }
 
         public static IServiceCollection AddCulture(this IServiceCollection services, IConfiguration configuration)

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { ButtonModalSetting } from '../../../shared/models/layout/button-modal-setting.model';
 import { ButtonType } from '../../../shared/enums/type-button.enum';
@@ -8,11 +8,13 @@ import { finalize } from 'rxjs/internal/operators/finalize';
 import { Office } from 'src/app/shared/models/system/office';
 import { map } from 'rxjs/internal/operators/map';
 import { NgProgress } from '@ngx-progressbar/core';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 @Component({
     selector: 'app-office',
     templateUrl: './office.component.html'
 })
 export class OfficeComponent extends AppList implements OnInit {
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     headers: CommonInterface.IHeaderTable[];
     offices: Office[] = [];
 
@@ -91,6 +93,11 @@ export class OfficeComponent extends AppList implements OnInit {
                 },
             );
     }
+
+    showDeletePopup() {
+        this.confirmDeletePopup.show();
+    }
+
 
 
 }

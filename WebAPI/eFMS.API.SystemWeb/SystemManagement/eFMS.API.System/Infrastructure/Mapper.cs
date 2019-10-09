@@ -18,6 +18,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<CatDepartment, CatDepartmentModel>();
             CreateMap<SysOffice, SysOfficeViewModel>();
             CreateMap<SysOfficeEditModel, SysOfficeModel>();
+            CreateMap<SysGroup, SysGroupModel>();
         }
     }
 }
