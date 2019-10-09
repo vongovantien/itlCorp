@@ -4,7 +4,7 @@ export class Department {
     deptName: string = '';
     deptNameEn: string = '';
     deptNameAbbr: string = '';
-    office: string = '';
+    officeName: string = '';
     company: string = '';
     status: string = '';
     managerId: string = '';
