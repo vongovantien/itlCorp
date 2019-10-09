@@ -20,11 +20,11 @@ namespace eFMS.API.System.DL.Services
     public class SysOfficeService :  RepositoryBase<SysOffice, SysOfficeModel>, ISysOfficeService
     {
         private readonly IDistributedCache cache;
-        private readonly IContextBase<SysBu> sysBuRepository;
+        private readonly IContextBase<SysCompany> sysBuRepository;
  
 
 
-        public SysOfficeService(IContextBase<SysOffice> repository, IMapper mapper, IContextBase<SysBu> sysBuRepo, IDistributedCache distributedCache) : base(repository, mapper)
+        public SysOfficeService(IContextBase<SysOffice> repository, IMapper mapper, IContextBase<SysCompany> sysBuRepo, IDistributedCache distributedCache) : base(repository, mapper)
         {
             sysBuRepository = sysBuRepo;
             cache = distributedCache;

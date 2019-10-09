@@ -542,7 +542,7 @@ namespace eFMS.API.System.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.Bu)
+                entity.HasOne(d => d.SysCompany)
                     .WithMany(p => p.SysOffice)
                     .HasForeignKey(d => d.Buid)
                     .OnDelete(DeleteBehavior.ClientSetNull)

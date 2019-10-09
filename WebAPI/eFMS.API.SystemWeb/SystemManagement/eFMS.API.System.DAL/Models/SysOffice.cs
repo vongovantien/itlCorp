@@ -30,7 +30,6 @@ namespace eFMS.API.System.Service.Models
         public string Code { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
-
-        public virtual SysCompany Bu { get; set; }
+        public virtual SysCompany SysCompany { get; set; }
     }
 }
