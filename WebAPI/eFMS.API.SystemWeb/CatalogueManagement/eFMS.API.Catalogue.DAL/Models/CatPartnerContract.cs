@@ -17,7 +17,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
         public string ActiveBy { get; set; }
-        public DateTime? ActiveOn { get; set; }
+        public DateTime? InActiveOn { get; set; }
         public decimal? CreditAmount { get; set; }
         public short? PaymentDeadline { get; set; }
         public string PaymentDeadlineUnit { get; set; }

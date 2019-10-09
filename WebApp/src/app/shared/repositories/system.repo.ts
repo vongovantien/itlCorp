@@ -11,27 +11,15 @@ export class SystemRepo {
     constructor(private _api: ApiService) {
     }
 
-    getListOffices(page?: number, size?: number) {
-        if (!!page && !!size) {
-            return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/paging`, {}, {
+    getOffice(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/paging`, body, {
                 page: '' + page,
                 size: '' + size
             }).pipe(
-                catchError((error) => throwError(error)),
-                map((data: any) => {
-                    return data;
-                })
-            );
-        } else {
-            return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/getAll`).pipe(
-                catchError((error) => throwError(error)),
-                map((data: any) => {
-                    return data;
-                })
+            map((data: any) => data)
             );
         }
 
-    }
 
     getListSystemUser() {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUser`).pipe(

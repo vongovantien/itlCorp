@@ -65,7 +65,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 entity.DatetimeModified = DateTime.Now;
                 if (entity.Active == true)
                 {
-                    entity.ActiveOn = DateTime.Now;
+                    entity.InActiveOn = DateTime.Now;
                 }
                 result = DataContext.Update(entity, x => x.Id == model.Id, false);
                 if (result.Success)

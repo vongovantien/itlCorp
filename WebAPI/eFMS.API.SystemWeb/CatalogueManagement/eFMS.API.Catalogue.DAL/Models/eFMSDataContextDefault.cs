@@ -580,7 +580,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.NameEn)
                     .HasColumnName("Name_EN")
@@ -636,7 +636,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.IncludedVat).HasColumnName("IncludedVAT");
 
@@ -696,7 +696,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnName("DebitVAT")
                     .HasColumnType("decimal(18, 4)");
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.Type).HasMaxLength(800);
 
@@ -739,7 +739,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.Note)
                     .HasMaxLength(250)
@@ -778,7 +778,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnName("GroupName_VN")
                     .HasMaxLength(4000);
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.Note).HasMaxLength(4000);
 
@@ -813,7 +813,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.ExtraWeight).HasColumnType("decimal(10, 4)");
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.Name).HasMaxLength(1600);
 
@@ -850,7 +850,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.NameEn)
                     .HasColumnName("Name_EN")
@@ -891,7 +891,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
@@ -930,7 +930,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.EffectiveOn).HasColumnType("datetime");
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.Rate).HasColumnType("decimal(18, 4)");
 
@@ -1003,7 +1003,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.Description).HasMaxLength(4000);
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.ManagerId)
                     .HasColumnName("ManagerID")
@@ -1095,7 +1095,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.InternalReferenceNo)
                     .HasMaxLength(50)
@@ -1218,7 +1218,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.FieldInterested).HasMaxLength(4000);
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.JobTitle).HasMaxLength(4000);
 
@@ -1262,7 +1262,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.ContractNo)
                     .HasMaxLength(50)
@@ -1327,7 +1327,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnName("GroupName_VN")
                     .HasMaxLength(800);
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
@@ -1377,7 +1377,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.LocalAreaId)
                     .HasColumnName("LocalAreaID")
@@ -1428,7 +1428,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.NameEn)
                     .HasColumnName("Name_EN")
@@ -1457,7 +1457,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.ResourceName).HasMaxLength(3200);
 
@@ -1571,7 +1571,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnName("Description_VN")
                     .HasMaxLength(4000);
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.StageNameEn)
                     .HasColumnName("StageName_EN")
@@ -1604,7 +1604,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.NameEn)
                     .HasColumnName("Name_EN")
@@ -1648,7 +1648,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.DescriptionVn).HasMaxLength(4000);
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.UnitNameEn)
                     .HasColumnName("UnitName_EN")
@@ -1804,7 +1804,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.DeConsolidator).HasMaxLength(250);
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.InvoiceDate).HasColumnType("datetime");
 
@@ -2399,7 +2399,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.GrossWeight).HasColumnType("decimal(18, 4)");
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.InvoiceDate).HasColumnType("datetime");
 
@@ -2509,7 +2509,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.GrossWeight).HasColumnType("decimal(18, 4)");
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.InvoiceNo).HasMaxLength(1600);
 
@@ -2669,7 +2669,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.InWord).HasMaxLength(4000);
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.IssueHblplaceAndDate)
                     .HasColumnName("IssueHBLPlaceAndDate")
@@ -3074,7 +3074,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnName("DBUsername")
                     .HasMaxLength(100);
 
-                entity.Property(e => e.ActiveOn).HasMaxLength(10);
+                entity.Property(e => e.InActiveOn).HasMaxLength(10);
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -3127,7 +3127,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.EndDate).HasColumnType("datetime");
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.StartDate).HasColumnType("datetime");
 
@@ -3174,7 +3174,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.MenuId)
                     .IsRequired()
@@ -3276,7 +3276,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.Fax).HasMaxLength(1600);
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.Logo).HasColumnType("image");
 
@@ -3369,7 +3369,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.Photo).HasColumnType("image");
 
@@ -3427,7 +3427,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.ManagerId)
                     .HasColumnName("ManagerID")
@@ -3470,7 +3470,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.RoleId).HasColumnName("RoleID");
 
@@ -3515,7 +3515,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.Icon).HasMaxLength(3200);
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.NameEn)
                     .HasColumnName("NameEN")
@@ -3557,7 +3557,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.Description).HasMaxLength(4000);
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.MenuId)
                     .IsRequired()
@@ -3659,7 +3659,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.Logo).HasColumnType("image");
 
@@ -3713,7 +3713,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.Description).HasMaxLength(4000);
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.Name)
                     .HasMaxLength(50)
@@ -3748,7 +3748,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.Active).HasDefaultValueSql("((1))");
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.Name).HasMaxLength(3200);
 
@@ -3779,7 +3779,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.MenuId)
                     .HasColumnName("MenuID")
@@ -3815,7 +3815,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.OtherIntructionId).HasColumnName("OtherIntructionID");
 
@@ -3905,7 +3905,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.Password).HasMaxLength(4000);
 
@@ -3942,7 +3942,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
@@ -4034,7 +4034,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
@@ -4071,7 +4071,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
-                entity.Property(e => e.ActiveOn).HasColumnType("datetime");
+                entity.Property(e => e.InActiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.RoleId).HasColumnName("RoleID");
 

@@ -159,7 +159,7 @@ namespace eFMS.API.Catalogue.Controllers
             commonityGroup.Id = id;
             if (commonityGroup.Active == true)
             {
-                commonityGroup.ActiveOn = DateTime.Now;
+                commonityGroup.InActiveOn = DateTime.Now;
             }
             var hs = catComonityGroupService.Update(commonityGroup, x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Update);

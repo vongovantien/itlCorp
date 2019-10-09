@@ -25,6 +25,6 @@ namespace eFMS.API.Catalogue.Service.Models
         public string UserModified { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool? Active { get; set; }
-        public DateTime? ActiveOn { get; set; }
+        public DateTime? InActiveOn { get; set; }
     }
 }

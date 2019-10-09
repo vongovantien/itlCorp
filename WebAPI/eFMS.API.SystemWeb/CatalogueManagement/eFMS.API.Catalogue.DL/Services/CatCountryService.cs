@@ -64,7 +64,7 @@ namespace eFMS.API.Catalogue.DL.Services
             entity.UserModified = currentUser.UserID;
             if (entity.Active == true)
             {
-                entity.ActiveOn = DateTime.Now;
+                entity.InActiveOn = DateTime.Now;
             }
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
             if (hs.Success)
@@ -135,7 +135,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         DatetimeCreated = DateTime.Now,
                         UserCreated = currentUser.UserID,
                         Active = (item.Status ?? "").Contains("active"),
-                        ActiveOn = item.Status != null? DateTime.Now: Active
+                        InActiveOn = item.Status != null? DateTime.Now: Active
                     };
                     dc.CatCountry.Add(country);
                 }
@@ -243,7 +243,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         UserModified = item.UserModified,
                         DatetimeModified = item.DatetimeModified,
                         Active = item.Active,
-                        ActiveOn = item.ActiveOn
+                        InActiveOn = item.InActiveOn
                     };
                     results.Add(country);
                 }
@@ -261,7 +261,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         UserModified = item.UserModified,
                         DatetimeModified = item.DatetimeModified,
                         Active = item.Active,
-                        ActiveOn = item.ActiveOn
+                        InActiveOn = item.InActiveOn
                     };
                     results.Add(country);
                 }

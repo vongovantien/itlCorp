@@ -27,7 +27,7 @@ namespace eFMS.API.Catalogue.DL.Models
         //public string UserModified { get; set; }
         //public DateTime? DatetimeModified { get; set; }
         //public bool? Active { get; set; }
-        //public DateTime? ActiveOn { get; set; }
+        //public DateTime? InActiveOn { get; set; }
         //public string DistrictName { get; set; }
         //public string ProvinceName { get; set; }
         //public string CountryName { get; set; }

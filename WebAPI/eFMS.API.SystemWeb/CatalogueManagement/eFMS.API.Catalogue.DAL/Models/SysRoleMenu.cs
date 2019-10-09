@@ -12,7 +12,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
-        public DateTime? ActiveOn { get; set; }
+        public DateTime? InActiveOn { get; set; }
 
         public virtual SysMenu Menu { get; set; }
         public virtual SysRole Role { get; set; }
