@@ -14,6 +14,7 @@ namespace eFMS.API.System.DL.Services
     {
         public SysGroupService(IContextBase<SysGroup> repository, IMapper mapper) : base(repository, mapper)
         {
+            SetChildren<SysUserGroup>("Id", "GroupId");
         }
     }
 }
