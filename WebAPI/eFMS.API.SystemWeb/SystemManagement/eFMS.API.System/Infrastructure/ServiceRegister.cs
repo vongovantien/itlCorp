@@ -23,6 +23,8 @@ using System.Reflection;
 using System;
 using eFMS.API.System.DL.Services;
 using eFMS.IdentityServer.DL.Services;
+using eFMS.API.System.DL.IService;
+using eFMS.IdentityServer.DL.IService;
 
 namespace eFMS.API.System.Infrastructure
 {
@@ -42,7 +44,7 @@ namespace eFMS.API.System.Infrastructure
             services.AddTransient<ISysUserService, SysUserService>();
             services.AddTransient<ISysEmployeeService, SysEmployeeService>();
             services.AddTransient<ISysOfficeService, SysOfficeService>();
-            services.AddTransient<ISysBuService, SysBuService>();
+            services.AddTransient<ISysCompanyService, SysCompanyService>();
             services.AddTransient<ICatDepartmentService, CatDepartmentService>();
         }
 
