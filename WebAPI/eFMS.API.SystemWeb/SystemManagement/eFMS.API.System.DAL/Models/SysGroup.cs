@@ -22,9 +22,10 @@ namespace eFMS.API.System.Service.Models
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
-        public bool? Inactive { get; set; }
+        public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
 
+        public virtual CatDepartment Department { get; set; }
         public virtual ICollection<SysGroupRole> SysGroupRole { get; set; }
         public virtual ICollection<SysUserGroup> SysUserGroup { get; set; }
     }

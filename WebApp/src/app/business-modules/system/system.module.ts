@@ -6,13 +6,12 @@ import { UserManagementComponent } from './user-management/user-management.compo
 import { GroupComponent } from './group/group.component';
 import { RoleComponent } from './role/role.component';
 import { PermissionComponent } from './permission/permission.component';
-import { DepartmentComponent } from './department/department.component';
 
 @NgModule({
   imports: [
     CommonModule,
     SystemRoutingModule,
   ],
-  declarations: [UserManagementComponent, GroupComponent, RoleComponent, PermissionComponent, DepartmentComponent]
+  declarations: [UserManagementComponent, GroupComponent, RoleComponent, PermissionComponent ]
 })
 export class SystemModule { }

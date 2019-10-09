@@ -1,9 +1,7 @@
 import { Component, Output, EventEmitter} from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
-import { User } from 'src/app/shared/models';
 import { BaseService } from 'src/app/shared/services';
-import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'department-form-search',
@@ -22,7 +20,6 @@ export class DepartmentFormSearchComponent extends AppForm {
     constructor(
         private _fb: FormBuilder,
         private _baseService: BaseService
-
     ) {
         super();
         this.requestSearch = this.onSubmit;
@@ -43,8 +40,6 @@ export class DepartmentFormSearchComponent extends AppForm {
     }
 
     initDataInform() {
-        // this.statusApprovals = this.getStatusApproval();
-        // this.statusPayments = this.getStatusPayment();
         this.fieldSearchs = this.getFieldSearch();
         this.selectedTitleFilter = this.fieldSearchs[0].title;
         this.selectedValueFilter = this.fieldSearchs[0].value;
@@ -52,7 +47,7 @@ export class DepartmentFormSearchComponent extends AppForm {
 
     onSubmit() {
         const body: ISearchDepartment = {
-            searchOptions: this.selectedValueFilter,
+            type: this.selectedValueFilter,
             keyword: this.searchKey.value,            
         };
         this.onSearch.emit(body);
@@ -86,6 +81,6 @@ export class DepartmentFormSearchComponent extends AppForm {
 }
 
 interface ISearchDepartment {
-    searchOptions: string;
+    type: string;
     keyword: string;
 }

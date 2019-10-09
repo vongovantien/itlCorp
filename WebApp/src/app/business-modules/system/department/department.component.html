@@ -2,7 +2,7 @@
     <app-sub-header>
         <div class="c-button-actions">
             <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-            [routerLink]="'/home/system/department/new'">
+                [routerLink]="'/home/system/department/new'">
                 <span>
                     <i class="la la-plus"></i>
                     <span>
@@ -37,8 +37,7 @@
                                         <td>
                                             <div class="m-checkbox-list d-flex align-items-center">
                                                 <span>
-                                                    <a title="Delete" class="pointer"
-                                                        (click)="showDeletePopup()">
+                                                    <a title="Delete" class="pointer" (click)="showDeletePopup()">
                                                         <i class="la la-trash text-danger"></i>
                                                     </a>
                                                 </span>
@@ -69,29 +68,27 @@
                     </div>
                     <div class="pagination-nav ">
                         <div class="row">
-                          <div class="col-sm-6">
-                              <div class="tatable__pager-size">
-                                  <div class="select-box">
-                                      <!-- <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
+                            <div class="col-sm-6">
+                                <div class="tatable__pager-size">
+                                    <div class="select-box">
+                                        <!-- <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
                                           (change)="selectPageSize(pageSize, dataSearch)" name="pagesize">
                                           <ng-container
                                               *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
                                               <option [ngValue]="item">{{item}} line / screen</option>
                                           </ng-container>
                                       </select> -->
-                                      <select class="form-control" id="" aria-label=""
-                                           name="pagesize">
-                                          <ng-container
-                                              >
-                                              <option>3 line / screen</option>
-                                              <option>15 line / screen</option>
-                                              <option>25 line / screen</option>
-                                          </ng-container>
-                                      </select>
-                                  </div>
-                              </div>
-                          </div>
-                          <!-- <div class="col-sm-6" *ngIf="totalItems > pageSize">
+                                        <select class="form-control" id="" aria-label="" name="pagesize">
+                                            <ng-container>
+                                                <option>3 line / screen</option>
+                                                <option>15 line / screen</option>
+                                                <option>25 line / screen</option>
+                                            </ng-container>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- <div class="col-sm-6" *ngIf="totalItems > pageSize">
                               <div class="float-right">
                                   <pagination [boundaryLinks]="true" [totalItems]="totalItems"
                                       [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
@@ -99,7 +96,7 @@
                                   </pagination>
                               </div>
                           </div> -->
-                      </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -107,5 +104,5 @@
     </div>
 </div>
 
-    <!-- <confirm-popup [body]="'Do you want to delete?'" [labelConfirm]="'Yes'">
-    </confirm-popup> -->
+<confirm-popup [body]="'Do you want to delete?'" [labelConfirm]="'Yes'">
+</confirm-popup>
