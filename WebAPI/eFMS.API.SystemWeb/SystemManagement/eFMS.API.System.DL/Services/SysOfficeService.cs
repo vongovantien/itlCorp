@@ -113,6 +113,7 @@ namespace eFMS.API.System.DL.Services
             foreach (var item in query)
             {
                 var SysOffice = mapper.Map<SysOfficeViewModel>(item.branch);
+                SysOffice.CompanyName = item.companyName;
                 results.Add(SysOffice);
             }
             return results;

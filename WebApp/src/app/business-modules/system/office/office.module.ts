@@ -8,6 +8,7 @@ import { NgProgressModule } from '@ngx-progressbar/core';
 import { Routes, RouterModule } from '@angular/router';
 import { OfficeAddNewComponent } from './addnew/office.addnew.component';
 import { OfficeDetailsComponent } from './details/office-details.component';
+import { OfficeFormSearchComponent } from './components/form-search-office/form-search-office.component';
 
 
 const routing: Routes = [
@@ -28,7 +29,7 @@ const routing: Routes = [
         RouterModule.forChild(routing)
     ],
     exports: [],
-    declarations: [OfficeComponent, OfficeAddNewComponent, OfficeDetailsComponent],
+    declarations: [OfficeComponent, OfficeAddNewComponent, OfficeDetailsComponent, OfficeFormSearchComponent],
     providers: [],
 })
 export class OfficeModule { }

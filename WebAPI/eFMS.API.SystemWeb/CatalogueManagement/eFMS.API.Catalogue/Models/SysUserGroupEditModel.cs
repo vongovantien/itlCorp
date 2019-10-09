@@ -26,6 +26,6 @@ namespace eFMS.API.Catalogue.Models
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public bool? Inactive { get; set; }
-        public DateTime? InactiveOn { get; set; }
+        public DateTime? InInActiveOn { get; set; }
     }
 }

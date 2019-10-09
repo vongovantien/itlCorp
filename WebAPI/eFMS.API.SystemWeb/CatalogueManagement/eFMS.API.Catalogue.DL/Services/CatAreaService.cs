@@ -71,7 +71,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         UserModified = item.UserModified,
                         DatetimeModified = item.DatetimeModified,
                         Active = item.Active,
-                        ActiveOn = item.ActiveOn
+                        InActiveOn = item.InActiveOn
                     };
                     results.Add(area);
                 }
@@ -89,7 +89,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         UserModified = item.UserModified,
                         DatetimeModified = item.DatetimeModified,
                         Active = item.Active,
-                        ActiveOn = item.ActiveOn
+                        InActiveOn = item.InActiveOn
                     };
                     results.Add(area);
                 }

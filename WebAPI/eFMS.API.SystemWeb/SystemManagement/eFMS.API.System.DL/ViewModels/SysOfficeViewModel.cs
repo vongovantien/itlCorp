@@ -30,5 +30,6 @@ namespace eFMS.API.System.DL.ViewModels
         public DateTime? DatetimeCreated { get; set; }
         public string SwiftCode { get; set; }
         public string ShortName { get; set; }
+        public string CompanyName { get; set; }
     }
 }

@@ -180,7 +180,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.UserModified = currentUser;
                     item.DatetimeModified = DateTime.Now;
                     item.Active = true;
-                    item.ActiveOn = DateTime.Now;
+                    item.InActiveOn = DateTime.Now;
                     ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Update(item);
                 }
                 DataContext.DC.SaveChanges();

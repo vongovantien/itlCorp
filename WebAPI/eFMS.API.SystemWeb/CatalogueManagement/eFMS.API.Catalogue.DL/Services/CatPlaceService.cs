@@ -74,7 +74,7 @@ namespace eFMS.API.Catalogue.DL.Services
             entity.UserModified = currentUser.UserID;
             if (entity.Active == true)
             {
-                entity.ActiveOn = DateTime.Now;
+                entity.InActiveOn = DateTime.Now;
             }
             var result = DataContext.Update(entity, x => x.Id == model.Id);
             if (result.Success)
@@ -243,7 +243,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     UserModified = x.UserModified,
                     DatetimeModified = x.DatetimeModified,
                     Active = x.Active,
-                    ActiveOn = x.ActiveOn,
+                    InActiveOn = x.InActiveOn,
                     CountryName = x.CountryNameVN,
                     AreaName = x.AreaNameVN,
                     LocalAreaName = x.LocalAreaNameVN
@@ -275,7 +275,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     UserModified = x.UserModified,
                     DatetimeModified = x.DatetimeModified,
                     Active = x.Active,
-                    ActiveOn = x.ActiveOn,
+                    InActiveOn = x.InActiveOn,
                     CountryName = x.CountryNameEN,
                     AreaName = x.AreaNameEN,
                     LocalAreaName = x.LocalAreaNameEN
@@ -747,7 +747,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         UserModified = currentUser.UserID,
                         PlaceTypeId = item.PlaceTypeId,
                         Active = Active,
-                        ActiveOn = ActiveDate,
+                        InActiveOn = ActiveDate,
                         ModeOfTransport = item.ModeOfTransport,
                         AreaId = item.AreaId
                     };
