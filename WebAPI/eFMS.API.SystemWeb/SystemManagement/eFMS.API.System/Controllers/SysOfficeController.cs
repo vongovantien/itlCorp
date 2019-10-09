@@ -1,16 +1,17 @@
 ﻿using AutoMapper;
 using eFMS.API.Common;
+using eFMS.API.Common.Globals;
+using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.Infrastructure.Common;
+using eFMS.API.System.Infrastructure.Middlewares;
 using eFMS.API.System.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;
-using SystemManagementAPI.Infrastructure.Middlewares;
-using SystemManagementAPI.Resources;
 
 namespace eFMS.API.System.Controllers
 {
@@ -21,9 +22,9 @@ namespace eFMS.API.System.Controllers
     public class SysOfficeController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly ISysBranchService sysBranchService;
+        private readonly ISysOfficeService sysBranchService;
         private readonly IMapper mapper;
-        public SysOfficeController(IStringLocalizer<LanguageSub> localizer, ISysBranchService service, IMapper iMapper)
+        public SysOfficeController(IStringLocalizer<LanguageSub> localizer, ISysOfficeService service, IMapper iMapper)
         {
             stringLocalizer = localizer;
             sysBranchService = service;
@@ -37,11 +38,11 @@ namespace eFMS.API.System.Controllers
         [HttpGet("GetAll")]
         public IActionResult GetAll()
         {
-            var results = sysBranchService.GetBranchs();
+            var results = sysBranchService.GetOffices();
             return Ok(results);
         }
         /// <summary>
-        /// get and paging the list of branch
+        /// get and paging the list of office
         /// </summary>
         /// <param name="criteria">search conditions</param>
         /// <param name="page">page to retrieve data</param>
@@ -49,7 +50,7 @@ namespace eFMS.API.System.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
-        public IActionResult Paging(SysBranchCriteria criteria, int page, int size)
+        public IActionResult Paging(SysOfficeCriteria criteria, int page, int size)
         {
             var data = sysBranchService.Paging(criteria, page, size, out int rowCount);
             var result = new { data, totalItems = rowCount, page, size };
@@ -61,7 +62,7 @@ namespace eFMS.API.System.Controllers
         /// </summary>
         [HttpPost]
         [Route("Query")]
-        public IActionResult Get(SysBranchCriteria criteria)
+        public IActionResult Get(SysOfficeCriteria criteria)
         {
             var results = sysBranchService.Query(criteria);
             return Ok(results);
@@ -76,7 +77,7 @@ namespace eFMS.API.System.Controllers
         [Authorize]
         public IActionResult Delete(Guid id)
         {
-            var hs = sysBranchService.DeleteBranch(id);
+            var hs = sysBranchService.DeleteOffice(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -94,7 +95,7 @@ namespace eFMS.API.System.Controllers
         /// <returns></returns>
         [HttpPut("{id}")]
         //[Authorize]
-        public IActionResult Put(Guid id, SysBranchEditModel model)
+        public IActionResult Put(Guid id, SysOfficeEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
         
@@ -103,9 +104,9 @@ namespace eFMS.API.System.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            var branch = mapper.Map<SysBranchModel>(model);
+            var branch = mapper.Map<SysOfficeModel>(model);
             branch.Id = id;
-            var hs = sysBranchService.UpdateBranch(branch);
+            var hs = sysBranchService.UpdateOffice(branch);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -116,14 +117,14 @@ namespace eFMS.API.System.Controllers
         }
 
         /// <summary>
-        /// add new partner
+        /// add new office
         /// </summary>
         /// <param name="model">object to add</param>
         /// <returns></returns>
         [HttpPost]
         [Route("Add")]
         //[Authorize]
-        public IActionResult Post(SysBranchEditModel model)
+        public IActionResult Post(SysOfficeEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
             var checkExistMessage = CheckExist(Guid.Empty, model);
@@ -131,7 +132,7 @@ namespace eFMS.API.System.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            var branch = mapper.Map<SysBranchModel>(model);
+            var branch = mapper.Map<SysOfficeModel>(model);
             var hs = sysBranchService.Add(branch);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -142,7 +143,7 @@ namespace eFMS.API.System.Controllers
             return Ok(result);
         }
 
-        private string CheckExist(Guid id, SysBranchEditModel model)
+        private string CheckExist(Guid id, SysOfficeEditModel model)
         {
             string message = string.Empty;
             if (id == Guid.Empty)

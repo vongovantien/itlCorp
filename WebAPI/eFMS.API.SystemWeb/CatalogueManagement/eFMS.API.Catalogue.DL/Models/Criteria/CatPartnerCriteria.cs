@@ -20,7 +20,7 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public string Fax { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeModified { get; set; }
-        public bool? Inactive { get; set; }
+        public bool? Active { get; set; }
         public string AccountNo { get; set; }
     }
 }

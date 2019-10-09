@@ -17,33 +17,33 @@ using eFMS.API.Common.NoSql;
 
 namespace eFMS.API.System.DL.Services
 {
-    public class SysBranchService :  RepositoryBase<SysBranch, SysBranchModel>, ISysBranchService
+    public class SysOfficeService :  RepositoryBase<SysOffice, SysOfficeModel>, ISysOfficeService
     {
         private readonly IDistributedCache cache;
         private readonly IContextBase<SysBu> sysBuRepository;
  
 
 
-        public SysBranchService(IContextBase<SysBranch> repository, IMapper mapper, IContextBase<SysBu> sysBuRepo, IDistributedCache distributedCache) : base(repository, mapper)
+        public SysOfficeService(IContextBase<SysOffice> repository, IMapper mapper, IContextBase<SysBu> sysBuRepo, IDistributedCache distributedCache) : base(repository, mapper)
         {
             sysBuRepository = sysBuRepo;
             cache = distributedCache;
 
         }
 
-        public HandleState AddBranch(SysBranchModel  sysBranch)
+        public HandleState AddOffice(SysOfficeModel  SysOffice)
         {
-            return DataContext.Add(sysBranch);
+            return DataContext.Add(SysOffice);
         }
 
-        public IQueryable<SysBranch> GetBranchs()
+        public IQueryable<SysOffice> GetOffices()
         {
-            //var lstSysBranch = RedisCacheHelper.GetObject<List<SysBranch>>(cache, Templates.SysBranch.NameCaching.ListName);
-            var lstSysBranch = new List<SysBranch>();
-            IQueryable<SysBranch> data = null;
-            if (lstSysBranch != null)
+            //var lstSysOffice = RedisCacheHelper.GetObject<List<SysOffice>>(cache, Templates.SysOffice.NameCaching.ListName);
+            var lstSysOffice = new List<SysOffice>();
+            IQueryable<SysOffice> data = null;
+            if (lstSysOffice != null)
             {
-                //data = lstSysBranch.AsQueryable();
+                //data = lstSysOffice.AsQueryable();
                 data = DataContext.Get();
 
             }
@@ -52,13 +52,13 @@ namespace eFMS.API.System.DL.Services
                 data = DataContext.Get();
                 RedisCacheHelper.SetObject(cache, Templates.SysBranch.NameCaching.ListName, data);
             }
-            var results = data?.Select(x => mapper.Map<SysBranchModel>(x));
+            var results = data?.Select(x => mapper.Map<SysOfficeModel>(x));
             return results;
         }
 
-        public IQueryable<SysBranchViewModel> Paging(SysBranchCriteria criteria, int page, int size, out int rowsCount)
+        public IQueryable<SysOfficeViewModel> Paging(SysOfficeCriteria criteria, int page, int size, out int rowsCount)
         {
-            List<SysBranchViewModel> results = null;
+            List<SysOfficeViewModel> results = null;
             var list = Query(criteria);
             if (list == null)
             {
@@ -78,11 +78,11 @@ namespace eFMS.API.System.DL.Services
             return results.AsQueryable();
         }
 
-        public List<SysBranchViewModel> Query(SysBranchCriteria criteria)
+        public List<SysOfficeViewModel> Query(SysOfficeCriteria criteria)
         {
-            var sysBranchs = GetBranchs();
+            var SysOffices = GetOffices();
             var sysBu = sysBuRepository.Get();
-            var query = (from branch in sysBranchs
+            var query = (from branch in SysOffices
                          join bu in sysBu on branch.Buid equals bu.Id
                          select new { branch, companyName = bu.Code });
 
@@ -109,19 +109,19 @@ namespace eFMS.API.System.DL.Services
                             );
             }
             if (query.Count() == 0) return null;
-            List<SysBranchViewModel> results = new List<SysBranchViewModel>();
+            List<SysOfficeViewModel> results = new List<SysOfficeViewModel>();
             foreach (var item in query)
             {
-                var sysBranch = mapper.Map<SysBranchViewModel>(item.branch);
-                results.Add(sysBranch);
+                var SysOffice = mapper.Map<SysOfficeViewModel>(item.branch);
+                results.Add(SysOffice);
             }
             return results;
         }
 
-        public HandleState UpdateBranch(SysBranchModel model)
+        public HandleState UpdateOffice(SysOfficeModel model)
         {
-            var entity = mapper.Map<SysBranch>(model);
-            if (entity.Inactive == true)
+            var entity = mapper.Map<SysOffice>(model);
+            if (entity.Active == true)
             {
                 entity.InactiveOn = DateTime.Now;
             }
@@ -133,7 +133,7 @@ namespace eFMS.API.System.DL.Services
             return hs;
         }
 
-        public HandleState DeleteBranch(Guid id)
+        public HandleState DeleteOffice(Guid id)
         {
             //ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = DataContext.Delete(x => x.Id == id);

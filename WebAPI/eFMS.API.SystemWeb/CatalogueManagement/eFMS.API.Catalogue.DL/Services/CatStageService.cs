@@ -62,7 +62,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                     && ((stage.StageNameEn ?? "").IndexOf(criteria.StageNameEn ?? "") >= 0)
                                     && ((stage.StageNameVn ?? "").IndexOf(criteria.StageNameVn ?? "") >= 0)
                                     && ((stage.Code ?? "").IndexOf(criteria.Code ?? "") >= 0)
-                                    && (stage.Inactive == criteria.Inactive || criteria.Inactive == null))
+                                    && (stage.Active == criteria.Active || criteria.Active == null))
                                     .OrderByDescending(x => x.DatetimeModified);
 
                 var t = ((eFMSDataContext)DataContext.DC).CatDepartment.Where(x => (x.DeptName ?? "").IndexOf(criteria.DepartmentName ?? "") >= 0);
@@ -225,7 +225,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         DescriptionVn = item.DescriptionVn,
                         DatetimeCreated = DateTime.Now,
                         UserCreated = ChangeTrackerHelper.currentUser,
-                        Inactive = item.Status.ToString().ToLower()=="active"?false:true
+                        Active = item.Status.ToString().ToLower()=="active"?false:true
                     };
                     dc.CatStage.Add(stage);
                 }

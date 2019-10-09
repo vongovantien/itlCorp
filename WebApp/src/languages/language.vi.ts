@@ -82,6 +82,7 @@ export const language = {
         { name: "Advance Payment", route_child: "advance-payment", display: true },
         { name: "Settlement Payment", route_child: "settlement-payment", display: true },
         { name: "Statement of Account", route_child: "statement-of-account", display: true }
+      ]
     },
 
     {

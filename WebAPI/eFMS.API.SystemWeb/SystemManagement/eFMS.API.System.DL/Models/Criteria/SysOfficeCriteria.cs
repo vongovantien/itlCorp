@@ -2,7 +2,7 @@
 
 namespace eFMS.API.System.DL.Models.Criteria
 {
-    public class SysBranchCriteria
+    public class SysOfficeCriteria
     {
         public string All { get; set; }
         public string Code { get; set; }

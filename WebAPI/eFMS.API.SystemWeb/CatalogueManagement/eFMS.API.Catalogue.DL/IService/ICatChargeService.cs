@@ -21,7 +21,7 @@ namespace eFMS.API.Catalogue.DL.IService
         CatChargeAddOrUpdateModel GetChargeById(Guid id);
         List<CatChargeImportModel> CheckValidImport(List<CatChargeImportModel> list);
         HandleState Import(List<CatChargeImportModel> data);
-        IQueryable<CatChargeModel> GetSettlePaymentCharges(string keySearch, bool? inActive, int? size);
+        IQueryable<CatChargeModel> GetSettlePaymentCharges(string keySearch, bool? Active, int? size);
         object GetListService();
     }
 }

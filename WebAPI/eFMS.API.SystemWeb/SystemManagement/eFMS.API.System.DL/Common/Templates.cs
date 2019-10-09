@@ -11,7 +11,6 @@ namespace eFMS.API.System.DL.Common
             public struct NameCaching
             {
                 public static string ListName = "SysBranch";
-                public static string ListName = "Branch";
             }
         }
         public struct CatPlace

@@ -97,8 +97,8 @@ namespace eFMS.API.Catalogue.DL.Services
                             DatetimeCreated = com.DatetimeCreated,
                             UserModified = com.UserModified,
                             DatetimeModified = com.DatetimeModified,
-                            Inactive = com.Inactive,
-                            InactiveOn = com.InactiveOn,
+                            Active = com.Active,
+                            ActiveOn = com.ActiveOn,
                             CommodityGroupNameEn = grp != null? grp.GroupNameEn: string.Empty,
                             CommodityGroupNameVn = grp != null? grp.GroupNameVn: string.Empty
                         };
@@ -129,7 +129,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var commonity = mapper.Map<CatCommodity>(entity);
             commonity.UserCreated = commonity.UserModified = currentUser.UserID;
             commonity.DatetimeCreated = commonity.DatetimeModified = DateTime.Now;
-            commonity.Inactive = false;
+            commonity.Active = true;
             var result = DataContext.Add(commonity);
             if (result.Success)
             {
@@ -142,9 +142,9 @@ namespace eFMS.API.Catalogue.DL.Services
             var entity = mapper.Map<CatCommodity>(model);
             entity.UserModified = currentUser.UserID;
             entity.DatetimeModified = DateTime.Now;
-            if (entity.Inactive == true)
+            if (entity.Active == true)
             {
-                entity.InactiveOn = DateTime.Now;
+                entity.ActiveOn = DateTime.Now;
             }
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
             if (hs.Success)
@@ -179,7 +179,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         CommodityNameVn = item.CommodityNameVn,
                         CommodityGroupId = item.CommodityGroupId,
                         Code = item.Code,
-                        Inactive = item.Status.ToLower() != "active",
+                        Active = item.Status.ToLower() != "active",
                         DatetimeCreated = DateTime.Now,
                         DatetimeModified = DateTime.Now,
                         UserCreated = currentUser.UserID
@@ -262,11 +262,11 @@ namespace eFMS.API.Catalogue.DL.Services
             if (commonitiesCaching == null)
             {
                 RedisCacheHelper.SetObject(cache, Templates.CatCommodity.NameCaching.ListName, DataContext.Get());
-                commodities = DataContext.Get(x => x.Inactive == criteria.Inactive || criteria.Inactive == null);
+                commodities = DataContext.Get(x => x.Active == criteria.Active || criteria.Active == null);
             }
             else
             {
-                commodities = commonitiesCaching.Where(x => x.Inactive == criteria.Inactive || criteria.Inactive == null).AsQueryable();
+                commodities = commonitiesCaching.Where(x => x.Active == criteria.Active || criteria.Active == null).AsQueryable();
             }
             return commodities;
         }

@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.ViewModels;
+using eFMS.API.System.Models;
 using eFMS.API.System.Service.Models;
 
 namespace eFMS.API.Catalogue.Infrastructure
@@ -13,8 +15,8 @@ namespace eFMS.API.Catalogue.Infrastructure
             //CreateMap<SysUserGroupModel, SysUserGroup>();
 
             CreateMap<SysUser, SysUserViewModel>();
-            CreateMap<SysBranch, SysBranchViewModel>();
-            CreateMap<SysBranchEditModel, SysBranchModel>();
+            CreateMap<SysBranch, SysOfficeViewModel>();
+            CreateMap<SysOfficeEditModel, SysOfficeModel>();
 
 
 

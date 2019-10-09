@@ -14,8 +14,8 @@ namespace eFMS.API.Catalogue.Service.Models
         public string ResourceName { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
-        public bool? Inactive { get; set; }
-        public DateTime? InactiveOn { get; set; }
+        public bool? Active { get; set; }
+        public DateTime? ActiveOn { get; set; }
 
         public virtual ICollection<SysEmployee> SysEmployee { get; set; }
     }

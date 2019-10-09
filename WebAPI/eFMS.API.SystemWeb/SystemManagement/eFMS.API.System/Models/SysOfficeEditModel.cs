@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace eFMS.API.System.DL.ViewModels
+namespace eFMS.API.System.Models
 {
-    public class SysBranchViewModel
+    public class SysOfficeEditModel
     {
-        public Guid Id { get; set; }
         public string BranchNameVn { get; set; }
         public string BranchNameEn { get; set; }
         public Guid Buid { get; set; }
