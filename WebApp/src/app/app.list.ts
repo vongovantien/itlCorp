@@ -12,7 +12,7 @@ export abstract class AppList extends AppPage {
     keyword: string = '';
     requestList: any = null;
     requestSort: any = null;
-
+    dataSearch: any = {};
     constructor() {
         super();
     }

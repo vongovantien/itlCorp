@@ -280,7 +280,7 @@ namespace eFMS.API.Accounting.Controllers
                         Partner = item.Type.Equals(Constants.TYPE_CHARGE_BUY) ? item.PaymentObjectId : item.PayerId,
                         CustomNo = item.ClearanceNo,
                         InvoiceNo = item.InvoiceNo,
-                        ContNo = item.ContNo
+                        ContNo = item.ContNo,
                     };
                     if (acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment))
                     {
@@ -337,7 +337,7 @@ namespace eFMS.API.Accounting.Controllers
                         Partner = item.Type.Equals(Constants.TYPE_CHARGE_BUY) ? item.PaymentObjectId : item.PayerId,
                         CustomNo = item.ClearanceNo,
                         InvoiceNo = item.InvoiceNo,
-                        ContNo = item.ContNo
+                        ContNo = item.ContNo,
                     };
                     if (acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment))
                     {

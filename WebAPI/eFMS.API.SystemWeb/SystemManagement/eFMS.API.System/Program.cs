@@ -9,12 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 
-namespace SystemManagementAPI
+namespace eFMS.API.System
 {
     public class Program
     {
         public static void Main(string[] args)
-        {
+       {
             var appSettings = JObject.Parse(File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json")));
             var environmentValue = appSettings["Environment"].ToString();
 

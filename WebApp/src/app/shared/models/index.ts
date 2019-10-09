@@ -11,6 +11,8 @@ export * from './operation/shipment';
 export * from './document/csShipmentSurcharge';
 export * from './accouting/settlement-payment';
 export * from './operation/surcharge';
+export * from './system/company';
+
 
 
 

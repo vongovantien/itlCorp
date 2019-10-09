@@ -10,6 +10,7 @@ namespace eFMS.API.Accounting.DL.Models.SettlementPayment
         public string JobId { get; set; }
         public string HBL { get; set; }
         public string MBL { get; set; }
+        public Guid HBLID { get; set; }
         public string CustomNo { get; set; }
         public string Service { get; set; }
     }

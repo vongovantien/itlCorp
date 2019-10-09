@@ -42,7 +42,26 @@ export class SystemRepo {
         );
     }
 
+    getCompany(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysBu/paging`, body, {
+            page: '' + page,
+            size: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
 
+    getDetailCompany(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysBu/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    addNewCompany(body: any) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysBu/Add`, body).pipe(
+            map((data: any) => data)
+        );
+    }
 
 }
 

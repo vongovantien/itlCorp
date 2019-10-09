@@ -31,6 +31,6 @@ namespace eFMS.API.System.Service.Models
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
 
-        //public virtual SysBu Bu { get; set; }
+        public virtual SysBu Bu { get; set; }
     }
 }

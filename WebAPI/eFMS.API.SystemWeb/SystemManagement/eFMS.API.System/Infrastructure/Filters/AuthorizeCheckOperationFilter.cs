@@ -19,6 +19,7 @@ namespace eFMS.API.System.Infrastructure.Filters
         }
         public void Apply(Operation operation, OperationFilterContext context)
         {
+            // Check for authorize attribute
             var hasAuthorize = context.MethodInfo.DeclaringType.GetCustomAttributes(true)
                     .Union(context.MethodInfo.GetCustomAttributes(true))
                     .OfType<AuthorizeAttribute>().Any();

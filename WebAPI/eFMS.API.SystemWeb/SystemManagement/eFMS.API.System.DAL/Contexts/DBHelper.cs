@@ -12,8 +12,11 @@ namespace DbHelper
 {
     public class DbHelper
     {
-        //public static readonly string ConnectionString = "Server=192.168.7.88; Database=DNTOneTMSTest; User ID=sa; Password=P@ssw0rd";
         public static string ConnectionString { get; set; }
+        public static string MongoDBConnectionString { get; set; }
+
+        //public static readonly string ConnectionString = "Server=192.168.7.88; Database=DNTOneTMSTest; User ID=sa; Password=P@ssw0rd";
+
         public static DbConnection CreateConnection()
         {
             SqlConnection conn = new SqlConnection(ConnectionString);

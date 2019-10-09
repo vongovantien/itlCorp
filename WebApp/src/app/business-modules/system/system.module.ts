@@ -6,7 +6,6 @@ import { UserManagementComponent } from './user-management/user-management.compo
 import { GroupComponent } from './group/group.component';
 import { RoleComponent } from './role/role.component';
 import { PermissionComponent } from './permission/permission.component';
-import { CompanyInfoComponent } from './company-info/company-info.component';
 import { SharedModule } from '../../shared/shared.module';
 import { DepartmentComponent } from './department/department.component';
 
@@ -17,6 +16,6 @@ import { DepartmentComponent } from './department/department.component';
     SystemRoutingModule,
     SharedModule
   ],
-  declarations: [UserManagementComponent, DepartmentComponent, GroupComponent, RoleComponent, PermissionComponent, CompanyInfoComponent]
+  declarations: [UserManagementComponent, GroupComponent, RoleComponent, PermissionComponent, DepartmentComponent]
 })
 export class SystemModule { }

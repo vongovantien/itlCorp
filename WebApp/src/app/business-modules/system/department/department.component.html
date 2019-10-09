@@ -1,3 +1,111 @@
-<p>
-  department works!
-</p>
+<div class="department-page">
+    <app-sub-header>
+        <div class="c-button-actions">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+            [routerLink]="'/home/system/department/new'">
+                <span>
+                    <i class="la la-plus"></i>
+                    <span>
+                        create
+                    </span>
+                </span>
+            </button>
+            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-upload"></i>
+                    <span>
+                        export
+                    </span>
+                </span>
+            </button>
+        </div>
+    </app-sub-header>
+    <div class="m-content">
+        <department-form-search (onSearch)="onSearchDepartment($event)"></department-form-search>
+        <div class="m-portlet">
+            <div class="m-form">
+                <div class="m-portlet__body">
+                    <div class="table-wrapper table-scrollabler" id="adv-payment-list-table">
+                        <table class="table table-brand table-hover dataTable">
+                            <thead app-table-header [headers]="headers">
+                                <th class="m--w-50 first">
+                                </th>
+                            </thead>
+                            <tbody class="tbody-group">
+                                <ng-container>
+                                    <tr class="text-center">
+                                        <td>
+                                            <div class="m-checkbox-list d-flex align-items-center">
+                                                <span>
+                                                    <a title="Delete" class="pointer"
+                                                        (click)="showDeletePopup()">
+                                                        <i class="la la-trash text-danger"></i>
+                                                    </a>
+                                                </span>
+                                                <span>
+                                                    <a title="Detail" class="pointer" (click)="gotoDetailDepartment()">
+                                                        <i class="la la-file-text-o"></i>
+                                                    </a>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td class="text-underline text-primary pointer">
+                                            <a (click)="gotoDetailDepartment()">A
+                                            </a>
+                                        </td>
+                                        <td>B</td>
+                                        <td>C</td>
+                                        <td>D</td>
+                                        <td>E</td>
+                                        <td>F</td>
+                                    </tr>
+
+                                </ng-container>
+                                <!-- <tr *ngIf="!isLoading && !settlements.length" app-table-none-record
+                                      [colspan]="headers.length + 1"></tr>
+                                  <tr *ngIf="isLoading" app-table-row-loading></tr> -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination-nav ">
+                        <div class="row">
+                          <div class="col-sm-6">
+                              <div class="tatable__pager-size">
+                                  <div class="select-box">
+                                      <!-- <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
+                                          (change)="selectPageSize(pageSize, dataSearch)" name="pagesize">
+                                          <ng-container
+                                              *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
+                                              <option [ngValue]="item">{{item}} line / screen</option>
+                                          </ng-container>
+                                      </select> -->
+                                      <select class="form-control" id="" aria-label=""
+                                           name="pagesize">
+                                          <ng-container
+                                              >
+                                              <option>3 line / screen</option>
+                                              <option>15 line / screen</option>
+                                              <option>25 line / screen</option>
+                                          </ng-container>
+                                      </select>
+                                  </div>
+                              </div>
+                          </div>
+                          <!-- <div class="col-sm-6" *ngIf="totalItems > pageSize">
+                              <div class="float-right">
+                                  <pagination [boundaryLinks]="true" [totalItems]="totalItems"
+                                      [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
+                                      [(ngModel)]="page">
+                                  </pagination>
+                              </div>
+                          </div> -->
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- <confirm-popup [body]="'Do you want to delete?'" [labelConfirm]="'Yes'">
+    </confirm-popup> -->

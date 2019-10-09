@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
-using eFMS.API.System.DL.Models.Criteria;
-using Microsoft.AspNetCore.Http;
+using eFMS.API.System.Infrastructure.Middlewares;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using SystemManagementAPI.Infrastructure.Middlewares;
-using SystemManagementAPI.Resources;
 
+// For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace eFMS.API.System.Controllers
 {
@@ -31,8 +30,9 @@ namespace eFMS.API.System.Controllers
         public IActionResult Get()
         {
             return Ok(catDepartmentService.Get());
-           
+
         }
 
     }
+
 }

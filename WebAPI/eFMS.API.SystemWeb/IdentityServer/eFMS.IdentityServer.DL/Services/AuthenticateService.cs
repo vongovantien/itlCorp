@@ -35,30 +35,30 @@ namespace eFMS.IdentityServer.DL.Services
 
         public UserViewModel GetUserById(string id)
         {
-            var data = ((eFMSDataContext)DataContext.DC).SysEmployee.Join(((eFMSDataContext)DataContext.DC).SysUser, x => x.Id, y => y.EmployeeId,
-                (x, y) => new { x, y }).FirstOrDefault(x => x.y.Id == id);
-            if (data == null) return null;
+            var user = DataContext.Get(x => x.Id == id).FirstOrDefault();
+            if (user == null) return null;
+            var employee = employeeRepository.Get(x => x.Id == user.EmployeeId).FirstOrDefault();
             var result = new UserViewModel();
-            result.Id = data.y.Id;
-            result.Username = data.y.Username;
-            //result.UserGroupId = data.y.UserGroupId;
-            result.EmployeeId = data.y.EmployeeId;
-            result.WorkPlaceId = data.y.WorkPlaceId;
-            result.RefuseEmail = data.y.RefuseEmail;
-            result.LdapObjectGuid = data.y.LdapObjectGuid;
-            result.DepartmentId = data.x.DepartmentId;
-            result.EmployeeNameVn = data.x.EmployeeNameVn;
-            result.EmployeeNameEn = data.x.EmployeeNameEn;
-            result.Position = data.x.Position;
-            result.Birthday = data.x.Birthday;
-            result.ExtNo = data.x.ExtNo;
-            result.Tel = data.x.Tel;
-            result.HomePhone = data.x.HomePhone;
-            result.HomeAddress = data.x.HomeAddress;
-            result.Email = data.x.Email;
-            result.Photo = data.x.Photo;
-            result.EmpPhotoSize = data.x.EmpPhotoSize;
-            var inActive = (data.y.Inactive == null || data.y.Inactive == true ) ? true : false;
+
+            result.Id = user.Id;
+            result.Username = user.Username;
+            result.EmployeeId = user.EmployeeId;
+            result.WorkPlaceId = user.WorkPlaceId;
+            result.RefuseEmail = user.RefuseEmail;
+            result.LdapObjectGuid = user.LdapObjectGuid;
+            result.DepartmentId = employee?.DepartmentId;
+            result.EmployeeNameVn = employee?.EmployeeNameVn;
+            result.EmployeeNameEn = employee?.EmployeeNameEn;
+            result.Position = employee?.Position;
+            result.Birthday = employee?.Birthday;
+            result.ExtNo = employee?.ExtNo;
+            result.Tel = employee?.Tel;
+            result.HomePhone = employee?.HomePhone;
+            result.HomeAddress = employee?.HomeAddress;
+            result.Email = employee?.Email;
+            result.Photo = employee?.Photo;
+            result.EmpPhotoSize = employee?.EmpPhotoSize;
+            var inActive = (user.Inactive == null || user.Inactive == true ) ? true : false;
             result.InActive = inActive;
             return result;
         }
