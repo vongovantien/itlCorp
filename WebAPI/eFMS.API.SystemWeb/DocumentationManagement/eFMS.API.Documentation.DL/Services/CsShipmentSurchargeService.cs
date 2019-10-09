@@ -193,7 +193,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             //        foreach (var item in listCharges)
             //        {
-            //            var exchangeRate = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == item.ExchangeDate.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == "VND" && x.Inactive == false)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+            //            var exchangeRate = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == item.ExchangeDate.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == "VND" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
             //            item.ExchangeRate = exchangeRate?.Rate;
             //        }
             //        var returnObj = new { houseBill.Hwbno, houseBill.Hbltype, houseBill.Id, listCharges };

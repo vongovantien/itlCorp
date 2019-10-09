@@ -47,7 +47,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string PurchaseOrderNo { get; set; }
         public string ServiceType { get; set; }
         public string ShippingMark { get; set; }
-        public bool? Inactive { get; set; }
+        public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
         public string InWord { get; set; }
         public string OnBoardStatus { get; set; }

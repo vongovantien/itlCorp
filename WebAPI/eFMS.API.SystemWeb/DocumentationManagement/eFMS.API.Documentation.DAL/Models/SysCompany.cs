@@ -3,17 +3,18 @@ using System.Collections.Generic;
 
 namespace eFMS.API.Documentation.Service.Models
 {
-    public partial class SysBu
+    public partial class SysCompany
     {
-        public SysBu()
+        public SysCompany()
         {
-            SysBranch = new HashSet<SysBranch>();
+            SysOffice = new HashSet<SysOffice>();
         }
 
-        public short Id { get; set; }
+        public Guid Id { get; set; }
         public string Code { get; set; }
         public string BunameVn { get; set; }
         public string BunameEn { get; set; }
+        public string BunameAbbr { get; set; }
         public string DescriptionVn { get; set; }
         public string DescriptionEn { get; set; }
         public string AddressVn { get; set; }
@@ -32,6 +33,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string AccountName { get; set; }
         public string BankName { get; set; }
         public string BankAddress { get; set; }
+        public string LogoPath { get; set; }
         public byte[] Logo { get; set; }
         public string Tax { get; set; }
         public string TaxAccount { get; set; }
@@ -39,9 +41,9 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
-        public bool? Inactive { get; set; }
+        public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
 
-        public virtual ICollection<SysBranch> SysBranch { get; set; }
+        public virtual ICollection<SysOffice> SysOffice { get; set; }
     }
 }

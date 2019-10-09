@@ -4,7 +4,7 @@ export class Department {
     deptName: string = '';
     deptNameEn: string = '';
     deptNameAbbr: string = '';
-    office: string = '';
+    officeName: string = '';
     company: string = '';
     status: string = '';
     managerId: string = '';
@@ -12,7 +12,7 @@ export class Department {
     datetimeCreated: string = '';
     userModified: string = '';
     datetimeModified: string = '';
-    inactive: string = '';
+    active: string = '';
     inactiveOn: string = '';   
     constructor(object?: any) {
         const self = this;

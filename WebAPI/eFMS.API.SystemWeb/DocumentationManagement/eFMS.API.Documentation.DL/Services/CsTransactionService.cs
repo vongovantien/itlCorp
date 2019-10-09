@@ -40,7 +40,7 @@ namespace eFMS.API.Documentation.DL.Services
                 transaction.JobNo = GenerateID.GenerateJobID(Constants.SEF_SHIPMENT, countNumberJob);
                 //transaction.UserCreated = "01";
                 transaction.CreatedDate = transaction.ModifiedDate= DateTime.Now;
-                transaction.Inactive = false;
+                transaction.Active = true;
                 transaction.UserModified = transaction.UserCreated;
 
                 var hsTrans = dc.CsTransaction.Add(transaction);
@@ -63,7 +63,7 @@ namespace eFMS.API.Documentation.DL.Services
                         var transDetail = mapper.Map<CsTransactionDetail>(item);
                         transDetail.Id = Guid.NewGuid();
                         transDetail.JobId = transaction.Id;
-                        transDetail.Inactive = false;
+                        transDetail.Active = true;
                         transDetail.UserCreated = transaction.UserModified = transaction.UserCreated;  //ChangeTrackerHelper.currentUser;
                         transDetail.DatetimeCreated = transaction.ModifiedDate = DateTime.Now;
                         dc.CsTransactionDetail.Add(transDetail);
@@ -170,8 +170,8 @@ namespace eFMS.API.Documentation.DL.Services
 
                 foreach (var c in charges)
                 {
-                    var exchangeRate = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == c.ExchangeDate.Value.Date && x.CurrencyFromId == c.CurrencyId && x.CurrencyToId == "VND" && x.Inactive == false)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-                    var UsdToVnd = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == c.ExchangeDate.Value.Date && x.CurrencyFromId == "USD" && x.CurrencyToId == "VND" && x.Inactive == false)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                    var exchangeRate = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == c.ExchangeDate.Value.Date && x.CurrencyFromId == c.CurrencyId && x.CurrencyToId == "VND" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                    var UsdToVnd = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == c.ExchangeDate.Value.Date && x.CurrencyFromId == "USD" && x.CurrencyToId == "VND" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
                     var rate = exchangeRate == null ? 1 : exchangeRate.Rate;
                     var usdToVndRate = UsdToVnd == null ? 1 : UsdToVnd.Rate;
                     if (c.Type.ToLower() == "buy")
@@ -211,7 +211,7 @@ namespace eFMS.API.Documentation.DL.Services
                 //transaction.UserCreated = "01";
                 transaction.CreatedDate = transaction.ModifiedDate = DateTime.Now;
                 transaction.UserModified = model.UserCreated;
-                transaction.Inactive = false;
+                transaction.Active = true;
                 var hsTrans = dc.CsTransaction.Add(transaction);
                 List<CsMawbcontainer> containers = null;
                 if (model.CsMawbcontainers.Count > 0)
@@ -262,7 +262,7 @@ namespace eFMS.API.Documentation.DL.Services
                         item.JobId = transaction.Id;
                         item.Hwbno = GenerateID.GenerateHousebillNo(generatePrefixHouse, countDetail);
                         countDetail = countDetail + 1;
-                        item.Inactive = false;
+                        item.Active = true;
                         item.UserCreated = transaction.UserCreated;  //ChangeTrackerHelper.currentUser;
                         item.DatetimeCreated = DateTime.Now;
                         dc.CsTransactionDetail.Add(item);
@@ -360,7 +360,7 @@ namespace eFMS.API.Documentation.DL.Services
                 x.UserCreated,
                 x.CreatedDate,
                 x.ModifiedDate,
-                x.Inactive,
+                x.Active,
                 x.InactiveOn,
                 x.SupplierName,
                 x.CreatorName,
@@ -401,7 +401,7 @@ namespace eFMS.API.Documentation.DL.Services
                 UserCreated = x.Key.UserCreated,
                 CreatedDate = x.Key.CreatedDate,
                 ModifiedDate = x.Key.ModifiedDate,
-                Inactive = x.Key.Inactive,
+                Active = x.Key.Active,
                 SupplierName = x.Key.SupplierName,
                 CreatorName = x.Key.CreatorName,
                 SumCont = x.Key.SumCont,

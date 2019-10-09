@@ -20,8 +20,8 @@ export class DepartmentComponent extends AppList {
   departments: Department[] = [];
 
   constructor(private _router: Router,
-    private _systemRepo: SystemRepo, 
-    private _progressService: NgProgress,) {
+    private _systemRepo: SystemRepo,
+    private _progressService: NgProgress, ) {
     super();
 
   }
@@ -35,6 +35,10 @@ export class DepartmentComponent extends AppList {
       { title: 'Office', field: 'officeName', sortable: true },
       { title: 'Status', field: 'active', sortable: true },
     ];
+    this.dataSearch = {
+      type: 'All'
+    };
+    this.searchDepartment(this.dataSearch);
   }
 
   showDeletePopup() {
@@ -44,17 +48,18 @@ export class DepartmentComponent extends AppList {
 
   onSearchDepartment(data: any) {
     console.log(data);
+    this.searchDepartment(data);
   }
 
-  searchCompany(dataSearch?: any) {
+  searchDepartment(dataSearch?: any) {
     //this.isLoading = true;
-    this._progressRef.start();
+    //this._progressRef.start();
     this._systemRepo.getDepartment(this.page, this.pageSize, Object.assign({}, dataSearch))
       .pipe(
         catchError(this.catchError),
-        finalize(() => { 
+        finalize(() => {
           //this.isLoading = false; 
-          this._progressRef.complete(); 
+          //this._progressRef.complete(); 
         }),
         map((data: any) => {
           return {
