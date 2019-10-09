@@ -64,7 +64,7 @@ export class StatementOfAccountSearchComponent extends AppPage {
         forkJoin([ // ? forkJoin like Promise.All
             this._catalogueRepo.getListCurrency(),
             this._sysRepo.getListSystemUser(),
-            this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, inactive: false })
+            this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, active: true })
         ]).pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 ([dataCurrency, dataSystemUser, dataPartner]: any) => {

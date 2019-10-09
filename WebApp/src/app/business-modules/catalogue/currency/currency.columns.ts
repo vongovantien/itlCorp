@@ -22,12 +22,12 @@ export const CURRENCYCOLUMNSETTING: ColumnSetting[] = [
         primaryKey: 'isDefault',
         header: 'IsDefault',
         isShow: true,
-        dataType: 'boolean',
+        dataType: 'boolean2', // TODO tạm thời để kiểu này cho table có 2 cột có checkbox (DO BỊ DÍNH THẰNG ACTIVE TRONG COMPONENT INPUT-TABLE-LAYOUT)
         required: true,
         lookup: ''
     },
     {
-        primaryKey: 'inactive',
+        primaryKey: 'active',
         header: 'Inactive',
         isShow: true,
         dataType: 'boolean',

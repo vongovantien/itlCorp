@@ -1,6 +1,6 @@
 // import { moment } from "ngx-bootstrap/chronos/test/chain";
 export class StageModel {
-    
+
     public id: number = -1;
     public code: string = '';
     public stageNameVn: string = '';
@@ -12,7 +12,7 @@ export class StageModel {
     public datetimeCreated: string = '';
     public userModified: string = '';
     public datetimeModified: string = '';
-    public inactive?: boolean = false;
+    public active?: boolean = true;
     public inactiveOn?: string = '';
 
     constructor(data?: any) {
@@ -22,6 +22,6 @@ export class StageModel {
                 self[key] = data[key];
             }
         }
-      }
+    }
 
 }

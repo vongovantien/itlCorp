@@ -53,7 +53,7 @@ export class CsTransaction {
   createdDate: Date = null;
   userModified: String = null;
   modifiedDate: Date = null;
-  inactive: Boolean = null;
+  active: Boolean = true;
   inactiveOn: Date = null;
   packageContainer: String = '';
   desOfGoods: String = '';

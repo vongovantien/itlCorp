@@ -56,7 +56,6 @@ const LIB = [
     declarations: [
         JobManagementComponent,
         JobManagementCreateJobComponent,
-        JobManagementDetailJobComponent,
         JobManagementFormSearchComponent
     ],
     providers: [

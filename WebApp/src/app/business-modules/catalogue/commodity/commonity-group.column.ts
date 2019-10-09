@@ -28,7 +28,7 @@ export const COMMODITYGROUPCOLUMNSETTING: ColumnSetting[] =
       lookup: ''
     },
     {
-      primaryKey: 'inactive',
+      primaryKey: 'active',
       header: 'Inactive',
       isShow: true,
       dataType: 'boolean',
