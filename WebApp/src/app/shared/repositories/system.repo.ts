@@ -13,7 +13,7 @@ export class SystemRepo {
 
     getListOffices(page?: number, size?: number) {
         if (!!page && !!size) {
-            return this._api.post(`${environment.HOST.SystemLocal}/api/${this.VERSION}/en-US/SysOffice/paging`, {}, {
+            return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/paging`, {}, {
                 page: '' + page,
                 size: '' + size
             }).pipe(
@@ -23,7 +23,7 @@ export class SystemRepo {
                 })
             );
         } else {
-            return this._api.get(`${environment.HOST.SystemLocal}/api/${this.VERSION}/en-US/SysOffice/getAll`).pipe(
+            return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/getAll`).pipe(
                 catchError((error) => throwError(error)),
                 map((data: any) => {
                     return data;
