@@ -85,6 +85,18 @@ namespace eFMS.API.System.DL.Services
             }
             return data;
         }
+
+        public CatDepartmentModel GetDepartmentById(int id)
+        {
+            var data = new CatDepartmentModel();
+            var dept = DataContext.Get(x => x.Id == id).FirstOrDefault();
+            if (dept != null)
+            {
+                data = mapper.Map<CatDepartmentModel>(dept);
+            }
+            return data;
+        }
+
     }
 
 }

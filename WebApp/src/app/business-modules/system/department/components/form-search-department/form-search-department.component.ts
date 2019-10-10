@@ -69,14 +69,9 @@ export class DepartmentFormSearchComponent extends AppForm {
     }
 
     reset() {
-        // this.initDataInform();
-        // this.resetFormControl(this.requestDate);
-        // this.resetFormControl(this.modifiedDate);
-        // this.resetFormControl(this.referenceNo);
-        // this.resetFormControl(this.paymentMethod);
-        // this.resetFormControl(this.statusApproval);
-
-        // this.onSearch.emit(<any>{});
+        this.initDataInform();
+        this.resetFormControl(this.searchKey);
+        this.onSearch.emit(<any>{});
     }
 }
 

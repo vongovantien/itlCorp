@@ -12,6 +12,8 @@ namespace eFMS.API.System.DL.IService
         IQueryable<CatDepartmentModel> QueryData(CatDepartmentCriteria criteria);
 
         IQueryable<CatDepartmentModel> Paging(CatDepartmentCriteria criteria, int page, int size, out int rowsCount);
+
+        CatDepartmentModel GetDepartmentById(int id);
     }
 
 }

@@ -40,10 +40,10 @@
                                 [ngClass]="{'m-form__group has-danger': (departmentCode.dirty && !departmentCode.valid) || (isSubmited && !departmentCode.valid)}">
                                 <label class="form-control-label">
                                     Department Code:
-                                    <span class="text-danger">*</span>
+                                    <!-- <span class="text-danger">*</span> -->
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square"
-                                    placeholder="Department code" formControlName="departmentCode">
+                                    placeholder="Department code" formControlName="departmentCode" disabled>
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmited && (departmentCode.errors | equalError: 'required') || (departmentCode.errors | equalError: 'required') && departmentCode.dirty">
                                     Department code is required!
