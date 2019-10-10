@@ -105,7 +105,7 @@ export class DepartmentDetailComponent extends AppPage {
                 deptName: this.nameLocal.value,
                 deptNameEn: this.nameEn.value,
                 deptNameAbbr: this.nameAbbr.value,
-                office: this.office.value.value,
+                officeName: this.office.value.value,
                 company: '',
                 status: this.status.value.value,
                 managerId: '',
@@ -113,7 +113,7 @@ export class DepartmentDetailComponent extends AppPage {
                 datetimeCreated: '',
                 userModified: '',
                 datetimeModified: '',
-                inactive: '',
+                active: true,
                 inactiveOn: ''
             };
             console.log(dept);
@@ -211,8 +211,8 @@ export class DepartmentDetailComponent extends AppPage {
         //         },
         //     );
     }
-   
-    
+
+
     back() {
         this._router.navigate(['home/system/department']);
     }

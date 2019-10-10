@@ -104,7 +104,7 @@ export class DepartmentAddNewComponent extends AppPage {
                 deptName: this.nameLocal.value,
                 deptNameEn: this.nameEn.value,
                 deptNameAbbr: this.nameAbbr.value,
-                office: this.office.value.value,
+                officeName: this.office.value.value,
                 company: '',
                 status: this.status.value.value,
                 managerId: '',
@@ -112,7 +112,7 @@ export class DepartmentAddNewComponent extends AppPage {
                 datetimeCreated: '',
                 userModified: '',
                 datetimeModified: '',
-                inactive: '',
+                active: true,
                 inactiveOn: ''
             };
             console.log(dept);
