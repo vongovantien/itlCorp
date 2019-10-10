@@ -20,6 +20,26 @@ export class SystemRepo {
         );
     }
 
+    deleteOffice(id: string) {
+        return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/Delete`, { id: id })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    getDetailOffice(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateOffice(body: any = {}) {
+        return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/Update`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+
     addNewOffice(body: any) {
         return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/Add`, body).pipe(
             map((data: any) => data)

@@ -33,8 +33,8 @@ export class OfficeAddNewComponent extends AppPage {
     debugger;
     this._progressRef.start();
     const body: IOfficeAdd = {
-      branchNameVn: this.formAdd.branchNameVn.value,
       branchNameEn: this.formAdd.branchNameEn.value,
+      branchNameVn: this.formAdd.branchNameVn.value,
       buid: this.formAdd.company.value,
       addressVn: this.formAdd.addressVn.value,
       addressEn: this.formAdd.addressEn.value,
@@ -49,7 +49,7 @@ export class OfficeAddNewComponent extends AppPage {
       code: this.formAdd.code.value,
       swiftCode: this.formAdd.swiftCode.value,
       shortName: this.formAdd.shortName.value,
-      active: this.formAdd.active.value
+      active: this.formAdd.active.value.value
 
     };
     this._systemRepo.addNewOffice(body)

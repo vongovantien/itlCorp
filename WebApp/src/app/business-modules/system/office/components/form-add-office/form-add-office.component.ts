@@ -33,7 +33,7 @@ export class OfficeFormAddComponent extends AppForm {
     active: AbstractControl;
     bankName: AbstractControl;
 
-    types: CommonInterface.ICommonTitleValue[] = [
+    status: CommonInterface.ICommonTitleValue[] = [
         { title: 'Active', value: true },
         { title: 'Inactive', value: false },
     ];
@@ -86,7 +86,7 @@ export class OfficeFormAddComponent extends AppForm {
             swiftCode: [],
             bankAddress: [],
             bankName: [],
-            active: [this.types[0]],
+            active: [this.status[0]],
         });
 
         this.code = this.formGroup.controls['code'];
@@ -104,7 +104,8 @@ export class OfficeFormAddComponent extends AppForm {
         this.active = this.formGroup.controls['active'];
         this.bankName = this.formGroup.controls['bankName'];
         this.addressVn = this.formGroup.controls['addressVn'];
-
+        this.bankAccountVND = this.formGroup.controls['bankAccountVND'];
+        this.branchNameVn = this.formGroup.controls['branchNameVn'];
 
     }
 }
@@ -119,8 +120,8 @@ export interface IFormAddOffice {
     fax: string;
     email: string;
     taxcode: string;
-    bankAccountVnd: string;
-    bankAccountUsd: string;
+    bankAccountVND: string;
+    bankAccountUSD: string;
     bankName: string;
     bankAddress: string;
     code: string;

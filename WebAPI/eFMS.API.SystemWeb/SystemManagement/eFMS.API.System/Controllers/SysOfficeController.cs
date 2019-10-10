@@ -22,12 +22,12 @@ namespace eFMS.API.System.Controllers
     public class SysOfficeController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly ISysOfficeService sysBranchService;
+        private readonly ISysOfficeService sysOfficeService;
         private readonly IMapper mapper;
         public SysOfficeController(IStringLocalizer<LanguageSub> localizer, ISysOfficeService service, IMapper iMapper)
         {
             stringLocalizer = localizer;
-            sysBranchService = service;
+            sysOfficeService = service;
             mapper = iMapper;
         }
 
@@ -38,7 +38,7 @@ namespace eFMS.API.System.Controllers
         [HttpGet("GetAll")]
         public IActionResult GetAll()
         {
-            var results = sysBranchService.GetOffices();
+            var results = sysOfficeService.GetOffices();
             return Ok(results);
         }
         /// <summary>
@@ -52,7 +52,7 @@ namespace eFMS.API.System.Controllers
         [Route("Paging")]
         public IActionResult Paging(SysOfficeCriteria criteria, int page, int size)
         {
-            var data = sysBranchService.Paging(criteria, page, size, out int rowCount);
+            var data = sysOfficeService.Paging(criteria, page, size, out int rowCount);
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
         }
@@ -64,7 +64,7 @@ namespace eFMS.API.System.Controllers
         [Route("Query")]
         public IActionResult Get(SysOfficeCriteria criteria)
         {
-            var results = sysBranchService.Query(criteria);
+            var results = sysOfficeService.Query(criteria);
             return Ok(results);
         }
 
@@ -73,11 +73,12 @@ namespace eFMS.API.System.Controllers
         /// </summary>
         /// <param name="id">id of data that need to delete</param>
         /// <returns></returns>
-        [HttpDelete("{id}")]
-        [Authorize]
+        [HttpDelete]
+        [Route("Delete")]
+        //[Authorize]
         public IActionResult Delete(Guid id)
         {
-            var hs = sysBranchService.DeleteOffice(id);
+            var hs = sysOfficeService.DeleteOffice(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -93,7 +94,9 @@ namespace eFMS.API.System.Controllers
         /// <param name="id">id of data that need to update</param>
         /// <param name="model">object to update</param>
         /// <returns></returns>
-        [HttpPut("{id}")]
+        [HttpPut]
+        [Route("Update")]
+
         //[Authorize]
         public IActionResult Put(Guid id, SysOfficeEditModel model)
         {
@@ -106,7 +109,7 @@ namespace eFMS.API.System.Controllers
             }
             var branch = mapper.Map<SysOfficeModel>(model);
             branch.Id = id;
-            var hs = sysBranchService.UpdateOffice(branch);
+            var hs = sysOfficeService.UpdateOffice(branch);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -133,7 +136,7 @@ namespace eFMS.API.System.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var branch = mapper.Map<SysOfficeModel>(model);
-            var hs = sysBranchService.Add(branch);
+            var hs = sysOfficeService.Add(branch);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -142,20 +145,39 @@ namespace eFMS.API.System.Controllers
             }
             return Ok(result);
         }
+        /// <summary>
+        /// get office by id
+        /// </summary>
+        /// <param name="id">id of data that need to retrieve</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("{id}")]
+        public IActionResult GetBy(Guid id)
+        {
+            var result = sysOfficeService.First(x => x.Id == id);
+            if (result == null)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = "Error", Data = result });
+            }
+            else
+            {
+                return Ok(new ResultHandle { Status = true, Message = "Success", Data = result });
+            }
+        }
 
         private string CheckExist(Guid id, SysOfficeEditModel model)
         {
             string message = string.Empty;
             if (id == Guid.Empty)
             {
-                if (sysBranchService.Any(x => x.BranchNameEn == model.BranchNameEn || x.BranchNameVn == model.BranchNameVn || x.ShortName == model.ShortName))
+                if (sysOfficeService.Any(x => x.BranchNameEn == model.BranchNameEn  || x.ShortName == model.ShortName))
                 {
                     message = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
                 }
             }
             else
             {
-                if (sysBranchService.Any(x => (x.BranchNameEn == model.BranchNameEn || x.BranchNameVn == model.BranchNameVn) && x.Id != id))
+                if (sysOfficeService.Any(x => (x.BranchNameEn == model.BranchNameEn || x.BranchNameVn == model.BranchNameVn) && x.Id != id))
                 {
                     message = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
                 }

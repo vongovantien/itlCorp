@@ -1,183 +1,182 @@
 <div class="m-content form-add-office">
     <form [formGroup]="formGroup">
-        <div class="m-form m-form--state">
-            <div class="m-portlet">
-                <div class="m-portlet__body">
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Office Code <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" class="form-control" formControlName="code"
-                                    placeholder="Please Enter Office Code">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Name EN <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" formControlName="branchNameEn" class="form-control"
-                                    placeholder="Please Enter Name EN">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Name Local <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" formControlName="branchNameVn" class="form-control"
-                                    placeholder="Please Enter Name Local">
-                            </div>
+        <div class="m-portlet">
+            <div class="m-portlet__body">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Office Code <span class="m--font-danger">(*)</span>
+                            </label>
+                            <input type="text" class="form-control" formControlName="code"
+                                placeholder="Please Enter Office Code">
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Name Abbr <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" formControlName="shortName" class="form-control"
-                                    placeholder="Please Enter Name Abbr">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Address EN <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" formControlName="addressEn" class="form-control"
-                                    placeholder="Please Enter Address EN">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Address Local <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" formControlName="addressVn" class="form-control"
-                                    placeholder="Please Enter Address Local">
-                            </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Name EN <span class="m--font-danger">(*)</span>
+                            </label>
+                            <input type="text" formControlName="branchNameEn" class="form-control"
+                                placeholder="Please Enter Name EN">
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Tax Code <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" formControlName="taxcode"
-                                    class="form-control m-input m-input--square" placeholder="Please Enter Tax Code">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Work Phone <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" formControlName="tel" class="form-control"
-                                    placeholder="Please Enter Work Phone">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Email <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" formControlName="email" class="form-control"
-                                    placeholder="Please Enter Email">
-                            </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Name Local <span class="m--font-danger">(*)</span>
+                            </label>
+                            <input type="text" formControlName="branchNameVn" class="form-control"
+                                placeholder="Please Enter Name Local">
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Fax <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" formControlName="fax" class="form-control"
-                                    placeholder="Please Enter Fax">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label">
-                                    Company <span class="m--font-danger">(*)</span>
-                                </label>
-                                <select formControlName="company" class="form-control">
-                                    <option *ngFor="let company of companies" [ngValue]="company.id">{{company.code}}
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Bank Account No <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" formControlName="bankAccountVND" class="form-control"
-                                    placeholder="Please Enter Bank Account No">
-                            </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Name Abbr <span class="m--font-danger">(*)</span>
+                            </label>
+                            <input type="text" formControlName="shortName" class="form-control"
+                                placeholder="Please Enter Name Abbr">
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label">
-                                    Bank Account Name <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" formControlName="bankAccountName" class="form-control"
-                                    placeholder="Please Enter Bank Account Name">
-                            </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Address EN <span class="m--font-danger">(*)</span>
+                            </label>
+                            <input type="text" formControlName="addressEn" class="form-control"
+                                placeholder="Please Enter Address EN">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Address Local <span class="m--font-danger">(*)</span>
+                            </label>
+                            <input type="text" formControlName="addressVn" class="form-control"
+                                placeholder="Please Enter Address Local">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Tax Code <span class="m--font-danger">(*)</span>
+                            </label>
+                            <input type="text" formControlName="taxcode" class="form-control m-input m-input--square"
+                                placeholder="Please Enter Tax Code">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Work Phone <span class="m--font-danger">(*)</span>
+                            </label>
+                            <input type="text" formControlName="tel" class="form-control"
+                                placeholder="Please Enter Work Phone">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Email <span class="m--font-danger">(*)</span>
+                            </label>
+                            <input type="text" formControlName="email" class="form-control"
+                                placeholder="Please Enter Email">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Fax <span class="m--font-danger">(*)</span>
+                            </label>
+                            <input type="text" formControlName="fax" class="form-control"
+                                placeholder="Please Enter Fax">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label">
+                                Company <span class="m--font-danger">(*)</span>
+                            </label>
+                            <select formControlName="company" class="form-control">
+                                <option *ngFor="let company of companies" [ngValue]="company.id">{{company.code}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Bank Account No <span class="m--font-danger">(*)</span>
+                            </label>
+                            <input type="text" formControlName="bankAccountVND" class="form-control"
+                                placeholder="Please Enter Bank Account No">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label">
+                                Bank Account Name <span class="m--font-danger">(*)</span>
+                            </label>
+                            <input type="text" formControlName="bankAccountName" class="form-control"
+                                placeholder="Please Enter Bank Account Name">
+                        </div>
 
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Swift Code <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" formControlName="swiftCode" class="form-control"
-                                    placeholder="Please Enter Bank Swift Code">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Bank Address <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" formControlName="bankAddress" class="form-control"
-                                    placeholder="Please Enter Bank Address">
-                            </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Swift Code <span class="m--font-danger">(*)</span>
+                            </label>
+                            <input type="text" formControlName="swiftCode" class="form-control"
+                                placeholder="Please Enter Bank Swift Code">
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label">
-                                    Bank Name <span class="m--font-danger">(*)</span>
-                                </label>
-                                <input type="text" formControlName="bankName" class="form-control"
-                                    placeholder="Please Enter Bank Name">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label">
-                                    Status <span class="m--font-danger">(*)</span>
-                                </label>
-                                <select formControlName="active" class="form-control">
-                                    <option *ngFor="let type of types" [ngValue]="type">{{type.title}}</option>
-                                </select>
-                            </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Bank Address <span class="m--font-danger">(*)</span>
+                            </label>
+                            <input type="text" formControlName="bankAddress" class="form-control"
+                                placeholder="Please Enter Bank Address">
                         </div>
                     </div>
-
-
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label">
+                                Bank Name <span class="m--font-danger">(*)</span>
+                            </label>
+                            <input type="text" formControlName="bankName" class="form-control"
+                                placeholder="Please Enter Bank Name">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label">
+                                Status <span class="m--font-danger">(*)</span>
+                            </label>
+                            <select formControlName="active" class="form-control">
+                                <option *ngFor="let status of status" [ngValue]="status">{{status.title}}</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
 
             </div>
+
+
         </div>
+
     </form>
 </div>

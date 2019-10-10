@@ -22,7 +22,9 @@ namespace eFMS.API.System.DL.ViewModels
         public string BankAccountUsd { get; set; }
         public string BankName { get; set; }
         public string BankAddress { get; set; }
-        public bool Inactive { get; set; }
+        public string BankAccountName { get; set; }
+
+        public bool Active { get; set; }
         public DateTime? InactiveOn { get; set; }
         public byte[] Logo { get; set; }
         public string Code { get; set; }
@@ -31,5 +33,9 @@ namespace eFMS.API.System.DL.ViewModels
         public string SwiftCode { get; set; }
         public string ShortName { get; set; }
         public string CompanyName { get; set; }
+        public string UserModified { get; set; }
+
+
+        public DateTime? DatetimeModified { get; set; }
     }
 }

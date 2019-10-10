@@ -9,15 +9,18 @@ import { Office } from 'src/app/shared/models/system/office';
 import { map } from 'rxjs/internal/operators/map';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { ToastrService } from 'ngx-toastr';
+
 @Component({
     selector: 'app-office',
     templateUrl: './office.component.html'
 })
-export class OfficeComponent extends AppList implements OnInit {
+export class OfficeComponent extends AppList {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     headers: CommonInterface.IHeaderTable[];
     offices: Office[] = [];
     criteria: any = {};
+    selectedOffice: Office;
     importButtonSetting: ButtonModalSetting = {
         typeButton: ButtonType.import
     };
@@ -38,11 +41,11 @@ export class OfficeComponent extends AppList implements OnInit {
     constructor(
         private _systemRepo: SystemRepo,
         private _progressService: NgProgress,
+        private _toastService: ToastrService
 
     ) {
         super();
         this._progressRef = this._progressService.ref();
-
         this.requestList = this.searchOffice;
     }
 
@@ -64,7 +67,7 @@ export class OfficeComponent extends AppList implements OnInit {
             type: 'All'
         };
         this.criteria.all = null;
-        this.searchOffice(this.criteria);
+        this.searchOffice();
 
     }
 
@@ -98,11 +101,11 @@ export class OfficeComponent extends AppList implements OnInit {
         }
 
 
-        this.searchOffice(this.criteria);
+        this.searchOffice();
 
     }
 
-    searchOffice(dataSearch?: any) {
+    searchOffice() {
         this.isLoading = true;
         this._progressRef.start();
         this._systemRepo.getOffice(this.page, this.pageSize, Object.assign({}, this.criteria))
@@ -133,8 +136,33 @@ export class OfficeComponent extends AppList implements OnInit {
             );
     }
 
-    showDeletePopup() {
+    showDeletePopup(office: Office) {
         this.confirmDeletePopup.show();
+        this.selectedOffice = office;
+    }
+
+    onDeleteOffice() {
+        this.confirmDeletePopup.hide();
+        this.deleteOffice(this.selectedOffice.id);
+    }
+
+    deleteOffice(id: string) {
+        this.isLoading = true;
+        this._progressRef.start();
+        this._systemRepo.deleteOffice(id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message, '');
+                        this.searchOffice();
+                    } else {
+                        this._toastService.error(res.message || 'Có lỗi xảy ra', '');
+                    }
+                },
+            );
     }
 
 

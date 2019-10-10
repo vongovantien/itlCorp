@@ -50,8 +50,8 @@
                                 <td>{{office.addressVn}}</td>
                                 <td>{{office.taxcode}}</td>
                                 <td>{{office.companyName}}</td>
-                                <td [ngClass]="office.active ? 'text-danger' : 'text-success'">
-                                    {{office.active ? 'Inactive' : 'Active'}}</td>
+                                <td [ngClass]="office.active ? 'text-success' : 'text-danger'">
+                                    {{office.active ? 'Active' : 'InActive'}}</td>
                             </tr>
                         </ng-container>
                         <tr *ngIf="!isLoading && !offices.length" app-table-none-record [colspan]="headers.length + 1">
@@ -87,3 +87,5 @@
         </div>
     </div>
 </div>
+<confirm-popup [body]="'Do you want to delete this office ?'" [labelCancel]="'No'" (onSubmit)="onDeleteOffice()">
+</confirm-popup>

@@ -33,13 +33,15 @@ namespace eFMS.API.System.DL.Services
 
         public HandleState AddOffice(SysOfficeModel SysOffice)
         {
+            SysOffice.UserCreated = "admin";
+            SysOffice.DatetimeCreated = DateTime.Now;
             return DataContext.Add(SysOffice);
         }
 
         public IQueryable<SysOffice> GetOffices()
         {
-            //var lstSysOffice = RedisCacheHelper.GetObject<List<SysOffice>>(cache, Templates.SysOffice.NameCaching.ListName);
-            var lstSysOffice = new List<SysOffice>();
+            //var lstSysOffice = RedisCacheHelper.GetObject<List<SysOffice>>(cache, Templates.SysBranch.NameCaching.ListName);
+            var lstSysOffice = new List<SysOffice>(); 
             IQueryable<SysOffice> data = null;
             if (lstSysOffice != null)
             {
@@ -122,7 +124,10 @@ namespace eFMS.API.System.DL.Services
 
         public HandleState UpdateOffice(SysOfficeModel model)
         {
+
             var entity = mapper.Map<SysOffice>(model);
+            entity.UserModified = "admin";
+            entity.DatetimeModified = DateTime.Now;
             if (entity.Active == true)
             {
                 entity.InactiveOn = DateTime.Now;

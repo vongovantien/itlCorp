@@ -30,7 +30,7 @@ const routing: Routes = [
         SelectModule,
         FormsModule,
         NgProgressModule,
-        PaginationModule,
+        PaginationModule.forRoot(),
         TabsModule,
         ReactiveFormsModule,
         RouterModule.forChild(routing)
