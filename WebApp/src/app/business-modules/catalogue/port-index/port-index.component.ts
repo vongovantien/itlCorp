@@ -100,6 +100,8 @@ export class PortIndexComponent implements OnInit {
       this.portIndexs = [];
       this.pager.totalItems = 0;
     }
+
+    console.log(this.portIndexs);
   }
   onSearch(event) {
     this.criteria = {

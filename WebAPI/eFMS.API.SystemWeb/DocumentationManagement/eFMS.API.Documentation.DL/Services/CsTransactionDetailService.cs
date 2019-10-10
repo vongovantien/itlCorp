@@ -30,7 +30,7 @@ namespace eFMS.API.Documentation.DL.Services
             detail.Id = Guid.NewGuid();
             detail.UserModified = detail.UserCreated;
             detail.DatetimeModified = detail.DatetimeCreated = DateTime.Now;
-            detail.Inactive = false;           
+            detail.Active = true;           
             try
             {
                 var hs = DataContext.Add(detail, false);
@@ -322,7 +322,7 @@ namespace eFMS.API.Documentation.DL.Services
                 detail.Id = Guid.NewGuid();
                 //int countDetail = dc.CsTransactionDetail.Count(x => x.JobId == model.JobId);
                 //detail.Hwbno = "SEF" + GenerateID.GenerateJobID("HB", countDetail);
-                detail.Inactive = false;
+                detail.Active = true;
                 detail.UserCreated = model.UserCreated;  //ChangeTrackerHelper.currentUser;
                 detail.DatetimeCreated = DateTime.Now;
                 detail.DesOfGoods = null;

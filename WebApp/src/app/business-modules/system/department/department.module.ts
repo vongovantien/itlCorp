@@ -20,7 +20,7 @@ const routing: Routes = [
         data: { name: "New", path: "New", level: 3 }
     },
     {
-        path: "detail", component: DepartmentDetailComponent,
+        path: ":id", component: DepartmentDetailComponent,
         data: { name: "Detail", path: "Detail", level: 3 }
     },
 ]
@@ -30,7 +30,7 @@ const routing: Routes = [
         SharedModule,
         SelectModule,
         FormsModule,
-        PaginationModule,
+        PaginationModule.forRoot(),
         ReactiveFormsModule,
         RouterModule.forChild(routing)
     ],

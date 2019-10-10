@@ -10,7 +10,6 @@ import { catchError, finalize, map } from 'rxjs/operators';
 @Component({
   selector: 'app-department',
   templateUrl: './department.component.html',
-  styleUrls: ['./department.component.sass']
 })
 export class DepartmentComponent extends AppList {
   @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
@@ -20,10 +19,11 @@ export class DepartmentComponent extends AppList {
   departments: Department[] = [];
 
   constructor(private _router: Router,
-    private _systemRepo: SystemRepo, 
-    private _progressService: NgProgress,) {
+    private _systemRepo: SystemRepo,
+    private _progressService: NgProgress, ) {
     super();
-
+    this.requestList = this.searchDepartment;
+    this._progressRef = this._progressService.ref();
   }
 
   ngOnInit() {
@@ -35,24 +35,29 @@ export class DepartmentComponent extends AppList {
       { title: 'Office', field: 'officeName', sortable: true },
       { title: 'Status', field: 'active', sortable: true },
     ];
+    this.dataSearch = {
+      type: 'All'
+    };
+    this.searchDepartment(this.dataSearch);
   }
 
   showDeletePopup() {
-    //this.selectedSettlement = settlement;
     this.confirmDeletePopup.show();
   }
 
   onSearchDepartment(data: any) {
     console.log(data);
+    this.page = 1; // reset page.
+    this.searchDepartment(data);
   }
 
-  searchCompany(dataSearch?: any) {
+  searchDepartment(dataSearch?: any) {
     //this.isLoading = true;
     this._progressRef.start();
     this._systemRepo.getDepartment(this.page, this.pageSize, Object.assign({}, dataSearch))
       .pipe(
         catchError(this.catchError),
-        finalize(() => { 
+        finalize(() => {
           //this.isLoading = false; 
           this._progressRef.complete(); 
         }),
@@ -71,8 +76,9 @@ export class DepartmentComponent extends AppList {
       );
   }
 
-  gotoDetailDepartment() {
-    this._router.navigate([`home/system/department/detail`]);
+  gotoDetailDepartment(id: number) {
+    console.log(id)
+    this._router.navigate([`home/system/department/${id}`]);//([`${id}`])//
   }
 
 }

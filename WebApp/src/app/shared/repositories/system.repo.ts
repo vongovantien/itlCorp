@@ -94,5 +94,11 @@ export class SystemRepo {
         );
     }
 
+    getDetailDepartment(id: number) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }
 

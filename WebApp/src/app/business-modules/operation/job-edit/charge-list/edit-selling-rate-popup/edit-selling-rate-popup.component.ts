@@ -134,7 +134,7 @@ export class EditSellingRatePopupComponent extends PopupBase implements OnInit, 
     // }
 
     getCurrencies() {
-        this.baseServices.post(this.api_menu.Catalogue.Currency.getAllByQuery, { inactive: false }).subscribe((res: any) => {
+        this.baseServices.post(this.api_menu.Catalogue.Currency.getAllByQuery, { active: true }).subscribe((res: any) => {
             this.lstCurrencies = prepareNg2SelectData(res, "id", "id");
         });
     }

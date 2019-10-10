@@ -4,15 +4,14 @@ export class Department {
     deptName: string = '';
     deptNameEn: string = '';
     deptNameAbbr: string = '';
-    office: string = '';
-    company: string = '';
-    status: string = '';
+    officeName: string = '';
+    companyName: string = '';
     managerId: string = '';
     userCreated: string = '';
     datetimeCreated: string = '';
     userModified: string = '';
     datetimeModified: string = '';
-    inactive: string = '';
+    active: boolean = true;
     inactiveOn: string = '';   
     constructor(object?: any) {
         const self = this;

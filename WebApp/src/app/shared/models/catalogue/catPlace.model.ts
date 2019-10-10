@@ -1,4 +1,4 @@
-export class CatPlaceModel{
+export class CatPlaceModel {
     code: string;
     nameVn: string;
     nameEn: string;
@@ -18,6 +18,6 @@ export class CatPlaceModel{
     datetimeCreated: Date;
     userModified: string;
     datetimeModified: Date;
-    inactive: boolean;
+    active: boolean;
     inactiveOn: Date;
 }

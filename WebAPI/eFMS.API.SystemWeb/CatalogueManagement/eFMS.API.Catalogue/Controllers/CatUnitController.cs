@@ -9,6 +9,7 @@ using eFMS.API.Common.Globals;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using System.Linq;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -93,7 +94,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            var data = catUnitService.First(x => x.Id == id);
+            var data = catUnitService.Get(x => x.Id == id).FirstOrDefault();
             return Ok(data);
         }
 

@@ -15,7 +15,7 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
-        public bool? Inactive { get; set; }
+        public bool? Active { get; set; }
         public string ActiveBy { get; set; }
         public DateTime? ActiveOn { get; set; }
         public decimal? CreditAmount { get; set; }

@@ -10,6 +10,6 @@ export class CatChargeDefaultAccount {
     datetimeCreated: Date;
     userModified: string;
     datetimeModified: DataCue;
-    inactive: boolean;
+    active: boolean;
     inactiveOn: Date;
 } 

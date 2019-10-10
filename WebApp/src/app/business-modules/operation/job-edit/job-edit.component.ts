@@ -147,7 +147,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
     }
     getPartners() {
-        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, inactive: false })
+        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, active: true })
             .subscribe((res: any) => {
                 console.log('this is partners');
                 // this.lstPartners = res;
@@ -268,7 +268,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     getWarehouses() {
-        this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Warehouse, inactive: false }).subscribe((res: any) => {
+        this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Warehouse, active: true }).subscribe((res: any) => {
             this.warehouses = res;
             this._data.setDataService(SystemConstants.CSTORAGE.WAREHOUSE, this.warehouses);
         });
@@ -338,7 +338,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     getPorts() {
-        this._catalogueRepo.getListPort({ placeType: PlaceTypeEnum.Port, inactive: false })
+        this._catalogueRepo.getListPort({ placeType: PlaceTypeEnum.Port, active: true })
             .subscribe((res: any) => {
                 this.ports = res;
                 this._data.setDataService(SystemConstants.CSTORAGE.PORT, this.ports);
@@ -385,7 +385,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     public getListBuyingRateCharges() {
-        this._catalogueRepo.getCharges({ inactive: false, type: 'CREDIT', serviceTypeId: ChargeConstants.CL_CODE })
+        this._catalogueRepo.getCharges({ active: true, type: 'CREDIT', serviceTypeId: ChargeConstants.CL_CODE })
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
@@ -398,11 +398,11 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     public getListSellingRateCharges() {
-        // this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { inactive: false, type: 'DEBIT', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
+        // this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { active: true, type: 'DEBIT', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
         //     this.lstSellingRateChargesComboBox = res['data'];
         //     this._data.setDataService('sellingCharges', this.lstSellingRateChargesComboBox);
         // });
-        this._catalogueRepo.getCharges({ inactive: false, type: 'DEBIT', serviceTypeId: ChargeConstants.CL_CODE })
+        this._catalogueRepo.getCharges({ active: true, type: 'DEBIT', serviceTypeId: ChargeConstants.CL_CODE })
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
@@ -415,11 +415,11 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     public getListOBHCharges() {
-        // this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { inactive: false, type: 'OBH', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
+        // this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { active: true, type: 'OBH', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
         //     this.lstOBHChargesComboBox = res['data'];
         //     this._data.setDataService('obhCharges', this.lstOBHChargesComboBox);
         // });
-        this._catalogueRepo.getCharges({ inactive: false, type: 'OBH', serviceTypeId: ChargeConstants.CL_CODE })
+        this._catalogueRepo.getCharges({ active: true, type: 'OBH', serviceTypeId: ChargeConstants.CL_CODE })
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
