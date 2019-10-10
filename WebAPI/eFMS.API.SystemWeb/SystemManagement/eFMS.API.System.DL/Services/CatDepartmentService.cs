@@ -1,10 +1,14 @@
 ﻿using AutoMapper;
+using eFMS.API.Common.NoSql;
+using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.Service.Models;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +18,15 @@ namespace eFMS.API.System.DL.Services
 {
     public class CatDepartmentService : RepositoryBase<CatDepartment, CatDepartmentModel>, ICatDepartmentService
     {
-        public CatDepartmentService(IContextBase<CatDepartment> repository, IMapper mapper) : base(repository, mapper)
+        private readonly IContextBase<SysCompany> sysCompanyRepo;
+        private readonly IContextBase<SysOffice> sysOfficeRepo;
+        private readonly IStringLocalizer stringLocalizer;
+        public CatDepartmentService(IStringLocalizer<LanguageSub> localizer, IContextBase<CatDepartment> repository, IMapper mapper, IContextBase<SysOffice> sysOffice, IContextBase<SysCompany> sysCompany) : base(repository, mapper)
         {
-
+            stringLocalizer = localizer;
+            sysOfficeRepo = sysOffice;
+            sysCompanyRepo = sysCompany;
+            //SetChildren<CatDepartment>("","","Used",false);
         }
 
         public IQueryable<CatDepartmentModel> QueryData(CatDepartmentCriteria criteria)
@@ -49,24 +59,27 @@ namespace eFMS.API.System.DL.Services
                     );
                 }
             }
-            var result = query.Select(x => new CatDepartmentModel
-            {
-                Id = x.Id,
-                Code = x.Code,
-                DeptName = x.DeptName,
-                DeptNameEn = x.DeptNameEn,
-                DeptNameAbbr = x.DeptNameAbbr,
-                Description = x.Description,
-                BranchId = x.BranchId,
-                OfficeName = "",
-                ManagerId = x.ManagerId,
-                UserCreated = x.UserCreated,
-                DatetimeCreated = x.DatetimeCreated,
-                UserModified = x.UserModified,
-                DatetimeModified = x.DatetimeModified,
-                Active = x.Active,
-                InactiveOn = x.InactiveOn
-            });
+            var result = from d in query
+                         join off in sysOfficeRepo.Get() on d.BranchId equals off.Id into off2
+                         from off in off2.DefaultIfEmpty()
+                         select new CatDepartmentModel
+                         {
+                             Id = d.Id,
+                             Code = d.Code,
+                             DeptName = d.DeptName,
+                             DeptNameEn = d.DeptNameEn,
+                             DeptNameAbbr = d.DeptNameAbbr,
+                             Description = d.Description,
+                             BranchId = d.BranchId,
+                             OfficeName = off.BranchNameEn,
+                             ManagerId = d.ManagerId,
+                             UserCreated = d.UserCreated,
+                             DatetimeCreated = d.DatetimeCreated,
+                             UserModified = d.UserModified,
+                             DatetimeModified = d.DatetimeModified,
+                             Active = d.Active,
+                             InactiveOn = d.InactiveOn
+                         };
             result = result.OrderByDescending(x => x.DatetimeModified);
             return result;
         }
@@ -92,11 +105,88 @@ namespace eFMS.API.System.DL.Services
             var dept = DataContext.Get(x => x.Id == id).FirstOrDefault();
             if (dept != null)
             {
+                var off = sysOfficeRepo.Get(x => x.Id == dept.BranchId).FirstOrDefault();
+                var com = sysCompanyRepo.Get(x => off != null && x.Id == off.Buid).FirstOrDefault();
                 data = mapper.Map<CatDepartmentModel>(dept);
+                data.OfficeName = off != null ? off.BranchNameEn : "";
+                data.CompanyName = com != null ? com.BunameEn : "";
             }
             return data;
         }
 
+        public HandleState Insert(CatDepartmentModel model)
+        {
+            try
+            {
+                var userCurrent = "admin";
+                var today = DateTime.Now;
+                var modelAdd = mapper.Map<CatDepartment>(model);
+                var deptCurrent = DataContext.Get(x => x.Code == model.Code).FirstOrDefault();
+                if(deptCurrent != null)
+                {
+                    return new HandleState("Code has already existed");
+                }
+                modelAdd.UserCreated = modelAdd.UserModified = userCurrent;
+                modelAdd.DatetimeCreated = modelAdd.DatetimeModified = today;
+                if (modelAdd.Active == false)
+                {
+                    modelAdd.InactiveOn = today;
+                }
+                var hs = DataContext.Add(modelAdd);
+
+                if (hs.Success)
+                {
+                    model.Id = DataContext.Get(x => x.Code == model.Code).Any() ? DataContext.Get(x => x.Code == model.Code).FirstOrDefault().Id : 0;
+                }
+                return hs;
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
+
+        public HandleState Update(CatDepartmentModel model)
+        {
+            try
+            {
+                var userCurrent = "admin";
+                var today = DateTime.Now;
+                var modelUpdate = mapper.Map<CatDepartment>(model);
+                var deptCurrent = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+                modelUpdate.UserCreated = deptCurrent.UserCreated;
+                modelUpdate.DatetimeCreated = deptCurrent.DatetimeCreated;
+                modelUpdate.Code = deptCurrent.Code;
+                modelUpdate.Description = deptCurrent.Description;
+                modelUpdate.ManagerId = deptCurrent.ManagerId;
+                modelUpdate.UserModified = userCurrent;
+                modelUpdate.DatetimeModified = today;
+                if (modelUpdate.Active == false)
+                {
+                    modelUpdate.InactiveOn = today;
+                }
+                var hs = DataContext.Update(modelUpdate, x => x.Id == model.Id);
+                return hs;
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
+
+        public HandleState Delete(int id)
+        {
+            try
+            {
+                ChangeTrackerHelper.currentUser = "admin";
+                var hs = DataContext.Delete(x => x.Id == id);
+                return hs;
+            }
+            catch(Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
     }
 
 }
