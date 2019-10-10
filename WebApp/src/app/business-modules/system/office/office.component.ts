@@ -10,6 +10,7 @@ import { map } from 'rxjs/internal/operators/map';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ToastrService } from 'ngx-toastr';
+import { SortService } from 'src/app/shared/services';
 
 @Component({
     selector: 'app-office',
@@ -41,14 +42,20 @@ export class OfficeComponent extends AppList {
     constructor(
         private _systemRepo: SystemRepo,
         private _progressService: NgProgress,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _sortService: SortService,
+
 
     ) {
         super();
         this._progressRef = this._progressService.ref();
         this.requestList = this.searchOffice;
+        this.requestSort = this.sortLocal;
     }
 
+    sortLocal(sort: string): void {
+        this.offices = this._sortService.sort(this.offices, sort, this.order);
+    }
 
     ngOnInit() {
         this.headers = [

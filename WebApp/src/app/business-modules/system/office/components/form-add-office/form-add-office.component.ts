@@ -1,18 +1,27 @@
 import { Component, ViewChild } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
-import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
+import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { Company } from 'src/app/shared/models';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { finalize } from 'rxjs/internal/operators/finalize';
 import { map } from 'rxjs/internal/operators/map';
 
+
 @Component({
     selector: 'form-add-office',
     templateUrl: './form-add-office.component.html'
 })
 export class OfficeFormAddComponent extends AppForm {
-
+    selectedDataOffice: any;
+    isSubmited: boolean = false;
+    configOffice: CommonInterface.IComboGirdConfig = {
+        placeholder: 'Please select',
+        displayFields: [],
+        dataSource: [],
+        selectedDisplayFields: [],
+    };
+    selectedCompany: Partial<CommonInterface.IComboGridData> = {};
     companies: Company[] = [];
     formGroup: FormGroup;
     code: AbstractControl;
@@ -47,9 +56,21 @@ export class OfficeFormAddComponent extends AppForm {
     }
 
     ngOnInit(): void {
-        this.getDataComboBox();
         this.initForm();
+        this.getDataComboBox();
 
+
+    }
+    onSelectDataFormInfo(data: any) {
+        this.selectedCompany = { field: 'id', value: data.id };
+        this.selectedDataOffice = data;
+        console.log(this.selectedDataOffice);
+
+    }
+
+    update(formdata: any, data: any) {
+        this.formGroup.patchValue(formdata);
+        this.active.setValue(this.status.filter(i => i.value === data)[0]);
     }
 
     getCompanies() {
@@ -61,6 +82,7 @@ export class OfficeFormAddComponent extends AppForm {
                 (res: any) => {
                     this.companies = res;
                     console.log(this.companies);
+                    this.getCompanyData(this.companies);
                 },
             );
     }
@@ -68,24 +90,80 @@ export class OfficeFormAddComponent extends AppForm {
         this.getCompanies();
     }
 
+    getCompanyData(data: any) {
+        this.configOffice.dataSource = data;
+        this.configOffice.displayFields = [
+            { field: 'code', label: 'Company Code' },
+            { field: 'bunameEn', label: 'Name EN' },
+            { field: 'bunameVn', label: 'Name Local' },
+        ];
+        this.configOffice.selectedDisplayFields = ['bunameEn'];
+    }
+
+
     initForm() {
         this.formGroup = this._fb.group({
-            code: [],
-            branchNameEn: [],
-            branchNameVn: [],
-            shortName: [],
-            addressEn: [],
-            addressVn: [],
-            taxcode: [],
-            tel: [],
-            email: [],
-            fax: [],
+            code: ['',
+                Validators.compose([
+                    Validators.required
+                ])],
+            branchNameEn: ['',
+                Validators.compose([
+                    Validators.required
+                ])],
+            branchNameVn: ['',
+                Validators.compose([
+                    Validators.required
+                ])],
+            shortName: ['',
+                Validators.compose([
+                    Validators.required
+                ])],
+            addressEn: ['',
+                Validators.compose([
+                    Validators.required
+                ])],
+            addressVn: ['',
+                Validators.compose([
+                    Validators.required
+                ])],
+            taxcode: ['',
+                Validators.compose([
+                    Validators.required
+                ])],
+            tel: ['',
+                Validators.compose([
+                    Validators.required
+                ])],
+            email: ['',
+                Validators.compose([
+                    Validators.required
+                ])],
+            fax: ['',
+                Validators.compose([
+                    Validators.required
+                ])],
             company: [],
-            bankAccountVND: [],
-            bankAccountName: [],
-            swiftCode: [],
-            bankAddress: [],
-            bankName: [],
+            bankAccountVND: ['',
+                Validators.compose([
+                    Validators.required
+                ])],
+            bankAccountName: ['',
+                Validators.compose([
+                    Validators.required
+                ])],
+            swiftCode: ['',
+                Validators.compose([
+                    Validators.required
+                ])],
+            bankAddress: ['',
+                Validators.compose([
+                    Validators.required
+                ])],
+            bankName: ['',
+                Validators.compose([
+                    Validators.required
+                ])],
             active: [this.status[0]],
         });
 
@@ -111,7 +189,9 @@ export class OfficeFormAddComponent extends AppForm {
 }
 
 export interface IFormAddOffice {
+    id: string;
     branchNameVn: string;
+    bankAccountName: string;
     branchNameEn: string;
     buid: string;
     addressVn: string;

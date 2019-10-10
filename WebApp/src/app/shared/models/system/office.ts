@@ -17,6 +17,7 @@ export class Office {
     code: string = '';
     swiftCode: string = '';
     shortName: string = '';
+    companyName: string = '';
     active: boolean = false;
 
     constructor(data?: any) {

@@ -96,19 +96,18 @@ namespace eFMS.API.System.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("Update")]
-
         //[Authorize]
-        public IActionResult Put(Guid id, SysOfficeEditModel model)
+        public IActionResult Put( SysOfficeEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
         
-            var checkExistMessage = CheckExist(id, model);
+            var checkExistMessage = CheckExist(model.Id, model);
             if (checkExistMessage.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var branch = mapper.Map<SysOfficeModel>(model);
-            branch.Id = id;
+            branch.Id = model.Id;
             var hs = sysOfficeService.UpdateOffice(branch);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

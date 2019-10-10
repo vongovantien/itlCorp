@@ -7,6 +7,7 @@ namespace eFMS.API.System.Models
 {
     public class SysOfficeEditModel
     {
+        public Guid Id { get; set; }
         public string Code { get; set; }
         public string BranchNameEn { get; set; }
         public string BranchNameVn { get; set; }
@@ -24,6 +25,7 @@ namespace eFMS.API.System.Models
         public string BankAccountUsd { get; set; }
         public string BankName { get; set; }
         public string BankAddress { get; set; }
+        public string BankAccountName { get; set; }
         public byte[] Logo { get; set; }
    
         public string UserCreated { get; set; }
