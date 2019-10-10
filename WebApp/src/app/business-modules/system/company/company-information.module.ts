@@ -10,7 +10,7 @@ import { CompanyInformationAddComponent } from './add/add-company-information.co
 import { CompanyInformationDetailComponent } from './detail/detail-company-information.component';
 import { CompanyInformationFormSearchComponent } from './components/form-search-company/form-search-company.component';
 import { CompanyInformationFormAddComponent } from './components/form-add-company/form-add-company.component';
-
+import { FroalaEditorModule, FroalaViewModule } from 'angular-froala-wysiwyg';
 
 const routing: Routes = [
     {
@@ -43,7 +43,9 @@ const routing: Routes = [
         PaginationModule.forRoot(),
         ReactiveFormsModule,
         PerfectScrollbarModule,
-        RouterModule.forChild(routing)
+        RouterModule.forChild(routing),
+        FroalaEditorModule.forRoot(),
+        FroalaViewModule.forRoot(),
     ],
     exports: [],
     providers: [],
