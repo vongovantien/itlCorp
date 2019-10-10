@@ -11,6 +11,7 @@ namespace eFMS.API.System.DL.IService
 {
     public interface ISysGroupService : IRepositoryBase<SysGroup, SysGroupModel>
     {
+        IQueryable<SysGroupModel> Paging(SysGroupCriteria criteria, int page, int size, out int rowsCount);
         IQueryable<SysGroupModel> Query(SysGroupCriteria criteria);
     }
 }

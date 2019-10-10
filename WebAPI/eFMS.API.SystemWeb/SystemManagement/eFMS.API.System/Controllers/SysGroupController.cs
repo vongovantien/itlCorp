@@ -8,6 +8,7 @@ using eFMS.API.Common.Globals;
 using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
+using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.System.Infrastructure.Middlewares;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +35,7 @@ namespace eFMS.API.System.Controllers
         /// <param name="localizer"></param>
         /// <param name="groupService"></param>
         /// <param name="imapper"></param>
-        public SysGroupController(IStringLocalizer<LanguageSub> localizer, 
+        public SysGroupController(IStringLocalizer<LanguageSub> localizer,
             ISysGroupService groupService,
             IMapper imapper) {
             stringLocalizer = localizer;
@@ -54,7 +55,34 @@ namespace eFMS.API.System.Controllers
         }
 
         /// <summary>
-        /// get detai group by id
+        /// get list of groups by criteria
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("Query")]
+        public IActionResult Query(SysGroupCriteria criteria)
+        {
+            var results = sysGroupService.Query(criteria);
+            return Ok(results);
+        }
+
+        /// <summary>
+        /// paging and query list of groups by criteria
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <param name="page"></param>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        [HttpPost("Paging")]
+        public IActionResult Paging(SysGroupCriteria criteria, int page, int size)
+        {
+            var data = sysGroupService.Paging(criteria, page, size, out int rowCount);
+            var result = new { data, totalItems = rowCount, page, size };
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// get detail group by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
