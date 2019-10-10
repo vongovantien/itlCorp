@@ -69,6 +69,19 @@ namespace eFMS.API.System.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Get department by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("{id}")]
+        public IActionResult GetDepartmentById(int id)
+        {
+            var result = catDepartmentService.GetDepartmentById(id);
+            return Ok(result);
+        }
+
     }
 
 }
