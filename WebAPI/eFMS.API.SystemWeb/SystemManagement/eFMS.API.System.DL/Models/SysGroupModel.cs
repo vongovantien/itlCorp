@@ -11,6 +11,9 @@ namespace eFMS.API.System.DL.Models
         public string Code { get; set; }
         public string Name { get; set; }
         public int? DepartmentId { get; set; }
+        public string DepartmentName { get; set; }
+        public string OfficeName { get; set; }
+        public string CompanyName { get; set; }
         public short ParentId { get; set; }
         public string ManagerId { get; set; }
         public string Decription { get; set; }

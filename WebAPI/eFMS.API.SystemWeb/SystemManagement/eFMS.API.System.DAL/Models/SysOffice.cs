@@ -5,11 +5,6 @@ namespace eFMS.API.System.Service.Models
 {
     public partial class SysOffice
     {
-        public SysOffice()
-        {
-            CatDepartment = new HashSet<CatDepartment>();
-        }
-
         public Guid Id { get; set; }
         public string BranchNameVn { get; set; }
         public string BranchNameEn { get; set; }
@@ -28,14 +23,14 @@ namespace eFMS.API.System.Service.Models
         public string BankAccountUsd { get; set; }
         public string BankName { get; set; }
         public string BankAddress { get; set; }
-        public bool? Active { get; set; }
+        public bool Active { get; set; }
         public DateTime? InactiveOn { get; set; }
         public byte[] Logo { get; set; }
         public string SwiftCode { get; set; }
         public string Code { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
-        public virtual SysCompany SysCompany { get; set; }
-        public virtual ICollection<CatDepartment> CatDepartment { get; set; }
+
+        public virtual SysCompany Bu { get; set; }
     }
 }

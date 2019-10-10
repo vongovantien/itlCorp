@@ -15,7 +15,6 @@ namespace eFMS.API.System.Service.Models
         {
         }
 
-        public virtual DbSet<CatDepartment> CatDepartment { get; set; }
         public virtual DbSet<CatPlace> CatPlace { get; set; }
         public virtual DbSet<SysCompany> SysCompany { get; set; }
         public virtual DbSet<SysEmployee> SysEmployee { get; set; }
@@ -42,57 +41,6 @@ namespace eFMS.API.System.Service.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
-
-            modelBuilder.Entity<CatDepartment>(entity =>
-            {
-                entity.ToTable("catDepartment");
-
-                entity.HasIndex(e => e.Code)
-                    .HasName("U_catDepartment_Code")
-                    .IsUnique();
-
-                entity.Property(e => e.Id).HasColumnName("ID");
-
-                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
-
-                entity.Property(e => e.BranchId).HasColumnName("BranchID");
-
-                entity.Property(e => e.Code)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.DatetimeCreated)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getdate())");
-
-                entity.Property(e => e.DatetimeModified)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getdate())");
-
-                entity.Property(e => e.DeptName).HasMaxLength(1600);
-
-                entity.Property(e => e.Description).HasMaxLength(4000);
-
-                entity.Property(e => e.InactiveOn).HasColumnType("datetime");
-
-                entity.Property(e => e.ManagerId)
-                    .HasColumnName("ManagerID")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UserCreated)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UserModified)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.HasOne(d => d.Branch)
-                    .WithMany(p => p.CatDepartment)
-                    .HasForeignKey(d => d.BranchId)
-                    .HasConstraintName("FK_catDepartment_sysBranch");
-            });
 
             modelBuilder.Entity<CatPlace>(entity =>
             {
@@ -193,8 +141,6 @@ namespace eFMS.API.System.Service.Models
                     .HasColumnName("AccountNo_VN")
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.AddressEn)
                     .HasColumnName("Address_EN")
@@ -301,8 +247,6 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.AccessDescription).HasMaxLength(1600);
 
-                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
-
                 entity.Property(e => e.Birthday).HasColumnType("datetime");
 
                 entity.Property(e => e.Bonus).HasColumnType("decimal(10, 4)");
@@ -379,8 +323,6 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
-                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
-
                 entity.Property(e => e.Code)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -393,7 +335,7 @@ namespace eFMS.API.System.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.Decription).HasMaxLength(4000);
+                entity.Property(e => e.ShortName).HasMaxLength(100);
 
                 entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
 
@@ -404,7 +346,13 @@ namespace eFMS.API.System.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Name).HasMaxLength(3200);
+                entity.Property(e => e.NameEn)
+                    .HasColumnName("NameEN")
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.NameVn)
+                    .HasColumnName("NameVN")
+                    .HasMaxLength(250);
 
                 entity.Property(e => e.ParentId).HasColumnName("ParentID");
 
@@ -422,8 +370,6 @@ namespace eFMS.API.System.Service.Models
                 entity.ToTable("sysGroupRole");
 
                 entity.Property(e => e.Id).HasColumnName("ID");
-
-                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("datetime")
@@ -447,6 +393,12 @@ namespace eFMS.API.System.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.HasOne(d => d.Group)
+                    .WithMany(p => p.SysGroupRole)
+                    .HasForeignKey(d => d.GroupId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_sysGroupRole_sysGroup");
+
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.SysGroupRole)
                     .HasForeignKey(d => d.RoleId)
@@ -463,8 +415,6 @@ namespace eFMS.API.System.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .ValueGeneratedNever();
-
-                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.Arguments).HasMaxLength(4000);
 
@@ -502,10 +452,6 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
                     .HasDefaultValueSql("(newid())");
-
-                entity.Property(e => e.Active)
-                    .IsRequired()
-                    .HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.AddressEn)
                     .HasColumnName("Address_EN")
@@ -588,7 +534,7 @@ namespace eFMS.API.System.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.SysCompany)
+                entity.HasOne(d => d.Bu)
                     .WithMany(p => p.SysOffice)
                     .HasForeignKey(d => d.Buid)
                     .OnDelete(DeleteBehavior.ClientSetNull)
@@ -615,8 +561,6 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.Description).HasMaxLength(4000);
 
-                entity.Property(e => e.Inactive).HasDefaultValueSql("((1))");
-
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.Name).HasMaxLength(3200);
@@ -639,8 +583,6 @@ namespace eFMS.API.System.Service.Models
                     .IsUnique();
 
                 entity.Property(e => e.Id).HasColumnName("ID");
-
-                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.AllowAccess).HasDefaultValueSql("((1))");
 
@@ -678,8 +620,6 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
-                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
-
                 entity.Property(e => e.DatetimeModified)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
@@ -712,8 +652,6 @@ namespace eFMS.API.System.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .ValueGeneratedNever();
-
-                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("datetime")
@@ -753,8 +691,6 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
-                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
-
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
@@ -781,6 +717,12 @@ namespace eFMS.API.System.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.HasOne(d => d.Group)
+                    .WithMany(p => p.SysUserGroup)
+                    .HasForeignKey(d => d.GroupId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_sysUserGroup_sysGroup");
+
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.SysUserGroup)
                     .HasForeignKey(d => d.UserId)
@@ -793,8 +735,6 @@ namespace eFMS.API.System.Service.Models
                 entity.ToTable("sysUserRole");
 
                 entity.Property(e => e.Id).HasColumnName("ID");
-
-                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.BranchId)
                     .IsRequired()

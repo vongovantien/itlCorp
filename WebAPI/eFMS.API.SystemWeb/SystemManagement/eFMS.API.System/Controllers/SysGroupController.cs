@@ -58,6 +58,7 @@ namespace eFMS.API.System.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [HttpGet("{id}")]
         public IActionResult Get(short id)
         {
             var result = sysGroupService.First(x => x.Id == id);
