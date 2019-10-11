@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Group } from 'src/app/shared/models/system/group';
 import { NgProgress } from '@ngx-progressbar/core';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { SortService } from 'src/app/shared/services';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 @Component({
   selector: 'app-group',
@@ -12,10 +13,11 @@ import { SortService } from 'src/app/shared/services';
   styleUrls: ['./group.component.sass']
 })
 export class GroupComponent extends AppList implements OnInit {
-
+  @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
   headers: CommonInterface.IHeaderTable[];
   titleConfirmDelete = 'Do you want to delete?';
   groups: Group[] = [];
+  selectedGroup: any = null;
 
   constructor(
     private _progressService: NgProgress,
@@ -65,7 +67,12 @@ export class GroupComponent extends AppList implements OnInit {
   sortGroups(sort: string): void {
     this.groups = this._sortService.sort(this.groups, sort, this.order);
   }
-  onDelete(event) {
+  onDeleteGroup(event) {
+    this.confirmDeletePopup.hide();
+    this.deleteGroup(this.selectedGroup.id);
+  }
+  deleteGroup(id: any) {
+    throw new Error("Method not implemented.");
   }
   onSearchGroup(dataSearch: any) {
     this.dataSearch = {};
@@ -79,10 +86,10 @@ export class GroupComponent extends AppList implements OnInit {
       if (dataSearch.type === 'code') {
         this.dataSearch.code = dataSearch.keyword;
       }
-      if (dataSearch.type === 'nameEN') {
+      if (dataSearch.type === 'nameEn') {
         this.dataSearch.nameEN = dataSearch.keyword;
       }
-      if (dataSearch.type === 'nameVN') {
+      if (dataSearch.type === 'nameVn') {
         this.dataSearch.nameVN = dataSearch.keyword;
       }
       if (dataSearch.type === 'shortName') {
@@ -94,5 +101,9 @@ export class GroupComponent extends AppList implements OnInit {
     }
     // this.dataSearch = dataSearch;
     this.searchGroup(this.dataSearch);
+  }
+  confirmDelete(group) {
+    this.selectedGroup = group;
+    this.confirmDeletePopup.show();
   }
 }

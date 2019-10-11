@@ -19,7 +19,7 @@ export class FormSearchGroupComponent extends AppForm {
     this.configSearch = {
       typeSearch: 'outtab',
       settingFields: <CommonInterface.IValueDisplay[]>[
-        { displayName: 'Company Code', fieldName: 'code' },
+        { displayName: 'Group Code', fieldName: 'code' },
         { displayName: 'Name En', fieldName: 'nameEn' },
         { displayName: 'Name Local', fieldName: 'nameVn' },
         { displayName: 'Name Abbr', fieldName: 'shortName' },
@@ -38,7 +38,7 @@ export class FormSearchGroupComponent extends AppForm {
   }
 
   onReset(data: any) {
-    console.log(data);
+    this.onSearch.emit(data);
   }
 }
 interface ISearchCompany {

@@ -73,7 +73,12 @@ export class SystemRepo {
             map((data: any) => data)
         );
     }
-    getAllOffice(){
+    deleteGroup(id: number) {
+        return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup/Delete`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+    getAllOffice() {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/GetAll`).pipe(
             map((data: any) => data)
         );
@@ -91,8 +96,8 @@ export class SystemRepo {
         );
     }
 
-    deleteDepartment(id: number){
-        return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/Delete`,{ id: id }).pipe(
+    deleteDepartment(id: number) {
+        return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/Delete`, { id: id }).pipe(
             map((data: any) => data)
         );
     }

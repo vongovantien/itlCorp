@@ -60,6 +60,10 @@ namespace eFMS.API.System.DL.Services
                                                || (x.ShortName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                         );
                 departments = departmentRepository.Get(x => x.DeptNameEn.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1);
+                if(departments.Count() == 0)
+                {
+                    departments = departmentRepository.Get();
+                }
             }
             if (groups == null) return null;
             var results = groups.Join(departments, x => x.DepartmentId, y => y.Id, (x, y) => new SysGroupModel

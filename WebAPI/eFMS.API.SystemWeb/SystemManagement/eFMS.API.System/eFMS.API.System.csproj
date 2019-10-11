@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <Compile Remove="Controllers\SysEmployeesController.cs" />
-    <Compile Remove="Controllers\SysGroupController.cs" />
     <Compile Remove="Infrastructure\Middlewares\JsonLocalizationServiceCollectionEx.cs" />
     <Compile Remove="Resources\LanguageSub.cs" />
   </ItemGroup>
