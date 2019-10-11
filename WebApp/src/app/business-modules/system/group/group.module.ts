@@ -6,18 +6,32 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PaginationModule, TabsModule } from 'ngx-bootstrap';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { GroupComponent } from './group.component';
+import { AddGroupComponent } from './add/add-group/add-group.component';
+import { GroupDetailComponent } from './detail/detail-group/detail-group.component';
+import { FormSearchGroupComponent } from './components/form-search-group/form-search-group.component';
 
 
 const routing: Routes = [
     {
         path: "", component: GroupComponent, pathMatch: 'full',
         data: { name: "Group", path: "group", level: 2 }
+    },
+    {
+        path: "new", component: AddGroupComponent,
+        data: { name: "New", path: "New", level: 3 }
+    },
+    {
+        path: ":id", component: GroupDetailComponent,
+        data: { name: "Detail", path: "Detail", level: 3 }
     }
 ];
 
 @NgModule({
     declarations: [
-        GroupComponent
+        GroupComponent,
+        AddGroupComponent,
+        GroupDetailComponent,
+        FormSearchGroupComponent
     ],
     imports: [
         CommonModule,
@@ -32,7 +46,10 @@ const routing: Routes = [
     exports: [],
     providers: [],
     bootstrap: [
-        GroupComponent
+        GroupComponent,
+        AddGroupComponent,
+        GroupDetailComponent,
+        FormSearchGroupComponent
     ]
 })
 export class GroupModule { }

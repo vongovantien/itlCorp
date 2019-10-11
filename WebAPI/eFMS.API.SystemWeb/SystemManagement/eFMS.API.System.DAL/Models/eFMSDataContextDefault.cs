@@ -441,12 +441,6 @@ namespace eFMS.API.System.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.Group)
-                    .WithMany(p => p.SysGroupRole)
-                    .HasForeignKey(d => d.GroupId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_sysGroupRole_sysGroup");
-
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.SysGroupRole)
                     .HasForeignKey(d => d.RoleId)
@@ -791,12 +785,6 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.Group)
-                    .WithMany(p => p.SysUserGroup)
-                    .HasForeignKey(d => d.GroupId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_sysUserGroup_sysGroup");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.SysUserGroup)

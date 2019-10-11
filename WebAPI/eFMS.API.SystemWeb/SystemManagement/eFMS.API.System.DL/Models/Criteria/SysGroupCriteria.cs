@@ -13,5 +13,6 @@ namespace eFMS.API.System.DL.Models.Criteria
         public string NameVN { get; set; }
         public string ShortName { get; set; }
         public string DepartmentName { get; set; }
+        public int DepartmentId { get; set; }
     }
 }
