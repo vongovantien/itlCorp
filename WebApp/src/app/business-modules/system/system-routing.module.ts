@@ -18,9 +18,12 @@ const routes: Routes = [
   {
     path: 'department', loadChildren: () => import('./department/department.module').then(m => m.DepartmentModule),
   },
+  // {
+  //   path: 'group',
+  //   component: GroupComponent
+  // },
   {
-    path: 'group',
-    component: GroupComponent
+    path: 'group', loadChildren: () => import('./group/group.module').then(m => m.GroupModule),
   },
   {
     path: 'permission',

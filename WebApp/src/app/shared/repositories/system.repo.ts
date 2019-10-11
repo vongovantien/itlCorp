@@ -74,7 +74,17 @@ export class SystemRepo {
         );
     }
     deleteGroup(id: number) {
-        return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup/Delete`, { id: id }).pipe(
+        return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+    addNewGroup(body: any) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+    updateGroup(body: any) {
+        return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup`, body).pipe(
             map((data: any) => data)
         );
     }
