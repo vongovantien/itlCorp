@@ -23,6 +23,7 @@ using System;
 using eFMS.API.System.DL.Services;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Common;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.System.Infrastructure
 {
@@ -43,6 +44,8 @@ namespace eFMS.API.System.Infrastructure
             services.AddTransient<ICatDepartmentService, CatDepartmentService>();
             services.AddTransient<ISysGroupService, SysGroupService>();
             services.AddTransient<ISysImageService, SysImageService>();
+            services.AddTransient<ICurrentUser, CurrentUser>();
+
 
         }
 
