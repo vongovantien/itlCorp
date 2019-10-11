@@ -37,7 +37,7 @@ export class GroupComponent extends AppList implements OnInit {
       { title: 'Status', field: 'active', sortable: true }
     ];
     this.dataSearch = {
-      type: 'All'
+      all: null
     };
     this.searchGroup(this.dataSearch);
   }
@@ -68,7 +68,31 @@ export class GroupComponent extends AppList implements OnInit {
   onDelete(event) {
   }
   onSearchGroup(dataSearch: any) {
-    this.dataSearch = dataSearch;
+    this.dataSearch = {};
+    if (dataSearch.type === 'All') {
+      this.dataSearch.all = dataSearch.keyword;
+    } else {
+      this.dataSearch.all = null;
+      if (dataSearch.type === 'id') {
+        this.dataSearch.id = dataSearch.keyword;
+      }
+      if (dataSearch.type === 'code') {
+        this.dataSearch.code = dataSearch.keyword;
+      }
+      if (dataSearch.type === 'nameEN') {
+        this.dataSearch.nameEN = dataSearch.keyword;
+      }
+      if (dataSearch.type === 'nameVN') {
+        this.dataSearch.nameVN = dataSearch.keyword;
+      }
+      if (dataSearch.type === 'shortName') {
+        this.dataSearch.shortName = dataSearch.keyword;
+      }
+      if (dataSearch.type === 'departmentName') {
+        this.dataSearch.departmentName = dataSearch.keyword;
+      }
+    }
+    // this.dataSearch = dataSearch;
     this.searchGroup(this.dataSearch);
   }
 }

@@ -19,10 +19,10 @@ export class FormSearchGroupComponent extends AppForm {
     this.configSearch = {
       typeSearch: 'outtab',
       settingFields: <CommonInterface.IValueDisplay[]>[
-        { displayName: 'Company Code', fieldName: 'Code' },
-        { displayName: 'Name En', fieldName: 'NameEn' },
-        { displayName: 'Name Local', fieldName: 'NameVn' },
-        { displayName: 'Name Abbr', fieldName: 'NameAbbr' },
+        { displayName: 'Company Code', fieldName: 'code' },
+        { displayName: 'Name En', fieldName: 'nameEn' },
+        { displayName: 'Name Local', fieldName: 'nameVn' },
+        { displayName: 'Name Abbr', fieldName: 'shortName' },
         { displayName: 'Department', fieldName: 'departmentName' }
       ]
     };

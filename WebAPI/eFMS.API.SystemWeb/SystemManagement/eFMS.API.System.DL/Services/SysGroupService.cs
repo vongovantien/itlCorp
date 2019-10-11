@@ -54,12 +54,12 @@ namespace eFMS.API.System.DL.Services
             }
             else
             {
-                groups = DataContext.Get(x => x.Code.IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                               && x.NameEn.IndexOf(criteria.NameEN ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                               && x.NameVn.IndexOf(criteria.NameVN ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                               && x.ShortName.IndexOf(criteria.ShortName ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                groups = DataContext.Get(x => (x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                               || (x.NameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                               || (x.NameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                               || (x.ShortName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                         );
-                departments = departmentRepository.Get(x => x.DeptNameEn.IndexOf(criteria.DepartmentName ?? "", StringComparison.OrdinalIgnoreCase) > -1);
+                departments = departmentRepository.Get(x => x.DeptNameEn.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1);
             }
             if (groups == null) return null;
             var results = groups.Join(departments, x => x.DepartmentId, y => y.Id, (x, y) => new SysGroupModel
