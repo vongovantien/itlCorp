@@ -2,11 +2,10 @@ import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { NgProgress } from '@ngx-progressbar/core';
-import { catchError, finalize, tap, switchMap, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { IFormAddCompany, CompanyInformationFormAddComponent } from '../components/form-add-company/form-add-company.component';
 import { Company, Office } from 'src/app/shared/models';
 import { ToastrService } from 'ngx-toastr';
-import { AppForm } from 'src/app/app.form';
 import { forkJoin } from 'rxjs';
 import { AppList } from 'src/app/app.list';
 
@@ -28,7 +27,7 @@ export class CompanyInformationDetailComponent extends AppList {
     companyId: string = '';
     company: Company;
 
-    offices: any[];
+    offices: Office[] = [];
 
     headersOffice: CommonInterface.IHeaderTable[];
 
@@ -69,16 +68,15 @@ export class CompanyInformationDetailComponent extends AppList {
 
     getDetailCompany(id: string) {
         this._progressRef.start();
+        this.isLoading = true;
         forkJoin([
             this._systemRepo.getDetailCompany(id),
             this._systemRepo.getOfficeByCompany(id)
-        ]).pipe(catchError(this.catchError))
+        ]).pipe(catchError(this.catchError), finalize(() => { this._progressRef.complete(); this.isLoading = false; }))
             .subscribe(
-                ([dataCompany, offices]) => {
-                    if (dataCompany.status) {
-                        this.getDataDetail(dataCompany.data);
-                        this.getOffices(offices.data);
-                    }
+                ([dataCompany, offices]: any) => {
+                    this.getDataDetail(dataCompany || []);
+                    this.getOffices(offices);
                 }
             );
     }
@@ -98,9 +96,8 @@ export class CompanyInformationDetailComponent extends AppList {
         this.formAddCompany.code.disable();
     }
 
-    getOffices(office: Office[]) {
-        this.offices = (office || []).map((o: Office) => new Office(o));
-        console.log(this.offices);
+    getOffices(office: Office[] = []) {
+        this.offices = office.map((o: Office) => new Office(o));
     }
 
     saveInformation() {
@@ -137,6 +134,10 @@ export class CompanyInformationDetailComponent extends AppList {
 
     cancel() {
         this._router.navigate(["home/system/company"]);
+    }
+
+    gotoDetailOffice(office: Office) {
+        this._router.navigate([`home/system/office/${office.id}`]);
     }
 }
 

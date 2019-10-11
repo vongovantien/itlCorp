@@ -13,6 +13,7 @@ export class CompanyInformationFormSearchComponent extends AppForm {
     types: CommonInterface.ICommonTitleValue[];
     configSearch: any;
 
+    searchObject: ISearchCompany = {};
     constructor() {
         super();
         this.requestSearch = this.searchData;
@@ -23,34 +24,37 @@ export class CompanyInformationFormSearchComponent extends AppForm {
         this.configSearch = {
             typeSearch: 'outtab',
             settingFields: <CommonInterface.IValueDisplay[]>[
-                { displayName: 'Group Code', fieldName: 'code' },
-                { displayName: 'Name (EN)', fieldName: 'nameEn' },
-                { displayName: 'Name (Local)', fieldName: 'nameVn' },
-                { displayName: 'Name Abbr', fieldName: 'shortName' },
-                { displayName: 'Department', fieldName: 'active' }
+                { displayName: 'Company Code', fieldName: 'code' },
+                { displayName: 'Name (EN)', fieldName: 'buNameEn' },
+                { displayName: 'Name (Local)', fieldName: 'buNameVn' },
+                { displayName: 'Name Abbr', fieldName: 'buNameAbbr' },
             ]
         };
     }
 
     searchData(searchObject: ISearchObject) {
-        const searchData: ISearchCompany = {
-            type: searchObject.field,
-            keyword: searchObject.searchString
-        };
+        switch (searchObject.field || "All") {
+            case "All":
+                this.searchObject[searchObject.field] = null;
+                break;
+            default:
+                this.searchObject[searchObject.field] = searchObject.searchString;
+                break;
+        }
 
-        this.onSearch.emit(searchData);
-        console.log(searchData);
+        this.onSearch.emit(this.searchObject);
+        this.searchObject = {};
     }
 
     onReset(data: any) {
-        console.log(data);
+        this.searchObject = {};
+        this.searchObject.All = null;
+        this.onSearch.emit(this.searchObject);
     }
-
 }
 
 interface ISearchCompany {
-    type: string;
-    keyword: string;
+    [key: string]: string;
 }
 
 interface ISearchObject extends CommonInterface.IValueDisplay {
