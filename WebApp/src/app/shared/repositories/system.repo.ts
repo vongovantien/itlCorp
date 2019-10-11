@@ -100,5 +100,34 @@ export class SystemRepo {
         );
     }
 
+    getAllOffice(){
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/GetAll`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    addNewDepartment(body: any) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/Add`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateDepartment(body: any) {
+        return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/Update`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    deleteDepartment(id: number){
+        return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/Delete`,{ id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getDepartmentsByOfficeId(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/GetDepartmentByOfficeId`,{ id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 

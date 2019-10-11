@@ -1,12 +1,11 @@
-import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
-import { AccountingRepo } from 'src/app/shared/repositories';
+import { SystemRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { NgProgress } from '@ngx-progressbar/core';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
-import { BaseService } from 'src/app/shared/services';
 import { Department } from 'src/app/shared/models/system/department';
 
 @Component({
@@ -29,16 +28,13 @@ export class DepartmentAddNewComponent extends AppPage {
     isSubmited: boolean = false;
 
     constructor(
-        //private _accountingRepo: AccountingRepo,
+        private _systemRepo: SystemRepo,
         private _toastService: ToastrService,
         private _router: Router,
         private _progressService: NgProgress,
-        private cdRef: ChangeDetectorRef,
         private _fb: FormBuilder,
-        private _baseService: BaseService
     ) {
         super();
-
         this._progressRef = this._progressService.ref();
     }
 
@@ -87,12 +83,8 @@ export class DepartmentAddNewComponent extends AppPage {
     }
 
     initDataInform() {
-        this.statusList = this.getStatus();
-    }
-
-    ngAfterViewInit() {
-        //this.requestSurchargeListComponent.isShowButtonCopyCharge = true;
-        //this.cdRef.detectChanges(); // * Force to update view
+        this.getStatus();
+        this.getOffices();
     }
 
     saveDepartment() {
@@ -104,7 +96,8 @@ export class DepartmentAddNewComponent extends AppPage {
                 deptName: this.nameLocal.value,
                 deptNameEn: this.nameEn.value,
                 deptNameAbbr: this.nameAbbr.value,
-                officeName: this.office.value.value,
+                branchId: this.office.value.id,
+                officeName: this.office.value.branchNameEn,
                 companyName: '',
                 managerId: '',
                 userCreated: '',
@@ -115,48 +108,44 @@ export class DepartmentAddNewComponent extends AppPage {
                 inactiveOn: ''
             };
             console.log(dept);
+            this._progressRef.start();
+            //Add new Department
+            this._systemRepo.addNewDepartment(dept)
+                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success(res.message);
+                            //console.log(res);
+                            this._router.navigate([`home/system/department/${res.data.id}`]);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
+                    }
+                );
         }
-
-        // if (!this.requestSurchargeListComponent.surcharges.length) {
-        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-        //     return;
-        // }
-
-        // this._progressRef.start();
-        // const body: IDataSettlement = {
-        //     settlement: {
-        //         id: "00000000-0000-0000-0000-000000000000",
-        //         settlementNo: this.formCreateSurcharge.settlementNo.value,
-        //         requester: this.formCreateSurcharge.requester.value,
-        //         requestDate: formatDate(this.formCreateSurcharge.requestDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
-        //         paymentMethod: this.formCreateSurcharge.paymentMethod.value.value,
-        //         settlementCurrency: this.formCreateSurcharge.currency.value.id,
-        //         note: this.formCreateSurcharge.note.value,
-        //     },
-        //     shipmentCharge: this.requestSurchargeListComponent.surcharges || []
-        // };
-
-        // this._accountingRepo.addNewSettlement(body)
-        //     .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-        //     .subscribe(
-        //         (res: CommonInterface.IResult) => {
-        //             if (res.status) {
-        //                 this._toastService.success(res.message);
-
-        //                 this._router.navigate([`home/accounting/settlement-payment/${res.data.settlement.id}`]);
-        //             } else {
-        //                 this._toastService.warning(res.message);
-        //             }
-        //             this.requestSurchargeListComponent.selectedIndexSurcharge = null;
-        //         }
-        //     );
     }
 
-    getStatus(): CommonInterface.ICommonTitleValue[] {
-        return [
+    getStatus() {
+        this.statusList = [
             { title: 'Active', value: true },
             { title: 'Inactive', value: false }
         ];
+    }
+
+    getOffices() {
+        this._systemRepo.getAllOffice()
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (data: any) => {
+                    //console.log(data);
+                    this.officeList = data.map((item: any) => ({ id: item.id, code: item.code, branchname_En: item.branchNameEn }));
+                    console.log(this.officeList)
+                },
+            );
     }
 
     back() {
