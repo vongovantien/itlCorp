@@ -2,6 +2,7 @@
 using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
 using System;
+using System.Threading.Tasks;
 
 namespace eFMS.API.System.Infrastructure.Common
 {
@@ -52,6 +53,11 @@ namespace eFMS.API.System.Infrastructure.Common
 
             }
             return message;
+        }
+
+        internal static object GetMessage(Task<HandleState> hs, Crud insert)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -21,6 +21,7 @@ namespace eFMS.API.System.Service.Models
         public string Taxcode { get; set; }
         public string BankAccountVnd { get; set; }
         public string BankAccountUsd { get; set; }
+        public string BankAccountName { get; set; }
         public string BankName { get; set; }
         public string BankAddress { get; set; }
         public string BankAccountName { get; set; }

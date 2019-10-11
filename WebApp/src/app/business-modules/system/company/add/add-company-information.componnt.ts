@@ -4,8 +4,9 @@ import { CompanyInformationFormAddComponent } from '../components/form-add-compa
 import { SystemRepo } from 'src/app/shared/repositories';
 import { Router } from '@angular/router';
 import { NgProgress } from '@ngx-progressbar/core';
-import { catchError, finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
+import { catchError } from 'rxjs/internal/operators/catchError';
+import { finalize } from 'rxjs/internal/operators/finalize';
 
 @Component({
     selector: 'app-add-company-info',
@@ -16,14 +17,13 @@ export class CompanyInformationAddComponent extends AppPage {
     @ViewChild(CompanyInformationFormAddComponent, { static: false }) formAdd: CompanyInformationFormAddComponent;
 
     constructor(
-        private _systemRepo: SystemRepo,
-        private _router: Router,
-        private _progressService: NgProgress,
-        private _toastService: ToastrService
+        protected _systemRepo: SystemRepo,
+        protected _router: Router,
+        protected _progressService: NgProgress,
+        protected _toastService: ToastrService
     ) {
         super();
         this._progressRef = this._progressService.ref();
-
     }
 
     ngOnInit(): void { }
@@ -40,9 +40,9 @@ export class CompanyInformationAddComponent extends AppPage {
             companyNameVn: this.formAdd.bunameVn.value,
             companyNameAbbr: this.formAdd.bunameAbbr.value,
             website: this.formAdd.website.value,
-            photoUrl: 'https://picsum.photos/id/457/400/400', // TODO lấy url hình
+            photoUrl: this.formAdd.photoUrl,
             status: this.formAdd.active.value.value,
-            photoName: 'https://picsum.photos/id/457/400/400',
+            photoName: this.formAdd.photoUrl,
         };
         this._systemRepo.addNewCompany(body)
             .pipe(

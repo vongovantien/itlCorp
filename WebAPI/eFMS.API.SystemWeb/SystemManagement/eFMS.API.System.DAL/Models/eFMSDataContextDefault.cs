@@ -21,6 +21,7 @@ namespace eFMS.API.System.Service.Models
         public virtual DbSet<SysEmployee> SysEmployee { get; set; }
         public virtual DbSet<SysGroup> SysGroup { get; set; }
         public virtual DbSet<SysGroupRole> SysGroupRole { get; set; }
+        public virtual DbSet<SysImage> SysImage { get; set; }
         public virtual DbSet<SysMenu> SysMenu { get; set; }
         public virtual DbSet<SysOffice> SysOffice { get; set; }
         public virtual DbSet<SysRole> SysRole { get; set; }
@@ -453,6 +454,29 @@ namespace eFMS.API.System.Service.Models
                     .HasConstraintName("FK_sysGroupRole_sysRole");
             });
 
+            modelBuilder.Entity<SysImage>(entity =>
+            {
+                entity.ToTable("sysImage");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.DateTimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.Name).HasMaxLength(50);
+
+                entity.Property(e => e.Thumb).HasMaxLength(50);
+
+                entity.Property(e => e.Url).HasMaxLength(50);
+
+                entity.Property(e => e.UserCreated).HasMaxLength(50);
+
+                entity.Property(e => e.UserModified).HasMaxLength(50);
+            });
+
             modelBuilder.Entity<SysMenu>(entity =>
             {
                 entity.ToTable("sysMenu");
@@ -508,6 +532,10 @@ namespace eFMS.API.System.Service.Models
                     .HasColumnName("Address_VN")
                     .HasMaxLength(4000);
 
+                entity.Property(e => e.BankAccountName)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.BankAccountUsd)
                     .HasColumnName("BankAccount_USD")
                     .HasMaxLength(100)
@@ -539,6 +567,8 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
                 entity.Property(e => e.Email)
                     .HasMaxLength(50)
@@ -577,9 +607,19 @@ namespace eFMS.API.System.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Website)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.Bu)
+                    .WithMany(p => p.SysOffice)
+                    .HasForeignKey(d => d.Buid)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_sysBranch_sysBU");
             });
 
             modelBuilder.Entity<SysRole>(entity =>

@@ -65,7 +65,7 @@ export class SystemRepo {
     }
 
     getCompany(page?: number, size?: number, body: any = {}) {
-        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysBu/paging`, body, {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysCompany/paging`, body, {
             page: '' + page,
             size: '' + size
         }).pipe(
@@ -73,14 +73,20 @@ export class SystemRepo {
         );
     }
 
+    updateCompany(id: string, body: any) {
+        return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysCompany/${id}/Update`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getDetailCompany(id: string) {
-        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysBu/${id}`).pipe(
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysCompany/${id}`).pipe(
             map((data: any) => data)
         );
     }
 
     addNewCompany(body: any) {
-        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysBu/Add`, body).pipe(
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysCompany/Add`, body).pipe(
             map((data: any) => data)
         );
     }
@@ -128,6 +134,12 @@ export class SystemRepo {
         );
     }
 
+    getOfficeByCompany(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/GetByCompany/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
     addNewDepartment(body: any) {
         return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/Add`, body).pipe(
             map((data: any) => data)
@@ -147,7 +159,7 @@ export class SystemRepo {
     }
 
     getDepartmentsByOfficeId(id: string) {
-        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/GetDepartmentByOfficeId`,{ id: id }).pipe(
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/GetDepartmentByOfficeId`, { id: id }).pipe(
             map((data: any) => data)
         );
     }

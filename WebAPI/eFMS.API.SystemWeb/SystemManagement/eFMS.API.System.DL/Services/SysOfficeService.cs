@@ -151,6 +151,31 @@ namespace eFMS.API.System.DL.Services
             return hs;
         }
 
+        public IQueryable<SysOfficeViewModel> GetOfficeByCompany(Guid id)
+        {
+            var lstSysOffice = DataContext.Where( office => office.Buid == id);
+            var sysBu = sysBuRepository.Get();
+
+            //join với company.
+            var query = (from branch in lstSysOffice
+                         join bu in sysBu on branch.Buid equals bu.Id
+                         select new { branch, companyName = bu.BunameEn });
+            var result = query.Select(item => new SysOfficeViewModel
+            {
+                Id = item.branch.Id,
+                BranchNameEn = item.branch.BranchNameEn,
+                BranchNameVn = item.branch.BranchNameVn,
+                AddressEn = item.branch.AddressEn,
+                AddressVn = item.branch.AddressVn,
+                CompanyName = item.companyName,
+                Inactive = item.branch.Active,
+                ShortName = item.branch.ShortName
+            });
+
+            return result;
+        }
+
+
 
 
 

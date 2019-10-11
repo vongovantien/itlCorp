@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using eFMS.API.Common;
 using eFMS.API.Common.NoSql;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
@@ -56,48 +57,59 @@ namespace eFMS.API.System.DL.Services
                && ((x.BunameEn ?? "").IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                && ((x.BunameVn ?? "").IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
             }
-            else if (criteria.Type == "Code" )
+            else
             {
-                bu = bu.Where(x => x.Code == criteria.Keyword);
+                result = bu.Where(x => ((x.Code ?? "").IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                && ((x.BunameEn ?? "").IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                && ((x.BunameVn ?? "").IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
             }
-            else if (criteria.Type == "NameAbbr")
-            {
-                bu = bu.Where(x => x.BunameAbbr == criteria.Keyword);
-            }
-            else if (criteria.Type == "NameEn")
-            {
-                bu = bu.Where(x => ((x.BunameEn ?? "").IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
-            } else
-            {
-                bu = bu.Where(x => x.BunameVn == criteria.Keyword);
-            }
+            //else if (criteria.Type == "Code")
+            //{
+            //    bu = bu.Where(x => x.Code == criteria.Keyword);
+            //}
+            //else if (criteria.Type == "NameAbbr")
+            //{
+            //    bu = bu.Where(x => x.BunameAbbr == criteria.Keyword);
+            //}
+            //else if (criteria.Type == "NameEn")
+            //{
+            //    bu = bu.Where(x => ((x.BunameEn ?? "").IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
+            //}
+            //else
+            //{
+            //    bu = bu.Where(x => x.BunameVn == criteria.Keyword);
+            //}
 
             var responseData = mapper.Map<List<SysCompanyModel>>(bu).ToList(); // maping BU sang SysCompanyModel ( hoặc object # => define trong Mapper.cs);
 
             return responseData;
         }
 
-        public HandleState Update(SysCompanyAddModel model)
+        public HandleState Update(Guid id, SysCompanyAddModel model)
         {
             var userCurrent = "admin";
 
             try
             {
-                var SysCompanyCurrent = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+                var SysCompanyCurrent = DataContext.First(x => x.Id == id);
                 SysCompanyCurrent.DatetimeCreated = SysCompanyCurrent.DatetimeCreated;
                 SysCompanyCurrent.UserCreated = SysCompanyCurrent.UserCreated;
+                if (SysCompanyCurrent.Code != model.CompanyCode && DataContext.Any(item => item.Code == model.CompanyCode))
+                {
+                    return new HandleState("Code existed");
+                }
 
                 SysCompanyCurrent.DatetimeModified = DateTime.Now;
                 SysCompanyCurrent.UserModified = userCurrent;
                 SysCompanyCurrent.LogoPath = model.PhotoUrl;
                 SysCompanyCurrent.Active = model.Status;
-                SysCompanyCurrent.Code = model.CompanyCode; 
+                SysCompanyCurrent.Code = model.CompanyCode;
                 SysCompanyCurrent.Website = model.Website;
                 SysCompanyCurrent.BunameAbbr = model.CompanyNameAbbr;
                 SysCompanyCurrent.BunameEn = model.CompanyNameEn;
                 SysCompanyCurrent.BunameVn = model.CompanyNameVn;
 
-                DataContext.Update(SysCompanyCurrent, x => x.Id == model.Id);
+                DataContext.Update(SysCompanyCurrent, x => x.Id == id);
 
                 var hs = new HandleState();
                 return hs;
@@ -130,7 +142,7 @@ namespace eFMS.API.System.DL.Services
             try
             {
                 var userCurrent = "admin";
-                
+
                 var SysCompany = new SysCompanyModel
                 {
                     Code = model.CompanyCode,

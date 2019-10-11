@@ -5,7 +5,7 @@ Scaffold-DbContext "Server=192.168.7.31; Database=eFMSTest; User ID=sa; Password
 
 
 * System server
-Scaffold-DbContext "Server=192.168.7.31; Database=eFMSTest; User ID=sa; Password=P@ssw0rd" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -Context eFMSDataContextDefault -Project eFMS.API.System.Service -Force -Table catPlace, sysUser, sysEmployee, sysUserGroup, sysOffice, sysCompany, catDepartment, sysGroup, sysGroupRole, sysMenu, sysRole, sysRoleMenu, sysRolePermission, sysUserRole
+Scaffold-DbContext "Server=192.168.7.31; Database=eFMSTest; User ID=sa; Password=P@ssw0rd" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -Context eFMSDataContextDefault -Project eFMS.API.System.Service -Force -Table catPlace, sysUser, sysEmployee, sysUserGroup, sysOffice, sysCompany, catDepartment, sysGroup, sysGroupRole, sysMenu, sysRole, sysRoleMenu, sysRolePermission, sysUserRole, sysImage
 
 * Catalogue
 
