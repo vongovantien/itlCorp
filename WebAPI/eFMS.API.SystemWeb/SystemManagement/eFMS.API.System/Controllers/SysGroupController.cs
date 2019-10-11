@@ -8,6 +8,7 @@ using eFMS.API.Common.Globals;
 using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
+using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.System.Infrastructure.Middlewares;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +35,7 @@ namespace eFMS.API.System.Controllers
         /// <param name="localizer"></param>
         /// <param name="groupService"></param>
         /// <param name="imapper"></param>
-        public SysGroupController(IStringLocalizer<LanguageSub> localizer, 
+        public SysGroupController(IStringLocalizer<LanguageSub> localizer,
             ISysGroupService groupService,
             IMapper imapper) {
             stringLocalizer = localizer;
@@ -54,10 +55,38 @@ namespace eFMS.API.System.Controllers
         }
 
         /// <summary>
-        /// get detai group by id
+        /// get list of groups by criteria
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("Query")]
+        public IActionResult Query(SysGroupCriteria criteria)
+        {
+            var results = sysGroupService.Query(criteria);
+            return Ok(results);
+        }
+
+        /// <summary>
+        /// paging and query list of groups by criteria
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <param name="page"></param>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        [HttpPost("Paging")]
+        public IActionResult Paging(SysGroupCriteria criteria, int page, int size)
+        {
+            var data = sysGroupService.Paging(criteria, page, size, out int rowCount);
+            var result = new { data, totalItems = rowCount, page, size };
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// get detail group by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [HttpGet("{id}")]
         public IActionResult Get(short id)
         {
             var result = sysGroupService.First(x => x.Id == id);
@@ -69,9 +98,15 @@ namespace eFMS.API.System.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public IActionResult Post(SysGroupModel model)
+        [HttpPost]
+        public IActionResult Add(SysGroupModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+            var existedMessage = CheckExistCode(model.Code, 0);
+            if (existedMessage.Length > 0)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
+            }
             model.UserCreated = "admin";
             model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
             var hs = sysGroupService.Add(model);
@@ -83,6 +118,72 @@ namespace eFMS.API.System.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        /// <summary>
+        /// update an existed group
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPut]
+        public IActionResult Update(SysGroupModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            var existedMessage = CheckExistCode(model.Code, model.Id);
+            if (existedMessage.Length > 0)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
+            }
+            model.UserModified = "admin";
+            model.DatetimeModified = DateTime.Now;
+            var hs = sysGroupService.Add(model);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// delete an existed group
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete("{id}")]
+        public IActionResult Delete(short id)
+        {
+            var hs = sysGroupService.Delete(x => x.Id == id);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        private string CheckExistCode(string code, short id)
+        {
+            string message = string.Empty;
+            if(id == 0)
+            {
+                if (sysGroupService.Any(x => x.Code.ToLower().Trim() == code.ToLower().Trim()))
+                {
+                    message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
+                }
+            }
+            else
+            {
+                if (sysGroupService.Any(x => x.Code.ToLower().Trim() == code.ToLower().Trim() && x.Id != id))
+                {
+                    message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
+                }
+            }
+            return message;
         }
     }
 }

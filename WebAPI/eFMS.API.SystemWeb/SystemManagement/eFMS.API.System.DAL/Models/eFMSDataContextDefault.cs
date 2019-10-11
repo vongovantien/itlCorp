@@ -88,11 +88,6 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.Branch)
-                    .WithMany(p => p.CatDepartment)
-                    .HasForeignKey(d => d.BranchId)
-                    .HasConstraintName("FK_catDepartment_sysBranch");
             });
 
             modelBuilder.Entity<CatPlace>(entity =>

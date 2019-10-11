@@ -1,14 +1,13 @@
 import { Component, ViewChild } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
-//import { SettlementListChargeComponent } from '../components/list-charge-settlement/list-charge-settlement.component';
-//import { SettlementFormCreateComponent } from '../components/form-create-settlement/form-create-settlement.component';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, tap, switchMap } from 'rxjs/operators';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { Department } from 'src/app/shared/models/system/department';
+import { Office } from 'src/app/shared/models/system/office';
 
 @Component({
     selector: 'app-department-detail',
@@ -16,8 +15,6 @@ import { Department } from 'src/app/shared/models/system/department';
 })
 
 export class DepartmentDetailComponent extends AppPage {
-
-    //@ViewChild(SettlementListChargeComponent, { static: false }) requestSurchargeListComponent: SettlementListChargeComponent;
     //@ViewChild(SettlementFormCreateComponent, { static: false }) formCreateSurcharge: SettlementFormCreateComponent;
     formDetail: FormGroup;
     departmentCode: AbstractControl;
@@ -28,14 +25,16 @@ export class DepartmentDetailComponent extends AppPage {
     company: AbstractControl;
     status: AbstractControl;
     statusList: CommonInterface.ICommonTitleValue[] = [];
-    officeList: CommonInterface.ICommonTitleValue[] = [];
+    officeList: Office[];
 
     isValidForm: boolean = false;
     isSubmited: boolean = false;
 
     departmentId: number = 0;
-
     department: Department;
+
+    grpHeaders: CommonInterface.IHeaderTable[];
+    userHeaders: CommonInterface.IHeaderTable[];
 
     constructor(
         private _activedRouter: ActivatedRoute,
@@ -46,21 +45,33 @@ export class DepartmentDetailComponent extends AppPage {
         private _progressService: NgProgress
     ) {
         super();
-
         this._progressRef = this._progressService.ref();
-
     }
 
     ngOnInit() {
-        this.initDataInform();
-        this.initForm();
         this._activedRouter.params.subscribe((param: Params) => {
-            console.log(param)
             if (param.id) {
                 this.departmentId = param.id;
-                this.getDetailDeparment(this.departmentId);
-            } else {
-                this._router.navigate(["home/system/department"]);
+                this.getStatus();
+                this.initForm();
+                this.getDetail();
+
+                this.grpHeaders = [
+                    { title: 'Group Code', field: 'code', sortable: true },
+                    { title: 'Name EN', field: 'grpNameEn', sortable: true },
+                    { title: 'Name Local', field: 'grpName', sortable: true },
+                    { title: 'Name Abbr', field: 'grpNameAbbr', sortable: true },
+                    { title: 'Department', field: 'departmentName', sortable: true },
+                    { title: 'Status', field: 'active', sortable: true },
+                ];
+                this.userHeaders = [
+                    { title: 'User Name', field: 'userName', sortable: true },
+                    { title: 'Full Name', field: 'fullName', sortable: true },
+                    { title: 'Position', field: 'position', sortable: true },
+                    { title: 'Permission', field: 'permission', sortable: true },
+                    { title: 'Level Permission', field: 'levelPermission', sortable: true },
+                    { title: 'Status', field: 'active', sortable: true },
+                ];
             }
         });
     }
@@ -106,20 +117,17 @@ export class DepartmentDetailComponent extends AppPage {
         this.status = this.formDetail.controls['status'];
     }
 
-    initDataInform() {
-        this.statusList = this.getStatus();
-    }
-
     updateDepartment() {
         this.isSubmited = true;
         if (this.formDetail.valid) {
             const dept: Department = {
-                id: 0,
+                id: this.departmentId,
                 code: this.departmentCode.value,
                 deptName: this.nameLocal.value,
                 deptNameEn: this.nameEn.value,
                 deptNameAbbr: this.nameAbbr.value,
-                officeName: this.office.value.value,
+                branchId: this.office.value.id,
+                officeName: this.office.value.branchNameEn,
                 companyName: '',
                 managerId: '',
                 userCreated: '',
@@ -129,86 +137,73 @@ export class DepartmentDetailComponent extends AppPage {
                 active: this.status.value.value,
                 inactiveOn: ''
             };
-            console.log(dept);
-            console.log(this.formDetail.value)
+            //console.log(dept);
+            //console.log(this.formDetail.value)
+            this._progressRef.start();
+            //Update Info Department
+            this._systemRepo.updateDepartment(dept)
+                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success(res.message);
+                            this.getDetail();
+                        } else {
+                            this._toastService.error(res.message);
+                        }
+
+                    }
+                );
         }
-
-        // if (!this.requestSurchargeListComponent.surcharges.length) {
-        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-        //     return;
-        // }
-
-        // this._progressRef.start();
-        // const body: IDataSettlement = {
-        //     settlement: {
-        //         id: "00000000-0000-0000-0000-000000000000",
-        //         settlementNo: this.formCreateSurcharge.settlementNo.value,
-        //         requester: this.formCreateSurcharge.requester.value,
-        //         requestDate: formatDate(this.formCreateSurcharge.requestDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
-        //         paymentMethod: this.formCreateSurcharge.paymentMethod.value.value,
-        //         settlementCurrency: this.formCreateSurcharge.currency.value.id,
-        //         note: this.formCreateSurcharge.note.value,
-        //     },
-        //     shipmentCharge: this.requestSurchargeListComponent.surcharges || []
-        // };
-
-        // this._accountingRepo.addNewSettlement(body)
-        //     .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-        //     .subscribe(
-        //         (res: CommonInterface.IResult) => {
-        //             if (res.status) {
-        //                 this._toastService.success(res.message);
-
-        //                 this._router.navigate([`home/accounting/settlement-payment/${res.data.settlement.id}`]);
-        //             } else {
-        //                 this._toastService.warning(res.message);
-        //             }
-        //             this.requestSurchargeListComponent.selectedIndexSurcharge = null;
-        //         }
-        //     );
     }
-
-    getDetailDeparment(id: number) {
-        console.log(id);
-        this._systemRepo.getDetailDepartment(id)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            )
-            .subscribe(
-                (res: any) => {
-                    console.log(res)
-
-                    //this.department = new Department(res);
-                    //this.departmentCode.setValue(res.data.code);
-                    this.formDetail.setValue({
-                        departmentCode: res.code,
-                        nameEn: res.deptNameEn,
-                        nameLocal: res.deptName,
-                        nameAbbr: res.deptNameAbbr,
-                        office: res.officeName,
-                        company: res.companyName,
-                        status: this.statusList.filter(i => i.value === res.active)[0],
-                    });
-                    console.log(this.formDetail.value)
-                },
-                (errors: any) => { },
-                () => {
-                    this._progressRef.complete();
-                }
-            );
-    }
-
 
     back() {
         this._router.navigate(['home/system/department']);
     }
 
-    getStatus(): CommonInterface.ICommonTitleValue[] {
-        return [
+    getStatus() {
+        this.statusList = [
             { title: 'Active', value: true },
             { title: 'Inactive', value: false }
         ];
+    }
+
+    getDetail() {
+        this._progressRef.start();
+        this._systemRepo.getAllOffice()
+            .pipe(
+                catchError(this.catchError),
+                tap(data => {
+                    this.officeList = data.map((item: any) => ({ id: item.id, code: item.code, branchname_En: item.branchNameEn }));
+                    console.log(this.officeList)
+                }),
+                switchMap(() => this._systemRepo.getDetailDepartment(this.departmentId).pipe(
+                    catchError(this.catchError),
+                    finalize(() => this._progressRef.complete())
+                ))
+            )
+            .subscribe(
+                (res: any) => {
+                    //console.log(res)
+                    if (res.id !== 0) {
+                        this.department = new Department(res);
+                        console.log(this.department);
+                        this.formDetail.setValue({
+                            departmentCode: res.code,
+                            nameEn: res.deptNameEn,
+                            nameLocal: res.deptName,
+                            nameAbbr: res.deptNameAbbr,
+                            office: this.officeList.filter(i => i.id === res.branchId)[0] || [],
+                            company: res.companyName,
+                            status: this.statusList.filter(i => i.value === res.active)[0] || [],
+                        });
+                    } else {
+                        //Reset 
+                        this.formDetail.reset();
+                        this._toastService.error("Not found data");
+                    }
+                },
+            );
     }
 }
 

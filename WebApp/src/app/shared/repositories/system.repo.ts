@@ -20,6 +20,40 @@ export class SystemRepo {
         );
     }
 
+    deleteOffice(id: string) {
+        return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/Delete`, { id: id })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    getDetailOffice(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateOffice(body: any = {}) {
+        return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/Update`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+
+    addNewOffice(body: any) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/Add`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getListCompany() {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysBu`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
+    }
 
     getListSystemUser() {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUser`).pipe(
@@ -71,6 +105,19 @@ export class SystemRepo {
             map((data: any) => data)
         );
     }
+    getGroup(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup/paging`, body, {
+            page: '' + page,
+            size: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+    getAllOffice() {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/GetAll`).pipe(
+            map((data: any) => data)
+        );
+    }
 
     getOfficeByCompany(id: string) {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/GetByCompany/${id}`).pipe(
@@ -78,5 +125,28 @@ export class SystemRepo {
         );
     }
 
+    addNewDepartment(body: any) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/Add`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateDepartment(body: any) {
+        return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/Update`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    deleteDepartment(id: number) {
+        return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/Delete`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getDepartmentsByOfficeId(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/GetDepartmentByOfficeId`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 

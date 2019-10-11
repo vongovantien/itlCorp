@@ -1,8 +1,9 @@
 ﻿using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.Service.Models;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
-using System.Collections.Generic;
+using System;
 using System.Linq;
 
 namespace eFMS.API.System.DL.IService
@@ -14,6 +15,15 @@ namespace eFMS.API.System.DL.IService
         IQueryable<CatDepartmentModel> Paging(CatDepartmentCriteria criteria, int page, int size, out int rowsCount);
 
         CatDepartmentModel GetDepartmentById(int id);
+
+        HandleState Insert(CatDepartmentModel model);
+
+        HandleState Update(CatDepartmentModel model);
+
+        HandleState Delete(int id);
+
+        IQueryable<CatDepartmentModel> GetDepartmentsByOfficeId(Guid id);
+
     }
 
 }

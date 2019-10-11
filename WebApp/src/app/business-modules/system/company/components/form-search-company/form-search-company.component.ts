@@ -23,10 +23,11 @@ export class CompanyInformationFormSearchComponent extends AppForm {
         this.configSearch = {
             typeSearch: 'outtab',
             settingFields: <CommonInterface.IValueDisplay[]>[
-                { displayName: 'Company Code', fieldName: 'Code' },
-                { displayName: 'Name En', fieldName: 'NameEn' },
-                { displayName: 'Name Local', fieldName: 'NameVn' },
-                { displayName: 'Name Abbr', fieldName: 'NameAbbr' },
+                { displayName: 'Group Code', fieldName: 'code' },
+                { displayName: 'Name (EN)', fieldName: 'nameEn' },
+                { displayName: 'Name (Local)', fieldName: 'nameVn' },
+                { displayName: 'Name Abbr', fieldName: 'shortName' },
+                { displayName: 'Department', fieldName: 'active' }
             ]
         };
     }

@@ -6,6 +6,8 @@ import { SystemRepo } from 'src/app/shared/repositories';
 import { Department } from 'src/app/shared/models/system/department';
 import { NgProgress } from '@ngx-progressbar/core';
 import { catchError, finalize, map } from 'rxjs/operators';
+import { SortService } from 'src/app/shared/services';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-department',
@@ -18,18 +20,23 @@ export class DepartmentComponent extends AppList {
 
   departments: Department[] = [];
 
+  selectedDepartment: Department;
+
   constructor(private _router: Router,
     private _systemRepo: SystemRepo,
-    private _progressService: NgProgress, ) {
+    private _sortService: SortService,
+    private _progressService: NgProgress, 
+    private _toastService: ToastrService,) {
     super();
-    this.requestList = this.searchDepartment;
     this._progressRef = this._progressService.ref();
+    this.requestList = this.searchDepartment;
+    this.requestSort = this.sortDepartment;
   }
 
   ngOnInit() {
     this.headers = [
       { title: 'Department Code', field: 'code', sortable: true },
-      { title: 'Name EN', field: 'deptNameEN', sortable: true },
+      { title: 'Name EN', field: 'deptNameEn', sortable: true },
       { title: 'Name Local', field: 'deptName', sortable: true },
       { title: 'Name Abbr', field: 'deptNameAbbr', sortable: true },
       { title: 'Office', field: 'officeName', sortable: true },
@@ -41,7 +48,9 @@ export class DepartmentComponent extends AppList {
     this.searchDepartment(this.dataSearch);
   }
 
-  showDeletePopup() {
+  showDeletePopup(department: Department) {
+    this.selectedDepartment = department;
+    console.log(this.selectedDepartment)
     this.confirmDeletePopup.show();
   }
 
@@ -52,14 +61,12 @@ export class DepartmentComponent extends AppList {
   }
 
   searchDepartment(dataSearch?: any) {
-    //this.isLoading = true;
     this._progressRef.start();
     this._systemRepo.getDepartment(this.page, this.pageSize, Object.assign({}, dataSearch))
       .pipe(
         catchError(this.catchError),
         finalize(() => {
-          //this.isLoading = false; 
-          this._progressRef.complete(); 
+          this._progressRef.complete();
         }),
         map((data: any) => {
           return {
@@ -71,14 +78,41 @@ export class DepartmentComponent extends AppList {
         (res: any) => {
           this.totalItems = res.totalItems || 0;
           this.departments = res.data;
-          console.log(this.departments);
+          //console.log(this.departments);
         },
       );
   }
 
   gotoDetailDepartment(id: number) {
-    console.log(id)
-    this._router.navigate([`home/system/department/${id}`]);//([`${id}`])//
+    //console.log(id)
+    this._router.navigate([`home/system/department/${id}`]);
   }
 
+  sortDepartment(sort: string): void {
+    this.departments = this._sortService.sort(this.departments, sort, this.order);
+  }
+
+  onDeleteDepartment() {
+    this.confirmDeletePopup.hide();
+    this.deleteDepartment(this.selectedDepartment.id);
+  }
+
+  deleteDepartment(id: number) {
+    //console.log(id);
+    this._progressRef.start();
+    this._systemRepo.deleteDepartment(id)
+        .pipe(
+            catchError(this.catchError),
+            finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
+        ).subscribe(
+            (res: CommonInterface.IResult) => {
+                if (res.status) {
+                    this._toastService.success(res.message, '');
+                    this.searchDepartment(this.dataSearch);
+                } else {
+                    this._toastService.error(res.message || 'Có lỗi xảy ra', '');
+                }
+            },
+        );
+}
 }

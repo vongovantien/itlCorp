@@ -1,6 +1,6 @@
 export class Company {
     id: string = '';
-    code: string = ''
+    code: string = '';
     bunameVn: string = '';
     bunameEn: string = '';
     bunameAbbr: string = '';
