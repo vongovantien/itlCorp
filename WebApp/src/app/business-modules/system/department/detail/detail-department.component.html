@@ -109,7 +109,7 @@
                                     <span class="text-danger">*</span>
                                 </label>
                                 <select formControlName="office" class="form-control">
-                                    <option *ngFor="let office of statusList" [ngValue]="office">{{office.title}}
+                                    <option *ngFor="let office of officeList" [ngValue]="office">{{office.branchname_En}}
                                     </option>
                                 </select>
                                 <div class="form-control-feedback"
@@ -124,7 +124,7 @@
                                     Company:
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square" disabled
-                                    placeholder="Company" formControlName="company">
+                                    placeholder="" formControlName="company">
                             </div>
                         </div>
                     </div>
@@ -139,12 +139,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-6">
-                            Created: By
+                    <div class="row" *ngIf="!!department">
+                        <div class="col-6" *ngIf="!!department.datetimeCreated">
+                            Created: {{department.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by <span class="text-success">{{department.userCreated}}</span>
                         </div>
-                        <div class="col-6">
-                            Modified: By
+                        <div class="col-6" *ngIf="!!department.datetimeModified">
+                            Modified: {{department.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by <span class="text-success">{{department.userModified}}</span>
                         </div>
                     </div>
                 </form>

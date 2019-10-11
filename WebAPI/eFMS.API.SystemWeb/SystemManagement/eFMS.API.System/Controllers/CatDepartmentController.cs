@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
+using eFMS.API.Common;
+using eFMS.API.Common.Globals;
 using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
+using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.System.Infrastructure.Middlewares;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -64,6 +63,11 @@ namespace eFMS.API.System.Controllers
         [HttpPost("Paging")]
         public IActionResult Paging(CatDepartmentCriteria criteria, int page, int size)
         {
+            var _criteria = new CatDepartmentCriteria
+            {
+                Type = !string.IsNullOrEmpty(criteria.Type) ? criteria.Type.Trim() : criteria.Type,
+                Keyword = !string.IsNullOrEmpty(criteria.Keyword) ? criteria.Keyword.Trim() : criteria.Keyword,
+            };
             var data = catDepartmentService.Paging(criteria, page, size, out int rowCount);
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
@@ -82,6 +86,74 @@ namespace eFMS.API.System.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Insert department
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("Add")]
+        //[Authorize]
+        public IActionResult Insert(CatDepartmentModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            var hs = catDepartmentService.Insert(model);
+
+            var message = HandleError.GetMessage(hs, Crud.Insert);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
+            if (!hs.Success)
+            {
+                return Ok(result);
+            }
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Update department
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("Update")]
+        //[Authorize]
+        public IActionResult Update(CatDepartmentModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            var hs = catDepartmentService.Update(model);
+
+            var message = HandleError.GetMessage(hs, Crud.Update);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Delete department
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("Delete")]
+        //[Authorize]
+        public IActionResult Delete(int id)
+        {
+            //Chua check used
+            var hs = catDepartmentService.Delete(id);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
     }
 
 }
