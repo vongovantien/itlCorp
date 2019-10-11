@@ -57,22 +57,28 @@ namespace eFMS.API.System.DL.Services
                && ((x.BunameEn ?? "").IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                && ((x.BunameVn ?? "").IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
             }
-            else if (criteria.Type == "Code")
-            {
-                bu = bu.Where(x => x.Code == criteria.Keyword);
-            }
-            else if (criteria.Type == "NameAbbr")
-            {
-                bu = bu.Where(x => x.BunameAbbr == criteria.Keyword);
-            }
-            else if (criteria.Type == "NameEn")
-            {
-                bu = bu.Where(x => ((x.BunameEn ?? "").IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
-            }
             else
             {
-                bu = bu.Where(x => x.BunameVn == criteria.Keyword);
+                result = bu.Where(x => ((x.Code ?? "").IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                && ((x.BunameEn ?? "").IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                && ((x.BunameVn ?? "").IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
             }
+            //else if (criteria.Type == "Code")
+            //{
+            //    bu = bu.Where(x => x.Code == criteria.Keyword);
+            //}
+            //else if (criteria.Type == "NameAbbr")
+            //{
+            //    bu = bu.Where(x => x.BunameAbbr == criteria.Keyword);
+            //}
+            //else if (criteria.Type == "NameEn")
+            //{
+            //    bu = bu.Where(x => ((x.BunameEn ?? "").IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
+            //}
+            //else
+            //{
+            //    bu = bu.Where(x => x.BunameVn == criteria.Keyword);
+            //}
 
             var responseData = mapper.Map<List<SysCompanyModel>>(bu).ToList(); // maping BU sang SysCompanyModel ( hoặc object # => define trong Mapper.cs);
 

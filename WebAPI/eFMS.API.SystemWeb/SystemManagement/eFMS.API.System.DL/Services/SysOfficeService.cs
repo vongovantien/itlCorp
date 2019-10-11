@@ -145,6 +145,13 @@ namespace eFMS.API.System.DL.Services
             return hs;
         }
 
+        public IQueryable<SysOffice> GetOfficeByCompany(Guid id)
+        {
+            var office = DataContext.Where(x => x.Buid == id);
+            return office;
+        }
+        
+
 
 
 

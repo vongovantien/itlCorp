@@ -142,6 +142,21 @@ namespace eFMS.API.System.Controllers
             }
             return Ok(result);
         }
+        /// <summary>
+        /// get office by companyId
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+
+        [HttpGet]
+        [Route("GetByCompany/{id}")]
+        public IActionResult GetOfficeBy (Guid id)
+        {
+            var offices = sysBranchService.GetOfficeByCompany(id);
+
+            ResultHandle hs = new ResultHandle { Data = offices, Status = true };
+            return Ok(hs);
+        }
 
         private string CheckExist(Guid id, SysOfficeEditModel model)
         {

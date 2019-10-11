@@ -21,6 +21,7 @@ namespace eFMS.API.System.DL.IService
         HandleState AddOffice(SysOfficeModel sysOffice);
         HandleState UpdateOffice(SysOfficeModel sysOffice);
         HandleState DeleteOffice(Guid id);
+        IQueryable<SysOfficeViewModel> GetOfficeByCompany(Guid id);
 
     }
 }

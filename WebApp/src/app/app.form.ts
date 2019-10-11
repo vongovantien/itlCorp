@@ -8,6 +8,7 @@ export abstract class AppForm extends AppPage {
     requestSearch: any = null;
     requestReset: any = null;
     isDisabled: boolean = null;
+    isSubmitted: boolean = false;
 
     resetButtonSetting: ButtonModalSetting = {
         typeButton: ButtonType.reset

@@ -13,12 +13,12 @@ export class SystemRepo {
 
     getOffice(page?: number, size?: number, body: any = {}) {
         return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/paging`, body, {
-                page: '' + page,
-                size: '' + size
-            }).pipe(
+            page: '' + page,
+            size: '' + size
+        }).pipe(
             map((data: any) => data)
-            );
-        }
+        );
+    }
 
 
     getListSystemUser() {
@@ -31,7 +31,7 @@ export class SystemRepo {
     }
 
     getCompany(page?: number, size?: number, body: any = {}) {
-        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysBu/paging`, body, {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysCompany/paging`, body, {
             page: '' + page,
             size: '' + size
         }).pipe(
@@ -39,19 +39,25 @@ export class SystemRepo {
         );
     }
 
+    updateCompany(id: string, body: any) {
+        return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysCompany/${id}/Update`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getDetailCompany(id: string) {
-        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysBu/${id}`).pipe(
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysCompany/${id}`).pipe(
             map((data: any) => data)
         );
     }
 
     addNewCompany(body: any) {
-        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysBu/Add`, body).pipe(
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysCompany/Add`, body).pipe(
             map((data: any) => data)
         );
     }
 
-    getDepartment(page?: number, size?: number, body: any = {}){
+    getDepartment(page?: number, size?: number, body: any = {}) {
         return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/paging`, body, {
             page: '' + page,
             size: '' + size
@@ -62,6 +68,12 @@ export class SystemRepo {
 
     getDetailDepartment(id: number) {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getOfficeByCompany(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/GetByCompany/${id}`).pipe(
             map((data: any) => data)
         );
     }

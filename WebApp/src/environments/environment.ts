@@ -8,9 +8,10 @@ export const environment = {
         DOCUMENTATION: "test.api-efms.itlvn.com/Documentation",
         CATALOGUE: "localhost:44361",
         OPERATION: "test.api-efms.itlvn.com/Operation",
-        SYSTEM: "test.api-efms.itlvn.com/System",
+        SYSTEM: "localhost:44360",
         REPORT: "localhost:63492",
         EXPORT: "test.api-efms.itlvn.com/Export",
-        INDENTITY_SERVER_URL: "http://test.api-efms.itlvn.com/identityserver"
+        // INDENTITY_SERVER_URL: "http://test.api-efms.itlvn.com/identityserver"
+        INDENTITY_SERVER_URL: "https://localhost:44369"
     },
 };

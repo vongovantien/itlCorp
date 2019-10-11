@@ -33,8 +33,7 @@
                             </thead>
                             <tbody class="tbody-group">
                                 <ng-container *ngIf="!!departments.length">
-                                    <tr
-                                    *ngFor="let department of departments; let i = index; trackBy: trackByFn">
+                                    <tr *ngFor="let department of departments; let i = index; trackBy: trackByFn">
                                         <td>
                                             <div class="m-checkbox-list d-flex align-items-center">
                                                 <span>
@@ -43,7 +42,8 @@
                                                     </a>
                                                 </span>
                                                 <span>
-                                                    <a title="Detail" class="pointer" (click)="gotoDetailDepartment(department.id)">
+                                                    <a title="Detail" class="pointer"
+                                                        (click)="gotoDetailDepartment(department.id)">
                                                         <i class="la la-file-text-o"></i>
                                                     </a>
                                                 </span>
@@ -57,13 +57,14 @@
                                         <td>{{department.deptName}}</td>
                                         <td>{{department.deptNameAbbr}}</td>
                                         <td>{{department.officeName}}</td>
-                                        <td [ngClass]="department.active ? 'text-success' : 'text-danger'">{{department.active ? 'Active' : 'Inactive'}}</td>
+                                        <td [ngClass]="department.active ? 'text-success' : 'text-danger'">
+                                            {{department.active ? 'Active' : 'Inactive'}}</td>
                                     </tr>
 
                                 </ng-container>
-                                <tr *ngIf="!departments.length" app-table-none-record
-                                      [colspan]="headers.length + 1"></tr>
-                                  <!-- <tr *ngIf="isLoading" app-table-row-loading></tr> -->
+                                <tr *ngIf="!departments.length" app-table-none-record [colspan]="headers.length + 1">
+                                </tr>
+                                <!-- <tr *ngIf="isLoading" app-table-row-loading></tr> -->
                             </tbody>
                         </table>
                     </div>
@@ -73,23 +74,23 @@
                                 <div class="tatable__pager-size">
                                     <div class="select-box">
                                         <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
-                                          (change)="selectPageSize(pageSize, dataSearch)" name="pagesize">
-                                          <ng-container
-                                              *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
-                                              <option [ngValue]="item">{{item}} line / screen</option>
-                                          </ng-container>
-                                      </select>
+                                            (change)="selectPageSize(pageSize, dataSearch)" name="pagesize">
+                                            <ng-container
+                                                *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
+                                                <option [ngValue]="item">{{item}} line / screen</option>
+                                            </ng-container>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-sm-6" *ngIf="totalItems > pageSize">
-                              <div class="float-right">
-                                  <pagination [boundaryLinks]="true" [totalItems]="totalItems"
-                                      [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
-                                      [(ngModel)]="page">
-                                  </pagination>
-                              </div>
-                          </div>
+                                <div class="float-right">
+                                    <pagination [boundaryLinks]="true" [totalItems]="totalItems"
+                                        [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
+                                        [(ngModel)]="page">
+                                    </pagination>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

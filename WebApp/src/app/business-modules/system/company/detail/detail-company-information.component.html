@@ -1,7 +1,36 @@
 <div class="company-infomation-detail-page">
     <app-sub-header> </app-sub-header>
 
-    <form-add-company></form-add-company>
+    <form-add-company>
+        <div class="row">
+            <div class="col-6">
+                <span class="font-20">General Information</span>
+            </div>
+            <div class="col-6 text-right">
+                <div class="c-button-actions">
+                    <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="saveInformation()">
+                        <span>
+                            <i class="la la-save"></i>
+                            <span>
+                                Save
+                            </span>
+                        </span>
+                    </button>
+                    <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="cancel()">
+                        <span>
+                            <i class="la la-ban"></i>
+                            <span>
+                                Cancel
+                            </span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <hr>
+    </form-add-company>
 
     <div class="m-content">
         <div class="">
@@ -9,15 +38,25 @@
                 <tabset class="customClass">
                     <tab heading="Office" id="tab1">
                         <div class="p-3 bg-white">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem est corporis beatae fuga atque
-                            eos, unde optio officia libero doloremque. Corporis cupiditate similique perspiciatis
-                            voluptates. Illo voluptate ab consequuntur voluptatibus voluptates ut nulla quo animi ad
-                            quisquam? Placeat est quidem commodi obcaecati ad dicta dolorum quo perferendis praesentium
-                            tenetur. Est voluptas autem nisi at, quia suscipit pariatur eum earum accusamus, omnis quis
-                            in illum! Dicta ratione architecto voluptates, officiis dignissimos corrupti distinctio
-                            molestiae cumque, aliquam doloremque magni accusamus quaerat reprehenderit beatae, culpa
-                            vitae rem blanditiis voluptatibus eos error laudantium a eveniet? Rem libero voluptatem
-                            eligendi molestias sint in provident facere.
+                            <!-- <perfect-scrollbar style="max-height: 900px">
+                                <div class="table-wrapper table-scrollabler" id="adv-payment-list-table">
+                                    <table class="table table-brand table-hover dataTable">
+                                        <thead app-table-header [headers]="headers"
+                                            (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                                            <th class="m--w-50 first">
+                                            </th>
+                                        </thead>
+                                        <tbody class="tbody-group">
+                                            <ng-container *ngIf="!isLoading && !!companies.length">
+                                                <tr></tr>
+                                            </ng-container>
+                                            <tr *ngIf="!isLoading && !companies.length" app-table-none-record
+                                                [colspan]="headers.length + 1"></tr>
+                                            <tr *ngIf="isLoading" app-table-row-loading></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </perfect-scrollbar> -->
                         </div>
                     </tab>
                     <tab heading="User">
