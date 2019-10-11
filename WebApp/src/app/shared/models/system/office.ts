@@ -1,13 +1,23 @@
 export class Office {
     id: string = '';
-    code: string = ''
-    branchname_Vn: string = '';
-    branchname_En: string = '';
-    shortName: string = '';
-    address_Vn: string = '';
-    address_En: string = '';
+    branchNameVn: string = '';
+    bankAccountName: string = '';
+    branchNameEn: string = '';
+    buid: string = '';
+    addressVn: string = '';
+    addressEn: string = '';
+    tel: string = '';
+    fax: string = '';
+    email: string = '';
     taxcode: string = '';
-    companyname: string = '';
+    bankAccountVnd: string = '';
+    bankAccountUsd: string = '';
+    bankName: string = '';
+    bankAddress: string = '';
+    code: string = '';
+    swiftCode: string = '';
+    shortName: string = '';
+    companyName: string = '';
     active: boolean = false;
 
     constructor(data?: any) {

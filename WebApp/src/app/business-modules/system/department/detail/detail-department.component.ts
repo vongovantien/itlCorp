@@ -1,7 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
-//import { SettlementListChargeComponent } from '../components/list-charge-settlement/list-charge-settlement.component';
-//import { SettlementFormCreateComponent } from '../components/form-create-settlement/form-create-settlement.component';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
@@ -10,7 +8,6 @@ import { catchError, finalize, tap, switchMap } from 'rxjs/operators';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { Department } from 'src/app/shared/models/system/department';
 import { Office } from 'src/app/shared/models/system/office';
-import { isNgTemplate } from '@angular/compiler';
 
 @Component({
     selector: 'app-department-detail',
@@ -18,8 +15,6 @@ import { isNgTemplate } from '@angular/compiler';
 })
 
 export class DepartmentDetailComponent extends AppPage {
-
-    //@ViewChild(SettlementListChargeComponent, { static: false }) requestSurchargeListComponent: SettlementListChargeComponent;
     //@ViewChild(SettlementFormCreateComponent, { static: false }) formCreateSurcharge: SettlementFormCreateComponent;
     formDetail: FormGroup;
     departmentCode: AbstractControl;
@@ -38,6 +33,9 @@ export class DepartmentDetailComponent extends AppPage {
     departmentId: number = 0;
     department: Department;
 
+    grpHeaders: CommonInterface.IHeaderTable[];
+    userHeaders: CommonInterface.IHeaderTable[];
+
     constructor(
         private _activedRouter: ActivatedRoute,
         private _systemRepo: SystemRepo,
@@ -52,16 +50,29 @@ export class DepartmentDetailComponent extends AppPage {
 
     ngOnInit() {
         this._activedRouter.params.subscribe((param: Params) => {
-            //console.log(param)
             if (param.id) {
                 this.departmentId = param.id;
                 this.getStatus();
                 this.initForm();
                 this.getDetail();
+
+                this.grpHeaders = [
+                    { title: 'Group Code', field: 'code', sortable: true },
+                    { title: 'Name EN', field: 'grpNameEn', sortable: true },
+                    { title: 'Name Local', field: 'grpName', sortable: true },
+                    { title: 'Name Abbr', field: 'grpNameAbbr', sortable: true },
+                    { title: 'Department', field: 'departmentName', sortable: true },
+                    { title: 'Status', field: 'active', sortable: true },
+                ];
+                this.userHeaders = [
+                    { title: 'User Name', field: 'userName', sortable: true },
+                    { title: 'Full Name', field: 'fullName', sortable: true },
+                    { title: 'Position', field: 'position', sortable: true },
+                    { title: 'Permission', field: 'permission', sortable: true },
+                    { title: 'Level Permission', field: 'levelPermission', sortable: true },
+                    { title: 'Status', field: 'active', sortable: true },
+                ];
             }
-            // else {
-            //     this._router.navigate(["home/system/department"]);
-            // }
         });
     }
 
@@ -126,7 +137,7 @@ export class DepartmentDetailComponent extends AppPage {
                 active: this.status.value.value,
                 inactiveOn: ''
             };
-            console.log(dept);
+            //console.log(dept);
             //console.log(this.formDetail.value)
             this._progressRef.start();
             //Update Info Department
@@ -193,7 +204,6 @@ export class DepartmentDetailComponent extends AppPage {
                     }
                 },
             );
-
     }
 }
 

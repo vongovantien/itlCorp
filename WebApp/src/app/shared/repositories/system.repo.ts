@@ -20,6 +20,40 @@ export class SystemRepo {
         );
     }
 
+    deleteOffice(id: string) {
+        return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/Delete`, { id: id })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    getDetailOffice(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateOffice(body: any = {}) {
+        return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/Update`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+
+    addNewOffice(body: any) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/Add`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getListCompany() {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysBu`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
+    }
 
     getListSystemUser() {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUser`).pipe(
@@ -97,5 +131,10 @@ export class SystemRepo {
         );
     }
 
+    getDepartmentsByOfficeId(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/GetDepartmentByOfficeId`,{ id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 

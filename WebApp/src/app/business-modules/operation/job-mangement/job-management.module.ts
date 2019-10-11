@@ -9,7 +9,6 @@ import { SelectModule } from 'ng2-select';
 import { PaginationModule } from 'ngx-bootstrap';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { JobManagementCreateJobComponent } from './create/create-job.component';
-
 import { JobManagementFormSearchComponent } from './components/form-search-job/form-search-job.component';
 
 

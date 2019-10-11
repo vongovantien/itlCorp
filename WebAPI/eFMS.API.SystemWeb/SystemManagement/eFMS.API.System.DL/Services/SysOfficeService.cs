@@ -17,29 +17,31 @@ using eFMS.API.Common.NoSql;
 
 namespace eFMS.API.System.DL.Services
 {
-    public class SysOfficeService :  RepositoryBase<SysOffice, SysOfficeModel>, ISysOfficeService
+    public class SysOfficeService : RepositoryBase<SysOffice, SysOfficeModel>, ISysOfficeService
     {
         private readonly IDistributedCache cache;
         private readonly IContextBase<SysCompany> sysBuRepository;
- 
+
 
 
         public SysOfficeService(IContextBase<SysOffice> repository, IMapper mapper, IContextBase<SysCompany> sysBuRepo, IDistributedCache distributedCache) : base(repository, mapper)
         {
             sysBuRepository = sysBuRepo;
             cache = distributedCache;
-
+            SetChildren<CatDepartment>("Id", "BranchId");
         }
 
-        public HandleState AddOffice(SysOfficeModel  SysOffice)
+        public HandleState AddOffice(SysOfficeModel SysOffice)
         {
+            SysOffice.UserCreated = "admin";
+            SysOffice.DatetimeCreated = DateTime.Now;
             return DataContext.Add(SysOffice);
         }
 
         public IQueryable<SysOffice> GetOffices()
         {
-            //var lstSysOffice = RedisCacheHelper.GetObject<List<SysOffice>>(cache, Templates.SysOffice.NameCaching.ListName);
-            var lstSysOffice = new List<SysOffice>();
+            //var lstSysOffice = RedisCacheHelper.GetObject<List<SysOffice>>(cache, Templates.SysBranch.NameCaching.ListName);
+            var lstSysOffice = new List<SysOffice>(); 
             IQueryable<SysOffice> data = null;
             if (lstSysOffice != null)
             {
@@ -63,7 +65,7 @@ namespace eFMS.API.System.DL.Services
             if (list == null)
             {
                 rowsCount = 0;
-                return results.AsQueryable();
+                return null;
             }
             list = list.OrderByDescending(x => x.DatetimeCreated).ToList();
             rowsCount = list.ToList().Count;
@@ -89,24 +91,25 @@ namespace eFMS.API.System.DL.Services
             if (criteria.All == null)
             {
                 query = query.Where(x =>
-                           (x.branch.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                           ((x.branch.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase)) >= 0
                            && (x.branch.BranchNameEn ?? "").IndexOf(criteria.BranchNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.branch.BranchNameVn ?? "").IndexOf(criteria.BranchNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.branch.ShortName ?? "").IndexOf(criteria.ShortName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.branch.Taxcode ?? "").IndexOf(criteria.TaxCode ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           && (x.branch.Buid == criteria.Buid || criteria.Buid == Guid.Empty)
-                           );
+                           && (x.companyName ?? "").IndexOf(criteria.CompanyName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                           && (x.branch.Active == criteria.Active || criteria.Active == null));
             }
             else
             {
-                query = query.Where(x =>
-                             (x.branch.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                            || (x.branch.BranchNameEn ?? "").IndexOf(criteria.BranchNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                            || (x.branch.BranchNameVn ?? "").IndexOf(criteria.BranchNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                            || (x.branch.ShortName ?? "").IndexOf(criteria.ShortName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                            || (x.branch.Taxcode ?? "").IndexOf(criteria.TaxCode ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                            || (x.branch.Buid == criteria.Buid || criteria.Buid == Guid.Empty)
-                            );
+                query = query.Where(x => (
+                            ((x.branch.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                            || (x.branch.BranchNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                            || (x.branch.BranchNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                            || (x.branch.ShortName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                            || (x.branch.Taxcode ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                            && (x.companyName ?? "").IndexOf(criteria.CompanyName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                            && (x.branch.Active == criteria.Active || criteria.Active == null)
+                            ));
             }
             if (query.Count() == 0) return null;
             List<SysOfficeViewModel> results = new List<SysOfficeViewModel>();
@@ -121,7 +124,10 @@ namespace eFMS.API.System.DL.Services
 
         public HandleState UpdateOffice(SysOfficeModel model)
         {
+
             var entity = mapper.Map<SysOffice>(model);
+            entity.UserModified = "admin";
+            entity.DatetimeModified = DateTime.Now;
             if (entity.Active == true)
             {
                 entity.InactiveOn = DateTime.Now;

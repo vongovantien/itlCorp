@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
@@ -6,7 +6,6 @@ import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { NgProgress } from '@ngx-progressbar/core';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
-import { BaseService } from 'src/app/shared/services';
 import { Department } from 'src/app/shared/models/system/department';
 
 @Component({
@@ -33,9 +32,7 @@ export class DepartmentAddNewComponent extends AppPage {
         private _toastService: ToastrService,
         private _router: Router,
         private _progressService: NgProgress,
-        private cdRef: ChangeDetectorRef,
         private _fb: FormBuilder,
-        private _baseService: BaseService
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -119,7 +116,7 @@ export class DepartmentAddNewComponent extends AppPage {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message);
-                            console.log(res);
+                            //console.log(res);
                             this._router.navigate([`home/system/department/${res.data.id}`]);
                         } else {
                             this._toastService.error(res.message);
@@ -127,7 +124,6 @@ export class DepartmentAddNewComponent extends AppPage {
                     }
                 );
         }
-
     }
 
     getStatus() {
@@ -145,7 +141,7 @@ export class DepartmentAddNewComponent extends AppPage {
             )
             .subscribe(
                 (data: any) => {
-                    console.log(data);
+                    //console.log(data);
                     this.officeList = data.map((item: any) => ({ id: item.id, code: item.code, branchname_En: item.branchNameEn }));
                     console.log(this.officeList)
                 },

@@ -9,11 +9,15 @@ using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.System.Infrastructure.Middlewares;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using System;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace eFMS.API.System.Controllers
 {
+    /// <summary>
+    /// Controller Department
+    /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
@@ -22,19 +26,26 @@ namespace eFMS.API.System.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatDepartmentService catDepartmentService;
-        private readonly IMapper mapper;
-        public CatDepartmentController(IStringLocalizer<LanguageSub> localizer, IMapper mapper, ICatDepartmentService service)
+        /// <summary>
+        /// Contructor
+        /// </summary>
+        /// <param name="localizer"></param>
+        /// <param name="service"></param>
+        public CatDepartmentController(IStringLocalizer<LanguageSub> localizer, ICatDepartmentService service)
         {
             stringLocalizer = localizer;
             catDepartmentService = service;
-            mapper = this.mapper;
         }
 
+        /// <summary>
+        /// Get list department
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(catDepartmentService.Get());
-
+            var data = catDepartmentService.Get();
+            return Ok(data);
         }
 
         /// <summary>
@@ -129,7 +140,7 @@ namespace eFMS.API.System.Controllers
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
-                return BadRequest(result);
+                return Ok(result);
             }
             return Ok(result);
         }
@@ -144,15 +155,26 @@ namespace eFMS.API.System.Controllers
         //[Authorize]
         public IActionResult Delete(int id)
         {
-            //Chua check used
             var hs = catDepartmentService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
-                return BadRequest(result);
+                return Ok(result);
             }
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Get list department by office id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetDepartmentByOfficeId")]
+        public IActionResult GetDepartmentByOfficeId(Guid id)
+        {
+            var data = catDepartmentService.GetDepartmentsByOfficeId(id);
+            return Ok(data);
         }
     }
 

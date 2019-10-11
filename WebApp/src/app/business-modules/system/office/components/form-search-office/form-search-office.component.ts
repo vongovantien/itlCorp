@@ -45,7 +45,7 @@ export class OfficeFormSearchComponent extends AppForm {
     }
 
     onReset(data: any) {
-        console.log(data);
+
     }
 
 }

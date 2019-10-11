@@ -87,11 +87,6 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.Branch)
-                    .WithMany(p => p.CatDepartment)
-                    .HasForeignKey(d => d.BranchId)
-                    .HasConstraintName("FK_catDepartment_sysBranch");
             });
 
             modelBuilder.Entity<CatPlace>(entity =>
@@ -590,12 +585,6 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.Website)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.Bu)
-                    .WithMany(p => p.SysOffice)
-                    .HasForeignKey(d => d.Buid)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_sysBranch_sysBU");
             });
 
             modelBuilder.Entity<SysRole>(entity =>
