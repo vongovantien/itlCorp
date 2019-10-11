@@ -90,5 +90,10 @@ export class SystemRepo {
         );
     }
 
+    getDepartmentsByOfficeId(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/GetDepartmentByOfficeId`,{ id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 

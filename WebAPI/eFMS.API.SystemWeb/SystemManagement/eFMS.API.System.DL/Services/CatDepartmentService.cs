@@ -10,9 +10,7 @@ using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace eFMS.API.System.DL.Services
 {
@@ -20,19 +18,38 @@ namespace eFMS.API.System.DL.Services
     {
         private readonly IContextBase<SysCompany> sysCompanyRepo;
         private readonly IContextBase<SysOffice> sysOfficeRepo;
-        private readonly IStringLocalizer stringLocalizer;
-        public CatDepartmentService(IStringLocalizer<LanguageSub> localizer, IContextBase<CatDepartment> repository, IMapper mapper, IContextBase<SysOffice> sysOffice, IContextBase<SysCompany> sysCompany) : base(repository, mapper)
+        public CatDepartmentService(IContextBase<CatDepartment> repository, IMapper mapper, IContextBase<SysOffice> sysOffice, IContextBase<SysCompany> sysCompany) : base(repository, mapper)
         {
-            stringLocalizer = localizer;
             sysOfficeRepo = sysOffice;
             sysCompanyRepo = sysCompany;
-            //SetChildren<CatDepartment>("","","Used",false);
+            //Id is primarykey of table CatDepartment, DepartmentId is forgekey of table SysGroup       
+            SetChildren<SysGroup>("Id", "DepartmentId");
         }
 
         public IQueryable<CatDepartmentModel> QueryData(CatDepartmentCriteria criteria)
         {
             var dept = DataContext.Get();
-            var query = dept;
+            var query = from d in dept
+                        join off in sysOfficeRepo.Get() on d.BranchId equals off.Id into off2
+                        from off in off2.DefaultIfEmpty()
+                        select new CatDepartmentModel
+                        {
+                            Id = d.Id,
+                            Code = d.Code,
+                            DeptName = d.DeptName,
+                            DeptNameEn = d.DeptNameEn,
+                            DeptNameAbbr = d.DeptNameAbbr,
+                            Description = d.Description,
+                            BranchId = d.BranchId,
+                            OfficeName = off.BranchNameEn,
+                            ManagerId = d.ManagerId,
+                            UserCreated = d.UserCreated,
+                            DatetimeCreated = d.DatetimeCreated,
+                            UserModified = d.UserModified,
+                            DatetimeModified = d.DatetimeModified,
+                            Active = d.Active,
+                            InactiveOn = d.InactiveOn
+                        };
             if (criteria.Type == "All" || string.IsNullOrEmpty(criteria.Type))
             {
                 if (!string.IsNullOrEmpty(criteria.Keyword))
@@ -42,7 +59,7 @@ namespace eFMS.API.System.DL.Services
                         || x.DeptName == criteria.Keyword
                         || x.DeptNameEn == criteria.Keyword
                         || x.DeptNameAbbr == criteria.Keyword
-                        || x.BranchId.ToString() == criteria.Keyword
+                        || x.OfficeName == criteria.Keyword
                     );
                 }
             }
@@ -51,36 +68,16 @@ namespace eFMS.API.System.DL.Services
                 if (!string.IsNullOrEmpty(criteria.Keyword))
                 {
                     query = query.Where(x =>
-                           criteria.Type == "Code" ? x.Code == criteria.Keyword : 1 == 1
-                        && criteria.Type == "NameLocal" ? x.DeptName == criteria.Keyword : 1 == 1
-                        && criteria.Type == "NameEN" ? x.DeptNameEn == criteria.Keyword : 1 == 1
-                        && criteria.Type == "NameAbbr" ? x.DeptNameAbbr == criteria.Keyword : 1 == 1
-                        && criteria.Type == "Office" ? x.DeptNameEn == criteria.Keyword : 1 == 1
+                           criteria.Type == "Code" ? x.Code == criteria.Keyword : true
+                        && criteria.Type == "NameLocal" ? x.DeptName == criteria.Keyword : true
+                        && criteria.Type == "NameEN" ? x.DeptNameEn == criteria.Keyword : true
+                        && criteria.Type == "NameAbbr" ? x.DeptNameAbbr == criteria.Keyword : true
+                        && criteria.Type == "Office" ? x.OfficeName == criteria.Keyword : true
                     );
                 }
             }
-            var result = from d in query
-                         join off in sysOfficeRepo.Get() on d.BranchId equals off.Id into off2
-                         from off in off2.DefaultIfEmpty()
-                         select new CatDepartmentModel
-                         {
-                             Id = d.Id,
-                             Code = d.Code,
-                             DeptName = d.DeptName,
-                             DeptNameEn = d.DeptNameEn,
-                             DeptNameAbbr = d.DeptNameAbbr,
-                             Description = d.Description,
-                             BranchId = d.BranchId,
-                             OfficeName = off.BranchNameEn,
-                             ManagerId = d.ManagerId,
-                             UserCreated = d.UserCreated,
-                             DatetimeCreated = d.DatetimeCreated,
-                             UserModified = d.UserModified,
-                             DatetimeModified = d.DatetimeModified,
-                             Active = d.Active,
-                             InactiveOn = d.InactiveOn
-                         };
-            result = result.OrderByDescending(x => x.DatetimeModified);
+
+            var result = query.OrderByDescending(x => x.DatetimeModified);
             return result;
         }
 
@@ -122,7 +119,7 @@ namespace eFMS.API.System.DL.Services
                 var today = DateTime.Now;
                 var modelAdd = mapper.Map<CatDepartment>(model);
                 var deptCurrent = DataContext.Get(x => x.Code == model.Code).FirstOrDefault();
-                if(deptCurrent != null)
+                if (deptCurrent != null)
                 {
                     return new HandleState("Code has already existed");
                 }
@@ -182,10 +179,38 @@ namespace eFMS.API.System.DL.Services
                 var hs = DataContext.Delete(x => x.Id == id);
                 return hs;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return new HandleState(ex.Message);
             }
+        }
+
+        public IQueryable<CatDepartmentModel> GetDepartmentsByOfficeId(Guid id)
+        {
+            var dept = DataContext.Get(x => x.BranchId == id);
+            var query = from d in dept
+                        join off in sysOfficeRepo.Get() on d.BranchId equals off.Id into off2
+                        from off in off2.DefaultIfEmpty()
+                        select new CatDepartmentModel
+                        {
+                            Id = d.Id,
+                            Code = d.Code,
+                            DeptName = d.DeptName,
+                            DeptNameEn = d.DeptNameEn,
+                            DeptNameAbbr = d.DeptNameAbbr,
+                            Description = d.Description,
+                            BranchId = d.BranchId,
+                            OfficeName = off.BranchNameEn,
+                            ManagerId = d.ManagerId,
+                            UserCreated = d.UserCreated,
+                            DatetimeCreated = d.DatetimeCreated,
+                            UserModified = d.UserModified,
+                            DatetimeModified = d.DatetimeModified,
+                            Active = d.Active,
+                            InactiveOn = d.InactiveOn
+                        };
+            var result = query.OrderByDescending(x => x.DatetimeModified);
+            return result;
         }
     }
 

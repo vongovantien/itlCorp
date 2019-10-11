@@ -36,7 +36,7 @@ export class DepartmentComponent extends AppList {
   ngOnInit() {
     this.headers = [
       { title: 'Department Code', field: 'code', sortable: true },
-      { title: 'Name EN', field: 'deptNameEN', sortable: true },
+      { title: 'Name EN', field: 'deptNameEn', sortable: true },
       { title: 'Name Local', field: 'deptName', sortable: true },
       { title: 'Name Abbr', field: 'deptNameAbbr', sortable: true },
       { title: 'Office', field: 'officeName', sortable: true },
@@ -78,13 +78,13 @@ export class DepartmentComponent extends AppList {
         (res: any) => {
           this.totalItems = res.totalItems || 0;
           this.departments = res.data;
-          console.log(this.departments);
+          //console.log(this.departments);
         },
       );
   }
 
   gotoDetailDepartment(id: number) {
-    console.log(id)
+    //console.log(id)
     this._router.navigate([`home/system/department/${id}`]);
   }
 
@@ -98,7 +98,7 @@ export class DepartmentComponent extends AppList {
   }
 
   deleteDepartment(id: number) {
-    console.log(id);
+    //console.log(id);
     this._progressRef.start();
     this._systemRepo.deleteDepartment(id)
         .pipe(

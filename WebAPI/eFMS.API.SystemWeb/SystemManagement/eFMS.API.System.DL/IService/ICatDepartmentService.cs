@@ -3,6 +3,7 @@ using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
+using System;
 using System.Linq;
 
 namespace eFMS.API.System.DL.IService
@@ -20,6 +21,9 @@ namespace eFMS.API.System.DL.IService
         HandleState Update(CatDepartmentModel model);
 
         HandleState Delete(int id);
+
+        IQueryable<CatDepartmentModel> GetDepartmentsByOfficeId(Guid id);
+
     }
 
 }
