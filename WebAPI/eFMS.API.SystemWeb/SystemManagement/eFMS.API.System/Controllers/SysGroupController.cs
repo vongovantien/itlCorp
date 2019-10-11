@@ -94,6 +94,18 @@ namespace eFMS.API.System.Controllers
         }
 
         /// <summary>
+        /// get groups by departmentId
+        /// </summary>
+        /// <param name="departmentId"></param>
+        /// <returns></returns>
+        [HttpGet("GetBy")]
+        public IActionResult GetBy(int departmentId)
+        {
+            var results = sysGroupService.Get(x => x.DepartmentId == departmentId);
+            return Ok(results);
+        }
+
+        /// <summary>
         /// add new group
         /// </summary>
         /// <param name="model"></param>
