@@ -11,6 +11,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-office',
@@ -44,6 +45,7 @@ export class OfficeComponent extends AppList {
         private _progressService: NgProgress,
         private _toastService: ToastrService,
         private _sortService: SortService,
+        private _router: Router
 
 
     ) {
@@ -170,6 +172,10 @@ export class OfficeComponent extends AppList {
                     }
                 },
             );
+    }
+
+    gotoDetailOffice(id: number) {
+        this._router.navigate([`home/system/office/${id}`]);
     }
 
 

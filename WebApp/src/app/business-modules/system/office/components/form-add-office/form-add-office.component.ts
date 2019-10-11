@@ -15,6 +15,8 @@ import { map } from 'rxjs/internal/operators/map';
 export class OfficeFormAddComponent extends AppForm {
     selectedDataOffice: any;
     isSubmited: boolean = false;
+    isDetail: boolean = false;
+    isCreate: boolean = false;
     configOffice: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
         displayFields: [],
@@ -42,6 +44,7 @@ export class OfficeFormAddComponent extends AppForm {
     active: AbstractControl;
     bankName: AbstractControl;
 
+
     status: CommonInterface.ICommonTitleValue[] = [
         { title: 'Active', value: true },
         { title: 'Inactive', value: false },
@@ -58,7 +61,6 @@ export class OfficeFormAddComponent extends AppForm {
     ngOnInit(): void {
         this.initForm();
         this.getDataComboBox();
-
 
     }
     onSelectDataFormInfo(data: any) {
@@ -98,6 +100,7 @@ export class OfficeFormAddComponent extends AppForm {
             { field: 'bunameVn', label: 'Name Local' },
         ];
         this.configOffice.selectedDisplayFields = ['bunameEn'];
+
     }
 
 
@@ -207,5 +210,10 @@ export interface IFormAddOffice {
     code: string;
     swiftCode: string;
     shortName: string;
+    userCreated: string;
+    datetimeCreated: string;
+    userModified: string;
+    datetimeModified: string;
     active: boolean;
+
 }

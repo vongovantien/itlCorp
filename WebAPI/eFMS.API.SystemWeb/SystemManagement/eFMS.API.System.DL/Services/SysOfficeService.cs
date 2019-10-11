@@ -28,7 +28,7 @@ namespace eFMS.API.System.DL.Services
         {
             sysBuRepository = sysBuRepo;
             cache = distributedCache;
-
+            SetChildren<CatDepartment>("Id", "BranchId");
         }
 
         public HandleState AddOffice(SysOfficeModel SysOffice)

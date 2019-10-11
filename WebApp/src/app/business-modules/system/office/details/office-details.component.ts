@@ -33,6 +33,10 @@ export class OfficeDetailsComponent extends AppPage {
         code: '',
         swiftCode: '',
         shortName: '',
+        userCreated: '',
+        datetimeCreated: '',
+        userModified: '',
+        datetimeModified: '',
         active: true
     };
     officeId: string = '';
@@ -64,40 +68,44 @@ export class OfficeDetailsComponent extends AppPage {
     }
 
     updateOffice() {
-        this._progressRef.start();
-        const body: any = {
-            id: this.officeId,
-            code: this.formAdd.code.value,
-            branchNameEn: this.formAdd.branchNameEn.value,
-            branchNameVn: this.formAdd.branchNameVn.value,
-            shortName: this.formAdd.shortName.value,
-            addressEn: this.formAdd.addressEn.value,
-            buid: this.formAdd.selectedCompany.value,
-            addressVn: this.formAdd.addressVn.value,
-            taxcode: this.formAdd.taxcode.value,
-            tel: this.formAdd.tel.value,
-            fax: this.formAdd.fax.value,
-            email: this.formAdd.email.value,
-            bankAccountVnd: this.formAdd.bankAccountVND.value,
-            bankName: this.formAdd.bankName.value,
-            bankAccountName: this.formAdd.bankAccountName.value,
-            active: this.formAdd.active.value.value,
-            bankAddress: this.formAdd.bankAddress.value,
-            swiftCode: this.formAdd.swiftCode.value
+        this.formAdd.isSubmited = true;
+        if (this.formAdd.formGroup.valid) {
+            this._progressRef.start();
+            const body: any = {
+                id: this.officeId,
+                code: this.formAdd.code.value,
+                branchNameEn: this.formAdd.branchNameEn.value,
+                branchNameVn: this.formAdd.branchNameVn.value,
+                shortName: this.formAdd.shortName.value,
+                addressEn: this.formAdd.addressEn.value,
+                buid: this.formAdd.selectedCompany.value,
+                addressVn: this.formAdd.addressVn.value,
+                taxcode: this.formAdd.taxcode.value,
+                tel: this.formAdd.tel.value,
+                fax: this.formAdd.fax.value,
+                email: this.formAdd.email.value,
+                bankAccountVnd: this.formAdd.bankAccountVND.value,
+                bankName: this.formAdd.bankName.value,
+                bankAccountName: this.formAdd.bankAccountName.value,
+                active: this.formAdd.active.value.value,
+                bankAddress: this.formAdd.bankAddress.value,
+                swiftCode: this.formAdd.swiftCode.value
 
-        };
-        this._systemRepo.updateOffice(body)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this._toastService.success(res.message);
-                    } else {
-                        this._toastService.warning(res.message);
+            };
+            this._systemRepo.updateOffice(body)
+                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success(res.message);
+                        } else {
+                            this._toastService.warning(res.message);
 
+                        }
                     }
-                }
-            );
+                );
+        }
+
     }
 
     getDetailOffice(id: string) {
@@ -112,6 +120,7 @@ export class OfficeDetailsComponent extends AppPage {
                     if (res.status) {
                         this.office = new Office(res.data);
                         console.log(this.office);
+                        this.formAdd.isDetail = true;
 
                         this.formData.id = res.data.id;
                         this.formData.code = res.data.code;
