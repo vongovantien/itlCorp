@@ -19,6 +19,8 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<SysOffice, SysOfficeViewModel>();
             CreateMap<SysOfficeEditModel, SysOfficeModel>();
             CreateMap<SysGroup, SysGroupModel>();
+            CreateMap<SysImage, SysImageModel>();
+
         }
     }
 }

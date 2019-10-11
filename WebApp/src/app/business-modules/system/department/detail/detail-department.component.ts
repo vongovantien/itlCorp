@@ -2,8 +2,8 @@ import { Component, ViewChild } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
 //import { SettlementListChargeComponent } from '../components/list-charge-settlement/list-charge-settlement.component';
 //import { SettlementFormCreateComponent } from '../components/form-create-settlement/form-create-settlement.component';
-import { ActivatedRoute, Router } from '@angular/router';
-import { AccountingRepo } from 'src/app/shared/repositories';
+import { ActivatedRoute, Router, Params } from '@angular/router';
+import { SystemRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { catchError, finalize } from 'rxjs/operators';
@@ -32,9 +32,14 @@ export class DepartmentDetailComponent extends AppPage {
 
     isValidForm: boolean = false;
     isSubmited: boolean = false;
+
+    departmentId: number = 0;
+
+    department: Department;
+
     constructor(
         private _activedRouter: ActivatedRoute,
-        private _accoutingRepo: AccountingRepo,
+        private _systemRepo: SystemRepo,
         private _toastService: ToastrService,
         private _router: Router,
         private _fb: FormBuilder,
@@ -49,6 +54,15 @@ export class DepartmentDetailComponent extends AppPage {
     ngOnInit() {
         this.initDataInform();
         this.initForm();
+        this._activedRouter.params.subscribe((param: Params) => {
+            console.log(param)
+            if (param.id) {
+                this.departmentId = param.id;
+                this.getDetailDeparment(this.departmentId);
+            } else {
+                this._router.navigate(["home/system/department"]);
+            }
+        });
     }
 
     initForm() {
@@ -106,17 +120,17 @@ export class DepartmentDetailComponent extends AppPage {
                 deptNameEn: this.nameEn.value,
                 deptNameAbbr: this.nameAbbr.value,
                 officeName: this.office.value.value,
-                company: '',
-                status: this.status.value.value,
+                companyName: '',
                 managerId: '',
                 userCreated: '',
                 datetimeCreated: '',
                 userModified: '',
                 datetimeModified: '',
-                active: true,
+                active: this.status.value.value,
                 inactiveOn: ''
             };
             console.log(dept);
+            console.log(this.formDetail.value)
         }
 
         // if (!this.requestSurchargeListComponent.surcharges.length) {
@@ -154,62 +168,35 @@ export class DepartmentDetailComponent extends AppPage {
         //     );
     }
 
-    getDetailDeparment() {
-        // this._progressRef.start();
-        // this._accoutingRepo.getDetailSettlementPayment(settlementId)
-        //     .pipe(
-        //         catchError(this.catchError),
-        //         finalize(() => this._progressRef.complete())
-        //     )
-        //     .subscribe(
-        //         (res: ISettlementPaymentData) => {
-        //             if (!res.settlement) {
-        //                 this.back();
-        //                 this._toastService.warning("Settlement not found");
-        //                 return;
-        //             }
-        //             this.settlementPayment = res;
+    getDetailDeparment(id: number) {
+        console.log(id);
+        this._systemRepo.getDetailDepartment(id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: any) => {
+                    console.log(res)
 
-        //             switch (this.settlementPayment.settlement.statusApproval) {
-        //                 case 'New':
-        //                 case 'Denied':
-        //                     break;
-        //                 default:
-        //                     this.formCreateSurcharge.form.disable();
-        //                     this.formCreateSurcharge.isDisabled = true;
-
-        //                     this.requestSurchargeListComponent.STATE = 'READ';
-        //                     break;
-        //             }
-
-        //             // * wait to currecy list api
-        //             setTimeout(() => {
-        //                 this.formCreateSurcharge.form.setValue({
-        //                     settlementNo: this.settlementPayment.settlement.settlementNo,
-        //                     requester: this.settlementPayment.settlement.requester,
-        //                     requestDate: new Date(this.settlementPayment.settlement.requestDate),
-        //                     paymentMethod: this.formCreateSurcharge.methods.filter(method => method.value === this.settlementPayment.settlement.paymentMethod)[0],
-        //                     note: this.settlementPayment.settlement.note,
-        //                     amount: this.settlementPayment.chargeGrpSettlement.reduce((acc, curr) => acc + curr.totalAmount, 0),
-        //                     currency: this.formCreateSurcharge.currencyList.filter(currency => currency.id === this.settlementPayment.settlement.settlementCurrency)[0]
-        //                 });
-        //             }, 300);
-
-        //             this.requestSurchargeListComponent.surcharges = this.settlementPayment.chargeNoGrpSettlement;
-        //             this.requestSurchargeListComponent.groupShipments = this.settlementPayment.chargeGrpSettlement;
-
-        //             this.requestSurchargeListComponent.settlementCode = this.settlementPayment.settlement.settlementNo;
-
-        //             // *SWITCH UI TO GROUP LIST SHIPMENT
-        //             this.requestSurchargeListComponent.TYPE = typeCharge; // ? GROUP/LIST
-        //             this.requestSurchargeListComponent.STATE = 'WRITE'; //  ? READ/WRITE
-        //             this.requestSurchargeListComponent.isShowButtonCopyCharge = false;
-
-        //             if (this.requestSurchargeListComponent.groupShipments.length) {
-        //                 this.requestSurchargeListComponent.openAllCharge.next(true);
-        //             }
-        //         },
-        //     );
+                    //this.department = new Department(res);
+                    //this.departmentCode.setValue(res.data.code);
+                    this.formDetail.setValue({
+                        departmentCode: res.code,
+                        nameEn: res.deptNameEn,
+                        nameLocal: res.deptName,
+                        nameAbbr: res.deptNameAbbr,
+                        office: res.officeName,
+                        company: res.companyName,
+                        status: this.statusList.filter(i => i.value === res.active)[0],
+                    });
+                    console.log(this.formDetail.value)
+                },
+                (errors: any) => { },
+                () => {
+                    this._progressRef.complete();
+                }
+            );
     }
 
 

@@ -5,8 +5,8 @@
                 <div class="col-12">
                     <div class="mx-auto text-center upload-image-wp">
                         <div>
-                            <img [src]="photoUrl" alt="" title="Upload Image"
-                                onerror="this.src = 'assets/app/media/img/emptydata.png'" class="img-fluid pointer">
+                            <img [src]="imgDefault" alt="" class="img-responsive img-inputImage" id="imgedit"
+                                onerror="this.src = 'assets/app/media/img/emptydata.png'" (click)="inputFile()">
                             <div class="text-primary text-underline pointer">Upload Image PNG</div>
                         </div>
                     </div>
@@ -58,6 +58,9 @@
                                 </select>
                             </div>
                         </div>
+                        s
+                        <i class="fa fa-address-book" aria-hidden="true"></i>
+
                     </form>
                 </div>
             </div>

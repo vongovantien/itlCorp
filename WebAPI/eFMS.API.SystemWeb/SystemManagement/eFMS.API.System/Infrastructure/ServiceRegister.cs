@@ -22,6 +22,7 @@ using System.Reflection;
 using System;
 using eFMS.API.System.DL.Services;
 using eFMS.API.System.DL.IService;
+using eFMS.API.System.DL.Common;
 
 namespace eFMS.API.System.Infrastructure
 {
@@ -41,6 +42,8 @@ namespace eFMS.API.System.Infrastructure
             services.AddTransient<ISysCompanyService, SysCompanyService>();
             services.AddTransient<ICatDepartmentService, CatDepartmentService>();
             services.AddTransient<ISysGroupService, SysGroupService>();
+            services.AddTransient<ISysImageService, SysImageService>();
+
         }
 
         public static IServiceCollection AddCulture(this IServiceCollection services, IConfiguration configuration)
@@ -86,6 +89,9 @@ namespace eFMS.API.System.Infrastructure
                 options.RequireHttpsMetadata = bool.Parse(configuration["Authentication:RequireHttpsMetadata"]);
                 options.ApiName = configuration["Authentication:ApiName"];
                 options.ApiSecret = configuration["Authentication:ApiSecret"];
+            });
+            services.Configure<WebUrl>(option => {
+                option.Url = configuration.GetSection("WebUrl").Value;
             });
             return services;
         }

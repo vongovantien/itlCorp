@@ -5,15 +5,14 @@ export class Department {
     deptNameEn: string = '';
     deptNameAbbr: string = '';
     officeName: string = '';
-    company: string = '';
-    status: string = '';
+    companyName: string = '';
     managerId: string = '';
     userCreated: string = '';
     datetimeCreated: string = '';
     userModified: string = '';
     datetimeModified: string = '';
-    active: any = true;
-    inactiveOn: string = '';
+    active: boolean = true;
+    inactiveOn: string = '';   
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

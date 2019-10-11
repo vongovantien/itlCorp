@@ -43,14 +43,14 @@
                                                     </a>
                                                 </span>
                                                 <span>
-                                                    <a title="Detail" class="pointer" (click)="gotoDetailDepartment()">
+                                                    <a title="Detail" class="pointer" (click)="gotoDetailDepartment(department.id)">
                                                         <i class="la la-file-text-o"></i>
                                                     </a>
                                                 </span>
                                             </div>
                                         </td>
                                         <td class="text-underline text-primary pointer">
-                                            <a (click)="gotoDetailDepartment()">{{department.code}}
+                                            <a (click)="gotoDetailDepartment(department.id)">{{department.code}}
                                             </a>
                                         </td>
                                         <td>{{department.deptNameEn}}</td>
@@ -61,42 +61,35 @@
                                     </tr>
 
                                 </ng-container>
-                                <!-- <tr *ngIf="!isLoading && !settlements.length" app-table-none-record
+                                <tr *ngIf="!departments.length" app-table-none-record
                                       [colspan]="headers.length + 1"></tr>
-                                  <tr *ngIf="isLoading" app-table-row-loading></tr> -->
+                                  <!-- <tr *ngIf="isLoading" app-table-row-loading></tr> -->
                             </tbody>
                         </table>
                     </div>
                     <div class="pagination-nav ">
                         <div class="row">
-                            <div class="col-sm-6">
+                            <div *ngIf="!!departments.length" class="col-sm-6">
                                 <div class="tatable__pager-size">
                                     <div class="select-box">
-                                        <!-- <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
+                                        <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
                                           (change)="selectPageSize(pageSize, dataSearch)" name="pagesize">
                                           <ng-container
                                               *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
                                               <option [ngValue]="item">{{item}} line / screen</option>
                                           </ng-container>
-                                      </select> -->
-                                        <select class="form-control" id="" aria-label="" name="pagesize">
-                                            <ng-container>
-                                                <option>3 line / screen</option>
-                                                <option>15 line / screen</option>
-                                                <option>25 line / screen</option>
-                                            </ng-container>
-                                        </select>
+                                      </select>
                                     </div>
                                 </div>
                             </div>
-                            <!-- <div class="col-sm-6" *ngIf="totalItems > pageSize">
+                            <div class="col-sm-6" *ngIf="totalItems > pageSize">
                               <div class="float-right">
                                   <pagination [boundaryLinks]="true" [totalItems]="totalItems"
                                       [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
                                       [(ngModel)]="page">
                                   </pagination>
                               </div>
-                          </div> -->
+                          </div>
                         </div>
                     </div>
                 </div>

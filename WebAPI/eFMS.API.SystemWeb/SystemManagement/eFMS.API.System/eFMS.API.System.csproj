@@ -12,13 +12,6 @@
 </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="wwwroot\**" />
-    <Content Remove="wwwroot\**" />
-    <EmbeddedResource Remove="wwwroot\**" />
-    <None Remove="wwwroot\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Remove="Controllers\SysEmployeesController.cs" />
     <Compile Remove="Controllers\SysGroupController.cs" />
     <Compile Remove="Infrastructure\Middlewares\JsonLocalizationServiceCollectionEx.cs" />
@@ -28,6 +21,7 @@
   <ItemGroup>
     <Folder Include="Resources\Files\" />
     <Folder Include="ViewModels\" />
+    <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
   <ItemGroup>

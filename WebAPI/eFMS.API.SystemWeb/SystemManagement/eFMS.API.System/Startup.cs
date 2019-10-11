@@ -107,7 +107,7 @@ namespace eFMS.API.System
                         description.GroupName.ToUpperInvariant());
                 }
             });
-
+            app.UseStaticFiles();
             app.UseCors("AllowAllOrigins");
             app.UseAuthentication();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));

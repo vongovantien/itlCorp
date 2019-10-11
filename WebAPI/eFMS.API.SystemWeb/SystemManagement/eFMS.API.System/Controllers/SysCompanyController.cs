@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -25,8 +26,8 @@ namespace eFMS.API.System.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ISysCompanyService sysCompanyService;
         private readonly IMapper mapper;
-  
-        public SysCompanyController(IStringLocalizer<LanguageSub> localizer, ISysCompanyService sysCompanyService, 
+
+        public SysCompanyController(IStringLocalizer<LanguageSub> localizer, ISysCompanyService sysCompanyService,
             IMapper mapper
             )
         {
@@ -100,10 +101,10 @@ namespace eFMS.API.System.Controllers
 
         [HttpPut]
         [Route("{id}/Update")]
-        public IActionResult Update(Guid id,SysCompanyAddModel model)
+        public IActionResult Update(Guid id, SysCompanyAddModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-                        
+
             var hs = sysCompanyService.Update(id, model);
 
             var message = HandleError.GetMessage(hs, Crud.Update);
@@ -143,5 +144,18 @@ namespace eFMS.API.System.Controllers
             }
             return message;
         }
+
+        [HttpGet]
+        [Route("Test/Image")]
+        public List<object> GetImages()
+        {
+            List<object> listData = new List<object> {
+                new { url = "https://i.froala.com/assets/photo1.jpg", thumb = "https://i.froala.com/assets/thumbs/photo1.jpg"},
+                new { url = "https://i.froala.com/assets/photo1.jpg", thumb = "https://i.froala.com/assets/thumbs/photo1.jpg"},
+            };
+            return listData;
+        }
+
+        
     }
 }
