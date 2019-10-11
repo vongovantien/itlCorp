@@ -6,6 +6,7 @@ import { Company } from 'src/app/shared/models';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { finalize } from 'rxjs/internal/operators/finalize';
 import { map } from 'rxjs/internal/operators/map';
+import { Department } from 'src/app/shared/models/system/department';
 
 
 @Component({
@@ -25,6 +26,7 @@ export class OfficeFormAddComponent extends AppForm {
     };
     selectedCompany: Partial<CommonInterface.IComboGridData> = {};
     companies: Company[] = [];
+    departments: Department[] = [];
     formGroup: FormGroup;
     code: AbstractControl;
     branchNameEn: AbstractControl;
@@ -43,6 +45,7 @@ export class OfficeFormAddComponent extends AppForm {
     bankAddress: AbstractControl;
     active: AbstractControl;
     bankName: AbstractControl;
+    headers: CommonInterface.IHeaderTable[];
 
 
     status: CommonInterface.ICommonTitleValue[] = [
@@ -61,6 +64,14 @@ export class OfficeFormAddComponent extends AppForm {
     ngOnInit(): void {
         this.initForm();
         this.getDataComboBox();
+        this.headers = [
+            { title: 'Department Code', field: 'code', sortable: true },
+            { title: 'Name EN', field: 'deptNameEn', sortable: true },
+            { title: 'Name Local', field: 'deptName', sortable: true },
+            { title: 'Name Abbr', field: 'deptNameAbbr', sortable: true },
+            { title: 'Office', field: 'officeName', sortable: true },
+            { title: 'Status', field: 'active', sortable: true },
+        ];
 
     }
     onSelectDataFormInfo(data: any) {
@@ -68,6 +79,11 @@ export class OfficeFormAddComponent extends AppForm {
         this.selectedDataOffice = data;
         console.log(this.selectedDataOffice);
 
+    }
+
+    getDepartment(data: any) {
+        this.departments = data;
+        console.log(this.departments);
     }
 
     update(formdata: any, data: any) {

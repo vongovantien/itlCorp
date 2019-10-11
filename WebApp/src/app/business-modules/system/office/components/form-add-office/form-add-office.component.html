@@ -260,7 +260,7 @@
                 <div class="row" *ngIf="isDetail">
                     <div class="col-lg-6">
                         <div class="m--margin-top-10 m--margin-bottom-5" *ngIf="isDetail">
-                            <span class="m--font-bolder"></span>
+                            <span class="m--font-bolder">Created:</span>
                             <span class="m--font-brand m--margin-left-5"></span>
                             <span class="m--font-bolder m--margin-left-5">by</span>
                             <span class="m--font-brand m--margin-left-5"></span>
@@ -284,4 +284,37 @@
         </div>
 
     </form>
+
+    <div class="table-wrapper" id="" *ngIf="isDetail">
+        <table class="table table-striped table-brand dataTable">
+            <thead app-table-header [headers]="headers">
+                <th class="m--w-30 first">
+                </th>
+            </thead>
+            <tbody class="tbody-group">
+                <ng-container *ngIf="!isLoading && !!departments.length">
+                    <tr class="text-center" *ngFor="let department of departments; let i = index; trackBy: trackByFn">
+                        <td class="table-actions-col">
+                            <div class="table-actions" style="width: 100px">
+                                <!-- <ng-container>
+                                            <a title="Delete" class="pointer" (click)="showDeletePopup(office)">
+                                                <i class="la la-trash text-danger"></i>
+                                            </a>
+                                        </ng-container> -->
+                                <!-- <span [class.m--margin-left-20]="!office.status">
+                                            <a title="Detail" class="pointer" [routerLink]="office.id">
+                                                <i class="la la-file-text-o"></i>
+                                            </a>
+                                        </span> -->
+                            </div>
+                        </td>
+                        <td>{{department.code}}</td>
+                    </tr>
+                </ng-container>
+                <tr *ngIf="!isLoading && !departments.length" app-table-none-record [colspan]="headers.length + 1">
+                </tr>
+                <tr *ngIf="isLoading" app-table-row-loading></tr>
+            </tbody>
+        </table>
+    </div>
 </div>
