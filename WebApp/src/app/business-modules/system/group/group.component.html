@@ -42,7 +42,8 @@
   <div class="m-portlet">
     <div class="m-portlet__body">
       <!--begin::Form-->
-      <app-form-search-group (onSearch)="onSearchGroup($event)"></app-form-search-group>
+      <app-form-search-group (onSearch)="onSearchGroup($event)">
+      </app-form-search-group>
       <!--end::Form-->
     </div>
   </div>
@@ -67,7 +68,7 @@
                       <i class="la la-edit"></i>
                     </button>
                     <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                      title="Remove unit" data-toggle="modal" data-target="#confirm-delete-modal">
+                      title="Remove unit" (click)="confirmDelete(group)">
                       <i class="la la-trash"></i>
                     </button>
                   </div>
@@ -109,5 +110,6 @@
 <!--end::m-content of stage-management-->
 
 <!--begin::confirm-delete-modal-->
-<app-delete-confirm-modal (delete)="onDelete($event)" [title]="titleConfirmDelete"></app-delete-confirm-modal>
+<confirm-popup [body]="'Do you want to delete?'" [labelConfirm]="'Yes'" (onSubmit)="onDeleteGroup()">
+</confirm-popup>
 <!--end::confirm-delete-modal-->
