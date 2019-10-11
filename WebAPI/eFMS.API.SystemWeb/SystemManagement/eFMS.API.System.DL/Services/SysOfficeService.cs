@@ -168,7 +168,7 @@ namespace eFMS.API.System.DL.Services
                 AddressEn = item.branch.AddressEn,
                 AddressVn = item.branch.AddressVn,
                 CompanyName = item.companyName,
-                Inactive = item.branch.Active,
+                Active = item.branch.Active,
                 ShortName = item.branch.ShortName
             });
 

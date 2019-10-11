@@ -154,7 +154,7 @@ namespace eFMS.API.System.Controllers
         [Route("GetByCompany/{id}")]
         public IActionResult GetOfficeBy (Guid id)
         {
-            var offices = sysBranchService.GetOfficeByCompany(id);
+            var offices = sysOfficeService.GetOfficeByCompany(id);
 
             ResultHandle hs = new ResultHandle { Data = offices, Status = true };
             return Ok(hs);

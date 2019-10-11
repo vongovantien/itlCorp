@@ -24,7 +24,7 @@ namespace eFMS.API.System.DL.ViewModels
         public string BankAddress { get; set; }
         public string BankAccountName { get; set; }
 
-        public bool Active { get; set; }
+        public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
         public byte[] Logo { get; set; }
         public string Code { get; set; }
