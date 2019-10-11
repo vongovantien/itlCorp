@@ -9,6 +9,7 @@ using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.System.Infrastructure.Middlewares;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 
@@ -64,6 +65,7 @@ namespace eFMS.API.System.Controllers
 
         [HttpPost]
         [Route("Add")]
+        [Authorize]
         public IActionResult Add(SysCompanyAddModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -119,7 +121,7 @@ namespace eFMS.API.System.Controllers
 
         [HttpDelete]
         [Route("Delete")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Delete(Guid id)
         {
             var hs = sysCompanyService.Delete(id);
