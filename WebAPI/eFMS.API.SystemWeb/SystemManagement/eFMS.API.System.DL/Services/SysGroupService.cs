@@ -45,10 +45,10 @@ namespace eFMS.API.System.DL.Services
             IQueryable<CatDepartment> departments = null;
             if (criteria.All == null)
             {
-                groups = DataContext.Get(x => x.Code.IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                               && x.NameEn.IndexOf(criteria.NameEN ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                               && x.NameVn.IndexOf(criteria.NameVN ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                               && x.ShortName.IndexOf(criteria.ShortName ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                groups = DataContext.Get(x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                               && (x.NameEn ?? "").IndexOf(criteria.NameEN ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                               && (x.NameVn ?? "").IndexOf(criteria.NameVN ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                               && (x.ShortName ?? "").IndexOf(criteria.ShortName ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                         );
                 departments = departmentRepository.Get(x => x.DeptNameEn.IndexOf(criteria.DepartmentName ?? "", StringComparison.OrdinalIgnoreCase) > -1);
             }

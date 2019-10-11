@@ -178,7 +178,7 @@ namespace eFMS.API.System.Controllers
             }
             else
             {
-                if (sysGroupService.Any(x => x.Code.ToLower().Trim() == code.ToLower().Trim() && x.Id == id))
+                if (sysGroupService.Any(x => x.Code.ToLower().Trim() == code.ToLower().Trim() && x.Id != id))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
