@@ -17,11 +17,11 @@ using eFMS.API.Common.NoSql;
 
 namespace eFMS.API.System.DL.Services
 {
-    public class SysOfficeService :  RepositoryBase<SysOffice, SysOfficeModel>, ISysOfficeService
+    public class SysOfficeService : RepositoryBase<SysOffice, SysOfficeModel>, ISysOfficeService
     {
         private readonly IDistributedCache cache;
         private readonly IContextBase<SysCompany> sysBuRepository;
- 
+
 
 
         public SysOfficeService(IContextBase<SysOffice> repository, IMapper mapper, IContextBase<SysCompany> sysBuRepo, IDistributedCache distributedCache) : base(repository, mapper)
@@ -31,7 +31,7 @@ namespace eFMS.API.System.DL.Services
 
         }
 
-        public HandleState AddOffice(SysOfficeModel  SysOffice)
+        public HandleState AddOffice(SysOfficeModel SysOffice)
         {
             return DataContext.Add(SysOffice);
         }
@@ -145,12 +145,30 @@ namespace eFMS.API.System.DL.Services
             return hs;
         }
 
-        public IQueryable<SysOffice> GetOfficeByCompany(Guid id)
+        public IQueryable<SysOfficeViewModel> GetOfficeByCompany(Guid id)
         {
-            var office = DataContext.Where(x => x.Buid == id);
-            return office;
+            var lstSysOffice = DataContext.Where( office => office.Buid == id);
+            var sysBu = sysBuRepository.Get();
+
+            //join với company.
+            var query = (from branch in lstSysOffice
+                         join bu in sysBu on branch.Buid equals bu.Id
+                         select new { branch, companyName = bu.BunameEn });
+            var result = query.Select(item => new SysOfficeViewModel
+            {
+                Id = item.branch.Id,
+                BranchNameEn = item.branch.BranchNameEn,
+                BranchNameVn = item.branch.BranchNameVn,
+                AddressEn = item.branch.AddressEn,
+                AddressVn = item.branch.AddressVn,
+                CompanyName = item.companyName,
+                Inactive = item.branch.Active,
+                ShortName = item.branch.ShortName
+            });
+
+            return result;
         }
-        
+
 
 
 

@@ -8,13 +8,14 @@ import { Company, Office } from 'src/app/shared/models';
 import { ToastrService } from 'ngx-toastr';
 import { AppForm } from 'src/app/app.form';
 import { forkJoin } from 'rxjs';
+import { AppList } from 'src/app/app.list';
 
 @Component({
     selector: 'app-detail-company-info',
     templateUrl: './detail-company-information.component.html',
     styleUrls: ['./detail-company-information.component.scss']
 })
-export class CompanyInformationDetailComponent extends AppForm {
+export class CompanyInformationDetailComponent extends AppList {
     @ViewChild(CompanyInformationFormAddComponent, { static: false }) formAddCompany: CompanyInformationFormAddComponent;
     formData: IFormAddCompany = {
         code: 'sss',
@@ -132,6 +133,10 @@ export class CompanyInformationDetailComponent extends AppForm {
                     }
                 );
         }
+    }
+
+    cancel() {
+        this._router.navigate(["home/system/company"]);
     }
 }
 

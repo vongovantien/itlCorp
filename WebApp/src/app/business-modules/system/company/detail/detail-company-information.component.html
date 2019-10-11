@@ -38,25 +38,28 @@
                 <tabset class="customClass">
                     <tab heading="Office" id="tab1">
                         <div class="p-3 bg-white">
-                            <!-- <perfect-scrollbar style="max-height: 900px">
+                            <perfect-scrollbar style="max-height: 900px">
                                 <div class="table-wrapper table-scrollabler" id="adv-payment-list-table">
                                     <table class="table table-brand table-hover dataTable">
-                                        <thead app-table-header [headers]="headers"
+                                        <thead app-table-header [headers]="headersOffice"
                                             (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                                             <th class="m--w-50 first">
                                             </th>
                                         </thead>
                                         <tbody class="tbody-group">
-                                            <ng-container *ngIf="!isLoading && !!companies.length">
-                                                <tr></tr>
+                                            <ng-container *ngIf="!isLoading && !!offices.length">
+                                                <tr *ngFor="let office of offices; let i = index; trackBy: trackByFn">
+                                                    <td></td>
+                                                    <td>{{office}}</td>
+                                                </tr>
                                             </ng-container>
                                             <tr *ngIf="!isLoading && !companies.length" app-table-none-record
-                                                [colspan]="headers.length + 1"></tr>
+                                                [colspan]="headersOffice.length + 1"></tr>
                                             <tr *ngIf="isLoading" app-table-row-loading></tr>
                                         </tbody>
                                     </table>
                                 </div>
-                            </perfect-scrollbar> -->
+                            </perfect-scrollbar>
                         </div>
                     </tab>
                     <tab heading="User">
