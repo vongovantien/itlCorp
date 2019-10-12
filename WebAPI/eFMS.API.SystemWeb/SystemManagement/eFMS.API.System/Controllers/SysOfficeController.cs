@@ -75,7 +75,7 @@ namespace eFMS.API.System.Controllers
         /// <returns></returns>
         [HttpDelete]
         [Route("Delete")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Delete(Guid id)
         {
             var hs = sysOfficeService.DeleteOffice(id);
@@ -125,7 +125,7 @@ namespace eFMS.API.System.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Add")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Post(SysOfficeEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -145,6 +145,21 @@ namespace eFMS.API.System.Controllers
             return Ok(result);
         }
         /// <summary>
+        /// get office by companyId
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+
+        [HttpGet]
+        [Route("GetByCompany/{id}")]
+        public IActionResult GetOfficeBy (Guid id)
+        {
+            var offices = sysOfficeService.GetOfficeByCompany(id);
+
+            ResultHandle hs = new ResultHandle { Data = offices, Status = true };
+            return Ok(hs);
+        }
+        
         /// get office by id
         /// </summary>
         /// <param name="id">id of data that need to retrieve</param>

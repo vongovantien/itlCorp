@@ -22,6 +22,8 @@ using System.Reflection;
 using System;
 using eFMS.API.System.DL.Services;
 using eFMS.API.System.DL.IService;
+using eFMS.API.System.DL.Common;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.System.Infrastructure
 {
@@ -36,11 +38,16 @@ namespace eFMS.API.System.Infrastructure
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
+            services.AddTransient<ICurrentUser, CurrentUser>();
             services.AddTransient<ISysUserService, SysUserService>();
             services.AddTransient<ISysOfficeService, SysOfficeService>();
             services.AddTransient<ISysCompanyService, SysCompanyService>();
             services.AddTransient<ICatDepartmentService, CatDepartmentService>();
             services.AddTransient<ISysGroupService, SysGroupService>();
+            services.AddTransient<ISysImageService, SysImageService>();
+            services.AddTransient<ICurrentUser, CurrentUser>();
+
+
         }
 
         public static IServiceCollection AddCulture(this IServiceCollection services, IConfiguration configuration)
@@ -86,6 +93,9 @@ namespace eFMS.API.System.Infrastructure
                 options.RequireHttpsMetadata = bool.Parse(configuration["Authentication:RequireHttpsMetadata"]);
                 options.ApiName = configuration["Authentication:ApiName"];
                 options.ApiSecret = configuration["Authentication:ApiSecret"];
+            });
+            services.Configure<WebUrl>(option => {
+                option.Url = configuration.GetSection("WebUrl").Value;
             });
             return services;
         }

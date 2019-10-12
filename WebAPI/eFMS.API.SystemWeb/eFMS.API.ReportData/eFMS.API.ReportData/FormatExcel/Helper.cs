@@ -823,7 +823,60 @@ namespace eFMS.API.ReportData
 
         #endregion
 
+        #region
+        public Stream CreateDepartmentExcelFile(List<CatDepartmentModel> listObj, Stream stream = null)
+        {
+            try
+            {
+                var list = listObj;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("First Sheet");
+                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
+                    BindingFormatForDepartmentExcel(workSheet, list);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
 
+            }
+            return null;
+        }
+        public void BindingFormatForDepartmentExcel(ExcelWorksheet worksheet, List<CatDepartmentModel> listItems)
+        {
+            // Tạo header
+            worksheet.Cells[1, 1].Value = "Department Code";
+            worksheet.Cells[1, 2].Value = "Name EN";
+            worksheet.Cells[1, 3].Value = "Name Local";
+            worksheet.Cells[1, 4].Value = "Name Abbr";
+            worksheet.Cells[1, 5].Value = "Office";
+            worksheet.Cells[1, 6].Value = "Status";
+
+            worksheet.Cells.AutoFitColumns(minWidth, maxWidth);
+            worksheet.Cells["A1:Z1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            for (int i = 0; i < listItems.Count; i++)
+            {
+                var item = listItems[i];
+                worksheet.Cells[i + 2, 1].Value = item.Code;
+                worksheet.Cells[i + 2, 2].Value = item.DeptNameEn;
+                worksheet.Cells[i + 2, 3].Value = item.DeptName;
+                worksheet.Cells[i + 2, 4].Value = item.DeptNameAbbr;
+                worksheet.Cells[i + 2, 5].Value = item.OfficeName;
+                string status = "";
+                if (item.Active == true)
+                {
+                    status = "Active";
+                } else {
+                    status = "Inactive";
+                }
+                worksheet.Cells[i + 2, 6].Value = status;               
+            }
+        }
+
+        #endregion
 
 
     }

@@ -27,8 +27,8 @@
         <div class="m-portlet">
             <div class="m-porlet__body p-3">
                 <perfect-scrollbar style="max-height: 900px">
-                    <div class="table-wrapper table-scrollabler" id="adv-payment-list-table">
-                        <table class="table table-brand table-hover dataTable table-bordered">
+                    <div class="table-wrapper table-scrollabler">
+                        <table class="table table-brand table-hover dataTable">
                             <thead app-table-header [headers]="headers"
                                 (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                                 <th class="m--w-50 first">
@@ -38,19 +38,17 @@
                                 <ng-container *ngIf="!isLoading && !!companies.length">
                                     <tr class="text-center"
                                         *ngFor="let company of companies; let i = index; trackBy: trackByFn">
-                                        <td>
-                                            <div class="m-checkbox-list d-flex align-items-center">
-                                                <ng-container *ngIf="!company.active">
-                                                    <a title="Delete" class="pointer"
-                                                        (click)="showDeletePopup(company)">
-                                                        <i class="la la-trash text-danger"></i>
-                                                    </a>
-                                                </ng-container>
-                                                <span [class.m--margin-left-20]="!company.active">
-                                                    <a title="Detail" class="pointer" [routerLink]="company.id">
-                                                        <i class="la la-file-text-o"></i>
-                                                    </a>
-                                                </span>
+                                        <td class="table-actions-col">
+                                            <div class="table-actions" style="width: 70px">
+                                                <button (click)="showDeletePopup(company)" [disabled]="company.active"
+                                                    class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                                    <i class="la la-trash"></i>
+                                                </button>
+                                                <a [routerLink]="company.id"
+                                                    class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                    title="Edit">
+                                                    <i class="la la-edit"></i>
+                                                </a>
                                             </div>
                                         </td>
                                         <td>{{company.code}}</td>
@@ -58,14 +56,14 @@
                                         <td>{{company.bunameVn}}</td>
                                         <td>{{company.bunameAbbr}}</td>
                                         <td>
-                                            <span class="text-primary text-underline">{{company.website}}</span>
-                                        </td>
-                                        <td>
                                             <div class="logo-company">
                                                 <img alt="" class="img-fluid"
                                                     onerror="this.src = 'assets/app/media/img/emptydata.png'"
                                                     [src]="company.logoPath">
                                             </div>
+                                        </td>
+                                        <td>
+                                            <span class="text-primary text-underline">{{company.website}}</span>
                                         </td>
                                         <td [ngClass]="!company.active ? 'text-danger' : 'text-success'">
                                             {{company.active ? 'Active' : 'Inactive'}}</td>
@@ -107,4 +105,5 @@
     </div>
 </div>
 
-<confirm-popup [body]="'Do you want to delete this company ?'" [labelCancel]="'No'"></confirm-popup>
+<confirm-popup [body]="'Do you want to delete this company ?'" [labelCancel]="'No'" (onSubmit)="onDelete()">
+</confirm-popup>

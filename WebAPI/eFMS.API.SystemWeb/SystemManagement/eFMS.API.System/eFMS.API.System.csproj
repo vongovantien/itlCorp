@@ -12,15 +12,7 @@
 </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="wwwroot\**" />
-    <Content Remove="wwwroot\**" />
-    <EmbeddedResource Remove="wwwroot\**" />
-    <None Remove="wwwroot\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Remove="Controllers\SysEmployeesController.cs" />
-    <Compile Remove="Controllers\SysGroupController.cs" />
     <Compile Remove="Infrastructure\Middlewares\JsonLocalizationServiceCollectionEx.cs" />
     <Compile Remove="Resources\LanguageSub.cs" />
   </ItemGroup>
@@ -28,6 +20,7 @@
   <ItemGroup>
     <Folder Include="Resources\Files\" />
     <Folder Include="ViewModels\" />
+    <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -64,6 +57,9 @@
     </Reference>
     <Reference Include="eFMS.API.System.Service">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.System.Service.dll</HintPath>
+    </Reference>
+    <Reference Include="eFMS.IdentityServer.DL">
+      <HintPath>..\bin\netcoreapp2.2\eFMS.IdentityServer.DL.dll</HintPath>
     </Reference>
     <Reference Include="ITL.NetCore.Common">
       <HintPath>..\bin\netcoreapp2.2\ITL.NetCore.Common.dll</HintPath>

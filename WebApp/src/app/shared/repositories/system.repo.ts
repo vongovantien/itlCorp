@@ -47,7 +47,7 @@ export class SystemRepo {
     }
 
     getListCompany() {
-        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysBu`).pipe(
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysCompany`).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => {
                 return data;
@@ -65,7 +65,7 @@ export class SystemRepo {
     }
 
     getCompany(page?: number, size?: number, body: any = {}) {
-        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysBu/paging`, body, {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysCompany/paging`, body, {
             page: '' + page,
             size: '' + size
         }).pipe(
@@ -73,14 +73,20 @@ export class SystemRepo {
         );
     }
 
-    getDetailCompany(id: string) {
-        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysBu/${id}`).pipe(
+    updateCompany(id: string, body: any) {
+        return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysCompany/${id}/Update`, body).pipe(
             map((data: any) => data)
         );
     }
 
+    getDetailCompany(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysCompany/${id}`).pipe(
+            map((data: CommonInterface.IResult) => data.data)
+        );
+    }
+
     addNewCompany(body: any) {
-        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysBu/Add`, body).pipe(
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysCompany/Add`, body).pipe(
             map((data: any) => data)
         );
     }
@@ -93,6 +99,11 @@ export class SystemRepo {
             map((data: any) => data)
         );
     }
+    getAllDepartment() {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment`).pipe(
+            map((data: any) => data)
+        );
+    }
 
     getDetailDepartment(id: number) {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/${id}`).pipe(
@@ -100,9 +111,38 @@ export class SystemRepo {
         );
     }
 
+    getGroup(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup/paging`, body, {
+            page: '' + page,
+            size: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+    deleteGroup(id: number) {
+        return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+    addNewGroup(body: any) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+    updateGroup(body: any) {
+        return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup`, body).pipe(
+            map((data: any) => data)
+        );
+    }
     getAllOffice() {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/GetAll`).pipe(
             map((data: any) => data)
+        );
+    }
+
+    getOfficeByCompany(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/GetByCompany/${id}`).pipe(
+            map((data: CommonInterface.IResult) => data.data)
         );
     }
 
@@ -126,6 +166,18 @@ export class SystemRepo {
 
     getDepartmentsByOfficeId(id: string) {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/GetDepartmentByOfficeId`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    deleteCompany(id: string) {
+        return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysCompany/Delete`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getGroupsByDeptId(id: number) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup/Query`, { departmentId: id }).pipe(
             map((data: any) => data)
         );
     }

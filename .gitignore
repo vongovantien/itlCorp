@@ -346,3 +346,9 @@ bin
 /WebAPI/eFMS.API.SystemWeb/eFMS.API.ReportData/eFMS.API.ReportData/obj
 /WebAPI/eFMS.API.SystemWeb/AccountingManagement/eFMS.API.Accounting/obj
 /WebAPI/eFMS.API.SystemWeb/DocumentationManagement/bin
+/WebAPI/eFMS.API.SystemWeb/SystemManagement/bin
+/WebAPI/eFMS.API.SystemWeb/SystemManagement/bin/netcoreapp2.2/ITL.NetCore.Connection.dll
+/WebAPI/eFMS.API.SystemWeb/SystemManagement/bin/netcoreapp2.2/ITL.NetCore.Connection.pdb
+/WebAPI/eFMS.API.SystemWeb/SystemManagement/bin/netcoreapp2.2/eFMS.IdentityServer.DL.dll
+/WebAPI/eFMS.API.SystemWeb/SystemManagement/bin/netcoreapp2.2/ITL.NetCore.Connection.deps.json
+/WebAPI/eFMS.API.SystemWeb/SystemManagement/bin/netcoreapp2.2

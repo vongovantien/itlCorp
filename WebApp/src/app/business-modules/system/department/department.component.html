@@ -58,7 +58,8 @@
                                         <td>{{department.deptName}}</td>
                                         <td>{{department.deptNameAbbr}}</td>
                                         <td>{{department.officeName}}</td>
-                                        <td [ngClass]="department.active ? 'text-success' : 'text-danger'">{{department.active ? 'Active' : 'Inactive'}}</td>
+                                        <td [ngClass]="department.active ? 'text-success' : 'text-danger'">
+                                            {{department.active ? 'Active' : 'Inactive'}}</td>
                                     </tr>
                                 </ng-container>
                                 <tr *ngIf="!departments.length" app-table-none-record [colspan]="headers.length + 1">

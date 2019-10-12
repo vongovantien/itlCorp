@@ -8,7 +8,6 @@ namespace eFMS.API.System.DL.Models
     public class SysCompanyAddModel
     {
         public Guid Id { get; set; }
-        [Required]
         public string CompanyCode { get; set; }
         [Required]
         public string CompanyNameEn { get; set; }

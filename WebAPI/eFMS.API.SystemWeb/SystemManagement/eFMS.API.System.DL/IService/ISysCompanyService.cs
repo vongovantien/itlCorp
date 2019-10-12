@@ -15,7 +15,7 @@ namespace eFMS.API.System.DL.IService
         List<SysCompanyModel> Paging(SysCompanyCriteria criteria, int page, int size, out int rowsCount);
         IQueryable<SysCompanyModel> GetAll();
         HandleState Add(SysCompanyAddModel sysBuModel);
-        HandleState Update(SysCompanyAddModel sysBuModel);
+        HandleState Update(Guid id, SysCompanyAddModel sysBuModel);
         HandleState Delete(Guid id);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -8,6 +9,8 @@ using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.System.Infrastructure.Middlewares;
+using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 
@@ -20,20 +23,21 @@ namespace eFMS.API.System.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    public class SysBuController : ControllerBase
+    public class SysCompanyController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ISysCompanyService sysCompanyService;
+        private readonly ICurrentUser currentUser;
         private readonly IMapper mapper;
-  
-        public SysBuController(IStringLocalizer<LanguageSub> localizer, ISysCompanyService sysCompanyService, 
-            IMapper mapper
+
+        public SysCompanyController(IStringLocalizer<LanguageSub> localizer, ISysCompanyService sysCompanyService,
+            IMapper mapper, ICurrentUser currUser
             )
         {
             stringLocalizer = localizer;
             this.sysCompanyService = sysCompanyService;
             this.mapper = mapper;
-            //currentUser = currUser;
+            currentUser = currUser;
         }
 
 
@@ -63,10 +67,11 @@ namespace eFMS.API.System.Controllers
 
         [HttpPost]
         [Route("Add")]
+        [Authorize]
         public IActionResult Add(SysCompanyAddModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var checkExistMessage = CheckExistCode(model.CompanyCode);
+            var checkExistMessage = CheckExist(model);
             if (checkExistMessage.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
@@ -99,12 +104,12 @@ namespace eFMS.API.System.Controllers
         }
 
         [HttpPut]
-        [Route("Update")]
-        public IActionResult Update(SysCompanyAddModel model)
+        [Route("{id}/Update")]
+        public IActionResult Update(Guid id, SysCompanyAddModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            var hs = sysCompanyService.Update(model);
+            var hs = sysCompanyService.Update(id, model);
 
             var message = HandleError.GetMessage(hs, Crud.Update);
 
@@ -118,7 +123,7 @@ namespace eFMS.API.System.Controllers
 
         [HttpDelete]
         [Route("Delete")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Delete(Guid id)
         {
             var hs = sysCompanyService.Delete(id);
@@ -131,17 +136,30 @@ namespace eFMS.API.System.Controllers
             return Ok(result);
         }
 
-        private string CheckExistCode(string Code)
+        private string CheckExist(SysCompanyAddModel company)
         {
             string message = string.Empty;
-            if (Code != "" || Code != null)
+            if (company.CompanyCode != "" || company.CompanyCode != null)
             {
-                if (sysCompanyService.Any(x => (x.Code == Code)))
+                if (sysCompanyService.Any(x => (x.Code == company.CompanyCode)))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
             }
             return message;
         }
+
+        [HttpGet]
+        [Route("Test/Image")]
+        public List<object> GetImages()
+        {
+            List<object> listData = new List<object> {
+                new { url = "https://i.froala.com/assets/photo1.jpg", thumb = "https://i.froala.com/assets/thumbs/photo1.jpg"},
+                new { url = "https://i.froala.com/assets/photo1.jpg", thumb = "https://i.froala.com/assets/thumbs/photo1.jpg"},
+            };
+            return listData;
+        }
+
+        
     }
 }

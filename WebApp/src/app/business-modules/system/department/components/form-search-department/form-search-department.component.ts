@@ -57,10 +57,10 @@ export class DepartmentFormSearchComponent extends AppForm {
         return [
             { title: 'All', value: 'All' },
             { title: 'Department Code', value: 'Code' },
-            { title: 'Name EN', value: 'NameEN' },
-            { title: 'Name Local', value: 'NameLocal' },
-            { title: 'Name Abbr', value: 'NameAbbr' },
-            { title: 'Office', value: 'Office' },
+            { title: 'Name EN', value: 'DeptName' },
+            { title: 'Name Local', value: 'DeptNameEn' },
+            { title: 'Name Abbr', value: 'DeptNameAbbr' },
+            { title: 'Office', value: 'OfficeName' },
         ];
     }
 
