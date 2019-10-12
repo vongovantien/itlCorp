@@ -258,24 +258,17 @@
                     </div>
                 </div>
                 <div class="row" *ngIf="isDetail">
-                    <div class="col-lg-6">
-                        <div class="m--margin-top-10 m--margin-bottom-5" *ngIf="isDetail">
-                            <span class="m--font-bolder">Created:</span>
-                            <span class="m--font-brand m--margin-left-5"></span>
-                            <span class="m--font-bolder m--margin-left-5">by</span>
-                            <span class="m--font-brand m--margin-left-5"></span>
-                        </div>
+                    <div class="col-6">
+                        Created: {{SelectedOffice.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by <span
+                            class="text-success">{{SelectedOffice.userCreated}}</span>
                     </div>
-                    <div class="col-lg-6">
-                        <div class="m--margin-top-10 m--margin-bottom-5" *ngIf="isDetail">
-                            <span class="m--font-bolder">Modified:</span>
-                            <span class="m--font-brand m--margin-left-5"></span>
-                            <span class="m--font-bolder m--margin-left-5">by</span>
-                            <span class="m--font-brand m--margin-left-5"></span>
-                        </div>
+                    <div class="col-6">
+                        Modified: {{SelectedOffice.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by <span
+                            class="text-success">{{SelectedOffice.userModified}}</span>
                     </div>
 
                 </div>
+
 
 
             </div>
@@ -284,37 +277,169 @@
         </div>
 
     </form>
+    <div *ngIf="isDetail">
+        <ul class="nav nav-tabs m-tabs m-tabs-line m-tabs-line--brand m-tabs-line-danger" role="tablist">
+            <li class="nav-item m-tabs__item">
+                <a class="nav-link m-tabs__link active" data-toggle="tab" href="#groups-tab" role="tab">
+                    Department
+                </a>
+            </li>
+            <li class="nav-item m-tabs__item">
+                <a class="nav-link m-tabs__link" data-toggle="tab" href="#users-tab" role="tab">
+                    User
+                </a>
+            </li>
+        </ul>
+        <div class="tab-content job-tab-content" id="jobTabContent">
+            <div class="tab-pane fade show active" id="groups-tab" role="tabpanel" aria-labelledby="">
+                <div class="m-portlet">
+                    <div class="m-form">
+                        <div class="m-portlet__body">
+                            <div class="table-wrapper table-scrollabler" id="group-list-table">
+                                <table class="table table-striped table-brand table-hover dataTable">
+                                    <thead app-table-header [headers]="headers"
+                                        (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                                        <th class="m--w-50 first">
+                                        </th>
+                                    </thead>
+                                    <tbody class="tbody-group">
+                                        <ng-container *ngIf="!isLoading && !!departments.length">
+                                            <tr class="text-center"
+                                                *ngFor="let department of departments; let i = index; trackBy: trackByFn">
+                                                <td class="table-actions-col">
+                                                    <div class="table-actions" style="width: 100px">
+                                                        <button type="button" title="Detail"
+                                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only pointer"
+                                                            (click)="gotoDetailDepartment(department.id)">
+                                                            <i class="la la-edit"></i>
+                                                        </button>
+                                                        <!-- <ng-container>
+                                                                                <a title="Delete" class="pointer" (click)="showDeletePopup(office)">
+                                                                                    <i class="la la-trash text-danger"></i>
+                                                                                </a>
+                                                                            </ng-container> -->
+                                                        <!-- <span [class.m--margin-left-20]="!office.status">
+                                                                                <a title="Detail" class="pointer" [routerLink]="office.id">
+                                                                                    <i class="la la-file-text-o"></i>
+                                                                                </a>
+                                                                            </span> -->
+                                                    </div>
+                                                </td>
+                                                <td>{{department.code}}</td>
+                                                <td>{{department.deptNameEn}}</td>
+                                                <td>{{department.deptName}}</td>
+                                                <td>{{department.deptNameAbbr}}</td>
+                                                <td>{{department.officeName}}</td>
+                                                <td [ngClass]="department.active ? 'text-success' : 'text-danger'">
+                                                    {{department.active ? 'Active' : 'Inactive'}}</td>
 
-    <div class="table-wrapper" id="" *ngIf="isDetail">
-        <table class="table table-striped table-brand dataTable">
-            <thead app-table-header [headers]="headers">
-                <th class="m--w-30 first">
-                </th>
-            </thead>
-            <tbody class="tbody-group">
-                <ng-container *ngIf="!isLoading && !!departments.length">
-                    <tr class="text-center" *ngFor="let department of departments; let i = index; trackBy: trackByFn">
-                        <td class="table-actions-col">
-                            <div class="table-actions" style="width: 100px">
-                                <!-- <ng-container>
-                                            <a title="Delete" class="pointer" (click)="showDeletePopup(office)">
-                                                <i class="la la-trash text-danger"></i>
-                                            </a>
-                                        </ng-container> -->
-                                <!-- <span [class.m--margin-left-20]="!office.status">
-                                            <a title="Detail" class="pointer" [routerLink]="office.id">
-                                                <i class="la la-file-text-o"></i>
-                                            </a>
-                                        </span> -->
+
+                                            </tr>
+                                        </ng-container>
+                                        <tr *ngIf="!isLoading && !departments.length" app-table-none-record
+                                            [colspan]="headers.length + 1">
+                                        </tr>
+                                        <tr *ngIf="isLoading" app-table-row-loading></tr>
+                                    </tbody>
+                                </table>
                             </div>
-                        </td>
-                        <td>{{department.code}}</td>
-                    </tr>
-                </ng-container>
-                <tr *ngIf="!isLoading && !departments.length" app-table-none-record [colspan]="headers.length + 1">
-                </tr>
-                <tr *ngIf="isLoading" app-table-row-loading></tr>
-            </tbody>
-        </table>
+                            <div class="pagination-nav ">
+                                <!-- <div class="row">
+                                        <div *ngIf="!!departments.length" class="col-sm-6">
+                                            <div class="tatable__pager-size">
+                                                <div class="select-box">
+                                                    <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
+                                                        (change)="selectPageSize(pageSize, dataSearch)" name="pagesize">
+                                                        <ng-container
+                                                            *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
+                                                            <option [ngValue]="item">{{item}} line / screen</option>
+                                                        </ng-container>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6" *ngIf="totalItems > pageSize">
+                                            <div class="float-right">
+                                                <pagination [boundaryLinks]="true" [totalItems]="totalItems"
+                                                    [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
+                                                    [(ngModel)]="page">
+                                                </pagination>
+                                            </div>
+                                        </div>
+                                    </div> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="users-tab" role="tabpanel" aria-labelledby="">
+                <div class="m-portlet">
+                    <div class="m-form">
+                        <div class="m-portlet__body">
+                            <div class="table-wrapper table-scrollabler" id="user-list-table">
+                                <table class="table table-striped table-brand table-hover dataTable">
+                                    <thead app-table-header [headers]="userHeaders">
+                                        <th class="m--w-50 first">
+                                        </th>
+                                    </thead>
+                                    <tbody class="tbody-group">
+                                        <!-- <ng-container *ngIf="!!departments.length"> -->
+                                        <tr>
+                                            <td class="table-actions-col">
+                                                <div class="table-actions">
+                                                    <button type="button" title="Detail"
+                                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only pointer">
+                                                        <i class="la la-edit"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td class="text-underline text-primary pointer">
+                                                <a>User name</a>
+                                            </td>
+                                            <td>Full name</td>
+                                            <td>Position</td>
+                                            <td>Permission</td>
+                                            <td>Level permission</td>
+                                            <td class='text-success'>Active</td>
+                                        </tr>
+
+                                        <!-- </ng-container> -->
+                                        <!-- <tr *ngIf="!departments.length" app-table-none-record [colspan]="headers.length + 1">
+                                            </tr> -->
+                                        <!-- <tr *ngIf="isLoading" app-table-row-loading></tr> -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="pagination-nav ">
+                                <!-- <div class="row">
+                                        <div *ngIf="!!departments.length" class="col-sm-6">
+                                            <div class="tatable__pager-size">
+                                                <div class="select-box">
+                                                    <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
+                                                        (change)="selectPageSize(pageSize, dataSearch)" name="pagesize">
+                                                        <ng-container
+                                                            *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
+                                                            <option [ngValue]="item">{{item}} line / screen</option>
+                                                        </ng-container>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6" *ngIf="totalItems > pageSize">
+                                            <div class="float-right">
+                                                <pagination [boundaryLinks]="true" [totalItems]="totalItems"
+                                                    [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
+                                                    [(ngModel)]="page">
+                                                </pagination>
+                                            </div>
+                                        </div>
+                                    </div> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
 </div>

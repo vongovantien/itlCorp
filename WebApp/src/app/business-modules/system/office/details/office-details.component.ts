@@ -103,6 +103,8 @@ export class OfficeDetailsComponent extends AppPage {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message);
+                            this._router.navigate([`home/system/office`]);
+
                         } else {
                             this._toastService.warning(res.message);
 
@@ -143,6 +145,8 @@ export class OfficeDetailsComponent extends AppPage {
                             this.formData.bankAccountVND = res.data.bankAccountVnd;
                             this.formData.bankAccountUSD = res.data.bankAccountUsd;
                             this.formData.bankAccountName = res.data.bankAccountName;
+                            this.formAdd.SelectedOffice = new Office(res.data);
+                            console.log('office selected:', this.formAdd.SelectedOffice);
 
                             setTimeout(() => {
                                 this.formAdd.selectedCompany = { field: 'id', value: res.data.buid };

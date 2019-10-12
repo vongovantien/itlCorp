@@ -1,20 +1,23 @@
 import { Component, ViewChild } from '@angular/core';
-import { AppForm } from 'src/app/app.form';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { Company } from 'src/app/shared/models';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { finalize } from 'rxjs/internal/operators/finalize';
-import { map } from 'rxjs/internal/operators/map';
 import { Department } from 'src/app/shared/models/system/department';
+import { AppList } from 'src/app/app.list';
+import { SortService } from 'src/app/shared/services';
+import { Router } from '@angular/router';
+import { Office } from 'src/app/shared/models/system/office';
+
 
 
 @Component({
     selector: 'form-add-office',
     templateUrl: './form-add-office.component.html'
 })
-export class OfficeFormAddComponent extends AppForm {
-    selectedDataOffice: any;
+export class OfficeFormAddComponent extends AppList {
+    selectedDataCompany: any;
     isSubmited: boolean = false;
     isDetail: boolean = false;
     isCreate: boolean = false;
@@ -25,6 +28,8 @@ export class OfficeFormAddComponent extends AppForm {
         selectedDisplayFields: [],
     };
     selectedCompany: Partial<CommonInterface.IComboGridData> = {};
+    userHeaders: CommonInterface.IHeaderTable[];
+    SelectedOffice: any = {};
     companies: Company[] = [];
     departments: Department[] = [];
     formGroup: FormGroup;
@@ -56,9 +61,12 @@ export class OfficeFormAddComponent extends AppForm {
 
     constructor(
         private _fb: FormBuilder,
-        private _systemRepo: SystemRepo
+        private _systemRepo: SystemRepo,
+        private _sortService: SortService,
+        private _router: Router
     ) {
         super();
+        this.requestSort = this.sortDepartment;
     }
 
     ngOnInit(): void {
@@ -72,12 +80,20 @@ export class OfficeFormAddComponent extends AppForm {
             { title: 'Office', field: 'officeName', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
         ];
+        this.userHeaders = [
+            { title: 'User Name', field: 'userName', sortable: true },
+            { title: 'Full Name', field: 'fullName', sortable: true },
+            { title: 'Position', field: 'position', sortable: true },
+            { title: 'Permission', field: 'permission', sortable: true },
+            { title: 'Level Permission', field: 'levelPermission', sortable: true },
+            { title: 'Status', field: 'active', sortable: true },
+        ];
 
     }
     onSelectDataFormInfo(data: any) {
         this.selectedCompany = { field: 'id', value: data.id };
-        this.selectedDataOffice = data;
-        console.log(this.selectedDataOffice);
+        this.selectedDataCompany = data;
+        console.log(this.selectedDataCompany);
 
     }
 
@@ -104,8 +120,17 @@ export class OfficeFormAddComponent extends AppForm {
                 },
             );
     }
+
     getDataComboBox() {
         this.getCompanies();
+    }
+
+    sortDepartment(sort: string): void {
+        this.departments = this._sortService.sort(this.departments, sort, this.order);
+    }
+
+    gotoDetailDepartment(id: number) {
+        this._router.navigate([`home/system/department/${id}`]);
     }
 
     getCompanyData(data: any) {
@@ -206,6 +231,7 @@ export class OfficeFormAddComponent extends AppForm {
 
     }
 }
+
 
 export interface IFormAddOffice {
     id: string;

@@ -1,5 +1,9 @@
 export class Office {
     id: string = '';
+    userCreated: string = '';
+    datetimeCreated: string = '';
+    userModified: string = '';
+    datetimeModified: string = '';
     branchNameVn: string = '';
     bankAccountName: string = '';
     branchNameEn: string = '';

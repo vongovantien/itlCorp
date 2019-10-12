@@ -86,7 +86,7 @@ namespace eFMS.API.System.DL.Services
             var sysBu = sysBuRepository.Get();
             var query = (from branch in SysOffices
                          join bu in sysBu on branch.Buid equals bu.Id
-                         select new { branch, companyName = bu.Code });
+                         select new { branch, companyName = bu.BunameEn });
 
             if (criteria.All == null)
             {
