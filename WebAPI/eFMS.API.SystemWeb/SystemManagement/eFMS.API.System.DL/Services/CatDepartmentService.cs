@@ -69,10 +69,10 @@ namespace eFMS.API.System.DL.Services
                 {
                     query = query.Where(x =>
                            criteria.Type == "Code" ? x.Code == criteria.Keyword : true
-                        && criteria.Type == "NameLocal" ? x.DeptName == criteria.Keyword : true
-                        && criteria.Type == "NameEN" ? x.DeptNameEn == criteria.Keyword : true
-                        && criteria.Type == "NameAbbr" ? x.DeptNameAbbr == criteria.Keyword : true
-                        && criteria.Type == "Office" ? x.OfficeName == criteria.Keyword : true
+                        && criteria.Type == "DeptName" ? x.DeptName == criteria.Keyword : true
+                        && criteria.Type == "DeptNameEn" ? x.DeptNameEn == criteria.Keyword : true
+                        && criteria.Type == "DeptNameAbbr" ? x.DeptNameAbbr == criteria.Keyword : true
+                        && criteria.Type == "OfficeName" ? x.OfficeName == criteria.Keyword : true
                     );
                 }
             }

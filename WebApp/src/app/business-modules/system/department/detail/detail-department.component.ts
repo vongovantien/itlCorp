@@ -8,13 +8,16 @@ import { catchError, finalize, tap, switchMap } from 'rxjs/operators';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { Department } from 'src/app/shared/models/system/department';
 import { Office } from 'src/app/shared/models/system/office';
+import { Group } from 'src/app/shared/models/system/group';
+import { SortService } from 'src/app/shared/services';
+import { AppList } from 'src/app/app.list';
 
 @Component({
     selector: 'app-department-detail',
     templateUrl: './detail-department.component.html'
 })
 
-export class DepartmentDetailComponent extends AppPage {
+export class DepartmentDetailComponent extends AppList {
     //@ViewChild(SettlementFormCreateComponent, { static: false }) formCreateSurcharge: SettlementFormCreateComponent;
     formDetail: FormGroup;
     departmentCode: AbstractControl;
@@ -36,16 +39,20 @@ export class DepartmentDetailComponent extends AppPage {
     grpHeaders: CommonInterface.IHeaderTable[];
     userHeaders: CommonInterface.IHeaderTable[];
 
+    groups: Group[] = [];
+
     constructor(
         private _activedRouter: ActivatedRoute,
         private _systemRepo: SystemRepo,
         private _toastService: ToastrService,
         private _router: Router,
         private _fb: FormBuilder,
-        private _progressService: NgProgress
+        private _progressService: NgProgress,
+        private _sortService: SortService,
     ) {
         super();
         this._progressRef = this._progressService.ref();
+        this.requestSort = this.sortGroup;
     }
 
     ngOnInit() {
@@ -55,13 +62,13 @@ export class DepartmentDetailComponent extends AppPage {
                 this.getStatus();
                 this.initForm();
                 this.getDetail();
+                this.getGroupsByDeptId(this.departmentId);
 
                 this.grpHeaders = [
                     { title: 'Group Code', field: 'code', sortable: true },
-                    { title: 'Name EN', field: 'grpNameEn', sortable: true },
-                    { title: 'Name Local', field: 'grpName', sortable: true },
-                    { title: 'Name Abbr', field: 'grpNameAbbr', sortable: true },
-                    { title: 'Department', field: 'departmentName', sortable: true },
+                    { title: 'Name EN', field: 'nameEn', sortable: true },
+                    { title: 'Name Local', field: 'nameVn', sortable: true },
+                    { title: 'Name Abbr', field: 'shortName', sortable: true },
                     { title: 'Status', field: 'active', sortable: true },
                 ];
                 this.userHeaders = [
@@ -179,7 +186,9 @@ export class DepartmentDetailComponent extends AppPage {
                 }),
                 switchMap(() => this._systemRepo.getDetailDepartment(this.departmentId).pipe(
                     catchError(this.catchError),
-                    finalize(() => this._progressRef.complete())
+                    finalize(() => {
+                        this._progressRef.complete();
+                    })
                 ))
             )
             .subscribe(
@@ -204,6 +213,29 @@ export class DepartmentDetailComponent extends AppPage {
                     }
                 },
             );
+    }
+
+    getGroupsByDeptId(id: number) {
+        this._systemRepo.getGroupsByDeptId(id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (data: any) => {
+                    console.log(data);
+                    this.groups = data;
+                    console.log(this.groups)
+                },
+            );
+    }
+
+    sortGroup(sort: string): void {
+        this.groups = this._sortService.sort(this.groups, sort, this.order);
+    }
+
+    gotoDetailGroup(id: number){
+        console.log(`Go to Group detail of ${id}`)
     }
 }
 
