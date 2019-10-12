@@ -88,7 +88,7 @@ export class JobManagementFormSearchComponent extends AppForm {
             this.getPartnerData(this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER));
 
         } else {
-            this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, inactive: false })
+            this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, active: true })
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (dataPartner: any) => {

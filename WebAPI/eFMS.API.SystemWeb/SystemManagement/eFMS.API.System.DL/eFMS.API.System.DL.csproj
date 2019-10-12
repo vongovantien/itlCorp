@@ -22,24 +22,61 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="IService\ICatBranchService.cs" />
-    <Compile Remove="IService\ICatPlaceTypeService.cs" />
-    <Compile Remove="IService\IUserGroupService.cs" />
+    <Compile Remove="Common\DataEnums.cs" />
+    <Compile Remove="Helpers\RedisCacheHelper.cs" />
+    <Compile Remove="Models\CatAreaModel.cs" />
     <Compile Remove="Models\CatBranchModel.cs" />
+    <Compile Remove="Models\CatChargeAddOrUpdateModel.cs" />
+    <Compile Remove="Models\CatChargeDefaultAccountImportModel.cs" />
+    <Compile Remove="Models\CatChargeDefaultAccountModel.cs" />
+    <Compile Remove="Models\CatChargeImportModel.cs" />
+    <Compile Remove="Models\CatChargeModel.cs" />
+    <Compile Remove="Models\CatChargeUpdateModel.cs" />
+    <Compile Remove="Models\CatCommodityGroupModel.cs" />
+    <Compile Remove="Models\CatCommodityModel.cs" />
+    <Compile Remove="Models\CatCountryImportModel.cs" />
+    <Compile Remove="Models\CatCountryModel.cs" />
+    <Compile Remove="Models\CatCurrencyExchangeModel.cs" />
+    <Compile Remove="Models\CatCurrencyModel.cs" />
+    <Compile Remove="Models\CatPartnerGroupModel.cs" />
+    <Compile Remove="Models\CatPartnerImportModel.cs" />
+    <Compile Remove="Models\CatPartnerModel.cs" />
+    <Compile Remove="Models\CatPlaceImportModel.cs" />
+    <Compile Remove="Models\CatPlaceModel.cs" />
     <Compile Remove="Models\CatPlaceTypeModel.cs" />
-    <Compile Remove="Services\CatBranchService.cs" />
-    <Compile Remove="Services\CatPlaceTypeService.cs" />
-    <Compile Remove="Services\UserGroupService.cs" />
+    <Compile Remove="Models\CatSaleManModel.cs" />
+    <Compile Remove="Models\CatStageImportModel.cs" />
+    <Compile Remove="Models\CatStageModel.cs" />
+    <Compile Remove="Models\CatUnitModel.cs" />
+    <Compile Remove="Models\CommodityGroupImportModel.cs" />
+    <Compile Remove="Models\CommodityImportModel.cs" />
+    <Compile Remove="Models\Criteria\CatChargeCriteria.cs" />
+    <Compile Remove="Models\Criteria\CatChargeDefaultAccountCriteria.cs" />
+    <Compile Remove="Models\Criteria\CatCommodityCriteria.cs" />
+    <Compile Remove="Models\Criteria\CatCommodityGroupCriteria.cs" />
+    <Compile Remove="Models\Criteria\CatCountryCriteria.cs" />
+    <Compile Remove="Models\Criteria\CatCurrencyExchangeCriteria.cs" />
+    <Compile Remove="Models\Criteria\CatCurrrencyCriteria.cs" />
+    <Compile Remove="Models\Criteria\CatPartnerCriteria.cs" />
+    <Compile Remove="Models\Criteria\CatPlaceCriteria.cs" />
+    <Compile Remove="Models\Criteria\CatPlaceTypeCriteria.cs" />
+    <Compile Remove="Models\Criteria\CatSalemanCriteria.cs" />
+    <Compile Remove="Models\Criteria\CatStageCriteria.cs" />
+    <Compile Remove="Models\Criteria\CatUnitCriteria.cs" />
+    <Compile Remove="Models\DepartmentPartner.cs" />
+    <Compile Remove="Models\ModeOfTransport.cs" />
+    <Compile Remove="Models\UnitType.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.0.0" />
-    <PackageReference Include="BCrypt-Official" Version="0.1.109" />
     <PackageReference Include="LinqKit.Microsoft.EntityFrameworkCore" Version="1.1.15" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="1.1.2" />
-    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="5.3.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.3.0" />
+    <PackageReference Include="mongocsharpdriver" Version="2.7.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.5.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -49,14 +86,14 @@
     <Reference Include="eFMS.API.System.Service">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.System.Service.dll</HintPath>
     </Reference>
+    <Reference Include="eFMS.IdentityServer.DL">
+      <HintPath>..\bin\netcoreapp2.2\eFMS.IdentityServer.DL.dll</HintPath>
+    </Reference>
     <Reference Include="ITL.NetCore.Common">
       <HintPath>..\bin\netcoreapp2.2\ITL.NetCore.Common.dll</HintPath>
     </Reference>
     <Reference Include="ITL.NetCore.Connection">
       <HintPath>..\bin\netcoreapp2.2\ITL.NetCore.Connection.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\newtonsoft.json\11.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.Data.SqlClient">
       <HintPath>C:\Program Files\dotnet\sdk\NuGetFallbackFolder\system.data.sqlclient\4.5.1\ref\netcoreapp2.1\System.Data.SqlClient.dll</HintPath>

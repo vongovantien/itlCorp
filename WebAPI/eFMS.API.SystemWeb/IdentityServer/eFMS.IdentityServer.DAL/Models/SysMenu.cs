@@ -20,7 +20,7 @@ namespace eFMS.IdentityServer.Service.Models
         public string Icon { get; set; }
         public int? Sequence { get; set; }
         public string Arguments { get; set; }
-        public bool? Inactive { get; set; }
+        public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
 
         public virtual SysMenu Parent { get; set; }

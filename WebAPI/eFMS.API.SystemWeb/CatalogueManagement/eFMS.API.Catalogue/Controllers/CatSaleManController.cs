@@ -131,7 +131,6 @@ namespace eFMS.API.Catalogue.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
             var saleman = mapper.Map<CatSaleManModel>(model);
-            saleman.Id = new Guid(id);
             var hs = catSaleManService.Update(saleman);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

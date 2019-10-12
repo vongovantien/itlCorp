@@ -126,7 +126,7 @@ namespace eFMS.API.Catalogue.Controllers
             var catCommodityGroup = mapper.Map<CatCommodityGroupModel>(model);
             catCommodityGroup.UserCreated = currentUser.UserID;
             catCommodityGroup.DatetimeCreated = catCommodityGroup.DatetimeModified = DateTime.Now;
-            catCommodityGroup.Inactive = false;
+            catCommodityGroup.Active = true;
             var hs = catComonityGroupService.Add(catCommodityGroup);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -157,9 +157,9 @@ namespace eFMS.API.Catalogue.Controllers
             commonityGroup.UserModified = currentUser.UserID;
             commonityGroup.DatetimeModified = DateTime.Now;
             commonityGroup.Id = id;
-            if (commonityGroup.Inactive == true)
+            if (commonityGroup.Active == true)
             {
-                commonityGroup.InactiveOn = DateTime.Now;
+                commonityGroup.InActiveOn = DateTime.Now;
             }
             var hs = catComonityGroupService.Update(commonityGroup, x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Update);

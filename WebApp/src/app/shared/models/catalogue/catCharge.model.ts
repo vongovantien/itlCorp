@@ -13,7 +13,7 @@ export class Charge {
     datetimeCreated: string = '';
     userModified: string = '';
     datetimeModified: string = '';
-    inactive: boolean;
+    active: boolean = true;
     inactiveOn: string = '';
 
     constructor(data?: any) {

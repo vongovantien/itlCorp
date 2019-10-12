@@ -5,7 +5,8 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <button routerLink="/home/catalogue/charge/addnew" type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+            <button routerLink="/home/catalogue/charge/addnew" type="button"
+                class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
                 <span>
                     <i class="la la-plus"></i>
                     <span>
@@ -14,7 +15,8 @@
                 </span>
             </button>
             <div class="dropdown m-dropdown m-dropdown--inline no-arrow">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase dropdown-toggle"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span>
                         <i class="la la-download"></i>
                         <span>
@@ -23,8 +25,10 @@
                     </span>
                 </button>
                 <div class="dropdown-menu" aria-labelledby="">
-                    <a routerLink="/home/catalogue/charge/import" class="dropdown-item" href="javascript:void(0)">Import charge</a>
-                    <a routerLink="/home/catalogue/charge/import-account-voucher" class="dropdown-item" href="javascript:void(0)">Import account voucher</a>
+                    <a routerLink="/home/catalogue/charge/import" class="dropdown-item" href="javascript:void(0)">Import
+                        charge</a>
+                    <a routerLink="/home/catalogue/charge/import-account-voucher" class="dropdown-item"
+                        href="javascript:void(0)">Import account voucher</a>
                 </div>
             </div>
             <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="export()">
@@ -50,14 +54,14 @@
                     <div class="col">
                         <div class="input-group m-input-group m-input-group--square">
                             <div class="input-group-prepend">
-                                <button type="button" class="btn btn-secondary dropdown-toggle"
-                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="false">
                                     {{selectedFilter}}
                                 </button>
                                 <div class="dropdown-menu">
                                     <a *ngFor="let filter of listFilter;let index=index;"
-                                        [ngClass]="{ 'active': filter.filter == selectedFilter}"
-                                        class="dropdown-item" href="javascript:void(0)" (click)="selectedFilter=filter.filter">
+                                        [ngClass]="{ 'active': filter.filter == selectedFilter}" class="dropdown-item"
+                                        href="javascript:void(0)" (click)="selectedFilter=filter.filter">
                                         {{filter.filter}}
                                     </a>
                                 </div>
@@ -72,7 +76,9 @@
                         </div>
                     </div>
                     <div class="col-md-auto">
-                        <button type="reset" class="btn btn-block btn-default m-btn--square m-btn--icon m-btn--uppercase" (click)="resetSearch()">
+                        <button type="reset"
+                            class="btn btn-block btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                            (click)="resetSearch()">
                             <span>
                                 <i class="la la-refresh"></i>
                                 <span>
@@ -96,19 +102,23 @@
                     <thead>
                         <tr>
                             <th class="table-actions-col no-sorting">Actions</th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'code'), 'sorting_desc': (!isDesc && sortKey == 'code') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'code'), 'sorting_desc': (!isDesc && sortKey == 'code') }"
                                 (click)="sort('code')">
                                 <span>Code</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'chargeNameEn'), 'sorting_desc': (!isDesc && sortKey == 'chargeNameEn') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'chargeNameEn'), 'sorting_desc': (!isDesc && sortKey == 'chargeNameEn') }"
                                 (click)="sort('chargeNameEn')">
                                 <span>Name EN</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'chargeNameVn'), 'sorting_desc': (!isDesc && sortKey == 'chargeNameVn') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'chargeNameVn'), 'sorting_desc': (!isDesc && sortKey == 'chargeNameVn') }"
                                 (click)="sort('chargeNameVn')">
                                 <span>Name Local</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'type'), 'sorting_desc': (!isDesc && sortKey == 'type') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'type'), 'sorting_desc': (!isDesc && sortKey == 'type') }"
                                 (click)="sort('type')">
                                 <span>Type</span>
                             </th>
@@ -122,17 +132,20 @@
                             <tr *ngFor="let item of ListCharges">
                                 <td class="table-actions-col">
                                     <div class="table-actions" style="width: 70px">
-                                        <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" (click)="gotoEditPage(item.charge.id)"
-                                            title="Edit stage">
+                                        <button type="button"
+                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            (click)="gotoEditPage(item.charge.id)" title="Edit stage">
                                             <i class="la la-edit"></i>
                                         </button>
-                                        <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal" (click)="prepareDeleteCharge(item.charge.id)">
+                                        <button type="button"
+                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            title="Remove stage" data-toggle="modal" data-target="#confirm-delete-modal"
+                                            (click)="prepareDeleteCharge(item.charge.id)">
                                             <i class="la la-trash"></i>
                                         </button>
                                     </div>
                                 </td>
-                            
+
                                 <td>
                                     <span>{{item.charge.code}}</span>
                                 </td>
@@ -148,13 +161,13 @@
                                 <td>
                                     <span>
                                         <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
-                                            <input type="checkbox" disabled [checked]="item.charge.inactive">
+                                            <input type="checkbox" disabled [checked]="!item.charge.active">
                                             <span></span>
                                         </label>
                                     </span>
                                 </td>
                             </tr>
-                            
+
                         </ng-container>
                     </tbody>
                     <ng-template #noRecord>
@@ -170,10 +183,10 @@
                 </table>
             </div>
             <!--end: Datatable -->
-          <!--begin::pagination-->
-          <app-pagination currentPage *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)"
-            (pagerObject)="setPage($event)"></app-pagination>
-        <!--end::pagination-->
+            <!--begin::pagination-->
+            <app-pagination currentPage *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)"
+                (pagerObject)="setPage($event)"></app-pagination>
+            <!--end::pagination-->
         </div>
     </div>
     <!--end:: m-portlet of charge-table-->
@@ -182,7 +195,8 @@
 
 
 <!--begin::confirm-delete-modal-->
-<div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby="" aria-hidden="true">
+<div class="modal fade" id="confirm-delete-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -197,7 +211,8 @@
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="deleteCharge()"> 
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    data-dismiss="modal" (click)="deleteCharge()">
                     <span>
                         <i class="la la-save"></i>
                         <span>

@@ -44,7 +44,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var currency = mapper.Map<CatCurrency>(entity);
             currency.DatetimeCreated = entity.DatetimeModified = DateTime.Now;
-            currency.Inactive = false;
+            currency.Active = true;
             currency.UserCreated = currentUser.UserID;
             var result = DataContext.Add(currency, true);
             if (result.Success)
@@ -63,9 +63,9 @@ namespace eFMS.API.Catalogue.DL.Services
                 var entity = mapper.Map<CatCurrency>(model);
                 entity.UserModified = currentUser.UserID;
                 entity.DatetimeModified = DateTime.Now;
-                if (entity.Inactive == true)
+                if (entity.Active == true)
                 {
-                    entity.InactiveOn = DateTime.Now;
+                    entity.InActiveOn = DateTime.Now;
                 }
                 result = DataContext.Update(entity, x => x.Id == model.Id, false);
                 if (result.Success)

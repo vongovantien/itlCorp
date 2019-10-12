@@ -30,6 +30,8 @@
         public static readonly string MSG_INVALID_MAX_LENGTH = "MSG_INVALID_MAX_LENGTH";
         public static readonly string MSG_INVALID_NEGATIVE = "MSG_INVALID_NEGATIVE";
 
+        public static readonly string EF_ANNOTATIONS_STRING_LENGTH = "EF_ANNOTATIONS_STRING_LENGTH";
+
         #region customclearance
         public static readonly string MSG_CUSTOM_CLEARANCE_NO_EMPTY = "MSG_CUSTOM_CLEARANCE_NO_EMPTY";
         public static readonly string MSG_CUSTOM_CLEARANCE_DATE_EMPTY = "MSG_CUSTOM_CLEARANCE_DATE_EMPTY";

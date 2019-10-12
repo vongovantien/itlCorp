@@ -27,8 +27,8 @@ namespace eFMS.API.Catalogue.DL.ViewModels
         public Nullable<DateTime> DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public Nullable<DateTime> DatetimeModified { get; set; }
-        public Nullable<bool> Inactive { get; set; }
-        public Nullable<DateTime> InactiveOn { get; set; }
+        public Nullable<bool> Active { get; set; }
+        public Nullable<DateTime> InActiveOn { get; set; }
         public string CountryName { get; set; }
         public string AreaName { get; set; }
         public string LocalAreaName { get; set; }

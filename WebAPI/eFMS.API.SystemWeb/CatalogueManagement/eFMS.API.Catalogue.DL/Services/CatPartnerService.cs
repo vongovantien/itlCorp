@@ -92,7 +92,7 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
             partner.DatetimeModified = DateTime.Now;
             //partner.UserCreated = partner.UserModified = currentUser.UserID;
             partner.UserCreated = partner.UserModified = "admin";
-            partner.Inactive = false;
+            partner.Active = true;
             if(!String.IsNullOrEmpty(partner.InternalReferenceNo))
             {
                 partner.Id =  partner.TaxCode + "." + partner.InternalReferenceNo;
@@ -123,9 +123,9 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
             var entity = mapper.Map<CatPartner>(model);
             entity.DatetimeModified = DateTime.Now;
             entity.UserModified = currentUser.UserID;
-            if (entity.Inactive == true)
+            if (entity.Active == true)
             {
-                entity.InactiveOn = DateTime.Now;
+                entity.InActiveOn = DateTime.Now;
             }
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
             if (hs.Success)
@@ -206,11 +206,10 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
             var sysUsers = sysUserRepository.Get();
             var partners = GetPartners().Where(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             var query = (from partner in partners
-                         join user in sysUsers on partner.UserCreated equals user.Id into userPartners
-                         from y in userPartners.DefaultIfEmpty()
+                         join user in sysUsers on partner.UserCreated equals user.Id
                          join saleman in sysUsers on partner.SalePersonId equals saleman.Id into prods
                          from x in prods.DefaultIfEmpty()
-                         select new { user = y, partner, saleman = x }
+                         select new { user, partner, saleman = x }
                           );
             if (criteria.All == null)
             {
@@ -222,9 +221,9 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
                            && (x.partner.TaxCode ?? "").IndexOf(criteria.TaxCode ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.Tel ?? "").IndexOf(criteria.Tel ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.Fax ?? "").IndexOf(criteria.Fax ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           //&& (x.user.Username ?? "").IndexOf(criteria.UserCreated ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                           && (x.user.Username ?? "").IndexOf(criteria.UserCreated ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.AccountNo ?? "").IndexOf(criteria.AccountNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           && (x.partner.Inactive == criteria.Inactive || criteria.Inactive == null)
+                           && (x.partner.Active == criteria.Active || criteria.Active == null)
                            ));
             }
             else
@@ -239,10 +238,10 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
                            || (x.partner.TaxCode ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            || (x.partner.Tel ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            || (x.partner.Fax ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           //|| (x.user.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                           || (x.user.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            || (x.partner.AccountNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            )
-                           && (x.partner.Inactive == criteria.Inactive || criteria.Inactive == null));
+                           && (x.partner.Active == criteria.Active || criteria.Active == null));
             }
             if (query.Count() == 0) return null;
             List<CatPartnerViewModel> results = new List<CatPartnerViewModel>();
@@ -269,7 +268,7 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
                     partner.DatetimeModified = DateTime.Now;
                     partner.DatetimeCreated = DateTime.Now;
                     partner.Id = partner.AccountNo = partner.TaxCode;
-                    partner.Inactive = false;
+                    partner.Active = true;
                     //dc.CatPartner.Add(partner);
                     DataContext.Add(partner, false);
                 }

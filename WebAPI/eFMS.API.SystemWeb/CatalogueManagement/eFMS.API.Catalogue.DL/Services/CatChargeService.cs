@@ -46,7 +46,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             Guid chargeId = Guid.NewGuid();
             model.Charge.Id = chargeId;
-            model.Charge.Inactive = false;
+            model.Charge.Active = true;
             model.Charge.UserCreated = model.Charge.UserModified = currentUser.UserID;
             model.Charge.DatetimeCreated = DateTime.Now;
 
@@ -57,7 +57,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 foreach (var x in model.ListChargeDefaultAccount)
                 {
                     x.ChargeId = chargeId;
-                    x.Inactive = false;
+                    x.Active = true;
                     x.UserCreated = x.UserModified = currentUser.UserID;
                     x.DatetimeCreated = DateTime.Now;
                     chargeDefaultRepository.Add(x, false);
@@ -121,9 +121,9 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var list = Query(criteria);
             List<object> listReturn = new List<object>();
-            if(criteria.Type!=null && criteria.ServiceTypeId!=null && criteria.Inactive != null)
+            if(criteria.Type!=null && criteria.ServiceTypeId!=null && criteria.Active != null)
             {
-                list = list.Where(x => (x.Type.Trim().ToLower() == criteria.Type.Trim().ToLower() && x.ServiceTypeId.IndexOf(criteria.ServiceTypeId)>-1 && x.Inactive == criteria.Inactive)).ToList();
+                list = list.Where(x => (x.Type.Trim().ToLower() == criteria.Type.Trim().ToLower() && x.ServiceTypeId.IndexOf(criteria.ServiceTypeId)>-1 && x.Active == criteria.Active)).ToList();
             }
             list = list.OrderByDescending(x => x.DatetimeModified).ToList();
             rowsCount = list.Count;
@@ -150,7 +150,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatCharge> Query(CatChargeCriteria criteria)
         {
-            var list = DataContext.Where(x => x.Inactive == criteria.Inactive || criteria.Inactive == null);
+            var list = DataContext.Where(x => x.Active == criteria.Active || criteria.Active == null);
             var currencies = currencyRepository.Get();
             var units = unitRepository.Get();
             if(criteria.All == null)
@@ -321,7 +321,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         CurrencyId = item.CurrencyId,
                         Type = item.Type,
                         ServiceTypeId = item.ServiceTypeId,
-                        Inactive = item.Status.Trim().ToLower() == "active" ? false : true,
+                        Active = item.Status.Trim().ToLower() == "active" ? false : true,
                         DatetimeCreated = DateTime.Now,
                         UserCreated = currentUser.UserID,
                         UserModified = currentUser.UserID
@@ -338,13 +338,13 @@ namespace eFMS.API.Catalogue.DL.Services
             }
         }
 
-        public IQueryable<CatChargeModel> GetSettlePaymentCharges(string keySearch, bool? inActive,int? size)
+        public IQueryable<CatChargeModel> GetSettlePaymentCharges(string keySearch, bool? Active,int? size)
         {
             IQueryable<CatChargeModel> list = null;
             if(size != null)
             {
                 int pageSize = (int)size;
-                list = Paging(x => x.Type != "DEBIT" && (x.Inactive == inActive || inActive == null)
+                list = Paging(x => x.Type != "DEBIT" && (x.Active == Active || Active == null)
                                                      && (x.Code.IndexOf(keySearch ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                             || x.ChargeNameEn.IndexOf(keySearch ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                             || x.ChargeNameVn.IndexOf(keySearch ?? "", StringComparison.OrdinalIgnoreCase) > -1)
@@ -352,7 +352,7 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             else
             {
-                list = Get(x => x.Type != "DEBIT" && (x.Inactive == inActive || inActive == null)
+                list = Get(x => x.Type != "DEBIT" && (x.Active == Active || Active == null)
                                                   && (x.Code.IndexOf(keySearch ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                             || x.ChargeNameEn.IndexOf(keySearch ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                             || x.ChargeNameVn.IndexOf(keySearch ?? "", StringComparison.OrdinalIgnoreCase) > -1)

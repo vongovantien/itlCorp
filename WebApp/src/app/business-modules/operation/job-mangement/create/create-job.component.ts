@@ -114,7 +114,7 @@ export class JobManagementCreateJobComponent extends AppPage {
         this.baseServices
             .post(this.api_menu.Catalogue.PartnerData.query, {
                 partnerGroup: PartnerGroupEnum.CUSTOMER,
-                inactive: false,
+                active: true,
                 all: null
             })
             .subscribe((res: any) => {
@@ -126,7 +126,7 @@ export class JobManagementCreateJobComponent extends AppPage {
         this.baseServices
             .post(this.api_menu.Catalogue.CatPlace.query, {
                 placeType: PlaceTypeEnum.Port,
-                inactive: false
+                active: true
             })
             .subscribe((res: any) => {
                 this.listPort = res;
@@ -137,7 +137,7 @@ export class JobManagementCreateJobComponent extends AppPage {
         this.baseServices
             .post(this.api_menu.Catalogue.PartnerData.query, {
                 partnerGroup: PartnerGroupEnum.CARRIER,
-                inactive: false,
+                active: true,
                 all: null
             })
             .subscribe((res: any) => {
@@ -149,7 +149,7 @@ export class JobManagementCreateJobComponent extends AppPage {
         this.baseServices
             .post(this.api_menu.Catalogue.PartnerData.query, {
                 partnerGroup: PartnerGroupEnum.AGENT,
-                inactive: false,
+                active: true,
                 all: null
             })
             .subscribe((res: any) => {

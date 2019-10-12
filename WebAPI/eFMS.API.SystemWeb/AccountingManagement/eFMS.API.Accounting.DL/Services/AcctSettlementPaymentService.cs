@@ -40,7 +40,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<CatCharge> catChargeRepo;
         readonly IContextBase<CatUnit> catUnitRepo;
         readonly IContextBase<CatPartner> catPartnerRepo;
-        readonly IContextBase<SysBranch> sysBranchRepo;
+        readonly IContextBase<SysOffice> SysOfficeRepo;
 
         public AcctSettlementPaymentService(IContextBase<AcctSettlementPayment> repository,
             IMapper mapper,
@@ -63,7 +63,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatCharge> catCharge,
             IContextBase<CatUnit> catUnit,
             IContextBase<CatPartner> catPartner,
-            IContextBase<SysBranch> sysBranch) : base(repository, mapper)
+            IContextBase<SysOffice> SysOffice) : base(repository, mapper)
         {
             currentUser = user;
             webUrl = url;
@@ -84,7 +84,7 @@ namespace eFMS.API.Accounting.DL.Services
             catChargeRepo = catCharge;
             catUnitRepo = catUnit;
             catPartnerRepo = catPartner;
-            sysBranchRepo = sysBranch;
+            SysOfficeRepo = SysOffice;
         }
 
         #region --- LIST SETTLEMENT PAYMENT ---
@@ -282,7 +282,7 @@ namespace eFMS.API.Accounting.DL.Services
                            JobId = (cst.JobNo != null ? cst.JobNo : ops.JobNo),
                            HBL = (cstd.Hwbno != null ? cstd.Hwbno : ops.Hwbno),
                            MBL = (cstd.Mawb != null ? cstd.Mawb : ops.Mblno),
-                           Amount = sur.Total != null ? sur.Total : 0, 
+                           Amount = sur.Total != null ? sur.Total : 0,
                            ChargeCurrency = sur.CurrencyId,
                            SettlementCurrency = set.SettlementCurrency
                        };
@@ -779,14 +779,14 @@ namespace eFMS.API.Accounting.DL.Services
             else
             {
                 result = csShipmentSurchargeRepo.Get(x =>
-                       x.Id != criteria.SurchargeID
-                    && x.ChargeId == criteria.ChargeID
-                    && x.Hblid == criteria.HBLID
-                    && (criteria.TypeCharge == Constants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == Constants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : 1 == 1))
-                    && (string.IsNullOrEmpty(criteria.CustomNo) ? 1 == 1 : x.ClearanceNo == criteria.CustomNo)
-                    && (string.IsNullOrEmpty(criteria.InvoiceNo) ? 1 == 1 : x.InvoiceNo == criteria.InvoiceNo)
-                    && (string.IsNullOrEmpty(criteria.ContNo) ? 1 == 1 : x.ContNo == criteria.ContNo)
-                    ).Any();
+                   x.Id != criteria.SurchargeID
+                && x.ChargeId == criteria.ChargeID
+                && x.Hblid == criteria.HBLID
+                && (criteria.TypeCharge == Constants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == Constants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : 1 == 1))
+                && (string.IsNullOrEmpty(criteria.CustomNo) ? 1 == 1 : x.ClearanceNo == criteria.CustomNo)
+                && (string.IsNullOrEmpty(criteria.InvoiceNo) ? 1 == 1 : x.InvoiceNo == criteria.InvoiceNo)
+                && (string.IsNullOrEmpty(criteria.ContNo) ? 1 == 1 : x.ContNo == criteria.ContNo)
+                ).Any();
             }
             return result;
         }
@@ -922,7 +922,8 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         var listChargeExists = csShipmentSurchargeRepo.Get(x => idChargeSceneUpdate.Contains(x.Id));
                         var listChargeSceneUpdate = mapper.Map<List<CsShipmentSurcharge>>(chargeSceneUpdate);
-                        listChargeSceneUpdate.ForEach(req => {
+                        listChargeSceneUpdate.ForEach(req =>
+                        {
                             req.UserCreated = listChargeExists.Where(x => x.Id == req.Id).First().UserCreated;
                             req.DatetimeCreated = listChargeExists.Where(x => x.Id == req.Id).First().DatetimeCreated;
                             req.UserModified = userCurrent;
@@ -1490,6 +1491,7 @@ namespace eFMS.API.Accounting.DL.Services
                     chargeCopy.JobId = shipment.JobId;
                     chargeCopy.HBL = shipment.HBL;
                     chargeCopy.MBL = shipment.MBL;
+                    chargeCopy.Hblid = shipment.HBLID;//Lấy HBLID của shipment gán cho surcharge
                     chargeCopy.SettlementCode = null;
 
                     chargesCopy.Add(chargeCopy);
@@ -1723,7 +1725,7 @@ namespace eFMS.API.Accounting.DL.Services
         //Đang gán cứng BrandId của Branch ITL HCM (27d26acb-e247-47b7-961e-afa7b3d7e11e)
         private string GetBUHeadId(string idBranch = "27d26acb-e247-47b7-961e-afa7b3d7e11e")
         {
-            var buHeadId = sysBranchRepo.Get(x => x.Id == Guid.Parse(idBranch)).FirstOrDefault().ManagerId;
+            var buHeadId = SysOfficeRepo.Get(x => x.Id == Guid.Parse(idBranch)).FirstOrDefault().ManagerId;
             return buHeadId;
         }
 

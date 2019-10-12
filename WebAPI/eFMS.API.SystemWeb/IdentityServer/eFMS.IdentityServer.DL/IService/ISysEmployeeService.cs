@@ -7,7 +7,7 @@ using System.Text;
 
 namespace eFMS.IdentityServer.DL.IService
 {
-    public interface ISysEmployeeService : IRepositoryBase<SysEmployee, SysEmployeeModel>
+    public interface ISysEmployeeService : IRepositoryBase<SysEmployee, EmployeeModel>
     {
     }
 }

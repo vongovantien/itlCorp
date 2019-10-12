@@ -8,8 +8,8 @@ namespace eFMS.API.System.Service.ViewModels
     {
         public Guid ID { get; set; }
         public string Code { get; set; }
-        public string Name_VN { get; set; }
-        public string Name_EN { get; set; }
+        public string NameVn { get; set; }
+        public string NameEn { get; set; }
         public string DisplayName { get; set; }
         public string Address { get; set; }
         public Nullable<Guid> DistrictID { get; set; }
@@ -35,5 +35,7 @@ namespace eFMS.API.System.Service.ViewModels
         public string CountryNameEN { get; set; }
         public string AreaNameVN { get; set; }
         public string AreaNameEN { get; set; }
+        public string LocalAreaNameEN { get; set; }
+        public string LocalAreaNameVN { get; set; }
     }
 }

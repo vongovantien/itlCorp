@@ -8,25 +8,19 @@
                         {{searchObject.displayName}}
                     </button>
                     <div class="dropdown-menu">
-                        
-                        <!-- <a class="dropdown-item active" href="javascript:void(0)" (click)="searchTypeChange('All',$event)" id="AllField">
-                            All
-                        </a>
-                        <ng-container *ngFor="let map of settingFields">
-                            <a *ngIf="map.allowSearch == true" class="dropdown-item"  href="javascript:void(0)" (click)="searchTypeChange(map,$event)" attr.id="{{map.header}}Field">
-                                {{ map.header }}
-                            </a>
-                        </ng-container> -->
                         <ng-container *ngFor="let item of settingFields">
-                            <a class="dropdown-item" [ngClass]="{ 'active': item.displayName == searchObject.displayName}"
-                                href="javascript:void(0)" (click)="searchTypeChange(item,$event)" attr.id="{{item.fieldName}}Field">
+                            <a class="dropdown-item"
+                                [ngClass]="{ 'active': item.displayName == searchObject.displayName}"
+                                href="javascript:void(0)" (click)="searchTypeChange(item,$event)"
+                                attr.id="{{item.fieldName}}Field">
                                 {{ item.displayName }}
                             </a>
                         </ng-container>
                     </div>
                 </div>
                 <input type="text" class="form-control" aria-label="Text input with dropdown button"
-                    [(ngModel)]="searchObject.searchString" name="searchString" (change)="searchObject.searchString = searchObject.searchString.trim()">
+                    [(ngModel)]="searchObject.searchString" name="searchString"
+                    (change)="searchObject.searchString = searchObject.searchString.trim()">
                 <div class="input-group-append">
                     <button class="btn btn-primary" type="button" title="Search" (click)="searchClick()">
                         <i class="la la-search"></i>
@@ -42,23 +36,16 @@
                         {{searchObject.displayName}}
                     </button>
                     <div class="dropdown-menu">
-                        
-                        <!-- <a class="dropdown-item active" href="javascript:void(0)" (click)="searchTypeChange('All',$event)" id="AllField">
-                            All
-                        </a>
-                        <ng-container *ngFor="let map of settingFields">
-                            <a *ngIf="map.allowSearch == true" class="dropdown-item"  href="javascript:void(0)" (click)="searchTypeChange(map,$event)" attr.id="{{map.header}}Field">
-                                {{ map.header }}
-                            </a>
-                        </ng-container> -->
                         <ng-container *ngFor="let item of settingFields">
-                            <a class="dropdown-item"  href="javascript:void(0)" (click)="searchTypeChange(item,$event)" attr.id="{{item.fieldName}}Field">
+                            <a class="dropdown-item" href="javascript:void(0)" (click)="searchTypeChange(item,$event)"
+                                attr.id="{{item.fieldName}}Field">
                                 {{ item.displayName }}
                             </a>
                         </ng-container>
                     </div>
                 </div>
-                <input type="text" class="form-control" aria-label="Text input with dropdown button" (change)="searchObject.searchString = searchObject.searchString.trim()"
+                <input type="text" class="form-control" aria-label="Text input with dropdown button"
+                    (change)="searchObject.searchString = searchObject.searchString.trim()"
                     [(ngModel)]="searchObject.searchString" name="searchString">
                 <div class="input-group-append">
                     <button class="btn btn-primary" type="button" title="Search" (click)="searchClick()">
@@ -69,6 +56,6 @@
         </ng-container>
     </div>
     <div class="col-md-auto">
-        <app-default-button [buttonSetting]="resetButtonSetting" (click)="resetSearch()" ></app-default-button>
+        <app-default-button [buttonSetting]="resetButtonSetting" (click)="resetSearch()"></app-default-button>
     </div>
 </div>

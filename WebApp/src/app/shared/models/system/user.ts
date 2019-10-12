@@ -11,7 +11,7 @@ export class User {
     datetimeCreated: string = '';
     userModified: string = '';
     datetimeModified: string = '';
-    inactive: string = '';
+    active: any = true;
     inactiveOn: string = '';
     preferred_username: string = '';
     constructor(data?: any) {

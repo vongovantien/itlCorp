@@ -18,7 +18,7 @@ using System.IO;
 
 namespace eFMS.IdentityServer.DL.Services
 {
-    public class AuthenticateService : RepositoryBase<SysUser, SysUserModel>, IAuthenUserService
+    public class AuthenticateService : RepositoryBase<SysUser, UserModel>, IAuthenUserService
     {
         protected ISysUserLogService userLogService;
         readonly LDAPConfig ldap;
@@ -33,33 +33,33 @@ namespace eFMS.IdentityServer.DL.Services
             employeeRepository = employeeRepo;
         }
 
-        public SysUserViewModel GetUserById(string id)
+        public UserViewModel GetUserById(string id)
         {
-            var data = ((eFMSDataContext)DataContext.DC).SysEmployee.Join(((eFMSDataContext)DataContext.DC).SysUser, x => x.Id, y => y.EmployeeId,
-                (x, y) => new { x, y }).FirstOrDefault(x => x.y.Id == id);
-            if (data == null) return null;
-            var result = new SysUserViewModel();
-            result.Id = data.y.Id;
-            result.Username = data.y.Username;
-            //result.UserGroupId = data.y.UserGroupId;
-            result.EmployeeId = data.y.EmployeeId;
-            result.WorkPlaceId = data.y.WorkPlaceId;
-            result.RefuseEmail = data.y.RefuseEmail;
-            result.LdapObjectGuid = data.y.LdapObjectGuid;
-            result.DepartmentId = data.x.DepartmentId;
-            result.EmployeeNameVn = data.x.EmployeeNameVn;
-            result.EmployeeNameEn = data.x.EmployeeNameEn;
-            result.Position = data.x.Position;
-            result.Birthday = data.x.Birthday;
-            result.ExtNo = data.x.ExtNo;
-            result.Tel = data.x.Tel;
-            result.HomePhone = data.x.HomePhone;
-            result.HomeAddress = data.x.HomeAddress;
-            result.Email = data.x.Email;
-            result.Photo = data.x.Photo;
-            result.EmpPhotoSize = data.x.EmpPhotoSize;
-            var inActive = (data.y.Inactive == null || data.y.Inactive == true ) ? true : false;
-            result.InActive = inActive;
+            var user = DataContext.Get(x => x.Id == id).FirstOrDefault();
+            if (user == null) return null;
+            var employee = employeeRepository.Get(x => x.Id == user.EmployeeId).FirstOrDefault();
+            var result = new UserViewModel();
+
+            result.Id = user.Id;
+            result.Username = user.Username;
+            result.EmployeeId = user.EmployeeId;
+            result.WorkPlaceId = user.WorkPlaceId;
+            result.RefuseEmail = user.RefuseEmail;
+            result.LdapObjectGuid = user.LdapObjectGuid;
+            result.DepartmentId = employee?.DepartmentId;
+            result.EmployeeNameVn = employee?.EmployeeNameVn;
+            result.EmployeeNameEn = employee?.EmployeeNameEn;
+            result.Position = employee?.Position;
+            result.Birthday = employee?.Birthday;
+            result.ExtNo = employee?.ExtNo;
+            result.Tel = employee?.Tel;
+            result.HomePhone = employee?.HomePhone;
+            result.HomeAddress = employee?.HomeAddress;
+            result.Email = employee?.Email;
+            result.Photo = employee?.Photo;
+            result.EmpPhotoSize = employee?.EmpPhotoSize;
+            var active = (user.Active == null || user.Active == true ) ? true : false;
+            result.Active = active;
             return result;
         }
         private string Signature(string password)
@@ -109,13 +109,13 @@ namespace eFMS.IdentityServer.DL.Services
                         employee = employeeRepository.Get(x => x.Id == user.EmployeeId).FirstOrDefault();
                         modelReturn = UpdateUserInfoFromLDAP(ldapInfo, user, false, employee);
                         //modelReturn = SetLoginReturnModel(user, employee);
-                        LogUserLogin(user, true ? employee.WorkPlaceId.ToString() : null);
+                        LogUserLogin(user, employee.WorkPlaceId);
                         return 1;
                     }
                 }
                 user = new SysUser { Username = username, Password = password, UserCreated = "admin" };
                 modelReturn = UpdateUserInfoFromLDAP(ldapInfo, user, true, null);
-                LogUserLogin(user, true ? modelReturn.workplaceId?.ToString() : null);
+                LogUserLogin(user, modelReturn.workplaceId);
                 return 1;
             }
             if (user == null)
@@ -125,7 +125,7 @@ namespace eFMS.IdentityServer.DL.Services
             }
             employee = employeeRepository.Get(x => x.Id == user.EmployeeId).FirstOrDefault();
             modelReturn = SetLoginReturnModel(user, employee);
-            LogUserLogin(user, true ? employee.WorkPlaceId.ToString() : null);
+            LogUserLogin(user, employee.WorkPlaceId);
             return 1;
         }
         private LoginReturnModel SetLoginReturnModel(SysUser user, SysEmployee employee)
@@ -135,7 +135,7 @@ namespace eFMS.IdentityServer.DL.Services
                 userName = user.Username,
                 email = employee?.Email,
                 idUser = user.Id,
-                workplaceId = employee?.Id,
+                workplaceId = employee?.WorkPlaceId,
                 status = true,
                 message = "Login successfull !"
             };
@@ -186,7 +186,7 @@ namespace eFMS.IdentityServer.DL.Services
             }
             return modelReturn;
         }
-        private void LogUserLogin(SysUser user, string workplaceId)
+        private void LogUserLogin(SysUser user, Guid? workplaceId)
         {
             var userLog = new SysUserLogModel
             {

@@ -1,13 +1,19 @@
 import { AppPage } from './app.base';
-import { AbstractControl, FormControl, FormGroup} from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
+import { ButtonModalSetting } from './shared/models/layout/button-modal-setting.model';
+import { ButtonType } from './shared/enums/type-button.enum';
 
 export abstract class AppForm extends AppPage {
 
     requestSearch: any = null;
     requestReset: any = null;
     isDisabled: boolean = null;
+    isSubmitted: boolean = false;
 
-  
+    resetButtonSetting: ButtonModalSetting = {
+        typeButton: ButtonType.reset
+    };
+
     constructor() {
         super();
     }
@@ -47,12 +53,12 @@ export abstract class AppForm extends AppPage {
         }
     }
 
-    search() {
-        this.requestSearch();
+    search($event?: any) {
+        this.requestSearch($event);
     }
 
-    reset() {
-        this.requestReset();
+    reset($event?: any) {
+        this.requestReset($event);
     }
 
 }

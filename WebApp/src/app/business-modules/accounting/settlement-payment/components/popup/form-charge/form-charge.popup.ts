@@ -360,7 +360,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
             this.getPartnerData(this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER));
         } else {
-            this._catalogueRepo.getListPartner(null, null, { inactive: false })
+            this._catalogueRepo.getListPartner(null, null, { active: true })
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (dataPartner: any) => {

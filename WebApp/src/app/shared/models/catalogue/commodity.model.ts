@@ -10,7 +10,7 @@ export class Commodity {
     datetimeCreated?: Date;
     userModified?: string;
     datetimeModified?: Date;
-    inactive: boolean;
+    active: boolean;
     inactiveOn?: Date;
-    code:String
+    code: String
 }

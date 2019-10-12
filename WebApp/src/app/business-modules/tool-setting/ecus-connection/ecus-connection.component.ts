@@ -8,11 +8,10 @@ import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
 import { SortService } from 'src/app/shared/services/sort.service';
-declare var $: any; 
+declare var $: any;
 @Component({
     selector: 'app-ecus-connection',
     templateUrl: './ecus-connection.component.html',
-    styleUrls: ['./ecus-connection.component.sass']
 })
 export class EcusConnectionComponent implements OnInit {
 
@@ -70,24 +69,26 @@ export class EcusConnectionComponent implements OnInit {
     getEcusConnections(pager: PagerSetting) {
 
         this.baseService.spinnerShow();
-        this.baseService.post(this.api_menu.Operation.EcusConnection.paging 
+        this.baseService.post(this.api_menu.Operation.EcusConnection.paging
             + '?pageNumber=' + pager.currentPage + '&pageSize=' + pager.pageSize, this.criteria).subscribe((res: any) => {
-            if (res != null) {
-                this.pager.totalItems = res.totalItems;
-                this.EcusConnections = this.sortService.sort(res.data, 'name', this.isDesc);
-                console.log(this.EcusConnections);
-            }
-            else {
-                this.EcusConnections = [];
-                this.pager.totalItems = 0;
-            }
-            this.baseService.spinnerHide();
-        });
+                if (res != null) {
+                    this.pager.totalItems = res.totalItems;
+                    this.EcusConnections = this.sortService.sort(res.data, 'name', this.isDesc);
+                    console.log(this.EcusConnections);
+                }
+                else {
+                    this.EcusConnections = [];
+                    this.pager.totalItems = 0;
+                }
+                this.baseService.spinnerHide();
+            });
+        this.baseService.spinnerHide();
+
     }
 
     async getEcusConnectionDetails(id: number) {
         this.EcusConnectionEdit = await this.baseService.getAsync(this.api_menu.Operation.EcusConnection.details
-                                                                    + '?id=' + id, true, false);
+            + '?id=' + id, true, false);
     }
 
     setPage(pager: PagerSetting) {
@@ -158,12 +159,12 @@ export class EcusConnectionComponent implements OnInit {
     isDesc = true;
     sortKey: string = "name";
     sort(property) {
-      this.isDesc = !this.isDesc;
-      this.sortKey = property;
-      this.EcusConnections = this.sortService.sort(this.EcusConnections, property, this.isDesc);
+        this.isDesc = !this.isDesc;
+        this.sortKey = property;
+        this.EcusConnections = this.sortService.sort(this.EcusConnections, property, this.isDesc);
     }
-  
-  
+
+
     /**
    * ng2-select
    */

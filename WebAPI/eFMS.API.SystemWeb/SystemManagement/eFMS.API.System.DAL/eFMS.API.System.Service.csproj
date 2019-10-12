@@ -20,27 +20,80 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Models\DefaulteFMSDataContext.cs" />
-    <Compile Remove="Models\DefaultFMSDataContext.cs" />
+    <Compile Remove="Helpers\ChangeTrackerHelper.cs" />
+    <Compile Remove="Helpers\MongoDbHelper.cs" />
+    <Compile Remove="Models\AcctAdvancePayment.cs" />
+    <Compile Remove="Models\AcctAdvanceRequest.cs" />
+    <Compile Remove="Models\AcctApproveAdvance.cs" />
+    <Compile Remove="Models\AcctApproveSettlement.cs" />
+    <Compile Remove="Models\AcctCdnote.cs" />
+    <Compile Remove="Models\AcctSoa.cs" />
+    <Compile Remove="Models\CatArea.cs" />
+    <Compile Remove="Models\CatBranch.cs" />
+    <Compile Remove="Models\CatCharge.cs" />
+    <Compile Remove="Models\CatChargeDefaultAccount.cs" />
+    <Compile Remove="Models\CatCommodity.cs" />
+    <Compile Remove="Models\CatCommodityGroup.cs" />
+    <Compile Remove="Models\CatContainerType.cs" />
+    <Compile Remove="Models\CatCountry.cs" />
+    <Compile Remove="Models\CatCurrency.cs" />
+    <Compile Remove="Models\CatCurrencyExchange.cs" />
+    <Compile Remove="Models\CatCustomerPlace.cs" />
+    <Compile Remove="Models\CatPartner.cs" />
+    <Compile Remove="Models\CatPartnerContact.cs" />
+    <Compile Remove="Models\CatPartnerContract.cs" />
+    <Compile Remove="Models\CatPartnerGroup.cs" />
+    <Compile Remove="Models\CatPlaceType.cs" />
+    <Compile Remove="Models\CatSaleMan.cs" />
+    <Compile Remove="Models\CatSaleResource.cs" />
+    <Compile Remove="Models\CatServiceType.cs" />
+    <Compile Remove="Models\CatStage.cs" />
+    <Compile Remove="Models\CatTransportationMode.cs" />
+    <Compile Remove="Models\CatUnit.cs" />
+    <Compile Remove="Models\CsManifest.cs" />
+    <Compile Remove="Models\CsMawbcontainer.cs" />
+    <Compile Remove="Models\CsShipmentSurcharge.cs" />
+    <Compile Remove="Models\CsShippingInstruction.cs" />
+    <Compile Remove="Models\CsTransaction.cs" />
+    <Compile Remove="Models\CsTransactionDetail.cs" />
+    <Compile Remove="Models\CustomsDeclaration.cs" />
     <Compile Remove="Models\eFMSDataContext.cs" />
+    <Compile Remove="Models\OpsStageAssigned.cs" />
+    <Compile Remove="Models\OpsTransaction.cs" />
+    <Compile Remove="Models\SetEcusconnection.cs" />
+    <Compile Remove="Models\SysAuthorization.cs" />
+    <Compile Remove="Models\SysAuthorizationDetail.cs" />
+    <Compile Remove="Models\SysMenuPermissionInstruction.cs" />
+    <Compile Remove="Models\SysSentEmailHistory.cs" />
+    <Compile Remove="Models\SysUserLog.cs" />
+    <Compile Remove="Models\SysUserOtherWorkPlace.cs" />
+    <Compile Remove="ViewModels\sp_GetCatPlace.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BCrypt-Official" Version="0.1.109" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.2.0" />
-    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="5.3.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.3.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.2.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" />
+    <PackageReference Include="mongocsharpdriver" Version="2.7.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="eFMS.API.Common">
+      <HintPath>..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
+    </Reference>
     <Reference Include="ITL.NetCore.Common">
       <HintPath>..\bin\netcoreapp2.2\ITL.NetCore.Common.dll</HintPath>
     </Reference>
     <Reference Include="ITL.NetCore.Connection">
       <HintPath>..\bin\netcoreapp2.2\ITL.NetCore.Connection.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Helpers\" />
   </ItemGroup>
 
 </Project>

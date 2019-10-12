@@ -1,8 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { CompanyInfoComponent } from './company-info/company-info.component';
 import { DepartmentComponent } from './department/department.component';
-import { GroupComponent } from './group/group.component';
 import { PermissionComponent } from './permission/permission.component';
 import { RoleComponent } from './role/role.component';
 import { UserManagementComponent } from './user-management/user-management.component';
@@ -14,16 +12,13 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
-    path: 'company-info',
-    component: CompanyInfoComponent
+    path: 'company', loadChildren: () => import('./company/company-information.module').then(m => m.CompanyInformationModule),
   },
   {
-    path: 'department',
-    component: DepartmentComponent
+    path: 'department', loadChildren: () => import('./department/department.module').then(m => m.DepartmentModule),
   },
   {
-    path: 'group',
-    component: GroupComponent
+    path: 'group', loadChildren: () => import('./group/group.module').then(m => m.GroupModule),
   },
   {
     path: 'permission',
@@ -36,7 +31,10 @@ const routes: Routes = [
   {
     path: 'user-management',
     component: UserManagementComponent
-  }
+  },
+  {
+    path: 'office', loadChildren: () => import('./office/office.module').then(m => m.OfficeModule),
+  },
 ];
 
 @NgModule({

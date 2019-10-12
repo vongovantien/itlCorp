@@ -47,7 +47,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             entity.DatetimeCreated = entity.DatetimeModified = DateTime.Now;
             entity.UserCreated = entity.UserModified = currentUser.UserID;
-            entity.Inactive = false;
+            entity.Active = true;
             var country = mapper.Map<CatCountry>(entity);
             var hs = DataContext.Add(country);
             if (hs.Success)
@@ -62,9 +62,9 @@ namespace eFMS.API.Catalogue.DL.Services
             var entity = mapper.Map<CatCountry>(model);
             entity.DatetimeModified = DateTime.Now;
             entity.UserModified = currentUser.UserID;
-            if (entity.Inactive == true)
+            if (entity.Active == true)
             {
-                entity.InactiveOn = DateTime.Now;
+                entity.InActiveOn = DateTime.Now;
             }
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
             if (hs.Success)
@@ -126,7 +126,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 var newList = new List<CatCountry>();
                 foreach (var item in data)
                 {
-                    DateTime? inactive = null;
+                    DateTime? Active = null;
                     var country = new CatCountry
                     {
                         Code = item.Code,
@@ -134,8 +134,8 @@ namespace eFMS.API.Catalogue.DL.Services
                         NameVn = item.NameVn,
                         DatetimeCreated = DateTime.Now,
                         UserCreated = currentUser.UserID,
-                        Inactive = (item.Status ?? "").Contains("active"),
-                        InactiveOn = item.Status != null? DateTime.Now: inactive
+                        Active = (item.Status ?? "").Contains("active"),
+                        InActiveOn = item.Status != null? DateTime.Now: Active
                     };
                     dc.CatCountry.Add(country);
                 }
@@ -205,14 +205,14 @@ namespace eFMS.API.Catalogue.DL.Services
                 query = x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                         && (x.NameEn ?? "").IndexOf(criteria.NameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                         && (x.NameVn ?? "").IndexOf(criteria.NameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                        && (x.Inactive == criteria.Inactive || criteria.Inactive == null);
+                                        && (x.Active == criteria.Active || criteria.Active == null);
             }
             else
             {
                 query = x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                                 || (x.NameEn ?? "").IndexOf(criteria.NameEn ?? "null", StringComparison.OrdinalIgnoreCase) > -1
                                                                 || (x.NameVn ?? "").IndexOf(criteria.NameVn ?? "null", StringComparison.OrdinalIgnoreCase) > -1)
-                                                                && (x.Inactive == criteria.Inactive || criteria.Inactive == null);
+                                                                && (x.Active == criteria.Active || criteria.Active == null);
             }
             IQueryable<CatCountry> data = RedisCacheHelper.Get<CatCountry>(cache, Templates.CatCountry.NameCaching.ListName);
             if (data == null)
@@ -242,8 +242,8 @@ namespace eFMS.API.Catalogue.DL.Services
                         DatetimeCreated = item.DatetimeCreated,
                         UserModified = item.UserModified,
                         DatetimeModified = item.DatetimeModified,
-                        Inactive = item.Inactive,
-                        InactiveOn = item.InactiveOn
+                        Active = item.Active,
+                        InActiveOn = item.InActiveOn
                     };
                     results.Add(country);
                 }
@@ -260,8 +260,8 @@ namespace eFMS.API.Catalogue.DL.Services
                         DatetimeCreated = item.DatetimeCreated,
                         UserModified = item.UserModified,
                         DatetimeModified = item.DatetimeModified,
-                        Inactive = item.Inactive,
-                        InactiveOn = item.InactiveOn
+                        Active = item.Active,
+                        InActiveOn = item.InActiveOn
                     };
                     results.Add(country);
                 }

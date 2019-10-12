@@ -7,7 +7,6 @@ namespace eFMS.API.System.Service.Models
     {
         public SysPermission()
         {
-            SysRolePermission = new HashSet<SysRolePermission>();
         }
 
         public short Id { get; set; }
@@ -18,7 +17,5 @@ namespace eFMS.API.System.Service.Models
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public bool? RequireAccessingForm { get; set; }
-
-        public virtual ICollection<SysRolePermission> SysRolePermission { get; set; }
     }
 }

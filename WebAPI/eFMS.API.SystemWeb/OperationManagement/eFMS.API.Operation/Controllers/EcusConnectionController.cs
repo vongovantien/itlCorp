@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.NoSql;
+using eFMS.API.Operation.DL.Common;
 using eFMS.API.Operation.DL.IService;
 using eFMS.API.Operation.DL.Models;
 using eFMS.API.Operation.DL.Models.Criteria;
@@ -33,7 +34,7 @@ namespace eFMS.API.Operation.Controllers
         /// </summary>
         /// <param name="localizer">inject interface IStringLocalizer</param>
         /// <param name="service">inject interface IEcusConnectionService</param>
-        public EcusConnectionController(IStringLocalizer<Resources.LanguageSub> localizer, IEcusConnectionService service, ICurrentUser user)
+        public EcusConnectionController(IStringLocalizer<LanguageSub> localizer, IEcusConnectionService service, ICurrentUser user)
         {
             stringLocalizer = localizer;
             ecusConnectionService = service;

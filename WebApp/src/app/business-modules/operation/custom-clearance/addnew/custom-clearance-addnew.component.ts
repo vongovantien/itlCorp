@@ -215,7 +215,7 @@ export class CustomClearanceAddnewComponent implements OnInit {
     }
 
     getListCommodity() {
-        this._catalogueRepo.getCommondity()
+        this._catalogueRepo.getCommondity({})
             .subscribe((res: any) => { this.listCommodity = res; });
     }
 

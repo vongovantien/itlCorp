@@ -38,7 +38,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public override HandleState Add(CatUnitModel entity)
         {
             entity.DatetimeCreated = entity.DatetimeModified = DateTime.Now;
-            entity.Inactive = false;
+            entity.Active = true;
             entity.UserCreated = entity.UserModified = currentUser.UserID;
             var unit = mapper.Map<CatUnit>(entity);
             var hs = DataContext.Add(unit);
@@ -54,9 +54,9 @@ namespace eFMS.API.Catalogue.DL.Services
             var entity = mapper.Map<CatUnit>(model);
             entity.DatetimeModified = DateTime.Now;
             entity.UserModified = currentUser.UserID;
-            if(entity.Inactive == true)
+            if(entity.Active == true)
             {
-                entity.InactiveOn = DateTime.Now;
+                entity.InActiveOn = DateTime.Now;
             }
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
             if (hs.Success)
@@ -113,7 +113,7 @@ namespace eFMS.API.Catalogue.DL.Services
             //                            && (x.UnitNameVn ?? "").IndexOf(criteria.UnitNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
             //                            && (x.UnitNameEn ?? "").IndexOf(criteria.UnitNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
             //                            && (x.UnitType ?? "").IndexOf(criteria.UnitType ?? "", StringComparison.OrdinalIgnoreCase) > -1
-            //                            && (x.Inactive == criteria.Inactive || criteria.Inactive == null);
+            //                            && (x.Active == criteria.Active || criteria.Active == null);
             //    //);
             //}
             //else
@@ -122,7 +122,7 @@ namespace eFMS.API.Catalogue.DL.Services
             //                                                    || (x.UnitNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
             //                                                    || (x.UnitNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
             //                                                    || (x.UnitType ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-            //                                                    && (x.Inactive == criteria.Inactive || criteria.Inactive == null);
+            //                                                    && (x.Active == criteria.Active || criteria.Active == null);
             //}
             //list = Query(data, query);
             //return list;
@@ -133,7 +133,7 @@ namespace eFMS.API.Catalogue.DL.Services
             //                            && (x.UnitNameVn ?? "").IndexOf(criteria.UnitNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
             //                            && (x.UnitNameEn ?? "").IndexOf(criteria.UnitNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
             //                            && (x.UnitType ?? "").IndexOf(criteria.UnitType ?? "", StringComparison.OrdinalIgnoreCase) > -1
-            //                            && (x.Inactive == criteria.Inactive || criteria.Inactive == null);
+            //                            && (x.Active == criteria.Active || criteria.Active == null);
             //    //);
             //}
             //else
@@ -142,7 +142,7 @@ namespace eFMS.API.Catalogue.DL.Services
             //                                                    || (x.UnitNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
             //                                                    || (x.UnitNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
             //                                                    || (x.UnitType ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-            //                                                    && (x.Inactive == criteria.Inactive || criteria.Inactive == null);
+            //                                                    && (x.Active == criteria.Active || criteria.Active == null);
             //}
             var data = GetBy(criteria);
             if (data == null) return null;
@@ -167,7 +167,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                         && (x.UnitNameVn ?? "").IndexOf(criteria.UnitNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                         && (x.UnitNameEn ?? "").IndexOf(criteria.UnitNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                         && (x.UnitType ?? "").IndexOf(criteria.UnitType ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                        && (x.Inactive == criteria.Inactive || criteria.Inactive == null);
+                                        && (x.Active == criteria.Active || criteria.Active == null);
                 //);
             }
             else
@@ -176,7 +176,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                                                 || (x.UnitNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                                 || (x.UnitNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                                 || (x.UnitType ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                                                                && (x.Inactive == criteria.Inactive || criteria.Inactive == null);
+                                                                && (x.Active == criteria.Active || criteria.Active == null);
             }
             IQueryable<CatUnit> data = RedisCacheHelper.Get<CatUnit>(cache, Templates.CatUnit.NameCaching.ListName);
             if (data == null)
