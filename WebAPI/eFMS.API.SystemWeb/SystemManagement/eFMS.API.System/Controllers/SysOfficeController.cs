@@ -75,7 +75,7 @@ namespace eFMS.API.System.Controllers
         /// <returns></returns>
         [HttpDelete]
         [Route("Delete")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Delete(Guid id)
         {
             var hs = sysOfficeService.DeleteOffice(id);
@@ -125,7 +125,7 @@ namespace eFMS.API.System.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Add")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Post(SysOfficeEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();

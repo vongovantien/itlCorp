@@ -9,6 +9,8 @@ using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.System.Infrastructure.Middlewares;
+using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 
@@ -25,16 +27,17 @@ namespace eFMS.API.System.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ISysCompanyService sysCompanyService;
+        private readonly ICurrentUser currentUser;
         private readonly IMapper mapper;
 
         public SysCompanyController(IStringLocalizer<LanguageSub> localizer, ISysCompanyService sysCompanyService,
-            IMapper mapper
+            IMapper mapper, ICurrentUser currUser
             )
         {
             stringLocalizer = localizer;
             this.sysCompanyService = sysCompanyService;
             this.mapper = mapper;
-            //currentUser = currUser;
+            currentUser = currUser;
         }
 
 
@@ -64,6 +67,7 @@ namespace eFMS.API.System.Controllers
 
         [HttpPost]
         [Route("Add")]
+        [Authorize]
         public IActionResult Add(SysCompanyAddModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -119,7 +123,7 @@ namespace eFMS.API.System.Controllers
 
         [HttpDelete]
         [Route("Delete")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Delete(Guid id)
         {
             var hs = sysCompanyService.Delete(id);

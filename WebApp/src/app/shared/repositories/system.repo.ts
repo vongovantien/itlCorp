@@ -81,7 +81,7 @@ export class SystemRepo {
 
     getDetailCompany(id: string) {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysCompany/${id}`).pipe(
-            map((data: any) => data)
+            map((data: CommonInterface.IResult) => data.data)
         );
     }
 
@@ -141,7 +141,7 @@ export class SystemRepo {
 
     getOfficeByCompany(id: string) {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/GetByCompany/${id}`).pipe(
-            map((data: any) => data)
+            map((data: CommonInterface.IResult) => data.data)
         );
     }
 
@@ -165,6 +165,12 @@ export class SystemRepo {
 
     getDepartmentsByOfficeId(id: string) {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/GetDepartmentByOfficeId`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    deleteCompany(id: string) {
+        return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysCompany/Delete`, { id: id }).pipe(
             map((data: any) => data)
         );
     }

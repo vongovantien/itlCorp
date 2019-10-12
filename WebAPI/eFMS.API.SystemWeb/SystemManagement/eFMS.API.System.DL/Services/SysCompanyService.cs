@@ -21,6 +21,7 @@ namespace eFMS.API.System.DL.Services
         public SysCompanyService(IContextBase<SysCompany> repository, IMapper mapper) : base(repository, mapper)
         {
             //currentUser = user;
+            SetChildren<SysCompany>("ID", "BUID");
         }
 
         public IQueryable<SysCompanyModel> GetAll()
@@ -49,36 +50,20 @@ namespace eFMS.API.System.DL.Services
         {
 
             var bu = DataContext.Get(); // tạo đối tượng context cho table SysCompany.
-            var result = bu.Where(x => x.Active == true);
 
-            if (criteria.Type == "All")
+            if (criteria.All == null)
             {
-                result = bu.Where(x => ((x.Code ?? "").IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-               && ((x.BunameEn ?? "").IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-               && ((x.BunameVn ?? "").IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
+               bu = bu.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+               && ((x.BunameEn ?? "").IndexOf(criteria.BuNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+               && ((x.BunameVn ?? "").IndexOf(criteria.BuNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
             }
             else
             {
-                result = bu.Where(x => ((x.Code ?? "").IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                && ((x.BunameEn ?? "").IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                && ((x.BunameVn ?? "").IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
+                bu = bu.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                || ((x.BunameEn ?? "").IndexOf(criteria.BuNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                || ((x.BunameVn ?? "").IndexOf(criteria.BuNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
             }
-            //else if (criteria.Type == "Code")
-            //{
-            //    bu = bu.Where(x => x.Code == criteria.Keyword);
-            //}
-            //else if (criteria.Type == "NameAbbr")
-            //{
-            //    bu = bu.Where(x => x.BunameAbbr == criteria.Keyword);
-            //}
-            //else if (criteria.Type == "NameEn")
-            //{
-            //    bu = bu.Where(x => ((x.BunameEn ?? "").IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
-            //}
-            //else
-            //{
-            //    bu = bu.Where(x => x.BunameVn == criteria.Keyword);
-            //}
+           
 
             var responseData = mapper.Map<List<SysCompanyModel>>(bu).ToList(); // maping BU sang SysCompanyModel ( hoặc object # => define trong Mapper.cs);
 
@@ -125,7 +110,7 @@ namespace eFMS.API.System.DL.Services
         {
             try
             {
-                ChangeTrackerHelper.currentUser = "admin";
+                ChangeTrackerHelper.currentUser = "admin"; //TODO
 
                 var hs = DataContext.Delete(x => x.Id == id);
                 return hs;

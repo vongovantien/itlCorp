@@ -45,6 +45,8 @@ namespace eFMS.API.System.Infrastructure
             services.AddTransient<ICatDepartmentService, CatDepartmentService>();
             services.AddTransient<ISysGroupService, SysGroupService>();
             services.AddTransient<ISysImageService, SysImageService>();
+            services.AddTransient<ICurrentUser, CurrentUser>();
+
 
         }
 

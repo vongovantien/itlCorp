@@ -27,7 +27,7 @@
         <div class="m-portlet">
             <div class="m-porlet__body p-3">
                 <perfect-scrollbar style="max-height: 900px">
-                    <div class="table-wrapper table-scrollabler" id="adv-payment-list-table">
+                    <div class="table-wrapper table-scrollabler">
                         <table class="table table-brand table-hover dataTable">
                             <thead app-table-header [headers]="headers"
                                 (onClick)="sortBy($event.sortField ? $event.sortField : '')">
@@ -40,7 +40,7 @@
                                         *ngFor="let company of companies; let i = index; trackBy: trackByFn">
                                         <td class="table-actions-col">
                                             <div class="table-actions" style="width: 70px">
-                                                <button (click)="showDeletePopup()" [disabled]="company.active"
+                                                <button (click)="showDeletePopup(company)" [disabled]="company.active"
                                                     class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
                                                     <i class="la la-trash"></i>
                                                 </button>
@@ -105,4 +105,5 @@
     </div>
 </div>
 
-<confirm-popup [body]="'Do you want to delete this company ?'" [labelCancel]="'No'"></confirm-popup>
+<confirm-popup [body]="'Do you want to delete this company ?'" [labelCancel]="'No'" (onSubmit)="onDelete()">
+</confirm-popup>
