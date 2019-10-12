@@ -9,6 +9,7 @@ import { GroupComponent } from './group.component';
 import { AddGroupComponent } from './add/add-group/add-group.component';
 import { GroupDetailComponent } from './detail/detail-group/detail-group.component';
 import { FormSearchGroupComponent } from './components/form-search-group/form-search-group.component';
+import { FormAddGroupComponent } from './components/form-add-group/form-add-group.component';
 
 
 const routing: Routes = [
@@ -31,7 +32,8 @@ const routing: Routes = [
         GroupComponent,
         AddGroupComponent,
         GroupDetailComponent,
-        FormSearchGroupComponent
+        FormSearchGroupComponent,
+        FormAddGroupComponent
     ],
     imports: [
         CommonModule,
@@ -49,7 +51,8 @@ const routing: Routes = [
         GroupComponent,
         AddGroupComponent,
         GroupDetailComponent,
-        FormSearchGroupComponent
+        FormSearchGroupComponent,
+        FormAddGroupComponent
     ]
 })
 export class GroupModule { }

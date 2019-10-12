@@ -23,6 +23,7 @@ using System;
 using eFMS.API.System.DL.Services;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Common;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.System.Infrastructure
 {
@@ -37,6 +38,7 @@ namespace eFMS.API.System.Infrastructure
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
+            services.AddTransient<ICurrentUser, CurrentUser>();
             services.AddTransient<ISysUserService, SysUserService>();
             services.AddTransient<ISysOfficeService, SysOfficeService>();
             services.AddTransient<ISysCompanyService, SysCompanyService>();

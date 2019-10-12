@@ -99,6 +99,11 @@ export class SystemRepo {
             map((data: any) => data)
         );
     }
+    getAllDepartment() {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment`).pipe(
+            map((data: any) => data)
+        );
+    }
 
     getDetailDepartment(id: number) {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/CatDepartment/${id}`).pipe(

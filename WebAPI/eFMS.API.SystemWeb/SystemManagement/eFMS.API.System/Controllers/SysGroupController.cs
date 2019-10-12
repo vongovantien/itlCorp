@@ -11,6 +11,8 @@ using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.System.Infrastructure.Middlewares;
+using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 
@@ -28,6 +30,7 @@ namespace eFMS.API.System.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ISysGroupService sysGroupService;
         private readonly IMapper mapper;
+        private readonly ICurrentUser currentUser;
 
         /// <summary>
         /// constructor
@@ -35,12 +38,15 @@ namespace eFMS.API.System.Controllers
         /// <param name="localizer"></param>
         /// <param name="groupService"></param>
         /// <param name="imapper"></param>
+        /// <param name="currUser"></param>
         public SysGroupController(IStringLocalizer<LanguageSub> localizer,
             ISysGroupService groupService,
-            IMapper imapper) {
+            IMapper imapper,
+            ICurrentUser currUser) {
             stringLocalizer = localizer;
             sysGroupService = groupService;
             mapper = imapper;
+            currentUser = currUser;
         }
 
         /// <summary>
@@ -99,6 +105,7 @@ namespace eFMS.API.System.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
+        [Authorize]
         public IActionResult Add(SysGroupModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -107,7 +114,7 @@ namespace eFMS.API.System.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
-            model.UserCreated = "admin";
+            model.UserCreated = currentUser.UserID;
             model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
             var hs = sysGroupService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
@@ -126,6 +133,7 @@ namespace eFMS.API.System.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPut]
+        [Authorize]
         public IActionResult Update(SysGroupModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -134,7 +142,7 @@ namespace eFMS.API.System.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
-            model.UserModified = "admin";
+            model.UserModified = currentUser.UserID;
             model.DatetimeModified = DateTime.Now;
             var hs = sysGroupService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
@@ -153,9 +161,10 @@ namespace eFMS.API.System.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
+        [Authorize]
         public IActionResult Delete(short id)
         {
-            var hs = sysGroupService.Delete(x => x.Id == id);
+            var hs = sysGroupService.Delete(x => x.Id == id && x.Active == false);
             var message = HandleError.GetMessage(hs, Crud.Update);
 
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
