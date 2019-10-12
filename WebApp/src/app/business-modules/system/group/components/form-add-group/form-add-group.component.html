@@ -8,7 +8,7 @@
           <form action="" class="row" [formGroup]="formGroup">
             <div class="col-4">
               <div class="form-group"
-                [ngClass]="{'m-form__group has-danger': (code.dirty && !code.valid) || (isSubmited && !code.valid)}">
+                [ngClass]="{'m-form__group has-danger': (code.dirty && !code.valid) || (isSubmitted && !code.valid)}">
                 <label for="">Group Code <span class="text-danger">(*)</span></label>
                 <input type="text" class="form-control m-input m-input--square" placeholder="Group Code"
                   formControlName="code">
@@ -19,7 +19,7 @@
             </div>
             <div class="col-4">
               <div class="form-group"
-                [ngClass]="{'m-form__group has-danger': (groupNameEN.dirty && !groupNameEN.valid) || (isSubmited && !groupNameEN.valid)}">
+                [ngClass]="{'m-form__group has-danger': (groupNameEN.dirty && !groupNameEN.valid) || (isSubmitted && !groupNameEN.valid)}">
                 <label for="">Name EN <span class="text-danger">(*)</span></label>
                 <input type="text" class="form-control m-input m-input--square" placeholder="Name EN"
                   formControlName="groupNameEN">
@@ -30,7 +30,7 @@
             </div>
             <div class="col-4">
               <div class="form-group"
-                [ngClass]="{'m-form__group has-danger': (groupNameVN.dirty && !groupNameVN.valid) || (isSubmited && !groupNameVN.valid)}">
+                [ngClass]="{'m-form__group has-danger': (groupNameVN.dirty && !groupNameVN.valid) || (isSubmitted && !groupNameVN.valid)}">
                 <label for="">Name Local <span class="text-danger">(*)</span></label>
                 <input type="text" class="form-control m-input m-input--square" placeholder="Name Local"
                   formControlName="groupNameVN">
@@ -41,7 +41,7 @@
             </div>
             <div class="col-4">
               <div class="form-group"
-                [ngClass]="{'m-form__group has-danger': (groupNameAbbr.dirty && !groupNameAbbr.valid) || (isSubmited && !groupNameAbbr.valid)}">
+                [ngClass]="{'m-form__group has-danger': (groupNameAbbr.dirty && !groupNameAbbr.valid) || (isSubmitted && !groupNameAbbr.valid)}">
                 <label for="">Name Abbr <span class="text-danger">(*)</span></label>
                 <input type="text" class="form-control m-input m-input--square" placeholder="Name Abbr"
                   formControlName="groupNameAbbr">
@@ -52,7 +52,7 @@
             </div>
             <div class="col-4">
               <div class="form-group"
-                [ngClass]="{'m-form__group has-danger': (department.dirty && !department.valid) || (isSubmited && !department.valid)}">
+                [ngClass]="{'m-form__group has-danger': (department.dirty && !department.valid) || (isSubmitted && !department.valid)}">
                 <label for="">Department <span class="text-danger">(*)</span></label>
                 <select formControlName="department" class="form-control">
                   <option *ngFor="let department of departments" [ngValue]="department">{{department.deptNameEn}}

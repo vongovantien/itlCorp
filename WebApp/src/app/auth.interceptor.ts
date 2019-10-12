@@ -3,6 +3,7 @@ import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
     providedIn: 'root'
@@ -13,6 +14,11 @@ export class AuthInterceptor implements HttpInterceptor {
     authReq: HttpRequest<any> = null;
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         const authHeader = `Bearer ${localStorage.getItem('access_token')}`;
+        if (environment.local) {
+            this.authReq = req.clone(Object.assign({}, req, { headers: req.headers.set('Authorization', authHeader), url: req.url }));
+        } else {
+            this.authReq = req.clone(Object.assign({}, req, { headers: req.headers, url: req.url }));
+        }
         // if (environment.local) {
         //     if (!!this.authReq && this.authReq.url.includes("44369") || !!this.authReq && this.authReq.method === 'DELETE') {
         //         this.authReq = req.clone(Object.assign({}, req, { headers: req.headers.set('Authorization', authHeader), url: req.url }));
@@ -29,7 +35,7 @@ export class AuthInterceptor implements HttpInterceptor {
             catchError((error: HttpErrorResponse) => {
                 switch (error.status) {
                     case 401:
-                        window.location.href = '/login';
+                        window.location.href = '#/login';
                         break;
                 }
                 let errorMessage = '';

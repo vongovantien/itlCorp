@@ -175,8 +175,8 @@ export class SystemRepo {
         );
     }
 
-    getGroupsByDeptId(id: number){
-        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup/Query`, {departmentId: id }).pipe(
+    getGroupsByDeptId(id: number) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup/Query`, { departmentId: id }).pipe(
             map((data: any) => data)
         );
     }

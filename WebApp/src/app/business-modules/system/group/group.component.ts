@@ -67,7 +67,7 @@ export class GroupComponent extends AppList implements OnInit {
   sortGroups(sort: string): void {
     this.groups = this._sortService.sort(this.groups, sort, this.order);
   }
-  onDeleteGroup(event) {
+  onDeleteGroup() {
     this.confirmDeletePopup.hide();
     this.deleteGroup(this.selectedGroup.id);
   }
