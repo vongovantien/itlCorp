@@ -1,7 +1,7 @@
 
 export const environment = {
     production: false,
-    local: false,
+    local: true,
     HOST: {
         WEB_URL: "test.api-efms.itlvn.com",
         ACCOUNTING: "test.api-efms.itlvn.com/Accounting",
