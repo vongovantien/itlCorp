@@ -26,9 +26,14 @@ namespace eFMS.API.ReportData.Models
         }
         public class System
         {
+<<<<<<< HEAD
             public const string DepartmentUrl = "/api/v1/en-US/CatDepartment/QueryData";
             public const string OfficeUrl = "/api/v1/en-US/SysOffice/Query";
 
+=======
+            public const string DepartmentUrl = "/System/api/v1/en-US/CatDepartment/QueryData";
+            public const string CompanyUrl = "/System/api/v1/en-US/SysCompany/Query";
+>>>>>>> dev
         }
     }
 }
