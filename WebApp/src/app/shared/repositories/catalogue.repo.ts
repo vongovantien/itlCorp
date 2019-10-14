@@ -139,7 +139,7 @@ export class CatalogueRepo {
 
     getListSaleman(partnerId: string) {
         // const header: HttpHeaders = new HttpHeaders();
-        return this._api.get(`${environment.HOST.CatalogueLocal}/api/${this.VERSION}/en-US/CatSaleMan/GetBy`, { partnerId: partnerId })
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/GetBy`, { partnerId: partnerId })
             .pipe(
                 map((data: any) => data)
             );
@@ -166,7 +166,7 @@ export class CatalogueRepo {
     }
 
     getListBranch() {
-        return this._api.get(`${environment.HOST.CatalogueLocal}/api/${this.VERSION}/en-US/CatBranch/GetListBranch`)
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatBranch/GetListBranch`)
             .pipe(
                 catchError((error) => throwError(error)),
                 map((data: any) => data)
@@ -258,14 +258,14 @@ export class CatalogueRepo {
     }
 
     createSaleman(body: any = {}) {
-        return this._api.post(`${environment.HOST.CatalogueLocal}/api/${this.VERSION}/vi/CatSaleMan/Add`, body).pipe(
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatSaleMan/Add`, body).pipe(
             map((data: any) => data)
         );
     }
 
     getListSaleManDetail(page?: number, size?: number, body: any = {}) {
         if (!!page && !!size) {
-            return this._api.post(`${environment.HOST.CatalogueLocal}/api/${this.VERSION}/en-US/CatSaleMan/paging`, body, {
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/paging`, body, {
                 page: '' + page,
                 size: '' + size
             }).pipe(
@@ -273,7 +273,7 @@ export class CatalogueRepo {
                 map((data: any) => data)
             );
         } else {
-            return this._api.get(`${environment.HOST.CatalogueLocal}/api/${this.VERSION}/en-US/CatSaleMan`).pipe(
+            return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan`).pipe(
                 map((data: any) => data)
             );
         }
