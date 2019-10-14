@@ -16,6 +16,13 @@ export class ExportRepo {
         );
     }
 
+    exportCompany(searchObject: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/System/ExportCompany`, searchObject).pipe(
+            catchError((error) => throwError(error)),
+            map(data => data)
+        );
+    }
+
 
 
 }
