@@ -2,11 +2,10 @@ import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { NgProgress } from '@ngx-progressbar/core';
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, takeUntil, switchMap, tap } from 'rxjs/operators';
 import { IFormAddCompany, CompanyInformationFormAddComponent } from '../components/form-add-company/form-add-company.component';
 import { Company, Office } from 'src/app/shared/models';
 import { ToastrService } from 'ngx-toastr';
-import { forkJoin } from 'rxjs';
 import { AppList } from 'src/app/app.list';
 
 @Component({
@@ -27,7 +26,7 @@ export class CompanyInformationDetailComponent extends AppList {
     companyId: string = '';
     company: Company;
 
-    offices: Office[] = [];
+    offices: any[] = [];
 
     headersOffice: CommonInterface.IHeaderTable[];
 
@@ -40,6 +39,7 @@ export class CompanyInformationDetailComponent extends AppList {
     ) {
         super();
         this._progressRef = this._progressService.ref();
+
         this.headersOffice = [
             { title: 'Office Code', field: 'code', sortable: true },
             { title: 'Name En', field: 'branchNameEn', sortable: true },
@@ -49,37 +49,31 @@ export class CompanyInformationDetailComponent extends AppList {
             { title: 'Company', field: 'code', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
         ];
-
     }
 
     ngOnInit(): void {
-        this._activedRouter.params.pipe(
-            catchError(this.catchError),
-            takeUntil(this.ngUnsubscribe)
-        ).subscribe((param: Params) => {
-            if (param.id) {
-                this.companyId = param.id;
-                this.getDetailCompany(this.companyId);
-            } else {
-                this._router.navigate(["home/system/company"]);
-            }
-        });
+        this._activedRouter.params
+            .pipe(
+                switchMap((param: Params) => this._systemRepo.getDetailCompany(param.id).pipe(
+                    catchError(this.catchError),
+                    tap((company: Company) => {
+                        this.isLoading = true;
+                        this.companyId = param.id;
+                        this.getDataDetail(company);
+                    }),
+                    switchMap(
+                        (company: Company) => this._systemRepo.getOfficeByCompany(company.id).pipe(
+                            catchError(this.catchError),
+                            finalize(() => this.isLoading = false)
+                        )
+                    )
+                )),
+            )
+            .subscribe((office: Office[]) => {
+                this.offices = (office || []).map(o => new Office(o));
+            });
     }
 
-    getDetailCompany(id: string) {
-        this._progressRef.start();
-        this.isLoading = true;
-        forkJoin([
-            this._systemRepo.getDetailCompany(id),
-            this._systemRepo.getOfficeByCompany(id)
-        ]).pipe(catchError(this.catchError), finalize(() => { this._progressRef.complete(); this.isLoading = false; }))
-            .subscribe(
-                ([dataCompany, offices]: any) => {
-                    this.getDataDetail(dataCompany || []);
-                    this.getOffices(offices);
-                }
-            );
-    }
 
     getDataDetail(company: Company) {
         this.company = new Company(company);
@@ -91,13 +85,12 @@ export class CompanyInformationDetailComponent extends AppList {
         this.formData.active = company.active;
         this.formAddCompany.photoUrl = this.company.logoPath;
 
+
+        this.formAddCompany.removeValidators(this.formAddCompany.code); // * Remove Validate
+        this.formAddCompany.isDisabled = true; // * Disabled code input
+
         this.formAddCompany.formGroup.patchValue(this.formData);
         this.formAddCompany.active.setValue(this.formAddCompany.types.filter(i => i.value === company.active)[0]);
-        this.formAddCompany.code.disable();
-    }
-
-    getOffices(office: Office[] = []) {
-        this.offices = office.map((o: Office) => new Office(o));
     }
 
     saveInformation() {

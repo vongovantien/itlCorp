@@ -26,56 +26,57 @@
 
         <div class="m-portlet">
             <div class="m-porlet__body p-3">
-                <perfect-scrollbar style="max-height: 900px">
-                    <div class="table-wrapper table-scrollabler">
-                        <table class="table table-brand table-hover dataTable">
-                            <thead app-table-header [headers]="headers"
-                                (onClick)="sortBy($event.sortField ? $event.sortField : '')">
-                                <th class="m--w-50 first">
-                                </th>
-                            </thead>
-                            <tbody class="tbody-group">
-                                <ng-container *ngIf="!isLoading && !!companies.length">
-                                    <tr class="text-center"
-                                        *ngFor="let company of companies; let i = index; trackBy: trackByFn">
-                                        <td class="table-actions-col">
-                                            <div class="table-actions" style="width: 70px">
-                                                <button (click)="showDeletePopup(company)" [disabled]="company.active"
-                                                    class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
-                                                    <i class="la la-trash"></i>
-                                                </button>
-                                                <a [routerLink]="company.id"
-                                                    class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                    title="Edit">
-                                                    <i class="la la-edit"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                        <td>{{company.code}}</td>
-                                        <td>{{company.bunameEn}}</td>
-                                        <td>{{company.bunameVn}}</td>
-                                        <td>{{company.bunameAbbr}}</td>
-                                        <td>
-                                            <div class="logo-company">
-                                                <img alt="" class="img-fluid"
-                                                    onerror="this.src = 'assets/app/media/img/emptydata.png'"
-                                                    [src]="company.logoPath">
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span class="text-primary text-underline">{{company.website}}</span>
-                                        </td>
-                                        <td [ngClass]="!company.active ? 'text-danger' : 'text-success'">
-                                            {{company.active ? 'Active' : 'Inactive'}}</td>
-                                    </tr>
-                                </ng-container>
-                                <tr *ngIf="!isLoading && !companies.length" app-table-none-record
-                                    [colspan]="headers.length + 1"></tr>
-                                <tr *ngIf="isLoading" app-table-row-loading></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </perfect-scrollbar>
+                <!-- <perfect-scrollbar style="max-height: 900px"> -->
+                <div class="table-wrapper">
+                    <table class="table table-brand table-striped dataTable">
+                        <thead app-table-header [headers]="headers"
+                            (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                            <th class="m--w-50 first">
+                                Action
+                            </th>
+                        </thead>
+                        <tbody class="tbody-group">
+                            <ng-container *ngIf="!isLoading && !!companies.length">
+                                <tr class="text-center"
+                                    *ngFor="let company of companies; let i = index; trackBy: trackByFn">
+                                    <td class="table-actions-col">
+                                        <div class="table-actions" style="width: 70px">
+                                            <button (click)="showDeletePopup(company)" [disabled]="company.active"
+                                                class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                                <i class="la la-trash"></i>
+                                            </button>
+                                            <a [routerLink]="company.id"
+                                                class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                title="Edit">
+                                                <i class="la la-edit"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td>{{company.code}}</td>
+                                    <td>{{company.bunameEn}}</td>
+                                    <td>{{company.bunameVn}}</td>
+                                    <td>{{company.bunameAbbr}}</td>
+                                    <td>
+                                        <div class="logo-company">
+                                            <img alt="" class="img-fluid"
+                                                onerror="this.src = 'assets/app/media/img/emptydata.png'"
+                                                [src]="company.logoPath">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="text-primary text-underline">{{company.website}}</span>
+                                    </td>
+                                    <td [ngClass]="!company.active ? 'text-danger' : 'text-success'">
+                                        {{company.active ? 'Active' : 'Inactive'}}</td>
+                                </tr>
+                            </ng-container>
+                            <tr *ngIf="!isLoading && !companies.length" app-table-none-record
+                                [colspan]="headers.length + 1"></tr>
+                            <tr *ngIf="isLoading" app-table-row-loading></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- </perfect-scrollbar> -->
                 <div class="pagination-nav ">
                     <div class="row">
                         <div class="col-sm-6">

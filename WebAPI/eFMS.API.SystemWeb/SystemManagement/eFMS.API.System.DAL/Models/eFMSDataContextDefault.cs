@@ -785,12 +785,6 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.SysUserGroup)
-                    .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_sysUserGroup_sysUser");
             });
 
             modelBuilder.Entity<SysUserRole>(entity =>

@@ -118,6 +118,11 @@ export class SystemRepo {
             map((data: any) => data)
         );
     }
+    getUsersInGroup(groupId: number) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserGroup/GetByGroup/${groupId}`).pipe(
+            map((data: any) => data)
+        );
+    }
     getDetailGroup(id: number) {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup/${id}`).pipe(
             map((data: any) => data)

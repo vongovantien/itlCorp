@@ -18,6 +18,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<SysOffice, SysOfficeViewModel>();
             CreateMap<SysGroup, SysGroupModel>();
             CreateMap<SysImage, SysImageModel>();
+            CreateMap<SysUserGroup, SysUserGroupModel>();
 
             //map view model to entity model
             CreateMap<SysOfficeEditModel, SysOfficeModel>();

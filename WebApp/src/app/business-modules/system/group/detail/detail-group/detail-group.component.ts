@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Location } from '@angular/common';
 import { AppForm } from 'src/app/app.form';
 import { FormGroup, Validators, FormBuilder, AbstractControl } from '@angular/forms';
 import { SystemRepo } from 'src/app/shared/repositories';
@@ -7,6 +8,7 @@ import { Params, ActivatedRoute, Router } from '@angular/router';
 import { Group } from 'src/app/shared/models/system/group';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Department } from 'src/app/shared/models/system/department';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-detail-group',
@@ -30,13 +32,16 @@ export class GroupDetailComponent extends AppForm implements OnInit {
   companyName: AbstractControl;
   active: AbstractControl;
   group: Group = null;
+  users: any = null;
   userHeaders: CommonInterface.IHeaderTable[];
 
   constructor(private _systemRepo: SystemRepo,
     private _router: Router,
     private _progressService: NgProgress,
     private _fb: FormBuilder,
-    private _activedRouter: ActivatedRoute) {
+    private _activedRouter: ActivatedRoute,
+    private _toastService: ToastrService,
+    private _location: Location) {
     super();
     this._progressRef = this._progressService.ref();
   }
@@ -48,16 +53,28 @@ export class GroupDetailComponent extends AppForm implements OnInit {
       if (param.id) {
         this.groupId = Number(param.id);
         this.getGroupDetail(this.groupId);
+        this.getUsersInGroup(this.groupId);
         this.userHeaders = [
           { title: 'User Name', field: 'userName', sortable: true },
-          { title: 'Full Name', field: 'fullName', sortable: true },
+          { title: 'Full Name', field: 'employeeName', sortable: true },
           { title: 'Position', field: 'position', sortable: true },
           { title: 'Permission', field: 'permission', sortable: true },
           { title: 'Level Permission', field: 'levelPermission', sortable: true },
-          { title: 'Status', field: 'active', sortable: true },
+          { title: 'Status', field: 'active', sortable: true }
         ];
       }
     });
+  }
+  getUsersInGroup(groupId: number) {
+    this._systemRepo.getUsersInGroup(groupId)
+      .pipe(
+        catchError(this.catchError),
+        finalize(() => this._progressRef.complete())
+      ).subscribe(
+        (res: any) => {
+          this.users = res;
+          console.log(this.users);
+        });
   }
 
   getGroupDetail(groupId: number) {
@@ -69,6 +86,7 @@ export class GroupDetailComponent extends AppForm implements OnInit {
         (res: any) => {
           if (res != null) {
             this.group = res;
+            console.log(this.group);
             this.setValueFormGroup(res);
           } else {
             this.formGroup.reset();
@@ -101,10 +119,18 @@ export class GroupDetailComponent extends AppForm implements OnInit {
       groupNameAbbr: ['', Validators.compose([
         Validators.required,
       ])],
-      department: [],
-      officeName: [''],
-      companyName: [''],
-      active: [this.types[0]],
+      department: ['', Validators.compose([
+        Validators.required
+      ])],
+      officeName: [{ value: '', disabled: true }, Validators.compose([
+        Validators.required
+      ])],
+      companyName: [{ value: '', disabled: true }, Validators.compose([
+        Validators.required
+      ])],
+      active: [this.types[0], Validators.compose([
+        Validators.required
+      ])],
     });
 
     this.code = this.formGroup.controls['code'];
@@ -129,7 +155,35 @@ export class GroupDetailComponent extends AppForm implements OnInit {
       );
   }
   cancel() {
-    this._router.navigate(["home/system/group"]);
+    this._location.back();
   }
-  update() { }
+  update() {
+    this.isSubmitted = true;
+    if (this.formGroup.valid) {
+      this._progressRef.start();
+      const body: any = {
+        id: this.group.id,
+        code: this.code.value,
+        nameEn: this.groupNameEN.value,
+        nameVn: this.groupNameVN.value,
+        shortName: this.groupNameAbbr.value,
+        departmentId: this.department.value.id,
+        active: this.active.value.value
+      };
+      this._systemRepo.updateGroup(body)
+        .pipe(
+          catchError(this.catchError),
+          finalize(() => this._progressRef.complete())
+        )
+        .subscribe(
+          (res: CommonInterface.IResult) => {
+            if (res.status) {
+              this._toastService.success(res.message, '');
+            } else {
+              this._toastService.error(res.message, '');
+            }
+          }
+        );
+    }
+  }
 }

@@ -45,9 +45,7 @@ namespace eFMS.API.System.Infrastructure
             services.AddTransient<ICatDepartmentService, CatDepartmentService>();
             services.AddTransient<ISysGroupService, SysGroupService>();
             services.AddTransient<ISysImageService, SysImageService>();
-            services.AddTransient<ICurrentUser, CurrentUser>();
-
-
+            services.AddTransient<ISysUserGroupService, SysUserGroupService>();
         }
 
         public static IServiceCollection AddCulture(this IServiceCollection services, IConfiguration configuration)

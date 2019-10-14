@@ -15,10 +15,14 @@ namespace eFMS.API.System.DL.Services
     public class SysUserService : RepositoryBase<SysUser, SysUserModel>, ISysUserService
     {
         private readonly IContextBase<SysEmployee> employeeRepository;
+        private readonly IContextBase<SysUserGroup> usergroupRepository;
+
         public SysUserService(IContextBase<SysUser> repository, IMapper mapper, 
-            IContextBase<SysEmployee> employeeRepo) : base(repository, mapper)
+            IContextBase<SysEmployee> employeeRepo,
+            IContextBase<SysUserGroup> usergroupRepo) : base(repository, mapper)
         {
             employeeRepository = employeeRepo;
+            usergroupRepository = usergroupRepo;
         }
 
         public List<SysUserViewModel> GetAll()

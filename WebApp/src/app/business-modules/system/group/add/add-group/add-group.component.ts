@@ -80,7 +80,7 @@ export class AddGroupComponent extends AppForm implements OnInit {
     this.isSubmitted = true;
     if (this.formGroup.valid) {
       this._progressRef.start();
-      const body: IGroupAdd = {
+      const body: any = {
         code: this.code.value,
         nameEn: this.groupNameEN.value,
         nameVn: this.groupNameVN.value,
@@ -107,12 +107,4 @@ export class AddGroupComponent extends AppForm implements OnInit {
   cancel() {
     this._router.navigate(["home/system/group"]);
   }
-}
-interface IGroupAdd {
-  code: string;
-  nameEn: string;
-  nameVn: string;
-  shortName: string;
-  departmentId: number;
-  active: boolean;
 }
