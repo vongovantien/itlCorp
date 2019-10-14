@@ -40,7 +40,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<CatCharge> catChargeRepo;
         readonly IContextBase<CatUnit> catUnitRepo;
         readonly IContextBase<CatPartner> catPartnerRepo;
-        readonly IContextBase<SysOffice> SysOfficeRepo;
+        readonly IContextBase<SysOffice> sysOfficeRepo;
 
         public AcctSettlementPaymentService(IContextBase<AcctSettlementPayment> repository,
             IMapper mapper,
@@ -84,7 +84,7 @@ namespace eFMS.API.Accounting.DL.Services
             catChargeRepo = catCharge;
             catUnitRepo = catUnit;
             catPartnerRepo = catPartner;
-            SysOfficeRepo = SysOffice;
+            sysOfficeRepo = SysOffice;
         }
 
         #region --- LIST SETTLEMENT PAYMENT ---
@@ -1725,7 +1725,7 @@ namespace eFMS.API.Accounting.DL.Services
         //Đang gán cứng BrandId của Branch ITL HCM (27d26acb-e247-47b7-961e-afa7b3d7e11e)
         private string GetBUHeadId(string idBranch = "27d26acb-e247-47b7-961e-afa7b3d7e11e")
         {
-            var buHeadId = SysOfficeRepo.Get(x => x.Id == Guid.Parse(idBranch)).FirstOrDefault().ManagerId;
+            var buHeadId = sysOfficeRepo.Get(x => x.Id == Guid.Parse(idBranch)).FirstOrDefault().ManagerId;
             return buHeadId;
         }
 

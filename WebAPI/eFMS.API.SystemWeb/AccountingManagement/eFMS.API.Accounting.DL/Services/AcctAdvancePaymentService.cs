@@ -33,7 +33,8 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<SysUserGroup> sysUserGroupRepo;
         readonly IContextBase<CatDepartment> catDepartmentRepo;
         readonly IContextBase<SysGroup> sysGroupRepo;
-        readonly IContextBase<SysOffice> SysOfficeRepo;
+        readonly IContextBase<SysOffice> sysOfficeRepo;
+        readonly IContextBase<OpsStageAssigned> opsStageAssignedRepo;
 
         public AcctAdvancePaymentService(IContextBase<AcctAdvancePayment> repository,
             IMapper mapper,
@@ -49,7 +50,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysUserGroup> sysUserGroup,
             IContextBase<CatDepartment> catDepartment,
             IContextBase<SysGroup> sysGroup,
-            IContextBase<SysOffice> SysOffice) : base(repository, mapper)
+            IContextBase<SysOffice> SysOffice,
+            IContextBase<OpsStageAssigned> opsStageAssigned) : base(repository, mapper)
         {
             currentUser = user;
             webUrl = url;
@@ -63,7 +65,8 @@ namespace eFMS.API.Accounting.DL.Services
             sysUserGroupRepo = sysUserGroup;
             catDepartmentRepo = catDepartment;
             sysGroupRepo = sysGroup;
-            SysOfficeRepo = SysOffice;
+            sysOfficeRepo = SysOffice;
+            opsStageAssignedRepo = opsStageAssigned;
         }
 
         public List<AcctAdvancePaymentResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount)
@@ -299,14 +302,35 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public List<Shipments> GetShipments()
         {
-            var shipmentsOperation = opsTransactionRepo
-                                    .Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED)
-                                    .Select(x => new Shipments
-                                    {
-                                        JobId = x.JobNo,
-                                        HBL = x.Hwbno,
-                                        MBL = x.Mblno
-                                    });
+            var userCurrent = currentUser.UserID;
+            //var shipmentsOperation = opsTransactionRepo
+            //                        .Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED)
+            //                        .Select(x => new Shipments
+            //                        {
+            //                            JobId = x.JobNo,
+            //                            HBL = x.Hwbno,
+            //                            MBL = x.Mblno
+            //                        });
+
+            //Start change request Modified 14/10/2019 by Andy.Hoa
+            //Get list shipment operation theo user current
+            var shipmentsOperation = from ops in opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED)
+                                     join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId into osa2
+                                     from osa in osa2.DefaultIfEmpty()
+                                     where osa.MainPersonInCharge == userCurrent
+                                     select new Shipments
+                                     {
+                                         JobId = ops.JobNo,
+                                         HBL = ops.Hwbno,
+                                         MBL = ops.Mblno
+                                     };
+            shipmentsOperation = shipmentsOperation.GroupBy(x => new { x.JobId, x.HBL, x.MBL }).Select(s => new Shipments
+            {
+                JobId = s.Key.JobId,
+                HBL = s.Key.HBL,
+                MBL = s.Key.MBL
+            });
+            //End change request
 
             var shipmentsDocumention = (from t in csTransactionRepo.Get()
                                         join td in csTransactionDetailRepo.Get() on t.Id equals td.JobId
@@ -586,7 +610,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     //Lấy ra NW, CBM, PSC, Container Qty
                     var ops = opsTransactionRepo.Get(x => x.JobNo == jobId).FirstOrDefault();
-                    
+
                     if (ops != null)
                     {
                         contQty += ops.SumContainers.HasValue ? ops.SumContainers.Value : 0;
@@ -994,7 +1018,7 @@ namespace eFMS.API.Accounting.DL.Services
         //Đang gán cứng BrandId của Branch ITL HCM (27d26acb-e247-47b7-961e-afa7b3d7e11e)
         private string GetBUHeadId(string idBranch = "27d26acb-e247-47b7-961e-afa7b3d7e11e")
         {
-            var buHeadId = SysOfficeRepo.Get(x => x.Id == Guid.Parse(idBranch)).FirstOrDefault().ManagerId;
+            var buHeadId = sysOfficeRepo.Get(x => x.Id == Guid.Parse(idBranch)).FirstOrDefault().ManagerId;
             return buHeadId;
         }
 
