@@ -12,6 +12,7 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
 import { Router } from '@angular/router';
+import { ExportRepo } from 'src/app/shared/repositories';
 
 @Component({
     selector: 'app-office',
@@ -45,7 +46,8 @@ export class OfficeComponent extends AppList {
         private _progressService: NgProgress,
         private _toastService: ToastrService,
         private _sortService: SortService,
-        private _router: Router
+        private _router: Router,
+        private _exportRepo: ExportRepo
 
 
     ) {
@@ -79,6 +81,19 @@ export class OfficeComponent extends AppList {
         this.searchOffice();
 
     }
+
+    export() {
+        this._exportRepo.exportOffice(this.criteria)
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    this.downLoadFile(response, "application/ms-excel", 'Office.xlsx');
+                },
+                (errors: any) => {
+                },
+                () => { }
+            );
+    }
+
 
     onSearchOffice(dataSearch: any) {
         this.dataSearch = dataSearch;

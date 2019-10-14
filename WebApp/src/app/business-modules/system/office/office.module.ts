@@ -10,7 +10,6 @@ import { OfficeAddNewComponent } from './addnew/office.addnew.component';
 import { OfficeDetailsComponent } from './details/office-details.component';
 import { OfficeFormSearchComponent } from './components/form-search-office/form-search-office.component';
 import { OfficeFormAddComponent } from './components/form-add-office/form-add-office.component';
-
 import { PaginationModule, TabsModule } from 'ngx-bootstrap';
 
 
@@ -31,7 +30,7 @@ const routing: Routes = [
         FormsModule,
         NgProgressModule,
         PaginationModule.forRoot(),
-        TabsModule,
+        TabsModule.forRoot(),
         ReactiveFormsModule,
         RouterModule.forChild(routing)
     ],

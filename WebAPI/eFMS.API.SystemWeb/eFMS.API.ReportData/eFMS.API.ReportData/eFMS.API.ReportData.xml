@@ -108,18 +108,19 @@
             <param name="catDepartmentCriteria"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.Controllers.ReportDataController.ExportOffice(eFMS.API.ReportData.Models.SysOfficeCriteria)">
-            <summary>
-            Export Office
-            </summary>
-            <param name="sysDeOfficeCriteria"></param>
-            <returns></returns>
         <member name="M:eFMS.API.ReportData.Controllers.SystemReportController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">
             <summary>
             
             </summary>
             <param name="appSettings"></param>
             <param name="fileHelper"></param>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.SystemReportController.ExportOffice(eFMS.API.ReportData.Models.SysOfficeCriteria)">
+            <summary>
+            Export Office
+            </summary>
+            <param name="sysOfficeCriteria"></param>
+            <returns></returns>
         </member>
         <member name="T:eFMS.API.ReportData.Helpers.FileHelper">
             <summary>

@@ -253,21 +253,7 @@ namespace eFMS.API.ReportData.Controllers
             return new FileHelper().ExportExcel(stream, FilesNames.DepartmentName);
         }
 
-        /// <summary>
-        /// Export Office
-        /// </summary>
-        /// <param name="sysDeOfficeCriteria"></param>
-        /// <returns></returns>
-        [Route("Office/ExportOffice")]
-        [HttpPost]
-        public async Task<IActionResult> ExportOffice(SysOfficeCriteria sysOfficeCriteria)
-        {
-            Helper helper = new Helper();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(sysOfficeCriteria, aPis.HostStaging + Urls.System.OfficeUrl);
-            var dataObjects = responseFromApi.Content.ReadAsAsync<List<SysOfficeModel>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
-            var stream = helper.CreateOfficeExcelFile(dataObjects.Result);
-            return new FileHelper().ExportExcel(stream, FilesNames.DepartmentName);
-        }
+
         #endregion
     }
 }
