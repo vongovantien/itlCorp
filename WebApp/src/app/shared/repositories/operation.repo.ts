@@ -88,6 +88,13 @@ export class OperationRepo {
         return this._api.put(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/OpsStageAssigned/Update`, body);
     }
 
+    assignStageOPS(body: any) {
+        return this._api.post(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/OpsStageAssigned/Add`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
 
 
 }

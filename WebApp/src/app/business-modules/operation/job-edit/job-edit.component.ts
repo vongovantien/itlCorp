@@ -136,7 +136,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this.getListPackageTypes();
         this.getPartners();
         this.route.params.subscribe((params: any) => {
-            this.tab = 'job-edit';
+            this.tab = 'stage';
             this.tabCharge = 'buying';
 
             if (!!params && !!params.id) {
