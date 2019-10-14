@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { Router } from '@angular/router';
 import { AppList } from 'src/app/app.list';
-import { SystemRepo } from 'src/app/shared/repositories';
+import { SystemRepo, ExportRepo } from 'src/app/shared/repositories';
 import { Department } from 'src/app/shared/models/system/department';
 import { NgProgress } from '@ngx-progressbar/core';
 import { catchError, finalize, map } from 'rxjs/operators';
@@ -25,8 +25,9 @@ export class DepartmentComponent extends AppList {
   constructor(private _router: Router,
     private _systemRepo: SystemRepo,
     private _sortService: SortService,
-    private _progressService: NgProgress, 
-    private _toastService: ToastrService,) {
+    private _progressService: NgProgress,
+    private _toastService: ToastrService, 
+    private _exportRepo: ExportRepo,) {
     super();
     this._progressRef = this._progressService.ref();
     this.requestList = this.searchDepartment;
@@ -78,13 +79,11 @@ export class DepartmentComponent extends AppList {
         (res: any) => {
           this.totalItems = res.totalItems || 0;
           this.departments = res.data;
-          //console.log(this.departments);
         },
       );
   }
 
   gotoDetailDepartment(id: number) {
-    //console.log(id)
     this._router.navigate([`home/system/department/${id}`]);
   }
 
@@ -98,21 +97,34 @@ export class DepartmentComponent extends AppList {
   }
 
   deleteDepartment(id: number) {
-    //console.log(id);
     this._progressRef.start();
     this._systemRepo.deleteDepartment(id)
-        .pipe(
-            catchError(this.catchError),
-            finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
-        ).subscribe(
-            (res: CommonInterface.IResult) => {
-                if (res.status) {
-                    this._toastService.success(res.message, '');
-                    this.searchDepartment(this.dataSearch);
-                } else {
-                    this._toastService.error(res.message || 'Có lỗi xảy ra', '');
-                }
-            },
-        );
-}
+      .pipe(
+        catchError(this.catchError),
+        finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
+      ).subscribe(
+        (res: CommonInterface.IResult) => {
+          if (res.status) {
+            this._toastService.success(res.message, '');
+            this.searchDepartment(this.dataSearch);
+          } else {
+            this._toastService.error(res.message || 'Có lỗi xảy ra', '');
+          }
+        },
+      );
+  }
+
+  export() {
+    console.log(this.dataSearch);
+    this._exportRepo.exportDepartment(this.dataSearch)
+      .subscribe(
+        (response: ArrayBuffer) => {
+          this.downLoadFile(response, "application/ms-excel", 'Department.xlsx');
+        },
+        (errors: any) => {
+          console.log(errors);
+        },
+        () => { }
+      );
+  }
 }

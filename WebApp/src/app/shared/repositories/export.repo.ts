@@ -16,7 +16,12 @@ export class ExportRepo {
         );
     }
 
-
+    exportDepartment(searchObject: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/ReportData/Department/ExportDepartment`, searchObject).pipe(
+            catchError((error) => throwError(error)),
+            map(data => data)
+        );
+    }
 
 }
 

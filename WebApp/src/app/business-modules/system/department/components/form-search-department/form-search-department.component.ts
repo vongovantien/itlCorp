@@ -1,7 +1,6 @@
 import { Component, Output, EventEmitter} from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
-import { BaseService } from 'src/app/shared/services';
 
 @Component({
     selector: 'department-form-search',
@@ -16,10 +15,8 @@ export class DepartmentFormSearchComponent extends AppForm {
     selectedTitleFilter: string;
     selectedValueFilter: string;
     searchKey: AbstractControl ;
-    //userLogged: User;
     constructor(
         private _fb: FormBuilder,
-        private _baseService: BaseService
     ) {
         super();
         this.requestSearch = this.onSubmit;
