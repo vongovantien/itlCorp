@@ -1,5 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
-import { AppPage } from 'src/app/app.base';
+import { Component } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
@@ -18,7 +17,6 @@ import { AppList } from 'src/app/app.list';
 })
 
 export class DepartmentDetailComponent extends AppList {
-    //@ViewChild(SettlementFormCreateComponent, { static: false }) formCreateSurcharge: SettlementFormCreateComponent;
     formDetail: FormGroup;
     departmentCode: AbstractControl;
     nameEn: AbstractControl;
@@ -144,8 +142,6 @@ export class DepartmentDetailComponent extends AppList {
                 active: this.status.value.value,
                 inactiveOn: ''
             };
-            //console.log(dept);
-            //console.log(this.formDetail.value)
             this._progressRef.start();
             //Update Info Department
             this._systemRepo.updateDepartment(dept)
@@ -193,10 +189,8 @@ export class DepartmentDetailComponent extends AppList {
             )
             .subscribe(
                 (res: any) => {
-                    //console.log(res)
                     if (res.id !== 0) {
                         this.department = new Department(res);
-                        console.log(this.department);
                         this.formDetail.setValue({
                             departmentCode: res.code,
                             nameEn: res.deptNameEn,
@@ -225,7 +219,6 @@ export class DepartmentDetailComponent extends AppList {
                 (data: any) => {
                     console.log(data);
                     this.groups = data;
-                    console.log(this.groups)
                 },
             );
     }
@@ -235,7 +228,7 @@ export class DepartmentDetailComponent extends AppList {
     }
 
     gotoDetailGroup(id: number){
-        console.log(`Go to Group detail of ${id}`)
+        this._router.navigate([`home/system/group/${id}`]);
     }
 }
 

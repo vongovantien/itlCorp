@@ -4,6 +4,7 @@ using OfficeOpenXml.Style;
 using OfficeOpenXml.Table;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 
 namespace eFMS.API.ReportData
@@ -12,7 +13,7 @@ namespace eFMS.API.ReportData
     {
         const double minWidth = 0.00;
         const double maxWidth = 500.00;
-        #region country
+        
         public Stream CreateCountryExcelFile(List<CatCountry> listObj, Stream stream = null)
         {
             try
@@ -62,7 +63,6 @@ namespace eFMS.API.ReportData
                 worksheet.Cells[i + 2, 4].Value = inactivechar;
             }
         }
-        #endregion
 
         #region Province
         public Stream CreateProvinceExcelFile(List<CatProvince> listObj, Stream stream = null)
@@ -876,7 +876,90 @@ namespace eFMS.API.ReportData
             }
         }
 
+        public Stream generateCompanyExcel(List<SysCompany> listCompany, Stream stream = null)
+        {
+            List<String> headers = new List<String>()
+            {
+                "No",
+                "Company Code",
+                "Name En",
+                "Name Local",
+                "Name Abbr",
+                "Website",
+                "Status"
+            };
+            try
+            {
+                int addressStartContent = 4;
+                int no = 1;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Sheet1");
+                    var worksheet = excelPackage.Workbook.Worksheets[1];
+
+                    buildHeader(worksheet, headers, "COMPANY INFORMATION");
+
+                    for (int i = 0; i < listCompany.Count; i++)
+                    {
+                        var item = listCompany[i];
+                        worksheet.Cells[i + addressStartContent, 1].Value = no.ToString();
+                        worksheet.Cells[i + addressStartContent, 2].Value = item.Code;
+                        worksheet.Cells[i + addressStartContent, 3].Value = item.BunameEn;
+                        worksheet.Cells[i + addressStartContent, 4].Value = item.BunameVn;
+                        worksheet.Cells[i + addressStartContent, 5].Value = item.BunameAbbr;
+                        worksheet.Cells[i + addressStartContent, 6].Value = item.Website;
+                        string status = "";
+                        if (item.Active == true)
+                        {
+                            status = "Active";
+                        }
+                        else
+                        {
+                            status = "Inactive";
+                        }
+                        worksheet.Cells[i + addressStartContent, 7].Value = status;
+
+                        no++;
+                    }
+
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+        public void buildHeader(ExcelWorksheet worksheet, List<String> headers, string title)
+        {
+            worksheet.Cells[1, 1, 1, headers.Count].Merge = true;
+            worksheet.Cells["A1"].Value = title;
+            worksheet.Cells["A1"].Style.Font.Size = 16;
+            worksheet.Cells["A1"].Style.Font.Bold = true;
+            worksheet.Cells["A1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            worksheet.Cells["A1"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            // Tạo header
+            for (int i = 0; i < headers.Count; i++)
+            {
+                worksheet.Cells[3, i + 1].Value = headers[i];
+
+                //worksheet.Column(i + 1).AutoFit();
+                worksheet.Cells[3, i + 1].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[3, i + 1].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[3, i + 1].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[3, i + 1].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+
+                worksheet.Cells[3, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[3, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+                worksheet.Column(i + 1).Width = 30;
+            }
+        }
         #endregion
+
 
 
     }

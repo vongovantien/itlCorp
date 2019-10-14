@@ -107,7 +107,7 @@ export class DepartmentAddNewComponent extends AppPage {
                 active: this.status.value.value,
                 inactiveOn: ''
             };
-            console.log(dept);
+            //console.log(dept);
             this._progressRef.start();
             //Add new Department
             this._systemRepo.addNewDepartment(dept)
@@ -116,7 +116,6 @@ export class DepartmentAddNewComponent extends AppPage {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message);
-                            //console.log(res);
                             this._router.navigate([`home/system/department/${res.data.id}`]);
                         } else {
                             this._toastService.error(res.message);
@@ -141,7 +140,6 @@ export class DepartmentAddNewComponent extends AppPage {
             )
             .subscribe(
                 (data: any) => {
-                    //console.log(data);
                     this.officeList = data.map((item: any) => ({ id: item.id, code: item.code, branchname_En: item.branchNameEn }));
                     console.log(this.officeList)
                 },

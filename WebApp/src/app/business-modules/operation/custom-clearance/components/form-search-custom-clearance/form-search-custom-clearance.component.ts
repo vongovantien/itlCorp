@@ -115,7 +115,7 @@ export class CustomClearanceFormSearchComponent extends AppForm {
             fromImportDate: !!this.importDate.value ? formatDate(this.importDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             toImportDate: !!this.importDate.value ? formatDate(this.importDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             type: !!this.type.value ? this.type.value.value : null,
-            personHandle: this.personalHandle.value.username
+            personHandle: this.personalHandle.value.id
         };
         this.onSearch.emit(body);
     }

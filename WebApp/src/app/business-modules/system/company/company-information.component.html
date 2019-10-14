@@ -31,7 +31,7 @@
                     <table class="table table-brand table-striped dataTable">
                         <thead app-table-header [headers]="headers"
                             (onClick)="sortBy($event.sortField ? $event.sortField : '')">
-                            <th class="m--w-50 first">
+                            <th class="m--w-50 first table-actions-col">
                                 Action
                             </th>
                         </thead>
@@ -40,8 +40,9 @@
                                 <tr class="text-center"
                                     *ngFor="let company of companies; let i = index; trackBy: trackByFn">
                                     <td class="table-actions-col">
-                                        <div class="table-actions" style="width: 70px">
+                                        <div class="d-flex">
                                             <button (click)="showDeletePopup(company)" [disabled]="company.active"
+                                                disabled
                                                 class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
                                                 <i class="la la-trash"></i>
                                             </button>
