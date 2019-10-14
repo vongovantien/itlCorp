@@ -1,53 +1,108 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormAddGroupComponent } from '../../components/form-add-group/form-add-group.component';
 import { Router } from '@angular/router';
 import { AppPage } from 'src/app/app.base';
 import { NgProgress } from '@ngx-progressbar/core';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
+import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
+import { AppForm } from 'src/app/app.form';
 
 @Component({
   selector: 'app-add-group',
   templateUrl: './add-group.component.html'
 })
-export class AddGroupComponent extends AppPage implements OnInit {
-  @ViewChild(FormAddGroupComponent, { static: false }) formAdd: FormAddGroupComponent;
+export class AddGroupComponent extends AppForm implements OnInit {
+  formGroup: FormGroup;
+  types: CommonInterface.ICommonTitleValue[] = [
+    { title: 'Active', value: true },
+    { title: 'Inactive', value: false },
+  ];
+  code: AbstractControl;
+  groupNameEN: AbstractControl;
+  groupNameVN: AbstractControl;
+  groupNameAbbr: AbstractControl;
+  department: AbstractControl;
+  active: AbstractControl;
+  departments: any[] = [];
 
   constructor(protected _router: Router,
     protected _progressService: NgProgress,
     private _systemRepo: SystemRepo,
-    private _toastService: ToastrService) {
+    private _toastService: ToastrService,
+    private _fb: FormBuilder) {
     super();
     this._progressRef = this._progressService.ref();
   }
 
   ngOnInit() {
+    this.getDepartments();
+    this.initForm();
   }
-  create() {
-    this._progressRef.start();
-    const body: IGroupAdd = {
-      code: this.formAdd.code.value,
-      nameEn: this.formAdd.groupNameEN.value,
-      nameVn: this.formAdd.groupNameVN.value,
-      shortName: this.formAdd.groupNameAbbr.value,
-      departmentId: this.formAdd.department.value.id,
-      active: this.formAdd.active.value.value
-    };
-    this._systemRepo.addNewGroup(body)
+  initForm() {
+    this.formGroup = this._fb.group({
+      code: ['', Validators.compose([
+        Validators.required,
+      ])],
+      groupNameEN: ['', Validators.compose([
+        Validators.required,
+      ])],
+      groupNameVN: ['', Validators.compose([
+        Validators.required,
+      ])],
+      groupNameAbbr: ['', Validators.compose([
+        Validators.required,
+      ])],
+      department: [],
+      active: [this.types[0]],
+    });
+
+    this.code = this.formGroup.controls['code'];
+    this.groupNameEN = this.formGroup.controls['groupNameEN'];
+    this.groupNameVN = this.formGroup.controls['groupNameVN'];
+    this.groupNameAbbr = this.formGroup.controls['groupNameAbbr'];
+    this.department = this.formGroup.controls['department'];
+    this.active = this.formGroup.controls['active'];
+  }
+  getDepartments() {
+    this._systemRepo.getAllDepartment()
       .pipe(
         catchError(this.catchError),
-        finalize(() => this._progressRef.complete())
+        finalize(() => { this.isLoading = false; })
       )
       .subscribe(
-        (res: CommonInterface.IResult) => {
-          if (res.status) {
-            this._toastService.success(res.message, '');
-          } else {
-            this._toastService.error(res.message, '');
-          }
-        }
+        (res: any) => {
+          this.departments = res;
+        },
       );
+  }
+  create() {
+    this.isSubmitted = true;
+    if (this.formGroup.valid) {
+      this._progressRef.start();
+      const body: IGroupAdd = {
+        code: this.code.value,
+        nameEn: this.groupNameEN.value,
+        nameVn: this.groupNameVN.value,
+        shortName: this.groupNameAbbr.value,
+        departmentId: this.department.value.id,
+        active: this.active.value.value
+      };
+      this._systemRepo.addNewGroup(body)
+        .pipe(
+          catchError(this.catchError),
+          finalize(() => this._progressRef.complete())
+        )
+        .subscribe(
+          (res: CommonInterface.IResult) => {
+            if (res.status) {
+              this._toastService.success(res.message, '');
+            } else {
+              this._toastService.error(res.message, '');
+            }
+          }
+        );
+    }
   }
   cancel() {
     this._router.navigate(["home/system/group"]);

@@ -11,15 +11,16 @@ namespace eFMS.API.Catalogue.Infrastructure
         public  MappingProfile()
         {
             // Add as many of these lines as you need to map your objects
-            //CreateMap<SysUserGroup, SysUserGroupModel>();
-            //CreateMap<SysUserGroupModel, SysUserGroup>();
 
+            //map entity model to view model
             CreateMap<SysUser, SysUserViewModel>();
             CreateMap<CatDepartment, CatDepartmentModel>();
             CreateMap<SysOffice, SysOfficeViewModel>();
-            CreateMap<SysOfficeEditModel, SysOfficeModel>();
             CreateMap<SysGroup, SysGroupModel>();
             CreateMap<SysImage, SysImageModel>();
+
+            //map view model to entity model
+            CreateMap<SysOfficeEditModel, SysOfficeModel>();
 
         }
     }

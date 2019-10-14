@@ -118,6 +118,11 @@ export class SystemRepo {
             map((data: any) => data)
         );
     }
+    getDetailGroup(id: number) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
     deleteGroup(id: number) {
         return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup`, { id: id }).pipe(
             map((data: any) => data)
@@ -175,8 +180,8 @@ export class SystemRepo {
         );
     }
 
-    getGroupsByDeptId(id: number){
-        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup/Query`, {departmentId: id }).pipe(
+    getGroupsByDeptId(id: number) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup/Query`, { departmentId: id }).pipe(
             map((data: any) => data)
         );
     }

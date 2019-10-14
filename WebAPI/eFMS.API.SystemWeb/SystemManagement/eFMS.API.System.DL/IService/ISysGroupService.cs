@@ -13,5 +13,6 @@ namespace eFMS.API.System.DL.IService
     {
         IQueryable<SysGroupModel> Paging(SysGroupCriteria criteria, int page, int size, out int rowsCount);
         IQueryable<SysGroupModel> Query(SysGroupCriteria criteria);
+        SysGroupModel GetById(short id);
     }
 }
