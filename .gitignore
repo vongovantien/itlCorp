@@ -352,3 +352,8 @@ bin
 /WebAPI/eFMS.API.SystemWeb/SystemManagement/bin/netcoreapp2.2/eFMS.IdentityServer.DL.dll
 /WebAPI/eFMS.API.SystemWeb/SystemManagement/bin/netcoreapp2.2/ITL.NetCore.Connection.deps.json
 /WebAPI/eFMS.API.SystemWeb/SystemManagement/bin/netcoreapp2.2
+WebAPI/eFMS.API.System.DL.deps.json
+WebAPI/eFMS.API.System.DL.dll
+WebAPI/eFMS.API.System.DL.pdb
+WebAPI/ITL.NetCore.Connection.dll
+WebAPI/ITL.NetCore.Connection.pdb
