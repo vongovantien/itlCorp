@@ -44,6 +44,8 @@ export class Shipment {
 
     customClearances: CustomDeclaration[] = []; // * custom
     customerName: string = '';
+    isLocked: boolean = false;
+
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

@@ -82,11 +82,16 @@
                                                             (click)="showCustomClearance(item.jobNo, i)">
                                                             <i class="la la-angle-up"></i>
                                                         </button>
-                                                        <button type="button"
+                                                        <button type="button" *ngIf="!item.isLocked"
                                                             class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                             [routerLink]="['/home/operation/job-edit/' + item.id]"
                                                             title="Edit">
                                                             <i class="la la-edit"></i>
+                                                        </button>
+                                                        <button type="button" *ngIf="item.isLocked"
+                                                            class="btn btn-fault btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Edit">
+                                                            <i class="fa fa-lock"></i>
                                                         </button>
                                                         <button type="button"
                                                             class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
