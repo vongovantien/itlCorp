@@ -24,16 +24,14 @@ namespace eFMS.API.System.Service.Models
         public string BankAccountName { get; set; }
         public string BankName { get; set; }
         public string BankAddress { get; set; }
-        public bool? Active { get; set; }
+        public bool Active { get; set; }
         public DateTime? InactiveOn { get; set; }
         public byte[] Logo { get; set; }
         public string SwiftCode { get; set; }
         public string Code { get; set; }
         public string UserCreated { get; set; }
-        public string UserModified { get; set; }
-        
         public DateTime? DatetimeCreated { get; set; }
+        public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
-
     }
 }

@@ -66,6 +66,7 @@ export class GroupDetailComponent extends AppForm implements OnInit {
         ];
       }
     });
+    this.getUsers();
   }
   getUsersInGroup(groupId: number) {
     this._systemRepo.getUsersInGroup(groupId)
@@ -187,6 +188,21 @@ export class GroupDetailComponent extends AppForm implements OnInit {
         );
     }
   }
+
+  getUsers() {
+    this._systemRepo.getListSystemUser()
+      .pipe(
+        catchError(this.catchError),
+        finalize(() => {
+        })
+      )
+      .subscribe(
+        (res: any) => {
+          this.usergroupPopup.users = res;
+        },
+      );
+  }
+
   addUserToGroup() {
     this.usergroupPopup.show();
   }

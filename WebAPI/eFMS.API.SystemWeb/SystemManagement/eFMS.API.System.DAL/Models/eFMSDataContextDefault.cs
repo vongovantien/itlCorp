@@ -440,12 +440,6 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.Role)
-                    .WithMany(p => p.SysGroupRole)
-                    .HasForeignKey(d => d.RoleId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_sysGroupRole_sysRole");
             });
 
             modelBuilder.Entity<SysImage>(entity =>
@@ -460,11 +454,7 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
-                entity.Property(e => e.Name).HasMaxLength(50);
-
-                entity.Property(e => e.Thumb).HasMaxLength(50);
-
-                entity.Property(e => e.Url).HasMaxLength(50);
+                entity.Property(e => e.Folder).HasMaxLength(50);
 
                 entity.Property(e => e.UserCreated).HasMaxLength(50);
 
@@ -503,11 +493,6 @@ namespace eFMS.API.System.Service.Models
                     .HasColumnName("ParentID")
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.Parent)
-                    .WithMany(p => p.InverseParent)
-                    .HasForeignKey(d => d.ParentId)
-                    .HasConstraintName("FK_sysMenu_sysParentMenu");
             });
 
             modelBuilder.Entity<SysOffice>(entity =>
@@ -671,11 +656,6 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.Menu)
-                    .WithMany(p => p.SysRoleMenu)
-                    .HasForeignKey(d => d.MenuId)
-                    .HasConstraintName("FK_RoleMenu_Menu");
 
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.SysRoleMenu)

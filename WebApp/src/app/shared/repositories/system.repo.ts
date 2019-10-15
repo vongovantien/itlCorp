@@ -125,7 +125,7 @@ export class SystemRepo {
         );
     }
     deleteGroup(id: number) {
-        return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup`, { id: id }).pipe(
+        return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup/${id}`).pipe(
             map((data: any) => data)
         );
     }

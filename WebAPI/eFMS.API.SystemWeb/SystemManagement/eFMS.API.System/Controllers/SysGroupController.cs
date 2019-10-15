@@ -144,7 +144,7 @@ namespace eFMS.API.System.Controllers
             }
             model.UserModified = currentUser.UserID;
             model.DatetimeModified = DateTime.Now;
-            var hs = sysGroupService.Add(model);
+            var hs = sysGroupService.Update(model, x => x.Id == model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
 
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
