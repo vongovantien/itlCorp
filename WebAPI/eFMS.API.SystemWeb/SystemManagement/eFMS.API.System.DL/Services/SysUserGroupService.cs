@@ -44,5 +44,11 @@ namespace eFMS.API.System.DL.Services
                                     });
             return results;
         }
+
+        public SysUserGroupModel GetDetail(int id)
+        {
+            var data = DataContext.Get(x => x.Id == id).FirstOrDefault();
+            return mapper.Map<SysUserGroupModel>(data);
+        }
     }
 }

@@ -149,6 +149,11 @@ export class SystemRepo {
             map((data: any) => data)
         );
     }
+    addUserToGroup(body: any) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserGroup`, body).pipe(
+            map((data: any) => data)
+        );
+    }
     getAllOffice() {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/GetAll`).pipe(
             map((data: any) => data)

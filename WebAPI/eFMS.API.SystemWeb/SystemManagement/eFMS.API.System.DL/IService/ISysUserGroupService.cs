@@ -11,5 +11,6 @@ namespace eFMS.API.System.DL.IService
     public interface ISysUserGroupService : IRepositoryBase<SysUserGroup, SysUserGroupModel>
     {
         IQueryable<SysUserGroupModel> GetByGroup(short groupId);
+        SysUserGroupModel GetDetail(int id);
     }
 }

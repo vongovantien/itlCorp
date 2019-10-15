@@ -41,6 +41,7 @@ export class CompanyInformationFormAddComponent extends AppForm {
     }
 
     ngOnInit(): void {
+
         this.initForm();
     }
 
@@ -83,12 +84,13 @@ export class CompanyInformationFormAddComponent extends AppForm {
                 imageMaxSize: 5 * 1024 * 1024,
                 imageAllowedTypes: ['jpeg', 'jpg', 'png'],
                 requestHeaders: {
-                    // Authorization: this.bearer,
+                    Authorization: `Bearer ${localStorage.getItem('access_token')}`,
                     Module: 'Company',
-                    Path: `dayladuongdanhinh`
+                    // Path: `dayladuongdanhinh`
                 },
                 imageUploadURL: `http://${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/image`,
                 imageManagerLoadURL: `http://${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/company`,
+
             }).on('froalaEditor.contentChanged', (e: any) => {
                 this.photoUrl = e.target.src;
             }).on('froalaEditor.image.error', (e, editor, error, response) => {

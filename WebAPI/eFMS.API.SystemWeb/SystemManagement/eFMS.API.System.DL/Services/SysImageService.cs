@@ -31,11 +31,11 @@ namespace eFMS.API.System.DL.Services
 
         }
 
-        public async Task<ResultHandle> UploadImage(IFormFile file)
+        public async Task<ResultHandle> UploadImage(IFormFile file, string folderName)
         {
             if (CheckIfImageFile(file))
             {
-                return await WriteFile(file);
+                return await WriteFile(file, folderName);
             }
 
             return new ResultHandle { Data = 1, Message = "Có lỗi xảy ra", Status = false };
@@ -53,26 +53,41 @@ namespace eFMS.API.System.DL.Services
             return ImageHelper.GetImageFormat(fileBytes) != ImageHelper.ImageFormat.unknown;
         }
 
-        public async Task<ResultHandle> WriteFile(IFormFile file)
+        public async Task<ResultHandle> WriteFile(IFormFile file, string folderName)
         {
             string fileName = "";
-            string folderName = "images";
+            //string folderName = "images";
             string path = webUrl.Value.Url.ToString();
             try
             {
                 var extension = "." + file.FileName.Split('.')[file.FileName.Split('.').Length - 1]; //lấy extension
 
                 fileName = file.FileName;
-                //fileName = Guid.NewGuid().ToString(); // lấy filename
+               
+                 /* Kiểm tra các thư mục có tồn tại */
+                if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\")))
+                {
+                    Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\"));
+                }
 
-                var physicPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\" + folderName, fileName); // lưu vào folder
+                if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images")))
+                {
+                    Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images"));
+                }
+
+                if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images" + folderName)))
+                {
+                    Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images\\" + folderName));
+                }
+
+                var physicPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images\\" + folderName, fileName); // lưu vào folder
 
                 using (var bits = new FileStream(physicPath, FileMode.Create))
                 {
                     await file.CopyToAsync(bits);
                 }
 
-                string urlImage = path + "/images/" + fileName;
+                string urlImage = path + "/images/" + folderName + "/" + fileName;
                 var result = new { link = urlImage };
 
 
@@ -80,6 +95,7 @@ namespace eFMS.API.System.DL.Services
                 {
                     Name = fileName,
                     Url = urlImage,
+                    Folder = folderName
                 };
 
                 HandleState x =  Add(image); // lưu db
@@ -108,6 +124,7 @@ namespace eFMS.API.System.DL.Services
                     Id = Guid.NewGuid(),
                     Url = imageModel.Url,
                     Name = imageModel.Name,
+                    Folder = imageModel.Folder ?? "Company"
                 };
 
                 sysImage.DateTimeCreated = sysImage.DatetimeModified = DateTime.Now;

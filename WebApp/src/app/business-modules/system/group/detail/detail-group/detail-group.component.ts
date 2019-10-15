@@ -10,6 +10,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { Department } from 'src/app/shared/models/system/department';
 import { ToastrService } from 'ngx-toastr';
 import { FormUserGroupComponent } from '../../components/form-user-group/form-user-group.component';
+import { UserGroup } from 'src/app/shared/models/system/userGroup.model';
 
 @Component({
   selector: 'app-detail-group',
@@ -36,6 +37,7 @@ export class GroupDetailComponent extends AppForm implements OnInit {
   group: Group = null;
   users: any[] = null;
   userHeaders: CommonInterface.IHeaderTable[];
+  userGroup: UserGroup = null;
 
   constructor(private _systemRepo: SystemRepo,
     private _router: Router,
@@ -204,10 +206,23 @@ export class GroupDetailComponent extends AppForm implements OnInit {
   }
 
   addUserToGroup() {
+    this.userGroup = new UserGroup();
+    this.userGroup.id = this.groupId;
     this.usergroupPopup.show();
   }
   viewUserGroup(item) {
-    this.usergroupPopup.title = "Edit/ View User";
-    this.usergroupPopup.show();
+    this._systemRepo.getUserGroupDetail(item.id)
+      .pipe(
+        catchError(this.catchError),
+        finalize(() => {
+          this.usergroupPopup.title = "Edit/ View User";
+          this.usergroupPopup.show();
+        })
+      )
+      .subscribe(
+        (res: any) => {
+          this.userGroup = res;
+        },
+      );
   }
 }

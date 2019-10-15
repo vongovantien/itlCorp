@@ -1,7 +1,7 @@
 <div class="modal fade" bsModal #popup="bs-modal" role="dialog" (onHide)="onHide($event)" (onShow)="onShow($event)">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-      <form name="formAddEdit" #formAddEdit="ngForm" novalidate (ngSubmit)="formAddEdit.form.valid">
+      <form [formGroup]="formGroup" *ngIf="userGroup">
         <div class="modal-header">
           <h5 class="modal-title">{{ title }}</h5>
           <button id="closeButton" type="button" class="close" aria-label="Close" (click)="hide()">
@@ -12,14 +12,16 @@
           <div class="m-form m-form m-form--state">
             <div class="row">
               <div class="col-lg-6">
-                <div class="form-group">
+                <div class="form-group"
+                  [ngClass]="{'m-form__group has-danger': (user.dirty && !user.valid) || (isSubmitted && !user.valid)}">
                   <label for="">User: <span class="text-danger">(*)</span></label>
-                  <select class="form-control">
+                  <select class="form-control" formControlName="user">
                     <option *ngFor="let user of users" [ngValue]="user">
                       {{user.username}}
                     </option>
                   </select>
-                  <div class="form-control-feedback">
+                  <div class="form-control-feedback"
+                    *ngIf="isSubmitted && (user.errors | equalError: 'required') || (user.errors | equalError: 'required') && user.dirty">
                     User is required!
                   </div>
                 </div>
@@ -34,9 +36,6 @@
                       âfafafa
                     </option>
                   </select>
-                  <div class="form-control-feedback">
-                    Level permission is required!
-                  </div>
                 </div>
               </div>
             </div>
@@ -45,13 +44,10 @@
                 <div class="form-group">
                   <label for="">Position: <span class="text-danger">(*)</span></label>
                   <select class="form-control">
-                    <option *ngFor="let user of users" [ngValue]="user">
-                      {{user.username}}
+                    <option *ngFor="let position of positions" [ngValue]="position">
+                      àafafaf
                     </option>
                   </select>
-                  <div class="form-control-feedback">
-                    Position is required!
-                  </div>
                 </div>
               </div>
               <div class="col-lg-6">
@@ -64,16 +60,13 @@
                       âfafafa
                     </option>
                   </select>
-                  <div class="form-control-feedback">
-                    Permission is required!
-                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
         <div class="modal-footer m--align-center c-button-actions">
-          <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+          <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="addUserToGroup()">
             <span>
               <i class="la la-save"></i>
               <span>

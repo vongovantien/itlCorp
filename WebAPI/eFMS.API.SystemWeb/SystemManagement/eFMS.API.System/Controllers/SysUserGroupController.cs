@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using eFMS.API.Common;
+using eFMS.API.Common.Globals;
 using eFMS.API.System.DL.IService;
+using eFMS.API.System.DL.Models;
+using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.System.Infrastructure.Middlewares;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -52,7 +56,23 @@ namespace eFMS.API.System.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            var result = userGroupService.Get(x => x.Id == id).FirstOrDefault();
+            var result = userGroupService.GetDetail(id);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        public IActionResult Add(SysUserGroupModel model)
+        {
+            model.UserCreated = "admin";
+            model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
+            var hs = userGroupService.Add(model);
+            var message = HandleError.GetMessage(hs, Crud.Insert);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
             return Ok(result);
         }
     }
