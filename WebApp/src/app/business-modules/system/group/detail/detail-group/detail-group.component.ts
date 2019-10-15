@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { AppForm } from 'src/app/app.form';
 import { FormGroup, Validators, FormBuilder, AbstractControl } from '@angular/forms';
@@ -9,6 +9,7 @@ import { Group } from 'src/app/shared/models/system/group';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Department } from 'src/app/shared/models/system/department';
 import { ToastrService } from 'ngx-toastr';
+import { FormUserGroupComponent } from '../../components/form-user-group/form-user-group.component';
 
 @Component({
   selector: 'app-detail-group',
@@ -16,6 +17,7 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./detail-group.component.scss']
 })
 export class GroupDetailComponent extends AppForm implements OnInit {
+  @ViewChild(FormUserGroupComponent, { static: true }) usergroupPopup: FormUserGroupComponent;
   formGroup: FormGroup;
   types: CommonInterface.ICommonTitleValue[] = [
     { title: 'Active', value: true },
@@ -32,7 +34,7 @@ export class GroupDetailComponent extends AppForm implements OnInit {
   companyName: AbstractControl;
   active: AbstractControl;
   group: Group = null;
-  users: any = null;
+  users: any[] = null;
   userHeaders: CommonInterface.IHeaderTable[];
 
   constructor(private _systemRepo: SystemRepo,
@@ -73,7 +75,6 @@ export class GroupDetailComponent extends AppForm implements OnInit {
       ).subscribe(
         (res: any) => {
           this.users = res;
-          console.log(this.users);
         });
   }
 
@@ -185,5 +186,12 @@ export class GroupDetailComponent extends AppForm implements OnInit {
           }
         );
     }
+  }
+  addUserToGroup() {
+    this.usergroupPopup.show();
+  }
+  viewUserGroup(item) {
+    this.usergroupPopup.title = "Edit/ View User";
+    this.usergroupPopup.show();
   }
 }

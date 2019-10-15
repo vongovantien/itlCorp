@@ -53,7 +53,9 @@ export class AddGroupComponent extends AppForm implements OnInit {
       groupNameAbbr: ['', Validators.compose([
         Validators.required,
       ])],
-      department: [],
+      department: ['', Validators.compose([
+        Validators.required
+      ])],
       active: [this.types[0]],
     });
 

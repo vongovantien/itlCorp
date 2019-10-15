@@ -44,10 +44,5 @@ namespace eFMS.API.System.DL.Services
                                     });
             return results;
         }
-
-        public SysUserGroupModel GetDetail(int id)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

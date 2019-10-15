@@ -43,5 +43,17 @@ namespace eFMS.API.System.Controllers
             var results = userGroupService.GetByGroup(id);
             return Ok(results);
         }
+
+        /// <summary>
+        /// get by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        public IActionResult Get(int id)
+        {
+            var result = userGroupService.Get(x => x.Id == id).FirstOrDefault();
+            return Ok(result);
+        }
     }
 }

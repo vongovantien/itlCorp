@@ -66,9 +66,9 @@
                 <option *ngFor="let department of departments" [ngValue]="department">{{department.deptNameEn}}
                 </option>
               </select>
-              <div class="form-control-feedback" *ngIf="isSubmitted && !department.valid">
+              <!-- <div class="form-control-feedback" *ngIf="isSubmitted && !department.valid">
                 Department is required!
-              </div>
+              </div> -->
               <div class="form-control-feedback"
                 *ngIf="isSubmitted && (department.errors | equalError: 'required') || (department.errors | equalError: 'required') && department.dirty">
                 Department is required!

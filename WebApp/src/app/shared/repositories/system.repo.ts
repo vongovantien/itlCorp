@@ -118,11 +118,6 @@ export class SystemRepo {
             map((data: any) => data)
         );
     }
-    getUsersInGroup(groupId: number) {
-        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserGroup/GetByGroup/${groupId}`).pipe(
-            map((data: any) => data)
-        );
-    }
     getDetailGroup(id: number) {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup/${id}`).pipe(
             map((data: any) => data)
@@ -140,6 +135,16 @@ export class SystemRepo {
     }
     updateGroup(body: any) {
         return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+    getUsersInGroup(groupId: number) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserGroup/GetByGroup/${groupId}`).pipe(
+            map((data: any) => data)
+        );
+    }
+    getUserGroupDetail(id: number) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserGroup/${id}`).pipe(
             map((data: any) => data)
         );
     }
