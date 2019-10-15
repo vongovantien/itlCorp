@@ -6,6 +6,7 @@ namespace eFMS.API.Setting.DL.Models
 {
     public class TariffViewModel
     {
+        public string TariffName { get; set; }
 
     }
 }
