@@ -10,7 +10,7 @@ namespace eFMS.API.Setting.DL.Models
         public string TariffName  { get; set; }
         public Guid OfficeID { get; set; }
         public string ProductService { get; set; }
-        public string CargoType { get; set; }
+        public string TariffType { get; set; }
         public string ServiceMode { get; set; }
         public string CustomerID { get; set; }
         public string SupplierID { get; set; }
