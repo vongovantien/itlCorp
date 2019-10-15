@@ -8,5 +8,7 @@ export * from './style-cell.directive';
 export * from './three-digit-decima-number.directive';
 export * from './two-digit-decima-number.directive';
 export * from './clickOutside.directive';
+export * from './loading-button.directive';
+
 
 

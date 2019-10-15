@@ -1,15 +1,14 @@
-import { Component, OnInit, Output, EventEmitter, OnDestroy, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, ViewChild } from '@angular/core';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import cloneDeep from 'lodash/cloneDeep';
 import filter from 'lodash/filter';
 import moment from 'moment/moment';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { AppPage } from 'src/app/app.base';
 import { OpsModuleCreditDebitNoteAddnewComponent } from './ops-module-credit-debit-note-addnew/ops-module-credit-debit-note-addnew.component';
-import { NgxSpinnerService } from 'ngx-spinner';
-import { catchError, finalize, takeUntil, tap, switchMap } from 'rxjs/operators';
+import { catchError, finalize, takeUntil, tap } from 'rxjs/operators';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { OpsModuleCreditDebitNoteDetailComponent } from './ops-module-credit-debit-note-detail/ops-module-credit-debit-note-detail.component';
 import { OpsModuleCreditDebitNoteEditComponent } from './ops-module-credit-debit-note-edit/ops-module-credit-debit-note-edit.component';
@@ -35,7 +34,6 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
     IsNewCDNote: boolean = false;
     STORAGE_DATA: any = null;
     CurrentHBID: string = null;
-    subscribe: Subject<any> = new Subject();
 
     cdNoteIdToDelete: string = null;
     CDNoteDetails: AcctCDNoteDetails = null;
@@ -48,7 +46,6 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
     constructor(
         private baseServices: BaseService,
         private api_menu: API_MENU,
-        private _spinner: NgxSpinnerService,
         private _documentRepo: DocumentationRepo,
         private sortService: SortService,
         private _activedRouter: ActivatedRoute,
@@ -103,12 +100,9 @@ export class OpsModuleCreditDebitNoteComponent extends AppPage implements OnInit
     }
 
     getAllCDNote() {
-        this._spinner.show();
-
         this._documentRepo.getListCDNoteByHouseBill(this.CurrentHBID).pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),
-            finalize(() => { this._spinner.hide(); }),
         ).subscribe(
             (res: any[]) => {
                 if (res instanceof Error) {

@@ -25,6 +25,13 @@ export class DocumentationRepo {
         );
     }
 
+    updateShipment(body: any) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/Update`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
     getDetailShipment(id: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction?id=${id}`).pipe(
             catchError((error) => throwError(error)),

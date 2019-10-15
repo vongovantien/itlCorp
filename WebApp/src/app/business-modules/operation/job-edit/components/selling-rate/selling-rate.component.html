@@ -15,7 +15,7 @@
         </div>
         <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
             <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                (click)="openAddNewSellingRatePopup()">
+                (click)="openAddNewSellingRatePopup()" appLoadingButton [state]="opsTransaction.isLocked">
                 <span>
                     <i class="la la-plus"></i>
                     <span>
@@ -38,13 +38,14 @@
                     *ngFor="let charge of data | filter: keyword : ['partnerName', 'nameEn', 'currency','docNo','soano']; let i = index">
                     <td class="table-actions-col">
                         <div class="table-actions" style="width: 70px">
-
-                            <button type="button" (click)="prepareEditCharge(charge)"
+                            <button type="button" (click)="prepareEditCharge(charge)" appLoadingButton
+                                [state]="opsTransaction.isLocked"
                                 class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit">
                                 <i class="la la-edit"></i>
                             </button>
 
-                            <button type="button" (click)="showConfirmDeleteCharge(charge.id)"
+                            <button type="button" (click)="showConfirmDeleteCharge(charge.id)" appLoadingButton
+                                [state]="opsTransaction.isLocked"
                                 class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Remove">
                                 <i class="la la-trash"></i>
                             </button>
@@ -56,7 +57,12 @@
                         </span>
                     </td>
                     <td>
-                        <a (click)="prepareEditCharge(charge)">{{charge.nameEn}}</a>
+                        <div *ngIf="opsTransaction.isLocked else link">
+                            {{charge.nameEn}}
+                        </div>
+                        <ng-template #link>
+                            <a (click)="prepareEditCharge(charge)">{{charge.nameEn}}</a>
+                        </ng-template>
                     </td>
                     <td>
                         {{charge.quantity}}
@@ -84,9 +90,14 @@
                         {{charge.soano}}
                     </td>
                     <td>
-                        <a (click)="openCreditDebitNote(charge.debitNo)">
+                        <div *ngIf="opsTransaction.isLocked else link">
                             {{ charge.debitNo }}
-                        </a>
+                        </div>
+                        <ng-template #link>
+                            <a (click)="openCreditDebitNote(charge.debitNo)">
+                                {{ charge.debitNo }}
+                            </a>
+                        </ng-template>
                     </td>
                     <td>
 
