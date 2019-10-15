@@ -50,7 +50,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysUserGroup> sysUserGroup,
             IContextBase<CatDepartment> catDepartment,
             IContextBase<SysGroup> sysGroup,
-            IContextBase<SysOffice> SysOffice,
+            IContextBase<SysOffice> sysOffice,
             IContextBase<OpsStageAssigned> opsStageAssigned) : base(repository, mapper)
         {
             currentUser = user;
@@ -65,7 +65,7 @@ namespace eFMS.API.Accounting.DL.Services
             sysUserGroupRepo = sysUserGroup;
             catDepartmentRepo = catDepartment;
             sysGroupRepo = sysGroup;
-            sysOfficeRepo = SysOffice;
+            sysOfficeRepo = sysOffice;
             opsStageAssignedRepo = opsStageAssigned;
         }
 
@@ -105,16 +105,16 @@ namespace eFMS.API.Accounting.DL.Services
                              criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ?
                              (
                                  (
-                                        (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.AdvanceNo) : 1 == 1)
-                                     || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.Hbl) : 1 == 1)
-                                     || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.Mbl) : 1 == 1)
-                                     || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.CustomNo) : 1 == 1)
-                                     || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.JobId) : 1 == 1)
+                                        (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.AdvanceNo) : true)
+                                     || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.Hbl) : true)
+                                     || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.Mbl) : true)
+                                     || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.CustomNo) : true)
+                                     || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.JobId) : true)
                                  )
                              )
                              :
                              (
-                                 1 == 1
+                                 true
                              )
                           )
                          select ad.AdvanceNo).ToList();
@@ -129,7 +129,7 @@ namespace eFMS.API.Accounting.DL.Services
                        from apr in apr2.DefaultIfEmpty()
                        where
                          (
-                            criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ? refNo.Contains(ad.AdvanceNo) : 1 == 1
+                            criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ? refNo.Contains(ad.AdvanceNo) : true
                          )
                          &&
                          (
@@ -142,7 +142,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 || (apr.AccountantApr == criteria.Requester && apr.AccountantAprDate != null)
                             )
                             :
-                                1 == 1
+                                true
                          )
                          &&
                          (
@@ -151,14 +151,14 @@ namespace eFMS.API.Accounting.DL.Services
                                 ad.RequestDate.Value.Date >= (criteria.RequestDateFrom.HasValue ? criteria.RequestDateFrom.Value.Date : criteria.RequestDateFrom)
                                 && ad.RequestDate.Value.Date <= (criteria.RequestDateTo.HasValue ? criteria.RequestDateTo.Value.Date : criteria.RequestDateTo)
                             :
-                                1 == 1
+                                true
                          )
                          &&
                          (
                             !string.IsNullOrEmpty(criteria.StatusApproval) && !criteria.StatusApproval.Equals("All") ?
                                 ad.StatusApproval == criteria.StatusApproval
                             :
-                                1 == 1
+                                true
                          )
                          &&
                          (
@@ -167,21 +167,21 @@ namespace eFMS.API.Accounting.DL.Services
                                 ad.DatetimeModified.Value.Date >= (criteria.AdvanceModifiedDateFrom.HasValue ? criteria.AdvanceModifiedDateFrom.Value.Date : criteria.AdvanceModifiedDateFrom)
                                 && ad.DatetimeModified.Value.Date <= (criteria.AdvanceModifiedDateTo.HasValue ? criteria.AdvanceModifiedDateTo.Value.Date : criteria.AdvanceModifiedDateTo)
                             :
-                                1 == 1
+                                true
                          )
                          &&
                          (
                            !string.IsNullOrEmpty(criteria.StatusPayment) && !criteria.StatusPayment.Equals("All") ?
                                 re.StatusPayment == criteria.StatusPayment
                            :
-                                1 == 1
+                                true
                          )
                          &&
                          (
                            !string.IsNullOrEmpty(criteria.PaymentMethod) && !criteria.PaymentMethod.Equals("All") ?
                                 ad.PaymentMethod == criteria.PaymentMethod
                            :
-                                1 == 1
+                                true
                           )
 
                        select new AcctAdvancePaymentResult
@@ -237,9 +237,9 @@ namespace eFMS.API.Accounting.DL.Services
                 StatusApproval = s.Key.StatusApproval,
                 AdvanceStatusPayment = GetAdvanceStatusPayment(s.Key.AdvanceNo),
                 PaymentMethod = s.Key.PaymentMethod,
-                PaymentMethodName = Common.CustomData.PaymentMethod.Where(x => x.Value == s.Key.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
+                PaymentMethodName = CustomData.PaymentMethod.Where(x => x.Value == s.Key.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
                 Amount = s.Sum(su => su.Amount),
-                StatusApprovalName = Common.CustomData.StatusApproveAdvance.Where(x => x.Value == s.Key.StatusApproval).Select(x => x.DisplayName).FirstOrDefault()
+                StatusApprovalName = CustomData.StatusApproveAdvance.Where(x => x.Value == s.Key.StatusApproval).Select(x => x.DisplayName).FirstOrDefault()
             }
             ).OrderByDescending(orb => orb.DatetimeModified);
             return data;
