@@ -9,6 +9,7 @@ namespace eFMS.API.System.Service.Models
         public string Name { get; set; }
         public string Thumb { get; set; }
         public string Url { get; set; }
+        public string Folder { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DateTimeCreated { get; set; }
         public string UserModified { get; set; }

@@ -117,42 +117,13 @@ namespace eFMS.API.Documentation.DL.Services
             //Nếu có chứa Service Custom Logistic
             if (services.Contains("CL"))
             {
-                //var shipmentOperation = opsRepository.Get(x => x.IsLocked == false && x.CurrentStatus != "Canceled");
-                //var shipmentsOperation = surcharge.Join(shipmentOperation, x => x.Hblid, y => y.Hblid, (x, y) => new { x, y }).Select(x => new Shipments
-                //{
-                //    JobId = x.y.JobNo,
-                //    HBL = x.y.Hwbno,
-                //    MBL = x.y.Mblno,
-                //});
-
-                //Start change request Modified 14/10/2019 by Andy.Hoa
-                //Get list shipment operation theo user current
-                var shipmentOperation = from ops in opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != "Canceled" && x.IsLocked == false)
-                                        join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId into osa2
-                                        from osa in osa2.DefaultIfEmpty()
-                                        where osa.MainPersonInCharge == userCurrent
-                                        select new Shipments
-                                        {
-                                            JobId = ops.JobNo,
-                                            HBL = ops.Hwbno,
-                                            MBL = ops.Mblno,
-                                            HBLID = ops.Hblid
-                                        };
-                shipmentOperation = shipmentOperation.GroupBy(x => new { x.Id, x.JobId, x.HBL, x.MBL, x.CustomerId, x.HBLID }).Select(s => new Shipments
+                var shipmentOperation = opsRepository.Get(x => x.IsLocked == false && x.CurrentStatus != "Canceled");
+                var shipmentsOperation = surcharge.Join(shipmentOperation, x => x.Hblid, y => y.Hblid, (x, y) => new { x, y }).Select(x => new Shipments
                 {
-                    JobId = s.Key.JobId,
-                    HBL = s.Key.HBL,
-                    MBL = s.Key.MBL,
-                    HBLID = s.Key.HBLID
+                    JobId = x.y.JobNo,
+                    HBL = x.y.Hwbno,
+                    MBL = x.y.Mblno,
                 });
-                var shipmentsOperation = surcharge.Join(shipmentOperation, x => x.Hblid, y => y.HBLID, (x, y) => new { x, y }).Select(x => new Shipments
-                {
-                    JobId = x.y.JobId,
-                    HBL = x.y.HBL,
-                    MBL = x.y.MBL,
-                });
-                //End change request
-
                 shipments = shipmentsDocumention.Union(shipmentsOperation).Where(x => x.JobId != null && x.HBL != null && x.MBL != null).Select(s => new Shipments { JobId = s.JobId, HBL = s.HBL, MBL = s.MBL });
             }
 
@@ -190,13 +161,13 @@ namespace eFMS.API.Documentation.DL.Services
                                     join cus in catPartnerRepo.Get() on ops.CustomerId equals cus.Id into cus2
                                     from cus in cus2.DefaultIfEmpty()
                                     where
-                                        searchOption.Equals("JOBNO") ? keywords.Contains(ops.JobNo) : 1 == 1
+                                        searchOption.Equals("JOBNO") ? keywords.Contains(ops.JobNo) : true
                                     &&
-                                        searchOption.Equals("HBL") ? keywords.Contains(ops.Hwbno) : 1 == 1
+                                        searchOption.Equals("HBL") ? keywords.Contains(ops.Hwbno) : true
                                     &&
-                                        searchOption.Equals("MBL") ? keywords.Contains(ops.Mblno) : 1 == 1
+                                        searchOption.Equals("MBL") ? keywords.Contains(ops.Mblno) : true
                                     &&
-                                        searchOption.Equals("CUSTOMNO") ? keywords.Contains(sur.ClearanceNo) : 1 == 1
+                                        searchOption.Equals("CUSTOMNO") ? keywords.Contains(sur.ClearanceNo) : true
                                     select new ShipmentsCopy
                                     {
                                         JobId = ops.JobNo,
@@ -217,13 +188,13 @@ namespace eFMS.API.Documentation.DL.Services
                               join cus in catPartnerRepo.Get() on cstd.CustomerId equals cus.Id into cus2
                               from cus in cus2.DefaultIfEmpty()
                               where
-                                    searchOption.Equals("JOBNO") ? keywords.Contains(cst.JobNo) : 1 == 1
+                                    searchOption.Equals("JOBNO") ? keywords.Contains(cst.JobNo) : true
                                 &&
-                                    searchOption.Equals("HBL") ? keywords.Contains(cstd.Hwbno) : 1 == 1
+                                    searchOption.Equals("HBL") ? keywords.Contains(cstd.Hwbno) : true
                                 &&
-                                    searchOption.Equals("MBL") ? keywords.Contains(cstd.Mawb) : 1 == 1
+                                    searchOption.Equals("MBL") ? keywords.Contains(cstd.Mawb) : true
                                 &&
-                                    searchOption.Equals("CUSTOMNO") ? keywords.Contains(sur.ClearanceNo) : 1 == 1
+                                    searchOption.Equals("CUSTOMNO") ? keywords.Contains(sur.ClearanceNo) : true
                               select new ShipmentsCopy
                               {
                                   JobId = cst.JobNo,
