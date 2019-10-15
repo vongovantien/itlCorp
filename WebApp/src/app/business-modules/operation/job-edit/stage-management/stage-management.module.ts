@@ -8,12 +8,14 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { SelectModule } from 'ng2-select';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { AssignStagePopupComponent } from './assign-stage/assign-stage.popup';
 
 @NgModule({
     declarations: [
         OpsModuleStageManagementComponent,
         OpsModuleStageManagementDetailComponent,
         OpsModuleStageManagementAddStagePopupComponent,
+        AssignStagePopupComponent
     ],
     imports: [
         CommonModule,

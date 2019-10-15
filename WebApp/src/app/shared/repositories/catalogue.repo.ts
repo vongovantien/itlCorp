@@ -278,4 +278,21 @@ export class CatalogueRepo {
             );
         }
     }
+
+    getStage(body?: any) {
+        if (!!body) {
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatStage/Query`, body).pipe(
+                map((res: any) => {
+                    return res;
+                })
+            );
+        } else {
+            return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatStage/GetAll`).pipe(
+                map((res: any) => {
+                    return res;
+                })
+            );
+        }
+
+    }
 }

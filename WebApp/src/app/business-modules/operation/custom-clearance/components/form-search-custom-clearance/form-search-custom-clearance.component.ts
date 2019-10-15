@@ -88,8 +88,8 @@ export class CustomClearanceFormSearchComponent extends AppForm {
     }
 
     getListUser() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)) {
-            this.users = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY) || [];
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SYSTEM_USER)) {
+            this.users = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SYSTEM_USER) || [];
             this.personalHandle.setValue(this.users.filter((user: User) => user.id === this.userLogged.id)[0]);
         } else {
             this._sysRepo.getListSystemUser()

@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Company } from 'src/app/shared/models';
-import { SystemRepo } from 'src/app/shared/repositories';
+import { SystemRepo, ExportRepo } from 'src/app/shared/repositories';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { finalize } from 'rxjs/internal/operators/finalize';
 import { map } from 'rxjs/internal/operators/map';
@@ -30,7 +30,8 @@ export class ComanyInformationComponent extends AppList {
         private _progressService: NgProgress,
         private _router: Router,
         private _toastService: ToastrService,
-        private _sortService: SortService
+        private _sortService: SortService,
+        private _exportRepo: ExportRepo,
 
     ) {
         super();
@@ -107,6 +108,15 @@ export class ComanyInformationComponent extends AppList {
                         this._toastService.warning(res.message);
                     }
                 }
+            );
+    }
+
+    exportExcel() {
+        this._exportRepo.exportCompany(this.dataSearch)
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    this.downLoadFile(response, "application/ms-excel", 'Company_List.xlsx');
+                },
             );
     }
 

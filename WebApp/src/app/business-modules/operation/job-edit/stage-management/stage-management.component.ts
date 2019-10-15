@@ -11,6 +11,7 @@ import { catchError, finalize, takeUntil, tap } from 'rxjs/operators';
 import { Stage } from "src/app/shared/models/operation/stage";
 import { SortService } from "src/app/shared/services";
 import { NgProgress } from "@ngx-progressbar/core";
+import { AssignStagePopupComponent } from "./assign-stage/assign-stage.popup";
 
 @Component({
     selector: "app-ops-module-stage-management",
@@ -22,6 +23,7 @@ export class OpsModuleStageManagementComponent extends AppPage {
     data: any = null;
     @ViewChild(OpsModuleStageManagementAddStagePopupComponent, { static: false }) popupCreate: OpsModuleStageManagementAddStagePopupComponent;
     @ViewChild(OpsModuleStageManagementDetailComponent, { static: false }) popupDetail: OpsModuleStageManagementDetailComponent;
+    @ViewChild(AssignStagePopupComponent, { static: false }) assignStagePopup: AssignStagePopupComponent;
 
     stages: Stage[] = [];
     stageAvailable: any[] = [];
@@ -68,11 +70,16 @@ export class OpsModuleStageManagementComponent extends AppPage {
     }
 
     openPopUpCreateStage() {
-        this.popupCreate.show({ backdrop: 'static', keyboard: true });
+        this.popupCreate.show();
     }
 
+    openPopUpAssignStage() {
+        this.assignStagePopup.show();
+    }
+
+
     openPopupDetail() {
-        this.popupDetail.show({ backdrop: 'static', keyboard: true });
+        this.popupDetail.show();
     }
 
     getListStageJob(id: string) {
