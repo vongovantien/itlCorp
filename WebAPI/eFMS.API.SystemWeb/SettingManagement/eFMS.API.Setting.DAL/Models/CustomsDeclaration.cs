@@ -36,6 +36,7 @@ namespace eFMS.API.Setting.Service.Models
         public string UserModified { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public DateTime? DatetimeModified { get; set; }
+        public DateTime? ConvertTime { get; set; }
         public string CargoType { get; set; }
     }
 }

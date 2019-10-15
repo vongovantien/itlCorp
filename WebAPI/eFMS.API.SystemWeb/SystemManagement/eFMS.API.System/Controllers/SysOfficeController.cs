@@ -50,6 +50,7 @@ namespace eFMS.API.System.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
+        [Authorize]
         public IActionResult Paging(SysOfficeCriteria criteria, int page, int size)
         {
             var data = sysOfficeService.Paging(criteria, page, size, out int rowCount);
@@ -96,7 +97,7 @@ namespace eFMS.API.System.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("Update")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Put( SysOfficeEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
