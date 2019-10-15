@@ -4,7 +4,8 @@ namespace eFMS.API.ReportData.Models
 {
     public class CatDepartmentModel
     {
-        public int Id { get; set; }
+        public int No { get; set; }
+        //public int Id { get; set; }
         public string Code { get; set; }
         public string DeptName { get; set; }
         public string DeptNameEn { get; set; }

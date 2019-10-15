@@ -135,7 +135,7 @@ namespace eFMS.API.System.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var branch = mapper.Map<SysOfficeModel>(model);
-            var hs = sysOfficeService.Add(branch);
+            var hs = sysOfficeService.AddOffice(branch);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

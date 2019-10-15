@@ -47,7 +47,7 @@ export class SystemRepo {
     }
 
     getListCompany() {
-        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysBu`).pipe(
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysCompany`).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => {
                 return data;
@@ -110,6 +110,7 @@ export class SystemRepo {
             map((data: any) => data)
         );
     }
+
     getGroup(page?: number, size?: number, body: any = {}) {
         return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup/paging`, body, {
             page: '' + page,

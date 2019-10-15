@@ -4,9 +4,11 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { AppPage } from 'src/app/app.base';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { NgProgress } from '@ngx-progressbar/core';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { Office } from 'src/app/shared/models/system/office';
 import { ToastrService } from 'ngx-toastr';
+import { Observable, from } from 'rxjs';
+import { Department } from 'src/app/shared/models/system/department';
 
 @Component({
     selector: 'app-office-details',
@@ -42,7 +44,9 @@ export class OfficeDetailsComponent extends AppPage {
     officeId: string = '';
 
     office: Office;
+    departments: Department[] = [];
 
+    headers: CommonInterface.IHeaderTable[];
 
     constructor(
         private _activedRouter: ActivatedRoute,
@@ -65,6 +69,7 @@ export class OfficeDetailsComponent extends AppPage {
                 this._router.navigate(["home/system/office"]);
             }
         });
+
     }
 
     updateOffice() {
@@ -98,6 +103,8 @@ export class OfficeDetailsComponent extends AppPage {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message);
+                            this._router.navigate([`home/system/office`]);
+
                         } else {
                             this._toastService.warning(res.message);
 
@@ -108,59 +115,54 @@ export class OfficeDetailsComponent extends AppPage {
 
     }
 
+
     getDetailOffice(id: string) {
         this._progressRef.start();
         this._systemRepo.getDetailOffice(id)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
+                finalize(() => this._progressRef.complete()),
+                tap(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this.office = new Office(res.data);
+                            this.formAdd.isDetail = true;
+                            this.formData.id = res.data.id;
+                            this.formData.code = res.data.code;
+                            this.formData.branchNameEn = res.data.branchNameEn;
+                            this.formData.branchNameVn = res.data.branchNameVn;
+                            this.formData.shortName = res.data.shortName;
+                            this.formData.addressEn = res.data.addressEn;
+                            this.formData.taxcode = res.data.taxcode;
+                            this.formData.tel = res.data.tel;
+                            this.formData.email = res.data.email;
+                            this.formData.fax = res.data.fax;
+                            this.formData.buid = res.data.buid;
+                            this.formData.swiftCode = res.data.swiftCode;
+                            this.formData.bankAddress = res.data.bankAddress;
+                            this.formData.bankName = res.data.bankName;
+                            this.formData.addressVn = res.data.addressVn;
+                            this.formData.bankAccountVND = res.data.bankAccountVnd;
+                            this.formData.bankAccountUSD = res.data.bankAccountUsd;
+                            this.formData.bankAccountName = res.data.bankAccountName;
+                            this.formAdd.SelectedOffice = new Office(res.data);
+                            console.log('office selected:', this.formAdd.SelectedOffice);
+
+                            setTimeout(() => {
+                                this.formAdd.selectedCompany = { field: 'id', value: res.data.buid };
+                                this.formAdd.update(this.formData, res.data.active);
+                            }, 300);
+                        }
+                    }
+                ),
+                switchMap(() => this._systemRepo.getDepartmentsByOfficeId(id))
             )
             .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this.office = new Office(res.data);
-                        console.log(this.office);
-                        this.formAdd.isDetail = true;
-
-                        this.formData.id = res.data.id;
-                        this.formData.code = res.data.code;
-                        this.formData.branchNameEn = res.data.branchNameEn;
-                        this.formData.branchNameVn = res.data.branchNameVn;
-                        this.formData.shortName = res.data.shortName;
-                        this.formData.addressEn = res.data.addressEn;
-                        this.formData.taxcode = res.data.taxcode;
-                        this.formData.tel = res.data.tel;
-                        this.formData.email = res.data.email;
-                        this.formData.fax = res.data.fax;
-                        this.formData.buid = res.data.buid;
-                        this.formData.swiftCode = res.data.swiftCode;
-                        this.formData.bankAddress = res.data.bankAddress;
-                        this.formData.bankName = res.data.bankName;
-                        this.formData.addressVn = res.data.addressVn;
-                        this.formData.bankAccountVND = res.data.bankAccountVnd;
-                        this.formData.bankAccountUSD = res.data.bankAccountUsd;
-                        this.formData.bankAccountName = res.data.bankAccountName;
-                        // this.formAdd.selectedCompany = { field: res.data.sysCompany.bunameEn, value: res.data.sysCompany.id };
-                        console.log(this.formAdd.selectedCompany);
-
-                        setTimeout(() => {
-                            this.formAdd.selectedCompany = { field: 'id', value: res.data.sysCompany.id };
-                            // this.formAdd.active.setValue(this.formAdd.status.filter(i => i.value === res.data.active)[0]);
-
-                            this.formAdd.update(this.formData, res.data.active);
-                        }, 300);
-
-                        // this.formAdd.company.setValue(res.data.buid);
-
-
-                        console.log(res.data);
-
-                    }
+                (res: any) => {
+                    this.departments = res;
+                    this.formAdd.getDepartment(this.departments);
+                    console.log(this.departments);
                 },
-                (errors: any) => { },
-                () => {
-                    this._progressRef.complete();
-                }
             );
 
     }
