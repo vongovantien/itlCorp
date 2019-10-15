@@ -15,6 +15,6 @@ namespace eFMS.API.Setting.DL.Models.Criteria
         public DateTime? Date { get; set; }
 
         public bool? Status { get; set; }
-        public Guid OfficeId { get; set; }
+        public string OfficeId { get; set; }
     }
 }
