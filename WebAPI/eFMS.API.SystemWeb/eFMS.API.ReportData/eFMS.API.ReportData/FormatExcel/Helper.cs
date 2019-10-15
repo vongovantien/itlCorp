@@ -743,7 +743,7 @@ namespace eFMS.API.ReportData
                 worksheet.Cells[i + 2, 5].Value = item.DescriptionEn;
                 worksheet.Cells[i + 2, 6].Value = item.DescriptionVn;
                 string inactivechar = "";
-                if (item.Inactive == true)
+                if (item.Active == true)
                 {
                     inactivechar = "Active";
                 }
@@ -951,6 +951,7 @@ namespace eFMS.API.ReportData
                 worksheet.Cells[3, i + 1].Style.Border.Left.Style = ExcelBorderStyle.Thin;
                 worksheet.Cells[3, i + 1].Style.Border.Right.Style = ExcelBorderStyle.Thin;
                 worksheet.Cells[3, i + 1].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[3, i + 1].Style.Font.Bold = true;
 
                 worksheet.Cells[3, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 worksheet.Cells[3, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
@@ -959,7 +960,68 @@ namespace eFMS.API.ReportData
             }
         }
         #endregion
+        public Stream generateOfficeExcel(List<SysOfficeModel> listCompany, Stream stream = null)
+        {
+            List<String> headers = new List<String>()
+            {
+                "No",
+                "Office Code",
+                "Name En",
+                "Name Local",
+                "Name Abbr",
+                "Address Local",
+                "Tax code",
+                "Company",
+                "Status"
+            };
+            try
+            {
+                int addressStartContent = 4;
+                int no = 1;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Sheet1");
+                    var worksheet = excelPackage.Workbook.Worksheets[1];
 
+                    buildHeader(worksheet, headers, "OFFICE INFORMATION");
+
+                    for (int i = 0; i < listCompany.Count; i++)
+                    {
+                        var item = listCompany[i];
+                        worksheet.Cells[i + addressStartContent, 1].Value = no.ToString();
+                        worksheet.Cells[i + addressStartContent, 2].Value = item.Code;
+                        worksheet.Cells[i + addressStartContent, 3].Value = item.BranchNameEn;
+                        worksheet.Cells[i + addressStartContent, 4].Value = item.BranchNameVn;
+                        worksheet.Cells[i + addressStartContent, 5].Value = item.ShortName;
+                        worksheet.Cells[i + addressStartContent, 6].Value = item.AddressVn;
+                        worksheet.Cells[i + addressStartContent, 7].Value = item.Taxcode;
+                        worksheet.Cells[i + addressStartContent, 8].Value = item.CompanyName;
+
+
+                        string status = "";
+                        if (item.Active == true)
+                        {
+                            status = "Active";
+                        }
+                        else
+                        {
+                            status = "Inactive";
+                        }
+                        worksheet.Cells[i + addressStartContent, 9].Value = status;
+
+                        no++;
+                    }
+
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
 
 
     }

@@ -11,6 +11,6 @@ namespace eFMS.API.ReportData.Models
         public string UnitType { get; set; }
         public string DescriptionEn { get; set; }
         public string DescriptionVn { get; set; }
-        public bool? Inactive { get; set; }
+        public bool? Active { get; set; }
     }
 }

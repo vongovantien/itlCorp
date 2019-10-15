@@ -30,5 +30,12 @@ export class ExportRepo {
             map(data => data)
         );
     }
+    exportOffice(searchObject: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/System/ExportOffice`, searchObject).pipe(
+            catchError((error) => throwError(error)),
+            map(data => data)
+        );
+    }
+
 }
 

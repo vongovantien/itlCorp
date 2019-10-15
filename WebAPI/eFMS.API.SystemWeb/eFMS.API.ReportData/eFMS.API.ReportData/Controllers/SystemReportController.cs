@@ -49,5 +49,29 @@ namespace eFMS.API.ReportData.Controllers
 
         }
 
+        /// <summary>
+        /// Export Office
+        /// </summary>
+        /// <param name="sysOfficeCriteria"></param>
+        /// <returns></returns>
+
+        [Route("System/ExportOffice")]
+        [HttpPost]
+        public async Task<IActionResult> ExportOffice(SysOfficeCriteria sysOfficeCriteria)
+        {
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(sysOfficeCriteria, aPis.HostStaging + Urls.System.OfficeUrl);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<SysOfficeModel>>();
+
+            var stream = new Helper().generateOfficeExcel(dataObjects.Result);
+            if (stream == null)
+            {
+                return null;
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Company List.xlsx");
+
+            return fileContent;
+
+        }
     }
 }

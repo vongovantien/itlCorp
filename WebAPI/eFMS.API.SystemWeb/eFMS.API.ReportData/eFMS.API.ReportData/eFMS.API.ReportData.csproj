@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
     <UserSecretsId>85b2b6e8-1ba7-4370-b950-7b4665f22dfe</UserSecretsId>
   </PropertyGroup>
 
@@ -29,7 +29,10 @@
   </ItemGroup>
    <ItemGroup>
      <Reference Include="eFMS.API.Common">
-       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
+       <HintPath>..\..\SystemManagement\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
+     </Reference>
+     <Reference Include="ITL.NetCore.Common">
+       <HintPath>..\..\SystemManagement\bin\netcoreapp2.2\ITL.NetCore.Common.dll</HintPath>
      </Reference>
    </ItemGroup>
 

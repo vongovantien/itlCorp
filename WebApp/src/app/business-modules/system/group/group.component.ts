@@ -6,6 +6,7 @@ import { SystemRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { SortService } from 'src/app/shared/services';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-group',
@@ -22,7 +23,8 @@ export class GroupComponent extends AppList implements OnInit {
   constructor(
     private _progressService: NgProgress,
     private _systemRepo: SystemRepo,
-    private _sortService: SortService) {
+    private _sortService: SortService,
+    private _toastService: ToastrService) {
     super();
     this._progressRef = this._progressService.ref();
     this.requestList = this.searchGroup;
@@ -72,7 +74,21 @@ export class GroupComponent extends AppList implements OnInit {
     this.deleteGroup(this.selectedGroup.id);
   }
   deleteGroup(id: any) {
-    throw new Error("Method not implemented.");
+    this._progressRef.start();
+    this._systemRepo.deleteGroup(id)
+      .pipe(
+        catchError(this.catchError),
+        finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
+      ).subscribe(
+        (res: CommonInterface.IResult) => {
+          if (res.status) {
+            this._toastService.success(res.message, '');
+            this.searchGroup(this.dataSearch);
+          } else {
+            this._toastService.error(res.message || 'Có lỗi xảy ra', '');
+          }
+        },
+      );
   }
   onSearchGroup(dataSearch: any) {
     this.dataSearch = {};

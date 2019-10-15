@@ -22,5 +22,7 @@ namespace eFMS.API.System.DL.Models
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
         public string DepartmentName { get; set; }
+        public string CompanyName { get; set; }
+        public string OfficeName { get; set; }
     }
 }
