@@ -21,6 +21,12 @@ namespace eFMS.API.Setting.Controllers
             tariffService = service;
         }
 
+        [HttpGet]
+        public IActionResult Get()
+        {
+            var data = tariffService.Get();
+            return Ok(data);
+        }
 
     }
 }
