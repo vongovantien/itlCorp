@@ -1,3 +1,19 @@
-<p>
-  tariff works!
-</p>
+<div class="company-infomation-page">
+    <app-sub-header>
+        <div class="c-button-actions">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                [routerLink]="'/home/setting/tariff/new'">
+                <span>
+                    <i class="la la-plus"></i>
+                    <span>
+                        Create
+                    </span>
+                </span>
+            </button>
+        </div>
+    </app-sub-header>
+    <div class="m-content">
+        <form-search-tariff></form-search-tariff>
+
+    </div>
+</div>
