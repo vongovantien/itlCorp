@@ -4,7 +4,7 @@ using System.Text;
 
 namespace eFMS.API.Setting.DL.Models
 {
-    public class TariffModel : Tariff
+    public class TariffViewModel
     {
 
     }

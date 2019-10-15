@@ -8,6 +8,7 @@ namespace eFMS.API.Setting.DL.IService
 {
     public interface ITariffService :  IRepositoryBase<Tariff, TariffModel>
     {
+        List<TariffViewModel> Query(SysOfficeCriteria employee);
 
 
     }

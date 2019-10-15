@@ -13,7 +13,6 @@ namespace eFMS.API.Setting.DL.Services
     {
         public TariffService(IContextBase<Tariff> repository, IMapper mapper) : base(repository, mapper)
         {
-            //catAreaApi = apiService;
         }   
 
 
