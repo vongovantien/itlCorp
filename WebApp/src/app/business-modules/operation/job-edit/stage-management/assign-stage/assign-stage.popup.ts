@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { CatalogueRepo, SystemRepo, OperationRepo } from 'src/app/shared/repositories';
 import { catchError, map } from 'rxjs/operators';
@@ -12,6 +12,8 @@ import { ToastrService } from 'ngx-toastr';
     templateUrl: './assign-stage.popup.html',
 })
 export class AssignStagePopupComponent extends PopupBase {
+
+    @Output() onAssign: EventEmitter<any> = new EventEmitter<any>();
 
     configStage: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
@@ -31,7 +33,7 @@ export class AssignStagePopupComponent extends PopupBase {
     description: string = '';
 
     isSubmitted: boolean = false;
-
+    jobId: string = '';
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -85,7 +87,7 @@ export class AssignStagePopupComponent extends PopupBase {
         }
         const body: IAssignStage = {
             id: "00000000-0000-0000-0000-000000000000",
-            jobId: this.selectedStageData.jobId,
+            jobId: this.jobId,
             stageId: this.selectedStageData.id,
             mainPersonInCharge: !!this.selectedUser ? this.selectedUser.id : null,
             description: this.description
@@ -95,8 +97,8 @@ export class AssignStagePopupComponent extends PopupBase {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-
-                        this.hide();
+                        this.onAssign.emit(this.selectedStageData.jobId);
+                        this.closePopup();
                     } else {
                         this._toastService.warning(res.message);
                     }
@@ -106,6 +108,16 @@ export class AssignStagePopupComponent extends PopupBase {
     onSelectStage(stage: any) {
         this.selectedStageData = stage;
         this.selectedStage = { field: 'stageNameEn', value: stage.stageNameEn };
+    }
+
+    closePopup() {
+        this.hide();
+
+        // * Reset value
+        this.description = '';
+        this.selectedUser = null;
+        this.selectedStage = {};
+        this.isSubmitted = false;
     }
 }
 

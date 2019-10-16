@@ -2,7 +2,7 @@
     <app-sub-header>
         <div class="c-button-actions">
             <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                [routerLink]="'/home/setting/tariff/new'">
+                [routerLink]="'/home/tool/tariff/new'">
                 <span>
                     <i class="la la-plus"></i>
                     <span>
@@ -13,25 +13,44 @@
         </div>
     </app-sub-header>
     <div class="m-content">
-        <form-search-tariff></form-search-tariff>
-        <div class="m-portlet">
-            <div class="m-porlet__body p-3">
-                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Optio voluptatum molestiae, dolor ipsum
-                doloremque consequatur consectetur quasi maiores fuga alias facilis qui dolorem fugit velit perspiciatis
-                ea. Praesentium neque quidem, tempore aperiam voluptates minima dicta, veniam ipsum, ratione nam
-                recusandae et natus mollitia! Pariatur ad amet sint, quam dolores ratione eos vitae temporibus? Quaerat,
-                ad consectetur est accusantium voluptatum voluptas fugiat quidem, voluptatibus blanditiis voluptates in
-                aliquam id sed debitis nulla pariatur exercitationem dolores provident quisquam nemo aspernatur. Alias
-                vel autem atque necessitatibus quas minima ratione excepturi fuga error quis magnam odit natus
-                voluptatem saepe ipsa eaque voluptatum enim modi ipsam dolor eos, dolorem placeat distinctio? Cupiditate
-                voluptate totam, impedit quo voluptatibus consequatur expedita, aut rem, facere eos mollitia delectus.
-                Voluptatem illum temporibus accusamus placeat soluta beatae odit nam, minus, itaque id repellendus
-                explicabo facilis eveniet voluptas ducimus quod nulla enim obcaecati adipisci nostrum repudiandae
-                exercitationem perferendis? Repellendus sunt eos dolor magni obcaecati itaque cum quae saepe, dicta
-                praesentium quidem odio, quo optio dolorum. Aut ex distinctio aliquam, pariatur atque veritatis incidunt
-                nemo in officiis est sed quos dolore porro, quod magni corrupti facilis doloribus eos eius veniam
-                recusandae quisquam velit! Delectus nesciunt nostrum totam eos eligendi doloremque, omnis blanditiis?
-            </div>
-        </div>
+        <tabset>
+            <tab heading="OPS Tariff">
+                <form-search-tariff></form-search-tariff>
+                <div class="m-portlet">
+                    <div class="m-portlet__body">
+                        <!-- <app-table-simple [data]="tariffs" [headers]="headers" (onSort)="sortBy($event)">
+                        </app-table-simple> -->
+                        <div class="table-wrapper">
+                            <table class="table table-striped table-brand dataTable">
+                                <thead app-table-header [headers]="headers"
+                                    (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                                    <th class="first table-actions-col"></th>
+                                </thead>
+                                <tbody>
+                                    <ng-container *ngIf="!isLoading && !!tariffs.length">
+                                        <tr class="text-center"
+                                            *ngFor="let tariff of tariffs; let i = index; trackBy: trackByFn">
+                                            <td></td>
+                                            <td>{{tariff.tariffName}}</td>
+                                            <td>{{tariff.tariffType}}</td>
+                                            <td>{{tariff.customerID}}</td>
+                                            <td>{{tariff.supplierID}}</td>
+                                            <td>{{tariff.serviceMode}}</td>
+                                            <td>{{tariff.effectiveDate | date: 'DD/mm/YYYY'}}</td>
+                                            <td>{{tariff.expiredDate | date: 'DD/mm/YYYY'}}</td>
+                                            <td [ngClass]="tariff.status ? 'text-success' : 'text-danger'">
+                                                {{tariff.status ? 'Active' : 'Inactive'}}</td>
+                                        </tr>
+                                        <tr app-table-none-record *ngIf="!isLoading && !tariffs.length"
+                                            [colspan]="headers.length + 1"></tr>
+                                        <tr app-table-loading *ngIf="isLoading"></tr>
+                                    </ng-container>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </tab>
+        </tabset>
     </div>
 </div>

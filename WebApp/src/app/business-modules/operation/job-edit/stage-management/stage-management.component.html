@@ -62,7 +62,7 @@
                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                 </thead>
                 <tbody class="tbody-group">
-                    <tr *ngFor="let stage of stages; let i = index" class="font-15 text-center">
+                    <tr *ngFor="let stage of stages; let i = index" class="text-center">
                         <td class="table-actions-col no-sorting">
                             <button (click)="getDetail(stage.id)" type="button" appLoadingButton
                                 [state]="!!data && data.isLocked"
@@ -122,4 +122,4 @@
 <detail-stage-popup [data]="selectedStage" (onSuccess)="onAddSuccess()"></detail-stage-popup>
 
 <!-- modal assign stage -->
-<asign-stage-popup></asign-stage-popup>
+<asign-stage-popup (onAssign)="getListStageJob(jobId)"></asign-stage-popup>

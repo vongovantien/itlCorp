@@ -7,7 +7,6 @@ import { throwError } from 'rxjs';
 @Injectable()
 export class SystemRepo {
     private VERSION: string = 'v1';
-    private MODULE: string = 'System';
     constructor(private _api: ApiService) {
     }
 
