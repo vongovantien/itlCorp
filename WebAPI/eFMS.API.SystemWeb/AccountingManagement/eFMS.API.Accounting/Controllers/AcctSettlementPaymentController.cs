@@ -522,8 +522,17 @@ namespace eFMS.API.Accounting.Controllers
         [Route("GetListSceneChargeSettlementBySettlementNo")]
         public IActionResult GetListSceneChargeSettlementBySettlementNo(string settlementNo)
         {
-            var data = acctSettlementPaymentService.GetListShipmentChargeSettlementNoGroup(settlementNo).Where(x => x.IsFromShipment == false);
+            //Start change request Modified 14/10/2019 by Andy.Hoa
+            //Chỉ search những charge hiện trường theo settlementNo thuộc user current
+            var userCurrent = currentUser.UserID;
+            var checkSettleOfUser = acctSettlementPaymentService.Get(x => x.UserCreated == userCurrent && x.SettlementNo == settlementNo).Any();
+            List<ShipmentChargeSettlement> data = new List<ShipmentChargeSettlement>();
+            if (checkSettleOfUser)
+            {
+                data = acctSettlementPaymentService.GetListShipmentChargeSettlementNoGroup(settlementNo).Where(x => x.IsFromShipment == false).ToList();
+            }
             return Ok(data);
+            //End change request
         }
 
         /// <summary>

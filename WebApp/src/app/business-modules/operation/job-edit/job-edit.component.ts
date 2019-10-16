@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { BaseService } from 'src/app/shared/services/base.service';
-import { API_MENU } from 'src/constants/api-menu.const';
 import * as dataHelper from 'src/helper/data.helper';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -23,6 +22,8 @@ import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common
 import { JobManagementBuyingRateComponent } from './components/buying-rate/buying-rate.component';
 import { JobManagementSellingRateComponent } from './components/selling-rate/selling-rate.component';
 import { JobManagementOBHComponent } from './components/obh/obh.component';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
@@ -101,10 +102,9 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     deleteMessage: string = '';
 
     packagesUnitActive = [];
-    //lstPartners: any[] = [];
 
     constructor(private baseServices: BaseService,
-        private api_menu: API_MENU,
+        private _spinner: NgxSpinnerService,
         private route: ActivatedRoute,
         private router: Router,
         private _data: DataService,
@@ -113,6 +113,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         private _ngProgressService: NgProgress,
         private _documentRepo: DocumentationRepo,
         private _router: Router,
+        private _toastService: ToastrService
     ) {
         super();
 
@@ -149,8 +150,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     getPartners() {
         this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, active: true })
             .subscribe((res: any) => {
-                console.log('this is partners');
-                // this.lstPartners = res;
                 this.buyingRateManagement.lstPartners = res;
                 this.sellingRateManagement.lstPartners = res;
                 this.obhRateManagement.lstPartners = res;
@@ -210,10 +209,12 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
         this.confirmCancelJobPopup.show();
     }
 
-    async saveShipment(form: NgForm) {
-        this.opsTransaction.serviceDate = this.serviceDate.startDate != null ? dataHelper.dateTimeToUTC(this.serviceDate.startDate) : null;
-        this.opsTransaction.finishDate = this.finishDate.startDate != null ? dataHelper.dateTimeToUTC(this.finishDate.startDate) : null;
+    saveShipment(form: NgForm) {
+        this.opsTransaction.serviceDate = !!this.serviceDate ? (this.serviceDate.startDate != null ? dataHelper.dateTimeToUTC(this.serviceDate.startDate) : null) : null;
+        this.opsTransaction.finishDate = !!this.finishDate ? (this.finishDate.startDate != null ? dataHelper.dateTimeToUTC(this.finishDate.startDate) : null) : null;
+
         const s = this.finishDate.startDate != null && this.serviceDate.startDate != null && (this.finishDate.startDate < this.serviceDate.startDate);
+
         if (form.invalid || this.opsTransaction.shipmentMode == null
             || (this.opsTransaction.pod === this.opsTransaction.pol && this.opsTransaction.pod != null && this.opsTransaction.pol != null)
             || this.opsTransaction.serviceMode == null
@@ -233,14 +234,33 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             this.opsTransaction.sumGrossWeight = this.opsTransaction.sumGrossWeight != null ? Number(this.opsTransaction.sumGrossWeight.toFixed(2)) : null;
             this.opsTransaction.sumNetWeight = this.opsTransaction.sumNetWeight != null ? Number(this.opsTransaction.sumNetWeight.toFixed(2)) : null;
             this.opsTransaction.sumCbm = this.opsTransaction.sumCbm != null ? Number(this.opsTransaction.sumCbm.toFixed(2)) : null;
-            await this.baseServices.putAsync(this.api_menu.Documentation.Operation.update, this.opsTransaction, true, true);
-            this.getShipmentDetails(this.opsTransaction.id);
+
+            this.updateShipment();
         }
     }
-    // -------------     Container   ------------------- //
-    /**
-     * Show popup & init new first row( if container list is null)
-     */
+
+    updateShipment() {
+        this._spinner.show();
+        console.log(this.opsTransaction);
+        this._documentRepo.updateShipment(this.opsTransaction)
+            .pipe(catchError(this.catchError), finalize(() => this._spinner.hide()))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        this.getShipmentDetails(this.opsTransaction.id);
+                    } else {
+                        this._toastService.warning(res.message);
+                    }
+                }
+            );
+    }
+
+    lockShipment() {
+        this.opsTransaction.isLocked = true;
+        this.updateShipment();
+    }
+
     showListContainer() {
         if (this.lstMasterContainers.length === 0) {
             this.lstMasterContainers.push(this.popupContainerList.initNewContainer());
@@ -384,7 +404,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             );
     }
 
-    public getListBuyingRateCharges() {
+    getListBuyingRateCharges() {
         this._catalogueRepo.getCharges({ active: true, type: 'CREDIT', serviceTypeId: ChargeConstants.CL_CODE })
             .pipe(
                 catchError(this.catchError),
@@ -397,7 +417,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             );
     }
 
-    public getListSellingRateCharges() {
+    getListSellingRateCharges() {
         // this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=0", { active: true, type: 'DEBIT', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
         //     this.lstSellingRateChargesComboBox = res['data'];
         //     this._data.setDataService('sellingCharges', this.lstSellingRateChargesComboBox);
@@ -414,7 +434,7 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             );
     }
 
-    public getListOBHCharges() {
+    getListOBHCharges() {
         // this.baseServices.post(this.api_menu.Catalogue.Charge.paging + "?pageNumber=1&pageSize=20", { active: true, type: 'OBH', serviceTypeId: ChargeConstants.CL_CODE }).subscribe(res => {
         //     this.lstOBHChargesComboBox = res['data'];
         //     this._data.setDataService('obhCharges', this.lstOBHChargesComboBox);
@@ -457,17 +477,18 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
             );
     }
 
-
     onSaveBuyingRate(event) {
         if (event === true) {
             this.getSurCharges('BUY');
         }
     }
+
     onSaveSellingRate(event) {
         if (event === true) {
             this.getSurCharges('SELL');
         }
     }
+
     onSaveOHBRate(event) {
         if (event === true) {
             this.getSurCharges('OBH');

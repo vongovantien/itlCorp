@@ -14,6 +14,9 @@ export class Group {
     active: boolean = true;
     inactiveOn: Date = null;
     departmentName: string = '';
+    companyName: string = '';
+    officeName: string = '';
+
     constructor(data?: any) {
         console.log(data);
         const self = this;

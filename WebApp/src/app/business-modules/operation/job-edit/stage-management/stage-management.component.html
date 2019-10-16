@@ -1,4 +1,3 @@
-<!--begin:: m-portlet-->
 <div class="m-portlet">
     <div class="m-portlet__body">
         <div class="row" *ngIf="!!data">
@@ -16,7 +15,6 @@
                 <span class="m--font-brand m--margin-left-5">{{!!data.currentStatus ? data.currentStatus : '-'}}</span>
             </div>
         </div>
-        <!--begin: Search Form -->
         <div class="m-form m-form--label-align-right m--margin-bottom-5">
             <div class="row align-items-center">
                 <div class="col-lg-4 order-2 order-lg-1">
@@ -33,63 +31,41 @@
                     </div>
                 </div>
                 <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
-                    <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                        (click)="openPopUpCreateStage()">
-                        <span>
-                            <i class="la la-plus"></i>
-                            <span>
-                                add stage
-                            </span>
-                        </span>
-                    </button>
+                    <div class="row">
+                        <div class="col">
+                            <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase"
+                                (click)="openPopUpAssignStage()" appLoadingButton [state]="!!data && data.isLocked">
+                                <span>
+                                    <i class="la la-plus"></i>
+                                    <span>
+                                        Assign
+                                    </span>
+                                </span>
+                            </button>
+                            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                (click)="openPopUpCreateStage()" appLoadingButton [state]="!!data && data.isLocked">
+                                <span>
+                                    <i class="la la-plus"></i>
+                                    <span>
+                                        add stage
+                                    </span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <!--end: Search Form -->
-        <!--begin: Datatable-->
         <div class="table-wrapper table-scrollable">
             <table class="table table-striped table-brand dataTable">
-                <thead>
-                    <tr>
-                        <th class="table-actions-col no-sorting">
-                            <span>Action</span>
-                        </th>
-                        <th class="sorting">
-                            <span>No</span>
-                        </th>
-                        <th class="sorting">
-                            <span>Status</span>
-                        </th>
-                        <th class="sorting">
-                            <span>Code</span>
-                        </th>
-                        <th class="sorting">
-                            <span>Name</span>
-                        </th>
-                        <th class="sorting">
-                            <span>Description</span>
-                        </th>
-                        <th class="sorting">
-                            <span>Role</span>
-                        </th>
-                        <th class="sorting">
-                            <span>OPS Incharge</span>
-                        </th>
-                        <th class="sorting">
-                            <span>Process Time</span>
-                        </th>
-                        <th class="sorting">
-                            <span>Deadline</span>
-                        </th>
-                        <th class="sorting">
-                            <span>Done Date</span>
-                        </th>
-                    </tr>
+                <thead app-table-header [headers]="headers"
+                    (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                 </thead>
                 <tbody class="tbody-group">
-                    <tr *ngFor="let stage of stages; let i = index" class="font-15">
+                    <tr *ngFor="let stage of stages; let i = index" class="font-15 text-center">
                         <td class="table-actions-col no-sorting">
-                            <button (click)="getDetail(stage.id)" type="button"
+                            <button (click)="getDetail(stage.id)" type="button" appLoadingButton
+                                [state]="!!data && data.isLocked"
                                 class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit">
                                 <i class="la la-edit"></i>
                             </button>
@@ -135,7 +111,6 @@
                 </tbody>
             </table>
         </div>
-        <!--end: Datatable-->
     </div>
 </div>
 
@@ -145,3 +120,6 @@
 
 <!-- modal stage detail -->
 <detail-stage-popup [data]="selectedStage" (onSuccess)="onAddSuccess()"></detail-stage-popup>
+
+<!-- modal assign stage -->
+<asign-stage-popup></asign-stage-popup>

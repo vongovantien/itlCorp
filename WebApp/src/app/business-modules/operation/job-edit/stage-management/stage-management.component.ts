@@ -1,27 +1,25 @@
 import { Component, ViewChild } from "@angular/core";
-import { AppPage } from "src/app/app.base";
 import { OpsModuleStageManagementAddStagePopupComponent } from "./add/add-stage.popup.component";
-import { NgxSpinnerService } from "ngx-spinner";
 import { OpsModuleStageManagementDetailComponent } from "./detail/detail-stage-popup.component";
 import { OperationRepo, DocumentationRepo } from "src/app/shared/repositories";
 import { ActivatedRoute } from "@angular/router";
-
-
-import { catchError, finalize, takeUntil, tap } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { Stage } from "src/app/shared/models/operation/stage";
 import { SortService } from "src/app/shared/services";
 import { NgProgress } from "@ngx-progressbar/core";
+import { AssignStagePopupComponent } from "./assign-stage/assign-stage.popup";
+import { AppList } from "src/app/app.list";
 
 @Component({
     selector: "app-ops-module-stage-management",
     templateUrl: "./stage-management.component.html",
-    styleUrls: ["./stage-management.component.scss"]
 })
-export class OpsModuleStageManagementComponent extends AppPage {
+export class OpsModuleStageManagementComponent extends AppList {
 
     data: any = null;
     @ViewChild(OpsModuleStageManagementAddStagePopupComponent, { static: false }) popupCreate: OpsModuleStageManagementAddStagePopupComponent;
     @ViewChild(OpsModuleStageManagementDetailComponent, { static: false }) popupDetail: OpsModuleStageManagementDetailComponent;
+    @ViewChild(AssignStagePopupComponent, { static: false }) assignStagePopup: AssignStagePopupComponent;
 
     stages: Stage[] = [];
     stageAvailable: any[] = [];
@@ -31,8 +29,9 @@ export class OpsModuleStageManagementComponent extends AppPage {
     jobId: string = '';
 
     timeOutSearch: any;
+
+    headers: CommonInterface.IHeaderTable[];
     constructor(
-        private _spinner: NgxSpinnerService,
         private _operation: OperationRepo,
         private _activedRouter: ActivatedRoute,
         private _sortService: SortService,
@@ -41,6 +40,21 @@ export class OpsModuleStageManagementComponent extends AppPage {
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
+        this.headers = [
+            { title: 'Action', field: 'status' },
+            { title: 'No', field: 'status' },
+            { title: 'Status', field: 'status', sortable: true },
+            { title: 'Code', field: 'stageCode', sortable: true },
+            { title: 'Name', field: 'stageNameEN', sortable: true },
+            { title: 'Description', field: 'description', sortable: true },
+            { title: 'Role', field: 'departmentName', sortable: true },
+            { title: 'OPS Incharge', field: 'mainPersonInCharge', sortable: true },
+            { title: 'Process Time', field: 'processTime', sortable: true },
+            { title: 'Deadline', field: 'deadline', sortable: true },
+            { title: 'Done Date', field: 'doneDate', sortable: true },
+        ];
+
+        this.requestSort = this.sortStage;
     }
 
     ngOnInit() {
@@ -68,20 +82,22 @@ export class OpsModuleStageManagementComponent extends AppPage {
     }
 
     openPopUpCreateStage() {
-        this.popupCreate.show({ backdrop: 'static', keyboard: true });
+        this.popupCreate.show();
     }
 
+    openPopUpAssignStage() {
+        this.assignStagePopup.show();
+    }
+
+
     openPopupDetail() {
-        this.popupDetail.show({ backdrop: 'static', keyboard: true });
+        this.popupDetail.show();
     }
 
     getListStageJob(id: string) {
-        this._spinner.show();
-
         this._operation.getListStageOfJob(id).pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),
-            finalize(() => { this._spinner.hide(); }),
         ).subscribe(
             (res: any[]) => {
                 if (res instanceof Error) {
@@ -94,12 +110,9 @@ export class OpsModuleStageManagementComponent extends AppPage {
     }
 
     getListStageAvailable(id: string) {
-        this._spinner.show();
-
         this._operation.getListStageNotAssigned(id).pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),
-            finalize(() => { this._spinner.hide(); }),
         ).subscribe(
             (res: any[]) => {
                 if (res instanceof Error) {
@@ -115,7 +128,6 @@ export class OpsModuleStageManagementComponent extends AppPage {
         this._operation.getDetailStageOfJob(id).pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),
-            finalize(() => { this._spinner.hide(); }),
         ).subscribe(
             (res: any[]) => {
                 if (res instanceof Error) {
@@ -150,5 +162,9 @@ export class OpsModuleStageManagementComponent extends AppPage {
     onAddSuccess() {
         this.getListStageJob(this.jobId);
         this.getListStageAvailable(this.jobId);
+    }
+
+    sortStage() {
+        this.stages = this._sortService.sort(this.stages, this.sort, this.order);
     }
 }

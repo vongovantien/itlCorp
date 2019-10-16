@@ -15,12 +15,31 @@ namespace eFMS.API.System.DL.Services
     public class SysGroupService : RepositoryBase<SysGroup, SysGroupModel>, ISysGroupService
     {
         private readonly IContextBase<CatDepartment> departmentRepository;
+        private readonly ICatDepartmentService departmentService;
+
         public SysGroupService(IContextBase<SysGroup> repository, 
             IMapper mapper,
-            IContextBase<CatDepartment> departmentRepo) : base(repository, mapper)
+            IContextBase<CatDepartment> departmentRepo,
+            ICatDepartmentService deptService) : base(repository, mapper)
         {
             SetChildren<SysUserGroup>("Id", "GroupId");
             departmentRepository = departmentRepo;
+            departmentService = deptService;
+        }
+
+        public SysGroupModel GetById(short id)
+        {
+            var group = DataContext.Get(x => x.Id == id).FirstOrDefault();
+            if (group == null) return null;
+            var result = mapper.Map<SysGroupModel>(group);
+            if(group.DepartmentId != null)
+            {
+                var department = departmentService.GetDepartmentById((int)group.DepartmentId);
+                result.DepartmentName = department.DeptNameEn;
+                result.CompanyName = department.CompanyName;
+                result.OfficeName = department.OfficeName;
+            }
+            return result;
         }
 
         public IQueryable<SysGroupModel> Paging(SysGroupCriteria criteria, int page, int size, out int rowsCount)
@@ -50,6 +69,7 @@ namespace eFMS.API.System.DL.Services
                                                && (x.NameVn ?? "").IndexOf(criteria.NameVN ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                && (x.ShortName ?? "").IndexOf(criteria.ShortName ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                && (x.DepartmentId == criteria.DepartmentId || criteria.DepartmentId == 0)
+                                               && (x.Id == criteria.Id || criteria.Id == 0)
                                         );
                 departments = departmentRepository.Get(x => x.DeptNameEn.IndexOf(criteria.DepartmentName ?? "", StringComparison.OrdinalIgnoreCase) > -1);
             }
@@ -60,6 +80,7 @@ namespace eFMS.API.System.DL.Services
                                                || (x.NameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                || (x.ShortName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                || (x.DepartmentId == criteria.DepartmentId || criteria.DepartmentId == 0)
+                                               || (x.Id == criteria.Id || criteria.Id == 0)
                                         );
                 departments = departmentRepository.Get(x => x.DeptNameEn.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1);
                 if(departments.Count() == 0)

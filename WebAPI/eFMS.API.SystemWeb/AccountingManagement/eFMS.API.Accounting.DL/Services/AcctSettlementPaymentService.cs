@@ -40,7 +40,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<CatCharge> catChargeRepo;
         readonly IContextBase<CatUnit> catUnitRepo;
         readonly IContextBase<CatPartner> catPartnerRepo;
-        readonly IContextBase<SysOffice> SysOfficeRepo;
+        readonly IContextBase<SysOffice> sysOfficeRepo;
 
         public AcctSettlementPaymentService(IContextBase<AcctSettlementPayment> repository,
             IMapper mapper,
@@ -63,7 +63,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatCharge> catCharge,
             IContextBase<CatUnit> catUnit,
             IContextBase<CatPartner> catPartner,
-            IContextBase<SysOffice> SysOffice) : base(repository, mapper)
+            IContextBase<SysOffice> sysOffice) : base(repository, mapper)
         {
             currentUser = user;
             webUrl = url;
@@ -84,7 +84,7 @@ namespace eFMS.API.Accounting.DL.Services
             catChargeRepo = catCharge;
             catUnitRepo = catUnit;
             catPartnerRepo = catPartner;
-            SysOfficeRepo = SysOffice;
+            sysOfficeRepo = sysOffice;
         }
 
         #region --- LIST SETTLEMENT PAYMENT ---
@@ -141,20 +141,20 @@ namespace eFMS.API.Accounting.DL.Services
                               criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ?
                               (
                                   (
-                                         (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(set.SettlementNo) : 1 == 1)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.Hwbno) : 1 == 1)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.Mblno) : 1 == 1)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.JobNo) : 1 == 1)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cstd.Hwbno) : 1 == 1)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cstd.Mawb) : 1 == 1)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cst.JobNo) : 1 == 1)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cus.ClearanceNo) : 1 == 1)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(req.AdvanceNo) : 1 == 1)
+                                         (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(set.SettlementNo) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.Hwbno) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.Mblno) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.JobNo) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cstd.Hwbno) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cstd.Mawb) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cst.JobNo) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cus.ClearanceNo) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(req.AdvanceNo) : true)
                                   )
                               )
                               :
                               (
-                                  1 == 1
+                                  true
                               )
                          )
                          select sur.SettlementCode).ToList();
@@ -169,7 +169,7 @@ namespace eFMS.API.Accounting.DL.Services
                        from apr in apr1.DefaultIfEmpty()
                        where
                        (
-                            criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ? refNo.Contains(set.SettlementNo) : 1 == 1
+                            criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ? refNo.Contains(set.SettlementNo) : true
                        )
                        &&
                        (
@@ -182,7 +182,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 || (apr.AccountantApr == criteria.Requester && apr.AccountantAprDate != null)
                             )
                             :
-                                1 == 1
+                                true
                        )
                        &&
                        (
@@ -191,21 +191,21 @@ namespace eFMS.API.Accounting.DL.Services
                                 set.RequestDate.Value.Date >= (criteria.RequestDateFrom.HasValue ? criteria.RequestDateFrom.Value.Date : criteria.RequestDateFrom)
                                 && set.RequestDate.Value.Date <= (criteria.RequestDateTo.HasValue ? criteria.RequestDateTo.Value.Date : criteria.RequestDateTo)
                             :
-                                1 == 1
+                                true
                        )
                        &&
                        (
                             !string.IsNullOrEmpty(criteria.StatusApproval) && !criteria.StatusApproval.Equals("All") ?
                                 set.StatusApproval == criteria.StatusApproval
                             :
-                                1 == 1
+                                true
                        )
                        &&
                        (
                            !string.IsNullOrEmpty(criteria.PaymentMethod) && !criteria.PaymentMethod.Equals("All") ?
                                 set.PaymentMethod == criteria.PaymentMethod
                            :
-                                1 == 1
+                                true
                        )
                        select new AcctSettlementPaymentResult
                        {
@@ -721,11 +721,11 @@ namespace eFMS.API.Accounting.DL.Services
                        join cst in csTrans on cstd.JobId equals cst.Id into cst2
                        from cst in cst2.DefaultIfEmpty()
                        where
-                                !string.IsNullOrEmpty(JobId) ? (opst.JobNo == null ? cst.JobNo : opst.JobNo) == JobId : 1 == 1
+                                !string.IsNullOrEmpty(JobId) ? (opst.JobNo == null ? cst.JobNo : opst.JobNo) == JobId : true
                             &&
-                                !string.IsNullOrEmpty(HBL) ? (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno) == HBL : 1 == 1
+                                !string.IsNullOrEmpty(HBL) ? (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno) == HBL : true
                             &&
-                                !string.IsNullOrEmpty(MBL) ? (opst.Mblno == null ? cstd.Mawb : opst.Mblno) == MBL : 1 == 1
+                                !string.IsNullOrEmpty(MBL) ? (opst.Mblno == null ? cstd.Mawb : opst.Mblno) == MBL : true
                        select new ShipmentChargeSettlement
                        {
                            Id = sur.Id,
@@ -770,10 +770,10 @@ namespace eFMS.API.Accounting.DL.Services
                 result = csShipmentSurchargeRepo.Get(x =>
                        x.ChargeId == criteria.ChargeID
                     && x.Hblid == criteria.HBLID
-                    && (criteria.TypeCharge == Constants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == Constants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : 1 == 1))
-                    && (string.IsNullOrEmpty(criteria.CustomNo) ? 1 == 1 : x.ClearanceNo == criteria.CustomNo)
-                    && (string.IsNullOrEmpty(criteria.InvoiceNo) ? 1 == 1 : x.InvoiceNo == criteria.InvoiceNo)
-                    && (string.IsNullOrEmpty(criteria.ContNo) ? 1 == 1 : x.ContNo == criteria.ContNo)
+                    && (criteria.TypeCharge == Constants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == Constants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : true))
+                    && (string.IsNullOrEmpty(criteria.CustomNo) ? true : x.ClearanceNo == criteria.CustomNo)
+                    && (string.IsNullOrEmpty(criteria.InvoiceNo) ? true : x.InvoiceNo == criteria.InvoiceNo)
+                    && (string.IsNullOrEmpty(criteria.ContNo) ? true : x.ContNo == criteria.ContNo)
                     ).Any();
             }
             else
@@ -782,10 +782,10 @@ namespace eFMS.API.Accounting.DL.Services
                    x.Id != criteria.SurchargeID
                 && x.ChargeId == criteria.ChargeID
                 && x.Hblid == criteria.HBLID
-                && (criteria.TypeCharge == Constants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == Constants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : 1 == 1))
-                && (string.IsNullOrEmpty(criteria.CustomNo) ? 1 == 1 : x.ClearanceNo == criteria.CustomNo)
-                && (string.IsNullOrEmpty(criteria.InvoiceNo) ? 1 == 1 : x.InvoiceNo == criteria.InvoiceNo)
-                && (string.IsNullOrEmpty(criteria.ContNo) ? 1 == 1 : x.ContNo == criteria.ContNo)
+                && (criteria.TypeCharge == Constants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == Constants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : true))
+                && (string.IsNullOrEmpty(criteria.CustomNo) ? true : x.ClearanceNo == criteria.CustomNo)
+                && (string.IsNullOrEmpty(criteria.InvoiceNo) ? true : x.InvoiceNo == criteria.InvoiceNo)
+                && (string.IsNullOrEmpty(criteria.ContNo) ? true : x.ContNo == criteria.ContNo)
                 ).Any();
             }
             return result;
@@ -1725,7 +1725,7 @@ namespace eFMS.API.Accounting.DL.Services
         //Đang gán cứng BrandId của Branch ITL HCM (27d26acb-e247-47b7-961e-afa7b3d7e11e)
         private string GetBUHeadId(string idBranch = "27d26acb-e247-47b7-961e-afa7b3d7e11e")
         {
-            var buHeadId = SysOfficeRepo.Get(x => x.Id == Guid.Parse(idBranch)).FirstOrDefault().ManagerId;
+            var buHeadId = sysOfficeRepo.Get(x => x.Id == Guid.Parse(idBranch)).FirstOrDefault().ManagerId;
             return buHeadId;
         }
 

@@ -6,7 +6,8 @@ import { SystemRepo } from 'src/app/shared/repositories';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { finalize } from 'rxjs/internal/operators/finalize';
 import { ToastrService } from 'ngx-toastr';
-import { FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
+
 
 
 @Component({
@@ -17,7 +18,8 @@ export class OfficeAddNewComponent extends AppPage {
     @ViewChild(OfficeFormAddComponent, { static: false }) formAdd: OfficeFormAddComponent;
     constructor(private _progressService: NgProgress,
         private _systemRepo: SystemRepo,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _router: Router
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -61,6 +63,8 @@ export class OfficeAddNewComponent extends AppPage {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message, '');
+                            this._router.navigate([`home/system/office`]);
+
                         } else {
                             this._toastService.error(res.message, '');
                         }

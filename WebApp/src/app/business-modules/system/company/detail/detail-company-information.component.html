@@ -33,24 +33,23 @@
         <div class="date-time p-3 font-14" *ngIf="!!company">
             <div class="row">
                 <div class="col-6">
-                    <span>Created: {{company.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by
-                        {{company.userCreated}}</span>
+                    <span>Created: {{company.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by </span> <span
+                        class="text-success">{{company.userCreated}}</span>
                 </div>
                 <div class="col-6">
-                    <span>Modified: {{company.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by
-                        {{company.userModified}}</span>
+                    <span>Modified: {{company.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by </span> <span
+                        class="text-success">{{company.userModified}}</span>
                 </div>
             </div>
         </div>
     </form-add-company>
-
     <div class="m-content">
         <div class="m-porlet__body p-3">
             <tabset class="customClass">
                 <tab heading="Office" id="tab1">
                     <div class="p-3 bg-white">
                         <perfect-scrollbar style="max-height: 900px">
-                            <div class="table-wrapper table-scrollabler" id="adv-payment-list-table">
+                            <div class="table-wrapper table-scrollabler">
                                 <table class="table table-brand table-hover dataTable">
                                     <thead app-table-header [headers]="headersOffice"
                                         (onClick)="sortBy($event.sortField ? $event.sortField : '')">
@@ -62,9 +61,9 @@
                                             <tr *ngFor="let office of offices; let i = index; trackBy: trackByFn"
                                                 class="text-center">
                                                 <td class="table-actions-col">
-                                                    <div class="table-actions" style="width: 70px">
-                                                        <a [routerLink]="gotoDetailOffice(office)"
-                                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                    <div class="table-actions">
+                                                        <a (click)="gotoDetailOffice(office)"
+                                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only text-white"
                                                             title="Edit">
                                                             <i class="la la-edit"></i>
                                                         </a>

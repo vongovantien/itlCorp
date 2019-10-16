@@ -7,7 +7,7 @@
             <app-default-button [buttonSetting]="addButtonSetting" [dataTarget]="addButtonSetting.dataTarget"
                 routerLink="/home/system/office/addnew">
             </app-default-button>
-            <app-default-button [buttonSetting]="exportButtonSetting"></app-default-button>
+            <app-default-button [buttonSetting]="exportButtonSetting" (onClick)="export()"></app-default-button>
         </div>
     </div>
 </div>

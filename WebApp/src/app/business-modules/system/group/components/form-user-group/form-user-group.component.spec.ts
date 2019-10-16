@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TariffComponent } from './tariff.component';
+import { FormUserGroupComponent } from './form-user-group.component';
 
-describe('TariffComponent', () => {
-  let component: TariffComponent;
-  let fixture: ComponentFixture<TariffComponent>;
+describe('FormUserGroupComponent', () => {
+  let component: FormUserGroupComponent;
+  let fixture: ComponentFixture<FormUserGroupComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TariffComponent ]
+      declarations: [ FormUserGroupComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TariffComponent);
+    fixture = TestBed.createComponent(FormUserGroupComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

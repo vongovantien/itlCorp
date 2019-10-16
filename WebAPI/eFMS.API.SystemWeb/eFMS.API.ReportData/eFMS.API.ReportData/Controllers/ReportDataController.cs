@@ -235,23 +235,5 @@ namespace eFMS.API.ReportData.Controllers
 
 
         #endregion
-
-        #region
-        /// <summary>
-        /// Export Department
-        /// </summary>
-        /// <param name="catDepartmentCriteria"></param>
-        /// <returns></returns>
-        [Route("Department/ExportDepartment")]
-        [HttpPost]
-        public async Task<IActionResult> ExportDepartment(CatDepartmentCriteria catDepartmentCriteria)
-        {
-            Helper helper = new Helper();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catDepartmentCriteria, aPis.HostStaging + Urls.System.DepartmentUrl);
-            var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatDepartmentModel>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
-            var stream = helper.CreateDepartmentExcelFile(dataObjects.Result);
-            return new FileHelper().ExportExcel(stream, FilesNames.DepartmentName);
-        }
-        #endregion
     }
 }

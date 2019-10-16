@@ -6,10 +6,13 @@
             <div class="row">
                 <div class="col-12">
                     <div class="mx-auto text-center upload-image-wp">
-                        <div>
-                            <img #image [src]="photoUrl" alt="" class="img-responsive img-inputImage" id="imageUpload"
-                                onerror="this.src = 'assets/app/media/img/emptydata.png'">
-                            <div class="text-primary text-underline pointer">Upload Image</div>
+                        <div class="image-upload-content">
+                            <div class="image-upload-content">
+                                <img #image [src]="photoUrl" alt="" class="img-responsive img-inputImage"
+                                    id="imageUpload" onerror="this.src = 'assets/app/media/img/emptydata.png'">
+                            </div>
+                            <div class="text-primary text-underline pointer">
+                                {{!!photoUrl ? 'Click to change image' : 'Upload Image'}}</div>
                         </div>
                     </div>
                 </div>
@@ -19,10 +22,10 @@
                     <form action="" class="row" [formGroup]="formGroup">
                         <div class="col-4">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': (code.dirty && !code.valid) || (isSubmited && !code.valid)}">
+                                [ngClass]="{'m-form__group has-danger': (code.dirty && !code.valid) || (isSubmitted && !code.valid)}">
                                 <label for="">Company Code <span class="text-danger">(*)</span></label>
                                 <input type="text" class="form-control m-input m-input--square"
-                                    placeholder="Company Code" formControlName="code">
+                                    placeholder="Company Code" formControlName="code" [attr.disabled]="isDisabled">
                                 <div class="form-control-feedback" *ngIf="isSubmitted && !code.valid">
                                     Company code is required!
                                 </div>
@@ -30,7 +33,7 @@
                         </div>
                         <div class="col-4">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': (bunameAbbr.dirty && !bunameAbbr.valid) || (isSubmited && !bunameAbbr.valid)}">
+                                [ngClass]="{'m-form__group has-danger': (bunameAbbr.dirty && !bunameAbbr.valid) || (isSubmitted && !bunameAbbr.valid)}">
                                 <label for="">Name Abbr <span class="text-danger">(*)</span></label>
                                 <input type="text" class="form-control m-input m-input--square" placeholder="Name Abbr"
                                     formControlName="bunameAbbr">
@@ -41,7 +44,7 @@
                         </div>
                         <div class="col-4">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': (bunameVn.dirty && !bunameVn.valid) || (isSubmited && !bunameVn.valid)}">
+                                [ngClass]="{'m-form__group has-danger': (bunameVn.dirty && !bunameVn.valid) || (isSubmitted && !bunameVn.valid)}">
                                 <label for="">Name Local <span class="text-danger">(*)</span></label>
                                 <input type="text" class="form-control m-input m-input--square"
                                     placeholder="Company Code" formControlName="bunameVn">
@@ -60,7 +63,7 @@
                         </div>
                         <div class="col-4">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': (bunameEn.dirty && !bunameEn.valid) || (isSubmited && !bunameEn.valid)}">
+                                [ngClass]="{'m-form__group has-danger': (bunameEn.dirty && !bunameEn.valid) || (isSubmitted && !bunameEn.valid)}">
                                 <label for="">Name English <span class="text-danger">(*)</span></label>
                                 <input type="text" class="form-control m-input m-input--square"
                                     placeholder="Company Code" formControlName="bunameEn">

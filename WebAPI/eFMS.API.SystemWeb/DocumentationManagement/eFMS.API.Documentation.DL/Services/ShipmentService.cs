@@ -3,6 +3,7 @@ using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,9 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CsShipmentSurcharge> surCharge;
         readonly IContextBase<CatPartner> catPartnerRepo;
         readonly IMapper mapper;
-        public ShipmentService(IContextBase<CsTransaction> cs, IContextBase<OpsTransaction> ops, IMapper iMapper, IContextBase<CsTransactionDetail> detail, IContextBase<CsShipmentSurcharge> surcharge, IContextBase<CatPartner> catPartner)
+        readonly IContextBase<OpsStageAssigned> opsStageAssignedRepo;
+        private readonly ICurrentUser currentUser;
+        public ShipmentService(IContextBase<CsTransaction> cs, IContextBase<OpsTransaction> ops, IMapper iMapper, IContextBase<CsTransactionDetail> detail, IContextBase<CsShipmentSurcharge> surcharge, IContextBase<CatPartner> catPartner, IContextBase<OpsStageAssigned> opsStageAssigned, ICurrentUser user)
         {
             csRepository = cs;
             opsRepository = ops;
@@ -26,20 +29,48 @@ namespace eFMS.API.Documentation.DL.Services
             detailRepository = detail;
             surCharge = surcharge;
             catPartnerRepo = catPartner;
+            opsStageAssignedRepo = opsStageAssigned;
+            currentUser = user;
         }
 
         public IQueryable<Shipments> GetShipmentNotLocked()
         {
-            var shipmentsOperation = opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != "Canceled" && x.IsLocked == false)
-                                    .Select(x => new Shipments
-                                    {
-                                        Id = x.Id,
-                                        JobId = x.JobNo,
-                                        HBL = x.Hwbno,
-                                        MBL = x.Mblno,
-                                        CustomerId = x.CustomerId,
-                                        HBLID = x.Hblid
-                                    });
+            var userCurrent = currentUser.UserID;
+            //var shipmentsOperation = opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != "Canceled" && x.IsLocked == false)
+            //                        .Select(x => new Shipments
+            //                        {
+            //                            Id = x.Id,
+            //                            JobId = x.JobNo,
+            //                            HBL = x.Hwbno,
+            //                            MBL = x.Mblno,
+            //                            CustomerId = x.CustomerId,
+            //                            HBLID = x.Hblid
+            //                        });
+            //Start change request Modified 14/10/2019 by Andy.Hoa
+            //Get list shipment operation theo user current
+            var shipmentsOperation = from ops in opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != "Canceled" && x.IsLocked == false)
+                                     join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId into osa2
+                                     from osa in osa2.DefaultIfEmpty()
+                                     where osa.MainPersonInCharge == userCurrent
+                                     select new Shipments
+                                     {
+                                         Id = ops.Id,
+                                         JobId = ops.JobNo,
+                                         HBL = ops.Hwbno,
+                                         MBL = ops.Mblno,
+                                         CustomerId = ops.CustomerId,
+                                         HBLID = ops.Hblid
+                                     };
+            shipmentsOperation = shipmentsOperation.GroupBy(x => new { x.Id, x.JobId, x.HBL, x.MBL, x.CustomerId, x.HBLID }).Select(s => new Shipments
+            {
+                Id = s.Key.Id,
+                JobId = s.Key.JobId,
+                HBL = s.Key.HBL,
+                MBL = s.Key.MBL,
+                CustomerId = s.Key.CustomerId,
+                HBLID = s.Key.HBLID
+            });
+            //End change request
             var transactions = csRepository.Get(x => x.IsLocked == false);
             var shipmentsDocumention = transactions.Join(detailRepository.Get(), x => x.Id, y => y.JobId, (x, y) => new { x, y }).Select(x => new Shipments
             {
@@ -56,6 +87,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         public IQueryable<Shipments> GetShipmentsCreditPayer(string partner, List<string> services)
         {
+            var userCurrent = currentUser.UserID;
             //Chỉ lấy ra những phí Credit(BUY) & Payer (chưa bị lock)
             var surcharge = surCharge.Get(x =>
                     (x.Type == "BUY" || (x.PayerId != null && x.CreditNo != null))
@@ -92,7 +124,6 @@ namespace eFMS.API.Documentation.DL.Services
                     HBL = x.y.Hwbno,
                     MBL = x.y.Mblno,
                 });
-
                 shipments = shipmentsDocumention.Union(shipmentsOperation).Where(x => x.JobId != null && x.HBL != null && x.MBL != null).Select(s => new Shipments { JobId = s.JobId, HBL = s.HBL, MBL = s.MBL });
             }
 
@@ -107,6 +138,8 @@ namespace eFMS.API.Documentation.DL.Services
 
         public List<ShipmentsCopy> GetListShipmentBySearchOptions(string searchOption, List<string> keywords)
         {
+            var userCurrent = currentUser.UserID;
+
             var dataList = new List<ShipmentsCopy>();
 
             if (string.IsNullOrEmpty(searchOption) || keywords == null || keywords.Count == 0 || keywords.Any(x => x == null)) return dataList;
@@ -114,21 +147,27 @@ namespace eFMS.API.Documentation.DL.Services
             var surcharge = surCharge.Get();
             var cstran = csRepository.Get();
             var cstrandel = detailRepository.Get();
-            var opstran = opsRepository.Get(x => x.CurrentStatus != "Canceled");
+            //var opstran = opsRepository.Get(x => x.CurrentStatus != "Canceled");
 
+            //Start change request Modified 14/10/2019 by Andy.Hoa
+            //Get list shipment operation theo user current
+            var opstran = from ops in opsRepository.Get(x => x.CurrentStatus != "Canceled")
+                          join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId //So sánh bằng
+                          where osa.MainPersonInCharge == userCurrent
+                          select ops;
             var shipmentOperation = from ops in opstran
                                     join sur in surcharge on ops.Hblid equals sur.Hblid into sur2
                                     from sur in sur2.DefaultIfEmpty()
                                     join cus in catPartnerRepo.Get() on ops.CustomerId equals cus.Id into cus2
                                     from cus in cus2.DefaultIfEmpty()
                                     where
-                                        searchOption.Equals("JOBNO") ? keywords.Contains(ops.JobNo) : 1 == 1
+                                        searchOption.Equals("JOBNO") ? keywords.Contains(ops.JobNo) : true
                                     &&
-                                        searchOption.Equals("HBL") ? keywords.Contains(ops.Hwbno) : 1 == 1
+                                        searchOption.Equals("HBL") ? keywords.Contains(ops.Hwbno) : true
                                     &&
-                                        searchOption.Equals("MBL") ? keywords.Contains(ops.Mblno) : 1 == 1
+                                        searchOption.Equals("MBL") ? keywords.Contains(ops.Mblno) : true
                                     &&
-                                        searchOption.Equals("CUSTOMNO") ? keywords.Contains(sur.ClearanceNo) : 1 == 1
+                                        searchOption.Equals("CUSTOMNO") ? keywords.Contains(sur.ClearanceNo) : true
                                     select new ShipmentsCopy
                                     {
                                         JobId = ops.JobNo,
@@ -139,6 +178,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         CustomNo = sur.ClearanceNo,
                                         Service = "CL"
                                     };
+            //End change request
+
             var shipmentDoc = from cstd in cstrandel
                               join cst in cstran on cstd.JobId equals cst.Id into cst2
                               from cst in cst2.DefaultIfEmpty()
@@ -147,13 +188,13 @@ namespace eFMS.API.Documentation.DL.Services
                               join cus in catPartnerRepo.Get() on cstd.CustomerId equals cus.Id into cus2
                               from cus in cus2.DefaultIfEmpty()
                               where
-                                    searchOption.Equals("JOBNO") ? keywords.Contains(cst.JobNo) : 1 == 1
+                                    searchOption.Equals("JOBNO") ? keywords.Contains(cst.JobNo) : true
                                 &&
-                                    searchOption.Equals("HBL") ? keywords.Contains(cstd.Hwbno) : 1 == 1
+                                    searchOption.Equals("HBL") ? keywords.Contains(cstd.Hwbno) : true
                                 &&
-                                    searchOption.Equals("MBL") ? keywords.Contains(cstd.Mawb) : 1 == 1
+                                    searchOption.Equals("MBL") ? keywords.Contains(cstd.Mawb) : true
                                 &&
-                                    searchOption.Equals("CUSTOMNO") ? keywords.Contains(sur.ClearanceNo) : 1 == 1
+                                    searchOption.Equals("CUSTOMNO") ? keywords.Contains(sur.ClearanceNo) : true
                               select new ShipmentsCopy
                               {
                                   JobId = cst.JobNo,

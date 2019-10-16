@@ -12,7 +12,7 @@ import { ServiceModule } from "./services/service.module";
 import { SearchStage, FilterPipe, NegativeNumberePipe, EqualErrorPipe, AbsPipe, RemoveTrimPipe } from "./pipes";
 
 import { InfoPopupComponent, ConfirmPopupComponent } from "./common/popup";
-import { DecimalNumberGreaterThan0Directive, StyleCellDirective, AutofocusDirective, TwoDigitDecimaNumberDirective, ThreeDigitDecimaNumberDirective, IntergerInputDirective, SpecialCharacterDirective, EcusSpecicalCharacterAllowSpaceDirective, EcusSpecicalCharacterNoSpaceDirective, ClickOutSideDirective } from "./directives";
+import { DecimalNumberGreaterThan0Directive, StyleCellDirective, AutofocusDirective, TwoDigitDecimaNumberDirective, ThreeDigitDecimaNumberDirective, IntergerInputDirective, SpecialCharacterDirective, EcusSpecicalCharacterAllowSpaceDirective, EcusSpecicalCharacterNoSpaceDirective, ClickOutSideDirective, AppLoadingButtonDirective } from "./directives";
 
 import { PaginationComponent, TableLayoutComponent, InputTableLayoutComponent, BreadcrumbComponent, DefaultButtonComponent, DeleteConfirmModalComponent, SearchOptionsComponent, InputFormComponent, TableDetailComponent, CloseModalButtonComponent, ReportPreviewComponent, ComboGridVirtualScrollComponent, CfBeforeLeaveModalComponent, AppMultipleSelectComponent, TableNoneRecordComponent, TableHeaderComponent, TableRowLoadingComponent, SubHeaderComponent, TableCollapseRowComponent } from "./common";
 import { CollapseModule } from "ngx-bootstrap/collapse";
@@ -77,7 +77,8 @@ const APP_DIRECTIVES = [
   EcusSpecicalCharacterNoSpaceDirective,
   DecimalNumberGreaterThan0Directive,
   ClickOutSideDirective,
-  LoadModuleDirective
+  LoadModuleDirective,
+  AppLoadingButtonDirective
 ];
 @NgModule({
   imports: [

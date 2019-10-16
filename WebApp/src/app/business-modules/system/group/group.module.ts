@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { PaginationModule, TabsModule } from 'ngx-bootstrap';
+import { PaginationModule, TabsModule, ModalModule } from 'ngx-bootstrap';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { GroupComponent } from './group.component';
 import { AddGroupComponent } from './add/add-group/add-group.component';
 import { GroupDetailComponent } from './detail/detail-group/detail-group.component';
 import { FormSearchGroupComponent } from './components/form-search-group/form-search-group.component';
-import { FormAddGroupComponent } from './components/form-add-group/form-add-group.component';
+import { FormUserGroupComponent } from './components/form-user-group/form-user-group.component';
 
 
 const routing: Routes = [
@@ -33,12 +33,13 @@ const routing: Routes = [
         AddGroupComponent,
         GroupDetailComponent,
         FormSearchGroupComponent,
-        FormAddGroupComponent
+        FormUserGroupComponent
     ],
     imports: [
         CommonModule,
         SharedModule,
         FormsModule,
+        ModalModule.forRoot(),
         TabsModule.forRoot(),
         PaginationModule.forRoot(),
         ReactiveFormsModule,
@@ -52,7 +53,7 @@ const routing: Routes = [
         AddGroupComponent,
         GroupDetailComponent,
         FormSearchGroupComponent,
-        FormAddGroupComponent
+        FormUserGroupComponent
     ]
 })
 export class GroupModule { }

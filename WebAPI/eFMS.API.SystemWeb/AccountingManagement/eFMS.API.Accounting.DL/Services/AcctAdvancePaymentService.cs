@@ -33,7 +33,8 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<SysUserGroup> sysUserGroupRepo;
         readonly IContextBase<CatDepartment> catDepartmentRepo;
         readonly IContextBase<SysGroup> sysGroupRepo;
-        readonly IContextBase<SysOffice> SysOfficeRepo;
+        readonly IContextBase<SysOffice> sysOfficeRepo;
+        readonly IContextBase<OpsStageAssigned> opsStageAssignedRepo;
 
         public AcctAdvancePaymentService(IContextBase<AcctAdvancePayment> repository,
             IMapper mapper,
@@ -49,7 +50,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysUserGroup> sysUserGroup,
             IContextBase<CatDepartment> catDepartment,
             IContextBase<SysGroup> sysGroup,
-            IContextBase<SysOffice> SysOffice) : base(repository, mapper)
+            IContextBase<SysOffice> sysOffice,
+            IContextBase<OpsStageAssigned> opsStageAssigned) : base(repository, mapper)
         {
             currentUser = user;
             webUrl = url;
@@ -63,7 +65,8 @@ namespace eFMS.API.Accounting.DL.Services
             sysUserGroupRepo = sysUserGroup;
             catDepartmentRepo = catDepartment;
             sysGroupRepo = sysGroup;
-            SysOfficeRepo = SysOffice;
+            sysOfficeRepo = sysOffice;
+            opsStageAssignedRepo = opsStageAssigned;
         }
 
         public List<AcctAdvancePaymentResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount)
@@ -102,16 +105,16 @@ namespace eFMS.API.Accounting.DL.Services
                              criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ?
                              (
                                  (
-                                        (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.AdvanceNo) : 1 == 1)
-                                     || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.Hbl) : 1 == 1)
-                                     || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.Mbl) : 1 == 1)
-                                     || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.CustomNo) : 1 == 1)
-                                     || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.JobId) : 1 == 1)
+                                        (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.AdvanceNo) : true)
+                                     || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.Hbl) : true)
+                                     || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.Mbl) : true)
+                                     || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.CustomNo) : true)
+                                     || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.JobId) : true)
                                  )
                              )
                              :
                              (
-                                 1 == 1
+                                 true
                              )
                           )
                          select ad.AdvanceNo).ToList();
@@ -126,7 +129,7 @@ namespace eFMS.API.Accounting.DL.Services
                        from apr in apr2.DefaultIfEmpty()
                        where
                          (
-                            criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ? refNo.Contains(ad.AdvanceNo) : 1 == 1
+                            criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ? refNo.Contains(ad.AdvanceNo) : true
                          )
                          &&
                          (
@@ -139,7 +142,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 || (apr.AccountantApr == criteria.Requester && apr.AccountantAprDate != null)
                             )
                             :
-                                1 == 1
+                                true
                          )
                          &&
                          (
@@ -148,14 +151,14 @@ namespace eFMS.API.Accounting.DL.Services
                                 ad.RequestDate.Value.Date >= (criteria.RequestDateFrom.HasValue ? criteria.RequestDateFrom.Value.Date : criteria.RequestDateFrom)
                                 && ad.RequestDate.Value.Date <= (criteria.RequestDateTo.HasValue ? criteria.RequestDateTo.Value.Date : criteria.RequestDateTo)
                             :
-                                1 == 1
+                                true
                          )
                          &&
                          (
                             !string.IsNullOrEmpty(criteria.StatusApproval) && !criteria.StatusApproval.Equals("All") ?
                                 ad.StatusApproval == criteria.StatusApproval
                             :
-                                1 == 1
+                                true
                          )
                          &&
                          (
@@ -164,21 +167,21 @@ namespace eFMS.API.Accounting.DL.Services
                                 ad.DatetimeModified.Value.Date >= (criteria.AdvanceModifiedDateFrom.HasValue ? criteria.AdvanceModifiedDateFrom.Value.Date : criteria.AdvanceModifiedDateFrom)
                                 && ad.DatetimeModified.Value.Date <= (criteria.AdvanceModifiedDateTo.HasValue ? criteria.AdvanceModifiedDateTo.Value.Date : criteria.AdvanceModifiedDateTo)
                             :
-                                1 == 1
+                                true
                          )
                          &&
                          (
                            !string.IsNullOrEmpty(criteria.StatusPayment) && !criteria.StatusPayment.Equals("All") ?
                                 re.StatusPayment == criteria.StatusPayment
                            :
-                                1 == 1
+                                true
                          )
                          &&
                          (
                            !string.IsNullOrEmpty(criteria.PaymentMethod) && !criteria.PaymentMethod.Equals("All") ?
                                 ad.PaymentMethod == criteria.PaymentMethod
                            :
-                                1 == 1
+                                true
                           )
 
                        select new AcctAdvancePaymentResult
@@ -234,9 +237,9 @@ namespace eFMS.API.Accounting.DL.Services
                 StatusApproval = s.Key.StatusApproval,
                 AdvanceStatusPayment = GetAdvanceStatusPayment(s.Key.AdvanceNo),
                 PaymentMethod = s.Key.PaymentMethod,
-                PaymentMethodName = Common.CustomData.PaymentMethod.Where(x => x.Value == s.Key.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
+                PaymentMethodName = CustomData.PaymentMethod.Where(x => x.Value == s.Key.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
                 Amount = s.Sum(su => su.Amount),
-                StatusApprovalName = Common.CustomData.StatusApproveAdvance.Where(x => x.Value == s.Key.StatusApproval).Select(x => x.DisplayName).FirstOrDefault()
+                StatusApprovalName = CustomData.StatusApproveAdvance.Where(x => x.Value == s.Key.StatusApproval).Select(x => x.DisplayName).FirstOrDefault()
             }
             ).OrderByDescending(orb => orb.DatetimeModified);
             return data;
@@ -299,14 +302,35 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public List<Shipments> GetShipments()
         {
-            var shipmentsOperation = opsTransactionRepo
-                                    .Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED)
-                                    .Select(x => new Shipments
-                                    {
-                                        JobId = x.JobNo,
-                                        HBL = x.Hwbno,
-                                        MBL = x.Mblno
-                                    });
+            var userCurrent = currentUser.UserID;
+            //var shipmentsOperation = opsTransactionRepo
+            //                        .Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED)
+            //                        .Select(x => new Shipments
+            //                        {
+            //                            JobId = x.JobNo,
+            //                            HBL = x.Hwbno,
+            //                            MBL = x.Mblno
+            //                        });
+
+            //Start change request Modified 14/10/2019 by Andy.Hoa
+            //Get list shipment operation theo user current
+            var shipmentsOperation = from ops in opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED)
+                                     join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId into osa2
+                                     from osa in osa2.DefaultIfEmpty()
+                                     where osa.MainPersonInCharge == userCurrent
+                                     select new Shipments
+                                     {
+                                         JobId = ops.JobNo,
+                                         HBL = ops.Hwbno,
+                                         MBL = ops.Mblno
+                                     };
+            shipmentsOperation = shipmentsOperation.GroupBy(x => new { x.JobId, x.HBL, x.MBL }).Select(s => new Shipments
+            {
+                JobId = s.Key.JobId,
+                HBL = s.Key.HBL,
+                MBL = s.Key.MBL
+            });
+            //End change request
 
             var shipmentsDocumention = (from t in csTransactionRepo.Get()
                                         join td in csTransactionDetailRepo.Get() on t.Id equals td.JobId
@@ -586,7 +610,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     //Lấy ra NW, CBM, PSC, Container Qty
                     var ops = opsTransactionRepo.Get(x => x.JobNo == jobId).FirstOrDefault();
-                    
+
                     if (ops != null)
                     {
                         contQty += ops.SumContainers.HasValue ? ops.SumContainers.Value : 0;
@@ -994,7 +1018,7 @@ namespace eFMS.API.Accounting.DL.Services
         //Đang gán cứng BrandId của Branch ITL HCM (27d26acb-e247-47b7-961e-afa7b3d7e11e)
         private string GetBUHeadId(string idBranch = "27d26acb-e247-47b7-961e-afa7b3d7e11e")
         {
-            var buHeadId = SysOfficeRepo.Get(x => x.Id == Guid.Parse(idBranch)).FirstOrDefault().ManagerId;
+            var buHeadId = sysOfficeRepo.Get(x => x.Id == Guid.Parse(idBranch)).FirstOrDefault().ManagerId;
             return buHeadId;
         }
 

@@ -1,5 +1,5 @@
 import { AppPage } from './app.base';
-import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, ValidatorFn } from '@angular/forms';
 import { ButtonModalSetting } from './shared/models/layout/button-modal-setting.model';
 import { ButtonType } from './shared/enums/type-button.enum';
 
@@ -51,6 +51,16 @@ export abstract class AppForm extends AppPage {
         } else {
             return { 'invalidPassword': true };
         }
+    }
+
+    removeValidators(form: FormControl | AbstractControl) {
+        form.clearValidators();
+        form.updateValueAndValidity();
+    }
+
+    addValidators(form: FormControl | AbstractControl, validateFn: ValidatorFn | ValidatorFn[]) {
+        form.setValidators(validateFn);
+        form.updateValueAndValidity();
     }
 
     search($event?: any) {

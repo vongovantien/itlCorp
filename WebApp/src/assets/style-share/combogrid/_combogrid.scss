@@ -4,18 +4,20 @@
         min-width: 100%;
         padding: 0;
         background-color: #fff;
-        -webkit-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .16), 0 2px 8px 0 rgba(0, 0, 0, .12);
-        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .16), 0 2px 8px 0 rgba(0, 0, 0, .12);
+        -webkit-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16),
+            0 2px 8px 0 rgba(0, 0, 0, 0.12);
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16),
+            0 2px 8px 0 rgba(0, 0, 0, 0.12);
         transform: translateX(0) !important;
         -webkit-transform: translateX(0) !important;
         -moz-transform: translateX(0) !important;
         -ms-transform: translateX(0) !important;
         -o-transform: translateX(0) !important;
-}
+    }
 
     .table {
         min-width: 100%;
-        table-layout: fixed;
+        // table-layout: fixed;
 
         thead {
             tr {
@@ -29,7 +31,6 @@
         thead,
         tbody {
             tr {
-
                 th,
                 td {
                     width: 100px;
@@ -60,7 +61,6 @@
     .table-header {
         padding-right: 5px;
         background-color: #f2dedf;
-        ;
     }
 
     .table-body-scroll {
@@ -69,7 +69,6 @@
 
         .table {
             tr {
-
                 th,
                 td {
                     cursor: pointer;

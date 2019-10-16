@@ -2,6 +2,7 @@ import { Component, ElementRef, NgZone, Renderer2, ViewChild } from '@angular/co
 import { AppForm } from 'src/app/app.form';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { environment } from 'src/environments/environment';
 
 declare var $: any;
 @Component({
@@ -40,6 +41,7 @@ export class CompanyInformationFormAddComponent extends AppForm {
     }
 
     ngOnInit(): void {
+
         this.initForm();
     }
 
@@ -82,12 +84,13 @@ export class CompanyInformationFormAddComponent extends AppForm {
                 imageMaxSize: 5 * 1024 * 1024,
                 imageAllowedTypes: ['jpeg', 'jpg', 'png'],
                 requestHeaders: {
-                    // Authorization: this.bearer,
+                    Authorization: `Bearer ${localStorage.getItem('access_token')}`,
                     Module: 'Company',
-                    Path: `dayladuongdanhinh`
+                    // Path: `dayladuongdanhinh`
                 },
-                imageUploadURL: 'http://localhost:44360/api/v1/1/SysImageUpload/image',
-                imageManagerLoadURL: 'http://localhost:44360/api/v1/1/SysImageUpload/company',
+                imageUploadURL: `http://${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/image`,
+                imageManagerLoadURL: `http://${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/company`,
+
             }).on('froalaEditor.contentChanged', (e: any) => {
                 this.photoUrl = e.target.src;
             }).on('froalaEditor.image.error', (e, editor, error, response) => {

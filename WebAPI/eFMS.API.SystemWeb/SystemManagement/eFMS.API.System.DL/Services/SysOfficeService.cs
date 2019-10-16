@@ -41,21 +41,31 @@ namespace eFMS.API.System.DL.Services
         public IQueryable<SysOffice> GetOffices()
         {
             //var lstSysOffice = RedisCacheHelper.GetObject<List<SysOffice>>(cache, Templates.SysBranch.NameCaching.ListName);
-            var lstSysOffice = new List<SysOffice>(); 
-            IQueryable<SysOffice> data = null;
-            if (lstSysOffice != null)
-            {
-                //data = lstSysOffice.AsQueryable();
-                data = DataContext.Get();
+            var lstSysOffice = DataContext.Get();
+            lstSysOffice = DataContext.Get();
+            //IQueryable<SysOffice> data = null;
 
-            }
-            else
+            List<SysOfficeModel> resultData = new List<SysOfficeModel>();
+
+            var sysCompany = sysBuRepository.Get();
+            var dataJoinCompany = (from office in lstSysOffice
+                                   join company in sysCompany on office.Buid equals company.Id
+                                   select new { office, companyName = company.BunameEn });
+            foreach (var item in dataJoinCompany)
             {
-                data = DataContext.Get();
-                RedisCacheHelper.SetObject(cache, Templates.SysBranch.NameCaching.ListName, data);
+                var office = mapper.Map<SysOfficeModel>(item.office);
+                office.CompanyName = item.companyName;
+                resultData.Add(office);
             }
-            var results = data?.Select(x => mapper.Map<SysOfficeModel>(x));
-            return results;
+            RedisCacheHelper.SetObject(cache, Templates.SysBranch.NameCaching.ListName, resultData);
+
+            return resultData.AsQueryable();
+
+
+            //data = DataContext.Get();
+
+            //var results = data?.Select(x => mapper.Map<SysOfficeModel>(x));
+            //return results;
         }
 
         public IQueryable<SysOfficeViewModel> Paging(SysOfficeCriteria criteria, int page, int size, out int rowsCount)
@@ -86,7 +96,7 @@ namespace eFMS.API.System.DL.Services
             var sysBu = sysBuRepository.Get();
             var query = (from branch in SysOffices
                          join bu in sysBu on branch.Buid equals bu.Id
-                         select new { branch, companyName = bu.Code });
+                         select new { branch, companyName = bu.BunameEn });
 
             if (criteria.All == null)
             {
@@ -153,7 +163,7 @@ namespace eFMS.API.System.DL.Services
 
         public IQueryable<SysOfficeViewModel> GetOfficeByCompany(Guid id)
         {
-            var lstSysOffice = DataContext.Where( office => office.Buid == id);
+            var lstSysOffice = DataContext.Where(office => office.Buid == id);
             var sysBu = sysBuRepository.Get();
 
             //join với company.

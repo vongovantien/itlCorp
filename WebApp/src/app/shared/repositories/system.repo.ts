@@ -47,7 +47,7 @@ export class SystemRepo {
     }
 
     getListCompany() {
-        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysBu`).pipe(
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysCompany`).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => {
                 return data;
@@ -110,11 +110,17 @@ export class SystemRepo {
             map((data: any) => data)
         );
     }
+
     getGroup(page?: number, size?: number, body: any = {}) {
         return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup/paging`, body, {
             page: '' + page,
             size: '' + size
         }).pipe(
+            map((data: any) => data)
+        );
+    }
+    getDetailGroup(id: number) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup/${id}`).pipe(
             map((data: any) => data)
         );
     }
@@ -130,6 +136,16 @@ export class SystemRepo {
     }
     updateGroup(body: any) {
         return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+    getUsersInGroup(groupId: number) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserGroup/GetByGroup/${groupId}`).pipe(
+            map((data: any) => data)
+        );
+    }
+    getUserGroupDetail(id: number) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserGroup/${id}`).pipe(
             map((data: any) => data)
         );
     }
@@ -175,8 +191,8 @@ export class SystemRepo {
         );
     }
 
-    getGroupsByDeptId(id: number){
-        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup/Query`, {departmentId: id }).pipe(
+    getGroupsByDeptId(id: number) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup/Query`, { departmentId: id }).pipe(
             map((data: any) => data)
         );
     }

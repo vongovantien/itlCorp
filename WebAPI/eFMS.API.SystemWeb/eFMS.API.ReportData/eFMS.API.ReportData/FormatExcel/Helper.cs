@@ -4,6 +4,7 @@ using OfficeOpenXml.Style;
 using OfficeOpenXml.Table;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 
 namespace eFMS.API.ReportData
@@ -12,7 +13,7 @@ namespace eFMS.API.ReportData
     {
         const double minWidth = 0.00;
         const double maxWidth = 500.00;
-        #region country
+        
         public Stream CreateCountryExcelFile(List<CatCountry> listObj, Stream stream = null)
         {
             try
@@ -62,7 +63,6 @@ namespace eFMS.API.ReportData
                 worksheet.Cells[i + 2, 4].Value = inactivechar;
             }
         }
-        #endregion
 
         #region Province
         public Stream CreateProvinceExcelFile(List<CatProvince> listObj, Stream stream = null)
@@ -743,7 +743,7 @@ namespace eFMS.API.ReportData
                 worksheet.Cells[i + 2, 5].Value = item.DescriptionEn;
                 worksheet.Cells[i + 2, 6].Value = item.DescriptionVn;
                 string inactivechar = "";
-                if (item.Inactive == true)
+                if (item.Active == true)
                 {
                     inactivechar = "Active";
                 }
@@ -831,10 +831,127 @@ namespace eFMS.API.ReportData
                 var list = listObj;
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
-                    excelPackage.Workbook.Worksheets.Add("First Sheet");
+                    excelPackage.Workbook.Worksheets.Add("Sheet1");
                     var workSheet = excelPackage.Workbook.Worksheets[1];
-                    workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
+                    workSheet.Cells[3, 1].LoadFromCollection(list, true, TableStyles.None);
                     BindingFormatForDepartmentExcel(workSheet, list);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+        public void BindingFormatForDepartmentExcel(ExcelWorksheet worksheet, List<CatDepartmentModel> listItems)
+        {
+            // Tạo header
+            List<string> headers = new List<string>
+            {
+                "No.", "Department Code", "Name EN", "Name Local", "Name Abbr", "Office", "Status"
+            };
+
+            for(int i = 0; i < headers.Count; i++)
+            {
+                worksheet.Cells[3, i + 1].Value = headers[i];
+                worksheet.Cells[3, i + 1].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[3, i + 1].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[3, i + 1].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[3, i + 1].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+
+                worksheet.Cells[3, i + 1].Style.Font.Bold = true;
+                worksheet.Cells[3, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[3, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            }
+
+            worksheet.Cells[1, 1, 1, 7].Merge = true;
+            worksheet.Cells["A1"].Value = "DEPARTMENT INFORMATION";
+            worksheet.Cells["A1"].Style.Font.Size = 16;
+            worksheet.Cells["A1"].Style.Font.Bold = true;
+            worksheet.Cells["A1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            worksheet.Cells["A1"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+            worksheet.Cells.AutoFitColumns(minWidth, maxWidth);
+            worksheet.Cells["A1:Z1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            for (int i = 0; i < listItems.Count; i++)
+            {
+                var item = listItems[i];
+                worksheet.Cells[i + 4, 1].Value = i + 1;
+                worksheet.Cells[i + 4, 2].Value = item.Code;
+                worksheet.Cells[i + 4, 3].Value = item.DeptNameEn;
+                worksheet.Cells[i + 4, 4].Value = item.DeptName;
+                worksheet.Cells[i + 4, 5].Value = item.DeptNameAbbr;
+                worksheet.Cells[i + 4, 6].Value = item.OfficeName;
+                worksheet.Cells[i + 4, 7].Value = item.Active == true ? "Active" : "Inactive";
+
+                worksheet.Cells[i + 4, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[i + 4, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+                //Add border left right for cells
+                for (int j = 0; j < headers.Count; j++)
+                {
+                    worksheet.Cells[i + 4, j + 1].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                    worksheet.Cells[i + 4, j + 1].Style.Border.Right.Style = ExcelBorderStyle.Thin;                    
+                }
+
+                //Add border bottom for last cells
+                if (i == listItems.Count - 1)
+                {
+                    for (int j = 0; j < headers.Count; j++)
+                    {
+                        worksheet.Cells[i + 4, j + 1].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                    }                    
+                }
+            }
+        }
+
+        public Stream generateCompanyExcel(List<SysCompany> listCompany, Stream stream = null)
+        {
+            List<String> headers = new List<String>()
+            {
+                "No",
+                "Company Code",
+                "Name En",
+                "Name Local",
+                "Name Abbr",
+                "Website",
+                "Status"
+            };
+            try
+            {
+                int addressStartContent = 4;
+                int no = 1;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Sheet1");
+                    var worksheet = excelPackage.Workbook.Worksheets[1];
+
+                    buildHeader(worksheet, headers, "COMPANY INFORMATION");
+
+                    for (int i = 0; i < listCompany.Count; i++)
+                    {
+                        var item = listCompany[i];
+                        worksheet.Cells[i + addressStartContent, 1].Value = no.ToString();
+                        worksheet.Cells[i + addressStartContent, 2].Value = item.Code;
+                        worksheet.Cells[i + addressStartContent, 3].Value = item.BunameEn;
+                        worksheet.Cells[i + addressStartContent, 4].Value = item.BunameVn;
+                        worksheet.Cells[i + addressStartContent, 5].Value = item.BunameAbbr;
+                        worksheet.Cells[i + addressStartContent, 6].Value = item.Website;
+                        string status = "";
+                        if (item.Active == true)
+                        {
+                            status = "Active";
+                        }
+                        else
+                        {
+                            status = "Inactive";
+                        }
+                        worksheet.Cells[i + addressStartContent, 7].Value = status;
+
+                        no++;
+                    }
+
                     excelPackage.Save();
                     return excelPackage.Stream;
                 }
@@ -845,38 +962,96 @@ namespace eFMS.API.ReportData
             }
             return null;
         }
-        public void BindingFormatForDepartmentExcel(ExcelWorksheet worksheet, List<CatDepartmentModel> listItems)
-        {
-            // Tạo header
-            worksheet.Cells[1, 1].Value = "Department Code";
-            worksheet.Cells[1, 2].Value = "Name EN";
-            worksheet.Cells[1, 3].Value = "Name Local";
-            worksheet.Cells[1, 4].Value = "Name Abbr";
-            worksheet.Cells[1, 5].Value = "Office";
-            worksheet.Cells[1, 6].Value = "Status";
 
-            worksheet.Cells.AutoFitColumns(minWidth, maxWidth);
-            worksheet.Cells["A1:Z1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            for (int i = 0; i < listItems.Count; i++)
+        public void buildHeader(ExcelWorksheet worksheet, List<String> headers, string title)
+        {
+            worksheet.Cells[1, 1, 1, headers.Count].Merge = true;
+            worksheet.Cells["A1"].Value = title;
+            worksheet.Cells["A1"].Style.Font.Size = 16;
+            worksheet.Cells["A1"].Style.Font.Bold = true;
+            worksheet.Cells["A1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            worksheet.Cells["A1"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            // Tạo header
+            for (int i = 0; i < headers.Count; i++)
             {
-                var item = listItems[i];
-                worksheet.Cells[i + 2, 1].Value = item.Code;
-                worksheet.Cells[i + 2, 2].Value = item.DeptNameEn;
-                worksheet.Cells[i + 2, 3].Value = item.DeptName;
-                worksheet.Cells[i + 2, 4].Value = item.DeptNameAbbr;
-                worksheet.Cells[i + 2, 5].Value = item.OfficeName;
-                string status = "";
-                if (item.Active == true)
-                {
-                    status = "Active";
-                } else {
-                    status = "Inactive";
-                }
-                worksheet.Cells[i + 2, 6].Value = status;               
+                worksheet.Cells[3, i + 1].Value = headers[i];
+
+                //worksheet.Column(i + 1).AutoFit();
+                worksheet.Cells[3, i + 1].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[3, i + 1].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[3, i + 1].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[3, i + 1].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[3, i + 1].Style.Font.Bold = true;
+
+                worksheet.Cells[3, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[3, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+                worksheet.Column(i + 1).Width = 30;
             }
         }
-
         #endregion
+        public Stream generateOfficeExcel(List<SysOfficeModel> listCompany, Stream stream = null)
+        {
+            List<String> headers = new List<String>()
+            {
+                "No",
+                "Office Code",
+                "Name En",
+                "Name Local",
+                "Name Abbr",
+                "Address Local",
+                "Tax code",
+                "Company",
+                "Status"
+            };
+            try
+            {
+                int addressStartContent = 4;
+                int no = 1;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Sheet1");
+                    var worksheet = excelPackage.Workbook.Worksheets[1];
+
+                    buildHeader(worksheet, headers, "OFFICE INFORMATION");
+
+                    for (int i = 0; i < listCompany.Count; i++)
+                    {
+                        var item = listCompany[i];
+                        worksheet.Cells[i + addressStartContent, 1].Value = no.ToString();
+                        worksheet.Cells[i + addressStartContent, 2].Value = item.Code;
+                        worksheet.Cells[i + addressStartContent, 3].Value = item.BranchNameEn;
+                        worksheet.Cells[i + addressStartContent, 4].Value = item.BranchNameVn;
+                        worksheet.Cells[i + addressStartContent, 5].Value = item.ShortName;
+                        worksheet.Cells[i + addressStartContent, 6].Value = item.AddressVn;
+                        worksheet.Cells[i + addressStartContent, 7].Value = item.Taxcode;
+                        worksheet.Cells[i + addressStartContent, 8].Value = item.CompanyName;
+
+
+                        string status = "";
+                        if (item.Active == true)
+                        {
+                            status = "Active";
+                        }
+                        else
+                        {
+                            status = "Inactive";
+                        }
+                        worksheet.Cells[i + addressStartContent, 9].Value = status;
+
+                        no++;
+                    }
+
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
 
 
     }
