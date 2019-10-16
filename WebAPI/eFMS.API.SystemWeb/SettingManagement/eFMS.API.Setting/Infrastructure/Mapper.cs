@@ -12,6 +12,8 @@ namespace eFMS.API.Setting.Infrastructure
             //CreateMap<SysUserGroup, SysUserGroupModel>();
             //CreateMap<SysUserGroupModel, SysUserGroup>();
             //CreateMap<SysUserGroupEditModel, SysUserGroupModel>();
+            CreateMap<SetTariff, SetTariffModel>();
+            CreateMap<SetTariffDetail, SetTariffDetailModel>();
         }
     }
 }

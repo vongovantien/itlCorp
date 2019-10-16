@@ -4,5 +4,19 @@
         <name>eFMS.API.Setting</name>
     </assembly>
     <members>
+        <member name="M:eFMS.API.Setting.Controllers.TariffController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Setting.DL.Common.LanguageSub},eFMS.API.Setting.DL.IService.ITariffService)">
+            <summary>
+            Contructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="service"></param>
+        </member>
+        <member name="M:eFMS.API.Setting.Controllers.TariffController.AddTariff(eFMS.API.Setting.DL.Models.TariffModel)">
+            <summary>
+            Add tariff and list tariff details
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>
