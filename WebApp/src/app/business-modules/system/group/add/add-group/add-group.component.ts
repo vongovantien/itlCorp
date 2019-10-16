@@ -93,7 +93,11 @@ export class AddGroupComponent extends AppForm implements OnInit {
       this._systemRepo.addNewGroup(body)
         .pipe(
           catchError(this.catchError),
-          finalize(() => this._progressRef.complete())
+          finalize(() => {
+            this._progressRef.complete();
+            this.isSubmitted = false;
+            this.initForm();
+          })
         )
         .subscribe(
           (res: CommonInterface.IResult) => {
