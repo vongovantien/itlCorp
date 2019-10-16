@@ -6,6 +6,7 @@ namespace eFMS.API.Setting.DL.Models
 {
     public class TariffViewModel
     {
+        public Guid Id { get; set; }
         public string TariffName { get; set; }
         public string TariffType { get; set; }
         public string CustomerID { get; set; }
