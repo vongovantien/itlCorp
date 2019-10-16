@@ -54,10 +54,11 @@ namespace eFMS.API.Setting.Service.Models
         public DateTime? LockedDate { get; set; }
         public string TransactionType { get; set; }
         public string UserCreated { get; set; }
+        public bool? IsLocked { get; set; }
         public DateTime? CreatedDate { get; set; }
         public string UserModified { get; set; }
         public DateTime? ModifiedDate { get; set; }
-        public bool? Inactive { get; set; }
+        public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
 
         public virtual ICollection<CsTransactionDetail> CsTransactionDetail { get; set; }

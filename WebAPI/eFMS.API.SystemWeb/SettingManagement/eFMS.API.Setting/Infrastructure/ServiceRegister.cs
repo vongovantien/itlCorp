@@ -40,6 +40,8 @@ namespace eFMS.API.Setting.Infrastructure
             services.AddTransient<ICurrentUser, CurrentUser>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            services.AddSingleton<ITariffService, TariffService>();
+
         }
 
         public static IServiceCollection AddAuthorize(this IServiceCollection services, IConfiguration configuration)

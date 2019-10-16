@@ -54,12 +54,20 @@ namespace eFMS.API.System.DL.Services
             {
                 if (!string.IsNullOrEmpty(criteria.Keyword))
                 {
+                    //query = query.Where(x =>
+                    //       x.Code == criteria.Keyword
+                    //    || x.DeptName == criteria.Keyword
+                    //    || x.DeptNameEn == criteria.Keyword
+                    //    || x.DeptNameAbbr == criteria.Keyword
+                    //    || x.OfficeName == criteria.Keyword
+                    //);
+                    //Search gần đúng
                     query = query.Where(x =>
-                           x.Code == criteria.Keyword
-                        || x.DeptName == criteria.Keyword
-                        || x.DeptNameEn == criteria.Keyword
-                        || x.DeptNameAbbr == criteria.Keyword
-                        || x.OfficeName == criteria.Keyword
+                           x.Code.IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                        || x.DeptName.IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                        || x.DeptNameEn.IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                        || x.DeptNameAbbr.IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                        || x.OfficeName.IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     );
                 }
             }
@@ -67,12 +75,20 @@ namespace eFMS.API.System.DL.Services
             {
                 if (!string.IsNullOrEmpty(criteria.Keyword))
                 {
+                    //query = query.Where(x =>
+                    //       criteria.Type == "Code" ? x.Code == criteria.Keyword : true
+                    //    && criteria.Type == "DeptName" ? x.DeptName == criteria.Keyword : true
+                    //    && criteria.Type == "DeptNameEn" ? x.DeptNameEn == criteria.Keyword : true
+                    //    && criteria.Type == "DeptNameAbbr" ? x.DeptNameAbbr == criteria.Keyword : true
+                    //    && criteria.Type == "OfficeName" ? x.OfficeName == criteria.Keyword : true
+                    //);
+                    //Search gần đúng
                     query = query.Where(x =>
-                           criteria.Type == "Code" ? x.Code == criteria.Keyword : true
-                        && criteria.Type == "DeptName" ? x.DeptName == criteria.Keyword : true
-                        && criteria.Type == "DeptNameEn" ? x.DeptNameEn == criteria.Keyword : true
-                        && criteria.Type == "DeptNameAbbr" ? x.DeptNameAbbr == criteria.Keyword : true
-                        && criteria.Type == "OfficeName" ? x.OfficeName == criteria.Keyword : true
+                           criteria.Type == "Code" ? x.Code.IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0 : true
+                        && criteria.Type == "DeptName" ? x.DeptName.IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0 : true
+                        && criteria.Type == "DeptNameEn" ? x.DeptNameEn.IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0 : true
+                        && criteria.Type == "DeptNameAbbr" ? x.DeptNameAbbr.IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0 : true
+                        && criteria.Type == "OfficeName" ? x.OfficeName.IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0 : true
                     );
                 }
             }

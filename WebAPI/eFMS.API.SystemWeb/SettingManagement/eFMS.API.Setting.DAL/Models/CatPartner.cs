@@ -56,13 +56,14 @@ namespace eFMS.API.Setting.Service.Models
         public string ZipCode { get; set; }
         public string ZipCodeShipping { get; set; }
         public string SwiftCode { get; set; }
+        public Guid? WorkPlaceId { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
-        public bool? Inactive { get; set; }
+        public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
-        public Guid? WorkPlaceId { get; set; }
+        public string InternalReferenceNo { get; set; }
 
         public virtual ICollection<CatPartnerContact> CatPartnerContact { get; set; }
     }
