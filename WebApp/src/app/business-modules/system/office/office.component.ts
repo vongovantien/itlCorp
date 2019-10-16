@@ -63,7 +63,7 @@ export class OfficeComponent extends AppList {
 
     ngOnInit() {
         this.headers = [
-            { title: 'Office Code', field: 'code', sortable: true },
+            { title: 'Office Code', field: 'code', sortable: true, width: 100 },
             { title: 'Name EN', field: 'branchNameEn', sortable: true },
             { title: 'Name Local', field: 'branchNameVn', sortable: true },
             { title: 'Name Abbr', field: 'shortName', sortable: true },
