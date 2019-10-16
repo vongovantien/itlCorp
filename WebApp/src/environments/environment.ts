@@ -14,8 +14,8 @@ export const environment = {
         REPORT: "localhost:63492",
         // EXPORT: "test.api-efms.itlvn.com/Export",
         EXPORT: "localhost:63492",
-        // INDENTITY_SERVER_URL: "http://test.api-efms.itlvn.com/identityserver",
-        INDENTITY_SERVER_URL: "https://localhost:44369",
+        INDENTITY_SERVER_URL: "http://test.api-efms.itlvn.com/identityserver",
+        //INDENTITY_SERVER_URL: "https://localhost:44369",
 
     },
 };
