@@ -28,8 +28,8 @@ export class AuthInterceptor implements HttpInterceptor {
         // } else {
         //     this.authReq = req.clone(Object.assign({}, req, { headers: req.headers.set('Authorization', authHeader), url: req.url }));
         // }
-        // this.authReq = req.clone(Object.assign({}, req, { headers: req.headers.set('Authorization', authHeader), url: req.url }));
-        this.authReq = req.clone(Object.assign({}, req, { headers: req.headers, url: req.url }));
+        this.authReq = req.clone(Object.assign({}, req, { headers: req.headers.set('Authorization', authHeader), url: req.url }));
+        // this.authReq = req.clone(Object.assign({}, req, { headers: req.headers, url: req.url }));
         // 
         return next.handle(this.authReq).pipe(
             catchError((error: HttpErrorResponse) => {

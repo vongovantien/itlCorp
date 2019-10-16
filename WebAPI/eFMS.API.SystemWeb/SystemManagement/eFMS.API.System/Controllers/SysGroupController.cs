@@ -164,6 +164,11 @@ namespace eFMS.API.System.Controllers
         [Authorize]
         public IActionResult Delete(short id)
         {
+            var item = sysGroupService.GetById(id);
+            if (item.Active == false)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED].Value });
+            }
             var hs = sysGroupService.Delete(x => x.Id == id && x.Active == false);
             var message = HandleError.GetMessage(hs, Crud.Update);
 
