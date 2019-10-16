@@ -53,7 +53,7 @@
                         {{charge.partnerShortName}}
                     </td>
                     <td>
-                        <div *ngIf="opsTransaction.isLocked else link">
+                        <div *ngIf="opsTransaction.isLocked; else link">
                             {{charge.nameEn}}
                         </div>
                         <ng-template #link>
@@ -92,10 +92,10 @@
                         {{charge.invoiceDate | date: 'dd/MM/yyyy'}}
                     </td>
                     <td>
-                        <div *ngIf="opsTransaction.isLocked else link">
+                        <div *ngIf="opsTransaction.isLocked; else creditNo">
                             {{ charge.creditNo }}
                         </div>
-                        <ng-template #link>
+                        <ng-template #creditNo>
                             <a (click)="openCreditDebitNote(charge.creditNo)">
                                 {{ charge.creditNo }}
                             </a>
