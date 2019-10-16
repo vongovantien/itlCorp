@@ -95,14 +95,14 @@ export class AddGroupComponent extends AppForm implements OnInit {
           catchError(this.catchError),
           finalize(() => {
             this._progressRef.complete();
-            this.isSubmitted = false;
-            this.initForm();
           })
         )
         .subscribe(
           (res: CommonInterface.IResult) => {
             if (res.status) {
               this._toastService.success(res.message, '');
+              this.isSubmitted = false;
+              this.initForm();
             } else {
               this._toastService.error(res.message, '');
             }

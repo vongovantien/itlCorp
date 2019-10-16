@@ -106,7 +106,7 @@ namespace eFMS.API.System.DL.Services
                 Active = x.Active,
                 InactiveOn = x.InactiveOn,
                 DepartmentName = y.DeptNameEn
-            });
+            }).OrderByDescending(x => x.DatetimeModified);
             return results;
         }
     }
