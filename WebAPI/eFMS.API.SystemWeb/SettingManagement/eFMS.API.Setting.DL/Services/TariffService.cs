@@ -273,14 +273,41 @@ namespace eFMS.API.Setting.DL.Services
             var tariff = GetAllTariff();
             var query = from t in tariff
                         select t;
-            query = query.Where(x => (x.TariffName.ToLower().Contains(criteria.Name.ToLower()))
-            && (x.CustomerId == criteria.CustomerID || string.IsNullOrEmpty(criteria.CustomerID))
+            query = query.Where(x =>
+            ((x.TariffName ?? "").IndexOf(criteria.Name ?? "", StringComparison.OrdinalIgnoreCase)) >= 0
+            && (x.CustomerId ?? "").IndexOf(criteria.CustomerID ?? "", StringComparison.OrdinalIgnoreCase) >= 0
             && (x.TariffType == criteria.TariffType || string.IsNullOrEmpty(criteria.TariffType))
             && (x.ServiceMode == criteria.ServiceMode || string.IsNullOrEmpty(criteria.ServiceMode))
             && (x.SupplierId == criteria.SupplierID || string.IsNullOrEmpty(criteria.SupplierID))
-            && (x.OfficeId == new Guid(criteria.OfficeId) || string.IsNullOrEmpty(criteria.OfficeId))
-            && (x.Status == criteria.Status || criteria.Status == null)
-            && (x.DatetimeCreated == criteria.Date || x.EffectiveDate == criteria.Date || x.DatetimeModified == criteria.Date || criteria.Date == null));
+            && (x.OfficeId == criteria.OfficeId || criteria.OfficeId == Guid.Empty)
+            && (x.Status == criteria.Status || criteria.Status == null));
+            if (criteria.DateType == "CreateDate")
+            {
+                query = query.Where(x =>
+                (x.DatetimeCreated >= criteria.FromDate && x.DatetimeCreated <= criteria.ToDate));
+            }
+            else if (criteria.DateType == "EffectiveDate")
+            {
+                query = query.Where(x =>
+                (x.EffectiveDate >= criteria.FromDate && x.EffectiveDate <= criteria.ToDate));
+            }
+            else if(criteria.DateType == "ModifiedDate")
+            {
+               query = query.Where(x =>
+               (x.DatetimeModified >= criteria.FromDate && x.DatetimeModified <= criteria.ToDate));
+            }
+            else
+            {
+                query = query.Where(x =>
+                   ((x.DatetimeCreated >= criteria.FromDate || criteria.FromDate == null) &&
+                   (x.DatetimeCreated <= criteria.ToDate || criteria.ToDate == null))
+                   || ((x.EffectiveDate >= criteria.FromDate || criteria.FromDate == null)
+                   && (x.EffectiveDate <= criteria.ToDate || criteria.ToDate == null))
+                   || ((x.DatetimeModified >= criteria.FromDate || criteria.FromDate == null)
+                   && (x.DatetimeModified <= criteria.ToDate || criteria.ToDate == null))
+                  );
+            }
+
             if (query.Count() == 0) return null;
             List<TariffViewModel> results = new List<TariffViewModel>();
             foreach (var item in query)

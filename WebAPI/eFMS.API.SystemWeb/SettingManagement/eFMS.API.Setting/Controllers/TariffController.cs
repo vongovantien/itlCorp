@@ -35,6 +35,15 @@ namespace eFMS.API.Setting.Controllers
             stringLocalizer = localizer;
             tariffService = service;
         }
+
+        [HttpPost]
+        [Route("Query")]
+        public IActionResult Get(TariffCriteria criteria)
+        {
+            var results = tariffService.Query(criteria);
+            return Ok(results);
+        }
+
         /// <summary>
         /// get and paging the list of tariff
         /// </summary>

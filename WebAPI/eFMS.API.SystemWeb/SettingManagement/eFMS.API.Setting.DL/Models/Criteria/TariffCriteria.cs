@@ -12,9 +12,9 @@ namespace eFMS.API.Setting.DL.Models.Criteria
         public string SupplierID { get; set; }
         public string TariffType { get; set; }
         public string DateType { get; set; }
-        public DateTime? Date { get; set; }
-
+        public DateTime? FromDate { get; set; }
+        public DateTime? ToDate { get; set; }
         public bool? Status { get; set; }
-        public string OfficeId { get; set; }
+        public Guid OfficeId { get; set; }
     }
 }
