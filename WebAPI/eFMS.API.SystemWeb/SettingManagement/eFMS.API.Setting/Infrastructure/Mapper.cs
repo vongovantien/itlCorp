@@ -17,6 +17,8 @@ namespace eFMS.API.Setting.Infrastructure
             CreateMap<SetTariff, TariffViewModel>();
             CreateMap<SetTariffModel, SetTariff>();
             CreateMap<SetTariffDetailModel, SetTariffDetail>();
+            CreateMap<SetTariffModel, TariffViewModel>();
+
         }
     }
 }
