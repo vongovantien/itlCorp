@@ -19,7 +19,7 @@
                 </div>
                 <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
                     <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                        (click)="removeImported()">
+                        (click)="removeImported()" appLoadingButton [state]="!!currentJob && currentJob.isLocked">
                         <span>
                             <i class="la la-trash"></i>
                             <span>
@@ -28,7 +28,7 @@
                         </span>
                     </button>
                     <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                        (click)="showPopupAdd()">
+                        (click)="showPopupAdd()" appLoadingButton [state]="!!currentJob && currentJob.isLocked">
                         <span>
                             <i class="la la-plus"></i>
                             <span>

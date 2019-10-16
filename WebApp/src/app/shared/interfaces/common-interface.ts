@@ -43,7 +43,7 @@ namespace CommonInterface {
     }
 
     export interface IValueDisplay {
-        value: string;
+        value: any;
         displayName: string;
         fieldName?: string;
     }

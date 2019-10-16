@@ -1,40 +1,49 @@
-<div class="m-subheader">
-    <div class="d-flex align-items-center">
-        <div class="mr-auto">
-            <app-breadcrumb></app-breadcrumb>
-        </div>
-        <div class="c-button-actions">
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                (click)="onOpePLPrint()">
-                <span>
-                    <i class="la la-print"></i>
-                    <span>
-                        P/L Sheet
-                    </span>
-                </span>
-            </button>
-        </div>
-        <div class="c-button-actions">
-            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                (click)="checkDelete()">
-                <span>
-                    <i class="la la-trash"></i>
-                    <span>
-                        delete
-                    </span>
-                </span>
-            </button>
-        </div>
-        <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="confirmCancelJob()">
+<app-sub-header>
+    <div class="c-button-actions" *ngIf="!!opsTransaction && !opsTransaction.isLocked">
+        <button type="button" class="btn btn-warning m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+            (click)="lockShipment()">
             <span>
-                <i class="la la-ban"></i>
+                <i class="la la-lock"></i>
                 <span>
-                    cancel
+                    Lock
                 </span>
             </span>
         </button>
     </div>
-</div>
+    <span *ngIf="!!opsTransaction && !!opsTransaction.isLocked" class="m--margin-right-10">
+        <i class="fa fa-lock text-danger fa-3x"></i>
+    </span>
+    <div class="c-button-actions">
+        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+            (click)="onOpePLPrint()">
+            <span>
+                <i class="la la-print"></i>
+                <span>
+                    P/L Sheet
+                </span>
+            </span>
+        </button>
+    </div>
+    <div class="c-button-actions" *ngIf="!!opsTransaction && !opsTransaction.isLocked">
+        <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="checkDelete()"
+            title="Shipment was locked">
+            <span>
+                <i class="la la-trash"></i>
+                <span>
+                    delete
+                </span>
+            </span>
+        </button>
+    </div>
+    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="confirmCancelJob()">
+        <span>
+            <i class="la la-ban"></i>
+            <span>
+                cancel
+            </span>
+        </span>
+    </button>
+</app-sub-header>
 
 <div class="m-content" *ngIf="opsTransaction">
     <div class="row">
@@ -50,7 +59,7 @@
                                     </div>
                                     <div class="m-portlet__body" id="edit-ops-job-form">
                                         <div class="form-actions m--align-right">
-                                            <button type=""
+                                            <button appLoadingButton [state]="opsTransaction.isLocked"
                                                 class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
                                                 (click)="saveShipment(addOpsForm)">
                                                 <span>
@@ -582,7 +591,8 @@
                                                 <div class="col-8">
                                                     <div class="text-right">
                                                         <div class="m--margin-bottom-15 m--margin-top-25">
-                                                            <button type="button"
+                                                            <button type="button" appLoadingButton
+                                                                [state]="opsTransaction.isLocked"
                                                                 class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
                                                                 (click)="showListContainer()">
                                                                 <span>
@@ -731,19 +741,13 @@
                 <tab heading="Custom declaration" (selectTab)="selectTab($event,'custom-declaration')">
                     <ng-container *ngIf="tab === 'custom-declaration'" loadModule="cd">
                     </ng-container>
-                    <!-- <app-billing-custom-declaration *ngIf="tab === 'custom-declaration'" [currentJob]="opsTransaction">
-                    </app-billing-custom-declaration> -->
                 </tab>
                 <tab heading="Credit Note & Debit Note" (selectTab)="selectTab($event,'cre-debit-note')">
                     <ng-container *ngIf="tab === 'cre-debit-note'" loadModule="cdNote">
                     </ng-container>
-                    <!-- <app-ops-module-credit-debit-note *ngIf="tab === 'cre-debit-note'" [currentJob]="opsTransaction">
-                    </app-ops-module-credit-debit-note> -->
                 </tab>
                 <tab heading="Stage management" [active]="tab === 'stage'" (selectTab)="selectTab($event, 'stage')">
                     <ng-container *ngIf="tab === 'stage'" loadModule="stageManagement"></ng-container>
-                    <!-- <app-ops-module-stage-management *ngIf="tab === 'stage'" [data]="opsTransaction">
-                    </app-ops-module-stage-management> -->
                 </tab>
             </tabset>
         </div>

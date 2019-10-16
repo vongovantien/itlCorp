@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 
 import { ToolRoutingModule } from './tool-routing.module';
 import { IDDefinitionComponent } from './id-definition/id-definition.component';
-import { TariffComponent } from './tariff/tariff.component';
 import { EcusConnectionComponent } from './ecus-connection/ecus-connection.component';
 import { KPIComponent } from './kpi/kpi.component';
 import { SupplierComponent } from './supplier/supplier.component';
@@ -20,10 +19,10 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     ToolRoutingModule,
     SharedModule,
     SelectModule,
-    FormsModule, 
+    FormsModule,
     NgxDaterangepickerMd,
     DragDropModule
   ],
-  declarations: [IDDefinitionComponent, TariffComponent, EcusConnectionComponent, KPIComponent, SupplierComponent, ExchangeRateComponent, LogViewerComponent]
+  declarations: [IDDefinitionComponent, EcusConnectionComponent, KPIComponent, SupplierComponent, ExchangeRateComponent, LogViewerComponent]
 })
 export class ToolModule { }

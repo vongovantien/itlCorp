@@ -45,5 +45,7 @@ export class OpsTransaction {
         csMawbcontainers: Container[] = null;
         containerDescription: string = '';
         commodityGroupId: string = '';
+        isLocked: boolean = false;
+
 
 }
