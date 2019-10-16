@@ -13,7 +13,7 @@ namespace eFMS.API.Setting.Service.Models
         public string Dbpassword { get; set; }
         public string Dbname { get; set; }
         public string Note { get; set; }
-        public bool? Inactive { get; set; }
+        public bool? Active { get; set; }
         public string InactiveOn { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }

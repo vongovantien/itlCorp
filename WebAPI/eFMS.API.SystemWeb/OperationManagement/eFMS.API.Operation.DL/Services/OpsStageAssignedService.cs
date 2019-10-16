@@ -43,6 +43,7 @@ namespace eFMS.API.Operation.DL.Services
             var assignedItem = mapper.Map<OpsStageAssigned>(model);
             assignedItem.Id = Guid.NewGuid();
             assignedItem.Status = Constants.InSchedule;
+            assignedItem.RealPersonInCharge = assignedItem.MainPersonInCharge;
             assignedItem.CreatedDate = assignedItem.ModifiedDate = DateTime.Now;
             assignedItem.UserCreated = currentUser.UserID;
             var orderNumberProcess = DataContext.Count(x => x.JobId == model.JobId);

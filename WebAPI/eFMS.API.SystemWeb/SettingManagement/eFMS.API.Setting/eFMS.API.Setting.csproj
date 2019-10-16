@@ -37,7 +37,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.2.0" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="5.3.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
     <PackageReference Include="MongoDB.Driver" Version="2.7.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="3.0.0" />
@@ -49,7 +49,7 @@
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.API.Provider">
-      <HintPath>..\..\..\eFMS.API.Common\eFMS.API.Provider\obj\Debug\netcoreapp2.2\eFMS.API.Provider.dll</HintPath>
+      <HintPath>..\..\OperationManagement\bin\netcoreapp2.2\eFMS.API.Provider.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.API.Setting.DL">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Setting.DL.dll</HintPath>
@@ -61,7 +61,7 @@
       <HintPath>..\..\IdentityServer\bin\netcoreapp2.2\eFMS.IdentityServer.DL.dll</HintPath>
     </Reference>
     <Reference Include="ITL.NetCore.Common">
-      <HintPath>..\bin\netcoreapp2.2\ITL.NetCore.Common.dll</HintPath>
+      <HintPath>..\..\SystemManagement\bin\netcoreapp2.2\ITL.NetCore.Common.dll</HintPath>
     </Reference>
     <Reference Include="ITL.NetCore.Connection">
       <HintPath>..\bin\netcoreapp2.2\ITL.NetCore.Connection.dll</HintPath>

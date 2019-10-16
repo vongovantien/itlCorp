@@ -9,7 +9,7 @@ namespace eFMS.API.Setting.Service.Models
         public Guid Hblid { get; set; }
         public string Type { get; set; }
         public Guid ChargeId { get; set; }
-        public int Quantity { get; set; }
+        public decimal Quantity { get; set; }
         public short UnitId { get; set; }
         public decimal? UnitPrice { get; set; }
         public string CurrencyId { get; set; }
@@ -17,19 +17,21 @@ namespace eFMS.API.Setting.Service.Models
         public decimal? Vatrate { get; set; }
         public decimal Total { get; set; }
         public string PayerId { get; set; }
-        public string ReceiverObject { get; set; }
-        public string ReceiverId { get; set; }
         public string ObjectBePaid { get; set; }
         public string PaymentObjectId { get; set; }
         public bool? KickBack { get; set; }
         public DateTime? ExchangeDate { get; set; }
         public string Notes { get; set; }
-        public string DocNo { get; set; }
         public string SettlementCode { get; set; }
         public string Csidsettlement { get; set; }
         public string CsstatusSettlement { get; set; }
         public DateTime? CsdateSettlement { get; set; }
         public string InvoiceNo { get; set; }
+        public DateTime? InvoiceDate { get; set; }
+        public string SeriesNo { get; set; }
+        public string PaymentRequestType { get; set; }
+        public string ClearanceNo { get; set; }
+        public string ContNo { get; set; }
         public string PaymentRefNo { get; set; }
         public string AccountantId { get; set; }
         public DateTime? AccountantDate { get; set; }
@@ -50,8 +52,13 @@ namespace eFMS.API.Setting.Service.Models
         public string UnlockedSoadirectorStatus { get; set; }
         public DateTime? UnlockedSoadirectorDate { get; set; }
         public bool? Soaclosed { get; set; }
+        public bool? Cdclosed { get; set; }
+        public string CreditNo { get; set; }
+        public string DebitNo { get; set; }
         public string Soano { get; set; }
-        public string OtherSoa { get; set; }
+        public string PaySoano { get; set; }
+        public bool? IsFromShipment { get; set; }
+        public string TypeOfFee { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }

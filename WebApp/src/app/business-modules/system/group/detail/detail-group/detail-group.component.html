@@ -187,16 +187,22 @@
                                 <ng-container *ngIf="!!users">
                                     <tr *ngFor="let user of users; let i = index; trackBy: trackByFn"
                                         class="text-center">
-                                        <td class="table-actions-col">
+                                        <td class="table-actions-col" style="width: 70px">
                                             <div class="table-actions">
                                                 <button type="button" title="Detail" (click)="viewUserGroup(user)"
                                                     class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only pointer">
                                                     <i class="la la-edit"></i>
                                                 </button>
+                                                <button type="button"
+                                                    class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                    title="Remove" (click)="confirmDelete(user)"
+                                                    [disabled]="user.active">
+                                                    <i class="la la-trash"></i>
+                                                </button>
                                             </div>
                                         </td>
                                         <td class="text-underline text-primary pointer">
-                                            <a>{{ user.userName }}</a>
+                                            <a (click)="viewUserGroup(user)">{{ user.userName }}</a>
                                         </td>
                                         <td>{{ user.employeeName }}</td>
                                         <td>Position</td>
@@ -216,4 +222,9 @@
         </tab>
     </tabset>
 </div>
-<form-user-group [title]="'Add New User'"></form-user-group>
+<form-user-group [title]="'Add New User'" [userGroup]="userGroup" (isSaved)="saveSuccess($event)">
+</form-user-group>
+<!--begin::confirm-delete-modal-->
+<confirm-popup [body]="'Do you want to delete?'" [labelConfirm]="'Yes'" (onSubmit)="onDeleteGroup()">
+</confirm-popup>
+<!--end::confirm-delete-modal-->

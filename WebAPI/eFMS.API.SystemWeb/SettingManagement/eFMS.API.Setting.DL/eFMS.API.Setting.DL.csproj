@@ -34,6 +34,7 @@
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="5.3.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.7.2" />
     <PackageReference Include="MongoDB.Driver.Core" Version="2.7.2" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.5.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.3.0" />
   </ItemGroup>
 
@@ -42,7 +43,10 @@
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.API.Provider">
-      <HintPath>..\..\..\eFMS.API.Common\eFMS.API.Provider\obj\Debug\netcoreapp2.2\eFMS.API.Provider.dll</HintPath>
+      <HintPath>..\..\OperationManagement\bin\netcoreapp2.2\eFMS.API.Provider.dll</HintPath>
+    </Reference>
+    <Reference Include="eFMS.API.Setting.DL">
+      <HintPath>obj\Debug\netcoreapp2.2\eFMS.API.Setting.DL.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.API.Setting.Service">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Setting.Service.dll</HintPath>
