@@ -11,6 +11,7 @@ import { Department } from 'src/app/shared/models/system/department';
 import { ToastrService } from 'ngx-toastr';
 import { FormUserGroupComponent } from '../../components/form-user-group/form-user-group.component';
 import { UserGroup } from 'src/app/shared/models/system/userGroup.model';
+import { async } from 'q';
 
 @Component({
   selector: 'app-detail-group',
@@ -18,7 +19,7 @@ import { UserGroup } from 'src/app/shared/models/system/userGroup.model';
   styleUrls: ['./detail-group.component.scss']
 })
 export class GroupDetailComponent extends AppForm implements OnInit {
-  @ViewChild(FormUserGroupComponent, { static: true }) usergroupPopup: FormUserGroupComponent;
+  @ViewChild(FormUserGroupComponent, { static: false }) usergroupPopup: FormUserGroupComponent;
   formGroup: FormGroup;
   types: CommonInterface.ICommonTitleValue[] = [
     { title: 'Active', value: true },
@@ -38,6 +39,7 @@ export class GroupDetailComponent extends AppForm implements OnInit {
   users: any[] = null;
   userHeaders: CommonInterface.IHeaderTable[];
   userGroup: UserGroup = null;
+  allUsers: any[] = null;
 
   constructor(private _systemRepo: SystemRepo,
     private _router: Router,
@@ -52,6 +54,7 @@ export class GroupDetailComponent extends AppForm implements OnInit {
 
   ngOnInit() {
     this.getDepartments();
+    this.getUsers();
     this.initForm();
     this._activedRouter.params.subscribe((param: Params) => {
       if (param.id) {
@@ -68,7 +71,6 @@ export class GroupDetailComponent extends AppForm implements OnInit {
         ];
       }
     });
-    this.getUsers();
   }
   getUsersInGroup(groupId: number) {
     this._systemRepo.getUsersInGroup(groupId)
@@ -200,7 +202,7 @@ export class GroupDetailComponent extends AppForm implements OnInit {
       )
       .subscribe(
         (res: any) => {
-          this.usergroupPopup.users = res;
+          this.allUsers = res;
         },
       );
   }
@@ -208,15 +210,25 @@ export class GroupDetailComponent extends AppForm implements OnInit {
   addUserToGroup() {
     this.userGroup = new UserGroup();
     this.userGroup.id = this.groupId;
-    this.usergroupPopup.show();
+    setTimeout(async () => {
+      this.usergroupPopup.title = "Add New User";
+      this.usergroupPopup.users = this.allUsers;
+      this.usergroupPopup.initForm();
+      this.usergroupPopup.show();
+    }, 30);
   }
   viewUserGroup(item) {
     this._systemRepo.getUserGroupDetail(item.id)
       .pipe(
         catchError(this.catchError),
         finalize(() => {
-          this.usergroupPopup.title = "Edit/ View User";
-          this.usergroupPopup.show();
+          setTimeout(async () => {
+            this.usergroupPopup.title = "Edit/ View User";
+            this.usergroupPopup.users = this.allUsers;
+            this.usergroupPopup.initForm();
+            this.usergroupPopup.setValueFormGroup(this.userGroup);
+            this.usergroupPopup.show();
+          }, 30);
         })
       )
       .subscribe(

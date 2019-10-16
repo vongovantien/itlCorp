@@ -1,8 +1,7 @@
-import { Component, OnInit, Input, AfterViewInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { UserGroup } from 'src/app/shared/models/system/userGroup.model';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
-import { ActivatedRoute, Params } from '@angular/router';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
@@ -11,7 +10,7 @@ import { ToastrService } from 'ngx-toastr';
     selector: 'form-user-group',
     templateUrl: './form-user-group.component.html'
 })
-export class FormUserGroupComponent extends PopupBase implements OnInit, AfterViewInit {
+export class FormUserGroupComponent extends PopupBase implements OnInit {
     @Input() title: string;
     @Input() userGroup: UserGroup = null;
     formGroup: FormGroup;
@@ -33,11 +32,6 @@ export class FormUserGroupComponent extends PopupBase implements OnInit, AfterVi
     ngOnInit() {
         this.initForm();
     }
-    ngAfterViewInit() {
-        if (this.userGroup != null) {
-            this.setValueFormGroup(this.userGroup);
-        }
-    }
     initForm() {
         this.formGroup = this._fb.group({
             user: ['', Validators.compose([
@@ -50,9 +44,14 @@ export class FormUserGroupComponent extends PopupBase implements OnInit, AfterVi
         this.user = this.formGroup.controls['user'];
     }
     setValueFormGroup(res: any) {
-        this.formGroup.setValue({
-            user: this.users.filter(i => i.id === res.departmentId)[0] || null
-        });
+        if (this.users.length > 0) {
+            this.formGroup.setValue({
+                user: this.users.filter(i => i.id === res.userId)[0] || null,
+                level: '',
+                position: '',
+                permission: ''
+            });
+        }
     }
     addUserToGroup() {
         this.isSubmitted = true;
