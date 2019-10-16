@@ -49,7 +49,7 @@ export class TariffFormSearchComponent extends AppForm {
         protected _dataService: DataService,
         protected _catalogueRepo: CatalogueRepo,
         protected _systemRepo: SystemRepo,
-        private _fb: FormBuilder
+        protected _fb: FormBuilder
     ) {
         super();
         this.requestSearch = this.submitSearch;
