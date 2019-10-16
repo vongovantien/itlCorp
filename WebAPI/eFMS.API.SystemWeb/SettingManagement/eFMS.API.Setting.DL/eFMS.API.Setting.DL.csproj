@@ -45,6 +45,9 @@
     <Reference Include="eFMS.API.Provider">
       <HintPath>..\..\OperationManagement\bin\netcoreapp2.2\eFMS.API.Provider.dll</HintPath>
     </Reference>
+    <Reference Include="eFMS.API.Setting.DL">
+      <HintPath>obj\Debug\netcoreapp2.2\eFMS.API.Setting.DL.dll</HintPath>
+    </Reference>
     <Reference Include="eFMS.API.Setting.Service">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Setting.Service.dll</HintPath>
     </Reference>

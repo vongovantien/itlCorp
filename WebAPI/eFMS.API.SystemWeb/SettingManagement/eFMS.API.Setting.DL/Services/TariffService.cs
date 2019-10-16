@@ -1,15 +1,19 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using eFMS.API.Common.NoSql;
+using eFMS.API.Setting.DL.Common;
 using eFMS.API.Setting.DL.IService;
 using eFMS.API.Setting.DL.Models;
+using eFMS.API.Setting.DL.Models.Criteria;
 using eFMS.API.Setting.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Caching.Distributed;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace eFMS.API.Setting.DL.Services
 {
@@ -17,10 +21,20 @@ namespace eFMS.API.Setting.DL.Services
     {
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SetTariffDetail> setTariffDetailRepo;
-        public TariffService(IContextBase<SetTariff> repository, IMapper mapper, ICurrentUser user, IContextBase<SetTariffDetail> setTariffDetail) : base(repository, mapper)
+        private readonly IDistributedCache cache;
+        private readonly IContextBase<CatCharge> catChargeRepo;
+        private readonly IContextBase<CatCommodityGroup> catCommodityGroupRepo;
+        private readonly IContextBase<CatPartner> catPartnerRepo;
+        private readonly IContextBase<CatPlace> catPlaceRepo;
+
+        public TariffService(IContextBase<SetTariff> repository, IMapper mapper, ICurrentUser user, IContextBase<SetTariffDetail> setTariffDetail, IContextBase<CatCharge> catCharge, IContextBase<CatCommodityGroup> catCommodityGroup, IContextBase<CatPartner> catPartner, IContextBase<CatPlace> catPlace) : base(repository, mapper)
         {
             currentUser = user;
             setTariffDetailRepo = setTariffDetail;
+            catChargeRepo = catCharge;
+            catCommodityGroupRepo = catCommodityGroup;
+            catPartnerRepo = catPartner;
+            catPlaceRepo = catPlace;
         }
 
         /// <summary>
@@ -36,13 +50,9 @@ namespace eFMS.API.Setting.DL.Services
         {
             try
             {
-                if (model == null)
+                if (model == null || model.setTariff == null)
                 {
                     return new HandleState("Tariff is not null");
-                }
-                if (model.setTariff == null || model.setTariffDetails == null)
-                {
-                    return new HandleState("List tariff detail is not null");
                 }
 
                 //Trường hợp Insert (Id of tariff is null or empty)
@@ -122,10 +132,7 @@ namespace eFMS.API.Setting.DL.Services
         {
             try
             {
-                var checkData = CheckExistsDataTariff(model);
-                if (!checkData.Success) return checkData;
-
-                var userCurrent = "admin";//currentUser.UserID;
+                var userCurrent = currentUser.UserID;
                 var today = DateTime.Now;
                 //Insert SetTariff
                 var tariff = mapper.Map<SetTariff>(model.setTariff);
@@ -144,7 +151,7 @@ namespace eFMS.API.Setting.DL.Services
                         r.UserCreated = r.UserModified = userCurrent;
                         r.DatetimeCreated = r.DatetimeModified = today;
                     });
-                    var hs2 = setTariffDetailRepo.Add(tariffDetails);
+                    var hsTariffDetail = setTariffDetailRepo.Add(tariffDetails);
                 }
                 return hs;
             }
@@ -163,8 +170,60 @@ namespace eFMS.API.Setting.DL.Services
         {
             try
             {
-                var userCurrent = "admin";//currentUser.UserID;
-                var hs = new HandleState();
+                var userCurrent = currentUser.UserID;
+                var today = DateTime.Now;
+                //Update SetTariff
+                var tariff = mapper.Map<SetTariff>(model.setTariff);
+                //var tariffCurrent = DataContext.Get(x => x.Id == tariff.Id).FirstOrDefault();
+                //tariff.UserCreated = tariffCurrent.UserCreated;
+                tariff.UserModified = userCurrent;
+                //tariff.DatetimeCreated = tariffCurrent.DatetimeCreated;
+                tariff.DatetimeModified = today;
+
+                var hs = DataContext.Update(tariff, x => x.Id == tariff.Id);
+                if (hs.Success)
+                {
+                    var tariffDetails = mapper.Map<List<SetTariffDetail>>(model.setTariffDetails);
+
+                    //Remove các tariff mà user đã gỡ bỏ
+                    var listIdTariffDetail = tariffDetails.Select(s => s.Id);
+                    var listIdTariffDetailNeedRemove = setTariffDetailRepo.Get(x => x.TariffId == tariff.Id
+                                                                                 && !listIdTariffDetail.Contains(x.Id)).Select(x => x.Id);
+                    if (listIdTariffDetailNeedRemove.Count() > 0)
+                    {
+                        setTariffDetailRepo.Delete(x => listIdTariffDetailNeedRemove.Contains(x.Id));
+                    }
+
+                    //Update các tariff detail cũ
+                    var tariffDetailOld = tariffDetails.Where(x => x.Id != Guid.Empty
+                                                                && setTariffDetailRepo.Get(g => g.TariffId == tariff.Id).Select(s => s.Id).Contains(x.Id));
+                    if (tariffDetailOld.Count() > 0)
+                    {
+                        foreach (var item in tariffDetailOld)
+                        {
+                            //item.UserCreated = setTariffDetailRepo.Get(x => x.Id == item.Id).FirstOrDefault().UserCreated;
+                            item.UserModified = userCurrent;
+                            //item.DatetimeCreated = setTariffDetailRepo.Get(x => x.Id == item.Id).FirstOrDefault().DatetimeCreated;
+                            item.DatetimeModified = today;
+                            setTariffDetailRepo.Update(item, x => x.Id == item.Id);
+                        }
+                    }
+
+                    //Add các tariff detail mới
+                    var tariffDetailNew = tariffDetails.Where(x => x.Id == Guid.Empty).ToList();
+                    if (tariffDetailNew.Count > 0)
+                    {
+                        tariffDetailNew.ForEach(r =>
+                        {
+                            r.Id = Guid.NewGuid();
+                            r.TariffId = tariff.Id;
+                            r.UserCreated = r.UserModified = userCurrent;
+                            r.DatetimeCreated = r.DatetimeModified = today;
+                        });
+                        setTariffDetailRepo.Add(tariffDetailNew);
+                    }
+                }
+
                 return hs;
             }
             catch (Exception ex)
@@ -178,12 +237,17 @@ namespace eFMS.API.Setting.DL.Services
         /// </summary>
         /// <param name="idTariff"></param>
         /// <returns></returns>
-        public HandleState DeleteTariff(Guid idTariff)
+        public HandleState DeleteTariff(Guid tariffId)
         {
             try
             {
-                var userCurrent = "admin";//currentUser.UserID;
-                var hs = new HandleState();
+                ChangeTrackerHelper.currentUser = currentUser.UserID;
+                var hs = DataContext.Delete(x => x.Id == tariffId);
+                if (hs.Success)
+                {
+                    var hsTariffDetail = setTariffDetailRepo.Delete(x => x.TariffId == tariffId);
+                }
+
                 return hs;
             }
             catch (Exception ex)
@@ -191,5 +255,134 @@ namespace eFMS.API.Setting.DL.Services
                 return new HandleState(ex.Message);
             }
         }
+
+        public List<SetTariffModel> GetAllTariff()
+        {
+            //var clearanceCaching = RedisCacheHelper.GetObject<List<SetTariffModel>>(cache, Templates.CustomDeclaration.NameCaching.ListName);
+            List<SetTariffModel> setTariffModels = null;
+            //get from view data
+            var list = DataContext.Get();
+            setTariffModels = mapper.Map<List<SetTariffModel>>(list);
+            //RedisCacheHelper.SetObject(cache, Templates.CustomDeclaration.NameCaching.ListName, customClearances);
+            return setTariffModels;
+        }
+
+
+        public List<TariffViewModel> Query(TariffCriteria criteria)
+        {
+            var tariff = GetAllTariff();
+            var query = from t in tariff
+                        select t;
+            query = query.Where(x => (x.TariffName.ToLower().Contains(criteria.Name.ToLower()))
+            && (x.CustomerId == criteria.CustomerID || string.IsNullOrEmpty(criteria.CustomerID))
+            && (x.TariffType == criteria.TariffType || string.IsNullOrEmpty(criteria.TariffType))
+            && (x.ServiceMode == criteria.ServiceMode || string.IsNullOrEmpty(criteria.ServiceMode))
+            && (x.SupplierId == criteria.SupplierID || string.IsNullOrEmpty(criteria.SupplierID))
+            && (x.OfficeId == new Guid(criteria.OfficeId) || string.IsNullOrEmpty(criteria.OfficeId))
+            && (x.Status == criteria.Status || criteria.Status == null)
+            && (x.DatetimeCreated == criteria.Date || x.EffectiveDate == criteria.Date || x.DatetimeModified == criteria.Date || criteria.Date == null));
+            if (query.Count() == 0) return null;
+            List<TariffViewModel> results = new List<TariffViewModel>();
+            foreach (var item in query)
+            {
+                var tariffView = mapper.Map<TariffViewModel>(item);
+                results.Add(tariffView);
+            }
+            return results;
+        }
+
+        public IQueryable<TariffViewModel> Paging(TariffCriteria criteria, int page, int size, out int rowsCount)
+        {
+            List<TariffViewModel> results = null;
+            var list = Query(criteria);
+            if (list == null)
+            {
+                rowsCount = 0;
+                return null;
+            }
+            list = list.OrderByDescending(x => x.DatetimeCreated).ToList();
+            rowsCount = list.ToList().Count;
+            if (size > 1)
+            {
+                if (page < 1)
+                {
+                    page = 1;
+                }
+                results = list.Skip((page - 1) * size).Take(size).ToList();
+            }
+            return results.AsQueryable();
+        }
+
+        public SetTariffModel GetTariffById(Guid tariffId)
+        {
+            var tariff = DataContext.Get(x => x.Id == tariffId).FirstOrDefault();
+            var data = mapper.Map<SetTariffModel>(tariff);
+            return data;
+        }
+
+        public SetTariffDetailModel GetTariffDetailById(Guid tariffDetailId)
+        {
+            var tariffDetail = setTariffDetailRepo.Get(x => x.Id == tariffDetailId).FirstOrDefault();
+            var data = mapper.Map<SetTariffDetailModel>(tariffDetail);
+            return data;
+        }
+
+        public IQueryable<SetTariffDetailModel> GetListTariffDetailByTariffId(Guid tariffId)
+        {
+            var tariffDetails = setTariffDetailRepo.Get(x => x.TariffId == tariffId);
+            var charges = catChargeRepo.Get();
+            var commoditiGrps = catCommodityGroupRepo.Get();
+            var payers = catPartnerRepo.Get();
+            var ports = catPlaceRepo.Get(x => x.PlaceTypeId == CatPlaceConstant.Port);
+            var warehouses = catPlaceRepo.Get(x => x.PlaceTypeId == CatPlaceConstant.Warehouse);
+
+            //var tariffDetailsModel = tariffDetails.ProjectTo<SetTariffDetailModel>(mapper.ConfigurationProvider);
+            var queryData = from tariff in tariffDetails
+                            join charge in charges on tariff.ChargeId equals charge.Id into charge2
+                            from charge in charge2.DefaultIfEmpty()
+                            join commoditiGrp in commoditiGrps on tariff.CommodityId equals commoditiGrp.Id into commoditiGrp2
+                            from commoditiGrp in commoditiGrp2.DefaultIfEmpty()
+                            join payer in payers on tariff.PayerId equals payer.Id into payer2
+                            from payer in payer2.DefaultIfEmpty()
+                            join port in ports on tariff.PortId equals port.Id into port2
+                            from port in port2.DefaultIfEmpty()
+                            join warehouse in warehouses on tariff.WarehouseId equals warehouse.Id into warehouse2
+                            from warehouse in warehouse2.DefaultIfEmpty()
+                            select new SetTariffDetailModel
+                            {
+                                Id = tariff.Id,
+                                TariffId = tariff.TariffId,
+                                ChargeId = tariff.ChargeId,
+                                UseFor = tariff.UseFor,
+                                Route = tariff.Route,
+                                CommodityId = tariff.CommodityId,
+                                PayerId = tariff.PayerId,
+                                PortId = tariff.PortId,
+                                WarehouseId = tariff.WarehouseId,
+                                Type = tariff.Type,
+                                RangeType = tariff.RangeType,
+                                RangeFrom = tariff.RangeFrom,
+                                RangeTo = tariff.RangeTo,
+                                UnitPrice = tariff.UnitPrice,
+                                Min = tariff.Min,
+                                Max = tariff.Max,
+                                NextUnit = tariff.NextUnit,
+                                NextUnitPrice = tariff.NextUnitPrice,
+                                UnitId = tariff.UnitId,
+                                CurrencyId = tariff.CurrencyId,
+                                Vatrate = tariff.Vatrate,
+                                UserCreated = tariff.UserCreated,
+                                DatetimeCreated = tariff.DatetimeCreated,
+                                UserModified = tariff.UserModified,
+                                DatetimeModified = tariff.DatetimeModified,
+                                ChargeName = charge.ChargeNameEn,
+                                CommodityName = commoditiGrp.GroupNameEn,
+                                PayerName = payer.ShortName,
+                                PortName = port.NameEn,
+                                WarehouseName = warehouse.NameEn
+                            };
+            return queryData.OrderByDescending(x => x.DatetimeModified);
+        }
+
     }
 }
