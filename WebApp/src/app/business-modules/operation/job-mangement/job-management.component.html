@@ -82,18 +82,17 @@
                                                             (click)="showCustomClearance(item.jobNo, i)">
                                                             <i class="la la-angle-up"></i>
                                                         </button>
-                                                        <button type="button" *ngIf="!item.isLocked"
+                                                        <button type="button"
                                                             class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                             [routerLink]="['/home/operation/job-edit/' + item.id]"
                                                             title="Edit">
                                                             <i class="la la-edit"></i>
                                                         </button>
                                                         <button type="button" *ngIf="item.isLocked"
-                                                            class="btn btn-fault btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            title="Edit">
+                                                            class="btn btn-fault btn-sm m-btn--square m-btn--icon m-btn--icon-only">
                                                             <i class="fa fa-lock"></i>
                                                         </button>
-                                                        <button type="button"
+                                                        <button type="button" *ngIf="!item.isLocked"
                                                             class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                             title="Remove" (click)="deleteSipment(item)">
                                                             <i class="la la-trash"></i>
@@ -110,26 +109,26 @@
                                                 <td>
                                                     <span>{{ item.customerName }}</span>
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     <span>{{ item.serviceDate | date:'dd/MM/yyyy' }}</span>
                                                 </td>
                                                 <td>
                                                     <span *ngIf="item.serviceMode == 'Import'">{{ item.podName }}</span>
                                                     <span *ngIf="item.serviceMode == 'Export'">{{ item.polName }}</span>
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     <span>{{ item.sumContainers }}</span>
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     <span>{{ item.sumPackages }}</span>
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     <span>{{ item.sumGrossWeight }}</span>
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     <span>{{ item.sumCbm }}</span>
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     <span>{{ item.modifiedDate | date:'dd/MM/yyyy' }}</span>
                                                 </td>
                                             </tr>

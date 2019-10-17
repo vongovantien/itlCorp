@@ -23,9 +23,14 @@ namespace eFMS.API.Setting.Infrastructure.Filters
                 operation.Responses.Add("403", new Response { Description = "Forbidden" });
 
                 operation.Security = new List<IDictionary<string, IEnumerable<string>>>();
+                //operation.Security.Add(new Dictionary<string, IEnumerable<string>>
+                //{
+                //    { "oauth2", new [] { "eFMS.API.Setting" } }
+                //});
+                //Add JWT bearer type
                 operation.Security.Add(new Dictionary<string, IEnumerable<string>>
                 {
-                    { "oauth2", new [] { "eFMS.API.Setting" } }
+                    { "Bearer", new string[] { } }
                 });
             }
         }

@@ -50,7 +50,6 @@ namespace eFMS.API.System.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
-        [Authorize]
         public IActionResult Paging(SysOfficeCriteria criteria, int page, int size)
         {
             var data = sysOfficeService.Paging(criteria, page, size, out int rowCount);

@@ -16,7 +16,7 @@
           </span>
         </span>
       </button>
-      <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+      <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="export()">
         <span>
           <i class="la la-upload"></i>
           <span>
@@ -52,7 +52,7 @@
           </thead>
           <tbody class="tbody-group">
             <ng-container *ngIf="!isLoading && !!groups.length">
-              <tr class="text-center" *ngFor="let group of groups; let i = index; trackBy: trackByFn">
+              <tr *ngFor="let group of groups; let i = index; trackBy: trackByFn">
                 <td class="table-actions-col">
                   <div class="table-actions" style="width: 70px">
                     <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
@@ -80,7 +80,7 @@
                 <td>
                   <span>{{ group.departmentName}}</span>
                 </td>
-                <td [ngClass]="!group.active ? 'text-danger' : 'text-success'">
+                <td class="text-center" [ngClass]="!group.active ? 'text-danger' : 'text-success'">
                   {{ group.active ? 'Active' : 'Inactive' }}</td>
               </tr>
             </ng-container>

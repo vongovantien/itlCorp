@@ -42,6 +42,9 @@
     <Reference Include="eFMS.API.Common">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
     </Reference>
+    <Reference Include="eFMS.API.Provider">
+      <HintPath>..\..\SystemManagement\bin\netcoreapp2.2\eFMS.API.Provider.dll</HintPath>
+    </Reference>
     <Reference Include="ITL.NetCore.Common">
       <HintPath>..\bin\netcoreapp2.2\ITL.NetCore.Common.dll</HintPath>
     </Reference>

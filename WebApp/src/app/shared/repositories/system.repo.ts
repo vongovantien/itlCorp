@@ -7,7 +7,6 @@ import { throwError } from 'rxjs';
 @Injectable()
 export class SystemRepo {
     private VERSION: string = 'v1';
-    private MODULE: string = 'System';
     constructor(private _api: ApiService) {
     }
 
@@ -125,7 +124,7 @@ export class SystemRepo {
         );
     }
     deleteGroup(id: number) {
-        return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup`, { id: id }).pipe(
+        return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup/${id}`).pipe(
             map((data: any) => data)
         );
     }
@@ -146,6 +145,21 @@ export class SystemRepo {
     }
     getUserGroupDetail(id: number) {
         return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserGroup/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+    addUserToGroup(body: any) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserGroup`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+    updateUserGroup(body: any) {
+        return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserGroup`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+    deleteUserGroup(id: number) {
+        return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserGroup/${id}`).pipe(
             map((data: any) => data)
         );
     }

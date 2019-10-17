@@ -128,5 +128,7 @@ namespace eFMS.API.System.DL.Common
         //#region Name field
         //public const string EF_DISPLAYNAME_CODE = "EF_DISPLAYNAME_CODE";
         //#endregion
+
+        public static readonly string MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED = "MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED";
     }
 }

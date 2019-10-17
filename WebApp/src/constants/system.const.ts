@@ -77,7 +77,10 @@ export class SystemConstants {
         AGENT: 'efms:agent',
         SUPPLIER: 'efms:supplier',
         WAREHOUSE: 'efms:warehouse',
-        COMMODITY: 'efms:commodity'
+        COMMODITY: 'efms:commodity',
+        OFFICE: 'efms:office',
+        COMPANY: 'efms:company',
+        DEPARTMENT: 'efms:department',
     };
 
 }

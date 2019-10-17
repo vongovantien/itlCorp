@@ -5,6 +5,7 @@ using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.Service.Models;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
@@ -18,12 +19,14 @@ namespace eFMS.API.System.DL.Services
     {
         private readonly IContextBase<SysCompany> sysCompanyRepo;
         private readonly IContextBase<SysOffice> sysOfficeRepo;
-        public CatDepartmentService(IContextBase<CatDepartment> repository, IMapper mapper, IContextBase<SysOffice> sysOffice, IContextBase<SysCompany> sysCompany) : base(repository, mapper)
+        private readonly ICurrentUser currentUser;
+        public CatDepartmentService(IContextBase<CatDepartment> repository, IMapper mapper, IContextBase<SysOffice> sysOffice, IContextBase<SysCompany> sysCompany, ICurrentUser user) : base(repository, mapper)
         {
             sysOfficeRepo = sysOffice;
             sysCompanyRepo = sysCompany;
             //Id is primarykey of table CatDepartment, DepartmentId is forgekey of table SysGroup       
             SetChildren<SysGroup>("Id", "DepartmentId");
+            currentUser = user;
         }
 
         public IQueryable<CatDepartmentModel> QueryData(CatDepartmentCriteria criteria)
@@ -54,12 +57,20 @@ namespace eFMS.API.System.DL.Services
             {
                 if (!string.IsNullOrEmpty(criteria.Keyword))
                 {
+                    //query = query.Where(x =>
+                    //       x.Code == criteria.Keyword
+                    //    || x.DeptName == criteria.Keyword
+                    //    || x.DeptNameEn == criteria.Keyword
+                    //    || x.DeptNameAbbr == criteria.Keyword
+                    //    || x.OfficeName == criteria.Keyword
+                    //);
+                    //Search gần đúng
                     query = query.Where(x =>
-                           x.Code == criteria.Keyword
-                        || x.DeptName == criteria.Keyword
-                        || x.DeptNameEn == criteria.Keyword
-                        || x.DeptNameAbbr == criteria.Keyword
-                        || x.OfficeName == criteria.Keyword
+                           x.Code.IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                        || x.DeptName.IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                        || x.DeptNameEn.IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                        || x.DeptNameAbbr.IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                        || x.OfficeName.IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                     );
                 }
             }
@@ -67,12 +78,20 @@ namespace eFMS.API.System.DL.Services
             {
                 if (!string.IsNullOrEmpty(criteria.Keyword))
                 {
+                    //query = query.Where(x =>
+                    //       criteria.Type == "Code" ? x.Code == criteria.Keyword : true
+                    //    && criteria.Type == "DeptName" ? x.DeptName == criteria.Keyword : true
+                    //    && criteria.Type == "DeptNameEn" ? x.DeptNameEn == criteria.Keyword : true
+                    //    && criteria.Type == "DeptNameAbbr" ? x.DeptNameAbbr == criteria.Keyword : true
+                    //    && criteria.Type == "OfficeName" ? x.OfficeName == criteria.Keyword : true
+                    //);
+                    //Search gần đúng
                     query = query.Where(x =>
-                           criteria.Type == "Code" ? x.Code == criteria.Keyword : true
-                        && criteria.Type == "DeptName" ? x.DeptName == criteria.Keyword : true
-                        && criteria.Type == "DeptNameEn" ? x.DeptNameEn == criteria.Keyword : true
-                        && criteria.Type == "DeptNameAbbr" ? x.DeptNameAbbr == criteria.Keyword : true
-                        && criteria.Type == "OfficeName" ? x.OfficeName == criteria.Keyword : true
+                           criteria.Type == "Code" ? x.Code.IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0 : true
+                        && criteria.Type == "DeptName" ? x.DeptName.IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0 : true
+                        && criteria.Type == "DeptNameEn" ? x.DeptNameEn.IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0 : true
+                        && criteria.Type == "DeptNameAbbr" ? x.DeptNameAbbr.IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0 : true
+                        && criteria.Type == "OfficeName" ? x.OfficeName.IndexOf(criteria.Keyword ?? "", StringComparison.OrdinalIgnoreCase) >= 0 : true
                     );
                 }
             }
@@ -115,7 +134,7 @@ namespace eFMS.API.System.DL.Services
         {
             try
             {
-                var userCurrent = "admin";
+                var userCurrent = currentUser.UserID;
                 var today = DateTime.Now;
                 var modelAdd = mapper.Map<CatDepartment>(model);
                 var deptCurrent = DataContext.Get(x => x.Code == model.Code).FirstOrDefault();
@@ -147,7 +166,7 @@ namespace eFMS.API.System.DL.Services
         {
             try
             {
-                var userCurrent = "admin";
+                var userCurrent = currentUser.UserID;
                 var today = DateTime.Now;
                 var modelUpdate = mapper.Map<CatDepartment>(model);
                 var deptCurrent = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
@@ -175,7 +194,7 @@ namespace eFMS.API.System.DL.Services
         {
             try
             {
-                ChangeTrackerHelper.currentUser = "admin";
+                ChangeTrackerHelper.currentUser = currentUser.UserID;
                 var hs = DataContext.Delete(x => x.Id == id);
                 return hs;
             }
