@@ -907,7 +907,7 @@ namespace eFMS.API.ReportData
             }
         }
 
-        public Stream generateCompanyExcel(List<SysCompany> listCompany, Stream stream = null)
+        public Stream GenerateCompanyExcel(List<SysCompany> listCompany, Stream stream = null)
         {
             List<String> headers = new List<String>()
             {
@@ -928,7 +928,7 @@ namespace eFMS.API.ReportData
                     excelPackage.Workbook.Worksheets.Add("Sheet1");
                     var worksheet = excelPackage.Workbook.Worksheets[1];
 
-                    buildHeader(worksheet, headers, "COMPANY INFORMATION");
+                    BuildHeader(worksheet, headers, "COMPANY INFORMATION");
 
                     for (int i = 0; i < listCompany.Count; i++)
                     {
@@ -964,7 +964,7 @@ namespace eFMS.API.ReportData
             return null;
         }
 
-        public void buildHeader(ExcelWorksheet worksheet, List<String> headers, string title)
+        public void BuildHeader(ExcelWorksheet worksheet, List<String> headers, string title)
         {
             worksheet.Cells[1, 1, 1, headers.Count].Merge = true;
             worksheet.Cells["A1"].Value = title;
@@ -989,9 +989,11 @@ namespace eFMS.API.ReportData
 
                 worksheet.Column(i + 1).Width = 30;
             }
+            worksheet.Cells.AutoFitColumns(minWidth, maxWidth);
+            worksheet.Cells["A1:Z1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         }
         #endregion
-        public Stream generateOfficeExcel(List<SysOfficeModel> listCompany, Stream stream = null)
+        public Stream GenerateOfficeExcel(List<SysOfficeModel> listCompany, Stream stream = null)
         {
             List<String> headers = new List<String>()
             {
@@ -1014,7 +1016,7 @@ namespace eFMS.API.ReportData
                     excelPackage.Workbook.Worksheets.Add("Sheet1");
                     var worksheet = excelPackage.Workbook.Worksheets[1];
 
-                    buildHeader(worksheet, headers, "OFFICE INFORMATION");
+                    BuildHeader(worksheet, headers, "OFFICE INFORMATION");
 
                     for (int i = 0; i < listCompany.Count; i++)
                     {
@@ -1057,15 +1059,47 @@ namespace eFMS.API.ReportData
         #region Group
         internal Stream CreateGroupExcelFile(List<SysGroupModel> listObj, Stream stream = null)
         {
+            List<String> headers = new List<String>()
+            {
+                "No.",
+                "Group Code",
+                "Name EN",
+                "Name Local",
+                "Name Abbr",
+                "Department",
+                "Status"
+            };
             try
             {
-                var list = listObj;
+                int addressStartContent = 4;
+                int no = 1;
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
-                    excelPackage.Workbook.Worksheets.Add("First Sheet");
-                    var workSheet = excelPackage.Workbook.Worksheets[1];
-                    workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
-                    BindingFormatForGroupExcel(workSheet, list);
+                    excelPackage.Workbook.Worksheets.Add("Sheet1");
+                    var worksheet = excelPackage.Workbook.Worksheets[1];
+
+                    BuildHeader(worksheet, headers, "GROUP INFORMATION");
+
+                    for (int i = 0; i < listObj.Count; i++)
+                    {
+                        var item = listObj[i];
+                        worksheet.Cells[i + addressStartContent, 1].Value = no;
+                        worksheet.Cells[i + addressStartContent, 2].Value = item.Code;
+                        worksheet.Cells[i + addressStartContent, 3].Value = item.NameEn;
+                        worksheet.Cells[i + addressStartContent, 4].Value = item.NameVn;
+                        worksheet.Cells[i + addressStartContent, 5].Value = item.ShortName;
+                        worksheet.Cells[i + addressStartContent, 6].Value = item.DepartmentName;
+                        worksheet.Cells[i + addressStartContent, 7].Value = item.Active == true ? "Active" : "Inactive";
+
+                        //Add border left right for cells
+                        AddBorderLeftRightCell(worksheet, headers, addressStartContent, i);
+
+                        //Add border bottom for last cells
+                        AddBorderBottomLastCell(worksheet, headers, addressStartContent, i, listObj.Count);
+                        
+                        no++;
+                    }
+
                     excelPackage.Save();
                     return excelPackage.Stream;
                 }
@@ -1077,69 +1111,23 @@ namespace eFMS.API.ReportData
             return null;
         }
 
-        private void BindingFormatForGroupExcel(ExcelWorksheet workSheet, List<SysGroupModel> list)
+        private void AddBorderBottomLastCell(ExcelWorksheet worksheet, List<string> headers, int addressStartContent, int indexDataRow, int totalItem)
         {
-            List<String> headers = new List<String>()
+            if (indexDataRow == totalItem - 1)
             {
-                "No",
-                "Group Code",
-                "Name En",
-                "Name Local",
-                "Name Abbr",
-                "Department",
-                "Status"
-            };
-            for (int i = 0; i < headers.Count; i++)
-            {
-                workSheet.Cells[3, i + 1].Value = headers[i];
-                workSheet.Cells[3, i + 1].Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                workSheet.Cells[3, i + 1].Style.Border.Left.Style = ExcelBorderStyle.Thin;
-                workSheet.Cells[3, i + 1].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                workSheet.Cells[3, i + 1].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-
-                workSheet.Cells[3, i + 1].Style.Font.Bold = true;
-                workSheet.Cells[3, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                workSheet.Cells[3, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            }
-
-            workSheet.Cells[1, 1, 1, 7].Merge = true;
-            workSheet.Cells["A1"].Value = ResourceConsts.GROUP_NAME;
-            workSheet.Cells["A1"].Style.Font.Size = 16;
-            workSheet.Cells["A1"].Style.Font.Bold = true;
-            workSheet.Cells["A1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["A1"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-
-            workSheet.Cells.AutoFitColumns(minWidth, maxWidth);
-            workSheet.Cells["A1:Z1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            for (int i = 0; i < list.Count; i++)
-            {
-                var item = list[i];
-                workSheet.Cells[i + 4, 1].Value = i + 1;
-                workSheet.Cells[i + 4, 2].Value = item.Code;
-                workSheet.Cells[i + 4, 3].Value = item.NameEn;
-                workSheet.Cells[i + 4, 4].Value = item.NameVn;
-                workSheet.Cells[i + 4, 5].Value = item.ShortName;
-                workSheet.Cells[i + 4, 6].Value = item.DepartmentName;
-                workSheet.Cells[i + 4, 7].Value = item.Active == true ? "Active" : "Inactive";
-
-                workSheet.Cells[i + 4, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                workSheet.Cells[i + 4, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-
-                //Add border left right for cells
                 for (int j = 0; j < headers.Count; j++)
                 {
-                    workSheet.Cells[i + 4, j + 1].Style.Border.Left.Style = ExcelBorderStyle.Thin;
-                    workSheet.Cells[i + 4, j + 1].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                    worksheet.Cells[indexDataRow + addressStartContent, j + 1].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
                 }
+            }
+        }
 
-                //Add border bottom for last cells
-                if (i == list.Count - 1)
-                {
-                    for (int j = 0; j < headers.Count; j++)
-                    {
-                        workSheet.Cells[i + 4, j + 1].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                    }
-                }
+        private void AddBorderLeftRightCell(ExcelWorksheet worksheet, List<string> headers, int addressStartContent, int indexDataRow)
+        {
+            for (int j = 0; j < headers.Count; j++)
+            {
+                worksheet.Cells[indexDataRow + addressStartContent, j + 1].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[indexDataRow + addressStartContent, j + 1].Style.Border.Right.Style = ExcelBorderStyle.Thin;
             }
         }
         #endregion
