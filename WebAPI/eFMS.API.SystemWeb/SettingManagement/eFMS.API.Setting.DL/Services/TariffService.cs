@@ -290,12 +290,13 @@ namespace eFMS.API.Setting.DL.Services
         {
             var tariff = GetAllTariff();
             var partner = catPartnerRepo.Get();
+
             var query = from t in tariff
                         join p in partner on t.CustomerId equals p.Id into partnerdata
                         from p in partnerdata.DefaultIfEmpty()
                         join s in partner on t.SupplierId equals s.Id into supplierdata
                         from s in supplierdata.DefaultIfEmpty()
-                        select new { t, CustomerName = p != null ? p.ShortName : null, SupplierName = s != null ?  s.ShortName : null };
+                        select new { t, CustomerName = p != null ? p.ShortName : null, SupplierName = s != null ? s.ShortName : null };
             query = query.Where(x =>
             ((x.t.TariffName ?? "").IndexOf(criteria.Name ?? "", StringComparison.OrdinalIgnoreCase)) >= 0
             && (x.t.CustomerId ?? "").IndexOf(criteria.CustomerID ?? "", StringComparison.OrdinalIgnoreCase) >= 0
@@ -304,31 +305,46 @@ namespace eFMS.API.Setting.DL.Services
             && (x.t.SupplierId == criteria.SupplierID || string.IsNullOrEmpty(criteria.SupplierID))
             && (x.t.OfficeId == criteria.OfficeId || criteria.OfficeId == Guid.Empty)
             && (x.t.Status == criteria.Status || criteria.Status == null));
-            if (criteria.DateType == "CreateDate")
+            if (criteria.DateType == "CreateDate" && criteria.ToDate.HasValue && criteria.FromDate.HasValue)
             {
                 query = query.Where(x =>
-                (x.t.DatetimeCreated >= criteria.FromDate && x.t.DatetimeCreated <= criteria.ToDate));
+                (x.t.DatetimeCreated.HasValue && x.t.DatetimeCreated.Value.Date >= criteria.FromDate.Value.Date && x.t.DatetimeCreated.Value.Date <= criteria.ToDate.Value.Date));
             }
-            else if (criteria.DateType == "EffectiveDate")
+            else if (criteria.DateType == "EffectiveDate" && criteria.ToDate.HasValue && criteria.FromDate.HasValue)
             {
                 query = query.Where(x =>
-                (x.t.EffectiveDate >= criteria.FromDate && x.t.EffectiveDate <= criteria.ToDate));
+                (x.t.EffectiveDate.Date >= criteria.FromDate && x.t.EffectiveDate <= criteria.ToDate));
             }
-            else if(criteria.DateType == "ModifiedDate")
+            else if (criteria.DateType == "ModifiedDate" && criteria.ToDate.HasValue && criteria.FromDate.HasValue)
             {
-               query = query.Where(x =>
-               (x.t.DatetimeModified >= criteria.FromDate && x.t.DatetimeModified <= criteria.ToDate));
+                query = query.Where(x =>
+                (x.t.DatetimeModified.HasValue && x.t.DatetimeModified.Value.Date >= criteria.FromDate.Value.Date && x.t.DatetimeModified.Value.Date <= criteria.ToDate.Value.Date));
+            }
+            else if (criteria.DateType == "ExpiredDate")
+            {
+                query = query.Where(x =>
+                (x.t.ExpiredDate.Date >= criteria.FromDate && x.t.ExpiredDate.Date <= criteria.ToDate));
             }
             else
             {
                 query = query.Where(x =>
-                   ((x.t.DatetimeCreated >= criteria.FromDate || criteria.FromDate == null) &&
-                   (x.t.DatetimeCreated <= criteria.ToDate || criteria.ToDate == null))
-                   || ((x.t.EffectiveDate >= criteria.FromDate || criteria.FromDate == null)
-                   && (x.t.EffectiveDate <= criteria.ToDate || criteria.ToDate == null))
-                   || ((x.t.DatetimeModified >= criteria.FromDate || criteria.FromDate == null)
+                   ((x.t.DatetimeCreated.HasValue && x.t.DatetimeCreated.Value.Date >= criteria.FromDate || criteria.FromDate == null) &&
+                   (x.t.DatetimeCreated.Value.Date <= criteria.ToDate || criteria.ToDate == null))
+
+                   || ((x.t.EffectiveDate.Date >= criteria.FromDate || criteria.FromDate == null)
+                   && (x.t.EffectiveDate.Date <= criteria.ToDate || criteria.ToDate == null))
+
+                   || ((x.t.DatetimeModified.HasValue && x.t.DatetimeModified >= criteria.FromDate || criteria.FromDate == null)
                    && (x.t.DatetimeModified <= criteria.ToDate || criteria.ToDate == null))
+
+                   //|| ((x.t.DatetimeModified.HasValue ? x.t.DatetimeModified.Value.Date >= criteria.FromDate || criteria.FromDate == null : x.t.DatetimeModified >= criteria.FromDate || criteria.FromDate == null)
+                   //&& (x.t.DatetimeModified.HasValue ? x.t.DatetimeModified.Value.Date <= criteria.ToDate || criteria.ToDate == null : x.t.DatetimeModified <= criteria.ToDate || criteria.ToDate == null))
+
+                   || ((x.t.ExpiredDate.Date >= criteria.FromDate || criteria.FromDate == null)
+                   && (x.t.ExpiredDate.Date <= criteria.ToDate || criteria.ToDate == null))
+
                   );
+
             }
 
             if (query.Count() == 0) return null;
