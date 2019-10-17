@@ -12,7 +12,8 @@ import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'app-container-list',
-    templateUrl: './container-list.component.html'
+    templateUrl: './container-list.component.html',
+    styleUrls: ['./container-list.component.scss']
 })
 export class ContainerListComponent extends PopupBase implements OnInit {
     @Input() jobId: string;
