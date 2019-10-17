@@ -59,7 +59,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public string UserModified { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool? Active { get; set; }
-        public DateTime? InActiveOn { get; set; }
+        public DateTime? InactiveOn { get; set; }
 
         public virtual ICollection<CsTransactionDetail> CsTransactionDetail { get; set; }
     }

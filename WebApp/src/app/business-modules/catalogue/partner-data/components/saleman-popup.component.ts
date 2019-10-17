@@ -93,8 +93,6 @@ export class SalemanPopupComponent extends PopupBase {
         this.selectedStatus = this.status[1];
     }
 
-
-
     getService() {
         this._catalogueRepo.getListService()
             .pipe(catchError(this.catchError))
@@ -143,7 +141,7 @@ export class SalemanPopupComponent extends PopupBase {
     }
 
     async getSalemans() {
-        let responses = await this.baseService.getAsync(this.api_menu.System.User_Management.getAll);
+        const responses = await this.baseService.getAsync(this.api_menu.System.User_Management.getAll);
         if (responses != null) {
             this.users = responses;
         }

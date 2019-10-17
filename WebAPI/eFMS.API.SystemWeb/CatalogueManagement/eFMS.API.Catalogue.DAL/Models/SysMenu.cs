@@ -21,7 +21,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public int? Sequence { get; set; }
         public string Arguments { get; set; }
         public bool? Active { get; set; }
-        public DateTime? InActiveOn { get; set; }
+        public DateTime? InactiveOn { get; set; }
 
         public virtual SysMenu Parent { get; set; }
         public virtual ICollection<SysMenu> InverseParent { get; set; }

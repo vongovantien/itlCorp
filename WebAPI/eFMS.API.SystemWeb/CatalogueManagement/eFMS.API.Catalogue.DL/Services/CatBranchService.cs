@@ -33,8 +33,9 @@ namespace eFMS.API.Catalogue.DL.Services
 
             //var lstBranch = DataContext.Get();
             var lstOfficeCompany = from b in dc.SysOffice
-                                   join bu in dc.SysCompany on b.Buid equals bu.Id
-                                   select new {b, AbbrCompany = bu.Code };
+                                   join bu in dc.SysCompany on b.Buid equals bu.Id into bu2
+                                   from bu in bu2.DefaultIfEmpty()
+                                   select new {b, AbbrCompany = bu.BunameAbbr };
 
             foreach (var item in lstOfficeCompany)
             {

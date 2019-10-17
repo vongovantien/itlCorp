@@ -14,7 +14,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public bool? Active { get; set; }
-        public DateTime? InActiveOn { get; set; }
+        public DateTime? InactiveOn { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public bool? RequireAccessingForm { get; set; }
