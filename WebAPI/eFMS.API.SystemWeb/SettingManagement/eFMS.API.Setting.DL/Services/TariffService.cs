@@ -50,63 +50,10 @@ namespace eFMS.API.Setting.DL.Services
         {
             try
             {
-                if (model == null || model.setTariff == null)
+                var hs = CheckDuplicateTariff(model.setTariff);
+                if (!hs.Success)
                 {
-                    return new HandleState("Tariff is not null");
-                }
-
-                //Trường hợp Insert (Id of tariff is null or empty)
-                if (model.setTariff.Id == Guid.Empty)
-                {
-                    var tariffNameExists = DataContext.Get(x => x.TariffName == model.setTariff.TariffName).Any();
-                    if (tariffNameExists)
-                    {
-                        return new HandleState("Tariff name already exists");
-                    }
-
-                    //Check theo bộ 4
-                    var tariff = DataContext.Get(x => x.TariffType == model.setTariff.TariffType
-                                                    && x.ProductService == model.setTariff.ProductService
-                                                    && x.CargoType == model.setTariff.CargoType
-                                                    && x.ServiceMode == model.setTariff.ServiceMode);
-                    if (tariff.Any())
-                    {
-                        //Check nằm trong khoảng EffectiveDate - ExpiredDate
-                        tariff = tariff
-                            .Where(x => model.setTariff.EffectiveDate.Date >= x.EffectiveDate.Date
-                                     && model.setTariff.ExpiredDate.Date <= x.ExpiredDate.Date);
-                        if (tariff.Any())
-                        {
-                            return new HandleState("Tariff already exists");
-                        }
-                    }
-                }
-                else //Trường hợp Update (Id of tariff is not null & not empty)
-                {
-                    var tariffNameExists = DataContext.Get(x => x.Id != model.setTariff.Id
-                                                             && x.TariffName == model.setTariff.TariffName).Any();
-                    if (tariffNameExists)
-                    {
-                        return new HandleState("Tariff name already exists");
-                    }
-
-                    //Check theo bộ 4
-                    var tariff = DataContext.Get(x => x.Id != model.setTariff.Id
-                                                    && x.TariffType == model.setTariff.TariffType
-                                                    && x.ProductService == model.setTariff.ProductService
-                                                    && x.CargoType == model.setTariff.CargoType
-                                                    && x.ServiceMode == model.setTariff.ServiceMode);
-                    if (tariff.Any())
-                    {
-                        //Check nằm trong khoảng EffectiveDate - ExpiredDate
-                        tariff = tariff
-                            .Where(x => model.setTariff.EffectiveDate.Date >= x.EffectiveDate.Date
-                                     && model.setTariff.ExpiredDate.Date <= x.ExpiredDate.Date);
-                        if (tariff.Any())
-                        {
-                            return new HandleState("Tariff already exists");
-                        }
-                    }
+                    return hs;
                 }
 
                 //Check list tariff detail không được phép trống
@@ -115,6 +62,77 @@ namespace eFMS.API.Setting.DL.Services
                     return new HandleState("Please add tariff to create new OPS tariff");
                 }
 
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
+
+        public HandleState CheckDuplicateTariff(SetTariffModel model)
+        {
+            try
+            {
+                if (model == null)
+                {
+                    return new HandleState("Tariff is not null");
+                }
+
+                //Trường hợp Insert (Id of tariff is null or empty)
+                if (model.Id == Guid.Empty)
+                {
+                    var tariffNameExists = DataContext.Get(x => x.TariffName == model.TariffName).Any();
+                    if (tariffNameExists)
+                    {
+                        return new HandleState("Tariff name already exists");
+                    }
+
+                    //Check theo bộ 4
+                    var tariff = DataContext.Get(x => x.TariffType == model.TariffType
+                                                    && x.ProductService == model.ProductService
+                                                    && x.CargoType == model.CargoType
+                                                    && x.ServiceMode == model.ServiceMode);
+                    if (tariff.Any())
+                    {
+                        //Check nằm trong khoảng EffectiveDate - ExpiredDate
+                        tariff = tariff
+                            .Where(x => model.EffectiveDate.Date >= x.EffectiveDate.Date
+                                     && model.ExpiredDate.Date <= x.ExpiredDate.Date);
+                        if (tariff.Any())
+                        {
+                            return new HandleState("Tariff already exists");
+                        }
+                    }
+                }
+                else //Trường hợp Update (Id of tariff is not null & not empty)
+                {
+                    var tariffNameExists = DataContext.Get(x => x.Id != model.Id
+                                                             && x.TariffName == model.TariffName).Any();
+                    if (tariffNameExists)
+                    {
+                        return new HandleState("Tariff name already exists");
+                    }
+
+                    //Check theo bộ 4
+                    var tariff = DataContext.Get(x => x.Id != model.Id
+                                                    && x.TariffType == model.TariffType
+                                                    && x.ProductService == model.ProductService
+                                                    && x.CargoType == model.CargoType
+                                                    && x.ServiceMode == model.ServiceMode);
+                    if (tariff.Any())
+                    {
+                        //Check nằm trong khoảng EffectiveDate - ExpiredDate
+                        tariff = tariff
+                            .Where(x => model.EffectiveDate.Date >= x.EffectiveDate.Date
+                                     && model.ExpiredDate.Date <= x.ExpiredDate.Date);
+                        if (tariff.Any())
+                        {
+                            return new HandleState("Tariff already exists");
+                        }
+                    }
+                }
+                
                 return new HandleState();
             }
             catch (Exception ex)

@@ -165,5 +165,12 @@ namespace eFMS.API.Setting.Controllers
             }
         }
 
+        [HttpPost("CheckDuplicateTariff")]
+        public IActionResult CheckDuplicateTariff(SetTariffModel model)
+        {
+            var checkData = tariffService.CheckDuplicateTariff(model);
+            return Ok(new ResultHandle { Status = checkData.Success, Message = checkData.Exception.Message.ToString(), Data = model });
+        }
+
     }
 }
