@@ -95,6 +95,7 @@ namespace eFMS.API.Operation.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("Add")]
+        [Authorize]
         public IActionResult Add(OpsStageAssignedEditModel model)
         {
             string message = string.Empty;

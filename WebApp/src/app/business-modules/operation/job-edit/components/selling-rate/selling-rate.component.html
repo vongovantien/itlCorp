@@ -57,7 +57,7 @@
                         </span>
                     </td>
                     <td>
-                        <div *ngIf="opsTransaction.isLocked else link">
+                        <div *ngIf="opsTransaction.isLocked; else link">
                             {{charge.nameEn}}
                         </div>
                         <ng-template #link>
@@ -90,10 +90,10 @@
                         {{charge.soano}}
                     </td>
                     <td>
-                        <div *ngIf="opsTransaction.isLocked else link">
+                        <div *ngIf="opsTransaction.isLocked; else debit">
                             {{ charge.debitNo }}
                         </div>
-                        <ng-template #link>
+                        <ng-template #debit>
                             <a (click)="openCreditDebitNote(charge.debitNo)">
                                 {{ charge.debitNo }}
                             </a>

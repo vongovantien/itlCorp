@@ -4,6 +4,9 @@
         <name>eFMS.API.ReportData</name>
     </assembly>
     <members>
+        <member name="T:eFMS.API.ReportData.Consts.ResourceConsts">
+            <summary>Supports all classes in the .NET Framework class hierarchy and provides low-level services to derived classes. This is the ultimate base class of all classes in the .NET Framework; it is the root of the type hierarchy.</summary>
+        </member>
         <member name="T:eFMS.API.ReportData.Controllers.ReportDataController">
             <summary>
             A base class for an MVC controller without view support.

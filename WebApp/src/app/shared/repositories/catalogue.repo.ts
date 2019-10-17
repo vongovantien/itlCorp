@@ -176,7 +176,7 @@ export class CatalogueRepo {
     getSettlePaymentCharges(keyword: string, size: number = 10) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/SettlePaymentCharges`, {
             keySearch: keyword,
-            inActive: false,
+            active: true,
             size: size
         }).pipe(
             map((data: any) => data)

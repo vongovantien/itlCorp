@@ -185,7 +185,10 @@ export class GroupDetailComponent extends AppForm implements OnInit {
             this._systemRepo.updateGroup(body)
                 .pipe(
                     catchError(this.catchError),
-                    finalize(() => this._progressRef.complete())
+                    finalize(() => {
+                        this.getGroupDetail(this.groupId);
+                        this._progressRef.complete();
+                    })
                 )
                 .subscribe(
                     (res: CommonInterface.IResult) => {

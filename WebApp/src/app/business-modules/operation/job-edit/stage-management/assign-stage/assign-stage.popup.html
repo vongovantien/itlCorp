@@ -3,7 +3,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">OPS Assignment</h5>
-                <button type="button" class="close" aria-label="Close" (click)=hide()>
+                <button type="button" class="close" aria-label="Close" (click)=closePopup()>
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -53,7 +53,7 @@
                     </span>
                 </button>
                 <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="hide()">
+                    (click)="closePopup()">
                     <span>
                         <i class="la la-ban"></i>
                         <span>

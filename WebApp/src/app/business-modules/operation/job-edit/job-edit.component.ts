@@ -39,6 +39,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     @ViewChild('confirmCancelUpdate', { static: false }) confirmCancelJobPopup: ConfirmPopupComponent;
     @ViewChild('notAllowDelete', { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild('confirmDelete', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
+    @ViewChild('confirmLockShipment', { static: false }) confirmLockShipmentPopup: ConfirmPopupComponent;
+
 
     opsTransaction: OpsTransaction = null;
     productServices: any[] = [];
@@ -257,6 +259,10 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     }
 
     lockShipment() {
+        this.confirmLockShipmentPopup.show();
+    }
+
+    onLockShipment() {
         this.opsTransaction.isLocked = true;
         this.updateShipment();
     }

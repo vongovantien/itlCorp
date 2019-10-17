@@ -62,7 +62,7 @@
                         </span>
                     </td>
                     <td>
-                        <div *ngIf="opsTransaction.isLocked else link">
+                        <div *ngIf="opsTransaction.isLocked; else link">
                             {{charge.nameEn}}
                         </div>
                         <ng-template #link>
@@ -117,7 +117,7 @@
                         {{charge.invoiceDate | date: 'dd/MM/yyyy'}}
                     </td>
                     <td>
-                        <div *ngIf="opsTransaction.isLocked else link">
+                        <div *ngIf="opsTransaction.isLocked; else obh">
                             <a *ngIf="charge.creditNo">
                                 {{ charge.creditNo }}
                             </a>
@@ -127,7 +127,7 @@
                             </a>
                             <a *ngIf="charge.debitNo === null"> __</a>
                         </div>
-                        <ng-template #link>
+                        <ng-template #obh>
                             <a (click)="openCreditDebitNote(charge.creditNo)" *ngIf="charge.creditNo">
                                 {{ charge.creditNo }}
                             </a>

@@ -271,40 +271,45 @@ namespace eFMS.API.Setting.DL.Services
         public List<TariffViewModel> Query(TariffCriteria criteria)
         {
             var tariff = GetAllTariff();
+            var partner = catPartnerRepo.Get();
             var query = from t in tariff
-                        select t;
+                        join p in partner on t.CustomerId equals p.Id into partnerdata
+                        from p in partnerdata.DefaultIfEmpty()
+                        join s in partner on t.SupplierId equals s.Id into supplierdata
+                        from s in supplierdata.DefaultIfEmpty()
+                        select new { t, CustomerName = p != null ? p.ShortName : null, SupplierName = s != null ?  s.ShortName : null };
             query = query.Where(x =>
-            ((x.TariffName ?? "").IndexOf(criteria.Name ?? "", StringComparison.OrdinalIgnoreCase)) >= 0
-            && (x.CustomerId ?? "").IndexOf(criteria.CustomerID ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-            && (x.TariffType == criteria.TariffType || string.IsNullOrEmpty(criteria.TariffType))
-            && (x.ServiceMode == criteria.ServiceMode || string.IsNullOrEmpty(criteria.ServiceMode))
-            && (x.SupplierId == criteria.SupplierID || string.IsNullOrEmpty(criteria.SupplierID))
-            && (x.OfficeId == criteria.OfficeId || criteria.OfficeId == Guid.Empty)
-            && (x.Status == criteria.Status || criteria.Status == null));
+            ((x.t.TariffName ?? "").IndexOf(criteria.Name ?? "", StringComparison.OrdinalIgnoreCase)) >= 0
+            && (x.t.CustomerId ?? "").IndexOf(criteria.CustomerID ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+            && (x.t.TariffType == criteria.TariffType || string.IsNullOrEmpty(criteria.TariffType))
+            && (x.t.ServiceMode == criteria.ServiceMode || string.IsNullOrEmpty(criteria.ServiceMode))
+            && (x.t.SupplierId == criteria.SupplierID || string.IsNullOrEmpty(criteria.SupplierID))
+            && (x.t.OfficeId == criteria.OfficeId || criteria.OfficeId == Guid.Empty)
+            && (x.t.Status == criteria.Status || criteria.Status == null));
             if (criteria.DateType == "CreateDate")
             {
                 query = query.Where(x =>
-                (x.DatetimeCreated >= criteria.FromDate && x.DatetimeCreated <= criteria.ToDate));
+                (x.t.DatetimeCreated >= criteria.FromDate && x.t.DatetimeCreated <= criteria.ToDate));
             }
             else if (criteria.DateType == "EffectiveDate")
             {
                 query = query.Where(x =>
-                (x.EffectiveDate >= criteria.FromDate && x.EffectiveDate <= criteria.ToDate));
+                (x.t.EffectiveDate >= criteria.FromDate && x.t.EffectiveDate <= criteria.ToDate));
             }
             else if(criteria.DateType == "ModifiedDate")
             {
                query = query.Where(x =>
-               (x.DatetimeModified >= criteria.FromDate && x.DatetimeModified <= criteria.ToDate));
+               (x.t.DatetimeModified >= criteria.FromDate && x.t.DatetimeModified <= criteria.ToDate));
             }
             else
             {
                 query = query.Where(x =>
-                   ((x.DatetimeCreated >= criteria.FromDate || criteria.FromDate == null) &&
-                   (x.DatetimeCreated <= criteria.ToDate || criteria.ToDate == null))
-                   || ((x.EffectiveDate >= criteria.FromDate || criteria.FromDate == null)
-                   && (x.EffectiveDate <= criteria.ToDate || criteria.ToDate == null))
-                   || ((x.DatetimeModified >= criteria.FromDate || criteria.FromDate == null)
-                   && (x.DatetimeModified <= criteria.ToDate || criteria.ToDate == null))
+                   ((x.t.DatetimeCreated >= criteria.FromDate || criteria.FromDate == null) &&
+                   (x.t.DatetimeCreated <= criteria.ToDate || criteria.ToDate == null))
+                   || ((x.t.EffectiveDate >= criteria.FromDate || criteria.FromDate == null)
+                   && (x.t.EffectiveDate <= criteria.ToDate || criteria.ToDate == null))
+                   || ((x.t.DatetimeModified >= criteria.FromDate || criteria.FromDate == null)
+                   && (x.t.DatetimeModified <= criteria.ToDate || criteria.ToDate == null))
                   );
             }
 
@@ -312,7 +317,9 @@ namespace eFMS.API.Setting.DL.Services
             List<TariffViewModel> results = new List<TariffViewModel>();
             foreach (var item in query)
             {
-                var tariffView = mapper.Map<TariffViewModel>(item);
+                var tariffView = mapper.Map<TariffViewModel>(item.t);
+                tariffView.CustomerName = item.CustomerName != null ? item.CustomerName.ToString() : null;
+                tariffView.SupplierName = item.SupplierName != null ? item.SupplierName.ToString() : null;
                 results.Add(tariffView);
             }
             return results;

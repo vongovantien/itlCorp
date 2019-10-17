@@ -9,6 +9,8 @@ using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
 using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.System.Infrastructure.Middlewares;
+using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 
@@ -27,16 +29,18 @@ namespace eFMS.API.System.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ISysUserGroupService userGroupService;
+        private readonly ICurrentUser currentUser;
 
         /// <summary>
         /// constructor
         /// </summary>
         /// <param name="sysUserGroup"></param>
         /// <param name="localizer"></param>
-        public SysUserGroupController(ISysUserGroupService sysUserGroup, IStringLocalizer<LanguageSub> localizer)
+        public SysUserGroupController(ISysUserGroupService sysUserGroup, IStringLocalizer<LanguageSub> localizer, ICurrentUser currUser)
         {
             userGroupService = sysUserGroup;
             stringLocalizer = localizer;
+            currentUser = currUser;
         }
 
         /// <summary>
@@ -69,9 +73,10 @@ namespace eFMS.API.System.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
+        [Authorize]
         public IActionResult Add(SysUserGroupModel model)
         {
-            model.UserCreated = "admin";
+            model.UserCreated = currentUser.UserID;
             model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
             var hs = userGroupService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
@@ -90,9 +95,10 @@ namespace eFMS.API.System.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPut]
+        [Authorize]
         public IActionResult Update(SysUserGroupModel model)
         {
-            model.UserModified = "admin";
+            model.UserModified = currentUser.UserID;
             model.DatetimeModified = DateTime.Now;
             var hs = userGroupService.Update(model, x => x.Id == model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
@@ -111,10 +117,11 @@ namespace eFMS.API.System.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
+        [Authorize]
         public IActionResult Delete(int id)
         {
             var item = userGroupService.GetDetail(id);
-            if(item.Active == false)
+            if(item.Active == true)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED].Value });
             }
