@@ -14,6 +14,7 @@ using eFMS.API.System.DL.Models.Criteria;
 using System;
 using eFMS.API.System.DL.ViewModels;
 using eFMS.API.Common.NoSql;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.System.DL.Services
 {
@@ -21,8 +22,7 @@ namespace eFMS.API.System.DL.Services
     {
         private readonly IDistributedCache cache;
         private readonly IContextBase<SysCompany> sysBuRepository;
-
-
+        private readonly ICurrentUser currentUser;
 
         public SysOfficeService(IContextBase<SysOffice> repository, IMapper mapper, IContextBase<SysCompany> sysBuRepo, IDistributedCache distributedCache) : base(repository, mapper)
         {
@@ -33,9 +33,15 @@ namespace eFMS.API.System.DL.Services
 
         public HandleState AddOffice(SysOfficeModel SysOffice)
         {
-            SysOffice.UserCreated = "admin";
-            SysOffice.DatetimeCreated = DateTime.Now;
-            return DataContext.Add(SysOffice);
+            try
+            {
+                return DataContext.Add(SysOffice);
+            }
+            catch(Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+    
         }
 
         public IQueryable<SysOffice> GetOffices()
@@ -134,31 +140,43 @@ namespace eFMS.API.System.DL.Services
 
         public HandleState UpdateOffice(SysOfficeModel model)
         {
-
-            var entity = mapper.Map<SysOffice>(model);
-            entity.UserModified = "admin";
-            entity.DatetimeModified = DateTime.Now;
-            if (entity.Active == true)
+            try
             {
-                entity.InactiveOn = DateTime.Now;
+                var entity = mapper.Map<SysOffice>(model);
+                if (entity.Active == true)
+                {
+                    entity.InactiveOn = DateTime.Now;
+                }
+                var hs = DataContext.Update(entity, x => x.Id == model.Id);
+                if (hs.Success)
+                {
+                    cache.Remove(Templates.SysBranch.NameCaching.ListName);
+                }
+                return hs;
             }
-            var hs = DataContext.Update(entity, x => x.Id == model.Id);
-            if (hs.Success)
+            catch(Exception ex)
             {
-                cache.Remove(Templates.SysBranch.NameCaching.ListName);
+                return new HandleState(ex.Message);
             }
-            return hs;
+         
         }
 
         public HandleState DeleteOffice(Guid id)
         {
-            //ChangeTrackerHelper.currentUser = currentUser.UserID;
-            var hs = DataContext.Delete(x => x.Id == id);
-            if (hs.Success)
-            {
-                cache.Remove(Templates.SysBranch.NameCaching.ListName);
+            try {
+                ChangeTrackerHelper.currentUser = currentUser.UserID;
+                var hs = DataContext.Delete(x => x.Id == id);
+                if (hs.Success)
+                {
+                    cache.Remove(Templates.SysBranch.NameCaching.ListName);
+                }
+                return hs;
             }
-            return hs;
+            catch(Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+
         }
 
         public IQueryable<SysOfficeViewModel> GetOfficeByCompany(Guid id)

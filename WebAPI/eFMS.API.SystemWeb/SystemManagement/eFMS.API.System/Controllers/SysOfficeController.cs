@@ -8,6 +8,7 @@ using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.System.Infrastructure.Middlewares;
 using eFMS.API.System.Models;
+using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -24,6 +25,7 @@ namespace eFMS.API.System.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ISysOfficeService sysOfficeService;
         private readonly IMapper mapper;
+        private readonly ICurrentUser currentUser;
         public SysOfficeController(IStringLocalizer<LanguageSub> localizer, ISysOfficeService service, IMapper iMapper)
         {
             stringLocalizer = localizer;
@@ -106,8 +108,11 @@ namespace eFMS.API.System.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
+
             var branch = mapper.Map<SysOfficeModel>(model);
             branch.Id = model.Id;
+            branch.UserModified = currentUser.UserID;
+            branch.DatetimeModified = DateTime.Now;
             var hs = sysOfficeService.UpdateOffice(branch);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -135,6 +140,8 @@ namespace eFMS.API.System.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var branch = mapper.Map<SysOfficeModel>(model);
+            branch.UserCreated = currentUser.UserID;
+            branch.DatetimeCreated = DateTime.Now;
             var hs = sysOfficeService.AddOffice(branch);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
