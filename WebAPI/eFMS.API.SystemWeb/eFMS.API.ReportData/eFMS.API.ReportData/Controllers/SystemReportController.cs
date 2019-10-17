@@ -90,10 +90,17 @@ namespace eFMS.API.ReportData.Controllers
             return new FileHelper().ExportExcel(stream, FilesNames.DepartmentName);
         }
 
+        /// <summary>
+        /// export list group to excel file
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [Route("Group/ExportGroup")]
+        [HttpPost]
         public async Task<IActionResult> ExportGroup(SysGroupCriteria criteria)
         {
             Helper helper = new Helper();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.System.DepartmentUrl);
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.System.GroupUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<SysGroupModel>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
             var stream = helper.CreateGroupExcelFile(dataObjects.Result);
             return new FileHelper().ExportExcel(stream, FilesNames.GroupName);
