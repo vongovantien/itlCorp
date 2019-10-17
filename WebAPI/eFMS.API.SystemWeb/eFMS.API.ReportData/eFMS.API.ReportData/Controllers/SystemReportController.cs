@@ -89,5 +89,14 @@ namespace eFMS.API.ReportData.Controllers
             var stream = helper.CreateDepartmentExcelFile(dataObjects.Result);
             return new FileHelper().ExportExcel(stream, FilesNames.DepartmentName);
         }
+
+        public async Task<IActionResult> ExportGroup(SysGroupCriteria criteria)
+        {
+            Helper helper = new Helper();
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.System.DepartmentUrl);
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<SysGroupModel>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
+            var stream = helper.CreateGroupExcelFile(dataObjects.Result);
+            return new FileHelper().ExportExcel(stream, FilesNames.GroupName);
+        }
     }
 }
