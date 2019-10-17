@@ -63,6 +63,7 @@
     <Compile Remove="Models\Criteria\CatSalemanCriteria.cs" />
     <Compile Remove="Models\Criteria\CatStageCriteria.cs" />
     <Compile Remove="Models\Criteria\CatUnitCriteria.cs" />
+    <Compile Remove="Models\Criteria\ImageHelper.cs" />
     <Compile Remove="Models\DepartmentPartner.cs" />
     <Compile Remove="Models\ModeOfTransport.cs" />
     <Compile Remove="Models\UnitType.cs" />

@@ -78,6 +78,7 @@ namespace eFMS.API.System.Controllers
         {
             model.UserCreated = currentUser.UserID;
             model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
+            model.Active = true;
             var hs = userGroupService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
 
@@ -125,7 +126,10 @@ namespace eFMS.API.System.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED].Value });
             }
-            var hs = userGroupService.Delete(x => x.Id == id);
+            item.Active = false;
+            item.UserModified = currentUser.UserID;
+            item.InactiveOn = DateTime.Now;
+            var hs = userGroupService.Update(item, x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
 
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

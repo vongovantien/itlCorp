@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.Setting.Controllers
 {
