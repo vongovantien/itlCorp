@@ -338,13 +338,13 @@ namespace eFMS.API.Catalogue.DL.Services
             }
         }
 
-        public IQueryable<CatChargeModel> GetSettlePaymentCharges(string keySearch, bool? Active,int? size)
+        public IQueryable<CatChargeModel> GetSettlePaymentCharges(string keySearch, bool? active,int? size)
         {
             IQueryable<CatChargeModel> list = null;
             if(size != null)
             {
                 int pageSize = (int)size;
-                list = Paging(x => x.Type != "DEBIT" && (x.Active == Active || Active == null)
+                list = Paging(x => x.Type != "DEBIT" && (x.Active == active || active == null)
                                                      && (x.Code.IndexOf(keySearch ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                             || x.ChargeNameEn.IndexOf(keySearch ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                             || x.ChargeNameVn.IndexOf(keySearch ?? "", StringComparison.OrdinalIgnoreCase) > -1)
@@ -352,7 +352,7 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             else
             {
-                list = Get(x => x.Type != "DEBIT" && (x.Active == Active || Active == null)
+                list = Get(x => x.Type != "DEBIT" && (x.Active == active || active == null)
                                                   && (x.Code.IndexOf(keySearch ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                             || x.ChargeNameEn.IndexOf(keySearch ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                             || x.ChargeNameVn.IndexOf(keySearch ?? "", StringComparison.OrdinalIgnoreCase) > -1)

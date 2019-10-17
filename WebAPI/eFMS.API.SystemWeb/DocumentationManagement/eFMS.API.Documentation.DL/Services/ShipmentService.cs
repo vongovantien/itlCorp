@@ -87,7 +87,6 @@ namespace eFMS.API.Documentation.DL.Services
 
         public IQueryable<Shipments> GetShipmentsCreditPayer(string partner, List<string> services)
         {
-            var userCurrent = currentUser.UserID;
             //Chỉ lấy ra những phí Credit(BUY) & Payer (chưa bị lock)
             var surcharge = surCharge.Get(x =>
                     (x.Type == "BUY" || (x.PayerId != null && x.CreditNo != null))

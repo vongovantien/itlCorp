@@ -103,9 +103,9 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="size"></param>
         /// <returns></returns>
         [HttpGet("SettlePaymentCharges")]
-        public IActionResult GetSettlePaymentCharges(string keySearch, bool? inActive, int? size)
+        public IActionResult GetSettlePaymentCharges(string keySearch, bool? active, int? size)
         {
-            var results = catChargeService.GetSettlePaymentCharges(keySearch,inActive, size);
+            var results = catChargeService.GetSettlePaymentCharges(keySearch, active, size);
             return Ok(results);
         }
 
