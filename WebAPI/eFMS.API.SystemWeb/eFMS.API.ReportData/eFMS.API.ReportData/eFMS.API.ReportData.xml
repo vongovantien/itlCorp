@@ -125,6 +125,13 @@
             <param name="catDepartmentCriteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.SystemReportController.ExportGroup(eFMS.API.ReportData.Models.Criteria.SysGroupCriteria)">
+            <summary>
+            export list group to excel file
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.ReportData.Helpers.FileHelper">
             <summary>
             A base class for an MVC controller without view support.
