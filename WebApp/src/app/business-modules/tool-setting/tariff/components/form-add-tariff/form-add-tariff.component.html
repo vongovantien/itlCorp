@@ -1,0 +1,138 @@
+<div class="m-portlet form-add-tariff">
+    <div class="m-portlet__body">
+        <div class="row">
+            <div class="col-6">
+                Create new OPS Tariff
+            </div>
+            <div class="col-6">
+                <ng-content></ng-content>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-4">
+                <div class="form-group">
+                    <label for="">Tariff Name <span class="text-danger">(*)</span> </label>
+                    <input type="text" class="form-control">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="">Tariff Type</label>
+                    <select [(ngModel)]="selectedTariffType" class="form-control">
+                        <option *ngFor="let type of tariffTypes" [ngValue]="type">{{type.displayName}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="">Status</label>
+                    <select [(ngModel)]="selectedStatus" class="form-control">
+                        <option *ngFor="let status of status" [ngValue]="status">{{status.displayName}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="">Effective Date</label>
+                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                        <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                            [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [ranges]="ranges" [maxDate]="maxDate"
+                            [alwaysShowCalendars]="true" name="daterange" placeholder="From date - to date" readonly />
+                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                            <span>
+                                <i class="la la-calendar"></i>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="">Expired Date</label>
+                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                        <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                            [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [ranges]="ranges" [maxDate]="maxDate"
+                            [alwaysShowCalendars]="true" name="daterange" placeholder="From date - to date" readonly />
+                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                            <span>
+                                <i class="la la-calendar"></i>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="">Apply For Office</label>
+                    <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedOffice"
+                        (itemSelected)="onSelectDataFormInfo($event, 'office')"
+                        [selectedDisplayFields]="configOffice.selectedDisplayFields"
+                        [dataSources]="configOffice.dataSource" [displayFields]="configOffice.displayFields"
+                        [height]="200">
+                    </app-combo-grid-virtual-scroll>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="">Product Service</label>
+                    <select [(ngModel)]="selectedShipmentMode" class="form-control">
+                        <option *ngFor="let mode of shipmentModes" [ngValue]="mode">{{mode.displayName}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="">Cargo Type</label>
+                    <select [(ngModel)]="selectedShipmentMode" class="form-control">
+                        <option *ngFor="let mode of shipmentModes" [ngValue]="mode">{{mode.displayName}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="">Service Mode</label>
+                    <select [(ngModel)]="selectedShipmentMode" class="form-control">
+                        <option *ngFor="let mode of shipmentModes" [ngValue]="mode">{{mode.displayName}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="">Customer</label>
+                    <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCustomer"
+                        (itemSelected)="onSelectDataFormInfo($event, 'customer')"
+                        [selectedDisplayFields]="configCustomer.selectedDisplayFields"
+                        [dataSources]="configCustomer.dataSource" [displayFields]="configCustomer.displayFields"
+                        [height]="200">
+                    </app-combo-grid-virtual-scroll>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="">Supplier</label>
+                    <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedSupplier"
+                        (itemSelected)="onSelectDataFormInfo($event, 'supplier')" [selectedDisplayFields]="suppliers"
+                        [dataSources]="configCustomer.dataSource" [displayFields]="configCustomer.displayFields"
+                        [height]="200">
+                    </app-combo-grid-virtual-scroll>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="">Agent</label>
+                    <select [(ngModel)]="selectedDateType" class="form-control">
+                        <option *ngFor="let type of dateTypes" [ngValue]="type">{{type.displayName}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="">Description</label>
+                    <textarea rows="5" class="form-control"></textarea>
+                </div>
+            </div>
+        </div>
+        <ng-content></ng-content>
+    </div>
+</div>

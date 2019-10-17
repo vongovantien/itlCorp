@@ -12,6 +12,7 @@ export const environment = {
         SYSTEM: "test.api-efms.itlvn.com/System",
         REPORT: "test.api-efms.itlvn.com/ReportPreview/Default.aspx",
         EXPORT: "test.api-efms.itlvn.com/Export",
+        SETTING: "test.api-efms.itlvn.com/Setting",
         INDENTITY_SERVER_URL: "http://test.api-efms.itlvn.com/identityserver"
     },
 

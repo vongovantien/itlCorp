@@ -11,6 +11,7 @@ export const environment = {
         SYSTEM: "localhost:44360",
         REPORT: "localhost:53717/Default.aspx",
         EXPORT: "localhost:63492",
+        SETTING: "localhost:44363",
         INDENTITY_SERVER_URL: "https://localhost:44369",
     },
 };
