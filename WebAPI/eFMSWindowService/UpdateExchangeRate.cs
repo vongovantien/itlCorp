@@ -57,7 +57,7 @@ namespace eFMSWindowService
                         UserCreated = "system",
                         UserModified = "system",
                         Rate = item.Rate,
-                        Inactive = false,
+                        Active = true,
                         CurrencyToID = item.CurrencyToID
                     };
                     db.catCurrencyExchanges.Add(exchange);
