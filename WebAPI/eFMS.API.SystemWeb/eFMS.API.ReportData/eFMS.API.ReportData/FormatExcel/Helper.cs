@@ -1132,5 +1132,120 @@ namespace eFMS.API.ReportData
         }
         #endregion
 
+        #region -- Accounting --
+        public Stream GenerateAdvancePaymentExcel(List<AdvancePaymentModel> listObj, Stream stream = null)
+        {
+            List<string> headers = new List<string>()
+            {
+                "No",
+                "Advance No",
+                "Amount",
+                "Currency",
+                "Requester",
+                "Request Date",
+                "Deadline Date",
+                "Modified Date",
+                "Status Approval",
+                "Status Payment",
+                "Payment Menthod",
+                "Description"
+            };
+            try
+            {
+                int addressStartContent = 4;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Sheet1");
+                    var worksheet = excelPackage.Workbook.Worksheets[1];
+
+                    BuildHeader(worksheet, headers, "ADVANCE PAYMENT INFORMATION");
+
+                    for (int i = 0; i < listObj.Count; i++)
+                    {
+                        var item = listObj[i];
+                        worksheet.Cells[i + addressStartContent, 1].Value = i + 1;
+                        worksheet.Cells[i + addressStartContent, 2].Value = item.AdvanceNo;
+                        worksheet.Cells[i + addressStartContent, 3].Value = item.Amount;
+                        worksheet.Cells[i + addressStartContent, 4].Value = item.AdvanceCurrency;
+                        worksheet.Cells[i + addressStartContent, 5].Value = item.RequesterName;
+                        worksheet.Cells[i + addressStartContent, 6].Value = item.RequestDate.HasValue ? item.RequestDate.Value.ToString("dd/MM/yyyy") : "";
+                        worksheet.Cells[i + addressStartContent, 7].Value = item.DeadlinePayment.HasValue ? item.DatetimeModified.Value.ToString("dd/MM/yyyy") : "";
+                        worksheet.Cells[i + addressStartContent, 8].Value = item.DatetimeModified.HasValue ? item.DatetimeModified.Value.ToString("dd/MM/yyyy") : "";
+                        worksheet.Cells[i + addressStartContent, 9].Value = item.StatusApprovalName;
+                        worksheet.Cells[i + addressStartContent, 10].Value = item.AdvanceStatusPayment.Equals("Settled") ? "Settled" : (item.AdvanceStatusPayment.Equals("NotSettled") ? "Not Settled" : "Partial Settlement");
+                        worksheet.Cells[i + addressStartContent, 11].Value = item.PaymentMethodName;
+                        worksheet.Cells[i + addressStartContent, 12].Value = item.AdvanceNote;
+
+                        //Add border left right for cells
+                        AddBorderLeftRightCell(worksheet, headers, addressStartContent, i);
+
+                        //Add border bottom for last cells
+                        AddBorderBottomLastCell(worksheet, headers, addressStartContent, i, listObj.Count);
+                    }
+
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }            
+        }
+
+        public Stream GenerateSettlementPaymentExcel(List<SettlementPaymentModel> listObj, Stream stream = null)
+        {
+            List<string> headers = new List<string>()
+            {
+                "No",
+                "Settlement No",
+                "Amount",
+                "Currency",
+                "Requester",
+                "Request Date",
+                "Status Approval",
+                "Payment Menthod",
+                "Description"
+            };
+            try
+            {
+                int addressStartContent = 4;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Sheet1");
+                    var worksheet = excelPackage.Workbook.Worksheets[1];
+
+                    BuildHeader(worksheet, headers, "SETTLEMENT PAYMENT INFORMATION");
+
+                    for (int i = 0; i < listObj.Count; i++)
+                    {
+                        var item = listObj[i];
+                        worksheet.Cells[i + addressStartContent, 1].Value = i + 1;
+                        worksheet.Cells[i + addressStartContent, 2].Value = item.SettlementNo;
+                        worksheet.Cells[i + addressStartContent, 3].Value = item.Amount;
+                        worksheet.Cells[i + addressStartContent, 4].Value = item.SettlementCurrency;
+                        worksheet.Cells[i + addressStartContent, 5].Value = item.RequesterName;
+                        worksheet.Cells[i + addressStartContent, 6].Value = item.RequestDate.HasValue ? item.RequestDate.Value.ToString("dd/MM/yyyy") : "";
+                        worksheet.Cells[i + addressStartContent, 7].Value = item.StatusApprovalName;
+                        worksheet.Cells[i + addressStartContent, 8].Value = item.PaymentMethodName;
+                        worksheet.Cells[i + addressStartContent, 9].Value = item.Note;
+                        
+                        //Add border left right for cells
+                        AddBorderLeftRightCell(worksheet, headers, addressStartContent, i);
+
+                        //Add border bottom for last cells
+                        AddBorderBottomLastCell(worksheet, headers, addressStartContent, i, listObj.Count);
+                    }
+
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+        #endregion -- Accounting --
     }
 }

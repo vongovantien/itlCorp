@@ -451,6 +451,7 @@ namespace eFMS.API.Setting.DL.Services
                                 UserModified = tariff.UserModified,
                                 DatetimeModified = tariff.DatetimeModified,
                                 ChargeName = charge.ChargeNameEn,
+                                ChargeCode = charge.Code,
                                 CommodityName = commoditiGrp.GroupNameEn,
                                 PayerName = payer.ShortName,
                                 PortName = port.NameEn,
