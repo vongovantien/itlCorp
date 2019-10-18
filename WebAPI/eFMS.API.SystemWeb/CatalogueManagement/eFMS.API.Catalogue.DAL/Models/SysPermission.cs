@@ -5,11 +5,6 @@ namespace eFMS.API.Catalogue.Service.Models
 {
     public partial class SysPermission
     {
-        public SysPermission()
-        {
-            SysRolePermission = new HashSet<SysRolePermission>();
-        }
-
         public short Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
@@ -18,7 +13,5 @@ namespace eFMS.API.Catalogue.Service.Models
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public bool? RequireAccessingForm { get; set; }
-
-        public virtual ICollection<SysRolePermission> SysRolePermission { get; set; }
     }
 }

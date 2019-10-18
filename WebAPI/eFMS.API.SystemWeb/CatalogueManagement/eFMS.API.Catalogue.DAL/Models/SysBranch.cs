@@ -5,12 +5,6 @@ namespace eFMS.API.Catalogue.Service.Models
 {
     public partial class SysBranch
     {
-        public SysBranch()
-        {
-            CatDepartment = new HashSet<CatDepartment>();
-            SysUserOtherWorkPlace = new HashSet<SysUserOtherWorkPlace>();
-        }
-
         public Guid Id { get; set; }
         public string BranchNameVn { get; set; }
         public string BranchNameEn { get; set; }
@@ -34,9 +28,5 @@ namespace eFMS.API.Catalogue.Service.Models
         public string Code { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
-
-        public virtual SysBu Bu { get; set; }
-        public virtual ICollection<CatDepartment> CatDepartment { get; set; }
-        public virtual ICollection<SysUserOtherWorkPlace> SysUserOtherWorkPlace { get; set; }
     }
 }
