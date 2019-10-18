@@ -130,7 +130,8 @@
     </div>
 </div>
 
-<app-ops-module-credit-debit-note-addnew [currentJob]="currentJob"></app-ops-module-credit-debit-note-addnew>
+<app-ops-module-credit-debit-note-addnew [currentJob]="currentJob" *ngIf="currentJob">
+</app-ops-module-credit-debit-note-addnew>
 
 <app-ops-module-credit-debit-note-detail [CDNoteDetails]="CDNoteDetails" (openEditCDNote)="openEditCDNotePopUp($event)"
     (isCloseModal)="closeDetailModal($event)">
