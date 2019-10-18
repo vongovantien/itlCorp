@@ -31,5 +31,11 @@ namespace eFMS.API.ReportData.Models
             public const string CompanyUrl = "/System/api/v1/en-US/SysCompany/Query";
             public const string GroupUrl = "/System/api/v1/en-US/SysGroup/Query";
         }
+
+        public class Accounting
+        {
+            public const string AdvancePaymentUrl = "/Accounting/api/v1/en-US/AcctAdvancePayment/QueryData";
+            public const string SettlementPaymentUrl = "/Accounting/api/v1/en-US/AcctSettlementPayment/QueryData";
+        }
     }
 }
