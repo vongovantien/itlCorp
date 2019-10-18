@@ -14,13 +14,6 @@ export abstract class AppForm extends AppPage {
         typeButton: ButtonType.reset
     };
 
-    configComoBoGrid: CommonInterface.IComboGirdConfig = {
-        placeholder: 'Please select',
-        displayFields: [],
-        dataSource: [],
-        selectedDisplayFields: [],
-    };
-
     constructor() {
         super();
     }

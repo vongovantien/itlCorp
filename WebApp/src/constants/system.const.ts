@@ -81,6 +81,10 @@ export class SystemConstants {
         OFFICE: 'efms:office',
         COMPANY: 'efms:company',
         DEPARTMENT: 'efms:department',
+        CARRIER: 'efms:carrier'
+
     };
+
+    public static EMPTY_GUID = "00000000-0000-0000-0000-000000000000";
 
 }

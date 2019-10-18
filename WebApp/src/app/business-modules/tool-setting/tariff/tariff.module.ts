@@ -9,18 +9,37 @@ import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { TariffAddComponent } from './add/add-tariff.component';
 import { TariffFormAddComponent } from './components/form-add-tariff/form-add-tariff.component';
+import { TariffListChargeComponent } from './components/list-charge-tariff/list-charge-tariff.component';
+import { TariffChargePopupComponent } from './components/popup/tariff-charge/tariff-charge.popup';
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { NgxCurrencyModule } from 'ngx-currency';
 
 const routing: Routes = [
     { path: '', component: TariffComponent, data: { name: "Tariff", level: 2 } },
     { path: 'new', component: TariffAddComponent, data: { name: "New", level: 3 } },
 
 ];
+
+const customCurrencyMaskConfig = {
+    align: "right",
+    allowNegative: false,
+    allowZero: true,
+    decimal: ".",
+    precision: 0,
+    prefix: "",
+    suffix: "",
+    thousands: ",",
+    nullable: true
+};
+
 @NgModule({
     declarations: [
         TariffComponent,
         TariffAddComponent,
         TariffFormSearchComponent,
-        TariffFormAddComponent
+        TariffFormAddComponent,
+        TariffListChargeComponent,
+        TariffChargePopupComponent,
     ],
     imports: [
         CommonModule,
@@ -28,8 +47,11 @@ const routing: Routes = [
         FormsModule,
         ReactiveFormsModule,
         TabsModule.forRoot(),
+        ModalModule.forRoot(),
         NgxDaterangepickerMd.forRoot(),
-        RouterModule.forChild(routing)
+        RouterModule.forChild(routing),
+        NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
+
     ],
     exports: [],
     providers: [],

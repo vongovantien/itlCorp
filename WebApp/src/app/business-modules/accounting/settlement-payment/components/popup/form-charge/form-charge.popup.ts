@@ -22,8 +22,6 @@ export class SettlementFormChargePopupComponent extends PopupBase {
 
     @Input() state: string = 'create';
 
-    private _isShowAutoComplete = new BehaviorSubject<boolean>(false);
-    $isShowAutoComplete: Observable<boolean> = this._isShowAutoComplete.asObservable();
     isShow: boolean = false;
 
     term$ = new BehaviorSubject<string>('');
@@ -262,14 +260,14 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         this.term$.next(keyword);
     }
 
-    autocomplete = (time: number, callBack: Function) => (source$: Observable<any>) =>
-        source$.pipe(
-            debounceTime(time),
-            distinctUntilChanged(),
-            switchMap((...args: any[]) =>
-                callBack(...args).pipe(takeUntil(source$.pipe(skip(1))))
-            )
-        )
+    // autocomplete = (time: number, callBack: Function) => (source$: Observable<any>) =>
+    //     source$.pipe(
+    //         debounceTime(time),
+    //         distinctUntilChanged(),
+    //         switchMap((...args: any[]) =>
+    //             callBack(...args).pipe(takeUntil(source$.pipe(skip(1))))
+    //         )
+    //     )
 
     getCustomNo() {
         this._operationRepo.getListCustomsDeclaration()
@@ -648,6 +646,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     onClickOutsideChargeName() {
         this._isShowAutoComplete.next(false);
     }
+
 
 }
 

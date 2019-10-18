@@ -18,6 +18,7 @@ namespace CommonInterface {
     export interface IComboGridData {
         field: string;
         value: string;
+        data?: any;
     }
 
     export interface IResult {

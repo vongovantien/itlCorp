@@ -1,138 +1,219 @@
 <div class="m-portlet form-add-tariff">
     <div class="m-portlet__body">
         <div class="row">
-            <div class="col-6">
+            <div class="col-md-6">
                 Create new OPS Tariff
             </div>
-            <div class="col-6">
+            <div class="col-md-6">
                 <ng-content></ng-content>
             </div>
         </div>
         <hr>
-        <div class="row">
-            <div class="col-4">
-                <div class="form-group">
-                    <label for="">Tariff Name <span class="text-danger">(*)</span> </label>
-                    <input type="text" class="form-control">
+        <form action="" [formGroup]="formAdd" class="m-form m-form--state">
+            <div class="row" formGroupName="tariff">
+                <div class="col-md-4">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger': isSubmitted && !formAdd.value.tariff.tariffName}">
+                        <label required>Tariff Name</label>
+                        <input type="text" class="form-control" formControlName="tariffName">
+                        <div class="form-control-feedback" *ngIf="isSubmitted && !formAdd.value.tariff.tariffName">
+                            Tariff Name is required !
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="">Tariff Type</label>
-                    <select [(ngModel)]="selectedTariffType" class="form-control">
-                        <option *ngFor="let type of tariffTypes" [ngValue]="type">{{type.displayName}}</option>
-                    </select>
+                <div class="col-md-4">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger': isSubmitted && !formAdd.value.tariff.tariffType}">
+                        <label required>Tariff Type</label>
+                        <select formControlName="tariffType" class="form-control"
+                            (ngModelChange)="onChangeTariffType($event)">
+                            <!-- <option [ngValue]="null">Please Select</option> -->
+                            <option *ngFor="let type of tariffTypes" [ngValue]="type">{{type.displayName}}</option>
+                        </select>
+                        <div class="form-control-feedback" *ngIf="isSubmitted && !formAdd.value.tariff.tariffName">
+                            Tariff Type is required !
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="">Status</label>
-                    <select [(ngModel)]="selectedStatus" class="form-control">
-                        <option *ngFor="let status of status" [ngValue]="status">{{status.displayName}}</option>
-                    </select>
+                <div class="col-md-4">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger': isSubmitted && !formAdd.value.tariff.status}">
+                        <label required>Status</label>
+                        <select formControlName="status" class="form-control">
+                            <option [ngValue]="null">Please Select</option>
+                            <option *ngFor="let status of status" [ngValue]="status">{{status.displayName}}</option>
+                        </select>
+                        <div class="form-control-feedback" *ngIf="isSubmitted && !formAdd.value.tariff.status">
+                            Status is required !
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="">Effective Date</label>
-                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                        <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                            [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [ranges]="ranges" [maxDate]="maxDate"
-                            [alwaysShowCalendars]="true" name="daterange" placeholder="From date - to date" readonly />
-                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                            <span>
-                                <i class="la la-calendar"></i>
+                <div class="col-md-4">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger': isSubmitted && !formAdd.value.tariff.effectiveDate}">
+                        <label required>Effective Date</label>
+                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                            <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [ranges]="ranges"
+                                [maxDate]="maxDate" name="daterange" placeholder="From date - to date" readonly
+                                [singleDatePicker]="true" formControlName="effectiveDate" [alwaysShowCalendars]="true"
+                                [autoApply]="true" />
+                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                <span>
+                                    <i class="la la-calendar"></i>
+                                </span>
                             </span>
-                        </span>
+                        </div>
+                        <div class="form-control-feedback" *ngIf="isSubmitted && !formAdd.value.tariff.effectiveDate">
+                            Effective Date is required !
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger': isSubmitted && !formAdd.value.tariff.expiredDate}">
+                        <label required>Expired Date</label>
+                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                            <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [ranges]="ranges"
+                                [maxDate]="maxDate" name="daterange" placeholder="From date - to date" readonly
+                                [autoApply]="true" [singleDatePicker]="true" formControlName="expiredDate"
+                                [alwaysShowCalendars]="true" />
+                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                <span>
+                                    <i class="la la-calendar"></i>
+                                </span>
+                            </span>
+                        </div>
+                        <div class="form-control-feedback" *ngIf="isSubmitted && !formAdd.value.tariff.expiredDate">
+                            Expired Date is required !
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedOffice.value}">
+                        <label required>Apply For Office</label>
+                        <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedOffice"
+                            (itemSelected)="onSelectDataFormInfo($event, 'office')"
+                            [selectedDisplayFields]="configOffice.selectedDisplayFields"
+                            [dataSources]="configOffice.dataSource" [displayFields]="configOffice.displayFields"
+                            [height]="200">
+                        </app-combo-grid-virtual-scroll>
+                        <div class="form-control-feedback" *ngIf="isSubmitted && !selectedOffice.value">
+                            Apply For Office is required !
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger': isSubmitted && !formAdd.value.tariff.productService}">
+                        <label required>Product Service</label>
+                        <select formControlName="productService" class="form-control">
+                            <option [ngValue]="null">Please Select</option>
+                            <option *ngFor="let productService of productSerices" [ngValue]="productService">
+                                {{productService.displayName}}</option>
+                        </select>
+                        <div class="form-control-feedback" *ngIf="isSubmitted && !formAdd.value.tariff.productService">
+                            Product Service is required !
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger': isSubmitted && !formAdd.value.tariff.cargoType}">
+                        <label required>Cargo Type</label>
+                        <select formControlName="cargoType" class="form-control">
+                            <option [ngValue]="null">Please Select</option>
+                            <option *ngFor="let cagoType of cargoTypes" [ngValue]="cagoType">{{cagoType.displayName}}
+                            </option>
+                        </select>
+                        <div class="form-control-feedback" *ngIf="isSubmitted && !formAdd.value.tariff.cargoType">
+                            Cargo Type is required !
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger': isSubmitted && !formAdd.value.tariff.serviceMode}">
+                        <label required>Service Mode</label>
+                        <select formControlName="serviceMode" class="form-control">
+                            <option [ngValue]="null">Please Select</option>
+                            <option *ngFor="let mode of serviceModes" [ngValue]="mode">{{mode.displayName}}</option>
+                        </select>
+                        <div class="form-control-feedback" *ngIf="isSubmitted && !formAdd.value.tariff.serviceMode">
+                            Service Mode is required !
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger': !isDisabledCustomer && isSubmitted && !selectedCustomer.value}">
+                        <label>
+                            Customer
+                            <ng-container *ngIf="!isDisabledCustomer">
+                                <span class="text-danger">(*)</span>
+                            </ng-container>
+                        </label>
+                        <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCustomer"
+                            (itemSelected)="onSelectDataFormInfo($event, 'customer')"
+                            [selectedDisplayFields]="configCustomer.selectedDisplayFields"
+                            [dataSources]="configCustomer.dataSource" [displayFields]="configCustomer.displayFields"
+                            [height]="200" [disabled]="isDisabledCustomer">
+                        </app-combo-grid-virtual-scroll>
+                        <div class="form-control-feedback"
+                            *ngIf=" !isDisabledCustomer && isSubmitted && !selectedCarrier.value">
+                            Customer is required !
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger': !isDisabledSupplier && isSubmitted && !selectedCarrier.value}">
+                        <label>Supplier
+                            <ng-container *ngIf="!isDisabledSupplier">
+                                <span class="text-danger">(*)</span>
+                            </ng-container>
+                        </label>
+                        <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCarrier"
+                            (itemSelected)="onSelectDataFormInfo($event, 'carrier')"
+                            [selectedDisplayFields]="configCustomer.selectedDisplayFields" [dataSources]="carries"
+                            [displayFields]="configCustomer.displayFields" [height]="200"
+                            [disabled]="isDisabledSupplier">
+                        </app-combo-grid-virtual-scroll>
+                        <div class="form-control-feedback"
+                            *ngIf="!isDisabledSupplier && isSubmitted && !selectedCarrier.value">
+                            Supplier is required !
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger': !isDisabledAgent && isSubmitted && !selectedAgent.value}">
+                        <label>Agent
+                            <ng-container *ngIf="!isDisabledAgent">
+                                <span class="text-danger">(*)</span>
+                            </ng-container>
+                        </label>
+                        <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedAgent"
+                            (itemSelected)="onSelectDataFormInfo($event, 'agent')"
+                            [selectedDisplayFields]="configCustomer.selectedDisplayFields" [dataSources]="agents"
+                            [displayFields]="configCustomer.displayFields" [height]="200" [disabled]="isDisabledAgent">
+                        </app-combo-grid-virtual-scroll>
+                        <div class="form-control-feedback"
+                            *ngIf="!isDisabledAgent && isSubmitted && !selectedAgent.value">
+                            Customer is required !
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="">Description</label>
+                        <textarea rows="5" class="form-control" formControlName="description"></textarea>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="">Expired Date</label>
-                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                        <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                            [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [ranges]="ranges" [maxDate]="maxDate"
-                            [alwaysShowCalendars]="true" name="daterange" placeholder="From date - to date" readonly />
-                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                            <span>
-                                <i class="la la-calendar"></i>
-                            </span>
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="">Apply For Office</label>
-                    <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedOffice"
-                        (itemSelected)="onSelectDataFormInfo($event, 'office')"
-                        [selectedDisplayFields]="configOffice.selectedDisplayFields"
-                        [dataSources]="configOffice.dataSource" [displayFields]="configOffice.displayFields"
-                        [height]="200">
-                    </app-combo-grid-virtual-scroll>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="">Product Service</label>
-                    <select [(ngModel)]="selectedShipmentMode" class="form-control">
-                        <option *ngFor="let mode of shipmentModes" [ngValue]="mode">{{mode.displayName}}</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="">Cargo Type</label>
-                    <select [(ngModel)]="selectedShipmentMode" class="form-control">
-                        <option *ngFor="let mode of shipmentModes" [ngValue]="mode">{{mode.displayName}}</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="">Service Mode</label>
-                    <select [(ngModel)]="selectedShipmentMode" class="form-control">
-                        <option *ngFor="let mode of shipmentModes" [ngValue]="mode">{{mode.displayName}}</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="">Customer</label>
-                    <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCustomer"
-                        (itemSelected)="onSelectDataFormInfo($event, 'customer')"
-                        [selectedDisplayFields]="configCustomer.selectedDisplayFields"
-                        [dataSources]="configCustomer.dataSource" [displayFields]="configCustomer.displayFields"
-                        [height]="200">
-                    </app-combo-grid-virtual-scroll>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="">Supplier</label>
-                    <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedSupplier"
-                        (itemSelected)="onSelectDataFormInfo($event, 'supplier')" [selectedDisplayFields]="suppliers"
-                        [dataSources]="configCustomer.dataSource" [displayFields]="configCustomer.displayFields"
-                        [height]="200">
-                    </app-combo-grid-virtual-scroll>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="">Agent</label>
-                    <select [(ngModel)]="selectedDateType" class="form-control">
-                        <option *ngFor="let type of dateTypes" [ngValue]="type">{{type.displayName}}</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-12">
-                <div class="form-group">
-                    <label for="">Description</label>
-                    <textarea rows="5" class="form-control"></textarea>
-                </div>
-            </div>
-        </div>
+        </form>
         <ng-content></ng-content>
     </div>
 </div>

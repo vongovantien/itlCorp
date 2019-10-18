@@ -1,0 +1,31 @@
+<div class="dropdown e--combogrid combogrid-autocomplete">
+    <div class="dropdown-menu e--combogrid-content d-block">
+        <div class="tabel-wrapper table-fixed">
+            <div class="table-head-fixed">
+                <div class="table-header">
+                    <table class="table table-hover">
+                        <thead app-table-header [headers]="headers"> </thead>
+                    </table>
+                </div>
+            </div>
+            <div class="table-body-scroll">
+                <div>
+                    <table class="table table-hover">
+                        <tbody>
+                            <ng-container *ngFor="let item of data; let i = index; trackBy: trackByFn">
+                                <tr class="data-row " (click)="selectItem(item)"
+                                    [class.data-selected]="!!selectedItem && item.id === selectedItem.id">
+                                    <td *ngFor="let header of headers">
+                                        {{item[header.field]}}
+                                    </td>
+                                </tr>
+                            </ng-container>
+                            <tr *ngIf="!data.length" app-table-none-record [colspan]="headers.length"> </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

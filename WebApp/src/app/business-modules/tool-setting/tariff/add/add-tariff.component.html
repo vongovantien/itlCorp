@@ -1,11 +1,20 @@
 <div class="company-infomation-page">
     <app-sub-header> </app-sub-header>
     <div class="m-content">
-        <form-add-tariff></form-add-tariff>
-
+        <form-add-tariff [(tariff)]="tariff.setTariff"></form-add-tariff>
+        <div class="row">
+            <div class="col-12">
+                <button class="btn btn-primary" (click)="addTariff()">add</button>
+            </div>
+        </div>
         <div class="m-portlet">
             <div class="m-portlet__body">
-                list charge tariff
+                <tabset>
+                    <tab heading="Tariff">
+                        <list-charge-tariff [(charges)]="tariff.setTariffDetails"></list-charge-tariff>
+                    </tab>
+                    <tab heading="Selling"></tab>
+                </tabset>
             </div>
         </div>
     </div>

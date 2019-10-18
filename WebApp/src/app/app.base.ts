@@ -1,5 +1,5 @@
 import { OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit } from "@angular/core";
-import { Observable, Subject, throwError } from "rxjs";
+import { Observable, Subject, throwError, BehaviorSubject } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 
 import { UtilityHelper } from "src/helper";
@@ -7,6 +7,7 @@ import { NgProgressRef } from "@ngx-progressbar/core";
 import { ButtonModalSetting } from "./shared/models/layout/button-modal-setting.model";
 import { ButtonType } from "./shared/enums/type-button.enum";
 import moment from "moment";
+import { debounceTime, distinctUntilChanged, switchMap, takeUntil, skip } from "rxjs/operators";
 
 export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit {
 
@@ -34,6 +35,8 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
 
     isLoading: boolean = false;
     isCheckAll: boolean = false;
+    _isShowAutoComplete = new BehaviorSubject<boolean>(false);
+    $isShowAutoComplete: Observable<boolean> = this._isShowAutoComplete.asObservable();
 
     _progressRef: NgProgressRef;
 
@@ -55,6 +58,13 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
             icon: "la la-search"
         },
         typeButton: ButtonType.search,
+    };
+
+    configComoBoGrid: CommonInterface.IComboGirdConfig = {
+        placeholder: 'Please select',
+        displayFields: [],
+        dataSource: [],
+        selectedDisplayFields: [],
     };
 
     ngOnInit(): void { }
@@ -136,5 +146,14 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
         document.body.removeChild(a);
         URL.revokeObjectURL(objectUrl);
     }
+
+    autocomplete = (time: number, callBack: Function) => (source$: Observable<any>) =>
+        source$.pipe(
+            debounceTime(time),
+            distinctUntilChanged(),
+            switchMap((...args: any[]) =>
+                callBack(...args).pipe(takeUntil(source$.pipe(skip(1))))
+            )
+        )
 }
 

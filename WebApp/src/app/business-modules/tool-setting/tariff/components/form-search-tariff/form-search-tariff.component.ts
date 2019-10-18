@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
@@ -9,12 +9,14 @@ import { forkJoin } from 'rxjs';
 import _uniqBy from 'lodash/uniqBy';
 import { Partner } from 'src/app/shared/models';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
+import { formatDate } from '@angular/common';
 @Component({
     selector: 'form-search-tariff',
     templateUrl: './form-search-tariff.component.html',
 })
 export class TariffFormSearchComponent extends AppForm {
 
+    @Output() onSearch: EventEmitter<Partial<ITariffSearch> | any> = new EventEmitter<Partial<ITariffSearch> | any>();
     tariffTypes: CommonInterface.IValueDisplay[] | any;
     selectedTariffType: CommonInterface.IValueDisplay = null;
 
@@ -28,11 +30,12 @@ export class TariffFormSearchComponent extends AppForm {
     selectedDateType: CommonInterface.IValueDisplay = null;
 
     configCustomer: CommonInterface.IComboGirdConfig | any = {};
+    configOffice: CommonInterface.IComboGirdConfig | any = {};
+
     selectedCustomer: Partial<CommonInterface.IComboGridData | any> = {};
     selectedSupplier: Partial<CommonInterface.IComboGridData | any> = {};
-
-    configOffice: CommonInterface.IComboGirdConfig | any = {};
     selectedOffice: Partial<CommonInterface.IComboGridData | any> = {};
+
 
     suppliers: Partner[] = [];
 
@@ -58,7 +61,7 @@ export class TariffFormSearchComponent extends AppForm {
     }
 
     ngOnInit(): void {
-        this.configCustomer = Object.assign(this.configComoBoGrid, {
+        this.configCustomer = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
                 { field: 'id', label: 'PartnerID' },
                 { field: 'shortName', label: 'Abbr Name' },
@@ -66,7 +69,7 @@ export class TariffFormSearchComponent extends AppForm {
             ]
         }, { selectedDisplayFields: ['shortName'], });
 
-        this.configOffice = Object.assign(this.configOffice, {
+        this.configOffice = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
                 { field: 'code', label: 'Office Code' },
                 { field: 'shortName', label: 'Office' },
@@ -78,7 +81,7 @@ export class TariffFormSearchComponent extends AppForm {
 
         this.getBasicData();
         this.getCustomer();
-        this.getSuppliers();
+        this.getCarrierAndShipper();
         this.getOffice();
     }
 
@@ -91,7 +94,6 @@ export class TariffFormSearchComponent extends AppForm {
             tariffDateType: [],
             tariffStatus: [],
         });
-
         this.tariffName = this.formSearchTariff.controls['tariffName'];
         this.tariffType = this.formSearchTariff.controls['tariffType'];
         this.tariffShipmentMode = this.formSearchTariff.controls['tariffShipmentMode'];
@@ -108,10 +110,10 @@ export class TariffFormSearchComponent extends AppForm {
         ];
 
         this.tariffTypes = [
-            { displayName: 'General', value: null },
-            { displayName: 'Customer', value: null },
-            { displayName: 'Supplier', value: null },
-            { displayName: 'Agent', value: null },
+            { displayName: 'General', value: 'General' },
+            { displayName: 'Customer', value: 'Customer' },
+            { displayName: 'Supplier', value: 'Supplier' },
+            { displayName: 'Agent', value: 'Agent' },
             { displayName: 'All', value: null },
         ];
 
@@ -120,6 +122,8 @@ export class TariffFormSearchComponent extends AppForm {
             { displayName: 'Create Date', value: 'CreateDate' },
             { displayName: 'Effective Date', value: 'EffectiveDate' },
             { displayName: 'Modified Date', value: 'ModifiedDate' },
+            { displayName: 'ExpiredDate', value: 'ExpiredDate' },
+
         ];
 
         this.shipmentModes = [
@@ -149,15 +153,17 @@ export class TariffFormSearchComponent extends AppForm {
         }
     }
 
-    getSuppliers() {
+    getCarrierAndShipper() {
         forkJoin([
             this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CARRIER),
             this._catalogueRepo.getPartnersByType(PartnerGroupEnum.SHIPPER),
         ]).pipe(catchError(this.catchError))
             .subscribe(
-                ([carries, shippers]: any[]) => {
+                ([carries, shippers]: any[] = [[], []]) => {
                     this.suppliers = [...new Set(carries), ...shippers];
                     this.suppliers = _uniqBy(this.suppliers, 'id');
+
+                    this._dataService.setDataService(SystemConstants.CSTORAGE.CARRIER, carries || []);
                 }
             );
     }
@@ -180,28 +186,43 @@ export class TariffFormSearchComponent extends AppForm {
     onSelectDataFormInfo(data: any, key: string | any) {
         switch (key) {
             case 'customer':
+                this.selectedCustomer = { field: 'shortName', value: data.shortName, data: data };
                 break;
-            case 'supllier':
+            case 'supplier':
+                this.selectedSupplier = { field: 'shortName', value: data.shortName, data: data };
                 break;
             case 'office':
+                this.selectedOffice = { field: 'shortName', value: data.shortName, data: data };
                 break;
             default:
                 break;
         }
     }
 
-    submitSearch() {
+    submitSearch(formSearch: any) {
         const bodySearch: Partial<ITariffSearch> = {
+            name: formSearch.tariffName,
+            serviceMode: formSearch.tariffShipmentMode.value,
+            tariffType: formSearch.tariffType.value,
+            dateType: formSearch.tariffDateType.value,
+            status: formSearch.tariffStatus.value,
+            customerID: !!this.selectedCustomer.data ? this.selectedCustomer.data.id : null,
+            supplierID: !!this.selectedSupplier.data ? this.selectedSupplier.data.id : null,
+            officeId: !!this.selectedOffice.dat ? this.selectedOffice.data.id : '00000000-0000-0000-0000-000000000000',
+            fromDate: formatDate(formSearch.tariffDate.startDate, "yyyy-MM-dd", 'en'),
+            toDate: formatDate(formSearch.tariffDate.endDate, "yyyy-MM-dd", 'en'),
         };
-        console.log(bodySearch);
+        this.onSearch.emit(bodySearch);
     }
 
     resetForm() {
-
+        this.selectedCustomer = {};
+        this.selectedOffice = {};
+        this.selectedSupplier = {};
+        this.onSearch.emit({});
     }
-
-
 }
+
 
 interface ITariffSearch {
     name: string;

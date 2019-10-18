@@ -13,6 +13,8 @@ export * from './accouting/settlement-payment';
 export * from './operation/surcharge';
 export * from './system/company';
 export * from './system/office';
+export * from './tool-setting/tariff';
+
 
 
 
