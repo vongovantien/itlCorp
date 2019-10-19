@@ -11,9 +11,9 @@ import { CatalogueRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from "rxjs/operators";
 import { AppList } from "src/app/app.list";
 import { Saleman } from 'src/app/shared/models/catalogue/saleman.model';
-import { async } from '@angular/core/testing';
 import { formatDate } from '@angular/common';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
+import { SalemanPopupComponent } from '../components/saleman-popup.component';
 declare var $: any;
 
 @Component({
@@ -61,14 +61,18 @@ export class PartnerDataDetailComponent extends AppList {
     saleMantoView: Saleman = new Saleman();
     isShowSaleMan: boolean = false;
 
+
     @Output() isCloseModal = new EventEmitter();
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
+    @ViewChild(SalemanPopupComponent, { static: false }) poupSaleman: SalemanPopupComponent;
     @ViewChild('formAddEdit', { static: false }) form: NgForm;
     @ViewChild('chooseBillingCountry', { static: false }) public chooseBillingCountry: SelectComponent;
     @ViewChild('chooseBillingProvince', { static: false }) public chooseBillingProvince: SelectComponent;
     @ViewChild('chooseShippingCountry', { static: false }) public chooseShippingCountry: SelectComponent;
     @ViewChild('chooseShippingProvince', { static: false }) public chooseShippingProvince: SelectComponent;
+
+
 
     constructor(private route: ActivatedRoute,
         private router: Router,
@@ -574,6 +578,10 @@ export class PartnerDataDetailComponent extends AppList {
         if (!!sortData.sortField) {
             this.saleMandetail = this.sortService.sort(this.saleMandetail, sortData.sortField, sortData.order);
         }
+    }
+
+    showPopupSaleman() {
+        this.poupSaleman.show();
     }
 
 

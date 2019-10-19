@@ -160,12 +160,20 @@
                         </div>
 
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': (formAddEdit.submitted && parnetinternalReferenceNo.invalid) || isExistedTaxcode }">
                                 <label class="form-control-label" for="">
                                     Internal Reference No
                                 </label>
-                                <input type="text" [(ngModel)]="partner.internalReferenceNo" name="internalReferenceNo"
-                                    class="form-control m-input m-input--square" />
+                                <input type="text" minlength="3" maxlength="10"
+                                    [(ngModel)]="partner.internalReferenceNo" name="internalReferenceNo"
+                                    #parnetinternalReferenceNo="ngModel" class="form-control"
+                                    [ngClass]="{ 'm-input--square': (formAddEdit.submitted &&  parnetinternalReferenceNo.invalid ) || isExistedTaxcode  }"
+                                    required />
+                                <div class="form-control-feedback"
+                                    *ngIf="formAddEdit.submitted && parnetinternalReferenceNo.invalid">
+                                    Internal Reference No required least 3 characters
+                                </div>
                             </div>
                         </div>
                     </div>

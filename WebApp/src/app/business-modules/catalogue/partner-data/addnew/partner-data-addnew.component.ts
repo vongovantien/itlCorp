@@ -36,6 +36,8 @@ export class PartnerDataAddnewComponent extends AppList {
     @ViewChild('chooseAccountRef', { static: false }) public chooseAccountRef: SelectComponent;
     @ViewChild('chooseWorkplace', { static: false }) public chooseWorkplace: SelectComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmTaxcode: ConfirmPopupComponent;
+
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild(SalemanPopupComponent, { static: false }) poupSaleman: SalemanPopupComponent;
 
@@ -70,6 +72,7 @@ export class PartnerDataAddnewComponent extends AppList {
     dataSearchSaleman: any = {};
     isShowSaleMan: boolean = false;
     index: number = 0;
+    isExistedTaxcode: boolean = false;
 
 
     list: any[] = [];
@@ -114,9 +117,15 @@ export class PartnerDataAddnewComponent extends AppList {
     }
 
     onDeleteSaleman() {
-        this.saleMandetail.splice(this.index, 1);
-        this.confirmDeleteJobPopup.hide();
-        this.toastr.success('Delete Success !');
+        if (this.saleMandetail.length > 0) {
+            this.saleMandetail.splice(this.index, 1);
+            this.confirmDeleteJobPopup.hide();
+            this.toastr.success('Delete Success !');
+        }
+        if (this.isExistedTaxcode) {
+            this.confirmTaxcode.hide();
+        }
+
     }
     // deleteSaleMan(index: any) {
     //     this.saleMandetail.splice(index, 1);
@@ -178,6 +187,20 @@ export class PartnerDataAddnewComponent extends AppList {
             );
     }
 
+    checkTaxcode() {
+        this._catalogueRepo.checkTaxCode(this.partner.taxCode)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        console.log(res);
+                        this.isExistedTaxcode = true;
+                        this.deleteMessage = `This Taxcode already Existed in  ${res.shortName}If you want to Create Internal account, Please fille info to Internal Reference Info.`;
+                        this.confirmTaxcode.show();
+                    }
+                },
+            );
+    }
 
     getOffice() {
         this._catalogueRepo.getListBranch()
@@ -315,6 +338,10 @@ export class PartnerDataAddnewComponent extends AppList {
     }
 
     onSubmit() {
+        if (this.partner.taxCode !== '') {
+            this.checkTaxcode();
+
+        }
         if (this.partner.countryId == null || this.partner.provinceId == null
             || this.partner.countryShippingId == null || this.partner.provinceShippingId == null || this.partner.departmentId == null) {
             return;

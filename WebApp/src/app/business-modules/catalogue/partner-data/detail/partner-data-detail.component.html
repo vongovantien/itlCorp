@@ -165,8 +165,16 @@
                                 <label class="form-control-label" for="">
                                     Internal Reference No
                                 </label>
-                                <input type="text" [(ngModel)]="partner.internalReferenceNo" name="internalReferenceNo"
-                                    readonly="readonly" class="form-control m-input m-input--square" />
+                                <input type="text" minlength="3" maxlength="10"
+                                    [(ngModel)]="partner.internalReferenceNo" name="internalReferenceNo"
+                                    #parnetinternalReferenceNo="ngModel" readonly="readonly"
+                                    class="form-control m-input m-input--square"
+                                    [ngClass]="{ 'm-input--square': formAddEdit.submitted && parnetinternalReferenceNo.invalid }"
+                                    required />
+                                <div class="form-control-feedback"
+                                    *ngIf="formAddEdit.submitted && parnetinternalReferenceNo.invalid">
+                                    Internal Reference No required least 3 characters
+                                </div>
                             </div>
                         </div>
 
@@ -675,6 +683,15 @@
                                         </span>
                                     </span>
                                 </button>
+                                <!-- <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                    (click)='showPopupSaleman()'>
+                                    <span>
+                                        <i class="la la-plus"></i>
+                                        <span>
+                                            Add new
+                                        </span>
+                                    </span>
+                                </button> -->
                             </div>
                         </div>
 
@@ -1072,3 +1089,5 @@
 
 
 <confirm-popup (onSubmit)="onDeleteSaleman()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>
+<app-saleman-popup [popupData]="saleMantoView">
+</app-saleman-popup>
