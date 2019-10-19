@@ -86,6 +86,12 @@ namespace eFMS.API.Setting.DL.Services
                     return new HandleState("Tariff is not null");
                 }
 
+                //Ngày ExpiredDate không được nhỏ hơn ngày EffectiveDate
+                if (model.EffectiveDate.Date > model.ExpiredDate.Date)
+                {
+                    return new HandleState("Expired Date cannot be less than the Effective Date");
+                }
+
                 //Trường hợp Insert (Id of tariff is null or empty)
                 if (model.Id == Guid.Empty)
                 {
