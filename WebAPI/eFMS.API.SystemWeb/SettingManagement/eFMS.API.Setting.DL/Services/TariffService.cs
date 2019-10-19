@@ -108,7 +108,7 @@ namespace eFMS.API.Setting.DL.Services
                                      && model.ExpiredDate.Date <= x.ExpiredDate.Date);
                         if (tariff.Any())
                         {
-                            return new HandleState("Tariff already exists");
+                            return new HandleState(ErrorCode.Existed, "Already exists");
                         }
                     }
                 }
@@ -135,7 +135,7 @@ namespace eFMS.API.Setting.DL.Services
                                      && model.ExpiredDate.Date <= x.ExpiredDate.Date);
                         if (tariff.Any())
                         {
-                            return new HandleState("Tariff already exists");
+                            return new HandleState(ErrorCode.Existed, "Already exists");
                         }
                     }
                 }

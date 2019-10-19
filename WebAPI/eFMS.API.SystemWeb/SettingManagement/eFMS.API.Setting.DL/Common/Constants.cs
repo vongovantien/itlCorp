@@ -70,4 +70,9 @@ namespace eFMS.API.Setting.DL.Common
         Ward = 16,
         ExchangeRate = 17
     }
+
+    public static class ErrorCode
+    {
+        public const int Existed = 463;
+    }
 }
