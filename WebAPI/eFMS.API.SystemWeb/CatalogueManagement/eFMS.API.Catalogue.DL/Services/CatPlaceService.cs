@@ -74,7 +74,7 @@ namespace eFMS.API.Catalogue.DL.Services
             entity.UserModified = currentUser.UserID;
             if (entity.Active == true)
             {
-                entity.InActiveOn = DateTime.Now;
+                entity.InactiveOn = DateTime.Now;
             }
             var result = DataContext.Update(entity, x => x.Id == model.Id);
             if (result.Success)
@@ -747,7 +747,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         UserModified = currentUser.UserID,
                         PlaceTypeId = item.PlaceTypeId,
                         Active = Active,
-                        InActiveOn = ActiveDate,
+                        InactiveOn = ActiveDate,
                         ModeOfTransport = item.ModeOfTransport,
                         AreaId = item.AreaId
                     };

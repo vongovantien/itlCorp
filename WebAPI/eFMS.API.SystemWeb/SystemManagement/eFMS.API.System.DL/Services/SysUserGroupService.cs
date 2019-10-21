@@ -28,7 +28,7 @@ namespace eFMS.API.System.DL.Services
 
         public IQueryable<SysUserGroupModel> GetByGroup(short groupId)
         {
-            var userGroups = DataContext.Get(x => x.GroupId == groupId);
+            var userGroups = DataContext.Get(x => x.GroupId == groupId && x.Active == true);
             var users = userRepository.Get();
             var employess = employeeRepository.Get();
             var results = userGroups.Join(users, x => x.UserId, y => y.Id, (x, y) => new { User = y, UserGroup = x })

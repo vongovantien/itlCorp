@@ -98,7 +98,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             UserModified = com.UserModified,
                             DatetimeModified = com.DatetimeModified,
                             Active = com.Active,
-                            InActiveOn = com.InActiveOn,
+                            InactiveOn = com.InactiveOn,
                             CommodityGroupNameEn = grp != null? grp.GroupNameEn: string.Empty,
                             CommodityGroupNameVn = grp != null? grp.GroupNameVn: string.Empty
                         };
@@ -144,7 +144,7 @@ namespace eFMS.API.Catalogue.DL.Services
             entity.DatetimeModified = DateTime.Now;
             if (entity.Active == true)
             {
-                entity.InActiveOn = DateTime.Now;
+                entity.InactiveOn = DateTime.Now;
             }
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
             if (hs.Success)

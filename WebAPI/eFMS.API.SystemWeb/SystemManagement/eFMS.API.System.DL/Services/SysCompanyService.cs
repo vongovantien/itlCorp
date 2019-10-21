@@ -9,6 +9,7 @@ using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.Service.Models;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
@@ -17,6 +18,7 @@ namespace eFMS.API.System.DL.Services
 {
     public class SysCompanyService : RepositoryBase<SysCompany, SysCompanyModel>, ISysCompanyService
     {
+        private readonly ICurrentUser currentUser;
         //private readonly ICurrentUser currentUser;
         public SysCompanyService(IContextBase<SysCompany> repository, IMapper mapper) : base(repository, mapper)
         {
@@ -72,7 +74,7 @@ namespace eFMS.API.System.DL.Services
 
         public HandleState Update(Guid id, SysCompanyAddModel model)
         {
-            var userCurrent = "admin";
+            var userCurrent = currentUser.UserID;
 
             try
             {
@@ -110,7 +112,7 @@ namespace eFMS.API.System.DL.Services
         {
             try
             {
-                ChangeTrackerHelper.currentUser = "admin"; //TODO
+                ChangeTrackerHelper.currentUser = currentUser.UserID; //TODO
 
                 var hs = DataContext.Delete(x => x.Id == id);
                 return hs;
@@ -126,7 +128,7 @@ namespace eFMS.API.System.DL.Services
         {
             try
             {
-                var userCurrent = "admin";
+                var userCurrent = currentUser.UserID;
 
                 var SysCompany = new SysCompanyModel
                 {

@@ -27,7 +27,14 @@ namespace eFMS.API.Setting.DL.Services
         private readonly IContextBase<CatPartner> catPartnerRepo;
         private readonly IContextBase<CatPlace> catPlaceRepo;
 
-        public TariffService(IContextBase<SetTariff> repository, IMapper mapper, ICurrentUser user, IContextBase<SetTariffDetail> setTariffDetail, IContextBase<CatCharge> catCharge, IContextBase<CatCommodityGroup> catCommodityGroup, IContextBase<CatPartner> catPartner, IContextBase<CatPlace> catPlace) : base(repository, mapper)
+        public TariffService(IContextBase<SetTariff> repository, 
+            IMapper mapper, 
+            ICurrentUser user, 
+            IContextBase<SetTariffDetail> setTariffDetail, 
+            IContextBase<CatCharge> catCharge, 
+            IContextBase<CatCommodityGroup> catCommodityGroup, 
+            IContextBase<CatPartner> catPartner, 
+            IContextBase<CatPlace> catPlace) : base(repository, mapper)
         {
             currentUser = user;
             setTariffDetailRepo = setTariffDetail;
@@ -79,6 +86,12 @@ namespace eFMS.API.Setting.DL.Services
                     return new HandleState("Tariff is not null");
                 }
 
+                //Ngày ExpiredDate không được nhỏ hơn ngày EffectiveDate
+                if (model.EffectiveDate.Date > model.ExpiredDate.Date)
+                {
+                    return new HandleState("Expired Date cannot be less than the Effective Date");
+                }
+
                 //Trường hợp Insert (Id of tariff is null or empty)
                 if (model.Id == Guid.Empty)
                 {
@@ -101,7 +114,7 @@ namespace eFMS.API.Setting.DL.Services
                                      && model.ExpiredDate.Date <= x.ExpiredDate.Date);
                         if (tariff.Any())
                         {
-                            return new HandleState("Tariff already exists");
+                            return new HandleState(ErrorCode.Existed, "Already exists");
                         }
                     }
                 }
@@ -128,7 +141,7 @@ namespace eFMS.API.Setting.DL.Services
                                      && model.ExpiredDate.Date <= x.ExpiredDate.Date);
                         if (tariff.Any())
                         {
-                            return new HandleState("Tariff already exists");
+                            return new HandleState(ErrorCode.Existed, "Already exists");
                         }
                     }
                 }
@@ -444,6 +457,7 @@ namespace eFMS.API.Setting.DL.Services
                                 UserModified = tariff.UserModified,
                                 DatetimeModified = tariff.DatetimeModified,
                                 ChargeName = charge.ChargeNameEn,
+                                ChargeCode = charge.Code,
                                 CommodityName = commoditiGrp.GroupNameEn,
                                 PayerName = payer.ShortName,
                                 PortName = port.NameEn,

@@ -31,7 +31,5 @@ namespace eFMS.API.Accounting.Service.Models
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
         public byte[] Signature { get; set; }
-
-        public virtual CatSaleResource SaleResourceNavigation { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using eFMS.API.Common;
+using eFMS.API.Common.Helpers;
 using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
@@ -33,7 +34,7 @@ namespace eFMS.API.System.DL.Services
 
         public async Task<ResultHandle> UploadImage(IFormFile file, string folderName)
         {
-            if (CheckIfImageFile(file))
+            if (ImageHelper.CheckIfImageFile(file))
             {
                 return await WriteFile(file, folderName);
             }
@@ -41,64 +42,30 @@ namespace eFMS.API.System.DL.Services
             return new ResultHandle { Data = 1, Message = "Có lỗi xảy ra", Status = false };
         }
 
-        private bool CheckIfImageFile(IFormFile file)
-        {
-            byte[] fileBytes;
-            using (var ms = new MemoryStream())
-            {
-                file.CopyTo(ms);
-                fileBytes = ms.ToArray();
-            }
-
-            return ImageHelper.GetImageFormat(fileBytes) != ImageHelper.ImageFormat.unknown;
-        }
-
         public async Task<ResultHandle> WriteFile(IFormFile file, string folderName)
         {
             string fileName = "";
             //string folderName = "images";
-            string path = webUrl.Value.Url.ToString();
+            string path = webUrl.Value.Url;
             try
             {
                 var extension = "." + file.FileName.Split('.')[file.FileName.Split('.').Length - 1]; //lấy extension
 
                 fileName = file.FileName;
-               
-                 /* Kiểm tra các thư mục có tồn tại */
-                if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\")))
-                {
-                    Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\"));
-                }
 
-                if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images")))
-                {
-                    Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images"));
-                }
-
-                if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images" + folderName)))
-                {
-                    Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images\\" + folderName));
-                }
-
-                var physicPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images\\" + folderName, fileName); // lưu vào folder
-
-                using (var bits = new FileStream(physicPath, FileMode.Create))
-                {
-                    await file.CopyToAsync(bits);
-                }
-
+                /* Kiểm tra các thư mục có tồn tại */
+                ImageHelper.CreateDirectoryImage(folderName);
+                await ImageHelper.SaveImage(fileName, folderName, file);
                 string urlImage = path + "/images/" + folderName + "/" + fileName;
                 var result = new { link = urlImage };
-
-
-                sysImageCriteria image = new sysImageCriteria
+                var sysImage = new SysImage
                 {
-                    Name = fileName,
+                    Id = Guid.NewGuid(),
                     Url = urlImage,
-                    Folder = folderName
+                    Name = fileName,
+                    Folder = folderName ?? "Company"
                 };
-
-                HandleState x =  Add(image); // lưu db
+                HandleState x =  Add(sysImage); // lưu db
                 if(x.Success)
                 {
                     return new ResultHandle { Data = result, Status = x.Success, Message = "" };
@@ -113,20 +80,12 @@ namespace eFMS.API.System.DL.Services
             }
         }
 
-        private HandleState Add(sysImageCriteria imageModel)
+        private HandleState Add(SysImage sysImage)
         {
             try
             {
                 var userCurrent = "admin"; // TODO
-
-                var sysImage = new SysImage
-                {
-                    Id = Guid.NewGuid(),
-                    Url = imageModel.Url,
-                    Name = imageModel.Name,
-                    Folder = imageModel.Folder ?? "Company"
-                };
-
+                sysImage.Id = Guid.NewGuid();
                 sysImage.DateTimeCreated = sysImage.DatetimeModified = DateTime.Now;
                 sysImage.UserCreated = sysImage.UserModified = userCurrent;
 

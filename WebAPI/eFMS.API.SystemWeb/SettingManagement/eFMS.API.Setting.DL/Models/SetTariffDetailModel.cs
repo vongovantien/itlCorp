@@ -8,6 +8,7 @@ namespace eFMS.API.Setting.DL.Models
     public class SetTariffDetailModel : SetTariffDetail
     {
         public string ChargeName { get; set; }
+        public string ChargeCode { get; set; }
         public string CommodityName { get; set; }
         public string PayerName { get; set; }
         public string PortName { get; set; }

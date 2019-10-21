@@ -1,4 +1,4 @@
-﻿// T4 code generation is enabled for model 'D:\Workspace\efms\src\WebAPI\eFMSWindowService\Models\eFMSModel.edmx'. 
+﻿// T4 code generation is enabled for model 'D:\eFMS\eFMS-WebApp\WebAPI\eFMSWindowService\Models\eFMSModel.edmx'. 
 // To enable legacy code generation, change the value of the 'Code Generation Strategy' designer
 // property to 'Legacy ObjectContext'. This property is available in the Properties Window when the model
 // is open in the designer.
