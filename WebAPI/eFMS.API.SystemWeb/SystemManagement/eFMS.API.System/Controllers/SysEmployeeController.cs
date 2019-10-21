@@ -30,8 +30,8 @@ namespace eFMS.API.System.Controllers
         }
 
         [HttpGet]
-        [Route("Query")]
-        public IActionResult Query(string employeeid)
+        [Route("GetByEmployeeId")]
+        public IActionResult GetByEmployeeId(string employeeid)
         {
             var result = sysEmployeeService.First(x => x.Id == employeeid);
             if (result == null)

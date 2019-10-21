@@ -14,6 +14,7 @@ import { Saleman } from 'src/app/shared/models/catalogue/saleman.model';
 import { formatDate } from '@angular/common';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { SalemanPopupComponent } from '../components/saleman-popup.component';
+import { SystemRepo } from 'src/app/shared/repositories';
 declare var $: any;
 
 @Component({
@@ -80,6 +81,7 @@ export class PartnerDataDetailComponent extends AppList {
         private toastr: ToastrService,
         private api_menu: API_MENU,
         private _catalogueRepo: CatalogueRepo,
+        private _systemRepo: SystemRepo,
         private sortService: SortService) {
 
         super();
@@ -409,20 +411,31 @@ export class PartnerDataDetailComponent extends AppList {
             return false;
         }
     }
-
-    getEmployee(employeeId: any): any {
-        this.baseService.post(this.api_menu.System.Employee.query, { id: employeeId }).subscribe((responses: any) => {
-            if (responses.length > 0) {
-                this.employee = responses[0];
-            }
-            else {
-                this.employee = {};
-            }
-            console.log(this.employee);
-        }, err => {
-            this.baseService.handleError(err);
-        });
+    getEmployee(employeeId: any) {
+        this._systemRepo.getEmployeeByemployeeid(employeeId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this.isLoading = false; }),
+            ).subscribe(
+                (res: any) => {
+                    this.employee = res;
+                },
+            );
     }
+
+    // getEmployee(employeeId: any): any {
+    //     this.baseService.post(this.api_menu.System.Employee.query, { id: employeeId }).subscribe((responses: any) => {
+    //         if (responses.length > 0) {
+    //             this.employee = responses[0];
+    //         }
+    //         else {
+    //             this.employee = {};
+    //         }
+    //         console.log(this.employee);
+    //     }, err => {
+    //         this.baseService.handleError(err);
+    //     });
+    // }
 
     public removed(value: any, selectName?: string): void {
         if (selectName == 'billingCountry') {
