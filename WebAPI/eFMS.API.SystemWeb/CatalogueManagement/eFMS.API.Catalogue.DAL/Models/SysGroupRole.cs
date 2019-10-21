@@ -14,8 +14,5 @@ namespace eFMS.API.Catalogue.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
         public DateTime? InActiveOn { get; set; }
-
-        public virtual SysGroup Group { get; set; }
-        public virtual SysRole Role { get; set; }
     }
 }

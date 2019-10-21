@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Group } from 'src/app/shared/models/system/group';
 import { NgProgress } from '@ngx-progressbar/core';
-import { SystemRepo } from 'src/app/shared/repositories';
+import { SystemRepo, ExportRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { SortService } from 'src/app/shared/services';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
@@ -24,7 +24,8 @@ export class GroupComponent extends AppList implements OnInit {
     private _progressService: NgProgress,
     private _systemRepo: SystemRepo,
     private _sortService: SortService,
-    private _toastService: ToastrService) {
+    private _toastService: ToastrService,
+    private _exportRepo: ExportRepo) {
     super();
     this._progressRef = this._progressService.ref();
     this.requestList = this.searchGroup;
@@ -121,5 +122,16 @@ export class GroupComponent extends AppList implements OnInit {
   confirmDelete(group) {
     this.selectedGroup = group;
     this.confirmDeletePopup.show();
+  }
+  export() {
+    this._exportRepo.exportGroup(this.dataSearch)
+      .subscribe(
+        (response: ArrayBuffer) => {
+          this.downLoadFile(response, "application/ms-excel", 'Goup.xlsx');
+        },
+        (errors: any) => {
+        },
+        () => { }
+      );
   }
 }

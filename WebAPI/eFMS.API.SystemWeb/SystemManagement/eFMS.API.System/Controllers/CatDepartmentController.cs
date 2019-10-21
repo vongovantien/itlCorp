@@ -7,6 +7,7 @@ using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.Infrastructure.Common;
 using eFMS.API.System.Infrastructure.Middlewares;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;
@@ -104,7 +105,7 @@ namespace eFMS.API.System.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Add")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Insert(CatDepartmentModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -128,7 +129,7 @@ namespace eFMS.API.System.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("Update")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Update(CatDepartmentModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -152,7 +153,7 @@ namespace eFMS.API.System.Controllers
         /// <returns></returns>
         [HttpDelete]
         [Route("Delete")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Delete(int id)
         {
             var hs = catDepartmentService.Delete(id);

@@ -1,4 +1,5 @@
-﻿using eFMS.API.ReportData.Models;
+﻿using eFMS.API.ReportData.Consts;
+using eFMS.API.ReportData.Models;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using OfficeOpenXml.Table;
@@ -906,7 +907,7 @@ namespace eFMS.API.ReportData
             }
         }
 
-        public Stream generateCompanyExcel(List<SysCompany> listCompany, Stream stream = null)
+        public Stream GenerateCompanyExcel(List<SysCompany> listCompany, Stream stream = null)
         {
             List<String> headers = new List<String>()
             {
@@ -927,7 +928,7 @@ namespace eFMS.API.ReportData
                     excelPackage.Workbook.Worksheets.Add("Sheet1");
                     var worksheet = excelPackage.Workbook.Worksheets[1];
 
-                    buildHeader(worksheet, headers, "COMPANY INFORMATION");
+                    BuildHeader(worksheet, headers, "COMPANY INFORMATION");
 
                     for (int i = 0; i < listCompany.Count; i++)
                     {
@@ -963,7 +964,7 @@ namespace eFMS.API.ReportData
             return null;
         }
 
-        public void buildHeader(ExcelWorksheet worksheet, List<String> headers, string title)
+        public void BuildHeader(ExcelWorksheet worksheet, List<String> headers, string title)
         {
             worksheet.Cells[1, 1, 1, headers.Count].Merge = true;
             worksheet.Cells["A1"].Value = title;
@@ -988,9 +989,11 @@ namespace eFMS.API.ReportData
 
                 worksheet.Column(i + 1).Width = 30;
             }
+            worksheet.Cells.AutoFitColumns(minWidth, maxWidth);
+            worksheet.Cells["A1:Z1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         }
         #endregion
-        public Stream generateOfficeExcel(List<SysOfficeModel> listCompany, Stream stream = null)
+        public Stream GenerateOfficeExcel(List<SysOfficeModel> listCompany, Stream stream = null)
         {
             List<String> headers = new List<String>()
             {
@@ -1013,7 +1016,7 @@ namespace eFMS.API.ReportData
                     excelPackage.Workbook.Worksheets.Add("Sheet1");
                     var worksheet = excelPackage.Workbook.Worksheets[1];
 
-                    buildHeader(worksheet, headers, "OFFICE INFORMATION");
+                    BuildHeader(worksheet, headers, "OFFICE INFORMATION");
 
                     for (int i = 0; i < listCompany.Count; i++)
                     {
@@ -1053,6 +1056,196 @@ namespace eFMS.API.ReportData
             return null;
         }
 
+        #region Group
+        internal Stream CreateGroupExcelFile(List<SysGroupModel> listObj, Stream stream = null)
+        {
+            List<String> headers = new List<String>()
+            {
+                "No.",
+                "Group Code",
+                "Name EN",
+                "Name Local",
+                "Name Abbr",
+                "Department",
+                "Status"
+            };
+            try
+            {
+                int addressStartContent = 4;
+                int no = 1;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Sheet1");
+                    var worksheet = excelPackage.Workbook.Worksheets[1];
 
+                    BuildHeader(worksheet, headers, "GROUP INFORMATION");
+
+                    for (int i = 0; i < listObj.Count; i++)
+                    {
+                        var item = listObj[i];
+                        worksheet.Cells[i + addressStartContent, 1].Value = no;
+                        worksheet.Cells[i + addressStartContent, 2].Value = item.Code;
+                        worksheet.Cells[i + addressStartContent, 3].Value = item.NameEn;
+                        worksheet.Cells[i + addressStartContent, 4].Value = item.NameVn;
+                        worksheet.Cells[i + addressStartContent, 5].Value = item.ShortName;
+                        worksheet.Cells[i + addressStartContent, 6].Value = item.DepartmentName;
+                        worksheet.Cells[i + addressStartContent, 7].Value = item.Active == true ? "Active" : "Inactive";
+
+                        //Add border left right for cells
+                        AddBorderLeftRightCell(worksheet, headers, addressStartContent, i);
+
+                        //Add border bottom for last cells
+                        AddBorderBottomLastCell(worksheet, headers, addressStartContent, i, listObj.Count);
+                        
+                        no++;
+                    }
+
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+        private void AddBorderBottomLastCell(ExcelWorksheet worksheet, List<string> headers, int addressStartContent, int indexDataRow, int totalItem)
+        {
+            if (indexDataRow == totalItem - 1)
+            {
+                for (int j = 0; j < headers.Count; j++)
+                {
+                    worksheet.Cells[indexDataRow + addressStartContent, j + 1].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                }
+            }
+        }
+
+        private void AddBorderLeftRightCell(ExcelWorksheet worksheet, List<string> headers, int addressStartContent, int indexDataRow)
+        {
+            for (int j = 0; j < headers.Count; j++)
+            {
+                worksheet.Cells[indexDataRow + addressStartContent, j + 1].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[indexDataRow + addressStartContent, j + 1].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            }
+        }
+        #endregion
+
+        #region -- Accounting --
+        public Stream GenerateAdvancePaymentExcel(List<AdvancePaymentModel> listObj, Stream stream = null)
+        {
+            List<string> headers = new List<string>()
+            {
+                "No",
+                "Advance No",
+                "Amount",
+                "Currency",
+                "Requester",
+                "Request Date",
+                "Deadline Date",
+                "Modified Date",
+                "Status Approval",
+                "Status Payment",
+                "Payment Menthod",
+                "Description"
+            };
+            try
+            {
+                int addressStartContent = 4;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Sheet1");
+                    var worksheet = excelPackage.Workbook.Worksheets[1];
+
+                    BuildHeader(worksheet, headers, "ADVANCE PAYMENT INFORMATION");
+
+                    for (int i = 0; i < listObj.Count; i++)
+                    {
+                        var item = listObj[i];
+                        worksheet.Cells[i + addressStartContent, 1].Value = i + 1;
+                        worksheet.Cells[i + addressStartContent, 2].Value = item.AdvanceNo;
+                        worksheet.Cells[i + addressStartContent, 3].Value = item.Amount;
+                        worksheet.Cells[i + addressStartContent, 4].Value = item.AdvanceCurrency;
+                        worksheet.Cells[i + addressStartContent, 5].Value = item.RequesterName;
+                        worksheet.Cells[i + addressStartContent, 6].Value = item.RequestDate.HasValue ? item.RequestDate.Value.ToString("dd/MM/yyyy") : "";
+                        worksheet.Cells[i + addressStartContent, 7].Value = item.DeadlinePayment.HasValue ? item.DatetimeModified.Value.ToString("dd/MM/yyyy") : "";
+                        worksheet.Cells[i + addressStartContent, 8].Value = item.DatetimeModified.HasValue ? item.DatetimeModified.Value.ToString("dd/MM/yyyy") : "";
+                        worksheet.Cells[i + addressStartContent, 9].Value = item.StatusApprovalName;
+                        worksheet.Cells[i + addressStartContent, 10].Value = item.AdvanceStatusPayment.Equals("Settled") ? "Settled" : (item.AdvanceStatusPayment.Equals("NotSettled") ? "Not Settled" : "Partial Settlement");
+                        worksheet.Cells[i + addressStartContent, 11].Value = item.PaymentMethodName;
+                        worksheet.Cells[i + addressStartContent, 12].Value = item.AdvanceNote;
+
+                        //Add border left right for cells
+                        AddBorderLeftRightCell(worksheet, headers, addressStartContent, i);
+
+                        //Add border bottom for last cells
+                        AddBorderBottomLastCell(worksheet, headers, addressStartContent, i, listObj.Count);
+                    }
+
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }            
+        }
+
+        public Stream GenerateSettlementPaymentExcel(List<SettlementPaymentModel> listObj, Stream stream = null)
+        {
+            List<string> headers = new List<string>()
+            {
+                "No",
+                "Settlement No",
+                "Amount",
+                "Currency",
+                "Requester",
+                "Request Date",
+                "Status Approval",
+                "Payment Menthod",
+                "Description"
+            };
+            try
+            {
+                int addressStartContent = 4;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Sheet1");
+                    var worksheet = excelPackage.Workbook.Worksheets[1];
+
+                    BuildHeader(worksheet, headers, "SETTLEMENT PAYMENT INFORMATION");
+
+                    for (int i = 0; i < listObj.Count; i++)
+                    {
+                        var item = listObj[i];
+                        worksheet.Cells[i + addressStartContent, 1].Value = i + 1;
+                        worksheet.Cells[i + addressStartContent, 2].Value = item.SettlementNo;
+                        worksheet.Cells[i + addressStartContent, 3].Value = item.Amount;
+                        worksheet.Cells[i + addressStartContent, 4].Value = item.SettlementCurrency;
+                        worksheet.Cells[i + addressStartContent, 5].Value = item.RequesterName;
+                        worksheet.Cells[i + addressStartContent, 6].Value = item.RequestDate.HasValue ? item.RequestDate.Value.ToString("dd/MM/yyyy") : "";
+                        worksheet.Cells[i + addressStartContent, 7].Value = item.StatusApprovalName;
+                        worksheet.Cells[i + addressStartContent, 8].Value = item.PaymentMethodName;
+                        worksheet.Cells[i + addressStartContent, 9].Value = item.Note;
+                        
+                        //Add border left right for cells
+                        AddBorderLeftRightCell(worksheet, headers, addressStartContent, i);
+
+                        //Add border bottom for last cells
+                        AddBorderBottomLastCell(worksheet, headers, addressStartContent, i, listObj.Count);
+                    }
+
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+        #endregion -- Accounting --
     }
 }

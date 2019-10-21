@@ -5,11 +5,6 @@ namespace eFMS.API.Catalogue.Service.Models
 {
     public partial class SysBu
     {
-        public SysBu()
-        {
-            SysBranch = new HashSet<SysBranch>();
-        }
-
         public short Id { get; set; }
         public string Code { get; set; }
         public string BunameVn { get; set; }
@@ -41,7 +36,5 @@ namespace eFMS.API.Catalogue.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
         public DateTime? InActiveOn { get; set; }
-
-        public virtual ICollection<SysBranch> SysBranch { get; set; }
     }
 }

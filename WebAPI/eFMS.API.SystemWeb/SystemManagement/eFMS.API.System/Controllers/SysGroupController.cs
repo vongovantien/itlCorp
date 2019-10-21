@@ -170,7 +170,7 @@ namespace eFMS.API.System.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED].Value });
             }
 
-            var hs = sysGroupService.Delete(x => x.Id == id && x.Active == false);
+            var hs = sysGroupService.Delete(x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Update);
 
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

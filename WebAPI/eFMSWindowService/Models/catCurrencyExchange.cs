@@ -23,7 +23,7 @@ namespace eFMSWindowService.Models
         public Nullable<System.DateTime> DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public Nullable<System.DateTime> DatetimeModified { get; set; }
-        public Nullable<bool> Inactive { get; set; }
+        public Nullable<bool> Active { get; set; }
         public Nullable<System.DateTime> InactiveOn { get; set; }
     }
 }

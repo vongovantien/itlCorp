@@ -27,7 +27,14 @@ namespace eFMS.API.Setting.DL.Services
         private readonly IContextBase<CatPartner> catPartnerRepo;
         private readonly IContextBase<CatPlace> catPlaceRepo;
 
-        public TariffService(IContextBase<SetTariff> repository, IMapper mapper, ICurrentUser user, IContextBase<SetTariffDetail> setTariffDetail, IContextBase<CatCharge> catCharge, IContextBase<CatCommodityGroup> catCommodityGroup, IContextBase<CatPartner> catPartner, IContextBase<CatPlace> catPlace) : base(repository, mapper)
+        public TariffService(IContextBase<SetTariff> repository, 
+            IMapper mapper, 
+            ICurrentUser user, 
+            IContextBase<SetTariffDetail> setTariffDetail, 
+            IContextBase<CatCharge> catCharge, 
+            IContextBase<CatCommodityGroup> catCommodityGroup, 
+            IContextBase<CatPartner> catPartner, 
+            IContextBase<CatPlace> catPlace) : base(repository, mapper)
         {
             currentUser = user;
             setTariffDetailRepo = setTariffDetail;
@@ -50,63 +57,10 @@ namespace eFMS.API.Setting.DL.Services
         {
             try
             {
-                if (model == null || model.setTariff == null)
+                var hs = CheckDuplicateTariff(model.setTariff);
+                if (!hs.Success)
                 {
-                    return new HandleState("Tariff is not null");
-                }
-
-                //Trường hợp Insert (Id of tariff is null or empty)
-                if (model.setTariff.Id == Guid.Empty)
-                {
-                    var tariffNameExists = DataContext.Get(x => x.TariffName == model.setTariff.TariffName).Any();
-                    if (tariffNameExists)
-                    {
-                        return new HandleState("Tariff name already exists");
-                    }
-
-                    //Check theo bộ 4
-                    var tariff = DataContext.Get(x => x.TariffType == model.setTariff.TariffType
-                                                    && x.ProductService == model.setTariff.ProductService
-                                                    && x.CargoType == model.setTariff.CargoType
-                                                    && x.ServiceMode == model.setTariff.ServiceMode);
-                    if (tariff.Any())
-                    {
-                        //Check nằm trong khoảng EffectiveDate - ExpiredDate
-                        tariff = tariff
-                            .Where(x => model.setTariff.EffectiveDate.Date >= x.EffectiveDate.Date
-                                     && model.setTariff.ExpiredDate.Date <= x.ExpiredDate.Date);
-                        if (tariff.Any())
-                        {
-                            return new HandleState("Tariff already exists");
-                        }
-                    }
-                }
-                else //Trường hợp Update (Id of tariff is not null & not empty)
-                {
-                    var tariffNameExists = DataContext.Get(x => x.Id != model.setTariff.Id
-                                                             && x.TariffName == model.setTariff.TariffName).Any();
-                    if (tariffNameExists)
-                    {
-                        return new HandleState("Tariff name already exists");
-                    }
-
-                    //Check theo bộ 4
-                    var tariff = DataContext.Get(x => x.Id != model.setTariff.Id
-                                                    && x.TariffType == model.setTariff.TariffType
-                                                    && x.ProductService == model.setTariff.ProductService
-                                                    && x.CargoType == model.setTariff.CargoType
-                                                    && x.ServiceMode == model.setTariff.ServiceMode);
-                    if (tariff.Any())
-                    {
-                        //Check nằm trong khoảng EffectiveDate - ExpiredDate
-                        tariff = tariff
-                            .Where(x => model.setTariff.EffectiveDate.Date >= x.EffectiveDate.Date
-                                     && model.setTariff.ExpiredDate.Date <= x.ExpiredDate.Date);
-                        if (tariff.Any())
-                        {
-                            return new HandleState("Tariff already exists");
-                        }
-                    }
+                    return hs;
                 }
 
                 //Check list tariff detail không được phép trống
@@ -115,6 +69,83 @@ namespace eFMS.API.Setting.DL.Services
                     return new HandleState("Please add tariff to create new OPS tariff");
                 }
 
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
+
+        public HandleState CheckDuplicateTariff(SetTariffModel model)
+        {
+            try
+            {
+                if (model == null)
+                {
+                    return new HandleState("Tariff is not null");
+                }
+
+                //Ngày ExpiredDate không được nhỏ hơn ngày EffectiveDate
+                if (model.EffectiveDate.Date > model.ExpiredDate.Date)
+                {
+                    return new HandleState("Expired Date cannot be less than the Effective Date");
+                }
+
+                //Trường hợp Insert (Id of tariff is null or empty)
+                if (model.Id == Guid.Empty)
+                {
+                    var tariffNameExists = DataContext.Get(x => x.TariffName == model.TariffName).Any();
+                    if (tariffNameExists)
+                    {
+                        return new HandleState("Tariff name already exists");
+                    }
+
+                    //Check theo bộ 4
+                    var tariff = DataContext.Get(x => x.TariffType == model.TariffType
+                                                    && x.ProductService == model.ProductService
+                                                    && x.CargoType == model.CargoType
+                                                    && x.ServiceMode == model.ServiceMode);
+                    if (tariff.Any())
+                    {
+                        //Check nằm trong khoảng EffectiveDate - ExpiredDate
+                        tariff = tariff
+                            .Where(x => model.EffectiveDate.Date >= x.EffectiveDate.Date
+                                     && model.ExpiredDate.Date <= x.ExpiredDate.Date);
+                        if (tariff.Any())
+                        {
+                            return new HandleState(ErrorCode.Existed, "Already exists");
+                        }
+                    }
+                }
+                else //Trường hợp Update (Id of tariff is not null & not empty)
+                {
+                    var tariffNameExists = DataContext.Get(x => x.Id != model.Id
+                                                             && x.TariffName == model.TariffName).Any();
+                    if (tariffNameExists)
+                    {
+                        return new HandleState("Tariff name already exists");
+                    }
+
+                    //Check theo bộ 4
+                    var tariff = DataContext.Get(x => x.Id != model.Id
+                                                    && x.TariffType == model.TariffType
+                                                    && x.ProductService == model.ProductService
+                                                    && x.CargoType == model.CargoType
+                                                    && x.ServiceMode == model.ServiceMode);
+                    if (tariff.Any())
+                    {
+                        //Check nằm trong khoảng EffectiveDate - ExpiredDate
+                        tariff = tariff
+                            .Where(x => model.EffectiveDate.Date >= x.EffectiveDate.Date
+                                     && model.ExpiredDate.Date <= x.ExpiredDate.Date);
+                        if (tariff.Any())
+                        {
+                            return new HandleState(ErrorCode.Existed, "Already exists");
+                        }
+                    }
+                }
+                
                 return new HandleState();
             }
             catch (Exception ex)
@@ -271,48 +302,71 @@ namespace eFMS.API.Setting.DL.Services
         public List<TariffViewModel> Query(TariffCriteria criteria)
         {
             var tariff = GetAllTariff();
+            var partner = catPartnerRepo.Get();
+
             var query = from t in tariff
-                        select t;
+                        join p in partner on t.CustomerId equals p.Id into partnerdata
+                        from p in partnerdata.DefaultIfEmpty()
+                        join s in partner on t.SupplierId equals s.Id into supplierdata
+                        from s in supplierdata.DefaultIfEmpty()
+                        select new { t, CustomerName = p != null ? p.ShortName : null, SupplierName = s != null ? s.ShortName : null };
             query = query.Where(x =>
-            ((x.TariffName ?? "").IndexOf(criteria.Name ?? "", StringComparison.OrdinalIgnoreCase)) >= 0
-            && (x.CustomerId ?? "").IndexOf(criteria.CustomerID ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-            && (x.TariffType == criteria.TariffType || string.IsNullOrEmpty(criteria.TariffType))
-            && (x.ServiceMode == criteria.ServiceMode || string.IsNullOrEmpty(criteria.ServiceMode))
-            && (x.SupplierId == criteria.SupplierID || string.IsNullOrEmpty(criteria.SupplierID))
-            && (x.OfficeId == criteria.OfficeId || criteria.OfficeId == Guid.Empty)
-            && (x.Status == criteria.Status || criteria.Status == null));
-            if (criteria.DateType == "CreateDate")
+            ((x.t.TariffName ?? "").IndexOf(criteria.Name ?? "", StringComparison.OrdinalIgnoreCase)) >= 0
+            && (x.t.CustomerId ?? "").IndexOf(criteria.CustomerID ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+            && (x.t.TariffType == criteria.TariffType || string.IsNullOrEmpty(criteria.TariffType))
+            && (x.t.ServiceMode == criteria.ServiceMode || string.IsNullOrEmpty(criteria.ServiceMode))
+            && (x.t.SupplierId == criteria.SupplierID || string.IsNullOrEmpty(criteria.SupplierID))
+            && (x.t.OfficeId == criteria.OfficeId || criteria.OfficeId == Guid.Empty)
+            && (x.t.Status == criteria.Status || criteria.Status == null));
+            if (criteria.DateType == "CreateDate" && criteria.ToDate.HasValue && criteria.FromDate.HasValue)
             {
                 query = query.Where(x =>
-                (x.DatetimeCreated >= criteria.FromDate && x.DatetimeCreated <= criteria.ToDate));
+                (x.t.DatetimeCreated.HasValue && x.t.DatetimeCreated.Value.Date >= criteria.FromDate.Value.Date && x.t.DatetimeCreated.Value.Date <= criteria.ToDate.Value.Date));
             }
-            else if (criteria.DateType == "EffectiveDate")
+            else if (criteria.DateType == "EffectiveDate" && criteria.ToDate.HasValue && criteria.FromDate.HasValue)
             {
                 query = query.Where(x =>
-                (x.EffectiveDate >= criteria.FromDate && x.EffectiveDate <= criteria.ToDate));
+                (x.t.EffectiveDate.Date >= criteria.FromDate && x.t.EffectiveDate <= criteria.ToDate));
             }
-            else if(criteria.DateType == "ModifiedDate")
+            else if (criteria.DateType == "ModifiedDate" && criteria.ToDate.HasValue && criteria.FromDate.HasValue)
             {
-               query = query.Where(x =>
-               (x.DatetimeModified >= criteria.FromDate && x.DatetimeModified <= criteria.ToDate));
+                query = query.Where(x =>
+                (x.t.DatetimeModified.HasValue && x.t.DatetimeModified.Value.Date >= criteria.FromDate.Value.Date && x.t.DatetimeModified.Value.Date <= criteria.ToDate.Value.Date));
+            }
+            else if (criteria.DateType == "ExpiredDate")
+            {
+                query = query.Where(x =>
+                (x.t.ExpiredDate.Date >= criteria.FromDate && x.t.ExpiredDate.Date <= criteria.ToDate));
             }
             else
             {
                 query = query.Where(x =>
-                   ((x.DatetimeCreated >= criteria.FromDate || criteria.FromDate == null) &&
-                   (x.DatetimeCreated <= criteria.ToDate || criteria.ToDate == null))
-                   || ((x.EffectiveDate >= criteria.FromDate || criteria.FromDate == null)
-                   && (x.EffectiveDate <= criteria.ToDate || criteria.ToDate == null))
-                   || ((x.DatetimeModified >= criteria.FromDate || criteria.FromDate == null)
-                   && (x.DatetimeModified <= criteria.ToDate || criteria.ToDate == null))
+                   ((x.t.DatetimeCreated.HasValue && x.t.DatetimeCreated.Value.Date >= criteria.FromDate || criteria.FromDate == null) &&
+                   (x.t.DatetimeCreated.Value.Date <= criteria.ToDate || criteria.ToDate == null))
+
+                   || ((x.t.EffectiveDate.Date >= criteria.FromDate || criteria.FromDate == null)
+                   && (x.t.EffectiveDate.Date <= criteria.ToDate || criteria.ToDate == null))
+
+                   || ((x.t.DatetimeModified.HasValue && x.t.DatetimeModified >= criteria.FromDate || criteria.FromDate == null)
+                   && (x.t.DatetimeModified <= criteria.ToDate || criteria.ToDate == null))
+
+                   //|| ((x.t.DatetimeModified.HasValue ? x.t.DatetimeModified.Value.Date >= criteria.FromDate || criteria.FromDate == null : x.t.DatetimeModified >= criteria.FromDate || criteria.FromDate == null)
+                   //&& (x.t.DatetimeModified.HasValue ? x.t.DatetimeModified.Value.Date <= criteria.ToDate || criteria.ToDate == null : x.t.DatetimeModified <= criteria.ToDate || criteria.ToDate == null))
+
+                   || ((x.t.ExpiredDate.Date >= criteria.FromDate || criteria.FromDate == null)
+                   && (x.t.ExpiredDate.Date <= criteria.ToDate || criteria.ToDate == null))
+
                   );
+
             }
 
             if (query.Count() == 0) return null;
             List<TariffViewModel> results = new List<TariffViewModel>();
             foreach (var item in query)
             {
-                var tariffView = mapper.Map<TariffViewModel>(item);
+                var tariffView = mapper.Map<TariffViewModel>(item.t);
+                tariffView.CustomerName = item.CustomerName != null ? item.CustomerName.ToString() : null;
+                tariffView.SupplierName = item.SupplierName != null ? item.SupplierName.ToString() : null;
                 results.Add(tariffView);
             }
             return results;
@@ -403,6 +457,7 @@ namespace eFMS.API.Setting.DL.Services
                                 UserModified = tariff.UserModified,
                                 DatetimeModified = tariff.DatetimeModified,
                                 ChargeName = charge.ChargeNameEn,
+                                ChargeCode = charge.Code,
                                 CommodityName = commoditiGrp.GroupNameEn,
                                 PayerName = payer.ShortName,
                                 PortName = port.NameEn,

@@ -30,7 +30,7 @@ namespace eFMS.API.ReportData.Controllers
 
         }
 
-        [Route("System/ExportCompany")]
+        [Route("ExportCompany")]
         [HttpPost]
         public async Task<IActionResult> ExportCompany(SysCompanyCriteria sysCompanyCriteria)
         {
@@ -38,7 +38,7 @@ namespace eFMS.API.ReportData.Controllers
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<SysCompany>>();
 
-            var stream = new Helper().generateCompanyExcel(dataObjects.Result);
+            var stream = new Helper().GenerateCompanyExcel(dataObjects.Result);
             if (stream == null)
             {
                 return null;
@@ -55,7 +55,7 @@ namespace eFMS.API.ReportData.Controllers
         /// <param name="sysOfficeCriteria"></param>
         /// <returns></returns>
 
-        [Route("System/ExportOffice")]
+        [Route("ExportOffice")]
         [HttpPost]
         public async Task<IActionResult> ExportOffice(SysOfficeCriteria sysOfficeCriteria)
         {
@@ -63,7 +63,7 @@ namespace eFMS.API.ReportData.Controllers
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<SysOfficeModel>>();
 
-            var stream = new Helper().generateOfficeExcel(dataObjects.Result);
+            var stream = new Helper().GenerateOfficeExcel(dataObjects.Result);
             if (stream == null)
             {
                 return null;
@@ -79,7 +79,7 @@ namespace eFMS.API.ReportData.Controllers
         /// </summary>
         /// <param name="catDepartmentCriteria"></param>
         /// <returns></returns>
-        [Route("Department/ExportDepartment")]
+        [Route("ExportDepartment")]
         [HttpPost]
         public async Task<IActionResult> ExportDepartment(CatDepartmentCriteria catDepartmentCriteria)
         {
@@ -88,6 +88,22 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatDepartmentModel>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
             var stream = helper.CreateDepartmentExcelFile(dataObjects.Result);
             return new FileHelper().ExportExcel(stream, FilesNames.DepartmentName);
+        }
+
+        /// <summary>
+        /// export list group to excel file
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [Route("ExportGroup")]
+        [HttpPost]
+        public async Task<IActionResult> ExportGroup(SysGroupCriteria criteria)
+        {
+            Helper helper = new Helper();
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.System.GroupUrl);
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<SysGroupModel>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
+            var stream = helper.CreateGroupExcelFile(dataObjects.Result);
+            return new FileHelper().ExportExcel(stream, FilesNames.GroupName);
         }
     }
 }

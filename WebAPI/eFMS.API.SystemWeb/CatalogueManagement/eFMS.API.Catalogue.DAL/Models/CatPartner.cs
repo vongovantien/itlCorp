@@ -5,11 +5,6 @@ namespace eFMS.API.Catalogue.Service.Models
 {
     public partial class CatPartner
     {
-        public CatPartner()
-        {
-            CatPartnerContact = new HashSet<CatPartnerContact>();
-        }
-
         public string Id { get; set; }
         public string PartnerGroup { get; set; }
         public string PartnerNameVn { get; set; }
@@ -64,7 +59,5 @@ namespace eFMS.API.Catalogue.Service.Models
         public bool? Active { get; set; }
         public DateTime? InActiveOn { get; set; }
         public string InternalReferenceNo { get; set; }
-
-        public virtual ICollection<CatPartnerContact> CatPartnerContact { get; set; }
     }
 }

@@ -18,11 +18,11 @@
           <Property Name="DatetimeCreated" Type="datetime" />
           <Property Name="UserModified" Type="varchar" MaxLength="50" />
           <Property Name="DatetimeModified" Type="datetime" />
-          <Property Name="Inactive" Type="bit" />
+          <Property Name="Active" Type="bit" />
           <Property Name="InactiveOn" Type="datetime" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'eFMS.dbo.vw_catCurrencyExchangeNewest' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'eFMSTest.dbo.vw_catCurrencyExchangeNewest' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="vw_catCurrencyExchangeNewest">
           <Key>
             <PropertyRef Name="ID" />
@@ -69,7 +69,7 @@ warning 6002: The table/view 'eFMS.dbo.vw_catCurrencyExchangeNewest' does not ha
           <Property Name="DatetimeCreated" Type="DateTime" Precision="3" />
           <Property Name="UserModified" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="DatetimeModified" Type="DateTime" Precision="3" />
-          <Property Name="Inactive" Type="Boolean" />
+          <Property Name="Active" Type="Boolean" />
           <Property Name="InactiveOn" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityType Name="vw_catCurrencyExchangeNewest">
@@ -94,7 +94,7 @@ warning 6002: The table/view 'eFMS.dbo.vw_catCurrencyExchangeNewest' does not ha
             <EntityTypeMapping TypeName="eFMSTestModel.catCurrencyExchange">
               <MappingFragment StoreEntitySet="catCurrencyExchange">
                 <ScalarProperty Name="InactiveOn" ColumnName="InactiveOn" />
-                <ScalarProperty Name="Inactive" ColumnName="Inactive" />
+                <ScalarProperty Name="Active" ColumnName="Active" />
                 <ScalarProperty Name="DatetimeModified" ColumnName="DatetimeModified" />
                 <ScalarProperty Name="UserModified" ColumnName="UserModified" />
                 <ScalarProperty Name="DatetimeCreated" ColumnName="DatetimeCreated" />

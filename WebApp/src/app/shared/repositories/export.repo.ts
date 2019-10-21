@@ -18,24 +18,29 @@ export class ExportRepo {
 
 
     exportCompany(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/System/ExportCompany`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/ExportCompany`, searchObject).pipe(
             catchError((error) => throwError(error)),
             map(data => data)
         );
     }
 
     exportDepartment(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/Department/ExportDepartment`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/ExportDepartment`, searchObject).pipe(
             catchError((error) => throwError(error)),
             map(data => data)
         );
     }
     exportOffice(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/System/ExportOffice`, searchObject).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/ExportOffice`, searchObject).pipe(
             catchError((error) => throwError(error)),
             map(data => data)
         );
     }
-
+    exportGroup(searchObject: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/ExportGroup`, searchObject).pipe(
+            catchError((error) => throwError(error)),
+            map(data => data)
+        );
+    }
 }
 

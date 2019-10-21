@@ -4,6 +4,29 @@
         <name>eFMS.API.ReportData</name>
     </assembly>
     <members>
+        <member name="T:eFMS.API.ReportData.Consts.ResourceConsts">
+            <summary>Supports all classes in the .NET Framework class hierarchy and provides low-level services to derived classes. This is the ultimate base class of all classes in the .NET Framework; it is the root of the type hierarchy.</summary>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">
+            <summary>
+            Contructor controller Accounting Report
+            </summary>
+            <param name="appSettings"></param>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportAdvancePayment(eFMS.API.ReportData.Models.Criteria.AdvancePaymentCriteria)">
+            <summary>
+            Export Advance Payment
+            </summary>
+            <param name="sysCompanyCriteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportSettlementPayment(eFMS.API.ReportData.Models.Criteria.SettlementPaymentCriteria)">
+            <summary>
+            Export Settlement Payment
+            </summary>
+            <param name="settlementPaymentCriteria"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.ReportData.Controllers.ReportDataController">
             <summary>
             A base class for an MVC controller without view support.
@@ -120,6 +143,13 @@
             Export Department
             </summary>
             <param name="catDepartmentCriteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.SystemReportController.ExportGroup(eFMS.API.ReportData.Models.Criteria.SysGroupCriteria)">
+            <summary>
+            export list group to excel file
+            </summary>
+            <param name="criteria"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.ReportData.Helpers.FileHelper">

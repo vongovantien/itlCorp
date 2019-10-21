@@ -71,7 +71,7 @@ namespace eFMS.API.System.DL.Services
                                                && (x.DepartmentId == criteria.DepartmentId || criteria.DepartmentId == 0)
                                                && (x.Id == criteria.Id || criteria.Id == 0)
                                         );
-                departments = departmentRepository.Get(x => x.DeptNameEn.IndexOf(criteria.DepartmentName ?? "", StringComparison.OrdinalIgnoreCase) > -1);
+                departments = departmentRepository.Get(x => (x.DeptNameEn ?? "").IndexOf(criteria.DepartmentName ?? "", StringComparison.OrdinalIgnoreCase) > -1);
             }
             else
             {
@@ -82,7 +82,7 @@ namespace eFMS.API.System.DL.Services
                                                || (x.DepartmentId == criteria.DepartmentId || criteria.DepartmentId == 0)
                                                || (x.Id == criteria.Id || criteria.Id == 0)
                                         );
-                departments = departmentRepository.Get(x => x.DeptNameEn.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1);
+                departments = departmentRepository.Get(x => (x.DeptNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1);
                 if(departments.Count() == 0)
                 {
                     departments = departmentRepository.Get();

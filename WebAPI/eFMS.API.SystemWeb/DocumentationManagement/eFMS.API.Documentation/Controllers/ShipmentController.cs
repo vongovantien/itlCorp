@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using eFMS.API.Documentation.DL.IService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
@@ -32,6 +33,7 @@ namespace eFMS.API.Documentation.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("GetShipmentNotLocked")]
+        [Authorize]
         public IActionResult GetShipmentNotLocked()
         {
             var list = shipmentService.GetShipmentNotLocked();
@@ -58,6 +60,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="keywords"></param>
         /// <returns></returns>
         [HttpGet("GetShipmentsCopyListBySearchOption")]
+        [Authorize]
         public IActionResult GetShipmentsCopyListBySearchOption(string searchOption, List<string> keywords)
         {
             var data = shipmentService.GetListShipmentBySearchOptions(searchOption, keywords);

@@ -21,5 +21,6 @@ namespace eFMS.API.Setting.DL.IService
         SetTariffModel GetTariffById(Guid tariffId);
         SetTariffDetailModel GetTariffDetailById(Guid tariffDetailId);
         IQueryable<SetTariffDetailModel> GetListTariffDetailByTariffId(Guid tariffId);
+        HandleState CheckDuplicateTariff(SetTariffModel model);
     }
 }

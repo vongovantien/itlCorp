@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.Setting.Controllers
 {
@@ -81,7 +82,7 @@ namespace eFMS.API.Setting.Controllers
             if (!ModelState.IsValid) return BadRequest();
 
             var checkData = tariffService.CheckExistsDataTariff(model);
-            if (!checkData.Success) return Ok(new ResultHandle { Status = checkData.Success, Message = checkData.Exception.Message.ToString(), Data = model });
+            if (!checkData.Success) return Ok(new ResultHandle { Status = checkData.Success, Message = checkData.Exception.Message.ToString(), Data = checkData.Code });
 
             var hs = tariffService.AddTariff(model);
 
@@ -163,6 +164,13 @@ namespace eFMS.API.Setting.Controllers
             {
                 return Ok(new ResultHandle { Status = true, Message = "Success", Data = result });
             }
+        }
+
+        [HttpPost("CheckDuplicateTariff")]
+        public IActionResult CheckDuplicateTariff(SetTariffModel model)
+        {
+            var checkData = tariffService.CheckDuplicateTariff(model);
+            return Ok(new ResultHandle { Status = checkData.Success, Message = checkData.Exception.Message.ToString(), Data = checkData.Code });
         }
 
     }
