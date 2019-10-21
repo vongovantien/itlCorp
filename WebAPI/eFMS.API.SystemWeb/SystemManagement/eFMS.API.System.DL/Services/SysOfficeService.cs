@@ -24,10 +24,11 @@ namespace eFMS.API.System.DL.Services
         private readonly IContextBase<SysCompany> sysBuRepository;
         private readonly ICurrentUser currentUser;
 
-        public SysOfficeService(IContextBase<SysOffice> repository, IMapper mapper, IContextBase<SysCompany> sysBuRepo, IDistributedCache distributedCache) : base(repository, mapper)
+        public SysOfficeService(IContextBase<SysOffice> repository, IMapper mapper, IContextBase<SysCompany> sysBuRepo, IDistributedCache distributedCache, ICurrentUser icurrentUser) : base(repository, mapper)
         {
             sysBuRepository = sysBuRepo;
             cache = distributedCache;
+            currentUser = icurrentUser;
             SetChildren<CatDepartment>("Id", "BranchId");
         }
 
