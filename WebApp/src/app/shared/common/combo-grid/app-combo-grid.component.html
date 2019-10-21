@@ -8,24 +8,22 @@
                     </table>
                 </div>
             </div>
-            <div class="table-body-scroll">
-                <div>
-                    <table class="table table-hover">
-                        <tbody>
-                            <ng-container *ngFor="let item of data; let i = index; trackBy: trackByFn">
-                                <tr class="data-row " (click)="selectItem(item)"
-                                    [class.data-selected]="!!selectedItem && item.id === selectedItem.id">
-                                    <td *ngFor="let header of headers">
-                                        {{item[header.field]}}
-                                    </td>
-                                </tr>
-                            </ng-container>
-                            <tr *ngIf="!data.length" app-table-none-record [colspan]="headers.length"> </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-            </div>
+            {{height}}
+            <cdk-virtual-scroll-viewport [ngStyle]="{'height.px': 200}" [itemSize]="3">
+                <table class="table table-hover">
+                    <tbody>
+                        <ng-container *cdkVirtualFor="let item of data; let i = index; trackBy: trackByFn">
+                            <tr class="data-row " (click)="selectItem(item)"
+                                [class.data-selected]="!!selectedItem && item.id === selectedItem.id">
+                                <td *ngFor="let header of headers">
+                                    {{item[header.field]}}
+                                </td>
+                            </tr>
+                        </ng-container>
+                        <tr *ngIf="!data.length" app-table-none-record [colspan]="headers.length"> </tr>
+                    </tbody>
+                </table>
+            </cdk-virtual-scroll-viewport>
         </div>
     </div>
 </div>

@@ -85,12 +85,13 @@ export class TariffComponent extends AppList {
     onDeleteTariff() {
         this._progressRef.start();
         this._settingRepo.deleteTariff(this.selectedTariff.id)
-            .pipe(catchError(this.catchError))
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this.confirmDeletePopup.hide();
                         this._toastService.success(res.message);
+                        this.searchTariff({});
                     } else {
                         this._toastService.warning(res.message);
                     }

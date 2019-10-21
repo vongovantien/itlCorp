@@ -13,11 +13,12 @@ import { TariffListChargeComponent } from './components/list-charge-tariff/list-
 import { TariffChargePopupComponent } from './components/popup/tariff-charge/tariff-charge.popup';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { NgxCurrencyModule } from 'ngx-currency';
+import { TariffDetailComponent } from './detail/detail-tariff.component';
 
 const routing: Routes = [
     { path: '', component: TariffComponent, data: { name: "Tariff", level: 2 } },
     { path: 'new', component: TariffAddComponent, data: { name: "New", level: 3 } },
-
+    { path: ':id', component: TariffDetailComponent, data: { name: "Detail", level: 3 } },
 ];
 
 const customCurrencyMaskConfig = {
@@ -32,14 +33,19 @@ const customCurrencyMaskConfig = {
     nullable: true
 };
 
+const COMPONENTS = [
+    TariffFormSearchComponent,
+    TariffFormAddComponent,
+    TariffListChargeComponent,
+    TariffChargePopupComponent,
+];
+
 @NgModule({
     declarations: [
         TariffComponent,
         TariffAddComponent,
-        TariffFormSearchComponent,
-        TariffFormAddComponent,
-        TariffListChargeComponent,
-        TariffChargePopupComponent,
+        TariffDetailComponent,
+        ...COMPONENTS
     ],
     imports: [
         CommonModule,

@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { TariffChargePopupComponent } from '../popup/tariff-charge/tariff-charge.popup';
-import { TariffCharge } from 'src/app/shared/models';
+import { TariffCharge, Currency, Charge } from 'src/app/shared/models';
 
 @Component({
     selector: 'list-charge-tariff',
@@ -17,6 +17,7 @@ export class TariffListChargeComponent extends AppList {
     headers: CommonInterface.IHeaderTable[];
 
     selectedTariffCharge: TariffCharge = new TariffCharge();
+    selectedIndex: number = -1; // * SELECT ITEM CHARGE IN TABLE.
 
     constructor() {
         super();
@@ -24,10 +25,10 @@ export class TariffListChargeComponent extends AppList {
 
     ngOnInit(): void {
         this.headers = [
-            { title: 'Charge Name', field: 'chargeName', sortable: true },
+            { title: 'Charge Name', field: 'chargeName', sortable: true, dataType: 'LINK' },
             { title: 'Charge Code', field: 'chargeCode', sortable: true },
             { title: 'Route', field: 'route', sortable: true },
-            { title: 'Comondities Group', field: 'commodityName', sortable: true },
+            { title: 'Comondities Group', field: 'commodityName', sortable: true, width: 150 },
             { title: 'Payer', field: 'payerName', sortable: true },
             { title: 'Range From', field: 'rangeFrom', sortable: true },
             { title: 'Range To', field: 'rangeTo', sortable: true },
@@ -46,18 +47,59 @@ export class TariffListChargeComponent extends AppList {
     }
 
     openAddChargePopupTariff() {
+        this.tariffChargePopup.ACTION = 'CREATE';
         this.selectedTariffCharge = new TariffCharge();
 
         this.tariffChargePopup.formChargeTariff.value.tariffChargeDetail.currencyId = this.tariffChargePopup.currencyList.filter(i => i.id === 'VND')[0];
         this.tariffChargePopup.show();
     }
 
-    showListChargeTariff() {
+    onChangeChargeTariff(tariffCharge?: TariffCharge) {
+        // * UPDATE ACTION FOR POPUP -> CREATE
+        if (this.tariffChargePopup.ACTION === 'UPDATE') {
+            this.charges[this.selectedIndex] = tariffCharge;
+        } else {
+            this.charges.push(tariffCharge);
+        }
         console.log(this.charges);
     }
 
-    onChangeChargeTariff(tariffCharge?: TariffCharge) {
-        this.charges.push(tariffCharge);
-        console.log(this.charges);
+    viewDetailTariffCharge(tariffCharge: TariffCharge, index: number) {
+        this.selectedIndex = index;
+        this.selectedTariffCharge = tariffCharge;
+
+        // * UPDATE ACTION FOR POPUP -> UPDATE
+        this.tariffChargePopup.ACTION = 'UPDATE';
+
+        const objectTariffChargeForm = {
+            useFor: this.tariffChargePopup.useFors.filter(useFor => useFor.value === this.selectedTariffCharge.useFor)[0],
+            route: this.tariffChargePopup.routes.filter(route => route.value === this.selectedTariffCharge.route)[0],
+            min: this.selectedTariffCharge.min,
+            max: this.selectedTariffCharge.max,
+            unitPrice: this.selectedTariffCharge.unitPrice,
+            nextUnit: this.selectedTariffCharge.nextUnit,
+            nextUnitPrice: this.selectedTariffCharge.nextUnitPrice,
+            rangeTo: this.selectedTariffCharge.rangeTo,
+            rangeFrom: this.selectedTariffCharge.rangeFrom,
+            vatrate: this.selectedTariffCharge.vatrate,
+            type: !!this.selectedTariffCharge.type ? this.tariffChargePopup.types.filter(type => type.value === this.selectedTariffCharge.type)[0] : null,
+            rangeType: !!this.selectedTariffCharge.rangeType ? this.tariffChargePopup.rangeTypes.filter(range => range.value === this.selectedTariffCharge.rangeType)[0] : null,
+            currencyId: !!this.selectedTariffCharge.currencyId ? this.tariffChargePopup.currencyList.filter((currency: Currency) => currency.id === this.selectedTariffCharge.currencyId)[0] : this.tariffChargePopup.currencyList.filter((currency: Currency) => currency.id === 'VND')[0],
+            unitId: !!this.selectedTariffCharge.unitId ? this.tariffChargePopup.units.filter(unit => unit.id === this.selectedTariffCharge.unitId)[0] : null
+        };
+
+        // * Update Combo Grid.
+        this.tariffChargePopup.keyword = this.selectedTariffCharge.chargeName;
+        this.tariffChargePopup.selectedCharge = new Charge({ code: this.selectedTariffCharge.chargeCode, id: this.selectedTariffCharge.chargeId, chargeNameEn: this.selectedTariffCharge.chargeName });
+
+        this.tariffChargePopup.selectedCommondityGroup = <CommonInterface.IComboGridData>{ field: 'id', value: this.selectedTariffCharge.commodityId };
+        this.tariffChargePopup.selectedPayer = <CommonInterface.IComboGridData>{ field: 'id', value: this.selectedTariffCharge.payerId };
+        this.tariffChargePopup.selectedPort = <CommonInterface.IComboGridData>{ field: 'id', value: this.selectedTariffCharge.portId };
+        this.tariffChargePopup.selectedWarehouse = <CommonInterface.IComboGridData>{ field: 'id', value: this.selectedTariffCharge.warehouseId };
+
+        // * Update Form Group IN POPUP.
+        this.tariffChargePopup.formChargeTariff.controls['tariffChargeDetail'].setValue(objectTariffChargeForm);
+
+        this.tariffChargePopup.show();
     }
 }

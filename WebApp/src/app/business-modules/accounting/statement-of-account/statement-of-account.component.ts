@@ -39,7 +39,7 @@ export class StatementOfAccountComponent extends AppList {
 
     ngOnInit() {
         this.headers = [
-            { title: 'SOA No', field: 'soano', sortable: true },
+            { title: 'SOA No', field: 'soano', sortable: true, width: 90 },
             { title: 'Partner', field: 'partnerName', sortable: true },
             { title: 'Shipment', field: 'shipment', sortable: true },
             { title: 'Credit Amount', field: 'creditAmount', sortable: true },

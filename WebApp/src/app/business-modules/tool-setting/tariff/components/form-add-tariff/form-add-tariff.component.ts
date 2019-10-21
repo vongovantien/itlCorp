@@ -5,7 +5,7 @@ import { CatalogueRepo, SystemRepo, SettingRepo, DocumentationRepo } from 'src/a
 import { FormBuilder, FormGroup, AbstractControl, FormControl, Validators } from '@angular/forms';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { SystemConstants } from 'src/constants/system.const';
-import { catchError } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, map } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
 import { Tariff, Partner, Company } from 'src/app/shared/models';
 import { Customer } from 'src/app/shared/models/catalogue/customer.model';
@@ -27,7 +27,7 @@ export class TariffFormAddComponent extends TariffFormSearchComponent {
     carries: any[] = [];
     agents: any[] = [];
 
-    selectedCarrier: Partial<CommonInterface.IComboGridData | any> = {};
+    selectedSupplier: Partial<CommonInterface.IComboGridData | any> = {};
     selectedAgent: Partial<CommonInterface.IComboGridData | any> = {};
 
     isDisabledCustomer: boolean = true;
@@ -72,6 +72,7 @@ export class TariffFormAddComponent extends TariffFormSearchComponent {
     }
 
     ngOnChanges() {
+
     }
 
     getOPSShipmentCommonData() {
@@ -104,15 +105,47 @@ export class TariffFormAddComponent extends TariffFormSearchComponent {
         ];
 
         // * Set default tariffType.
-        this.formAdd.controls['tariff'].setValue(
-            Object.assign({}, this.tariff, { tariffType: (this.tariffTypes || [])[0] })
-        );
+        this.formAdd.controls['tariff'].get('tariffType').setValue(this.tariffTypes[0]);
     }
 
     initFormAdd() {
         this.formAdd = this._fb.group({
-            tariff: this._fb.group(this.tariff)
+            tariff: this._fb.group({
+                tariffName: [this.tariff.tariffName, Validators.compose([
+                    Validators.required
+                ])],
+                tariffType: [this.tariff.tariffType, Validators.required,],
+                status: [this.tariff.status, Validators.compose([
+                    Validators.required
+                ])],
+                effectiveDate: [this.tariff.effectiveDate, Validators.compose([
+                    Validators.required
+                ])],
+                expiredDate: [this.tariff.expiredDate, Validators.compose([
+                    Validators.required
+                ])],
+                productService: [this.tariff.productService, Validators.compose([
+                    Validators.required
+                ])],
+                cargoType: [this.tariff.cargoType, Validators.compose([
+                    Validators.required
+                ])],
+                serviceMode: [this.tariff.serviceMode, Validators.compose([
+                    Validators.required
+                ])],
+                description: [this.tariff.description, Validators.compose([
+                    Validators.required
+                ])]
+            })
         });
+        this.formAdd.controls['tariff'].get("effectiveDate").valueChanges
+            .pipe(
+                distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
+                map((data: any) => data.startDate)
+            )
+            .subscribe((value: any) => {
+                this.minDate = value; // * Update MinDate -> ExpiredDate.
+            });
     }
 
     getCarrierAndAgent() {
@@ -133,22 +166,36 @@ export class TariffFormAddComponent extends TariffFormSearchComponent {
             case 'customer':
                 this.selectedCustomer = { field: 'shortName', value: data.shortName, data: data };
                 this.tariff.customerId = data.id;
+
+                // * Update Form Group
+                this.formAdd.value.tariff.customerId = data.id;
                 break;
             case 'agent':
                 this.selectedAgent = { field: 'shortName', value: data.shortName, data: data };
                 this.tariff.agentId = data.id;
+
+                // * Update Form Group
+                this.formAdd.value.tariff.agentId = data.id;
                 break;
             case 'office':
                 this.selectedOffice = { field: 'shortName', value: data.shortName, data: data };
                 this.tariff.officeId = data.id;
+
+                // * Update Form Group
+                this.formAdd.value.tariff.officeId = data.id;
                 break;
-            case 'carrier':
-                this.selectedCarrier = { field: 'shortName', value: data.shortName, data: data };
+            case 'supplier':
+                this.selectedSupplier = { field: 'shortName', value: data.shortName, data: data };
                 this.tariff.supplierId = data.id;
+
+                // * Update Form Group
+                this.formAdd.value.tariff.supplierId = data.id;
                 break;
             default:
                 break;
         }
+
+
     }
 
     onChangeTariffType(tariffType: CommonInterface.IValueDisplay) {
@@ -157,7 +204,8 @@ export class TariffFormAddComponent extends TariffFormSearchComponent {
                 this.isDisabledCustomer = false;
                 this.isDisabledSupplier = true;
                 this.isDisabledAgent = true;
-                [this.selectedAgent, this.selectedCarrier] = [{}, {}];
+                [this.selectedAgent, this.selectedSupplier] = [{}, {}];
+                [this.tariff.agentId, this.tariff.supplierId] = [null, null];
 
                 break;
             case 'Supplier':
@@ -165,17 +213,22 @@ export class TariffFormAddComponent extends TariffFormSearchComponent {
                 this.isDisabledCustomer = true;
                 this.isDisabledAgent = true;
                 [this.selectedAgent, this.selectedCustomer] = [{}, {}];
+                [this.tariff.agentId, this.tariff.customerId] = [null, null];
 
                 break;
             case 'Agent':
                 this.isDisabledAgent = false;
                 this.isDisabledSupplier = true;
                 this.isDisabledCustomer = true;
-                [this.selectedCarrier, this.selectedCustomer] = [{}, {}];
+                [this.selectedSupplier, this.selectedCustomer] = [{}, {}];
+                [this.tariff.supplierId, this.tariff.customerId] = [null, null];
+
                 break;
             default:
                 [this.isDisabledCustomer, this.isDisabledSupplier, this.isDisabledAgent] = [true, true, true];
-                [this.selectedCustomer, this.selectedAgent, this.selectedCarrier] = [{}, {}, {}];
+                [this.selectedCustomer, this.selectedAgent, this.selectedSupplier] = [{}, {}, {}];
+                [this.tariff.supplierId, this.tariff.customerId, this.tariff.agentId] = [null, null, null];
+
                 break;
         }
     }

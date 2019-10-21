@@ -29,5 +29,17 @@ export class SettingRepo {
             map((data: any) => data)
         );
     }
+
+    getDetailTariff(id: string) {
+        return this._api.get(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/Tariff/GetTariff`, { tariffId: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateTariff(body: any) {
+        return this._api.put(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/Tariff/Update`, body).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 

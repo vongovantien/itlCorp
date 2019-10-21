@@ -17,10 +17,10 @@ import { formatDate } from '@angular/common';
 export class TariffFormSearchComponent extends AppForm {
 
     @Output() onSearch: EventEmitter<Partial<ITariffSearch> | any> = new EventEmitter<Partial<ITariffSearch> | any>();
-    tariffTypes: CommonInterface.IValueDisplay[] | any;
+    tariffTypes: CommonInterface.IValueDisplay[] | any[];
     selectedTariffType: CommonInterface.IValueDisplay = null;
 
-    status: CommonInterface.IValueDisplay[] | any;
+    status: CommonInterface.IValueDisplay[] | any[];
     selectedStatus: CommonInterface.IValueDisplay = null;
 
     shipmentModes: CommonInterface.IValueDisplay[] | any[];

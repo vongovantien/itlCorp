@@ -1,11 +1,11 @@
 <div class="m-portlet form-add-tariff">
     <div class="m-portlet__body">
         <div class="row">
-            <div class="col-md-6">
-                Create new OPS Tariff
+            <div class="col-md-6 d-flex align-items-center">
+                <ng-content select="div.title"></ng-content>
             </div>
             <div class="col-md-6">
-                <ng-content></ng-content>
+                <ng-content select="div.form-actions"></ng-content>
             </div>
         </div>
         <hr>
@@ -27,10 +27,9 @@
                         <label required>Tariff Type</label>
                         <select formControlName="tariffType" class="form-control"
                             (ngModelChange)="onChangeTariffType($event)">
-                            <!-- <option [ngValue]="null">Please Select</option> -->
                             <option *ngFor="let type of tariffTypes" [ngValue]="type">{{type.displayName}}</option>
                         </select>
-                        <div class="form-control-feedback" *ngIf="isSubmitted && !formAdd.value.tariff.tariffName">
+                        <div class="form-control-feedback" *ngIf="isSubmitted && !formAdd.value.tariff.tariffType">
                             Tariff Type is required !
                         </div>
                     </div>
@@ -54,10 +53,9 @@
                         <label required>Effective Date</label>
                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [ranges]="ranges"
-                                [maxDate]="maxDate" name="daterange" placeholder="From date - to date" readonly
-                                [singleDatePicker]="true" formControlName="effectiveDate" [alwaysShowCalendars]="true"
-                                [autoApply]="true" />
+                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [maxDate]="maxDate"
+                                name="daterange" placeholder="From date - to date" readonly [singleDatePicker]="true"
+                                formControlName="effectiveDate" [alwaysShowCalendars]="true" [autoApply]="true" />
                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                 <span>
                                     <i class="la la-calendar"></i>
@@ -75,10 +73,9 @@
                         <label required>Expired Date</label>
                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [ranges]="ranges"
-                                [maxDate]="maxDate" name="daterange" placeholder="From date - to date" readonly
-                                [autoApply]="true" [singleDatePicker]="true" formControlName="expiredDate"
-                                [alwaysShowCalendars]="true" />
+                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [minDate]="minDate"
+                                name="daterange" placeholder="From date - to date" readonly [autoApply]="true"
+                                [singleDatePicker]="true" formControlName="expiredDate" [alwaysShowCalendars]="true" />
                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                 <span>
                                     <i class="la la-calendar"></i>
@@ -162,27 +159,27 @@
                             [height]="200" [disabled]="isDisabledCustomer">
                         </app-combo-grid-virtual-scroll>
                         <div class="form-control-feedback"
-                            *ngIf=" !isDisabledCustomer && isSubmitted && !selectedCarrier.value">
+                            *ngIf=" !isDisabledCustomer && isSubmitted && !selectedCustomer.value">
                             Customer is required !
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group"
-                        [ngClass]="{'m-form__group has-danger': !isDisabledSupplier && isSubmitted && !selectedCarrier.value}">
+                        [ngClass]="{'m-form__group has-danger': !isDisabledSupplier && isSubmitted && !selectedSupplier.value}">
                         <label>Supplier
                             <ng-container *ngIf="!isDisabledSupplier">
                                 <span class="text-danger">(*)</span>
                             </ng-container>
                         </label>
-                        <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCarrier"
-                            (itemSelected)="onSelectDataFormInfo($event, 'carrier')"
+                        <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedSupplier"
+                            (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
                             [selectedDisplayFields]="configCustomer.selectedDisplayFields" [dataSources]="carries"
                             [displayFields]="configCustomer.displayFields" [height]="200"
                             [disabled]="isDisabledSupplier">
                         </app-combo-grid-virtual-scroll>
                         <div class="form-control-feedback"
-                            *ngIf="!isDisabledSupplier && isSubmitted && !selectedCarrier.value">
+                            *ngIf="!isDisabledSupplier && isSubmitted && !selectedSupplier.value">
                             Supplier is required !
                         </div>
                     </div>

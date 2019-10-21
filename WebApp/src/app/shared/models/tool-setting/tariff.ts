@@ -42,10 +42,10 @@ export class TariffAdd {
                 self[key] = object[key];
             }
             if (!!self.setTariff) {
-                self.setTariff = new Tariff();
+                self.setTariff = new Tariff(object.setTariff);
             }
             if (!!self.setTariffDetails) {
-                self.setTariffDetails = new Array<TariffCharge>();
+                self.setTariffDetails = object.setTariffDetails.map(i => new TariffCharge(i));
             }
 
         }
@@ -55,6 +55,7 @@ export class TariffAdd {
 
 export class TariffCharge {
     chargeName: string = '';
+    chargeCode: string = '';
     commodityName: any = null;
     payerName: string = '';
     portName: string = '';

@@ -32,23 +32,32 @@
                 </thead>
                 <tbody>
                     <ng-container *ngIf="!!charges.length">
-                        <tr *ngFor="let charge of charges; let i = index; trackBy:trackByFn" class="text-center">
+                        <tr
+                            *ngFor="let charge of charges | filter: keyword: ['chargeName', 'chargeCode','route','commodityName','payerName','portName', 'warehouseName', 'currencyId']; let i = index; trackBy: trackByFn">
                             <td class="table-actions-col">
-                                <div class="table-actions" style="width: 70px">
-                                    <div class="d-flex">
-                                        <a class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only text-white"
-                                            title="Edit">
-                                            <i class="la la-copy"></i>
-                                        </a>
-                                        <button
-                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
-                                            <i class="la la-trash"></i>
-                                        </button>
-                                    </div>
+                                <div class="table-actions">
+                                    <a class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only text-white"
+                                        title="Edit">
+                                        <i class="la la-copy"></i>
+                                    </a>
+                                    <button class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                        <i class="la la-trash"></i>
+                                    </button>
                                 </div>
                             </td>
                             <ng-container *ngFor="let header of headers; let j = index; trackBy:trackByFn">
-                                <td>{{charge[header.field]}}</td>
+                                <td>
+                                    <ng-container *ngIf="header.dataType === 'LINK'; else dataTypeNormal">
+                                        <span class="text-underline text-primary pointer"
+                                            (click)="viewDetailTariffCharge(charge,i)">
+                                            {{charge[header.field]}}
+                                        </span>
+                                    </ng-container>
+                                    <ng-template #dataTypeNormal>
+                                        <span></span>
+                                        {{charge[header.field]}}
+                                    </ng-template>
+                                </td>
                             </ng-container>
                         </tr>
                     </ng-container>
@@ -58,13 +67,6 @@
             </table>
         </div>
     </div>
-    <button class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase" type="button"
-        (click)="showListChargeTariff()">
-        <span>
-            <i class="la la-plus"></i>
-            <span> Show tariff </span>
-        </span>
-    </button>
 </div>
 
 <tariff-charge-popup [(tariffCharge)]="selectedTariffCharge" (onChange)="onChangeChargeTariff($event)">

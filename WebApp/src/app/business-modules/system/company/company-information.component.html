@@ -37,23 +37,26 @@
                         </thead>
                         <tbody class="tbody-group">
                             <ng-container *ngIf="!isLoading && !!companies.length">
-                                <tr class="text-center"
-                                    *ngFor="let company of companies; let i = index; trackBy: trackByFn">
+                                <tr class="" *ngFor="let company of companies; let i = index; trackBy: trackByFn">
                                     <td class="table-actions-col">
-                                        <div class="d-flex">
-                                            <button (click)="showDeletePopup(company)" [disabled]="company.active"
-                                                disabled
-                                                class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
-                                                <i class="la la-trash"></i>
-                                            </button>
+                                        <div class="table-actions">
                                             <a [routerLink]="company.id"
                                                 class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                 title="Edit">
                                                 <i class="la la-edit"></i>
                                             </a>
+                                            <button (click)="showDeletePopup(company)" [disabled]="company.active"
+                                                disabled
+                                                class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                                <i class="la la-trash"></i>
+                                            </button>
                                         </div>
                                     </td>
-                                    <td>{{company.code}}</td>
+                                    <td>
+                                        <a [routerLink]="company.id">
+                                            {{company.code}}
+                                        </a>
+                                    </td>
                                     <td>{{company.bunameEn}}</td>
                                     <td>{{company.bunameVn}}</td>
                                     <td>{{company.bunameAbbr}}</td>

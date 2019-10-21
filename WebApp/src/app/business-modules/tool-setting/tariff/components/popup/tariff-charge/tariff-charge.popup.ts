@@ -21,9 +21,12 @@ export const TYPE_TARIFF = {
     templateUrl: './tariff-charge.popup.html',
 })
 export class TariffChargePopupComponent extends PopupBase {
+
     @Input() tariffCharge: TariffCharge = new TariffCharge();
     @Output() tariffDetailChange: EventEmitter<TariffCharge> = new EventEmitter<TariffCharge>();
     @Output() onChange: EventEmitter<any> = new EventEmitter<any>();
+
+    ACTION: CommonType.ACTION_FORM = 'CREATE';
 
     formChargeTariff: FormGroup;
 
@@ -49,6 +52,7 @@ export class TariffChargePopupComponent extends PopupBase {
 
     term$ = new BehaviorSubject<string>('');
 
+
     isShow: boolean = false;
     isSubmitted: boolean = false;
 
@@ -69,7 +73,7 @@ export class TariffChargePopupComponent extends PopupBase {
     }
 
     ngOnChanges() {
-        console.log(this.tariffCharge);
+        // console.log(this.tariffCharge);
     }
 
     ngOnInit(): void {
@@ -119,8 +123,27 @@ export class TariffChargePopupComponent extends PopupBase {
 
     initForm() {
         this.formChargeTariff = this._fb.group({
-            tariffChargeDetail: this._fb.group(this.tariffCharge)
+            tariffChargeDetail: this._fb.group({
+                useFor: [this.tariffCharge.useFor],
+                route: [this.tariffCharge.route],
+                type: [this.tariffCharge.type],
+                rangeType: [this.tariffCharge.rangeType],
+                rangeFrom: [this.tariffCharge.rangeFrom],
+                rangeTo: [this.tariffCharge.rangeTo],
+                unitPrice: [this.tariffCharge.unitPrice],
+                min: [this.tariffCharge.min],
+                max: [this.tariffCharge.max],
+                unitId: [this.tariffCharge.unitId],
+                nextUnit: [this.tariffCharge.nextUnit],
+                nextUnitPrice: [this.tariffCharge.nextUnitPrice],
+                vatrate: [this.tariffCharge.vatrate],
+                currencyId: [this.tariffCharge.currencyId],
+            })
         });
+
+        for (const control of ["rangeFrom", "rangeTo", "min", "max", "nextUnit", "nextUnitPrice", ""]) {
+            this.enableDisabledFormControl(this.formChargeTariff.controls['tariffChargeDetail'].get(control), 'disabled');
+        }
     }
 
     initBasicData() {
@@ -200,16 +223,14 @@ export class TariffChargePopupComponent extends PopupBase {
             this._catalogueRepo.getListCurrency()
                 .pipe(catchError(this.catchError))
                 .subscribe(
-                    (data: any) => {
+                    (data: any = []) => {
                         this.currencyList = data || [];
+                        this._dataService.setDataService(SystemConstants.CSTORAGE.CURRENCY, data || []);
 
-                        // * Set default currency.
-                        this.formChargeTariff.controls['tariffChargeDetail'].setValue(
-                            Object.assign({}, new TariffCharge(), { currencyId: (this.currencyList || []).filter(i => i.id === 'VND')[0] })
-                        );
-
-
+                        // * Set default tariffType.
+                        this.formChargeTariff.controls['tariffChargeDetail'].get('currencyId').setValue(this.currencyList.filter(i => i.id === 'VND')[0]);
                         this.tariffCharge.currencyId = this.currencyList.filter(i => i.id === 'VND')[0];
+
                     },
                 );
         }
@@ -224,7 +245,7 @@ export class TariffChargePopupComponent extends PopupBase {
                 .subscribe(
                     (dataPartner: any = []) => {
                         this.configPayer.dataSource = dataPartner;
-                        this._dataService.setData(SystemConstants.CSTORAGE.PARTNER, dataPartner);
+                        this._dataService.setDataService(SystemConstants.CSTORAGE.PARTNER, dataPartner);
                     },
                 );
         }
@@ -239,7 +260,7 @@ export class TariffChargePopupComponent extends PopupBase {
                 .subscribe(
                     (commondityGroup: any = []) => {
                         this.configComondity.dataSource = commondityGroup;
-                        this._dataService.setData(SystemConstants.CSTORAGE.COMMODITY, commondityGroup);
+                        this._dataService.setDataService(SystemConstants.CSTORAGE.COMMODITY, commondityGroup);
                     },
                 );
         }
@@ -254,7 +275,7 @@ export class TariffChargePopupComponent extends PopupBase {
                 .subscribe(
                     (port: any = []) => {
                         this.configPort.dataSource = port;
-                        this._dataService.setData(SystemConstants.CSTORAGE.PORT, port);
+                        this._dataService.setDataService(SystemConstants.CSTORAGE.PORT, port);
                     },
                 );
         }
@@ -269,7 +290,7 @@ export class TariffChargePopupComponent extends PopupBase {
                 .subscribe(
                     (wareHouse: any = []) => {
                         this.configWareHouse.dataSource = wareHouse;
-                        this._dataService.setData(SystemConstants.CSTORAGE.WAREHOUSE, wareHouse);
+                        this._dataService.setDataService(SystemConstants.CSTORAGE.WAREHOUSE, wareHouse);
                     },
                 );
         }
@@ -289,11 +310,12 @@ export class TariffChargePopupComponent extends PopupBase {
 
                 // * Update Model binding
                 this.tariffCharge.chargeName = this.selectedCharge.chargeNameEn;
+                this.tariffCharge.chargeCode = this.selectedCharge.code;
                 this.tariffCharge.chargeId = this.selectedCharge.id;
 
                 break;
             case 'payer':
-                this.selectedPayer = { field: 'partnerID', value: data.id, data: data };
+                this.selectedPayer = { field: 'id', value: data.id, data: data };
                 // * Update Form Group
                 this.formChargeTariff.value.tariffChargeDetail.payerId = this.selectedPayer.value;
                 this.formChargeTariff.value.tariffChargeDetail.payerName = this.selectedPayer.data.shortName;
@@ -391,25 +413,17 @@ export class TariffChargePopupComponent extends PopupBase {
         this._isShowAutoComplete.next(false);
     }
 
-    selectCharge(charge: Charge) {
-        this._isShowAutoComplete.next(false);
-
-        this.selectedCharge = new Charge(charge);
-        this.keyword = this.selectedCharge.chargeNameEn;
-
-        this.tariffCharge.chargeName = this.selectedCharge.chargeNameEn;
-        this.formChargeTariff.value.tariffChargeDetail.chargeName = this.selectedCharge.chargeNameEn;
-        this.tariffCharge.chargeId = this.selectedCharge.id;
-    }
-
-
     saveCharge() {
         this.isSubmitted = true;
-        if (!this.selectedCharge || !this.formChargeTariff.value.tariffChargeDetail.useFor || !this.formChargeTariff.value.tariffChargeDetail.route) {
+
+        const tariffChargeDetailForm: any = this.formChargeTariff.value.tariffChargeDetail;
+
+        if (!this.selectedCharge || !tariffChargeDetailForm.useFor || !tariffChargeDetailForm.route) {
             return;
         }
         const body: TariffCharge | any = {
             chargeName: this.tariffCharge.chargeName,
+            chargeCode: this.tariffCharge.chargeCode,
             commodityName: this.tariffCharge.commodityName,
             payerName: this.tariffCharge.payerName,
             portName: this.tariffCharge.portName,
@@ -422,27 +436,26 @@ export class TariffChargePopupComponent extends PopupBase {
             portId: this.tariffCharge.portId,
             warehouseId: this.tariffCharge.warehouseId,
 
-            useFor: !!this.formChargeTariff.value.tariffChargeDetail.useFor ? this.formChargeTariff.value.tariffChargeDetail.useFor.value : null,
-            route: !!this.formChargeTariff.value.tariffChargeDetail.route ? this.formChargeTariff.value.tariffChargeDetail.route.value : null,
-            type: !!this.formChargeTariff.value.tariffChargeDetail.type ? this.formChargeTariff.value.tariffChargeDetail.type.value : null,
-            rangeType: !!this.formChargeTariff.value.tariffChargeDetail.rangeType ? this.formChargeTariff.value.tariffChargeDetail.rangeType.value : null,
+            useFor: !!tariffChargeDetailForm.useFor ? tariffChargeDetailForm.useFor.value : null,
+            route: !!tariffChargeDetailForm.route ? tariffChargeDetailForm.route.value : null,
+            type: !!tariffChargeDetailForm.type ? tariffChargeDetailForm.type.value : null,
+            rangeType: !!tariffChargeDetailForm.rangeType ? tariffChargeDetailForm.rangeType.value : null,
 
-            rangeFrom: this.formChargeTariff.value.tariffChargeDetail.rangeFrom || 0,
-            rangeTo: this.formChargeTariff.value.tariffChargeDetail.rangeTo || 0,
-            unitPrice: this.formChargeTariff.value.tariffChargeDetail.unitPrice || 0,
-            min: this.formChargeTariff.value.tariffChargeDetail.min || 0,
-            max: this.formChargeTariff.value.tariffChargeDetail.max || 0,
-            nextUnit: this.formChargeTariff.value.tariffChargeDetail.nextUnit || 0,
-            nextUnitPrice: this.formChargeTariff.value.tariffChargeDetail.nextUnitPrice || 0,
-            vatrate: this.formChargeTariff.value.tariffChargeDetail.vatrate || 0,
+            rangeFrom: tariffChargeDetailForm.rangeFrom || 0,
+            rangeTo: tariffChargeDetailForm.rangeTo || 0,
+            unitPrice: tariffChargeDetailForm.unitPrice || 0,
+            min: tariffChargeDetailForm.min || 0,
+            max: tariffChargeDetailForm.max || 0,
+            nextUnit: tariffChargeDetailForm.nextUnit || 0,
+            nextUnitPrice: tariffChargeDetailForm.nextUnitPrice || 0,
+            vatrate: tariffChargeDetailForm.vatrate || 0,
 
-            currencyId: !!this.formChargeTariff.value.tariffChargeDetail.currencyId ? this.formChargeTariff.value.tariffChargeDetail.currencyId.id : null,
-            unitId: !!this.formChargeTariff.value.tariffChargeDetail.unitId ? this.formChargeTariff.value.tariffChargeDetail.unitId.id : null,
+            currencyId: !!tariffChargeDetailForm.currencyId ? tariffChargeDetailForm.currencyId.id : null,
+            unitId: !!tariffChargeDetailForm.unitId ? tariffChargeDetailForm.unitId.id : null,
         };
 
 
         this.tariffCharge = new TariffCharge(body);
-
         this.onChange.emit(this.tariffCharge);
         this.hide();
     }

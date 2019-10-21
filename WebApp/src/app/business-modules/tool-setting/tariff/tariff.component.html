@@ -43,24 +43,27 @@
                                 </thead>
                                 <tbody>
                                     <ng-container *ngIf="!isLoading && !!tariffs.length">
-                                        <tr class="text-center"
+                                        <tr class=""
                                             *ngFor="let tariff of tariffs | filter : keyword : ['tariffName','tariffType','customerID','supplierID','serviceMode','status']; let i = index; trackBy: trackByFn">
                                             <td class="table-actions-col">
-                                                <div class="table-actions" style="width: 70px">
-                                                    <div class="d-flex">
-                                                        <a [routerLink]="tariff.id"
-                                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            title="Edit">
-                                                            <i class="la la-copy"></i>
-                                                        </a>
-                                                        <button (click)="showDeletePopup(tariff)"
-                                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
-                                                            <i class="la la-trash"></i>
-                                                        </button>
-                                                    </div>
+                                                <div class="table-actions">
+                                                    <a [routerLink]="tariff.id"
+                                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Edit">
+                                                        <i class="la la-copy"></i>
+                                                    </a>
+                                                    <button (click)="showDeletePopup(tariff)"
+                                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                                        <i class="la la-trash"></i>
+                                                    </button>
                                                 </div>
                                             </td>
-                                            <td>{{tariff.tariffName}}</td>
+                                            <td>
+                                                <a class="text-underline" [routerLink]="tariff.id"
+                                                    [title]="tariff.tariffName">
+                                                    {{tariff.tariffName}}
+                                                </a>
+                                            </td>
                                             <td>{{tariff.tariffType}}</td>
                                             <td>{{tariff.customerName}}</td>
                                             <td>{{tariff.supplierName}}</td>
@@ -70,10 +73,10 @@
                                             <td [ngClass]="tariff.status ? 'text-success' : 'text-danger'">
                                                 {{tariff.status ? 'Active' : 'Inactive'}}</td>
                                         </tr>
-                                        <tr app-table-none-record *ngIf="!isLoading && !tariffs.length"
-                                            [colspan]="headers.length + 1"></tr>
-                                        <tr app-table-loading *ngIf="isLoading"></tr>
                                     </ng-container>
+                                    <tr app-table-none-record *ngIf="!isLoading && !tariffs.length"
+                                        [colspan]="headers.length + 1"></tr>
+                                    <tr app-table-loading *ngIf="isLoading"></tr>
                                 </tbody>
                             </table>
                         </div>
