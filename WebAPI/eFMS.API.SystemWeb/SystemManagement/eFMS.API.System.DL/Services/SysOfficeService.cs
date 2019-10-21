@@ -144,6 +144,9 @@ namespace eFMS.API.System.DL.Services
             try
             {
                 var entity = mapper.Map<SysOffice>(model);
+                var officeCurrent = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+                entity.UserCreated = officeCurrent.UserCreated;
+                entity.DatetimeCreated = officeCurrent.DatetimeCreated;
                 if (entity.Active == true)
                 {
                     entity.InactiveOn = DateTime.Now;
