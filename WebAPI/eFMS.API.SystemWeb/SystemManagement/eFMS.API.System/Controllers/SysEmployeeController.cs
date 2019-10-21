@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using eFMS.API.Common;
 using eFMS.API.System.DL.Common;
+using eFMS.API.System.DL.IService;
 using eFMS.API.System.Infrastructure.Middlewares;
-using eFMS.IdentityServer.DL.IService;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +27,21 @@ namespace eFMS.API.System.Controllers
       )
         {
             sysEmployeeService = isysEmployeeService;
+        }
+
+        [HttpGet]
+        [Route("Query")]
+        public IActionResult Query(string employeeid)
+        {
+            var result = sysEmployeeService.First(x => x.Id == employeeid);
+            if (result == null)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = "Không tìm thấy Employee", Data = result });
+            }
+            else
+            {
+                return Ok(new ResultHandle { Status = true, Message = "Success", Data = result });
+            }
         }
     }
 }
