@@ -31,25 +31,25 @@
                     <th class="first table-actions-col"></th>
                 </thead>
                 <tbody>
-                    <ng-container *ngIf="!!charges.length">
-                        <tr
-                            *ngFor="let charge of charges | filter: keyword: ['chargeName', 'chargeCode','route','commodityName','payerName','portName', 'warehouseName', 'currencyId']; let i = index; trackBy: trackByFn">
+                    <ng-container>
+                        <tr *ngFor="let charge of charges; let i = index; trackBy: trackByFn">
                             <td class="table-actions-col">
                                 <div class="table-actions">
                                     <a class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only text-white"
-                                        title="Edit">
+                                        title="Duplicate" (click)="viewDetailTariffCharge(charge, i, 'COPY')">
                                         <i class="la la-copy"></i>
                                     </a>
-                                    <button class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                    <button class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Delete" (click)="deleteTariff(i)">
                                         <i class="la la-trash"></i>
                                     </button>
                                 </div>
                             </td>
-                            <ng-container *ngFor="let header of headers; let j = index; trackBy:trackByFn">
+                            <ng-container *ngFor="let header of headers; let j = index;trackBy: trackByFn">
                                 <td>
                                     <ng-container *ngIf="header.dataType === 'LINK'; else dataTypeNormal">
                                         <span class="text-underline text-primary pointer"
-                                            (click)="viewDetailTariffCharge(charge,i)">
+                                            (click)="viewDetailTariffCharge(charge,i, 'UPDATE')">
                                             {{charge[header.field]}}
                                         </span>
                                     </ng-container>

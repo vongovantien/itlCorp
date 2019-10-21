@@ -47,7 +47,7 @@
                                             *ngFor="let tariff of tariffs | filter : keyword : ['tariffName','tariffType','customerID','supplierID','serviceMode','status']; let i = index; trackBy: trackByFn">
                                             <td class="table-actions-col">
                                                 <div class="table-actions">
-                                                    <a [routerLink]="tariff.id"
+                                                    <a [routerLink]="[tariff.id]" [queryParams]="{action: 'copy'}"
                                                         class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                         title="Edit">
                                                         <i class="la la-copy"></i>

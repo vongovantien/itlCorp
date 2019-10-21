@@ -19,6 +19,7 @@ export class TariffListChargeComponent extends AppList {
     selectedTariffCharge: TariffCharge = new TariffCharge();
     selectedIndex: number = -1; // * SELECT ITEM CHARGE IN TABLE.
 
+    data: any[] = [1, 2, 3];
     constructor() {
         super();
     }
@@ -64,12 +65,12 @@ export class TariffListChargeComponent extends AppList {
         console.log(this.charges);
     }
 
-    viewDetailTariffCharge(tariffCharge: TariffCharge, index: number) {
+    viewDetailTariffCharge(tariffCharge: TariffCharge, index: number, action: CommonType.ACTION_FORM = 'UPDATE') {
         this.selectedIndex = index;
         this.selectedTariffCharge = tariffCharge;
 
         // * UPDATE ACTION FOR POPUP -> UPDATE
-        this.tariffChargePopup.ACTION = 'UPDATE';
+        this.tariffChargePopup.ACTION = action;
 
         const objectTariffChargeForm = {
             useFor: this.tariffChargePopup.useFors.filter(useFor => useFor.value === this.selectedTariffCharge.useFor)[0],
@@ -101,5 +102,9 @@ export class TariffListChargeComponent extends AppList {
         this.tariffChargePopup.formChargeTariff.controls['tariffChargeDetail'].setValue(objectTariffChargeForm);
 
         this.tariffChargePopup.show();
+    }
+
+    deleteTariff(index: number) {
+        this.charges.splice(index, 1);
     }
 }

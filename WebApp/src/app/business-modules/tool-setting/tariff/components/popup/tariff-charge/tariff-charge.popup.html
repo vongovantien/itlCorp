@@ -215,7 +215,7 @@
                                 <span>
                                     <i class="la la-save"></i>
                                     <span>
-                                        Add
+                                        {{ACTION === 'CREATE' ? 'Add' : 'Update'}}
                                     </span>
                                 </span>
                             </button>
@@ -225,7 +225,7 @@
                                 <span>
                                     <i class="la la-download"></i>
                                     <span>
-                                        Add & Continue
+                                        {{ACTION === 'CREATE' ? 'Add' : 'Update'}} & Continue
                                     </span>
                                 </span>
                             </button>

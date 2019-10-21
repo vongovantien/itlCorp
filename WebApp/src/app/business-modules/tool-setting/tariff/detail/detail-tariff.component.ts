@@ -4,9 +4,11 @@ import { SettingRepo } from 'src/app/shared/repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { switchMap, tap, catchError, finalize } from 'rxjs/operators';
+import { switchMap, tap, catchError, finalize, map } from 'rxjs/operators';
 import { TariffAdd } from 'src/app/shared/models';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { SystemConstants } from 'src/constants/system.const';
+import { combineLatest } from 'rxjs';
 
 @Component({
     selector: 'app-detail-tariff',
@@ -17,15 +19,16 @@ export class TariffDetailComponent extends TariffAddComponent {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     tariffId: string = '';
     tariff: TariffAdd;
+    ACTION: CommonType.ACTION_FORM = 'UPDATE';
 
     constructor(
         protected _settingRepo: SettingRepo,
         protected _progressService: NgProgress,
         protected _toastService: ToastrService,
         private _activedRoute: ActivatedRoute,
-        private _router: Router
+        protected _router: Router
     ) {
-        super(_settingRepo, _progressService, _toastService);
+        super(_settingRepo, _progressService, _toastService, _router);
         this._progressRef = this._progressService.ref();
     }
 
@@ -34,16 +37,22 @@ export class TariffDetailComponent extends TariffAddComponent {
 
     ngAfterViewInit() {
         this._progressRef.start();
-        this._activedRoute.params
-            .pipe(
-                tap((param: Params) => {
-                    this.tariffId = param.id;
-                }),
-                switchMap(
-                    () => this._settingRepo.getDetailTariff(this.tariffId)
-                        .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-                ),
-            )
+        combineLatest([
+            this._activedRoute.params,
+            this._activedRoute.queryParams
+        ]).pipe(
+            map(([params, qParams]) => ({ ...params, ...qParams })),
+            tap((param: Params) => {
+                this.tariffId = param.id;
+                if (param.action) {
+                    this.ACTION = (param.action).toUpperCase() || "UPDATE";
+                }
+            }),
+            switchMap(
+                () => this._settingRepo.getDetailTariff(this.tariffId)
+                    .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            ),
+        )
             .subscribe((res: CommonInterface.IResult) => {
                 if (res.message) {
                     this.tariff = new TariffAdd(res.data);
@@ -51,7 +60,7 @@ export class TariffDetailComponent extends TariffAddComponent {
 
                     const objectTariffForm = {
                         tariffName: this.tariff.setTariff.tariffName,
-                        productService: (this.formAddTariffComponent.productSerices.filter(i => i.value === this.tariff.setTariff.productService))[0],
+                        productService: (this.formAddTariffComponent.productSerices || [].filter(i => i.value === this.tariff.setTariff.productService))[0],
                         tariffType: this.formAddTariffComponent.tariffTypes.filter(type => type.value === this.tariff.setTariff.tariffType)[0],
                         status: this.formAddTariffComponent.status.filter(i => i.value === this.tariff.setTariff.status)[0],
                         effectiveDate: { startDate: new Date(this.tariff.setTariff.effectiveDate), endDate: new Date(this.tariff.setTariff.effectiveDate) },
@@ -95,24 +104,27 @@ export class TariffDetailComponent extends TariffAddComponent {
         }
         this.onSubmitData();
 
-        // * UPDATE ID FOR CREATE TARIFF.
-        this.tariff.setTariff.id = this.tariffId;
-        for (const item of this.tariff.setTariffDetails) {
-            item.tariffId = this.tariffId;
-        }
+
 
         this._progressRef.start();
-        this._settingRepo.updateTariff(this.tariff)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this._toastService.success(res.message);
-                    } else {
-                        this._toastService.error(res.message);
-                    }
-                },
-            );
+        if (this.ACTION === "COPY") {
+            this.updateIdTariff(SystemConstants.EMPTY_GUID);
+            this.onCreateTariff();
+        } else {
+            this.updateIdTariff(this.tariffId);
+            this._settingRepo.updateTariff(this.tariff)
+                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
+                    },
+                );
+        }
+
     }
 
     deleteTariff() {
@@ -120,13 +132,14 @@ export class TariffDetailComponent extends TariffAddComponent {
     }
 
     onDeleteTariff() {
-        this.confirmDeletePopup.show();
         this._progressRef.start();
         this._settingRepo.deleteTariff(this.tariffId)
-            .pipe(catchError(this.catchError), finalize(() => {
-                this._progressRef.complete();
-                this.confirmDeletePopup.hide();
-            }))
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                    this.confirmDeletePopup.hide();
+                }))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -137,6 +150,13 @@ export class TariffDetailComponent extends TariffAddComponent {
                     }
                 }
             );
+    }
+
+    updateIdTariff(id: string) {
+        this.tariff.setTariff.id = id;
+        for (const item of this.tariff.setTariffDetails) {
+            item.tariffId = id;
+        }
     }
 
 }

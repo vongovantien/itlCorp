@@ -8,6 +8,7 @@ import { catchError, finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
 import { SystemConstants } from 'src/constants/system.const';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-add-tariff',
@@ -22,7 +23,8 @@ export class TariffAddComponent extends AppList {
     constructor(
         protected _settingRepo: SettingRepo,
         protected _progressService: NgProgress,
-        protected _toastService: ToastrService
+        protected _toastService: ToastrService,
+        protected _router: Router,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -84,12 +86,18 @@ export class TariffAddComponent extends AppList {
 
         this.tariff.setTariff.id = SystemConstants.EMPTY_GUID; // * UPDATE ID FOR CREATE TARIFF.
 
+        this.onCreateTariff();
+
+    }
+
+    onCreateTariff() {
         this._settingRepo.addTariff(this.tariff)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
+                        this._router.navigate(["home/tool/tariff"]);
                     } else {
                         this._toastService.error(res.message);
                     }
