@@ -51,8 +51,7 @@
             <tabset type="tabs">
                 <tab heading="Job detail" (selectTab)="selectTab($event,'job-edit')">
                     <div *ngIf="tab === 'job-edit'">
-                        <form novalidate #addOpsForm="ngForm" name="addOpsForm"
-                            (ngSubmit)="logSubmit($event); saveShipment(addOpsForm)">
+                        <form novalidate #addOpsForm="ngForm" name="addOpsForm" (ngSubmit)="logSubmit($event)">
                             <div class="m-form m-form--state">
                                 <div class="m-portlet">
                                     <div class="alert-block__heading">
