@@ -269,7 +269,7 @@
                       </td>
                       <td class="">
                         <div class="control-editable">
-                          <ng-select [allowClear]="true" [items]="weightMesurements" (data)="refreshValue($event)"
+                          <ng-select [allowClear]="true" [items]="weightMesurements"
                             (selected)="container.unitOfMeasureId = $event.id; container.unitOfMeasureName = $event.text"
                             (removed)="container.unitOfMeasureId = null; container.unitOfMeasureName = null"
                             [active]="container.unitOfMeasureActive" placeholder="Select filter">

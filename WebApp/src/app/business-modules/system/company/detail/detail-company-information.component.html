@@ -59,7 +59,7 @@
                                     <tbody class="tbody-group">
                                         <ng-container *ngIf="!isLoading && !!offices.length">
                                             <tr *ngFor="let office of offices; let i = index; trackBy: trackByFn"
-                                                class="text-center">
+                                                class="">
                                                 <td class="table-actions-col">
                                                     <div class="table-actions">
                                                         <a (click)="gotoDetailOffice(office)"
@@ -74,7 +74,6 @@
                                                 <td>{{office.branchNameVn}}</td>
                                                 <td>{{office.shortName}}</td>
                                                 <td>{{office.addressEn}}</td>
-                                                <td>{{office.companyName}}</td>
                                                 <td [ngClass]="office.active ? 'text-success' : 'text-danger'">
                                                     {{office.active ? 'Active' : 'Inactive'}}</td>
                                             </tr>

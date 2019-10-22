@@ -1,107 +1,112 @@
-<!--begin:: subheader-->
 <div class="m-subheader">
-  <div class="d-flex align-items-center">
-    <div class="mr-auto">
-      <!--begin:: breadcrumbs-->
-      <app-breadcrumb></app-breadcrumb>
-      <!--end:: breadcrumbs-->
+    <div class="d-flex align-items-center">
+        <div class="mr-auto">
+            <app-breadcrumb></app-breadcrumb>
+        </div>
+        <div class="c-button-actions">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                [routerLink]="'/home/system/group/new'">
+                <span>
+                    <i class="la la-plus"></i>
+                    <span>
+                        add new
+                    </span>
+                </span>
+            </button>
+            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-upload"></i>
+                    <span>
+                        export
+                    </span>
+                </span>
+            </button>
+        </div>
     </div>
     <div class="c-button-actions">
-      <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-        [routerLink]="'/home/system/group/new'">
-        <span>
-          <i class="la la-plus"></i>
-          <span>
-            add new
-          </span>
-        </span>
-      </button>
-      <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="export()">
-        <span>
-          <i class="la la-upload"></i>
-          <span>
-            export
-          </span>
-        </span>
-      </button>
+        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+            [routerLink]="'/home/system/group/new'">
+            <span>
+                <i class="la la-plus"></i>
+                <span>
+                    add new
+                </span>
+            </span>
+        </button>
+        <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="export()">
+            <span>
+                <i class="la la-upload"></i>
+                <span>
+                    export
+                </span>
+            </span>
+        </button>
     </div>
-  </div>
 </div>
-<!--end:: subheader-->
-<!--begin::m-content of stage-management-->
 <div class="m-content">
-  <!--begin:: m-portlet of search-form-->
-  <div class="m-portlet">
-    <div class="m-portlet__body">
-      <!--begin::Form-->
-      <app-form-search-group (onSearch)="onSearchGroup($event)">
-      </app-form-search-group>
-      <!--end::Form-->
+    <div class="m-portlet">
+        <div class="m-portlet__body">
+            <app-form-search-group (onSearch)="onSearchGroup($event)">
+            </app-form-search-group>
+        </div>
     </div>
-  </div>
-  <!--end::m-portlet of search-form-->
-  <!--begin:: m-portlet of stage-management-->
-  <div class="m-portlet">
-    <div class="m-portlet__body">
-      <!--begin: Datatable of stage-management-list-table -->
-      <div class="table-wrapper" id="">
-        <table class="table table-striped table-brand dataTable">
-          <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField ? $event.sortField : '')">
-            <th class="m--w-50 first">
-            </th>
-          </thead>
-          <tbody class="tbody-group">
-            <ng-container *ngIf="!isLoading && !!groups.length">
-              <tr *ngFor="let group of groups; let i = index; trackBy: trackByFn">
-                <td class="table-actions-col">
-                  <div class="table-actions" style="width: 70px">
-                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                      title="Edit unit" [routerLink]="group.id">
-                      <i class="la la-edit"></i>
-                    </button>
-                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                      [disabled]="group.active" title="Remove unit" (click)="confirmDelete(group)">
-                      <i class="la la-trash"></i>
-                    </button>
-                  </div>
-                </td>
-                <td>
-                  <span>{{ group.code}}</span>
-                </td>
-                <td>
-                  <span>{{ group.nameEn}}</span>
-                </td>
-                <td>
-                  <span>{{ group.nameVn}}</span>
-                </td>
-                <td>
-                  <span>{{ group.shortName}}</span>
-                </td>
-                <td>
-                  <span>{{ group.departmentName}}</span>
-                </td>
-                <td class="text-center" [ngClass]="!group.active ? 'text-danger' : 'text-success'">
-                  {{ group.active ? 'Active' : 'Inactive' }}</td>
-              </tr>
-            </ng-container>
-            <tr *ngIf="!isLoading && !groups.length" app-table-none-record [colspan]="headers.length + 1"></tr>
-            <tr *ngIf="isLoading" app-table-row-loading></tr>
-          </tbody>
-
-        </table>
-      </div>
-      <!--end: Datatable of stage-management-list-table -->
-      <!--begin::pagination-->
-      <!-- <app-pagination currentPage *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)"
-        (pagerObject)="setPage($event)"></app-pagination> -->
-      <!--end::pagination-->
-    </div>
-  </div>
-  <!--end:: m-portlet of stage-management-->
 </div>
-<!--end::m-content of stage-management-->
+<!--end::m-portlet of search-form-->
+<!--begin:: m-portlet of stage-management-->
+<div class="m-portlet">
+    <div class="m-portlet__body">
+        <!--begin: Datatable of stage-management-list-table -->
+        <div class="table-wrapper" id="">
+            <table class="table table-striped table-brand dataTable">
+                <thead app-table-header [headers]="headers"
+                    (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                    <th class="m--w-50 first">
+                    </th>
+                </thead>
+                <tbody class="tbody-group">
+                    <ng-container *ngIf="!isLoading && !!groups.length">
+                        <tr *ngFor="let group of groups; let i = index; trackBy: trackByFn">
+                            <td class="table-actions-col">
+                                <div class="table-actions" style="width: 70px">
+                                    <button type="button"
+                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        title="Edit unit" [routerLink]="group.id">
+                                        <i class="la la-edit"></i>
+                                    </button>
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        [disabled]="group.active" title="Remove unit" (click)="confirmDelete(group)">
+                                        <i class="la la-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                <span>{{ group.code}}</span>
+                            </td>
+                            <td>
+                                <span>{{ group.nameEn}}</span>
+                            </td>
+                            <td>
+                                <span>{{ group.nameVn}}</span>
+                            </td>
+                            <td>
+                                <span>{{ group.shortName}}</span>
+                            </td>
+                            <td>
+                                <span>{{ group.departmentName}}</span>
+                            </td>
+                            <td class="text-center" [ngClass]="!group.active ? 'text-danger' : 'text-success'">
+                                {{ group.active ? 'Active' : 'Inactive' }}</td>
+                        </tr>
+                    </ng-container>
+                    <tr *ngIf="!isLoading && !groups.length" app-table-none-record [colspan]="headers.length + 1"></tr>
+                    <tr *ngIf="isLoading" app-table-row-loading></tr>
+                </tbody>
 
-<!--begin::confirm-delete-modal-->
+            </table>
+        </div>
+    </div>
+</div>
+
 <confirm-popup [body]="'Do you want to delete?'" [labelConfirm]="'Yes'" (onSubmit)="onDeleteGroup()">
 </confirm-popup>
-<!--end::confirm-delete-modal-->

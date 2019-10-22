@@ -46,7 +46,6 @@ export class CompanyInformationDetailComponent extends AppList {
             { title: 'Name Local', field: 'branchNameVn', sortable: true },
             { title: 'Name Abbr', field: 'shortName', sortable: true },
             { title: 'Address En', field: 'addressEn', sortable: true },
-            { title: 'Company', field: 'code', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
         ];
     }

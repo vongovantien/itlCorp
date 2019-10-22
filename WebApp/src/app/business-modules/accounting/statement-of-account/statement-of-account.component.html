@@ -28,18 +28,12 @@
                             </div>
                             <div class="m-portlet">
                                 <div class="m-portlet__body">
-                                    <div class="table-wrapper" id="">
+                                    <div class="table-wrapper">
                                         <table class="table table-striped table-brand dataTable">
-                                            <thead>
-                                                <tr>
-                                                    <th class="table-actions-col"></th>
-                                                    <th *ngFor="let header of headers; let i = index; trackBy: trackByFn"
-                                                        [class]="sortClass(header.sortable ? header.field : '')"
-                                                        (click)="sortBy(header.sortable ? header.field : '')">
-                                                        <span>{{header.title}}</span>
-                                                        <span class="sort-indicator"></span>
-                                                    </th>
-                                                </tr>
+                                            <thead app-table-header [headers]="headers"
+                                                (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                                                <th class="m--w-50 first">
+                                                </th>
                                             </thead>
                                             <tbody>
                                                 <tr *ngIf="!isLoading && !SOAs.length">
@@ -86,7 +80,6 @@
                                                         <span
                                                             *ngIf="soa.totalAmount < 0">({{soa.totalAmount | abs | number: '.0-2' }})
                                                             {{soa.currency}}</span>
-
                                                     </td>
                                                     <td>
                                                         <span

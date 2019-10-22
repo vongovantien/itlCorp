@@ -5,7 +5,7 @@ namespace CommonInterface {
         sortable?: boolean;
         class?: string;
         width?: number;
-        dataType?: any;
+        dataType?: CommonType.DataType;
     }
 
     export interface IComboGirdConfig {
@@ -18,6 +18,7 @@ namespace CommonInterface {
     export interface IComboGridData {
         field: string;
         value: string;
+        data?: any;
     }
 
     export interface IResult {

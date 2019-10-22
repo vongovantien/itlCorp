@@ -9,6 +9,8 @@ export * from './three-digit-decima-number.directive';
 export * from './two-digit-decima-number.directive';
 export * from './clickOutside.directive';
 export * from './loading-button.directive';
+export * from './required.directive';
+
 
 
 

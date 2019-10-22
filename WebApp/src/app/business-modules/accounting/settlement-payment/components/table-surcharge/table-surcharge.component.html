@@ -1,11 +1,11 @@
 <div class="table-wrapper table-scrollable">
     <table class="table table-brand table-hover dataTable">
-        <thead app-table-header [headers]="headers" class="text-center" (onClick)="sortSurcharge($event)">
+        <thead app-table-header [headers]="headers" (onClick)="sortSurcharge($event)">
             <th class="first"> </th>
         </thead>
         <tbody class="tbody-group">
             <ng-container *ngFor="let surcharge of data.chargeSettlements; let i = index; trackBy: trackByFn">
-                <tr class="text-center">
+                <tr class="">
                     <td class="table-actions-col">
                         <div class="m-checkbox-list d-flex justify-content-center">
                             <label class="m-checkbox">

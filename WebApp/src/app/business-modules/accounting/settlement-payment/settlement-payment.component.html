@@ -38,7 +38,7 @@
                                 <tbody class="tbody-group">
                                     <ng-container
                                         *ngFor="let settlePayment of settlements; let i = index; trackBy: trackByFn">
-                                        <tr class="text-center">
+                                        <tr class="">
                                             <td>
                                                 <div class="m-checkbox-list d-flex align-items-center">
                                                     <button
@@ -96,7 +96,7 @@
                                                 <tbody>
                                                     <ng-container *ngIf="!!customClearances.length">
                                                         <tr *ngFor="let clearance of customClearances; let j = index; trackBy: trackByFn"
-                                                            class="text-center">
+                                                            class="">
                                                             <td>
                                                                 <span>{{clearance.jobId}}</span>
                                                             </td>

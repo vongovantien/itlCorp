@@ -12,9 +12,9 @@ import { ServiceModule } from "./services/service.module";
 import { SearchStage, FilterPipe, NegativeNumberePipe, EqualErrorPipe, AbsPipe, RemoveTrimPipe } from "./pipes";
 
 import { InfoPopupComponent, ConfirmPopupComponent } from "./common/popup";
-import { DecimalNumberGreaterThan0Directive, StyleCellDirective, AutofocusDirective, TwoDigitDecimaNumberDirective, ThreeDigitDecimaNumberDirective, IntergerInputDirective, SpecialCharacterDirective, EcusSpecicalCharacterAllowSpaceDirective, EcusSpecicalCharacterNoSpaceDirective, ClickOutSideDirective, AppLoadingButtonDirective } from "./directives";
+import { DecimalNumberGreaterThan0Directive, StyleCellDirective, AutofocusDirective, TwoDigitDecimaNumberDirective, ThreeDigitDecimaNumberDirective, IntergerInputDirective, SpecialCharacterDirective, EcusSpecicalCharacterAllowSpaceDirective, EcusSpecicalCharacterNoSpaceDirective, ClickOutSideDirective, AppLoadingButtonDirective, AppRequiredDirective } from "./directives";
 
-import { PaginationComponent, TableLayoutComponent, InputTableLayoutComponent, BreadcrumbComponent, DefaultButtonComponent, DeleteConfirmModalComponent, SearchOptionsComponent, InputFormComponent, TableDetailComponent, CloseModalButtonComponent, ReportPreviewComponent, ComboGridVirtualScrollComponent, CfBeforeLeaveModalComponent, AppMultipleSelectComponent, TableNoneRecordComponent, TableHeaderComponent, TableRowLoadingComponent, SubHeaderComponent, TableCollapseRowComponent, AppTableComponent } from "./common";
+import { PaginationComponent, TableLayoutComponent, InputTableLayoutComponent, BreadcrumbComponent, DefaultButtonComponent, DeleteConfirmModalComponent, SearchOptionsComponent, InputFormComponent, TableDetailComponent, CloseModalButtonComponent, ReportPreviewComponent, ComboGridVirtualScrollComponent, CfBeforeLeaveModalComponent, AppMultipleSelectComponent, TableNoneRecordComponent, TableHeaderComponent, TableRowLoadingComponent, SubHeaderComponent, TableCollapseRowComponent, AppTableComponent, AppComboGridComponent } from "./common";
 import { CollapseModule } from "ngx-bootstrap/collapse";
 import { UploadAlertComponent } from './common/popup/upload-alert/upload-alert.component';
 import { TooltipModule } from "ngx-bootstrap/tooltip";
@@ -64,6 +64,7 @@ const APP_COMPONENTS = [
   TableRowLoadingComponent,
   TableCollapseRowComponent,
   AppTableComponent,
+  AppComboGridComponent,
   ...APP_POPUP
 ];
 
@@ -79,7 +80,8 @@ const APP_DIRECTIVES = [
   DecimalNumberGreaterThan0Directive,
   ClickOutSideDirective,
   LoadModuleDirective,
-  AppLoadingButtonDirective
+  AppLoadingButtonDirective,
+  AppRequiredDirective
 ];
 @NgModule({
   imports: [

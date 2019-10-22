@@ -1,4 +1,4 @@
-<tr class="text-center">
+<tr class="text-left">
     <ng-content select="th.first"></ng-content>
     <th *ngFor="let header of headers; let i = index; trackBy: trackByFn" [ngStyle]="{ 'min-width.px': header.width }"
         [class]="sortClass(header.sortable ? header.field : '')" (click)="sortBy(header.sortable ? header.field : '')">

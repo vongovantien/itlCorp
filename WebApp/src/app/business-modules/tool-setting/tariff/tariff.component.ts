@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { SettingRepo } from 'src/app/shared/repositories';
 import { catchError } from 'rxjs/internal/operators/catchError';
@@ -6,6 +6,9 @@ import { finalize } from 'rxjs/internal/operators/finalize';
 import { map } from 'rxjs/operators';
 import { NgProgress } from '@ngx-progressbar/core';
 import { SortService } from 'src/app/shared/services';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { ToastrService } from 'ngx-toastr';
+import { Tariff } from 'src/app/shared/models';
 
 @Component({
     selector: 'app-tariff',
@@ -13,14 +16,18 @@ import { SortService } from 'src/app/shared/services';
 })
 export class TariffComponent extends AppList {
 
-    tariffs: ITariff[] = [];
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
 
+    tariffs: Tariff[] = [];
     headers: CommonInterface.IHeaderTable[] = [];
+
+    selectedTariff: ITariff;
 
     constructor(
         private _settingRepo: SettingRepo,
         private _progressService: NgProgress,
-        private _sortService: SortService
+        private _sortService: SortService,
+        private _toastService: ToastrService
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -53,7 +60,7 @@ export class TariffComponent extends AppList {
                 finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
                 map((data: any) => {
                     return {
-                        data: data.data,
+                        data: data.data.map((item: Tariff) => new Tariff(item)),
                         totalItems: data.totalItems,
                     };
                 })
@@ -70,6 +77,30 @@ export class TariffComponent extends AppList {
         this.tariffs = this._sortService.sort(this.tariffs, this.sort, this.order);
     }
 
+    showDeletePopup(tariff: ITariff) {
+        this.selectedTariff = tariff;
+        this.confirmDeletePopup.show();
+    }
+
+    onDeleteTariff() {
+        this._progressRef.start();
+        this._settingRepo.deleteTariff(this.selectedTariff.id)
+            .pipe(catchError(this.catchError), finalize(() => {
+                this._progressRef.complete();
+                this.confirmDeletePopup.hide();
+            }))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this.confirmDeletePopup.hide();
+                        this._toastService.success(res.message);
+                        this.searchTariff({});
+                    } else {
+                        this._toastService.warning(res.message);
+                    }
+                },
+            );
+    }
 }
 
 interface ITariff {

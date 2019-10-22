@@ -28,7 +28,7 @@ export class AuthInterceptor implements HttpInterceptor {
             catchError((error: HttpErrorResponse) => {
                 switch (error.status) {
                     case 401:
-                        window.location.href = '#/login';
+                        // window.location.href = '#/login';
                         break;
                 }
                 let errorMessage = '';

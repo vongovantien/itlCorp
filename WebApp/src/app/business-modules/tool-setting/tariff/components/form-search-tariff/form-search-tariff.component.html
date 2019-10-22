@@ -76,7 +76,7 @@
                         <label for="">Supplier</label>
                         <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedSupplier"
                             (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
-                            [selectedDisplayFields]="suppliers" [dataSources]="configCustomer.dataSource"
+                            [selectedDisplayFields]="configCustomer.selectedDisplayFields" [dataSources]="suppliers"
                             [displayFields]="configCustomer.displayFields" [height]="200">
                         </app-combo-grid-virtual-scroll>
                     </div>
@@ -98,7 +98,7 @@
                     <div class="col-lg-6"></div>
                     <div class="col-lg-6 m--align-right">
                         <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="search()">
+                            (click)="search(formSearchTariff.value)">
                             <span>
                                 <i class="la la-search"></i>
                                 <span>

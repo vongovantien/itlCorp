@@ -108,7 +108,7 @@
                         <tbody class="tbody-group">
                             <ng-container
                                 *ngFor="let surcharge of surcharges | filter: keyword:['jobId', 'hbl', 'mbl', 'chargeName', 'payer', 'obhPartnerName']; let i = index; trackBy: trackByFn">
-                                <tr class="text-center" [class.selected-row]="i === selectedIndexSurcharge">
+                                <tr class="" [class.selected-row]="i === selectedIndexSurcharge">
                                     <td class="table-actions-col">
                                         <div class="table-actions">
                                             <label class="m-checkbox">
