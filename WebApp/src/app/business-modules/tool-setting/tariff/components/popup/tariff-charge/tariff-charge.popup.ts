@@ -111,7 +111,6 @@ export class TariffChargePopupComponent extends PopupBase {
                 this.isShow = isShow;
 
                 // * set again.
-                // this.formChargeTariff.value.tariffChargeDetail.chargeName = !!this.selectedCharge ? this.selectedCharge.chargeNameEn : null;
                 this.keyword = !!this.selectedCharge ? this.selectedCharge.chargeNameEn : null;
 
             });
@@ -415,12 +414,44 @@ export class TariffChargePopupComponent extends PopupBase {
 
     saveCharge() {
         this.isSubmitted = true;
-
-        const tariffChargeDetailForm: any = this.formChargeTariff.value.tariffChargeDetail;
-
-        if (!this.selectedCharge || !tariffChargeDetailForm.useFor || !tariffChargeDetailForm.route) {
+        if (!this.validateFormGroup()) {
             return;
         }
+        this.submitData();
+        this.closePopup();
+    }
+
+    updateToContinue() {
+        this.isSubmitted = true;
+        if (!this.validateFormGroup()) {
+            return;
+        }
+
+        this.submitData();
+        this.closePopup();
+
+        setTimeout(() => {
+            this.selectedCommondityGroup = { field: 'id', value: this.tariffCharge.commodityId };
+            console.log(this.selectedCommondityGroup);
+            this.show();
+        }, 500);
+    }
+
+    closePopup() {
+        this.hide();
+        this.isSubmitted = false;
+        this.keyword = '';
+        this.selectedCharge = null;
+
+        // * Reset form
+        this.formChargeTariff.reset();
+        this.formChargeTariff.reset({ tariffChargeDetail: new TariffCharge() });
+
+    }
+
+    submitData() {
+        const tariffChargeDetailForm: any = this.formChargeTariff.value.tariffChargeDetail;
+
         const body: TariffCharge | any = {
             chargeName: this.tariffCharge.chargeName,
             chargeCode: this.tariffCharge.chargeCode,
@@ -454,24 +485,16 @@ export class TariffChargePopupComponent extends PopupBase {
             unitId: !!tariffChargeDetailForm.unitId ? tariffChargeDetailForm.unitId.id : null,
         };
 
-
         this.tariffCharge = new TariffCharge(body);
         this.onChange.emit(this.tariffCharge);
-        this.hide();
     }
 
-    updateToContinue() {
-
-    }
-
-    closePopup() {
-        this.hide();
-        this.isSubmitted = false;
-
-        // * Reset form
-        this.formChargeTariff.reset();
-        this.formChargeTariff.reset({ tariffChargeDetail: new TariffCharge() });
-
+    validateFormGroup() {
+        let valid: boolean = true;
+        if (!this.selectedCharge || !this.formChargeTariff.value.tariffChargeDetail.useFor || !this.formChargeTariff.value.tariffChargeDetail.route) {
+            valid = false;
+        }
+        return valid;
     }
 
     enableDisabledFormControl(control: FormControl | AbstractControl, type: string = 'enable') {

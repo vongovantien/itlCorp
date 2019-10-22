@@ -132,4 +132,8 @@ export class TariffAddComponent extends AppList {
                 return false;
         }
     }
+
+    back() {
+        this._router.navigate(["home/tool/tariff"]);
+    }
 }

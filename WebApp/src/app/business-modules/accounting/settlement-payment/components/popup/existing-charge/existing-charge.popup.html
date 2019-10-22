@@ -52,8 +52,7 @@
                 <div class="row m--margin-top-20 m--marginless">
                     <div class="table-wrapper m--margin-top-20">
                         <table class="table table-brand dataTable table-striped">
-                            <thead app-table-header [headers]="headers" class="text-center"
-                                (onClick)="sortSurcharge($event)">
+                            <thead app-table-header [headers]="headers" (onClick)="sortSurcharge($event)">
                                 <th class="first">
                                     <label class="m-checkbox">
                                         <input type="checkbox" [(ngModel)]="isCheckAll"
@@ -64,7 +63,7 @@
                             </thead>
                             <tbody class="tbody-group">
                                 <ng-container *ngFor="let charge of charges; let i = index; trackBy:trackByFn">
-                                    <tr class="text-center">
+                                    <tr class="">
                                         <td class="table-actions-col">
                                             <div class="table-actions">
                                                 <label class="m-checkbox" *ngIf="!charge.settlementCode">

@@ -33,6 +33,11 @@ export class CompanyInformationAddComponent extends AppPage {
     }
 
     create() {
+        this.formAdd.isSubmitted = true;
+        if (this.formAdd.formGroup.invalid) {
+            return;
+        }
+
         this._progressRef.start();
         const body: ICompanyAdd = {
             companyCode: this.formAdd.code.value,
