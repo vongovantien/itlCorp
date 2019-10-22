@@ -14,6 +14,16 @@ export abstract class AppForm extends AppPage {
         typeButton: ButtonType.reset
     };
 
+    saveButtonSetting: ButtonModalSetting = {
+        buttonAttribute: {
+            type: 'button',
+            titleButton: "Save",
+            classStyle: "btn btn-brand m-btn--square m-btn--icon m-btn--uppercase",
+            icon: "la la-save"
+        },
+        typeButton: ButtonType.save,
+    };
+
     constructor() {
         super();
     }

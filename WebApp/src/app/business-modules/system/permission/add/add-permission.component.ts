@@ -2,10 +2,10 @@ import { Component } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 
 @Component({
-    selector: 'form-search-permission',
-    templateUrl: './form-search-permission.component.html',
+    selector: 'app-create-permission',
+    templateUrl: './add-permission.component.html',
 })
-export class PermissionFormSearchComponent extends AppForm {
+export class PermissionCreateComponent extends AppForm {
     constructor() {
         super();
     }
