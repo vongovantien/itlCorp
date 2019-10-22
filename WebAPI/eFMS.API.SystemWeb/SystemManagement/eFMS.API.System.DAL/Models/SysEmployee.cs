@@ -22,6 +22,7 @@ namespace eFMS.API.System.Service.Models
         public string EmpPhotoSize { get; set; }
         public decimal? SaleTarget { get; set; }
         public decimal? Bonus { get; set; }
+        public string StaffCode { get; set; }
         public string SaleResource { get; set; }
         public Guid? LdapObjectGuid { get; set; }
         public string UserCreated { get; set; }

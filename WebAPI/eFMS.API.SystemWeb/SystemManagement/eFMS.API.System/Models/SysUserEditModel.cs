@@ -1,22 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace eFMS.API.System.Service.Models
+namespace eFMS.API.System.Models
 {
-    public partial class SysUser
+    public class SysUserEditModel
     {
-        public SysUser()
-        {
-            SysUserGroup = new HashSet<SysUserGroup>();
-        }
-
         public string Id { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-        public string PasswordLdap { get; set; }
-        public bool? IsLdap { get; set; }
         public string EmployeeId { get; set; }
         public Guid? WorkPlaceId { get; set; }
+        public string StaffCode { get; set; }
         public bool? RefuseEmail { get; set; }
         public Guid? LdapObjectGuid { get; set; }
         public int? UserType { get; set; }
@@ -26,8 +22,5 @@ namespace eFMS.API.System.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
-        public string WorkingStatus { get; set; }
-
-        public virtual ICollection<SysUserGroup> SysUserGroup { get; set; }
     }
 }
