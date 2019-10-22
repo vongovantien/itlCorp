@@ -8,7 +8,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public Guid Id { get; set; }
         public string BranchNameVn { get; set; }
         public string BranchNameEn { get; set; }
-        public short? Buid { get; set; }
+        public Guid Buid { get; set; }
         public string ManagerId { get; set; }
         public string AddressVn { get; set; }
         public string AddressEn { get; set; }

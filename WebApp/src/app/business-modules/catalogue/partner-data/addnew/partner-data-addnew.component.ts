@@ -36,6 +36,8 @@ export class PartnerDataAddnewComponent extends AppList {
     @ViewChild('chooseAccountRef', { static: false }) public chooseAccountRef: SelectComponent;
     @ViewChild('chooseWorkplace', { static: false }) public chooseWorkplace: SelectComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmTaxcode: ConfirmPopupComponent;
+
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild(SalemanPopupComponent, { static: false }) poupSaleman: SalemanPopupComponent;
 
@@ -70,6 +72,7 @@ export class PartnerDataAddnewComponent extends AppList {
     dataSearchSaleman: any = {};
     isShowSaleMan: boolean = false;
     index: number = 0;
+    isExistedTaxcode: boolean = false;
 
 
     list: any[] = [];
@@ -90,15 +93,21 @@ export class PartnerDataAddnewComponent extends AppList {
     closepp(param: SalemanAdd) {
         this.saleManToAdd = param;
         this.poupSaleman.isDetail = false;
-        this.isDup = this.saleMandetail.some((saleMane: Saleman) => (saleMane.saleman_ID === this.saleManToAdd.saleman_ID && saleMane.office === this.saleManToAdd.office));
+        this.isDup = this.saleMandetail.some((saleMane: Saleman) => (saleMane.service === this.saleManToAdd.service && saleMane.office === this.saleManToAdd.office));
 
         if (this.isDup) {
             console.log("dup");
+            this.toastr.error('Duplicate service, office with sale man!');
         } else {
             this.saleMandetail.push(this.saleManToAdd);
             this.poupSaleman.hide();
             console.log(this.saleMandetail);
         }
+    }
+
+    closeppAndDeleteSaleman(index: any) {
+        this.index = index;
+        this.deleteSaleman(this.index);
     }
 
     showPopupSaleman() {
@@ -108,9 +117,15 @@ export class PartnerDataAddnewComponent extends AppList {
     }
 
     onDeleteSaleman() {
-        this.saleMandetail.splice(this.index, 1);
-        this.confirmDeleteJobPopup.hide();
-        this.toastr.success('Delete Success !');
+        if (this.saleMandetail.length > 0) {
+            this.saleMandetail.splice(this.index, 1);
+            this.confirmDeleteJobPopup.hide();
+            this.toastr.success('Delete Success !');
+        }
+        if (this.isExistedTaxcode) {
+            this.confirmTaxcode.hide();
+        }
+
     }
     // deleteSaleMan(index: any) {
     //     this.saleMandetail.splice(index, 1);
@@ -118,7 +133,7 @@ export class PartnerDataAddnewComponent extends AppList {
 
     deleteSaleman(index: any) {
         this.index = index;
-        this.deleteMessage = `Do you want to delete sale man`;
+        this.deleteMessage = `Do you want to delete sale man  ${this.saleMandetail[index].saleman_ID}?`;
         this.confirmDeleteJobPopup.show();
     }
 
@@ -172,6 +187,20 @@ export class PartnerDataAddnewComponent extends AppList {
             );
     }
 
+    checkTaxcode() {
+        this._catalogueRepo.checkTaxCode(this.partner.taxCode)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        console.log(res);
+                        this.isExistedTaxcode = true;
+                        this.deleteMessage = `This Taxcode already Existed in  ${res.shortName}If you want to Create Internal account, Please fille info to Internal Reference Info.`;
+                        this.confirmTaxcode.show();
+                    }
+                },
+            );
+    }
 
     getOffice() {
         this._catalogueRepo.getListBranch()
@@ -309,14 +338,26 @@ export class PartnerDataAddnewComponent extends AppList {
     }
 
     onSubmit() {
+        if (this.partner.taxCode !== '') {
+            this.checkTaxcode();
+
+        }
         if (this.partner.countryId == null || this.partner.provinceId == null
             || this.partner.countryShippingId == null || this.partner.provinceShippingId == null || this.partner.departmentId == null) {
             return;
         }
         if (this.form.valid) {
             this.partner.accountNo = this.partner.id = this.partner.taxCode;
-            if (this.isRequiredSaleman && this.partner.salePersonId != null) {
+            if (this.saleMandetail.length === 0) {
+                if (this.isShowSaleMan) {
+                    this.toastr.error('Please add saleman and service for customer!');
+                    return;
+                }
+            }
+
+            if (this.isRequiredSaleman) {
                 // this.addNew();
+                this.partner.salePersonId = this.saleMans[0].id;
                 this.onCreatePartner();
             }
             else {
@@ -610,8 +651,9 @@ export class PartnerDataAddnewComponent extends AppList {
         }
     }
 
-    showDetailSaleMan(saleman: Saleman) {
+    showDetailSaleMan(saleman: Saleman, index: any) {
         this.poupSaleman.show();
+        this.poupSaleman.index = index;
         const saleMane: any = {
             description: saleman.description,
             office: saleman.office,

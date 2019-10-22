@@ -160,12 +160,20 @@
                         </div>
 
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': (formAddEdit.submitted && parnetinternalReferenceNo.invalid) || isExistedTaxcode }">
                                 <label class="form-control-label" for="">
                                     Internal Reference No
                                 </label>
-                                <input type="text" [(ngModel)]="partner.internalReferenceNo" name="internalReferenceNo"
-                                    class="form-control m-input m-input--square" />
+                                <input type="text" minlength="3" maxlength="10"
+                                    [(ngModel)]="partner.internalReferenceNo" name="internalReferenceNo"
+                                    #parnetinternalReferenceNo="ngModel" class="form-control"
+                                    [ngClass]="{ 'm-input--square': (formAddEdit.submitted &&  parnetinternalReferenceNo.invalid ) || isExistedTaxcode  }"
+                                    required />
+                                <div class="form-control-feedback"
+                                    *ngIf="formAddEdit.submitted && parnetinternalReferenceNo.invalid">
+                                    Internal Reference No required least 3 characters
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -398,7 +406,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-4">
+                        <!-- <div class="col-lg-4">
                             <div class="form-group">
                                 <div class="form-group"
                                     [ngClass]="{ 'm-form__group has-danger': (partner.salePersonId == null && isRequiredSaleman) }">
@@ -417,7 +425,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                         <div class="col-lg-4">
                             <div class="form-group">
@@ -650,7 +658,7 @@
                                         </td>
                                         <td>
                                             <span><a style="cursor:pointer;"
-                                                    (click)="showDetailSaleMan(sale)">{{sale.saleman_ID}}</a>
+                                                    (click)="showDetailSaleMan(sale,i)">{{sale.saleman_ID}}</a>
                                             </span>
                                         </td>
                                         <td>
@@ -707,5 +715,7 @@
     </div>
     <!--end::m-content of Partner-data-addnew-->
 </form>
-<app-saleman-popup [popupData]="saleMantoView" (onCreate)="closepp($event)"></app-saleman-popup>
+<app-saleman-popup [popupData]="saleMantoView" (onCreate)="closepp($event)"
+    (onDelete)="closeppAndDeleteSaleman($event)">
+</app-saleman-popup>
 <confirm-popup (onSubmit)="onDeleteSaleman()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>

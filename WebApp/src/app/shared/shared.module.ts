@@ -9,7 +9,7 @@ import { ModalModule } from "ngx-bootstrap/modal";
 import { API_MENU } from "../../constants/api-menu.const";
 import { RepositoryModule } from "./repositories/repository.module";
 import { ServiceModule } from "./services/service.module";
-import { SearchStage, FilterPipe, NegativeNumberePipe, EqualErrorPipe, AbsPipe } from "./pipes";
+import { SearchStage, FilterPipe, NegativeNumberePipe, EqualErrorPipe, AbsPipe, RemoveTrimPipe } from "./pipes";
 
 import { InfoPopupComponent, ConfirmPopupComponent } from "./common/popup";
 import { DecimalNumberGreaterThan0Directive, StyleCellDirective, AutofocusDirective, TwoDigitDecimaNumberDirective, ThreeDigitDecimaNumberDirective, IntergerInputDirective, SpecialCharacterDirective, EcusSpecicalCharacterAllowSpaceDirective, EcusSpecicalCharacterNoSpaceDirective, ClickOutSideDirective, AppLoadingButtonDirective } from "./directives";
@@ -33,7 +33,8 @@ const APP_PIPES = [
   FilterPipe,
   NegativeNumberePipe,
   EqualErrorPipe,
-  AbsPipe
+  AbsPipe,
+  RemoveTrimPipe
 ];
 
 const APP_POPUP = [

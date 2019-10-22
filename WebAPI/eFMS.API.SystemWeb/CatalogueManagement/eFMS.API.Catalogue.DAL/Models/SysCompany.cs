@@ -5,6 +5,11 @@ namespace eFMS.API.Catalogue.Service.Models
 {
     public partial class SysCompany
     {
+        public SysCompany()
+        {
+            SysOffice = new HashSet<SysOffice>();
+        }
+
         public Guid Id { get; set; }
         public string Code { get; set; }
         public string BunameVn { get; set; }
@@ -37,6 +42,8 @@ namespace eFMS.API.Catalogue.Service.Models
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
-        public DateTime? InActiveOn { get; set; }
+        public DateTime? InactiveOn { get; set; }
+
+        public virtual ICollection<SysOffice> SysOffice { get; set; }
     }
 }

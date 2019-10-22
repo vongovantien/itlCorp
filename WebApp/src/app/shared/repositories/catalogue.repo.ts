@@ -173,6 +173,19 @@ export class CatalogueRepo {
             );
     }
 
+
+    checkTaxCode(taxcode: string) {
+        // const header: HttpHeaders = new HttpHeaders();
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/CheckTaxCode`, { taxcode: taxcode })
+            .pipe(
+                map((data: any) => data)
+            );
+        // return this._httpClient.get(`${environment.HOST.CatalogueLocal}/api/${this.VERSION}/en-US/CatSaleMan/GetBy`, { params: { partnerId: partnerId } }).pipe(
+        //     catchError((error) => throwError(error)),
+        //     map((data: any) => data)
+        // );
+    }
+
     getSettlePaymentCharges(keyword: string, size: number = 10) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/SettlePaymentCharges`, {
             keySearch: keyword,
