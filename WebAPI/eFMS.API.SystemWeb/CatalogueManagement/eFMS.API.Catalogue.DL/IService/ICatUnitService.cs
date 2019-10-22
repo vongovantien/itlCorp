@@ -18,5 +18,6 @@ namespace eFMS.API.Catalogue.DL.IService
         List<UnitType> GetUnitTypes();
         HandleState Update(CatUnitModel model);
         HandleState Delete(short id);
+        CatUnitModel GetDetail(short id);
     }
 }

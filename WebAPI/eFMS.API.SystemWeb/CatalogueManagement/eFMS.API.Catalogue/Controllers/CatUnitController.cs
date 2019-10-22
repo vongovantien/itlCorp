@@ -92,9 +92,9 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="id">id of data that need to retrieve</param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public IActionResult Get(short id)
         {
-            var data = catUnitService.Get(x => x.Id == id).FirstOrDefault();
+            var data = catUnitService.GetDetail(id);
             return Ok(data);
         }
 

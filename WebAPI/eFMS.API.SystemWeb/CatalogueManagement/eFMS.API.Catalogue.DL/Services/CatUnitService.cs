@@ -199,5 +199,12 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             return data;
         }
+
+        public CatUnitModel GetDetail(short id)
+        {
+            var data = DataContext.Get(x => x.Id == id).FirstOrDefault();
+            if (data == null) return null;
+            return mapper.Map<CatUnitModel>(data);
+        }
     }
 }
