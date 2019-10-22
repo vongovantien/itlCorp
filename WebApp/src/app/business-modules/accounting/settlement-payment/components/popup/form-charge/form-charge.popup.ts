@@ -598,6 +598,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
                         if (this.action === 'update') {
                             this.onUpdateChange.emit(body);
                         } else {
+                            body.id = SystemConstants.EMPTY_GUID; // * Update ID
                             this.onRequest.emit(body);
                         }
                     } else {

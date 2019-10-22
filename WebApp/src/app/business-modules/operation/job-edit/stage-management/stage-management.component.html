@@ -62,7 +62,7 @@
                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                 </thead>
                 <tbody class="tbody-group">
-                    <tr *ngFor="let stage of stages; let i = index" class="text-center">
+                    <tr *ngFor="let stage of stages; let i = index">
                         <td class="table-actions-col no-sorting">
                             <button (click)="getDetail(stage.id)" type="button" appLoadingButton
                                 [state]="!!data && data.isLocked"

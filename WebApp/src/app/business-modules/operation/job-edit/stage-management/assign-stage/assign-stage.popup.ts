@@ -57,7 +57,6 @@ export class AssignStagePopupComponent extends PopupBase {
             .subscribe(
                 (res: any) => {
                     this.configStage.dataSource = res;
-                    console.log(res);
                 },
                 () => { }
             );
