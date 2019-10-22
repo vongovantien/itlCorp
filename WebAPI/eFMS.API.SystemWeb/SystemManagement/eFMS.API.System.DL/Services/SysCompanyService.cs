@@ -20,8 +20,9 @@ namespace eFMS.API.System.DL.Services
     {
         private readonly ICurrentUser currentUser;
         //private readonly ICurrentUser currentUser;
-        public SysCompanyService(IContextBase<SysCompany> repository, IMapper mapper) : base(repository, mapper)
+        public SysCompanyService(IContextBase<SysCompany> repository, IMapper mapper , ICurrentUser icurrentUser) : base(repository, mapper)
         {
+            currentUser = icurrentUser;
             //currentUser = user;
             SetChildren<SysCompany>("ID", "BUID");
         }

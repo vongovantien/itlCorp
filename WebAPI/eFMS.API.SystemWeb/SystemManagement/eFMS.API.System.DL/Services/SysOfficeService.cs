@@ -24,10 +24,11 @@ namespace eFMS.API.System.DL.Services
         private readonly IContextBase<SysCompany> sysBuRepository;
         private readonly ICurrentUser currentUser;
 
-        public SysOfficeService(IContextBase<SysOffice> repository, IMapper mapper, IContextBase<SysCompany> sysBuRepo, IDistributedCache distributedCache) : base(repository, mapper)
+        public SysOfficeService(IContextBase<SysOffice> repository, IMapper mapper, IContextBase<SysCompany> sysBuRepo, IDistributedCache distributedCache, ICurrentUser icurrentUser) : base(repository, mapper)
         {
             sysBuRepository = sysBuRepo;
             cache = distributedCache;
+            currentUser = icurrentUser;
             SetChildren<CatDepartment>("Id", "BranchId");
         }
 
@@ -124,7 +125,7 @@ namespace eFMS.API.System.DL.Services
                             || (x.branch.ShortName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                             || (x.branch.Taxcode ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                             || (x.companyName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                            || (x.branch.Active == criteria.Active || criteria.Active == null)
+                            && (x.branch.Active == criteria.Active || criteria.Active == null)
                             ));
             }
             if (query.Count() == 0) return null;
@@ -143,6 +144,9 @@ namespace eFMS.API.System.DL.Services
             try
             {
                 var entity = mapper.Map<SysOffice>(model);
+                var officeCurrent = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+                entity.UserCreated = officeCurrent.UserCreated;
+                entity.DatetimeCreated = officeCurrent.DatetimeCreated;
                 if (entity.Active == true)
                 {
                     entity.InactiveOn = DateTime.Now;

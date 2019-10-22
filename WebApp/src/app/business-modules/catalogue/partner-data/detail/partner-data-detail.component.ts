@@ -11,9 +11,10 @@ import { CatalogueRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from "rxjs/operators";
 import { AppList } from "src/app/app.list";
 import { Saleman } from 'src/app/shared/models/catalogue/saleman.model';
-import { async } from '@angular/core/testing';
 import { formatDate } from '@angular/common';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
+import { SalemanPopupComponent } from '../components/saleman-popup.component';
+import { SystemRepo } from 'src/app/shared/repositories';
 declare var $: any;
 
 @Component({
@@ -59,15 +60,20 @@ export class PartnerDataDetailComponent extends AppList {
     deleteMessage: string = '';
     selectedSaleman: Saleman = null;
     saleMantoView: Saleman = new Saleman();
+    isShowSaleMan: boolean = false;
+
 
     @Output() isCloseModal = new EventEmitter();
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
+    @ViewChild(SalemanPopupComponent, { static: false }) poupSaleman: SalemanPopupComponent;
     @ViewChild('formAddEdit', { static: false }) form: NgForm;
     @ViewChild('chooseBillingCountry', { static: false }) public chooseBillingCountry: SelectComponent;
     @ViewChild('chooseBillingProvince', { static: false }) public chooseBillingProvince: SelectComponent;
     @ViewChild('chooseShippingCountry', { static: false }) public chooseShippingCountry: SelectComponent;
     @ViewChild('chooseShippingProvince', { static: false }) public chooseShippingProvince: SelectComponent;
+
+
 
     constructor(private route: ActivatedRoute,
         private router: Router,
@@ -75,6 +81,7 @@ export class PartnerDataDetailComponent extends AppList {
         private toastr: ToastrService,
         private api_menu: API_MENU,
         private _catalogueRepo: CatalogueRepo,
+        private _systemRepo: SystemRepo,
         private sortService: SortService) {
 
         super();
@@ -141,6 +148,7 @@ export class PartnerDataDetailComponent extends AppList {
                 await this.getParnerDetails();
                 this.getSalemanPagingByPartnerId(this.dataSearchSaleman);
             }
+
         });
         this.getDataCombobox();
 
@@ -158,6 +166,7 @@ export class PartnerDataDetailComponent extends AppList {
         if (index > -1) { this.salemanActive = [this.saleMans.find(x => x.id === this.partner.salePersonId)]; }
         if (this.partner.partnerGroup.includes('CUSTOMER')) {
             this.isRequiredSaleman = true;
+            this.isShowSaleMan = true;
         }
         console.log(this.isRequiredSaleman);
         console.log(this.partner.salePersonId);
@@ -281,12 +290,19 @@ export class PartnerDataDetailComponent extends AppList {
             return;
         }
         if (this.form.valid) {
-            this.partner.accountNo = this.partner.id = this.partner.taxCode;
-            if (this.isRequiredSaleman && this.partner.salePersonId != null) {
+            // this.partner.accountNo = this.partner.id = this.partner.taxCode;
+            if (this.saleMandetail.length === 0) {
+                if (this.isShowSaleMan) {
+                    this.toastr.error('Please add saleman and service for customer!');
+                    return;
+                }
+            }
+            if (this.isRequiredSaleman) {
+                this.partner.salePersonId = this.saleMans[0].id;
                 this.update();
             }
             else {
-                if (this.isRequiredSaleman == false) {
+                if (this.isRequiredSaleman === false) {
                     this.partner.accountNo = this.partner.id = this.partner.taxCode;
                     this.update();
                 }
@@ -378,6 +394,15 @@ export class PartnerDataDetailComponent extends AppList {
         }
     }
     checkRequireSaleman(partnerGroup: string): boolean {
+        this.isShowSaleMan = false;
+        if (partnerGroup != null) {
+            if (partnerGroup.includes('CUSTOMER')) {
+                this.isShowSaleMan = true;
+            }
+        }
+        else {
+            this.isShowSaleMan = false;
+        }
         if (partnerGroup == null) {
             return false;
         } else if (partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')) {
@@ -386,20 +411,31 @@ export class PartnerDataDetailComponent extends AppList {
             return false;
         }
     }
-
-    getEmployee(employeeId: any): any {
-        this.baseService.post(this.api_menu.System.Employee.query, { id: employeeId }).subscribe((responses: any) => {
-            if (responses.length > 0) {
-                this.employee = responses[0];
-            }
-            else {
-                this.employee = {};
-            }
-            console.log(this.employee);
-        }, err => {
-            this.baseService.handleError(err);
-        });
+    getEmployee(employeeId: any) {
+        this._systemRepo.getEmployeeByemployeeid(employeeId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this.isLoading = false; }),
+            ).subscribe(
+                (res: any) => {
+                    this.employee = res;
+                },
+            );
     }
+
+    // getEmployee(employeeId: any): any {
+    //     this.baseService.post(this.api_menu.System.Employee.query, { id: employeeId }).subscribe((responses: any) => {
+    //         if (responses.length > 0) {
+    //             this.employee = responses[0];
+    //         }
+    //         else {
+    //             this.employee = {};
+    //         }
+    //         console.log(this.employee);
+    //     }, err => {
+    //         this.baseService.handleError(err);
+    //     });
+    // }
 
     public removed(value: any, selectName?: string): void {
         if (selectName == 'billingCountry') {
@@ -520,7 +556,9 @@ export class PartnerDataDetailComponent extends AppList {
 
             };
             this._catalogueRepo.createSaleman(body)
-                .pipe(catchError(this.catchError))
+                .pipe(catchError(this.catchError), finalize(() => {
+                    this.baseService.spinnerHide();
+                }))
                 .subscribe(
                     (res: any) => {
                         if (res.status) {
@@ -553,6 +591,10 @@ export class PartnerDataDetailComponent extends AppList {
         if (!!sortData.sortField) {
             this.saleMandetail = this.sortService.sort(this.saleMandetail, sortData.sortField, sortData.order);
         }
+    }
+
+    showPopupSaleman() {
+        this.poupSaleman.show();
     }
 
 

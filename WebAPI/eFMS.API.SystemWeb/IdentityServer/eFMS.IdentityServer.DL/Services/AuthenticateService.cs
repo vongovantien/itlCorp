@@ -104,7 +104,7 @@ namespace eFMS.IdentityServer.DL.Services
             {
                 if (user != null)
                 {
-                    if(BCrypt.Net.BCrypt.Verify(password, user.Password))
+                    if (BCrypt.Net.BCrypt.Verify(password, user.Password))
                     {
                         employee = employeeRepository.Get(x => x.Id == user.EmployeeId).FirstOrDefault();
                         modelReturn = UpdateUserInfoFromLDAP(ldapInfo, user, false, employee);
@@ -116,6 +116,13 @@ namespace eFMS.IdentityServer.DL.Services
                 user = new SysUser { Username = username, Password = password, UserCreated = "admin" };
                 modelReturn = UpdateUserInfoFromLDAP(ldapInfo, user, true, null);
                 LogUserLogin(user, modelReturn.workplaceId);
+                return 1;
+            }
+            if (BCrypt.Net.BCrypt.Verify(password, user.Password))
+            {
+                employee = employeeRepository.Get(x => x.Id == user.EmployeeId).FirstOrDefault();
+                modelReturn = SetLoginReturnModel(user, employee);
+                LogUserLogin(user, employee.WorkPlaceId);
                 return 1;
             }
             if (user == null)

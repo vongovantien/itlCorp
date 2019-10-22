@@ -210,5 +210,11 @@ export class SystemRepo {
             map((data: any) => data)
         );
     }
+
+    getEmployeeByemployeeid(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysEmployee/GetByEmployeeId?employeeid=${id}`).pipe(
+            map((data: CommonInterface.IResult) => data.data)
+        );
+    }
 }
 

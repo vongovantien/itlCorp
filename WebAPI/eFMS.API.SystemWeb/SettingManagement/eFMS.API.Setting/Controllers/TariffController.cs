@@ -105,7 +105,7 @@ namespace eFMS.API.Setting.Controllers
             if (!ModelState.IsValid) return BadRequest();
 
             var checkData = tariffService.CheckExistsDataTariff(model);
-            if (!checkData.Success) return Ok(new ResultHandle { Status = checkData.Success, Message = checkData.Exception.Message.ToString(), Data = model });
+            if (!checkData.Success) return Ok(new ResultHandle { Status = checkData.Success, Message = checkData.Exception.Message.ToString(), Data = checkData.Code });
 
             var hs = tariffService.UpdateTariff(model);
 
@@ -166,6 +166,11 @@ namespace eFMS.API.Setting.Controllers
             }
         }
 
+        /// <summary>
+        /// Check duplicate tariff
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost("CheckDuplicateTariff")]
         public IActionResult CheckDuplicateTariff(SetTariffModel model)
         {

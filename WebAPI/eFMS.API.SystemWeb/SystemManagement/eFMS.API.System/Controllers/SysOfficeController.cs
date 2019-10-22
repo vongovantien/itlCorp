@@ -26,11 +26,12 @@ namespace eFMS.API.System.Controllers
         private readonly ISysOfficeService sysOfficeService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
-        public SysOfficeController(IStringLocalizer<LanguageSub> localizer, ISysOfficeService service, IMapper iMapper)
+        public SysOfficeController(IStringLocalizer<LanguageSub> localizer, ISysOfficeService service, IMapper iMapper ,ICurrentUser icurrentUser)
         {
             stringLocalizer = localizer;
             sysOfficeService = service;
             mapper = iMapper;
+            currentUser = icurrentUser;
         }
 
         /// <summary>

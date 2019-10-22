@@ -18,6 +18,7 @@ import { formatDate } from '@angular/common';
 
 export class SalemanPopupComponent extends PopupBase {
     @Output() onCreate = new EventEmitter();
+    @Output() onDelete = new EventEmitter();
 
     saleMans: Saleman[] = [];
     headerSaleman: CommonInterface.IHeaderTable[];
@@ -37,6 +38,7 @@ export class SalemanPopupComponent extends PopupBase {
     isDetail: boolean = false;
     selectedDataSaleMan: any;
     selectedDataOffice: any;
+    index: number = 0;
 
     @Input() popupData: Saleman;
 
@@ -63,6 +65,12 @@ export class SalemanPopupComponent extends PopupBase {
         console.log(this.saleManToView);
     }
 
+    onDeleteSaleman() {
+        this.isDetail = false;
+        this.onDelete.emit(this.index);
+        this.hide();
+    }
+
     resetForm() {
         this.strSalemanCurrent = {};
         this.strOfficeCurrent = {};
@@ -84,8 +92,6 @@ export class SalemanPopupComponent extends PopupBase {
         this.status = this.getStatus();
         this.selectedStatus = this.status[1];
     }
-
-
 
     getService() {
         this._catalogueRepo.getListService()
@@ -135,7 +141,7 @@ export class SalemanPopupComponent extends PopupBase {
     }
 
     async getSalemans() {
-        let responses = await this.baseService.getAsync(this.api_menu.System.User_Management.getAll);
+        const responses = await this.baseService.getAsync(this.api_menu.System.User_Management.getAll);
         if (responses != null) {
             this.users = responses;
         }

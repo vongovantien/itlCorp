@@ -175,39 +175,15 @@ export class OfficeFormAddComponent extends AppList {
                 Validators.compose([
                     Validators.required
                 ])],
-            tel: ['',
-                Validators.compose([
-                    Validators.required
-                ])],
-            email: ['',
-                Validators.compose([
-                    Validators.required
-                ])],
-            fax: ['',
-                Validators.compose([
-                    Validators.required
-                ])],
+            tel: [],
+            email: [],
+            fax: [],
             company: [],
-            bankAccountVND: ['',
-                Validators.compose([
-                    Validators.required
-                ])],
-            bankAccountName: ['',
-                Validators.compose([
-                    Validators.required
-                ])],
-            swiftCode: ['',
-                Validators.compose([
-                    Validators.required
-                ])],
-            bankAddress: ['',
-                Validators.compose([
-                    Validators.required
-                ])],
-            bankName: ['',
-                Validators.compose([
-                    Validators.required
-                ])],
+            bankAccountVND: [],
+            bankAccountName: [],
+            swiftCode: [],
+            bankAddress: [],
+            bankName: [],
             active: [this.status[0]],
         });
 

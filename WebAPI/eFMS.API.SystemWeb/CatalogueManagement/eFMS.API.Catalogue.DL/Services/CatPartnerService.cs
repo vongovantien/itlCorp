@@ -125,7 +125,7 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
             entity.UserModified = currentUser.UserID;
             if (entity.Active == true)
             {
-                entity.InActiveOn = DateTime.Now;
+                entity.InactiveOn = DateTime.Now;
             }
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
             if (hs.Success)

@@ -21,8 +21,8 @@ namespace eFMS.IdentityServer
         public Task ValidateAsync(ResourceOwnerPasswordValidationContext context)
         {
             RSAHelper cryption = new RSAHelper();
-           // string password = cryption.Decrypt(context.Password);
-            var result = authenUser.Login(context.UserName, context.Password, out LoginReturnModel modelReturn);
+            string password = cryption.Decrypt(context.Password);
+            var result = authenUser.Login(context.UserName, password, out LoginReturnModel modelReturn);
             var messageError = String.Empty;
             if(result == -2)
             {

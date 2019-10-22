@@ -14,11 +14,11 @@ export class AppLoadingButtonDirective {
         private el: ElementRef,
     ) { }
 
-    @HostListener('click', ['$event'])
-    onClick($event: Event): void | any {
-        $event.stopPropagation();
-        $event.preventDefault();
-    }
+    // @HostListener('click', ['$event'])
+    // onClick($event: Event): void | any {
+    //     $event.stopPropagation();
+    //     $event.preventDefault();
+    // }
 
     ngOnInit() {
         this.renderer.setAttribute(this.el.nativeElement, 'disabled', this.state ? 'disabled' : '');

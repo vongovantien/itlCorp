@@ -126,6 +126,14 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(data);
         }
 
+        [HttpGet("CheckTaxCode")]
+        public IActionResult CheckTaxCode(string taxcode)
+        {
+            var result = catPartnerService.Get(x => x.TaxCode.Trim() == taxcode.Trim()).FirstOrDefault();
+            return Ok(result);
+        }
+
+
         /// <summary>
         /// add new partner
         /// </summary>
