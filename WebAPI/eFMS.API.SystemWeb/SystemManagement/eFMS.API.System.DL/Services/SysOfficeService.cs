@@ -125,7 +125,7 @@ namespace eFMS.API.System.DL.Services
                             || (x.branch.ShortName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                             || (x.branch.Taxcode ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                             || (x.companyName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                            || (x.branch.Active == criteria.Active || criteria.Active == null)
+                            && (x.branch.Active == criteria.Active || criteria.Active == null)
                             ));
             }
             if (query.Count() == 0) return null;
