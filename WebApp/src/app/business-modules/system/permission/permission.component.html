@@ -1,3 +1,25 @@
-<p>
-  permission works!
-</p>
+<div class="company-infomation-page">
+    <app-sub-header>
+        <div class="c-button-actions">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                [routerLink]="'/home/system/permission/new'">
+                <span>
+                    <i class="la la-plus"></i>
+                    <span>
+                        Create
+                    </span>
+                </span>
+            </button>
+        </div>
+    </app-sub-header>
+    <div class="m-content">
+
+        <form-search-permission></form-search-permission>
+
+        <div class="m-portlet">
+            <div class="m-portlet__body">
+
+            </div>
+        </div>
+    </div>
+</div>

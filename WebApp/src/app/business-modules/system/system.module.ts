@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { SystemRoutingModule } from './system-routing.module';
 import { UserManagementComponent } from './user-management/user-management.component';
 import { RoleComponent } from './role/role.component';
-import { PermissionComponent } from './permission/permission.component';
 import { SharedModule } from '../../shared/shared.module';
 
 
@@ -14,6 +13,6 @@ import { SharedModule } from '../../shared/shared.module';
     SystemRoutingModule,
     SharedModule
   ],
-  declarations: [UserManagementComponent, RoleComponent, PermissionComponent]
+  declarations: [UserManagementComponent, RoleComponent]
 })
 export class SystemModule { }
