@@ -91,14 +91,12 @@ export class ContainerImportComponent extends PopupBase implements OnInit {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    saveAs(res, "ContainerImportTemplate.xlsx");
+                    this.downLoadFile(res, "application/ms-excel", "ContainerImportTemplate.xlsx");
                 },
-                (errors: any) => { },
-                () => { }
             );
     }
 
-    async import() {
+    import() {
         if (this.data == null) { return; }
         if (this.totalInvalidRow > 0) {
             this.importAlert.show();

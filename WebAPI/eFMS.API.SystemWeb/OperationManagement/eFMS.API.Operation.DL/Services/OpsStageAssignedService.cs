@@ -25,17 +25,20 @@ namespace eFMS.API.Operation.DL.Services
         private readonly ICurrentUser currentUser;
         private readonly ICatDepartmentApiService catDepartmentApi;
         private readonly IContextBase<OpsTransaction> opsTransRepository;
+        private readonly IContextBase<SysUser> userRepository;
 
         public OpsStageAssignedService(IContextBase<OpsStageAssigned> repository, IMapper mapper,
             ICatStageApiService stageApi,
             ICurrentUser user,
             ICatDepartmentApiService departmentApi,
-            IContextBase<OpsTransaction> opsTransRepo) : base(repository, mapper)
+            IContextBase<OpsTransaction> opsTransRepo,
+            IContextBase<SysUser> userRepo) : base(repository, mapper)
         {
             catStageApi = stageApi;
             currentUser = user;
             catDepartmentApi = departmentApi;
             opsTransRepository = opsTransRepo;
+            userRepository = userRepo;
         }
 
         public HandleState Add(OpsStageAssignedEditModel model)
@@ -195,6 +198,7 @@ namespace eFMS.API.Operation.DL.Services
         {
             var stages = catStageApi.GetAll().Result;
             var departments = catDepartmentApi.GetAll().Result;
+            var users = userRepository.Get();
             var results = new List<OpsStageAssignedModel>();
             foreach (var item in data)
             {
@@ -205,7 +209,9 @@ namespace eFMS.API.Operation.DL.Services
                 assignedItem.Status = assignedItem.Status?.Trim();
                 assignedItem.DepartmentName = stage == null? null: departments?.FirstOrDefault(x => x.Id == stage.DepartmentId)?.DeptName;
                 assignedItem.DoneDate = item.Status?.Trim() == DataTypeEx.GetStageStatus(StageEnum.Done) ? item.ModifiedDate : null;
-                assignedItem.Description = assignedItem.Description != null ? assignedItem.Description : stages.FirstOrDefault(x => x.Id == item.StageId).DescriptionEn;
+                assignedItem.Description = assignedItem.Description ?? stages.FirstOrDefault(x => x.Id == item.StageId).DescriptionEn;
+                assignedItem.MainPersonInCharge = assignedItem.MainPersonInCharge != null ? users.FirstOrDefault(x => x.Id == assignedItem.MainPersonInCharge)?.Username : assignedItem.MainPersonInCharge;
+                assignedItem.RealPersonInCharge = assignedItem.RealPersonInCharge != null ? users.FirstOrDefault(x => x.Id == assignedItem.RealPersonInCharge)?.Username : assignedItem.RealPersonInCharge;
                 results.Add(assignedItem);
             }
             return results;
