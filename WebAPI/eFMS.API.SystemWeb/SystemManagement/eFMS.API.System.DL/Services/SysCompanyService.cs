@@ -20,7 +20,7 @@ namespace eFMS.API.System.DL.Services
     {
         private readonly ICurrentUser currentUser;
         //private readonly ICurrentUser currentUser;
-        public SysCompanyService(IContextBase<SysCompany> repository, IMapper mapper , ICurrentUser icurrentUser) : base(repository, mapper)
+        public SysCompanyService(IContextBase<SysCompany> repository, IMapper mapper, ICurrentUser icurrentUser) : base(repository, mapper)
         {
             currentUser = icurrentUser;
             //currentUser = user;
@@ -56,17 +56,21 @@ namespace eFMS.API.System.DL.Services
 
             if (criteria.All == null)
             {
-               bu = bu.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-               && ((x.BunameEn ?? "").IndexOf(criteria.BuNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-               && ((x.BunameVn ?? "").IndexOf(criteria.BuNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
+                bu = bu.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                && ((x.BunameEn ?? "").IndexOf(criteria.BuNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                && ((x.BunameVn ?? "").IndexOf(criteria.BuNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                && ((x.BunameAbbr ?? "").IndexOf(criteria.BuNameAbbr ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                );
             }
             else
             {
                 bu = bu.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                 || ((x.BunameEn ?? "").IndexOf(criteria.BuNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                || ((x.BunameVn ?? "").IndexOf(criteria.BuNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
+                || ((x.BunameVn ?? "").IndexOf(criteria.BuNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                || ((x.BunameAbbr ?? "").IndexOf(criteria.BuNameAbbr ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                );
             }
-           
+
 
             var responseData = mapper.Map<List<SysCompanyModel>>(bu).ToList(); // maping BU sang SysCompanyModel ( hoặc object # => define trong Mapper.cs);
 
