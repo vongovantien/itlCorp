@@ -19,7 +19,6 @@ export class TariffListChargeComponent extends AppList {
     selectedTariffCharge: TariffCharge = new TariffCharge();
     selectedIndex: number = -1; // * SELECT ITEM CHARGE IN TABLE.
 
-    data: any[] = [1, 2, 3];
     constructor() {
         super();
     }

@@ -10,7 +10,84 @@
         <div class="m-portlet">
             <div class="m-portlet__body">
                 <tabset>
-                    <tab heading="General Permission"></tab>
+                    <tab heading="General Permission">
+                        <div class="general-wrapper">
+                            <div class="d-flex header-permission flex-wrap">
+                                <div class="p-2 border">Module</div>
+                                <div class="p-2 border">Function</div>
+                                <div class="p-2 border">Access</div>
+                                <div class="p-2 border">Detail</div>
+                                <div class="p-2 border">Write</div>
+                                <div class="p-2 border">Delete</div>
+                                <div class="p-2 border">List</div>
+                                <div class="p-2 border">Import</div>
+                                <div class="p-2 border">Export</div>
+                            </div>
+                            <div class="list-permission-group-module">
+                                <ul class="list-group">
+                                    <li class="list-group-item">
+                                        Operation
+                                        <ul class="list-group">
+                                            <li class="list-group-item col">
+                                                <div class="row">
+                                                    <div class="col d-flex align-items-center">1</div>
+                                                    <div class="col">Job Management</div>
+                                                    <div class="col">
+                                                        <select class="form-control">
+                                                            <option *ngFor="let item of [1,2,3]" [value]="item">{{item}}
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col">
+                                                        <select class="form-control">
+                                                            <option *ngFor="let item of [1,2,3]" [value]="item">{{item}}
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col">
+                                                        <select class="form-control">
+                                                            <option *ngFor="let item of [1,2,3]" [value]="item">{{item}}
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col">
+                                                        <select class="form-control">
+                                                            <option *ngFor="let item of [1,2,3]" [value]="item">{{item}}
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col">
+                                                        <span class="m-switch m-switch--success">
+                                                            <label>
+                                                                <input type="checkbox" checked="checked" name="">
+                                                                <span></span>
+                                                            </label>
+                                                        </span>
+                                                    </div>
+                                                    <div class="col">
+                                                        <span class="m-switch m-switch--success">
+                                                            <label>
+                                                                <input type="checkbox" checked="checked" name="">
+                                                                <span></span>
+                                                            </label>
+                                                        </span>
+                                                    </div>
+                                                    <div class="col">
+                                                        <span class="m-switch m-switch--success">
+                                                            <label>
+                                                                <input type="checkbox" checked="checked" name="">
+                                                                <span></span>
+                                                            </label>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </tab>
                     <tab heading="Special Permission"></tab>
                 </tabset>
                 <div class="row">

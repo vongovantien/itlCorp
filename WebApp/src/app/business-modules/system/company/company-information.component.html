@@ -36,8 +36,8 @@
                             </th>
                         </thead>
                         <tbody class="tbody-group">
-                            <ng-container *ngIf="!isLoading && !!companies.length">
-                                <tr class="" *ngFor="let company of companies; let i = index; trackBy: trackByFn">
+                            <ng-container *ngFor="let company of companies; let i = index; trackBy: trackByFn">
+                                <tr class="">
                                     <td class="table-actions-col">
                                         <div class="table-actions">
                                             <a [routerLink]="company.id"

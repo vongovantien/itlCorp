@@ -1,0 +1,18 @@
+:host /deep/ {
+    .permission-add-page {
+        .general-wrapper {
+            .header-permission {
+            }
+            .m-switch.m-switch--success:not(.m-switch--outline)
+                input:empty
+                ~ span:before {
+                background-color: #ebedf2;
+            }
+            .m-switch.m-switch--success:not(.m-switch--outline)
+                input:checked
+                ~ span:before {
+                background-color: #34bfa3;
+            }
+        }
+    }
+}
