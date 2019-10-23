@@ -82,20 +82,29 @@ namespace eFMS.API.System.Controllers
 
             model.SysEmployeeModel.Id = Guid.NewGuid().ToString();
             var hsEmloyee = sysEmployeeService.Add(model.SysEmployeeModel);
-        
+            var messageEmployee = HandleError.GetMessage(hsEmloyee, Crud.Insert);
 
-            model.UserCreated = currentUser.UserID;
-            model.Id = Guid.NewGuid().ToString();
-            model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
-            var hs = sysUserService.Add(model);
-            var message = HandleError.GetMessage(hs, Crud.Insert);
-
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            if (!hs.Success)
+            ResultHandle resultEmployee = new ResultHandle { Status = hsEmloyee.Success, Message = stringLocalizer[messageEmployee].Value };
+            if (hsEmloyee.Success)
             {
-                return BadRequest(result);
+                model.EmployeeId = model.SysEmployeeModel.Id;
+                model.UserCreated = currentUser.UserID;
+                model.Id = Guid.NewGuid().ToString();
+                model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
+                var hs = sysUserService.Add(model);
+                var message = HandleError.GetMessage(hs, Crud.Insert);
+
+                ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+                if (!hs.Success)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
             }
-            return Ok(result);
+            else
+            {
+                return BadRequest(resultEmployee);
+            }
         }
 
         /// <summary>
