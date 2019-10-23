@@ -127,20 +127,35 @@ namespace eFMS.API.System.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedName });
             }
-            model.UserModified = currentUser.UserID;
-            model.DatetimeModified = DateTime.Now;
-            var userCurrent = sysUserService.Get(x => x.Id == model.Id).FirstOrDefault();
-            model.Password = userCurrent.Password;
-
-            var hs = sysUserService.Update(model, x => x.Id == model.Id);
-            var message = HandleError.GetMessage(hs, Crud.Update);
-
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            if (!hs.Success)
+           
+            var employeeCurrent = sysEmployeeService.Get(x => x.Id == model.EmployeeId).FirstOrDefault();
+            model.SysEmployeeModel.Id = employeeCurrent.Id;
+            model.SysEmployeeModel.UserModified = currentUser.UserID;
+            model.SysEmployeeModel.DatetimeModified = DateTime.Now;
+            var hsEmployee = sysEmployeeService.Update(model.SysEmployeeModel, x => x.Id == model.Id);
+            var messageEmployee = HandleError.GetMessage(hsEmployee, Crud.Update);
+            ResultHandle resultEmployee = new ResultHandle { Status = hsEmployee.Success, Message = stringLocalizer[messageEmployee].Value };
+            if (hsEmployee.Success)
             {
-                return BadRequest(result);
+                model.UserModified = currentUser.UserID;
+                model.DatetimeModified = DateTime.Now;
+                var userCurrent = sysUserService.Get(x => x.Id == model.Id).FirstOrDefault();
+                model.Password = userCurrent.Password;
+                var hs = sysUserService.Update(model, x => x.Id == model.Id);
+                var message = HandleError.GetMessage(hs, Crud.Update);
+
+                ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+                if (!hs.Success)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
             }
-            return Ok(result);
+            else
+            {
+                return BadRequest(resultEmployee);
+            }
+     
         }
 
         [HttpDelete("{id}")]
@@ -148,12 +163,12 @@ namespace eFMS.API.System.Controllers
         public IActionResult Delete(string id)
         {
             var item = sysUserService.Get(x => x.Id == id).FirstOrDefault();
-            if (item.Active == true)
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED].Value });
-            }
-
-            var hs = sysUserService.Delete(x => x.Id == id);
+            //if (item.Active == true)
+            //{
+            //    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED].Value });
+            //}
+            item.Active = false;
+            var hs = sysUserService.Update(item,x=>x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
 
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
