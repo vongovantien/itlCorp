@@ -9,6 +9,9 @@ using System.Collections.Generic;
 using System.Linq;
 using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.Service.Models;
+using ITL.NetCore.Common;
+using eFMS.API.System.DL.Common;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace eFMS.API.System.DL.Services
 {
@@ -16,13 +19,15 @@ namespace eFMS.API.System.DL.Services
     {
         private readonly IContextBase<SysEmployee> employeeRepository;
         private readonly IContextBase<SysUserGroup> usergroupRepository;
+        private readonly IDistributedCache cache;
 
         public SysUserService(IContextBase<SysUser> repository, IMapper mapper, 
             IContextBase<SysEmployee> employeeRepo,
-            IContextBase<SysUserGroup> usergroupRepo) : base(repository, mapper)
+            IContextBase<SysUserGroup> usergroupRepo , IDistributedCache distributedCache) : base(repository, mapper)
         {
             employeeRepository = employeeRepo;
             usergroupRepository = usergroupRepo;
+            cache = distributedCache;
         }
 
         public List<SysUserViewModel> GetAll()
@@ -112,5 +117,42 @@ namespace eFMS.API.System.DL.Services
             }
             return results.AsQueryable();
         }
+
+
+        public HandleState Insert(SysUserModel sysUserModel)
+        {
+            try
+            {
+                return DataContext.Add(sysUserModel);
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+
+        }
+
+        public HandleState Update(SysUserModel model)
+        {
+            try
+            {
+                var entity = mapper.Map<SysUser>(model);
+                if (entity.Active == true)
+                {
+                    entity.InactiveOn = DateTime.Now;
+                }
+                var hs = DataContext.Update(entity, x => x.Id == model.Id);
+                if (hs.Success)
+                {
+                    cache.Remove(Templates.SysBranch.NameCaching.ListName);
+                }
+                return hs;
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
+
     }
 }

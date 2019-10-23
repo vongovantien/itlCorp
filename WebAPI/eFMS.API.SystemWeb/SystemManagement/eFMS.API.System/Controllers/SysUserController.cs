@@ -81,9 +81,8 @@ namespace eFMS.API.System.Controllers
             }
 
             model.SysEmployeeModel.Id = Guid.NewGuid().ToString();
-            var hsEmloyee = sysEmployeeService.Add(model.SysEmployeeModel);
+            var hsEmloyee = sysEmployeeService.Insert(model.SysEmployeeModel);
             var messageEmployee = HandleError.GetMessage(hsEmloyee, Crud.Insert);
-
             ResultHandle resultEmployee = new ResultHandle { Status = hsEmloyee.Success, Message = stringLocalizer[messageEmployee].Value };
             if (hsEmloyee.Success)
             {
@@ -91,7 +90,7 @@ namespace eFMS.API.System.Controllers
                 model.UserCreated = currentUser.UserID;
                 model.Id = Guid.NewGuid().ToString();
                 model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
-                var hs = sysUserService.Add(model);
+                var hs = sysUserService.Insert(model);
                 var message = HandleError.GetMessage(hs, Crud.Insert);
 
                 ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -127,21 +126,23 @@ namespace eFMS.API.System.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedName });
             }
-           
-            var employeeCurrent = sysEmployeeService.Get(x => x.Id == model.EmployeeId).FirstOrDefault();
+            var userCurrent = sysUserService.GetUserById(model.Id);
+            var employeeCurrent = sysEmployeeService.Get(x => x.Id == userCurrent.EmployeeId).FirstOrDefault();
             model.SysEmployeeModel.Id = employeeCurrent.Id;
             model.SysEmployeeModel.UserModified = currentUser.UserID;
             model.SysEmployeeModel.DatetimeModified = DateTime.Now;
-            var hsEmployee = sysEmployeeService.Update(model.SysEmployeeModel, x => x.Id == model.Id);
+           
+
+            var hsEmployee = sysEmployeeService.Update(model.SysEmployeeModel);
             var messageEmployee = HandleError.GetMessage(hsEmployee, Crud.Update);
             ResultHandle resultEmployee = new ResultHandle { Status = hsEmployee.Success, Message = stringLocalizer[messageEmployee].Value };
             if (hsEmployee.Success)
             {
                 model.UserModified = currentUser.UserID;
                 model.DatetimeModified = DateTime.Now;
-                var userCurrent = sysUserService.Get(x => x.Id == model.Id).FirstOrDefault();
                 model.Password = userCurrent.Password;
-                var hs = sysUserService.Update(model, x => x.Id == model.Id);
+                model.EmployeeId = model.SysEmployeeModel.Id;
+                var hs = sysUserService.Update(model);
                 var message = HandleError.GetMessage(hs, Crud.Update);
 
                 ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -193,7 +194,7 @@ namespace eFMS.API.System.Controllers
                 }
                 else
                 {
-                    if (sysUserService.Any(x => x.Username.ToLower().Trim() == username.ToLower().Trim() && x.Id != id))
+                    if (sysUserService.Any(x=>x.Username!= null && x.Username.ToLower().Trim() == username.ToLower().Trim() && x.Id != id))
                     {
                         message = stringLocalizer[LanguageSub.MSG_NAME_EXISTED].Value;
                     }
