@@ -123,7 +123,7 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
             var entity = mapper.Map<CatPartner>(model);
             entity.DatetimeModified = DateTime.Now;
             entity.UserModified = currentUser.UserID;
-            if (entity.Active == true)
+            if (entity.Active == false)
             {
                 entity.InactiveOn = DateTime.Now;
             }

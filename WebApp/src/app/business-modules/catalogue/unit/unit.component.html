@@ -463,8 +463,8 @@
                             </label>
                             <div class="col-lg-8">
                                 <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
-                                    <input [checked]="UnitToUpdate.inactive"
-                                        (change)="UnitToUpdate.inactive=!UnitToUpdate.inactive"
+                                    <input [checked]="!UnitToUpdate.active"
+                                        (change)="UnitToUpdate.active=!UnitToUpdate.active"
                                         type="checkbox"><span></span></label>
                             </div>
                         </div>

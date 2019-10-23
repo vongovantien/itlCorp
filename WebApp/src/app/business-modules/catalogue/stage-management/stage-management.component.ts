@@ -107,6 +107,7 @@ export class StageManagementComponent {
 
     async edit_stage(index: number, action: string, form: NgForm) {
 
+        console.log(this.StageToUpdate);
         if (action == "confirm") {
 
             this.index_stage_edit = index;
