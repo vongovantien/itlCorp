@@ -141,7 +141,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Add")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Post(CatPartnerEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
