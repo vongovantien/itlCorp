@@ -266,14 +266,13 @@ export class WarehouseComponent extends AppList implements OnInit {
         if (this.form.valid && this.warehouse.countryID != null && this.warehouse.provinceID != null && this.warehouse.districtID != null) {
             if (this.warehouse.id == null) {
                 this.addNew();
-            }
-            else {
+            } else {
                 this.update();
             }
         }
     }
     async update() {
-        let response = await this.baseService.putAsync(this.api_menu.Catalogue.CatPlace.update + this.warehouse.id, this.warehouse, true, true);
+        const response = await this.baseService.putAsync(this.api_menu.Catalogue.CatPlace.update + this.warehouse.id, this.warehouse, true, true);
         if (response != null) {
             if (response.status) {
                 $('#edit-ware-house-modal').modal('hide');

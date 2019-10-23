@@ -470,8 +470,8 @@
                                     </label>
                                     <div class="col-lg-8">
                                         <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
-                                            <input [checked]="ListStages[index_stage_edit].inactive"
-                                                (change)="ListStages[index_stage_edit].inactive=!ListStages[index_stage_edit].inactive"
+                                            <input [checked]="!ListStages[index_stage_edit].active"
+                                                (change)="ListStages[index_stage_edit].active=!ListStages[index_stage_edit].active"
                                                 name="stageIsActive" type="checkbox"><span></span></label>
                                     </div>
                                 </div>

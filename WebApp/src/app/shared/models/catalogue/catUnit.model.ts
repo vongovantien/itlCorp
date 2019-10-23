@@ -1,5 +1,5 @@
 export class CatUnitModel {
-     id: number
+     id: number;
      code: String;
      unitNameVn: String;
      unitNameEn: String;
@@ -10,6 +10,6 @@ export class CatUnitModel {
      datetimeModified: Date;
      active: Boolean;
      inactiveOn: Date;
-     descriptionEn: String
+     descriptionEn: String;
      descriptionVn: String;
 }
