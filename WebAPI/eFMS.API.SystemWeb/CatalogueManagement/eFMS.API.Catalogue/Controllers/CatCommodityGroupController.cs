@@ -157,7 +157,7 @@ namespace eFMS.API.Catalogue.Controllers
             commonityGroup.UserModified = currentUser.UserID;
             commonityGroup.DatetimeModified = DateTime.Now;
             commonityGroup.Id = id;
-            if (commonityGroup.Active == true)
+            if (commonityGroup.Active == false)
             {
                 commonityGroup.InactiveOn = DateTime.Now;
             }

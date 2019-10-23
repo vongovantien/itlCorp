@@ -63,7 +63,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 var entity = mapper.Map<CatCurrency>(model);
                 entity.UserModified = currentUser.UserID;
                 entity.DatetimeModified = DateTime.Now;
-                if (entity.Active == true)
+                if (entity.Active == false)
                 {
                     entity.InactiveOn = DateTime.Now;
                 }
