@@ -79,7 +79,7 @@ namespace eFMS.API.System.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedName });
             }
-
+            model.SysEmployeeModel.Active = true;
             model.SysEmployeeModel.Id = Guid.NewGuid().ToString();
             var hsEmloyee = sysEmployeeService.Insert(model.SysEmployeeModel);
             var messageEmployee = HandleError.GetMessage(hsEmloyee, Crud.Insert);
@@ -90,6 +90,7 @@ namespace eFMS.API.System.Controllers
                 model.UserCreated = currentUser.UserID;
                 model.Id = Guid.NewGuid().ToString();
                 model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
+                model.Active = true;
                 var hs = sysUserService.Insert(model);
                 var message = HandleError.GetMessage(hs, Crud.Insert);
 

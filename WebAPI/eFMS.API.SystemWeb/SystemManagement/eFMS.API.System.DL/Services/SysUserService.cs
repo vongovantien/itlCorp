@@ -21,9 +21,9 @@ namespace eFMS.API.System.DL.Services
         private readonly IContextBase<SysUserGroup> usergroupRepository;
         private readonly IDistributedCache cache;
 
-        public SysUserService(IContextBase<SysUser> repository, IMapper mapper, 
+        public SysUserService(IContextBase<SysUser> repository, IMapper mapper,
             IContextBase<SysEmployee> employeeRepo,
-            IContextBase<SysUserGroup> usergroupRepo , IDistributedCache distributedCache) : base(repository, mapper)
+            IContextBase<SysUserGroup> usergroupRepo, IDistributedCache distributedCache) : base(repository, mapper)
         {
             employeeRepository = employeeRepo;
             usergroupRepository = usergroupRepo;
@@ -66,13 +66,23 @@ namespace eFMS.API.System.DL.Services
             var data = users.Join(employees, x => x.EmployeeId, y => y.Id, (x, y) => new { x, y });
             if (criteria.All == null)
             {
-                data = data.Where(x => (x.x.Username ?? "").IndexOf(criteria.Username ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
+                data = data.Where(x => (x.x.Username ?? "").IndexOf(criteria.Username ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                          && (x.y.EmployeeNameEn ?? "").IndexOf(criteria.EmployeeNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                          && (x.y.Title ?? "").IndexOf(criteria.Title ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                          && (x.x.UserType == criteria.UserType || criteria.UserType == null)
+                          && (x.x.Active == criteria.Active || criteria.Active == null)
+                );
             }
             else
             {
-                data = data.Where(x => (x.x.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
-            }
+                data = data.Where(x => (x.x.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                          || (x.y.EmployeeNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                          || (x.y.Title ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                          || (x.x.UserType == criteria.UserType || criteria.UserType == null)
+                          || (x.x.Active == criteria.Active || criteria.Active == null)
 
+                          );
+            }
             rowsCount = data.Count();
             if (size > 1)
             {

@@ -345,8 +345,6 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.Photo).HasColumnType("image");
 
-                entity.Property(e => e.Position).HasMaxLength(1600);
-
                 entity.Property(e => e.SaleResource)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -362,6 +360,8 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.Tel)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.Title).HasMaxLength(1600);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
