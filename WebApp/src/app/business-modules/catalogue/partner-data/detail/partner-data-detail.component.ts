@@ -159,12 +159,13 @@ export class PartnerDataDetailComponent extends AppList {
     }
 
     getReferenceData(): any {
-        if (this.partner.partnerGroup.includes('CUSTOMER') || this.partner.partnerGroup.includes('ALL')) {
+
+        if (this.partner.partnerGroup || [].includes('CUSTOMER') || this.partner.partnerGroup || [].includes('ALL')) {
             this.isRequiredSaleman = true;
         }
         let index = this.saleMans.findIndex(x => x.id === this.partner.salePersonId)
         if (index > -1) { this.salemanActive = [this.saleMans.find(x => x.id === this.partner.salePersonId)]; }
-        if (this.partner.partnerGroup.includes('CUSTOMER')) {
+        if (this.partner.partnerGroup || [].includes('CUSTOMER')) {
             this.isRequiredSaleman = true;
             this.isShowSaleMan = true;
         }
