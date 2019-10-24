@@ -3,7 +3,6 @@ import { Routes, RouterModule } from '@angular/router';
 import { DepartmentComponent } from './department/department.component';
 import { PermissionComponent } from './permission/permission.component';
 import { RoleComponent } from './role/role.component';
-import { UserManagementComponent } from './user-management/user-management.component';
 
 const routes: Routes = [
   {
@@ -29,8 +28,7 @@ const routes: Routes = [
     component: RoleComponent
   },
   {
-    path: 'user-management',
-    component: UserManagementComponent
+    path: 'user-management', loadChildren: () => import('./user-management/user-management.module').then(m => m.UserManagementModule)
   },
   {
     path: 'office', loadChildren: () => import('./office/office.module').then(m => m.OfficeModule),

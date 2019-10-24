@@ -69,19 +69,27 @@ namespace eFMS.API.System.DL.Services
                 data = data.Where(x => (x.x.Username ?? "").IndexOf(criteria.Username ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                           && (x.y.EmployeeNameEn ?? "").IndexOf(criteria.EmployeeNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                           && (x.y.Title ?? "").IndexOf(criteria.Title ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                          && (x.x.UserType == criteria.UserType || criteria.UserType == null)
+                          && (x.x.UserType ?? "").IndexOf(criteria.UserType ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                           && (x.x.Active == criteria.Active || criteria.Active == null)
                 );
             }
             else
             {
-                data = data.Where(x => (x.x.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                if(criteria.All.Contains("Active"))
+                {
+                    criteria.Active = true;
+                }
+                if(criteria.All.Contains("InActive"))
+                {
+                    criteria.Active = false;
+                }
+                data = data.Where(x => (
+                          ((x.x.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                           || (x.y.EmployeeNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                           || (x.y.Title ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                          || (x.x.UserType == criteria.UserType || criteria.UserType == null)
-                          || (x.x.Active == criteria.Active || criteria.Active == null)
-
-                          );
+                          || (x.x.UserType ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                          || (x.x.Active == criteria.Active)
+                          ));
             }
             rowsCount = data.Count();
             if (size > 1)

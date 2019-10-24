@@ -10,6 +10,28 @@ export class SystemRepo {
     constructor(private _api: ApiService) {
     }
 
+    addNewUser(body: any) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUser`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    deleteUser(id: string) {
+        return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUser/Delete`, { id: id })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    getUser(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUser/paging`, body, {
+            page: '' + page,
+            size: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getOffice(page?: number, size?: number, body: any = {}) {
         return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysOffice/paging`, body, {
             page: '' + page,

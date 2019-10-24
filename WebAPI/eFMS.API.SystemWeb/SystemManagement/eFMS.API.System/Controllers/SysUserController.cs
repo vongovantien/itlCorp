@@ -62,7 +62,7 @@ namespace eFMS.API.System.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        [Authorize]
+        //[Authorize]
         public IActionResult Add(SysUserModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -160,8 +160,10 @@ namespace eFMS.API.System.Controllers
      
         }
 
-        [HttpDelete("{id}")]
-        [Authorize]
+        [HttpDelete]
+        [Route("Delete")]
+
+        //[Authorize]
         public IActionResult Delete(string id)
         {
             var item = sysUserService.Get(x => x.Id == id).FirstOrDefault();
@@ -212,7 +214,7 @@ namespace eFMS.API.System.Controllers
             {
                 if (id == "0")
                 {
-                    if (sysEmployeeService.Any(x => x.StaffCode.ToLower().Trim() == code.ToLower().Trim()))
+                    if (sysEmployeeService.Any(x => x.StaffCode == code))
                     {
                         message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                     }
