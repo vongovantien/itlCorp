@@ -1,0 +1,27 @@
+<div class="sea-fcl-import-create-job-page">
+    <app-sub-header>
+        <div class="c-button-actions">
+
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-search-plus"></i>
+                    <span>
+                        Import Job Detail
+                    </span>
+                </span>
+            </button>
+
+            <app-default-button [buttonSetting]="saveButtonSetting"></app-default-button>
+
+            <app-default-button [buttonSetting]="cancelButtonSetting"></app-default-button>
+
+        </div>
+    </app-sub-header>
+    <div class="m-content">
+
+        <form-create-sea-fcl-import></form-create-sea-fcl-import>
+
+        <shipment-good-summary></shipment-good-summary>
+
+    </div>
+</div>
