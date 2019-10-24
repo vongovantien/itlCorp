@@ -208,7 +208,7 @@ export class TariffFormSearchComponent extends AppForm {
             status: formSearch.tariffStatus.value,
             customerID: !!this.selectedCustomer.data ? this.selectedCustomer.data.id : null,
             supplierID: !!this.selectedSupplier.data ? this.selectedSupplier.data.id : null,
-            officeId: !!this.selectedOffice.dat ? this.selectedOffice.data.id : '00000000-0000-0000-0000-000000000000',
+            officeId: !!this.selectedOffice.data ? this.selectedOffice.data.id : '00000000-0000-0000-0000-000000000000',
             fromDate: formatDate(formSearch.tariffDate.startDate, "yyyy-MM-dd", 'en'),
             toDate: formatDate(formSearch.tariffDate.endDate, "yyyy-MM-dd", 'en'),
         };

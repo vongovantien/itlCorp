@@ -1,6 +1,4 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-
 import { DesignModulesRoutingModule } from './design-modules-routing.module';
 import { FormComponent } from './form/form.component';
 import { TableComponent } from './table/table.component';
@@ -15,22 +13,21 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
 };
 @NgModule({
   imports: [
-    // CommonModule,
     DesignModulesRoutingModule,
     SharedModule,
     NgxDaterangepickerMd,
     FormsModule,
     SelectModule,
-    PerfectScrollbarModule, // Scrollbar
+    PerfectScrollbarModule,
   ],
   declarations: [
-    FormComponent, 
+    FormComponent,
     TableComponent
   ],
   providers: [
-    { 
-      provide: PERFECT_SCROLLBAR_CONFIG, // Scrollbar
-      useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG // Scrollbar
+    {
+      provide: PERFECT_SCROLLBAR_CONFIG,
+      useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG
     }
   ],
 })

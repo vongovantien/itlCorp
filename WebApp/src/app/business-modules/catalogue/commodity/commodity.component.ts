@@ -25,7 +25,6 @@ declare var $: any;
 @Component({
   selector: 'app-commodity',
   templateUrl: './commodity.component.html',
-  styleUrls: ['./commodity.component.sass']
 })
 export class CommodityComponent implements OnInit {
 
@@ -197,16 +196,14 @@ export class CommodityComponent implements OnInit {
   }
 
   onSortChange(column) {
-    if (column.dataType != 'boolean') {
-      let property = column.primaryKey;
+    let property = column.primaryKey;
 
-      this.isDesc = !this.isDesc;
-      if (this.activeTab == this.tabName.commodity) {
-        this.commodities = this.sortService.sort(this.commodities, property, this.isDesc);
-      }
-      if (this.activeTab == this.tabName.commodityGroup) {
-        this.commodityGroups = this.sortService.sort(this.commodityGroups, property, this.isDesc);
-      }
+    this.isDesc = !this.isDesc;
+    if (this.activeTab == this.tabName.commodity) {
+      this.commodities = this.sortService.sort(this.commodities, property, this.isDesc);
+    }
+    if (this.activeTab == this.tabName.commodityGroup) {
+      this.commodityGroups = this.sortService.sort(this.commodityGroups, property, this.isDesc);
     }
   }
   async showDetail(item, tabName) {

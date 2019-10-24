@@ -308,11 +308,9 @@ export class PortIndexComponent implements OnInit {
     this.child.setPage(this.pager.currentPage);
   }
   onSortChange(column) {
-    if (column.dataType != 'boolean') {
-      let property = column.primaryKey;
-      this.isDesc = !this.isDesc;
-      this.portIndexs = this.sortService.sort(this.portIndexs, property, this.isDesc);
-    }
+    let property = column.primaryKey;
+    this.isDesc = !this.isDesc;
+    this.portIndexs = this.sortService.sort(this.portIndexs, property, this.isDesc);
   }
   async export() {
     var portIndexes = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.query, this.criteria);

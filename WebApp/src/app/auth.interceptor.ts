@@ -49,7 +49,7 @@ export class AuthInterceptor implements HttpInterceptor {
                     errorMessage = `Error: ${error.message}`;
                     title = error.statusText;
                 }
-                this._toastService.error(errorMessage, title);
+                this._toastService.error(errorMessage);
                 return throwError(error);
             })
         );

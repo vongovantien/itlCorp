@@ -42,7 +42,7 @@ export class CompanyInformationDetailComponent extends AppList {
 
         this.headersOffice = [
             { title: 'Office Code', field: 'code', sortable: true },
-            { title: 'Name En', field: 'branchNameEn', sortable: true },
+            { title: 'Name EN', field: 'branchNameEn', sortable: true },
             { title: 'Name Local', field: 'branchNameVn', sortable: true },
             { title: 'Name Abbr', field: 'shortName', sortable: true },
             { title: 'Address En', field: 'addressEn', sortable: true },
