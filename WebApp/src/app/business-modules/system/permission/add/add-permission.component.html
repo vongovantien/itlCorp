@@ -12,51 +12,30 @@
                 <tabset>
                     <tab heading="General Permission">
                         <div class="general-wrapper">
-                            <div class="d-flex header-permission flex-wrap">
-                                <div class="p-2 border">Module</div>
-                                <div class="p-2 border">Function</div>
-                                <div class="p-2 border">Access</div>
-                                <div class="p-2 border">Detail</div>
-                                <div class="p-2 border">Write</div>
-                                <div class="p-2 border">Delete</div>
-                                <div class="p-2 border">List</div>
-                                <div class="p-2 border">Import</div>
-                                <div class="p-2 border">Export</div>
+                            <div class="header-permission row">
+                                <div class="p-2 col m-w-100">Module</div>
+                                <div class="p-2 col">Function</div>
+                                <div class="p-2 col">Access</div>
+                                <div class="p-2 col">Detail</div>
+                                <div class="p-2 col">Write</div>
+                                <div class="p-2 col">Delete</div>
+                                <div class="p-2 col">List</div>
+                                <div class="p-2 col">Import</div>
+                                <div class="p-2 col">Export</div>
                             </div>
-                            <div class="list-permission-group-module">
-                                <ul class="list-group">
+                            <div class="list-permission-group-module-wrapper">
+                                <ul class="list-group list-module">
                                     <li class="list-group-item">
-                                        Operation
-                                        <ul class="list-group">
+                                        <span class="font-15 font-weight-bold">Operation</span>
+                                        <ul class="list-group m--margin-top-10 list-permission">
                                             <li class="list-group-item col">
                                                 <div class="row">
-                                                    <div class="col d-flex align-items-center">1</div>
-                                                    <div class="col">Job Management</div>
-                                                    <div class="col">
-                                                        <select class="form-control">
-                                                            <option *ngFor="let item of [1,2,3]" [value]="item">{{item}}
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col">
-                                                        <select class="form-control">
-                                                            <option *ngFor="let item of [1,2,3]" [value]="item">{{item}}
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col">
-                                                        <select class="form-control">
-                                                            <option *ngFor="let item of [1,2,3]" [value]="item">{{item}}
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col">
-                                                        <select class="form-control">
-                                                            <option *ngFor="let item of [1,2,3]" [value]="item">{{item}}
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col">
+                                                    <div
+                                                        class="col d-flex align-items-center m-w-100 justify-content-center">
+                                                        1</div>
+                                                    <div class="col  d-flex align-items-center justify-content-center">
+                                                        Job Management</div>
+                                                    <div class="col text-center">
                                                         <span class="m-switch m-switch--success">
                                                             <label>
                                                                 <input type="checkbox" checked="checked" name="">
@@ -64,7 +43,31 @@
                                                             </label>
                                                         </span>
                                                     </div>
+                                                    <div class="col ">
+                                                        <select class="form-control">
+                                                            <option *ngFor="let item of [1,2,3]" [value]="item">{{item}}
+                                                            </option>
+                                                        </select>
+                                                    </div>
                                                     <div class="col">
+                                                        <select class="form-control">
+                                                            <option *ngFor="let item of [1,2,3]" [value]="item">{{item}}
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col">
+                                                        <select class="form-control">
+                                                            <option *ngFor="let item of [1,2,3]" [value]="item">{{item}}
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col">
+                                                        <select class="form-control">
+                                                            <option *ngFor="let item of [1,2,3]" [value]="item">{{item}}
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col text-center">
                                                         <span class="m-switch m-switch--success">
                                                             <label>
                                                                 <input type="checkbox" checked="checked" name="">
@@ -72,7 +75,7 @@
                                                             </label>
                                                         </span>
                                                     </div>
-                                                    <div class="col">
+                                                    <div class="col text-center">
                                                         <span class="m-switch m-switch--success">
                                                             <label>
                                                                 <input type="checkbox" checked="checked" name="">
@@ -90,7 +93,7 @@
                     </tab>
                     <tab heading="Special Permission"></tab>
                 </tabset>
-                <div class="row">
+                <div class="row m--margin-top-10">
                     <div class="col-md-6"></div>
                     <div class="col-md-6">
                         <div class="m--align-right">

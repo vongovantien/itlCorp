@@ -1,7 +1,15 @@
 :host /deep/ {
     .permission-add-page {
         .general-wrapper {
+            .m-w-100 {
+                max-width: 100px;
+            }
             .header-permission {
+                padding: 0px 15px;
+                text-align: center;
+                margin: 0;
+                background: #dfdfdf;
+                font-weight: bold;
             }
             .m-switch.m-switch--success:not(.m-switch--outline)
                 input:empty
