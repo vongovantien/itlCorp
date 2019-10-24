@@ -1,4 +1,5 @@
-<div class="modal fade form-edit-stage" role="dialog" aria-hidden="true" bsModal #popup="bs-modal" (onHide)="onHide($event)" (onShow)="onShow($event)">
+<div class="modal fade form-edit-stage" role="dialog" aria-hidden="true" bsModal #popup="bs-modal"
+    (onHide)="onHide($event)" (onShow)="onShow($event)">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -15,7 +16,8 @@
                                 <label class="form-control-label">
                                     Stage name
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" [formControl]="stageName" formControlName="stageName">
+                                <input type="text" class="form-control m-input m-input--square"
+                                    [formControl]="stageName" formControlName="stageName">
                             </div>
                         </div>
                         <div class="col-lg-6">
@@ -23,19 +25,21 @@
                                 <label class="form-control-label">
                                     Role
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" [formControl]="departmentName" formControlName="departmentName">
+                                <input type="text" class="form-control m-input m-input--square"
+                                    [formControl]="departmentName" formControlName="departmentName">
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-lg-6">
-                            <div class="form-group"  [ngClass]="{'m-form__group has-danger': isSummited && processTime.value === 0}">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': isSummited && processTime.value === 0}">
                                 <label class="form-control-label">
                                     Process time (h)
                                 </label>
-                                <input appTwoDigitDecimaNumber type="text" class="form-control m-input m-input--square" [formControl]="processTime" formControlName="processTime">
-                                <div class="form-control-feedback"
-                                    *ngIf="isSummited && processTime.value === 0">
+                                <input appTwoDigitDecimaNumber type="text" class="form-control m-input m-input--square"
+                                    [formControl]="processTime" formControlName="processTime">
+                                <div class="form-control-feedback" *ngIf="isSummited && processTime.value === 0">
                                     Process time must greater than 0 !
                                 </div>
                             </div>
@@ -46,7 +50,10 @@
                                     Deadline
                                 </label>
                                 <div class="m-input-icon m-input-icon--right down">
-                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd formControlName="deadLineDate" placeholder="Choose date" [singleDatePicker]="true" [timePicker]="true" [timePicker24Hour]="true" [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        formControlName="deadLineDate" placeholder="Choose date"
+                                        [singleDatePicker]="true" [timePicker]="true" [timePicker24Hour]="true"
+                                        [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true">
                                     <span class=" m-input-icon__icon m-input-icon__icon--right ">
                                         <span>
                                             <i class="la la-calendar "></i>
@@ -58,29 +65,34 @@
                     </div>
                     <div class="row ">
                         <div class="col-lg-6 ">
-                            <div class="form-group" [ngClass]="{'m-form__group has-danger': isSummited && !selectedMainPersonInCharge.value}">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': isSummited && !selectedMainPersonInCharge.value}">
                                 <label class="form-control-label ">
                                     Main person incharge <span class="m--font-danger">(*)</span>
                                 </label>
-                                <app-combo-grid-virtual-scroll *ngIf="!!data" [currentActiveItemId]="selectedMainPersonInCharge" (itemSelected)="onSelectMainPersonIncharge($event) " [selectedDisplayFields]="configComboGrid.selectedDisplayFields " [dataSources]="configComboGrid.source
+                                <app-combo-grid-virtual-scroll *ngIf="!!data"
+                                    [currentActiveItemId]="selectedMainPersonInCharge"
+                                    (itemSelected)="onSelectMainPersonIncharge($event) "
+                                    [selectedDisplayFields]="configComboGrid.selectedDisplayFields " [dataSources]="configComboGrid.source
                                         " [displayFields]="configComboGrid.displayFields ">
                                 </app-combo-grid-virtual-scroll>
-                                <div class="form-control-feedback" *ngIf="isSummited && !selectedMainPersonInCharge.value">
+                                <div class="form-control-feedback"
+                                    *ngIf="isSummited && !selectedMainPersonInCharge.value">
                                     Main person in charge is required!
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-6 ">
-                            <div class="form-group" [ngClass]="{'m-form__group has-danger': (!!selectedMainPersonInCharge && selectedMainPersonInCharge.value) && selectedRealPersonInCharge.value === selectedMainPersonInCharge.value}">
+                            <div class="form-group">
                                 <label class="form-control-label ">
                                     Real person incharge
                                 </label>
-                                <app-combo-grid-virtual-scroll *ngIf="!!data" (itemSelected)="onSelectRealPersonIncharge($event) " [selectedDisplayFields]="configComboGrid.selectedDisplayFields " [dataSources]="configComboGrid.source
-                                        " [displayFields]="configComboGrid.displayFields" [currentActiveItemId]="selectedRealPersonInCharge">
+                                <app-combo-grid-virtual-scroll *ngIf="!!data"
+                                    (itemSelected)="onSelectRealPersonIncharge($event) "
+                                    [selectedDisplayFields]="configComboGrid.selectedDisplayFields " [dataSources]="configComboGrid.source
+                                        " [displayFields]="configComboGrid.displayFields"
+                                    [currentActiveItemId]="selectedRealPersonInCharge">
                                 </app-combo-grid-virtual-scroll>
-                                <div class="form-control-feedback" *ngIf="(!!selectedMainPersonInCharge && selectedMainPersonInCharge.value) && selectedRealPersonInCharge.value === selectedMainPersonInCharge.value">
-                                    Real person incharge is not be same with main person!
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -90,16 +102,20 @@
                                 <label class="form-control-label ">
                                     Description
                                 </label>
-                                <textarea class="form-control m-input m-input--square " rows="3 " [formControl]="description" formControlName="description"></textarea>
+                                <textarea class="form-control m-input m-input--square " rows="3 "
+                                    [formControl]="description" formControlName="description"></textarea>
                             </div>
                         </div>
                         <div class="col-lg-6 ">
-                            <div class="form-group" [ngClass]="{'m-form__group has-danger': (statusStageActive[0].id === 'Pending' || statusStageActive[0].id === 'Deleted') && !comment.value}">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': (statusStageActive[0].id === 'Pending' || statusStageActive[0].id === 'Deleted') && !comment.value}">
                                 <label class="form-control-label ">
                                     Comment
                                 </label>
-                                <textarea class="form-control m-input m-input--square " rows="3 " [formControl]="comment" formControlName="comment"></textarea>
-                                <div class="form-control-feedback" *ngIf="(statusStageActive[0].id === 'Pending' || statusStageActive[0].id === 'Deleted') && !comment.value">
+                                <textarea class="form-control m-input m-input--square " rows="3 "
+                                    [formControl]="comment" formControlName="comment"></textarea>
+                                <div class="form-control-feedback"
+                                    *ngIf="(statusStageActive[0].id === 'Pending' || statusStageActive[0].id === 'Deleted') && !comment.value">
                                     Comment is required!
                                 </div>
                             </div>
@@ -111,7 +127,8 @@
                                 <label class="form-control-label ">
                                     Status
                                 </label>
-                                <ng-select [allowClear]="false" [items]="statusStage" [active]="statusStageActive" (selected)="selected($event)" placeholder="Select filter">
+                                <ng-select [allowClear]="false" [items]="statusStage" [active]="statusStageActive"
+                                    (selected)="selected($event)" placeholder="Select filter">
                                 </ng-select>
                             </div>
                         </div>
@@ -119,7 +136,8 @@
                     <div class="row">
                         <div class="col-md-12 mt-3">
                             <div class="border-top text-center p-3">
-                                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase mr-2" type="submit">
+                                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase mr-2"
+                                    type="submit">
                                     <span>
                                         <i class="la la-save "></i>
                                         <span>
@@ -127,7 +145,8 @@
                                         </span>
                                     </span>
                                 </button>
-                                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase " (click)="onCancel()">
+                                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase "
+                                    (click)="onCancel()">
                                     <span>
                                         <i class="la la-ban "></i>
                                         <span>

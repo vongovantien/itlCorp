@@ -157,11 +157,9 @@ export class WarehouseComponent extends AppList implements OnInit {
         }
     }
     onSortChange(column) {
-        if (column.dataType != 'boolean') {
-            let property = column.primaryKey;
-            this.isDesc = !this.isDesc;
-            this.warehouses = this.sortService.sort(this.warehouses, property, this.isDesc);
-        }
+        let property = column.primaryKey;
+        this.isDesc = !this.isDesc;
+        this.warehouses = this.sortService.sort(this.warehouses, property, this.isDesc);
     }
     async showDetail(item: Warehouse) {
         this.warehouse = item;

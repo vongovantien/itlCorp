@@ -111,11 +111,9 @@ export class ExchangeRateComponent implements OnInit {
   }
 
   onSortChange(column) {
-    if (column.dataType != 'boolean') {
       let property = column.primaryKey;
       this.isDesc = !this.isDesc;
       this.exchangeRates = this.sortService.sort(this.exchangeRates, property, this.isDesc);
-    }
   }
   searchHistory() {
     console.log(this.selectedrange);

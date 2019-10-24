@@ -74,7 +74,7 @@ export const PARTNERDATACOLUMNSETTING: ColumnSetting[] =
     },
     {
       primaryKey: 'active',
-      header: 'Inactive',
+      header: 'Status',
       isShow: true,
       dataType: 'boolean',
       required: true,

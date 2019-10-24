@@ -49,11 +49,9 @@ export class AirShipSupComponent implements OnInit {
     this.pager.totalItems = responses.totalItems;
   }
   onSortChange(column) {
-    if (column.dataType != 'boolean') {
-      let property = column.primaryKey;
-      this.isDesc = !this.isDesc;
-      this.airShips = this.sortService.sort(this.airShips, property, this.isDesc);
-    }
+    let property = column.primaryKey;
+    this.isDesc = !this.isDesc;
+    this.airShips = this.sortService.sort(this.airShips, property, this.isDesc);
   }
 
   showConfirmDelete(item) {
