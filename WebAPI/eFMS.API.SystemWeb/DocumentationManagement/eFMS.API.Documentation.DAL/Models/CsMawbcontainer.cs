@@ -6,7 +6,7 @@ namespace eFMS.API.Documentation.Service.Models
     public partial class CsMawbcontainer
     {
         public Guid Id { get; set; }
-        public Guid Mblid { get; set; }
+        public Guid? Mblid { get; set; }
         public Guid? Hblid { get; set; }
         public short? ContainerTypeId { get; set; }
         public int? Quantity { get; set; }

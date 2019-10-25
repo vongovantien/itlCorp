@@ -220,14 +220,7 @@
             <summary>
             add new transaction
             </summary>
-            <param name="model">model to update</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.Import(eFMS.API.Documentation.DL.Models.CsTransactionEditModel)">
-            <summary>
-            import transaction
-            </summary>
-            <param name="model"></param>
+            <param name="model">model to add</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.Put(eFMS.API.Documentation.DL.Models.CsTransactionEditModel)">
@@ -237,6 +230,13 @@
             <param name="model">model to update</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.CheckAllowDelete(System.Guid)">
+            <summary>
+            check allow delete an existed item
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.Delete(System.Guid)">
             <summary>
             delete an existed item
@@ -244,11 +244,11 @@
             <param name="id">id of existed data that want to delete</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.CheckAllowDelete(System.Guid)">
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.Import(eFMS.API.Documentation.DL.Models.CsTransactionEditModel)">
             <summary>
-            check allow delete an existed item
+            import transaction
             </summary>
-            <param name="id"></param>
+            <param name="model"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Documentation.Controllers.OpsTransactionController">
