@@ -10,6 +10,8 @@ import { SeaFCLImportManagementFormSearchComponent } from './sea-fcl-import-mana
 import { SeaFCLImportCreateJobComponent } from './sea-fcl-import-management/create-job/create-job-fcl-import.component';
 import { SeaFClImportFormCreateComponent } from './sea-fcl-import-management/components/form-create/form-create-sea-fcl-import.component';
 import { SeaFCLImportShipmentGoodSummaryComponent } from './sea-fcl-import-management/components/shipment-good-summary/shipment-good-summary.component';
+import { SeaFCLImportDetailJobComponent } from './sea-fcl-import-management/detail-job/detail-job-fcl-import.component';
+import { SeaFCLImportCDNoteComponent } from './sea-fcl-import-management/detail-job/cd-note/sea-fcl-import-cd-note.component';
 
 
 const routing: Routes = [
@@ -20,7 +22,15 @@ const routing: Routes = [
     {
         path: 'new', component: SeaFCLImportCreateJobComponent,
         data: { name: "Create New Job", path: "new", level: 3 }
+    },
+    {
+        path: ':id', component: SeaFCLImportDetailJobComponent,
+        data: { name: "Job Detail", path: ":id", level: 3 },
+    },
+    {
+        path: ':id/hbl', loadChildren: () => import('./sea-fcl-import-management/detail-job/hbl/sea-fcl-import-hbl.module').then(m => m.SeaFCLImportHBLModule),
     }
+
 ];
 
 const COMPONENTS = [
@@ -33,7 +43,9 @@ const COMPONENTS = [
     declarations: [
         ...COMPONENTS,
         SeaFCLImportManagementComponent,
-        SeaFCLImportCreateJobComponent
+        SeaFCLImportCreateJobComponent,
+        SeaFCLImportDetailJobComponent,
+        SeaFCLImportCDNoteComponent
     ],
     imports: [
         CommonModule,
@@ -41,7 +53,7 @@ const COMPONENTS = [
         RouterModule.forChild(routing),
         FormsModule,
         ReactiveFormsModule,
-        TabsModule,
+        TabsModule.forRoot(),
         PaginationModule,
         SelectModule,
         ModalModule.forRoot()
