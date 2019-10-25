@@ -23,5 +23,7 @@ namespace eFMS.API.System.DL.ViewModels
         public string EmployeeNameVn { get; set; }
         public string EmployeeNameEn { get; set; }
         public string Password { get; set; }
+        public string UserType { get; set; }
+        public string Title { get; set; }
     }
 }

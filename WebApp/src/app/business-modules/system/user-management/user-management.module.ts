@@ -8,14 +8,18 @@ import { NgProgressModule } from '@ngx-progressbar/core';
 import { Routes, RouterModule } from '@angular/router';
 import { PaginationModule, TabsModule } from 'ngx-bootstrap';
 import { UserFormSearchComponent } from './components/form-search-user/form-search-user.component';
-import { FormAddUserComponent } from './components/form-add-user/form-add-user/form-add-user.component';
 import { UserAddNewComponent } from './addnew/user.addnew.component';
-
+import { FormAddUserComponent } from './components/form-add-user/form-add-user.component';
+import { UserDetailsComponent } from './details/user-details.component';
+import { UserManagementImportComponent } from './import/user-management-import.component';
 const routing: Routes = [
+    { path: 'import', component: UserManagementImportComponent, data: { name: "Import User", level: 3 } },
 
     { path: '', component: UserManagementComponent, data: { name: "User Management", level: 2 } },
-
     { path: 'new', component: UserAddNewComponent, data: { name: "Create User", level: 3 } },
+    { path: ':id', component: UserDetailsComponent, data: { name: "Edit User", level: 3 } },
+
+
 ];
 
 @NgModule({
@@ -31,7 +35,7 @@ const routing: Routes = [
         RouterModule.forChild(routing)
     ],
     exports: [],
-    declarations: [UserManagementComponent, UserFormSearchComponent, FormAddUserComponent, UserAddNewComponent],
+    declarations: [UserManagementComponent, UserFormSearchComponent, FormAddUserComponent, UserAddNewComponent, UserDetailsComponent, UserManagementImportComponent],
     providers: [],
 })
 export class UserManagementModule { }

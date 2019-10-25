@@ -16,12 +16,31 @@ export class SystemRepo {
         );
     }
 
+    getDetailUser(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUser/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
     deleteUser(id: string) {
         return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUser/Delete`, { id: id })
             .pipe(
                 map((data: any) => data)
             );
     }
+
+    updateUser(body: any = {}) {
+        return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUser`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    resetPasswordUser(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUser/ResetPassword`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+
 
     getUser(page?: number, size?: number, body: any = {}) {
         return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUser/paging`, body, {

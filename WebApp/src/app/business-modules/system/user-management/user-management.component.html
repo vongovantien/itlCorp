@@ -7,7 +7,9 @@
             <app-default-button [buttonSetting]="addButtonSetting" [dataTarget]="addButtonSetting.dataTarget"
                 routerLink="/home/system/user-management/new">
             </app-default-button>
-            <app-default-button [buttonSetting]="exportButtonSetting"></app-default-button>
+            <app-default-button [buttonSetting]="importButtonSetting" routerLink="/home/system/user-management/import">
+            </app-default-button>
+            <app-default-button [buttonSetting]="exportButtonSetting" (click)="export()"></app-default-button>
         </div>
     </div>
 </div>
@@ -21,7 +23,8 @@
                     <table class="table table-striped table-brand table-hover dataTable">
                         <thead app-table-header [headers]="headers"
                             (onClick)="sortBy($event.sortField ? $event.sortField : '')">
-                            <th class="m--w-50 first">
+                            <th class="m--w-50 first table-actions-col">
+                                Action
                             </th>
                         </thead>
                         <tbody class="tbody-group">
@@ -30,11 +33,6 @@
                                     <td class="table-actions-col">
                                         <div class="table-actions" style="width: 70px">
 
-                                            <button type="button" [disabled]="user.active"
-                                                class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Remove" (click)="showDeletePopup(user)">
-                                                <i class="la la-trash"></i>
-                                            </button>
 
                                             <!-- <ng-container>
                                                     <a title="Delete" class="pointer" (click)="showDeletePopup(office)">
@@ -51,9 +49,16 @@
                                                 [routerLink]="user.id" title="Detail">
                                                 <i class="la la-edit"></i>
                                             </button>
+
+                                            <button type="button" [disabled]="user.active"
+                                                class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                title="Remove" (click)="showDeletePopup(user)">
+                                                <i class="la la-trash"></i>
+                                            </button>
                                         </div>
                                     </td>
-                                    <td class="text-underline text-primary pointer"><a>{{user.username}}</a> </td>
+                                    <td class="text-underline text-primary pointer"><a
+                                            (click)="gotoDetailUser(user.id)">{{user.username}}</a> </td>
                                     <td>{{user.employeeNameEn}}</td>
                                     <td>{{user.title}}</td>
                                     <td>{{user.userType}}</td>

@@ -1,6 +1,7 @@
 <div class="m-content form-add-user">
     <form [formGroup]="formGroup">
         <div class="m-portlet">
+            <ng-content></ng-content>
             <div class="m-portlet__body">
                 <div class="row">
                     <div class="col-lg-4">
@@ -127,7 +128,7 @@
                                 placeholder="Please Enter Phone Number">
                         </div>
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-2">
                         <div class="form-group">
                             <label class="form-control-label" for="">
                                 LDAP
@@ -137,11 +138,24 @@
                                     <label>
                                         <input type="checkbox" formControlName="ldap" checked="checked" name="">
                                         <span></span>
+
                                     </label>
                                 </span>
-                            </div>
 
+                            </div>
                         </div>
+                    </div>
+                    <div class="col-lg-4" *ngIf="isDetail">
+                        <div class="form-group">
+                            <label></label>
+                            <div class="c-btn-form-group">
+                                <button (click)="resetPassword(SelectedUser.id)"
+                                    class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">Reset
+                                    Password</button>
+                            </div>
+                        </div>
+
+
                     </div>
                     <!-- <div class="col-lg-8">
                         <div class="form-group">
@@ -153,6 +167,18 @@
                         </div>
                     </div> -->
                 </div>
+                <div class="row" *ngIf="isDetail">
+                    <div class="col-6">
+                        Created: {{SelectedUser.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by <span
+                            class="text-success">{{SelectedUser.userCreated}}</span>
+                    </div>
+                    <div class="col-6">
+                        Modified: {{SelectedUser.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by <span
+                            class="text-success">{{SelectedUser.userModified}}</span>
+                    </div>
+
+                </div>
+
             </div>
         </div>
     </form>

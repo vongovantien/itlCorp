@@ -15,6 +15,10 @@ using eFMS.API.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Common.Globals;
 using eFMS.API.System.Infrastructure.Common;
+using eFMS.API.Common.Helpers;
+using System.IO;
+using Microsoft.AspNetCore.Http;
+using OfficeOpenXml;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -56,6 +60,14 @@ namespace eFMS.API.System.Controllers
             return Ok(result);
         }
 
+        [HttpPost]
+        [Route("Query")]
+        public IActionResult Get(SysUserCriteria criteria)
+        {
+            var results = sysUserService.Query(criteria);
+            return Ok(results);
+        }
+
         /// <summary>
         /// add new group
         /// </summary>
@@ -89,8 +101,7 @@ namespace eFMS.API.System.Controllers
                 model.EmployeeId = model.SysEmployeeModel.Id;
                 model.UserCreated = currentUser.UserID;
                 model.Id = Guid.NewGuid().ToString();
-                model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
-                model.Active = true;
+                model.DatetimeCreated  = DateTime.Now;
                 var hs = sysUserService.Insert(model);
                 var message = HandleError.GetMessage(hs, Crud.Insert);
 
@@ -113,11 +124,12 @@ namespace eFMS.API.System.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPut]
-        [Authorize]
+        //[Authorize]
         public IActionResult Update(SysUserModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var existedMessage = CheckExistCode(model.SysEmployeeModel.StaffCode, model.Id);
+            var userCurrent = sysUserService.GetUserById(model.Id);
+            var existedMessage = CheckExistCode(model.SysEmployeeModel.StaffCode, userCurrent.EmployeeId);
             var existedName = CheckExistUserName(model.Username, model.Id);
             if (existedMessage.Length > 0)
             {
@@ -127,12 +139,11 @@ namespace eFMS.API.System.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedName });
             }
-            var userCurrent = sysUserService.GetUserById(model.Id);
             var employeeCurrent = sysEmployeeService.Get(x => x.Id == userCurrent.EmployeeId).FirstOrDefault();
             model.SysEmployeeModel.Id = employeeCurrent.Id;
             model.SysEmployeeModel.UserModified = currentUser.UserID;
             model.SysEmployeeModel.DatetimeModified = DateTime.Now;
-           
+            model.SysEmployeeModel.Active = true;
 
             var hsEmployee = sysEmployeeService.Update(model.SysEmployeeModel);
             var messageEmployee = HandleError.GetMessage(hsEmployee, Crud.Update);
@@ -143,6 +154,8 @@ namespace eFMS.API.System.Controllers
                 model.DatetimeModified = DateTime.Now;
                 model.Password = userCurrent.Password;
                 model.EmployeeId = model.SysEmployeeModel.Id;
+                model.UserCreated = userCurrent.UserCreated;
+                model.DatetimeCreated = userCurrent.DatetimeCreated;
                 var hs = sysUserService.Update(model);
                 var message = HandleError.GetMessage(hs, Crud.Update);
 
@@ -182,6 +195,110 @@ namespace eFMS.API.System.Controllers
             }
             return Ok(result);
         }
+        /// get user by id
+        /// </summary>
+        /// <param name="id">id of data that need to retrieve</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("{id}")]
+        public IActionResult GetBy(string id)
+        {
+            var result = sysUserService.First(x => x.Id == id);
+            result.SysEmployeeModel = sysEmployeeService.First(x => x.Id == result.EmployeeId);
+            if (result == null)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = "Error", Data = result });
+            }
+            else
+            {
+                return Ok(new ResultHandle { Status = true, Message = "Success", Data = result });
+            }
+        }
+        /// <summary>
+        /// reset password of user to default
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+
+        [HttpGet]
+        [Route("ResetPassword")]
+        public IActionResult ResetPassword(string id)
+        {
+            var item = sysUserService.Get(x => x.Id == id).FirstOrDefault();
+            item.Password = "12345678";
+            item.Password = BCrypt.Net.BCrypt.HashPassword(item.Password);
+            var hs = sysUserService.Update(item, x => x.Id == id);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// download file excel from server
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("DownloadExcel")]
+        public async Task<ActionResult> DownloadExcel()
+        {
+            var result = await new FileHelper().ExportExcel(Directory.GetCurrentDirectory(), Templates.SysUser.ExelImportFileName);
+            if (result != null)
+            {
+                return result;
+            }
+            else
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+            }
+        }
+
+        /// <summary>
+        /// read data from file excel
+        /// </summary>
+        /// <param name="uploadedFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("uploadFile")]
+        [Authorize]
+        public IActionResult UploadFile(IFormFile uploadedFile)
+        {
+            var file = new FileHelper().UploadExcel(uploadedFile);
+            if (file != null)
+            {
+                ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
+                int rowCount = worksheet.Dimension.Rows;
+                int colCount = worksheet.Dimension.Columns;
+                if (rowCount < 2) return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.NOT_FOUND_DATA_EXCEL].Value });
+                List<SysUserImportModel> list = new List<SysUserImportModel>();
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    var userobj = new SysUserImportModel
+                    {
+                        IsValid = true,
+                        Username = worksheet.Cells[row, 2].Value == null ? string.Empty : worksheet.Cells[row, 2].Value.ToString(),
+                        EmployeeNameEn = worksheet.Cells[row, 3].Value == null ? string.Empty : worksheet.Cells[row, 3].Value.ToString(),
+                        EmployeeNameVn = worksheet.Cells[row, 4].Value == null ? string.Empty : worksheet.Cells[row, 4].Value.ToString(),
+                        Title = worksheet.Cells[row, 5].Value == null ? string.Empty : worksheet.Cells[row, 5].Value.ToString(),
+                        UserType = worksheet.Cells[row, 5].Value == null ? string.Empty : worksheet.Cells[row, 5].Value.ToString(),
+
+
+
+
+                    };
+                }
+
+  
+                return Ok();
+
+            }
+            return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+
+        }
+
 
         private string CheckExistUserName(string username, string id)
         {
@@ -221,7 +338,7 @@ namespace eFMS.API.System.Controllers
                 }
                 else
                 {
-                    if (sysEmployeeService.Any(x => x.StaffCode.ToLower().Trim() == code.ToLower().Trim() && x.Id != id))
+                    if (sysEmployeeService.Any(x => x.StaffCode == code && x.Id != id))
                     {
                         message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                     }

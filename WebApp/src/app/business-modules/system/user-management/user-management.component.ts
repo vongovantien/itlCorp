@@ -16,8 +16,7 @@ import { ExportRepo } from 'src/app/shared/repositories';
 
 @Component({
     selector: 'app-user-management',
-    templateUrl: './user-management.component.html',
-    styleUrls: ['./user-management.component.sass']
+    templateUrl: './user-management.component.html'
 })
 export class UserManagementComponent extends AppList {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
@@ -30,6 +29,9 @@ export class UserManagementComponent extends AppList {
     };
     saveButtonSetting: ButtonModalSetting = {
         typeButton: ButtonType.save
+    };
+    importButtonSetting: ButtonModalSetting = {
+        typeButton: ButtonType.import
     };
 
     cancelButtonSetting: ButtonModalSetting = {
@@ -51,6 +53,7 @@ export class UserManagementComponent extends AppList {
         super();
         this._progressRef = this._progressService.ref();
         this.requestList = this.searchUser;
+        this.requestSort = this.sortLocal;
     }
 
     ngOnInit() {
@@ -70,6 +73,10 @@ export class UserManagementComponent extends AppList {
         };
         this.criteria.all = null;
         this.searchUser();
+    }
+
+    sortLocal(sort: string): void {
+        this.users = this._sortService.sort(this.users, sort, this.order);
     }
 
 
@@ -155,5 +162,23 @@ export class UserManagementComponent extends AppList {
                 },
             );
     }
+
+    gotoDetailUser(id: number) {
+        this._router.navigate([`home/system/user-management/${id}`]);
+    }
+
+    export() {
+        this._exportRepo.exportUser(this.criteria)
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    this.downLoadFile(response, "application/ms-excel", 'User.xlsx');
+                },
+                (errors: any) => {
+                },
+                () => { }
+            );
+    }
+
+
 
 }

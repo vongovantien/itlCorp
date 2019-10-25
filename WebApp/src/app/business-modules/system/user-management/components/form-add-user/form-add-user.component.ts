@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
-
+import { SystemRepo } from 'src/app/shared/repositories';
+import { ToastrService } from 'ngx-toastr';
+import { NgProgress } from '@ngx-progressbar/core';
+import { catchError } from 'rxjs/internal/operators/catchError';
+import { finalize } from 'rxjs/internal/operators/finalize';
 @Component({
     selector: 'app-form-add-user',
     templateUrl: './form-add-user.component.html'
@@ -9,6 +13,8 @@ import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/fo
 export class FormAddUserComponent extends AppList {
     formGroup: FormGroup;
     isSubmited: boolean = false;
+    isDetail: boolean = false;
+    SelectedUser: any = {};
     staffcode: AbstractControl;
     username: AbstractControl;
     employeeNameVn: AbstractControl;
@@ -41,8 +47,13 @@ export class FormAddUserComponent extends AppList {
 
     constructor(
         private _fb: FormBuilder,
+        private _systemRepo: SystemRepo,
+        private _toastService: ToastrService,
+        private _progressService: NgProgress,
+
     ) {
         super();
+        this._progressRef = this._progressService.ref();
     }
 
     initForm() {
@@ -95,5 +106,26 @@ export class FormAddUserComponent extends AppList {
     ngOnInit() {
         this.initForm();
     }
+
+    resetPassword(id: string) {
+        this.isLoading = true;
+        this._progressRef.start();
+        this._systemRepo.resetPasswordUser(id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message, '');
+                    } else {
+                        this._toastService.error(res.message || 'Có lỗi xảy ra', '');
+                    }
+                },
+            );
+    }
+
+
+
 
 }

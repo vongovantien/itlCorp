@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
-import { FormAddUserComponent } from '../components/form-add-user/form-add-user/form-add-user.component';
+import { FormAddUserComponent } from '../components/form-add-user/form-add-user.component';
 import { Employee } from 'src/app/shared/models/system/employee';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -73,7 +73,7 @@ export class UserAddNewComponent extends AppPage {
 }
 
 
-interface IAddUser {
+export interface IAddUser {
     sysEmployeeModel: Employee;
     username: string;
     userType: string;
