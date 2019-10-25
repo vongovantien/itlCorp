@@ -27,6 +27,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string Taxcode { get; set; }
         public string BankAccountVnd { get; set; }
         public string BankAccountUsd { get; set; }
+        public string BankAccountName { get; set; }
         public string BankName { get; set; }
         public string BankAddress { get; set; }
         public bool Active { get; set; }
@@ -36,6 +37,8 @@ namespace eFMS.API.Documentation.Service.Models
         public string Code { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
+        public string UserModified { get; set; }
+        public DateTime? DatetimeModified { get; set; }
 
         public virtual SysCompany Bu { get; set; }
         public virtual ICollection<CatDepartment> CatDepartment { get; set; }
