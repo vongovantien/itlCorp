@@ -5,8 +5,8 @@ using System.Text;
 
 namespace eFMS.API.System.DL.Models
 {
-    public class SysPermissionGeneralModel: SysPermissionGeneral
+    public class SysPermissionSampleGeneralModel: SysPermissionSampleGeneral
     {
-        public string RoleName { get; set; }
+        public string MenuName { get; set; }
     }
 }

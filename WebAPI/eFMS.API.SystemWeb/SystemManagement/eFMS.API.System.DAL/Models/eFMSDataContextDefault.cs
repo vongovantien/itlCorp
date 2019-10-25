@@ -24,8 +24,10 @@ namespace eFMS.API.System.Service.Models
         public virtual DbSet<SysImage> SysImage { get; set; }
         public virtual DbSet<SysMenu> SysMenu { get; set; }
         public virtual DbSet<SysOffice> SysOffice { get; set; }
-        public virtual DbSet<SysPermissionGeneral> SysPermissionGeneral { get; set; }
-        public virtual DbSet<SysPermissionGeneralDetail> SysPermissionGeneralDetail { get; set; }
+        public virtual DbSet<SysPermissionSample> SysPermissionSample { get; set; }
+        public virtual DbSet<SysPermissionSampleGeneral> SysPermissionSampleGeneral { get; set; }
+        public virtual DbSet<SysPermissionSampleSpecial> SysPermissionSampleSpecial { get; set; }
+        public virtual DbSet<SysPermissionSpecialAction> SysPermissionSpecialAction { get; set; }
         public virtual DbSet<SysRole> SysRole { get; set; }
         public virtual DbSet<SysRoleMenu> SysRoleMenu { get; set; }
         public virtual DbSet<SysRolePermission> SysRolePermission { get; set; }
@@ -503,6 +505,8 @@ namespace eFMS.API.System.Service.Models
                     .IsUnicode(false)
                     .ValueGeneratedNever();
 
+                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
+
                 entity.Property(e => e.Arguments).HasMaxLength(4000);
 
                 entity.Property(e => e.AssemplyName).HasMaxLength(4000);
@@ -638,9 +642,9 @@ namespace eFMS.API.System.Service.Models
                     .HasConstraintName("FK_sysBranch_sysBU");
             });
 
-            modelBuilder.Entity<SysPermissionGeneral>(entity =>
+            modelBuilder.Entity<SysPermissionSample>(entity =>
             {
-                entity.ToTable("sysPermissionGeneral");
+                entity.ToTable("sysPermissionSample");
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
@@ -651,11 +655,6 @@ namespace eFMS.API.System.Service.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
-
-                entity.Property(e => e.MenuId)
-                    .HasColumnName("MenuID")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
 
                 entity.Property(e => e.Name).HasMaxLength(100);
 
@@ -674,27 +673,93 @@ namespace eFMS.API.System.Service.Models
                     .IsUnicode(false);
             });
 
-            modelBuilder.Entity<SysPermissionGeneralDetail>(entity =>
+            modelBuilder.Entity<SysPermissionSampleGeneral>(entity =>
             {
+                entity.ToTable("sysPermissionSampleGeneral");
+
                 entity.Property(e => e.Id).HasColumnName("ID");
 
                 entity.Property(e => e.Delete)
+                    .IsRequired()
                     .HasMaxLength(20)
                     .IsUnicode(false);
 
                 entity.Property(e => e.Detail)
+                    .IsRequired()
                     .HasMaxLength(20)
                     .IsUnicode(false);
 
                 entity.Property(e => e.List)
+                    .IsRequired()
                     .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.MenuId)
+                    .IsRequired()
+                    .HasColumnName("MenuID")
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.PermissionId).HasColumnName("PermissionID");
 
                 entity.Property(e => e.Write)
+                    .IsRequired()
                     .HasMaxLength(20)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<SysPermissionSampleSpecial>(entity =>
+            {
+                entity.ToTable("sysPermissionSampleSpecial");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.ActionName)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.IsAllow).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.MenuId)
+                    .IsRequired()
+                    .HasColumnName("MenuID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ModuleId)
+                    .IsRequired()
+                    .HasColumnName("ModuleID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PermissionId).HasColumnName("PermissionID");
+            });
+
+            modelBuilder.Entity<SysPermissionSpecialAction>(entity =>
+            {
+                entity.ToTable("sysPermissionSpecialAction");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.MenuId)
+                    .IsRequired()
+                    .HasColumnName("MenuID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ModuleId)
+                    .IsRequired()
+                    .HasColumnName("ModuleID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.NameEn)
+                    .HasColumnName("NameEN")
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.NameVn)
+                    .HasColumnName("NameVN")
+                    .HasMaxLength(100);
             });
 
             modelBuilder.Entity<SysRole>(entity =>

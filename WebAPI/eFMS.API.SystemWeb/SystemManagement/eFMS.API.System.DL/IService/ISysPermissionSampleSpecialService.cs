@@ -8,8 +8,8 @@ using System.Text;
 
 namespace eFMS.API.System.DL.IService
 {
-    public interface ISysPermissionGeneralDetailService : IRepositoryBase<SysPermissionGeneralDetail, SysPermissionGeneralDetailModel>
+    public interface ISysPermissionSampleSpecialService : IRepositoryBase<SysPermissionSampleSpecial, SysPermissionSampleSpecialModel>
     {
-        List<SysPermissionGeneralDetailViewModel> GetBy(short permissionId);
+        List<SysPermissionSampleSpecialViewModel> GetBy(short permissionId);
     }
 }

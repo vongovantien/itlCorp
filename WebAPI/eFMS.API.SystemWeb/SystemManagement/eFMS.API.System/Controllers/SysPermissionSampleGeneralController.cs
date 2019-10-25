@@ -17,16 +17,28 @@ namespace eFMS.API.System.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    public class SysPermissionGeneralDetailController : ControllerBase
+    public class SysPermissionSampleGeneralController : ControllerBase
     {
-        private ISysPermissionGeneralDetailService permissionDetailService;
+        private ISysPermissionSampleGeneralService permissionDetailService;
         /// <summary>
         /// constructor
         /// </summary>
         /// <param name="permissionDetail"></param>
-        public SysPermissionGeneralDetailController(ISysPermissionGeneralDetailService permissionDetail)
+        public SysPermissionSampleGeneralController(ISysPermissionSampleGeneralService permissionDetail)
         {
             permissionDetailService = permissionDetail;
+        }
+
+        /// <summary>
+        /// get permission detail by permission
+        /// </summary>
+        /// <param name="permissionId">if add new : permissionId = 0 ---/--- update: permissionId > 0</param>
+        /// <returns></returns>
+        [HttpGet("GetByPermission")]
+        public IActionResult GetBy(short permissionId)
+        {
+            var results = permissionDetailService.GetBy(permissionId);
+            return Ok(results);
         }
     }
 }

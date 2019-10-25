@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace eFMS.API.System.Service.Models
 {
-    public partial class SysPermissionGeneralDetail
+    public partial class SysPermissionSampleGeneral
     {
         public short Id { get; set; }
         public short PermissionId { get; set; }

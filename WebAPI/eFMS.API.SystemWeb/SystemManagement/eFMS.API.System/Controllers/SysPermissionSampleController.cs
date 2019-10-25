@@ -28,14 +28,14 @@ namespace eFMS.API.System.Controllers
     public class SysPermissionGeneralController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly ISysPermissionGeneralService permissionGeneralService;
+        private readonly ISysPermissionSampleService permissionGeneralService;
 
         /// <summary>
         /// constructor
         /// </summary>
         /// <param name="generalService"></param>
         /// <param name="localizer"></param>
-        public SysPermissionGeneralController(ISysPermissionGeneralService generalService, IStringLocalizer<LanguageSub> localizer)
+        public SysPermissionGeneralController(ISysPermissionSampleService generalService, IStringLocalizer<LanguageSub> localizer)
         {
             permissionGeneralService = generalService;
             stringLocalizer = localizer;
@@ -69,10 +69,10 @@ namespace eFMS.API.System.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet]
+        [HttpGet("{id}")]
         public IActionResult Get(short id)
         {
-            var data = permissionGeneralService.Get(x => x.Id == id).FirstOrDefault();
+            var data = permissionGeneralService.GetBy(id);
             return Ok(data);
         }
 
@@ -82,7 +82,7 @@ namespace eFMS.API.System.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("Add")]
-        public IActionResult Add(SysPermissionGeneralModel model)
+        public IActionResult Add(SysPermissionSampleModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
             
@@ -106,7 +106,7 @@ namespace eFMS.API.System.Controllers
         [HttpPut]
         [Route("Update")]
         //[Authorize]
-        public IActionResult Update(SysPermissionGeneralModel model)
+        public IActionResult Update(SysPermissionSampleModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
 
@@ -130,9 +130,14 @@ namespace eFMS.API.System.Controllers
         [HttpDelete]
         public IActionResult Delete(short id)
         {
-            var hs = permissionGeneralService.Delete(x => x.Id == id);
+            var permission = permissionGeneralService.Get(x => x.Id == id && x.Active == false);
+            if (permission != null)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED].Value });
+            }
+            var hs = permissionGeneralService.Delete(id);
 
-            var message = HandleError.GetMessage(hs, Crud.Update);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
 
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
