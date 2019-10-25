@@ -19,6 +19,8 @@ export * from './sub-header/sub-header.component';
 export * from './table-collapse-row/table-collapse-row.component';
 export * from './table-simple/table-simple.component';
 export * from './combo-grid/app-combo-grid.component';
+export * from './switch-toggle/switch-toggle.component';
+
 
 
 

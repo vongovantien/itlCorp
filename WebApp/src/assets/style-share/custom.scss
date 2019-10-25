@@ -643,6 +643,17 @@ table.dataTable {
     }
 }
 
+.m-portlet__body {
+    .custom-class-tab {
+        ul {
+            margin-bottom: 0px;
+            .nav-link {
+                font-size: 15px;
+            }
+        }
+    }
+}
+
 // job management
 .collapse-toggle {
     .la-angle-up {
