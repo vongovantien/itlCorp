@@ -345,18 +345,18 @@ namespace eFMS.API.Documentation.DL.Services
 
             var transaction = cstransRepository.Get(x => x.Id == JobId).FirstOrDefault();
             var opsTransaction = opstransRepository.Get(x => x.Id == JobId).FirstOrDefault();
-            string warehouseId = null;
+            //string warehouseId = null;
             if (transaction != null)
             {
                 pol = places.FirstOrDefault(x => x.Id == transaction.Pol);
                 pod = places.FirstOrDefault(x => x.Id == transaction.Pod);
-                warehouseId = transaction.WareHouseId ?? null;
+                //warehouseId = transaction.WareHouseId ?? null;
             }
             else
             {
                 pol = places.FirstOrDefault(x => x.Id == opsTransaction.Pol);
                 pod = places.FirstOrDefault(x => x.Id == opsTransaction.Pod);
-                warehouseId = opsTransaction.WarehouseId?.ToString();
+                //warehouseId = opsTransaction.WarehouseId?.ToString();
             }
             if ((transaction == null && opsTransaction == null) || cdNote == null || partner==null)
             {
@@ -368,10 +368,10 @@ namespace eFMS.API.Documentation.DL.Services
 
             List<CsTransactionDetail> HBList = new List<CsTransactionDetail>();
             List<CsShipmentSurchargeDetailsModel> listSurcharges = new List<CsShipmentSurchargeDetailsModel>();
-            if(warehouseId != null)
+            /*if(warehouseId != null)
             {
                 soaDetails.WarehouseName = places.FirstOrDefault(x => x.Id == new Guid(warehouseId))?.NameEn;
-            }
+            }*/
             soaDetails.CreatedDate = ((DateTime)cdNote.DatetimeCreated).ToString("dd'/'MM'/'yyyy");
             foreach (var item in charges)
             {
@@ -416,7 +416,7 @@ namespace eFMS.API.Documentation.DL.Services
             foreach(var item in HBList)
             {
                 hbOfLadingNo += (item.Hwbno + ", ");
-                mbOfLadingNo += (item.JobNo + ", ");
+                //mbOfLadingNo += (item.JobNo + ", ");
                 var conts = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == item.Id).ToList();
                 foreach(var cont in conts)
                 {

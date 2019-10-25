@@ -117,7 +117,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="model">model to update</param>
         /// <returns></returns>
         [HttpPost]
-        [Authorize]
+        //[Authorize]
         public IActionResult Post(CsTransactionEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -126,7 +126,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            model.UserCreated = currentUser.UserID;
+            model.UserCreated = "admin";//currentUser.UserID;
             var result = csTransactionService.AddCSTransaction(model);
             return Ok(result);
         }
@@ -215,6 +215,9 @@ namespace eFMS.API.Documentation.Controllers
         private string CheckExist(Guid id, CsTransactionEditModel model)
         {
             string message = string.Empty;
+
+            message = string.IsNullOrEmpty(model.Mawb) ? "MBL is required!" : message;
+
             if (id == Guid.Empty)
             {
                 if (csTransactionService.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower()))
@@ -229,6 +232,62 @@ namespace eFMS.API.Documentation.Controllers
                     message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
                 }
             }
+
+            if(model.CsMawbcontainers.Count == 0)
+            {
+                message = "Shipment container list must have at least 1 row of data!";
+            }
+
+            if(model.TransactionTypeEnum == TransactionTypeEnum.SeaFCLImport)
+            {
+                message = CheckExistsSIF(id, model);
+            }
+
+            return message;
+        }
+
+        private string CheckExistsSIF(Guid id, CsTransactionEditModel model)
+        {
+            string message = string.Empty;
+            if (model.Etd.HasValue)
+            {
+                message = model.Etd > model.Eta ? "ETD date must be before ETA date" : string.Empty;
+            }
+
+            if(model.Eta.HasValue)
+            {
+                message = model.Eta > model.Etd ? "ETA date must be after ETD date" : string.Empty;
+            }
+            else
+            {
+                message = "ETA is required!";
+            }
+
+            message = string.IsNullOrEmpty(model.ShipmentType) ? "Shipment Type is required!" : message;
+
+            if (model.Pol != Guid.Empty)
+            {
+                message = model.Pol == model.Pod ? "Port of Loading must be different from Port of Destination" : string.Empty;
+            }
+
+            if(model.Pod == Guid.Empty)
+            {
+                message = "Port of Destination is required!";
+            }
+            else
+            {
+                message = model.Pod == model.Pol ? "Port of Destination must be different from Port of Loading" : string.Empty;
+            }
+
+            if(model.DeliveryPlace != Guid.Empty)
+            {
+                message = model.DeliveryPlace == model.Pol ? "Port of Destination must be different from Port of Loading" : string.Empty;
+            }
+
+            message = string.IsNullOrEmpty(model.TypeOfService) ? "Service Type is required!" : message;
+
+            message = string.IsNullOrEmpty(model.PersonIncharge) ? "Person In Charge is required!" : message;
+
             return message;
         }
     }

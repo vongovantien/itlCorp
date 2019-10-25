@@ -23,9 +23,18 @@ namespace eFMS.API.Documentation.DL.Services
     public class CsTransactionService : RepositoryBase<CsTransaction, CsTransactionModel>, ICsTransactionService
     {
         private readonly ICurrentUser currentUser;
-        public CsTransactionService(IContextBase<CsTransaction> repository, IMapper mapper, ICurrentUser user) : base(repository, mapper)
+        readonly IContextBase<CsTransactionDetail> csTransactionDetailRepo;
+        readonly IContextBase<CsMawbcontainer> csMawbcontainerRepo;
+
+        public CsTransactionService(IContextBase<CsTransaction> repository, 
+            IMapper mapper, 
+            ICurrentUser user,
+            IContextBase<CsTransactionDetail> csTransactionDetail,
+            IContextBase<CsMawbcontainer> csMawbcontainer) : base(repository, mapper)
         {
             currentUser = user;
+            csTransactionDetailRepo = csTransactionDetail;
+            csMawbcontainerRepo = csMawbcontainer;
         }
 
         public object AddCSTransaction(CsTransactionEditModel model)
@@ -33,19 +42,20 @@ namespace eFMS.API.Documentation.DL.Services
             try
             {
                 model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                if(model.TransactionType == string.Empty)
+                    return new { model = new object { }, result = new HandleState("Not found type transaction") };
+                //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var transaction = mapper.Map<CsTransaction>(model);
                 transaction.Id = Guid.NewGuid();
-                int countNumberJob = dc.CsTransaction.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
-                transaction.JobNo = GenerateID.GenerateJobID(Constants.SEF_SHIPMENT, countNumberJob);
-                //transaction.UserCreated = "01";
+                transaction.JobNo = CreateJobNoByTransactionType(model.TransactionTypeEnum, model.TransactionType);               
                 transaction.CreatedDate = transaction.ModifiedDate= DateTime.Now;
                 transaction.Active = true;
                 transaction.UserModified = transaction.UserCreated;
 
-                var hsTrans = dc.CsTransaction.Add(transaction);
+                //var hsTrans = dc.CsTransaction.Add(transaction);
+                var hsTrans = DataContext.Add(transaction);
                 var containers = mapper.Map<List<CsMawbcontainer>>(model.CsMawbcontainers);
-                if(containers != null)
+                if(containers != null && containers.Count > 0)
                 {
                     foreach (var container in containers)
                     {
@@ -53,10 +63,11 @@ namespace eFMS.API.Documentation.DL.Services
                         container.Mblid = transaction.Id;
                         container.UserModified = transaction.UserCreated;
                         container.DatetimeModified = DateTime.Now;
-                        dc.CsMawbcontainer.Add(container);
+                        //dc.CsMawbcontainer.Add(container);
+                        csMawbcontainerRepo.Add(container);
                     }
                 }
-                if(model.CsTransactionDetails != null)
+                if(model.CsTransactionDetails != null && model.CsTransactionDetails.Count > 0)
                 {
                     foreach(var item in model.CsTransactionDetails)
                     {
@@ -64,9 +75,10 @@ namespace eFMS.API.Documentation.DL.Services
                         transDetail.Id = Guid.NewGuid();
                         transDetail.JobId = transaction.Id;
                         transDetail.Active = true;
-                        transDetail.UserCreated = transaction.UserModified = transaction.UserCreated;  //ChangeTrackerHelper.currentUser;
+                        transDetail.UserCreated = transaction.UserModified = transaction.UserCreated;
                         transDetail.DatetimeCreated = transaction.ModifiedDate = DateTime.Now;
-                        dc.CsTransactionDetail.Add(transDetail);
+                        //dc.CsTransactionDetail.Add(transDetail);
+                        csTransactionDetailRepo.Add(transDetail);
                         if (item.CsMawbcontainers == null) continue;
                         else
                         {
@@ -76,12 +88,13 @@ namespace eFMS.API.Documentation.DL.Services
                                 x.Hblid = x.Id;
                                 x.Mblid = Guid.Empty;
                                 x.Id = Guid.NewGuid();
-                                dc.CsMawbcontainer.Add(x);
+                                //dc.CsMawbcontainer.Add(x);
+                                csMawbcontainerRepo.Add(x);
                             }
                         }
                     }
                 }
-                dc.SaveChanges();
+                //dc.SaveChanges();
                 var result = new HandleState();
                 return new { model = transaction, result };
             }
@@ -90,6 +103,60 @@ namespace eFMS.API.Documentation.DL.Services
                 var result = new HandleState(ex.Message);
                 return new { model = new object { }, result };
             }
+        }
+
+        /// <summary>
+        /// Create JobNo by Transaction Type
+        /// </summary>
+        /// <param name="typeEnum"></param>
+        /// <param name="transactionType"></param>
+        /// <returns></returns>
+        public string CreateJobNoByTransactionType(TransactionTypeEnum typeEnum, string transactionType)
+        {
+            var shipment = "";
+            int countNumberJob = 0;
+            switch (typeEnum)
+            {
+                case TransactionTypeEnum.InlandTrucking:
+                    shipment = "AAA";
+                    break;
+                case TransactionTypeEnum.AirExport:
+                    shipment = "AAA";
+                    break;
+                case TransactionTypeEnum.AirImport:
+                    shipment = "AAA";
+                    break;
+                case TransactionTypeEnum.SeaConsolExport:
+                    shipment = Constants.SEC_SHIPMENT;
+                    break;
+                case TransactionTypeEnum.SeaConsolImport:
+                    shipment = Constants.SIC_SHIPMENT;
+                    break;
+                case TransactionTypeEnum.SeaFCLExport:
+                    shipment = Constants.SEF_SHIPMENT;
+                    break;
+                case TransactionTypeEnum.SeaFCLImport:
+                    shipment = Constants.SIF_SHIPMENT;
+                    break;
+                case TransactionTypeEnum.SeaLCLExport:
+                    shipment = Constants.SEL_SHIPMENT;
+                    break;
+                case TransactionTypeEnum.SeaLCLImport:
+                    shipment = Constants.SIL_SHIPMENT;
+                    break;
+                default:
+                    break;
+            }
+            var currentShipment = DataContext.Get(x => x.TransactionType == transactionType 
+                                                    && x.CreatedDate.Value.Month == DateTime.Now.Month
+                                                    && x.CreatedDate.Value.Year == DateTime.Now.Year)
+                                                    .OrderByDescending(x => x.JobNo)
+                                                    .FirstOrDefault();
+            if(currentShipment != null)
+            {
+                countNumberJob = Convert.ToInt32(currentShipment.JobNo.Substring(shipment.Length + 3, 5));
+            }
+            return GenerateID.GenerateJobID(shipment, countNumberJob);
         }
 
         public bool CheckAllowDelete(Guid jobId)
@@ -345,7 +412,6 @@ namespace eFMS.API.Documentation.DL.Services
                 x.RequestedDate,
                 x.FlightVesselName,
                 x.VoyNo,
-                //x.FlightVesselConfirmedDate,
                 x.ShipmentType,
                 x.ServiceMode,
                 x.Commodity,
@@ -376,7 +442,6 @@ namespace eFMS.API.Documentation.DL.Services
                 Mbltype = x.Key.MBLType,
                 ColoaderId = x.Key.ColoaderID,
                 BookingNo = x.Key.BookingNo,
-                ShippingServiceType = x.Key.ShippingServiceType,
                 AgentId = x.Key.AgentID,
                 AgentName = x.Key.AgentName,
                 Pol = x.Key.POL,
@@ -384,20 +449,13 @@ namespace eFMS.API.Documentation.DL.Services
                 Pod = x.Key.POD,
                 PODName = x.Key.PODName,
                 PaymentTerm = x.Key.PaymentTerm,
-                LoadingDate = x.Key.LoadingDate,
-                RequestedDate = x.Key.RequestedDate,
                 FlightVesselName = x.Key.FlightVesselName,
                 VoyNo = x.Key.VoyNo,
                 ShipmentType = x.Key.ShipmentType,
-                ServiceMode = x.Key.ServiceMode,
                 Commodity = x.Key.Commodity,
-                InvoiceNo = x.Key.InvoiceNo,
                 Pono = x.Key.PONo,
                 PersonIncharge = x.Key.PersonIncharge,
-                DeliveryPoint = x.Key.DeliveryPoint,
-                RouteShipment = x.Key.RouteShipment,
                 Notes = x.Key.Notes,
-                Locked = x.Key.Locked,
                 UserCreated = x.Key.UserCreated,
                 CreatedDate = x.Key.CreatedDate,
                 ModifiedDate = x.Key.ModifiedDate,
