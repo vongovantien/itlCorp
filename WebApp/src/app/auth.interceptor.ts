@@ -38,15 +38,15 @@ export class AuthInterceptor implements HttpInterceptor {
                     title = error.statusText;
                 } else if (error.error != null) {
                     if (!!error.error.message) {
-                        errorMessage = `Error: ${error.error.message}`;
+                        errorMessage = `${error.error.message}`;
                     } else if (error.error.error_description) {
-                        errorMessage = `Error: ${error.error.error_description}`;
+                        errorMessage = `${error.error.error_description}`;
                     } else {
-                        errorMessage = `Error: ${error.error.error}`;
+                        errorMessage = `${error.error.error}`;
                     }
                     title = error.statusText;
                 } else {
-                    errorMessage = `Error: ${error.message}`;
+                    errorMessage = ` ${error.message}`;
                     title = error.statusText;
                 }
                 this._toastService.error(errorMessage);
