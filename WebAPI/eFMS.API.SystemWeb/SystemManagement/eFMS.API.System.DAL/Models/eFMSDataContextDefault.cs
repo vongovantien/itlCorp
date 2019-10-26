@@ -24,6 +24,10 @@ namespace eFMS.API.System.Service.Models
         public virtual DbSet<SysImage> SysImage { get; set; }
         public virtual DbSet<SysMenu> SysMenu { get; set; }
         public virtual DbSet<SysOffice> SysOffice { get; set; }
+        public virtual DbSet<SysPermissionSample> SysPermissionSample { get; set; }
+        public virtual DbSet<SysPermissionSampleGeneral> SysPermissionSampleGeneral { get; set; }
+        public virtual DbSet<SysPermissionSampleSpecial> SysPermissionSampleSpecial { get; set; }
+        public virtual DbSet<SysPermissionSpecialAction> SysPermissionSpecialAction { get; set; }
         public virtual DbSet<SysRole> SysRole { get; set; }
         public virtual DbSet<SysRoleMenu> SysRoleMenu { get; set; }
         public virtual DbSet<SysRolePermission> SysRolePermission { get; set; }
@@ -340,7 +344,9 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.Photo).HasColumnType("image");
 
-                entity.Property(e => e.Position).HasMaxLength(1600);
+                entity.Property(e => e.Position)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.SaleResource)
                     .HasMaxLength(50)
@@ -350,9 +356,15 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.Signature).HasColumnType("image");
 
+                entity.Property(e => e.StaffCode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Tel)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.Title).HasMaxLength(1600);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
@@ -470,6 +482,8 @@ namespace eFMS.API.System.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .ValueGeneratedNever();
+
+                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.Arguments).HasMaxLength(4000);
 
@@ -595,6 +609,126 @@ namespace eFMS.API.System.Service.Models
                     .IsUnicode(false);
             });
 
+            modelBuilder.Entity<SysPermissionSample>(entity =>
+            {
+                entity.ToTable("sysPermissionSample");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.DatetimeCreated)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.Name).HasMaxLength(100);
+
+                entity.Property(e => e.RoleId).HasColumnName("RoleID");
+
+                entity.Property(e => e.Type)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<SysPermissionSampleGeneral>(entity =>
+            {
+                entity.ToTable("sysPermissionSampleGeneral");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Delete)
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Detail)
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.List)
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.MenuId)
+                    .IsRequired()
+                    .HasColumnName("MenuID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PermissionId).HasColumnName("PermissionID");
+
+                entity.Property(e => e.Write)
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<SysPermissionSampleSpecial>(entity =>
+            {
+                entity.ToTable("sysPermissionSampleSpecial");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.ActionName)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.IsAllow).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.MenuId)
+                    .IsRequired()
+                    .HasColumnName("MenuID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ModuleId)
+                    .IsRequired()
+                    .HasColumnName("ModuleID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PermissionId).HasColumnName("PermissionID");
+            });
+
+            modelBuilder.Entity<SysPermissionSpecialAction>(entity =>
+            {
+                entity.ToTable("sysPermissionSpecialAction");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.MenuId)
+                    .IsRequired()
+                    .HasColumnName("MenuID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ModuleId)
+                    .IsRequired()
+                    .HasColumnName("ModuleID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.NameEn)
+                    .HasColumnName("NameEN")
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.NameVn)
+                    .HasColumnName("NameVN")
+                    .HasMaxLength(100);
+            });
+
             modelBuilder.Entity<SysRole>(entity =>
             {
                 entity.ToTable("sysRole");
@@ -656,11 +790,6 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.Role)
-                    .WithMany(p => p.SysRoleMenu)
-                    .HasForeignKey(d => d.RoleId)
-                    .HasConstraintName("FK_sysRoleMenu_sysRole");
             });
 
             modelBuilder.Entity<SysRolePermission>(entity =>
@@ -684,12 +813,6 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.Role)
-                    .WithMany(p => p.SysRolePermission)
-                    .HasForeignKey(d => d.RoleId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_sysRolePermission_sysRole");
             });
 
             modelBuilder.Entity<SysUser>(entity =>
@@ -717,7 +840,13 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
+                entity.Property(e => e.IsLdap).HasColumnName("IsLDAP");
+
                 entity.Property(e => e.Password).HasMaxLength(4000);
+
+                entity.Property(e => e.PasswordLdap)
+                    .HasColumnName("PasswordLDAP")
+                    .HasMaxLength(4000);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
@@ -727,11 +856,19 @@ namespace eFMS.API.System.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.UserType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Username)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.WorkPlaceId).HasColumnName("WorkPlaceID");
+
+                entity.Property(e => e.WorkingStatus)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<SysUserGroup>(entity =>

@@ -415,7 +415,7 @@ export class WarehouseComponent extends AppList implements OnInit {
                     item['districtNameEN'],
                     item['provinceNameEN'],
                     item['countryNameEN'],
-                    (item['inactive'] == true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+                    (item['active'] == true) ? SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH
                 ]
             });
         }
@@ -430,7 +430,7 @@ export class WarehouseComponent extends AppList implements OnInit {
                     item['districtNameVN'],
                     item['provinceNameVN'],
                     item['countryNameVN'],
-                    (item['inactive'] == true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+                    (item['active'] == true) ? SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM
                 ]
             });
         }

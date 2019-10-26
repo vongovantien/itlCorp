@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
@@ -71,6 +72,8 @@ namespace eFMS.API.Documentation.Controllers
             return csTransactionService.GetListTotalHB(JobId);
         }
 
+        #region -- LIST & PAGING --
+
         /// <summary>
         /// get list transactions by search condition
         /// </summary>
@@ -98,6 +101,7 @@ namespace eFMS.API.Documentation.Controllers
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
         }
+        #endregion -- LIST & PAGING --
 
         /// <summary>
         /// get transaction by id
@@ -111,13 +115,14 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(data);
         }
 
+        #region -- INSERT & UPDATE
         /// <summary>
         /// add new transaction
         /// </summary>
-        /// <param name="model">model to update</param>
+        /// <param name="model">model to add</param>
         /// <returns></returns>
         [HttpPost]
-        [Authorize]
+        //[Authorize]
         public IActionResult Post(CsTransactionEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -126,10 +131,84 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            model.UserCreated = currentUser.UserID;
+            model.UserCreated = "admin";//currentUser.UserID;
             var result = csTransactionService.AddCSTransaction(model);
             return Ok(result);
         }
+
+        /// <summary>
+        /// update an existed item
+        /// </summary>
+        /// <param name="model">model to update</param>
+        /// <returns></returns>
+        [HttpPut]
+        //[Authorize]
+        public IActionResult Put(CsTransactionEditModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            if (!csTransactionService.Any(x => x.Id == model.Id))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = "Not found transaction" });
+            }
+
+            string checkExistMessage = CheckExist(model.Id, model);
+            if (checkExistMessage.Length > 0)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+            }
+            model.UserModified = "admin";//currentUser.UserID;
+            var hs = csTransactionService.UpdateCSTransaction(model);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+        #endregion -- INSERT & UPDATE
+
+        #region -- DELETE --
+        /// <summary>
+        /// check allow delete an existed item
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("CheckAllowDelete/{id}")]
+        public IActionResult CheckAllowDelete(Guid id)
+        {
+            return Ok(csTransactionService.CheckAllowDelete(id));
+        }
+
+        /// <summary>
+        /// delete an existed item
+        /// </summary>
+        /// <param name="id">id of existed data that want to delete</param>
+        /// <returns></returns>
+        [HttpDelete("{id}")]
+        //[Authorize]
+        public IActionResult Delete(Guid id)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            if (!csTransactionService.Any(x => x.Id == id))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = "Not found transaction" });
+            }
+
+            if (csTransactionService.CheckAllowDelete(id) == false)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_NOT_ALLOW_DELETED].Value });
+            }
+            var hs = csTransactionService.DeleteCSTransaction(id);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+        #endregion -- DELETE --
 
         /// <summary>
         /// import transaction
@@ -152,84 +231,98 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// update an existed item
-        /// </summary>
-        /// <param name="model">model to update</param>
-        /// <returns></returns>
-        [HttpPut]
-        [Authorize]
-        public IActionResult Put(CsTransactionEditModel model)
-        {
-            if (!ModelState.IsValid) return BadRequest();
-            model.UserModified = currentUser.UserID;
-            string checkExistMessage = CheckExist(model.Id, model);
-            if (checkExistMessage.Length > 0)
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
-            }
-            var hs = csTransactionService.UpdateCSTransaction(model);
-            var message = HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            if (!hs.Success)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
-        }
-
-        /// <summary>
-        /// delete an existed item
-        /// </summary>
-        /// <param name="id">id of existed data that want to delete</param>
-        /// <returns></returns>
-        [HttpDelete("{id}")]
-        [Authorize]
-        public IActionResult Delete(Guid id)
-        {
-            if (!ModelState.IsValid) return BadRequest();
-            if (csTransactionService.CheckAllowDelete(id) == false) {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_NOT_ALLOW_DELETED].Value });
-            }
-            var hs = csTransactionService.DeleteCSTransaction(id);
-            var message = HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            if (!hs.Success)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
-        }
-
-        /// <summary>
-        /// check allow delete an existed item
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet("CheckAllowDelete/{id}")]
-        public IActionResult CheckAllowDelete(Guid id)
-        {
-            return Ok(csTransactionService.CheckAllowDelete(id));
-        }
-
+        #region -- METHOD PRIVATE --
         private string CheckExist(Guid id, CsTransactionEditModel model)
         {
             string message = string.Empty;
-            if (id == Guid.Empty)
+
+            if (string.IsNullOrEmpty(model.Mawb))
             {
-                if (csTransactionService.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower()))
+                message = "MBL is required!";
+            }
+            else
+            {
+                if (id == Guid.Empty)
                 {
-                    message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
+                    if (csTransactionService.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower()))
+                    {
+                        message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
+                    }
+                }
+                else
+                {
+                    if (csTransactionService.Any(x => (x.Mawb.ToLower() == model.Mawb.ToLower() && x.Id != id)))
+                    {
+                        message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
+                    }
+                }
+            }
+
+            if (model.CsMawbcontainers == null || model.CsMawbcontainers.Count == 0)
+            {
+                message = "Shipment container list must have at least 1 row of data!";
+            }
+
+            var resultMessage = string.Empty;
+            if (model.TransactionTypeEnum == TransactionTypeEnum.SeaFCLImport)
+            {
+                resultMessage = CheckExistsSIF(id, model);
+            }
+
+            message = resultMessage.Length == 0 ? message : resultMessage;
+
+            return message;
+        }
+
+        private string CheckExistsSIF(Guid id, CsTransactionEditModel model)
+        {
+            string message = string.Empty;
+            if (model.Etd.HasValue)
+            {
+                message = model.Etd.Value.Date >= model.Eta.Value.Date ? "ETD date must be before ETA date" : message;
+            }
+
+            if (model.Eta.HasValue)
+            {
+                if (model.Etd.HasValue)
+                {
+                    message = model.Eta.Value.Date <= model.Etd.Value.Date ? "ETA date must be after ETD date" : message;
                 }
             }
             else
             {
-                if (csTransactionService.Any(x => (x.Mawb.ToLower() == model.Mawb.ToLower() && x.Id != id)))
-                {
-                    message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
-                }
+                message = "ETA is required!";
             }
+
+            message = string.IsNullOrEmpty(model.Mbltype) ? "Master Bill of Lading Type is required!" : message;
+
+            message = string.IsNullOrEmpty(model.ShipmentType) ? "Shipment Type is required!" : message;
+
+            if (model.Pol != null && model.Pol != Guid.Empty)
+            {
+                message = model.Pol == model.Pod ? "Port of Loading must be different from Port of Destination" : message;
+            }
+
+            if (model.Pod == null || model.Pod == Guid.Empty)
+            {
+                message = "Port of Destination is required!";
+            }
+            else
+            {
+                message = model.Pod == model.Pol ? "Port of Destination must be different from Port of Loading" : message;
+            }
+
+            if(model.DeliveryPlace != null && model.DeliveryPlace != Guid.Empty)
+            {
+                message = model.DeliveryPlace == model.Pol ? "Port of Destination must be different from Port of Loading" : message;
+            }
+
+            message = string.IsNullOrEmpty(model.TypeOfService) ? "Service Type is required!" : message;
+
+            message = string.IsNullOrEmpty(model.PersonIncharge) ? "Person In Charge is required!" : message;
+
             return message;
         }
+        #endregion -- METHOD PRIVATE --
     }
 }

@@ -1027,7 +1027,7 @@ export class LocationComponent implements OnInit, AfterViewInit {
           country['code'],
           country['nameEn'],
           country['nameVn'],
-          (country['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+          (country['active'] === true) ? SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH
         ]
       });
     }
@@ -1039,7 +1039,7 @@ export class LocationComponent implements OnInit, AfterViewInit {
           country['code'],
           country['nameEn'],
           country['nameVn'],
-          (country['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+          (country['active'] === true) ? SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM
         ]
       });
     }
@@ -1056,7 +1056,7 @@ export class LocationComponent implements OnInit, AfterViewInit {
       { name: "Country Code", width: 10 },
       { name: "English Name", width: 20 },
       { name: "Local Name", width: 20 },
-      { name: "Inactive", width: 20 }
+      { name: "Status", width: 20 }
     ]
     exportModel.data = countries;
     this.excelService.generateExcel(exportModel);
@@ -1074,7 +1074,7 @@ export class LocationComponent implements OnInit, AfterViewInit {
           province['nameEn'],
           province['nameVn'],
           province['countryNameEN'],
-          (province['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+          (province['active'] === true) ? SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH
         ]
       });
     }
@@ -1087,7 +1087,7 @@ export class LocationComponent implements OnInit, AfterViewInit {
           province['nameEn'],
           province['nameVn'],
           province['countryNameVN'],
-          (province['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+          (province['active'] === true) ? SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM
         ]
       });
     }
@@ -1105,7 +1105,7 @@ export class LocationComponent implements OnInit, AfterViewInit {
       { name: "English Name", width: 20 },
       { name: "Local Name", width: 20 },
       { name: "Country", width: 20 },
-      { name: "Inactive", width: 20 }
+      { name: "Status", width: 20 }
     ]
     exportModel.data = provinces;
     this.excelService.generateExcel(exportModel);
@@ -1124,7 +1124,7 @@ export class LocationComponent implements OnInit, AfterViewInit {
           dist['nameVn'],
           dist['provinceNameEN'],
           dist['countryNameEN'],
-          (dist['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+          (dist['active'] === true) ? SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH
         ]
       });
     }
@@ -1138,7 +1138,7 @@ export class LocationComponent implements OnInit, AfterViewInit {
           dist['nameVn'],
           dist['provinceNameVN'],
           dist['countryNameVN'],
-          (dist['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+          (dist['active'] === true) ? SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM
         ]
       });
     }
@@ -1157,7 +1157,7 @@ export class LocationComponent implements OnInit, AfterViewInit {
       { name: "Local Name", width: 20 },
       { name: "Province", width: 20 },
       { name: "Country", width: 20 },
-      { name: "Inactive", width: 20 }
+      { name: "Status", width: 20 }
     ]
     exportModel.data = districts;
     this.excelService.generateExcel(exportModel);
@@ -1178,7 +1178,7 @@ export class LocationComponent implements OnInit, AfterViewInit {
           ward['districtNameEN'],
           ward['provinceNameEN'],
           ward['countryNameEN'],
-          (ward['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+          (ward['active'] === true) ? SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH
         ]
       });
     }
@@ -1193,7 +1193,7 @@ export class LocationComponent implements OnInit, AfterViewInit {
           ward['districtNameVN'],
           ward['provinceNameVN'],
           ward['countryNameVN'],
-          (ward['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+          (ward['active'] === true) ? SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM
         ]
       });
     }
@@ -1213,11 +1213,16 @@ export class LocationComponent implements OnInit, AfterViewInit {
       { name: "District", width: 20 },
       { name: "Province", width: 20 },
       { name: "Country", width: 20 },
-      { name: "Inactive", width: 20 }
+      { name: "Status", width: 20 }
     ]
     exportModel.data = wards;
     this.excelService.generateExcel(exportModel);
 
+  }
+
+  onChangeDistrictUpdate(event: any) {
+    console.log(event);
+    this.DistrictToUpdate.active = event.target.checked;
   }
 
 }

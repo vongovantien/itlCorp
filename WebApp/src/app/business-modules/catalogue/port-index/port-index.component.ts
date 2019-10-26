@@ -325,7 +325,7 @@ export class PortIndexComponent implements OnInit {
           pi['countryNameEN'],
           pi['areaNameEN'],
           pi['modeOfTransport'],
-          (pi['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+          (pi['active'] === true) ? SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH
         ]
       });
     }
@@ -340,7 +340,7 @@ export class PortIndexComponent implements OnInit {
           pi['countryNameVN'],
           pi['areaNameVN'],
           pi['modeOfTransport'],
-          (pi['inactive'] === true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+          (pi['active'] === true) ? SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM
         ]
       });
     }
@@ -357,7 +357,7 @@ export class PortIndexComponent implements OnInit {
       { name: "Country", width: 20 },
       { name: "Zone", width: 20 },
       { name: "Mode", width: 20 },
-      { name: "Inactive", width: 20 }
+      { name: "Status", width: 20 }
     ]
     exportModel.data = portIndexes;
     exportModel.fileName = "PortIndex";
