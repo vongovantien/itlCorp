@@ -63,7 +63,7 @@ export class OfficeAddNewComponent extends AppPage {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message, '');
-                            this._router.navigate([`home/system/office`]);
+                            this._router.navigate([`home/system/office/${res.data.id}`]);
 
                         } else {
                             this._toastService.error(res.message, '');
