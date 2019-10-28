@@ -17,5 +17,7 @@ namespace eFMS.API.System.DL.IService
         HandleState Update(SysUserModel sysUserModel);
         IQueryable<SysUserViewModel> Paging(SysUserCriteria criteria, int page, int size, out int rowsCount);
         IQueryable<SysUserViewModel> Query(SysUserCriteria criteria);
+        List<SysUserImportModel> CheckValidImport(List<SysUserImportModel> list);
+
     }
 }

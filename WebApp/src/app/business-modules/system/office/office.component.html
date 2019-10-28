@@ -68,7 +68,7 @@
                                     <td>{{office.taxcode}}</td>
                                     <td>{{office.companyName}}</td>
                                     <td [ngClass]="office.active ? 'text-success' : 'text-danger'">
-                                        {{office.active ? 'Active' : 'InActive'}}</td>
+                                        {{office.active ? 'Active' : 'Inactive'}}</td>
                                 </tr>
                             </ng-container>
                             <tr *ngIf="!isLoading && !offices.length" app-table-none-record

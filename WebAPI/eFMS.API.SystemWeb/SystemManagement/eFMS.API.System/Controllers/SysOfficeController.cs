@@ -142,7 +142,9 @@ namespace eFMS.API.System.Controllers
             }
             var branch = mapper.Map<SysOfficeModel>(model);
             branch.UserCreated = currentUser.UserID;
-            branch.DatetimeCreated = DateTime.Now;
+            branch.Id = Guid.NewGuid();
+            branch.DatetimeCreated = branch.DatetimeModified = DateTime.Now;
+            
             var hs = sysOfficeService.AddOffice(branch);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

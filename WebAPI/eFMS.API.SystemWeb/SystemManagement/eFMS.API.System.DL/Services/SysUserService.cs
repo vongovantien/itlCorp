@@ -12,6 +12,8 @@ using eFMS.API.System.Service.Models;
 using ITL.NetCore.Common;
 using eFMS.API.System.DL.Common;
 using Microsoft.Extensions.Caching.Distributed;
+using eFMS.API.System.Service.Contexts;
+using Microsoft.Extensions.Localization;
 
 namespace eFMS.API.System.DL.Services
 {
@@ -20,6 +22,7 @@ namespace eFMS.API.System.DL.Services
         private readonly IContextBase<SysEmployee> employeeRepository;
         private readonly IContextBase<SysUserGroup> usergroupRepository;
         private readonly IDistributedCache cache;
+        private readonly IStringLocalizer stringLocalizer;
 
         public SysUserService(IContextBase<SysUser> repository, IMapper mapper,
             IContextBase<SysEmployee> employeeRepo,
@@ -153,6 +156,91 @@ namespace eFMS.API.System.DL.Services
                 results.Add(model);
             }
             return results.AsQueryable();
+        }
+
+        public List<SysUserImportModel> CheckValidImport(List<SysUserImportModel> list)
+        {
+            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+            list.ForEach(item =>
+            {
+                //check empty username
+                string userName = item.Username;
+                item.UsernameValid = true;
+                if (string.IsNullOrEmpty(userName))
+                {
+                    item.Username = stringLocalizer[LanguageSub.MSG_USER_USERNAME_EMPTY];
+                    item.IsValid = false;
+                    item.UsernameValid = false;
+                }
+                //check empty Name EN
+                string nameEN = item.EmployeeNameEn;
+                item.EmployeeNameEnValid = true;
+                if (string.IsNullOrEmpty(nameEN))
+                {
+                    item.EmployeeNameEn = stringLocalizer[LanguageSub.MSG_USER_NAMEEN_EMPTY];
+                    item.IsValid = false;
+                    item.EmployeeNameEnValid = false;
+                }
+
+                //check empty Full Name
+                string nameVN = item.EmployeeNameVn;
+                item.EmployeeNameVnValid = true;
+                if (string.IsNullOrEmpty(nameVN))
+                {
+                    item.EmployeeNameVn = stringLocalizer[LanguageSub.MSG_USER_NAMEVN_EMPTY];
+                    item.IsValid = false;
+                    item.EmployeeNameVnValid = false;
+                }
+
+                //check empty and valid User Type
+                string userType = item.UserType;
+                item.UserTypeValid = true;
+                if (string.IsNullOrEmpty(userType))
+                {
+                    item.UserType = stringLocalizer[LanguageSub.MSG_USER_USERTYPE_EMPTY];
+                    item.IsValid = false;
+                    item.UserTypeValid = false;
+                }
+                else if(!userType.Equals("Normal User") && !userType.Equals("Local Admin") && !userType.Equals("Super Admin"))
+                {
+                    item.UserType = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
+                    item.IsValid = false;
+                    item.UserTypeValid = false;
+                }
+
+                //check empty and valid working status
+                string workingStatus = item.WorkingStatus;
+                item.WorkingStatusValid = true;
+                if (string.IsNullOrEmpty(workingStatus))
+                {
+                    item.WorkingStatus = stringLocalizer[LanguageSub.MSG_USER_WORKINGSTATUS_EMPTY];
+                    item.IsValid = false;
+                    item.WorkingStatusValid = false;
+                }else if(!workingStatus.Equals("Working") && !workingStatus.Equals("Maternity leave") && !workingStatus.Equals("Off"))
+                {
+                    item.WorkingStatus = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
+                    item.IsValid = false;
+                    item.WorkingStatusValid = false;
+                }
+
+                //check empty and valid status 
+                string status = item.Status;
+                item.StatusValid = true;
+                if (string.IsNullOrEmpty(status))
+                {
+                    item.Status = stringLocalizer[LanguageSub.MSG_USER_STATUS_EMPTY];
+                    item.IsValid = false;
+                    item.StatusValid = false;
+                }
+                else if(!status.Equals("Active") && !status.Equals("Inactive"))
+                {
+                    item.Status = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
+                    item.IsValid = false;
+                    item.StatusValid = false;
+                }
+
+            });
+            return list;
         }
 
 

@@ -279,15 +279,18 @@ namespace eFMS.API.System.Controllers
                     var userobj = new SysUserImportModel
                     {
                         IsValid = true,
-                        Username = worksheet.Cells[row, 2].Value == null ? string.Empty : worksheet.Cells[row, 2].Value.ToString(),
-                        EmployeeNameEn = worksheet.Cells[row, 3].Value == null ? string.Empty : worksheet.Cells[row, 3].Value.ToString(),
-                        EmployeeNameVn = worksheet.Cells[row, 4].Value == null ? string.Empty : worksheet.Cells[row, 4].Value.ToString(),
-                        Title = worksheet.Cells[row, 5].Value == null ? string.Empty : worksheet.Cells[row, 5].Value.ToString(),
-                        UserType = worksheet.Cells[row, 5].Value == null ? string.Empty : worksheet.Cells[row, 5].Value.ToString(),
-
-
-
-
+                        Username =  worksheet.Cells[row, 2].Value?.ToString(),
+                        EmployeeNameEn = worksheet.Cells[row, 3].Value?.ToString(),
+                        EmployeeNameVn = worksheet.Cells[row, 4].Value?.ToString(),
+                        Title =  worksheet.Cells[row, 5].Value?.ToString(),
+                        UserType =  worksheet.Cells[row, 6].Value?.ToString(),
+                        Role =  worksheet.Cells[row, 7].Value?.ToString(),
+                        LevelPermission = worksheet.Cells[row, 8].Value?.ToString(),
+                        Company = worksheet.Cells[row, 9].Value?.ToString(),
+                        Office = worksheet.Cells[row, 10].Value?.ToString(),
+                        Deparment = worksheet.Cells[row, 11].Value?.ToString(),
+                        WorkingStatus = worksheet.Cells[row, 12].Value?.ToString(),
+                        Status = worksheet.Cells[row, 13].Value?.ToString()
                     };
                 }
 

@@ -48,5 +48,10 @@
         #endregion
 
         public static readonly string MSG_STAGE_ASSIGNED_EXISTED = "MSG_STAGE_ASSIGNED_EXISTED";
+
+        #region user
+
+
+        #endregion
     }
 }

@@ -124,6 +124,20 @@ namespace eFMS.API.System.DL.Common
         public static readonly string MSG_STAGE_CODE_DUPLICATE = "MSG_STAGE_CODE_DUPLICATE";
         public static readonly string MSG_STAGE_STATUS_EMPTY = "MSG_STAGE_STATUS_EMPTY";
         #endregion
+        #region User
+        public static readonly string MSG_USER_USERNAME_EMPTY = "MSG_USER_USERNAME_EMPTY";
+        public static readonly string MSG_USER_NAMEEN_EMPTY = "MSG_USER_NAMEEN_EMPTY";
+        public static readonly string MSG_USER_NAMEVN_EMPTY = "MSG_USER_NAMEVN_EMPTY";
+        public static readonly string MSG_USER_USERTYPE_EMPTY = "MSG_USER_USERTYPE_EMPTY";
+        public static readonly string MSG_USER_WORKINGSTATUS_EMPTY = "MSG_USER_WORKINGSTATUS_EMPTY";
+        public static readonly string MSG_USER_STATUS_EMPTY = "MSG_USER_WORKINGSTATUS_EMPTY";
+
+
+
+
+
+
+        #endregion
 
         //#region Name field
         //public const string EF_DISPLAYNAME_CODE = "EF_DISPLAYNAME_CODE";
