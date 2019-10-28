@@ -148,5 +148,16 @@ namespace eFMS.API.System.Controllers
             }
             return Ok(result);
         }
+
+        /// <summary>
+        /// get all level permission
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetLevelPermissions")]
+        public IActionResult GetLevelPermissions()
+        {
+            var results = permissionGeneralService.GetLevelPermissions();
+            return Ok(results);
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using eFMS.API.Common;
+using eFMS.API.Common.Globals;
 using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
@@ -204,6 +205,20 @@ namespace eFMS.API.System.DL.Services
                 var hs = new HandleState(ex.Message);
                 return hs;
             }
+        }
+
+        public List<Common.CommonData> GetLevelPermissions()
+        {
+            var results = new List<Common.CommonData>
+            {
+                new Common.CommonData { Value = "Owner", DisplayName = "Owner" },
+                new Common.CommonData { Value = "Group", DisplayName = "Group" },
+                new Common.CommonData { Value = "Department", DisplayName = "Department" },
+                new Common.CommonData { Value = "Office", DisplayName = "Office" },
+                new Common.CommonData { Value = "Company", DisplayName = "Company" },
+                new Common.CommonData { Value = "All", DisplayName = "All"}
+            };
+            return results;
         }
     }
 }

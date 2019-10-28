@@ -1,4 +1,5 @@
-﻿using eFMS.API.System.DL.Models;
+﻿using eFMS.API.Common.Globals;
+using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.DL.ViewModels;
 using eFMS.API.System.Service.Models;
@@ -17,5 +18,6 @@ namespace eFMS.API.System.DL.IService
         SysPermissionSampleModel GetBy(Guid? id);
         HandleState Update(SysPermissionSampleModel entity);
         HandleState Delete(Guid id);
+        List<eFMS.API.System.DL.Common.CommonData> GetLevelPermissions();
     }
 }
