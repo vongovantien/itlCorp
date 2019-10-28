@@ -39,7 +39,7 @@ export class ComanyInformationComponent extends AppList {
         super();
         this._progressRef = this._progressService.ref();
 
-        this.requestList = this.searchCompany;
+        this.requestList = this.requestSearchComapny;
         this.requestSort = this.sortCompany;
 
     }
@@ -56,19 +56,20 @@ export class ComanyInformationComponent extends AppList {
         ];
         this.dataSearch = { All: null };
 
-
-        this._store.dispatch(new LoadCompanyAction(this.dataSearch));
-        this.searchCompany(this.dataSearch);
+        this.requestSearchComapny();
+        this.getCompany(this.dataSearch);
     }
 
     onSearchCompany(dataSearch: any) {
         this.dataSearch = dataSearch;
-        this._store.dispatch(new LoadCompanyAction(this.dataSearch));
-
-        // this.searchCompany(this.dataSearch);
+        this.requestSearchComapny();
     }
 
-    searchCompany(dataSearch?: any) {
+    requestSearchComapny() {
+        this._store.dispatch(new LoadCompanyAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+    }
+
+    getCompany(dataSearch?: any) {
         // this.isLoading = true;
         // this._progressRef.start();
         this._store.select<any>(getCompanyState)
@@ -110,7 +111,7 @@ export class ComanyInformationComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this.searchCompany();
+                        this.requestSearchComapny();
                     } else {
                         this._toastService.warning(res.message);
                     }

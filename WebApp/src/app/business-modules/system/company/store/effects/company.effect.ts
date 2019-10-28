@@ -18,7 +18,7 @@ export class CompanyEffects {
             ofType<any>(CompanyActionTypes.LOAD_COMPANY),
             map((action: CompanyAction) => action.payload),
             switchMap(
-                (payload: any) => this._systemRepo.getCompany(1, 10, payload)
+                (payload: { page: number, size: number, dataSearch: any }) => this._systemRepo.getCompany(payload.page, payload.size, payload.dataSearch)
                     .pipe(
                         map((data: any) => new LoadCompanySuccessAction(data)),
                         catchError(err => of(new LoadCompanyFailureAction(err)))
