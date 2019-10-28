@@ -292,10 +292,12 @@ namespace eFMS.API.System.Controllers
                         WorkingStatus = worksheet.Cells[row, 12].Value?.ToString(),
                         Status = worksheet.Cells[row, 13].Value?.ToString()
                     };
+                    list.Add(userobj);
                 }
-
-  
-                return Ok();
+                var data = sysUserService.CheckValidImport(list);
+                var totalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totalValidRows };
+                return Ok(results);
 
             }
             return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
