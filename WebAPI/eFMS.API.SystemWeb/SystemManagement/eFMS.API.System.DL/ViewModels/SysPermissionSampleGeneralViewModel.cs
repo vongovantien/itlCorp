@@ -9,7 +9,7 @@ namespace eFMS.API.System.DL.ViewModels
 {
     public class SysPermissionSampleGeneralViewModel
     {
-        public short PermissionID { get; set; }
+        public Guid PermissionID { get; set; }
         public string ModuleName { get; set; }
         public string ModuleID { get; set; }
         public List<SysPermissionSampleGeneralModel> SysPermissionGenerals { get; set; }

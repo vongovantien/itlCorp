@@ -11,7 +11,7 @@ namespace eFMS.API.System.DL.Models
     }
     public class SysPermissionSpecialViewModel
     {
-        public short PermissionId { get; set; }
+        public Guid PermissionId { get; set; }
         public string ModuleId { get; set; }
         public string MenuId { get; set; }
         public string MenuName { get; set; }
@@ -20,7 +20,7 @@ namespace eFMS.API.System.DL.Models
 
     public class PermissionSpecialAction
     {
-        public short PermissionId { get; set; }
+        public Guid PermissionId { get; set; }
         public short Id { get; set; }
         public string ModuleId { get; set; }
         public string MenuId { get; set; }

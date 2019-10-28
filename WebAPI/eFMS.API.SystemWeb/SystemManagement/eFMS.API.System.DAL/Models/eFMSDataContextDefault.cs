@@ -613,7 +613,9 @@ namespace eFMS.API.System.Service.Models
             {
                 entity.ToTable("sysPermissionSample");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
 
                 entity.Property(e => e.Active).HasDefaultValueSql("((1))");
 
@@ -646,6 +648,8 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
                 entity.Property(e => e.Delete)
                     .IsRequired()
                     .HasMaxLength(20)
@@ -669,6 +673,10 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.PermissionId).HasColumnName("PermissionID");
 
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Write)
                     .IsRequired()
                     .HasMaxLength(20)
@@ -685,6 +693,8 @@ namespace eFMS.API.System.Service.Models
                     .HasMaxLength(20)
                     .IsUnicode(false);
 
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
                 entity.Property(e => e.IsAllow).HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.MenuId)
@@ -700,6 +710,10 @@ namespace eFMS.API.System.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.PermissionId).HasColumnName("PermissionID");
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<SysPermissionSpecialAction>(entity =>

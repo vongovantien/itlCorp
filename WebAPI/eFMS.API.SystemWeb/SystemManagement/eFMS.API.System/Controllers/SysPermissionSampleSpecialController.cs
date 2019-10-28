@@ -42,7 +42,7 @@ namespace eFMS.API.System.Controllers
         /// <param name="permissionId"></param>
         /// <returns></returns>
         [HttpGet("GetByPermission")]
-        public IActionResult GetBy(short permissionId)
+        public IActionResult GetBy(Guid? permissionId)
         {
             var results = perSpecialServiceRepository.GetBy(permissionId);
             return Ok(results);

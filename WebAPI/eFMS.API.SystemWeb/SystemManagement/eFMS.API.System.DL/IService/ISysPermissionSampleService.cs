@@ -14,8 +14,8 @@ namespace eFMS.API.System.DL.IService
     public interface ISysPermissionSampleService : IRepositoryBase<SysPermissionSample, SysPermissionSampleModel>
     {
         IQueryable<SysPermissionSampleModel> Query(SysPermissionGeneralCriteria criteria);
-        SysPermissionSampleModel GetBy(short id);
+        SysPermissionSampleModel GetBy(Guid? id);
         HandleState Update(SysPermissionSampleModel entity);
-        HandleState Delete(short id);
+        HandleState Delete(Guid id);
     }
 }

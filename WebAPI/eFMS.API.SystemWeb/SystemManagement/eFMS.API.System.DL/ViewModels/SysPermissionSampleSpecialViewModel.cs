@@ -7,7 +7,7 @@ namespace eFMS.API.System.DL.ViewModels
 {
     public class SysPermissionSampleSpecialViewModel
     {
-        public short PermissionID { get; set; }
+        public Guid PermissionID { get; set; }
         public string ModuleName { get; set; }
         public string ModuleID { get; set; }
         public List<SysPermissionSpecialViewModel> SysPermissionSpecials { get; set; }

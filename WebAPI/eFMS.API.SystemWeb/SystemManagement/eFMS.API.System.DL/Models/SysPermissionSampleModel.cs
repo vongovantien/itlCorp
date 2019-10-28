@@ -9,5 +9,8 @@ namespace eFMS.API.System.DL.Models
     public class SysPermissionSampleModel: SysPermissionSample
     {
         public string RoleName { get; set; }
+
+        public List<SysPermissionSampleGeneralViewModel> SysPermissionSampleGenerals { get; set; }
+        public List<SysPermissionSampleSpecialViewModel> SysPermissionSampleSpecials { get; set; }
     }
 }

@@ -27,7 +27,7 @@ namespace eFMS.API.System.DL.Services
             specialActionRepository = specialActionRepo;
         }
 
-        public List<SysPermissionSampleSpecialViewModel> GetBy(short permissionId)
+        public List<SysPermissionSampleSpecialViewModel> GetBy(Guid? permissionId)
         {
             var actionDefaults = specialActionRepository.Get().ToList();
             var modules = actionDefaults.GroupBy(x => x.ModuleId);
@@ -42,7 +42,7 @@ namespace eFMS.API.System.DL.Services
                 var module = menus.FirstOrDefault(x => x.Id == item.Key);
                 specialP.ModuleName = module?.NameEn;
                 specialP.ModuleID = module?.Id;
-                specialP.PermissionID = permissionId;
+                specialP.PermissionID = permissionId == null? Guid.Empty:(Guid)permissionId;
                 List<SysPermissionSpecialViewModel> sampleSpecials = new List<SysPermissionSpecialViewModel>();
                 var actions = actionDefaults.Where(x => x.ModuleId == item.Key);
                 var actionsInMenu = actions.GroupBy(x => x.MenuId);
@@ -53,7 +53,8 @@ namespace eFMS.API.System.DL.Services
                     {
                         MenuId = menu?.Id,
                         MenuName = menu?.NameEn,
-                        PermissionId = permissionId
+                        PermissionId = permissionId == null ? Guid.Empty : (Guid)permissionId,
+                        ModuleId = item.Key
                     };
                     perSpecial.PermissionSpecialActions = actions.Where(x => x.MenuId == actionInMenu.Key)
                         .Select(x => new PermissionSpecialAction {
@@ -62,14 +63,14 @@ namespace eFMS.API.System.DL.Services
                             NameEn = x.NameEn,
                             NameVn = x.NameVn,
                             IsAllow = false,
-                            PermissionId = permissionId
+                            PermissionId = permissionId == null ? Guid.Empty : (Guid)permissionId
                         }).ToList();
                     perSpecial.PermissionSpecialActions.ForEach(x => {
                         var detail = specialPermissions.FirstOrDefault(y => y.ActionName == x.NameEn);
                         if(detail != null)
                         {
-                            x.Id = (short)(permissionId == 0 ? 0 : specialPermissions.FirstOrDefault(y => y.ActionName == x.NameEn)?.Id);
-                            x.IsAllow = permissionId == 0 ? false : specialPermissions.FirstOrDefault(y => y.ActionName == x.NameEn)?.IsAllow;
+                            x.Id = (short)(permissionId == null ? 0 : specialPermissions.FirstOrDefault(y => y.ActionName == x.NameEn)?.Id);
+                            x.IsAllow = permissionId == null ? false : specialPermissions.FirstOrDefault(y => y.ActionName == x.NameEn)?.IsAllow;
                         }
                     });
                     sampleSpecials.Add(perSpecial);

@@ -35,7 +35,7 @@ namespace eFMS.API.System.Controllers
         /// <param name="permissionId">if add new : permissionId = 0 ---/--- update: permissionId > 0</param>
         /// <returns></returns>
         [HttpGet("GetByPermission")]
-        public IActionResult GetBy(short permissionId)
+        public IActionResult GetBy(Guid? permissionId)
         {
             var results = permissionDetailService.GetBy(permissionId);
             return Ok(results);

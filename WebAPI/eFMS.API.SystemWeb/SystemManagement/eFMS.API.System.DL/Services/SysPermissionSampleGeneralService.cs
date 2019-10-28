@@ -24,7 +24,7 @@ namespace eFMS.API.System.DL.Services
             menuRepository = menuRepo;
         }
 
-        public List<SysPermissionSampleGeneralViewModel> GetBy(short permissionId)
+        public List<SysPermissionSampleGeneralViewModel> GetBy(Guid? permissionId)
         {
             List<SysPermissionSampleGeneralViewModel> results = new List<SysPermissionSampleGeneralViewModel>();
             var menus = menuRepository.Get().ToList();
@@ -37,7 +37,7 @@ namespace eFMS.API.System.DL.Services
                 {
                     ModuleName = module.NameEn,
                     ModuleID = module.Id,
-                    PermissionID = permissionId
+                    PermissionID = permissionId == null ? Guid.Empty : (Guid)permissionId
                 };
                 var functions = menus.Where(x => x.ParentId == module.Id);
                 var listPerDetails = new List<SysPermissionSampleGeneralModel>();
@@ -49,7 +49,7 @@ namespace eFMS.API.System.DL.Services
                         var perDetail = new SysPermissionSampleGeneralModel {
                                     MenuId = function.Id,
                                     MenuName = function.NameEn,
-                                    PermissionId = permissionId
+                                    PermissionId = permissionId == null ? Guid.Empty : (Guid)permissionId
                         };
                         if(detail != null)
                         {
