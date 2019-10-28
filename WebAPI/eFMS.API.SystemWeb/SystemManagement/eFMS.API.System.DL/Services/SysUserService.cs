@@ -353,8 +353,7 @@ namespace eFMS.API.System.DL.Services
                     objUser.EmployeeId = objEmployee.Id;
                     objUser.Id = Guid.NewGuid().ToString();
                     objUser.UserCreated = objUser.UserModified = currentUser.UserID;
-        
-
+                    objUser.Password = BCrypt.Net.BCrypt.HashPassword(Constants.Password);
                     sysUsers.Add(objUser);
 
                 }
