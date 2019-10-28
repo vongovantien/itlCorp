@@ -3,6 +3,8 @@ using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.Service.Models;
+using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
@@ -16,15 +18,18 @@ namespace eFMS.API.System.DL.Services
     {
         private readonly IContextBase<CatDepartment> departmentRepository;
         private readonly ICatDepartmentService departmentService;
+        private readonly ICurrentUser currentUser;
 
         public SysGroupService(IContextBase<SysGroup> repository, 
             IMapper mapper,
             IContextBase<CatDepartment> departmentRepo,
-            ICatDepartmentService deptService) : base(repository, mapper)
+            ICatDepartmentService deptService,
+            ICurrentUser currUser) : base(repository, mapper)
         {
             SetChildren<SysUserGroup>("Id", "GroupId");
             departmentRepository = departmentRepo;
             departmentService = deptService;
+            currentUser = currUser;
         }
 
         public SysGroupModel GetById(short id)
@@ -79,8 +84,8 @@ namespace eFMS.API.System.DL.Services
                                                || (x.NameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                || (x.NameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                || (x.ShortName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                               || (x.DepartmentId == criteria.DepartmentId || criteria.DepartmentId == 0)
-                                               || (x.Id == criteria.Id || criteria.Id == 0)
+                                               //|| (x.DepartmentId == criteria.DepartmentId || criteria.DepartmentId == 0)
+                                               //|| (x.Id == criteria.Id || criteria.Id == 0)
                                         );
                 departments = departmentRepository.Get(x => (x.DeptNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1);
                 if(departments.Count() == 0)
@@ -108,6 +113,20 @@ namespace eFMS.API.System.DL.Services
                 DepartmentName = y.DeptNameEn
             }).OrderByDescending(x => x.DatetimeModified);
             return results;
+        }
+
+        public override HandleState Add(SysGroupModel entity)
+        {
+            var item = mapper.Map<SysGroup>(entity);
+            item.UserCreated = item.UserModified = currentUser.UserID;
+            item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
+            var hs = DataContext.Add(item, true);
+            if (hs.Success)
+            {
+                entity.Id = (short)DataContext.Get(x => x.Code == entity.Code)?.FirstOrDefault()?.Id;
+            }
+            DataContext.SubmitChanges();
+            return hs;
         }
     }
 }
