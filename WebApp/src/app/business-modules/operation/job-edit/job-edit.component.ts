@@ -210,15 +210,13 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
     confirmCancelJob() {
         this.confirmCancelJobPopup.show();
     }
-    logSubmit($event) {
-        console.log($event)
-    }
+
+
     saveShipment(form: NgForm) {
         this.opsTransaction.serviceDate = !!this.serviceDate ? (this.serviceDate.startDate != null ? dataHelper.dateTimeToUTC(this.serviceDate.startDate) : null) : null;
         this.opsTransaction.finishDate = !!this.finishDate ? (this.finishDate.startDate != null ? dataHelper.dateTimeToUTC(this.finishDate.startDate) : null) : null;
 
         const s = this.finishDate.startDate != null && this.serviceDate.startDate != null && (this.finishDate.startDate < this.serviceDate.startDate);
-        console.log(this.opsTransaction);
         if (form.invalid || this.opsTransaction.shipmentMode == null
             || (this.opsTransaction.pod === this.opsTransaction.pol && this.opsTransaction.pod != null && this.opsTransaction.pol != null)
             || this.opsTransaction.serviceMode == null
@@ -245,7 +243,6 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
     updateShipment() {
         this._spinner.show();
-        console.log(this.opsTransaction);
         this._documentRepo.updateShipment(this.opsTransaction)
             .pipe(catchError(this.catchError), finalize(() => this._spinner.hide()))
             .subscribe(
@@ -266,6 +263,8 @@ export class OpsModuleBillingJobEditComponent extends AppPage implements OnInit 
 
     onLockShipment() {
         this.opsTransaction.isLocked = true;
+        this.confirmLockShipmentPopup.hide();
+
         this.updateShipment();
     }
 
