@@ -5,6 +5,11 @@ namespace eFMS.API.System.Service.Models
 {
     public partial class SysUser
     {
+        public SysUser()
+        {
+            SysUserGroup = new HashSet<SysUserGroup>();
+        }
+
         public string Id { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }

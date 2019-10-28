@@ -141,11 +141,12 @@ namespace eFMS.API.System.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var branch = mapper.Map<SysOfficeModel>(model);
-            branch.UserCreated = currentUser.UserID;
-            branch.DatetimeCreated = DateTime.Now;
+            branch.UserCreated = branch.UserModified = currentUser.UserID;
+            branch.Id = Guid.NewGuid();
+            branch.DatetimeCreated = branch.DatetimeModified = DateTime.Now;
             var hs = sysOfficeService.AddOffice(branch);
             var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value , Data = branch};
             if (!hs.Success)
             {
                 return BadRequest(result);

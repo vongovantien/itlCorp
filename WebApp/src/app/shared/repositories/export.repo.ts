@@ -42,5 +42,12 @@ export class ExportRepo {
             map(data => data)
         );
     }
+
+    exportUser(searchObject: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SystemReport/ExportUser`, searchObject).pipe(
+            catchError((error) => throwError(error)),
+            map(data => data)
+        );
+    }
 }
 

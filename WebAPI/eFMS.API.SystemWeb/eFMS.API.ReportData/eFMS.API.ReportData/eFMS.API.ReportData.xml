@@ -17,7 +17,7 @@
             <summary>
             Export Advance Payment
             </summary>
-            <param name="sysCompanyCriteria"></param>
+            <param name="advancePaymentCriteria"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportSettlementPayment(eFMS.API.ReportData.Models.Criteria.SettlementPaymentCriteria)">
@@ -150,6 +150,13 @@
             export list group to excel file
             </summary>
             <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.SystemReportController.ExportUser(eFMS.API.ReportData.Models.SysUserCriteria)">
+            <summary>
+            Export Office
+            </summary>
+            <param name="sysUserCriteria"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.ReportData.Helpers.FileHelper">

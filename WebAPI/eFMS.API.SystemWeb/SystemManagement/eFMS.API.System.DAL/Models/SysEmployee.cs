@@ -10,7 +10,7 @@ namespace eFMS.API.System.Service.Models
         public string DepartmentId { get; set; }
         public string EmployeeNameVn { get; set; }
         public string EmployeeNameEn { get; set; }
-        public string Position { get; set; }
+        public string Title { get; set; }
         public string Title { get; set; }
         public DateTime? Birthday { get; set; }
         public string ExtNo { get; set; }

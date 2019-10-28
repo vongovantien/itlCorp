@@ -1,0 +1,31 @@
+<!--begin:: subheader-->
+<div class="m-subheader">
+    <div class="d-flex align-items-center">
+        <div class="mr-auto">
+            <app-breadcrumb></app-breadcrumb>
+        </div>
+    </div>
+</div>
+<!--end:: subheader-->
+<app-form-add-user>
+
+</app-form-add-user>
+<div class="row">
+    <div class="col-12">
+        <div class="text-center">
+            <button type="button" (click)="create()" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-save"></i>
+                    <span> Save </span>
+                </span>
+            </button>
+            <button routerLink="/home/system/user-management" type="button"
+                class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase m--margin-left-20">
+                <span>
+                    <i class="la la-ban"></i>
+                    <span> Cancel </span>
+                </span>
+            </button>
+        </div>
+    </div>
+</div>

@@ -36,5 +36,10 @@ namespace eFMS.API.System.DL.Common
                 public static string ListName = "Units";
             }
         }
+        public struct SysUser
+        {
+            public static string ExelImportFileName = "User-Import.xlsx";
+
+        }
     }
 }
