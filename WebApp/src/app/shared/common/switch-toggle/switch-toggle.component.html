@@ -1,6 +1,6 @@
-<span class="m-switch m-switch--{{class}}">
+<span class="m-switch m-switch--{{class}} m-switch--{{size}}">
     <label>
-        <input type="checkbox" [(ngModel)]="toggle" [ngModelOptions]="{standalone: true}">
+        <input type="checkbox" [(ngModel)]="toggle" (ngModelChange)="onChangeToggle()">
         <span></span>
     </label>
 </span>

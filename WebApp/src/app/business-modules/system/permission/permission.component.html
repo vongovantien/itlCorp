@@ -14,7 +14,7 @@
     </app-sub-header>
     <div class="m-content">
 
-        <form-search-permission></form-search-permission>
+        <form-search-permission (onSearch)="searchPermission($event)"></form-search-permission>
 
         <div class="m-portlet">
             <div class="m-portlet__body">
@@ -37,11 +37,13 @@
                                             </button>
                                         </div>
                                     </td>
-                                    <td>{{permission.name}}</td>
+                                    <td class="text-underline">
+                                        <a [routerLink]="[permission.id]">{{permission.name}}</a>
+                                    </td>
                                     <td>{{permission.type}}</td>
-                                    <td>{{permission.role}}</td>
-                                    <td [ngClass]="permission.status ? 'text-success' : 'text-danger'">
-                                        {{permission.status ? 'Active' : 'Inactive'}}</td>
+                                    <td>{{permission.roleName}}</td>
+                                    <td [ngClass]="permission.active ? 'text-success' : 'text-danger'">
+                                        {{permission.active ? 'Active' : 'Inactive'}}</td>
                                 </tr>
                             </ng-container>
                             <tr *ngIf="!isLoading && !permissions.length" app-table-none-record

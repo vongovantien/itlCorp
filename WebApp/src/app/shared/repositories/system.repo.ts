@@ -216,5 +216,51 @@ export class SystemRepo {
             map((data: CommonInterface.IResult) => data.data)
         );
     }
+
+    getPermissionSample(id: string) {
+        /* 
+        * Create id = null
+        * Detail id = GUID
+        */
+        if (!!id) {
+            return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysPermissionGeneral/Get`, { id: id }).pipe(
+                map((data: any) => data)
+            );
+        } else {
+            return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysPermissionGeneral/Get`).pipe(
+                map((data: any) => data)
+            );
+        }
+    }
+
+    createPermissionSample(body: any = {}) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysPermissionGeneral/Add`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getSystemRole() {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysRole`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getListPermissionGeneral(body: any = {}) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysPermissionGeneral/Query`, body)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    deletePermissionGeneral(id: string) {
+        return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysPermissionGeneral/${id}`);
+    }
+
+    updatePermissionGeneral(body: any = {}) {
+        return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysPermissionGeneral/Update`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }
 
