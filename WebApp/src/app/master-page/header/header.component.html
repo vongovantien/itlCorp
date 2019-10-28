@@ -1,6 +1,5 @@
 <div class="m-container m-container--fluid m-container--full-height">
     <div class="m-stack m-stack--ver m-stack--desktop">
-        <!-- BEGIN: Brand -->
         <div class="m-stack__item m-brand  m-brand--skin-dark ">
             <div class="m-stack m-stack--ver m-stack--general">
                 <div class="m-stack__item m-stack__item--middle m-brand__logo">
@@ -9,34 +8,30 @@
                     </a>
                 </div>
                 <div class="m-stack__item m-stack__item--middle m-brand__tools">
-                    <!-- BEGIN: Left Aside Minimize Toggle -->
-                    <a href="javascript:;" id="m_aside_left_minimize_toggle" class="m-brand__icon m-brand__toggler m-brand__toggler--left m--visible-desktop-inline-block" (click)="minimize_page_sidebar()">
+                    <a href="javascript:;" id="m_aside_left_minimize_toggle"
+                        class="m-brand__icon m-brand__toggler m-brand__toggler--left m--visible-desktop-inline-block"
+                        (click)="minimize_page_sidebar()">
                         <span></span>
                     </a>
-                    <!-- END -->
-                    <!-- BEGIN: Responsive Aside Left Menu Toggler -->
-                    <a href="javascript:;" id="m_aside_left_offcanvas_toggle" class="m-brand__icon m-brand__toggler m-brand__toggler--left m--visible-tablet-and-mobile-inline-block">
+                    <a href="javascript:;" id="m_aside_left_offcanvas_toggle"
+                        class="m-brand__icon m-brand__toggler m-brand__toggler--left m--visible-tablet-and-mobile-inline-block">
                         <span></span>
                     </a>
-                    <!-- END -->
                 </div>
             </div>
         </div>
-        <!-- END: Brand -->
         <div class="m-stack__item m-stack__item--fluid m-header-head" id="m_header_nav">
-            <!-- BEGIN: Horizontal Menu -->
-            <button class="m-aside-header-menu-mobile-close  m-aside-header-menu-mobile-close--skin-dark " id="m_aside_header_menu_mobile_close_btn">
+            <button class="m-aside-header-menu-mobile-close  m-aside-header-menu-mobile-close--skin-dark "
+                id="m_aside_header_menu_mobile_close_btn">
                 <i class="la la-close"></i>
             </button>
             <div class="m-header-menu">
                 <h3 class="m-subheader__title">{{Page_Info}}</h3>
             </div>
-            <!-- END: Horizontal Menu -->
-            <!-- BEGIN: Topbar -->
             <div class="m-topbar m-stack m-stack--ver m-stack--general" id="m_header_topbar">
                 <div class="m-stack__item m-topbar__nav-wrapper">
                     <ul class="m-topbar__nav m-nav m-nav--inline">
-                        <li class="m-nav__item m-list-search m-list-search--skin-light">
+                        <!-- <li class="m-nav__item m-list-search m-list-search--skin-light">
                             <a class="m-nav__link m-dropdown__toggle" href="javascript:void(0)"  data-toggle="dropdown">
                                 <span class="m-nav__link-icon">
                                     <i class="la la-search"></i>
@@ -57,9 +52,9 @@
                                     </form>
                                 </div>
                             </div>
-                        </li>
-                        <li class="m-nav__item m-topbar__notifications">
-                            <a class="m-nav__link m-dropdown__toggle" href="javascript:void(0)"  data-toggle="dropdown">
+                        </li> -->
+                        <!-- <li class="m-nav__item m-topbar__notifications">
+                            <a class="m-nav__link m-dropdown__toggle" href="javascript:void(0)" data-toggle="dropdown">
                                 <span class="m-nav__link-badge m-badge m-badge--danger">3</span>
                                 <span class="m-nav__link-icon">
                                     <i class="la la-bell"></i>
@@ -163,19 +158,22 @@
                                     </div>
                                 </div>
                             </div>
-                        </li>
+                        </li> -->
                         <li class="m-nav__item topbar__lang">
-                            <a class="m-nav__link m-dropdown__toggle" href="javascript:void(0)"  data-toggle="dropdown">
+                            <a class="m-nav__link m-dropdown__toggle" href="javascript:void(0)" data-toggle="dropdown">
                                 <span class="m-topbar__userpic" *ngIf="active_flag">
-                                    <img alt="eFMS" class="m--img-rounded m--marginless m--img-centered" [src]="active_flag" />
+                                    <img alt="eFMS" class="m--img-rounded m--marginless m--img-centered"
+                                        [src]="active_flag" />
                                 </span>
                             </a>
                             <div class="dropdown-menu" style="min-width: 160px">
                                 <ul class="m-nav">
                                     <li class="m-nav__item">
-                                        <a class="m-nav__link active" href="javascript:void(0)" (click)="changeLanguage('en')">
-                                            <span class="m-nav__link-icon" *ngIf="english_flag">  
-                                                <img alt="eFMS" class="m--img-rounded m--marginless m--img-centered" [src]="english_flag" />
+                                        <a class="m-nav__link active" href="javascript:void(0)"
+                                            (click)="changeLanguage('en')">
+                                            <span class="m-nav__link-icon" *ngIf="english_flag">
+                                                <img alt="eFMS" class="m--img-rounded m--marginless m--img-centered"
+                                                    [src]="english_flag" />
                                             </span>
                                             <span class="m-nav__link-text">
                                                 English
@@ -183,9 +181,10 @@
                                         </a>
                                     </li>
                                     <li class="m-nav__item">
-                                        <a class="m-nav__link" href="javascript:void(0)" (click)="changeLanguage('vi')" >
-                                            <span class="m-nav__link-icon" *ngIf="vietnam_flag">  
-                                                <img alt="eFMS" class="m--img-rounded m--marginless m--img-centered" [src]="vietnam_flag" />
+                                        <a class="m-nav__link" href="javascript:void(0)" (click)="changeLanguage('vi')">
+                                            <span class="m-nav__link-icon" *ngIf="vietnam_flag">
+                                                <img alt="eFMS" class="m--img-rounded m--marginless m--img-centered"
+                                                    [src]="vietnam_flag" />
                                             </span>
                                             <span class="m-nav__link-text">
                                                 Vietnamese
@@ -198,15 +197,18 @@
                         <li class="m-nav__item m-topbar__user-profile">
                             <a class="m-nav__link" href="javascript:void(0)">
                                 <span class="m-topbar__userpic">
-                                    <img alt="eFMS" class="m--img-rounded m--marginless m--img-centered" src="assets/app/media/img/users/user4.jpg" />
+                                    <img alt="eFMS" class="m--img-rounded m--marginless m--img-centered"
+                                        src="assets/app/media/img/users/user4.jpg" />
                                 </span>
-                                <span class="m-topbar__username" style="color: #3966b6; font-size: 14px; text-transform: capitalize; padding-left: 10px;">
+                                <span class="m-topbar__username"
+                                    style="color: #3966b6; font-size: 14px; text-transform: capitalize; padding-left: 10px;">
                                     {{currenUser.preferred_username}}
                                 </span>
                             </a>
                         </li>
                         <li class="m-nav__item">
-                            <a class="m-nav__link" href="javascript:void(0)" data-toggle="modal" data-target="#logout-modal">
+                            <a class="m-nav__link" href="javascript:void(0)" data-toggle="modal"
+                                data-target="#logout-modal">
                                 <span class="m-nav__link-icon">
                                     <i class="la la-power-off"></i>
                                 </span>
@@ -215,7 +217,6 @@
                     </ul>
                 </div>
             </div>
-            <!-- END: Topbar -->
         </div>
     </div>
 </div>

@@ -231,7 +231,7 @@ export const language = {
     },
     {
       primaryKey: 'inactive',
-      header: 'Inactive',
+      header: 'Status',
       isShow: true,
       dataType: 'boolean',
       required: true,

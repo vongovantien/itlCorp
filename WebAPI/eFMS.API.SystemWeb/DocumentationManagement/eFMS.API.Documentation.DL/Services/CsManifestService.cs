@@ -160,7 +160,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var manifest = new SeaCargoManifest
                     {
-                        TransID = item.JobNo,
+                        //TransID = item.JobNo,
                         HBL = item.Hwbno,
                         Marks = item.ShippingMark,
                         Nofpiece = item.PackageContainer,

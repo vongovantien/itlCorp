@@ -10,10 +10,78 @@
         <div class="m-portlet">
             <div class="m-portlet__body">
                 <tabset>
-                    <tab heading="General Permission"></tab>
+                    <tab heading="General Permission">
+                        <div class="general-wrapper">
+                            <div class="header-permission row">
+                                <div class="p-2 col m-w-100">Module</div>
+                                <div class="p-2 col">Function</div>
+                                <div class="p-2 col">Access</div>
+                                <div class="p-2 col">Detail</div>
+                                <div class="p-2 col">Write</div>
+                                <div class="p-2 col">Delete</div>
+                                <div class="p-2 col">List</div>
+                                <div class="p-2 col">Import</div>
+                                <div class="p-2 col">Export</div>
+                            </div>
+                            <div class="list-permission-group-module-wrapper">
+                                <ul class="list-group list-module">
+                                    <li class="list-group-item">
+                                        <span class="font-15 font-weight-bold">Operation</span>
+                                        <ul class="list-group m--margin-top-10 list-permission">
+                                            <li class="list-group-item col">
+                                                <div class="row">
+                                                    <div
+                                                        class="col d-flex align-items-center m-w-100 justify-content-center">
+                                                        1</div>
+                                                    <div class="col  d-flex align-items-center justify-content-center">
+                                                        Job Management</div>
+                                                    <div class="col text-center">
+                                                        <app-switch [(toggle)]="isCheckAll">
+                                                        </app-switch>
+                                                    </div>
+                                                    <div class="col ">
+                                                        <select class="form-control">
+                                                            <option *ngFor="let item of [1,2,3]" [value]="item">{{item}}
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col">
+                                                        <select class="form-control">
+                                                            <option *ngFor="let item of [1,2,3]" [value]="item">{{item}}
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col">
+                                                        <select class="form-control">
+                                                            <option *ngFor="let item of [1,2,3]" [value]="item">{{item}}
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col">
+                                                        <select class="form-control">
+                                                            <option *ngFor="let item of [1,2,3]" [value]="item">{{item}}
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col text-center">
+                                                        <app-switch [(toggle)]="isCheckAll">
+                                                        </app-switch>
+                                                    </div>
+                                                    <div class="col text-center">
+                                                        <app-switch [(toggle)]="isCheckAll">
+                                                        </app-switch>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </tab>
                     <tab heading="Special Permission"></tab>
                 </tabset>
-                <div class="row">
+                <div class="row m--margin-top-10">
                     <div class="col-md-6"></div>
                     <div class="col-md-6">
                         <div class="m--align-right">

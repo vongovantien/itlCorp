@@ -21,7 +21,6 @@ declare var $: any;
 @Component({
     selector: 'app-stage-management',
     templateUrl: './stage-management.component.html',
-    styleUrls: ['./stage-management.component.sass']
 })
 export class StageManagementComponent {
     @ViewChild(ConfirmPopupComponent, { static: false }) popupConfirm: ConfirmPopupComponent;

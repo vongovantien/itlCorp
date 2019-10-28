@@ -68,19 +68,19 @@ namespace eFMS.API.System.Controllers
         [HttpPost]
         [Route("Add")]
         [Authorize]
-        public IActionResult Add(SysCompanyAddModel model)
+        public IActionResult Add(SysCompanyAddModel company)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var checkExistMessage = CheckExist(model);
+            var checkExistMessage = CheckExist(company);
             if (checkExistMessage.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            var hs = sysCompanyService.Add(model);
+            var hs = sysCompanyService.Add(company);
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
 
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = company };
             if (!hs.Success)
             {
                 return BadRequest(result);
@@ -105,6 +105,7 @@ namespace eFMS.API.System.Controllers
 
         [HttpPut]
         [Route("{id}/Update")]
+        [Authorize]
         public IActionResult Update(Guid id, SysCompanyAddModel model)
         {
             if (!ModelState.IsValid) return BadRequest();

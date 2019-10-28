@@ -149,7 +149,7 @@
                                         <span>Local Name</span>
                                     </th>
                                     <th>
-                                        <span>Inactive</span>
+                                        <span>Status</span>
                                     </th>
                                 </tr>
                             </thead>
@@ -184,10 +184,11 @@
                                         <td>
                                             <span>{{country.nameVn}}</span>
                                         </td>
-                                        <td>
-                                            <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input
+                                        <td [ngClass]="country.active ? 'text-success' : 'text-danger'">
+                                            {{country.active ? 'Active' : 'Inactive'}}
+                                            <!-- <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input
                                                     [checked]="!country.active" disabled
-                                                    type="checkbox"><span></span></label>
+                                                    type="checkbox"><span></span></label> -->
                                         </td>
                                     </tr>
                                 </ng-container>
@@ -295,7 +296,7 @@
                                         <span>Country</span>
                                     </th>
                                     <th>
-                                        <span>Inactive</span>
+                                        <span>Status</span>
                                     </th>
 
                                 </tr>
@@ -332,10 +333,11 @@
                                         <td>
                                             <span>{{item.countryName}}</span>
                                         </td>
-                                        <td>
-                                            <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input
-                                                    [checked]="item.inactive" disabled
-                                                    type="checkbox"><span></span></label>
+                                        <td [ngClass]="item.active ? 'text-success' : 'text-danger'">
+                                            {{item.active ? 'Active' : 'Inactive'}}
+                                            <!-- <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input
+                                                    [checked]="!item.active" disabled
+                                                    type="checkbox"><span></span></label> -->
                                         </td>
                                     </tr>
                                 </ng-container>
@@ -447,7 +449,7 @@
                                         <span>Country</span>
                                     </th>
                                     <th>
-                                        <span>Inactive</span>
+                                        <span>Status</span>
                                     </th>
 
                                 </tr>
@@ -486,10 +488,11 @@
                                         <td>
                                             <span>{{district.countryName}}</span>
                                         </td>
-                                        <td>
-                                            <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input
-                                                    [checked]="district.inactive" disabled
-                                                    type="checkbox"><span></span></label>
+                                        <td [ngClass]="district.active ? 'text-success' : 'text-danger'">
+                                            {{district.active ? 'Active' : 'Inactive'}}
+                                            <!-- <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input
+                                                    [checked]="!district.active" disabled
+                                                    type="checkbox"><span></span></label> -->
                                         </td>
                                     </tr>
 
@@ -609,7 +612,7 @@
                                         <span>Country</span>
                                     </th>
                                     <th>
-                                        <span>Inactive</span>
+                                        <span>Status</span>
                                     </th>
 
                                 </tr>
@@ -651,10 +654,11 @@
                                         <td>
                                             <span>{{ward.countryName}}</span>
                                         </td>
-                                        <td>
-                                            <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input
-                                                    [checked]="ward.inactive" disabled
-                                                    type="checkbox"><span></span></label>
+                                        <td [ngClass]="ward.active ? 'text-success' : 'text-danger'">
+                                            {{ward.active ? 'Active' : 'Inactive'}}
+                                            <!-- <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input
+                                                    [checked]="!ward.active" disabled
+                                                    type="checkbox"><span></span></label> -->
                                         </td>
                                     </tr>
 
@@ -792,8 +796,8 @@
 
 <!-- BEGIN UPDATE COUNTRY MODAL -->
 
-<div class="modal fade" id="update-country-modal" data-backdrop="static" role="dialog" aria-labelledby=""
-    aria-hidden="true">
+<div class="modal fade" id="update-country-modal" data-backdrop="static" role="dialog"
+    aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog modal-xs" role="document">
         <div class="modal-content">
 
@@ -873,13 +877,15 @@
 
                         <div class="form-group row">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Inactive
+                                Active
                             </label>
                             <div class="col-lg-8">
-                                <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input
-                                        [checked]="CountryToUpdate.inactive"
-                                        (change)="CountryToUpdate.inactive=!CountryToUpdate.inactive"
-                                        type="checkbox"><span></span></label>
+                                <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
+                                    <input type="checkbox" 
+                                    [attr.checked]="CountryToUpdate.active ? 'checked' : null"
+                                    (change)="CountryToUpdate.active = !CountryToUpdate.active">
+                                    <span></span>
+                                </label>
                             </div>
                         </div>
 
@@ -1137,12 +1143,12 @@
 
                         <div class="form-group row">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Inactive
+                                Active
                             </label>
                             <div class="col-lg-8">
                                 <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input
-                                        [checked]="ProvinceCityToUpdate.inactive"
-                                        (change)="ProvinceCityToUpdate.inactive=!ProvinceCityToUpdate.inactive"
+                                        [attr.checked]="ProvinceCityToUpdate.active ? 'Checked': null" 
+                                        (change)="ProvinceCityToUpdate.active = !ProvinceCityToUpdate.active"
                                         type="checkbox"><span></span></label>
                             </div>
                         </div>
@@ -1444,13 +1450,16 @@
 
                         <div class="form-group row">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Inactive
+                                Active
                             </label>
                             <div class="col-lg-8">
-                                <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input
-                                        [checked]="DistrictToUpdate.inactive"
-                                        (change)="DistrictToUpdate.inactive=!DistrictToUpdate.inactive"
-                                        type="checkbox"><span></span></label>
+                                <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
+                                    <input
+                                        [attr.checked]="DistrictToUpdate.active ? 'Checked' : null" 
+                                        (change)="onChangeDistrictUpdate($event)"
+                                        type="checkbox">
+                                        <span></span>
+                                </label>
                             </div>
                         </div>
 
@@ -1793,8 +1802,8 @@
                             </label>
                             <div class="col-lg-8">
                                 <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input
-                                        [checked]="WardToUpdate.inactive"
-                                        (change)="WardToUpdate.inactive=!WardToUpdate.inactive"
+                                        [attr.checked]="WardToUpdate.active ? 'Checked' : null" 
+                                        (change)="WardToUpdate.active = !WardToUpdate.active"
                                         type="checkbox"><span></span></label>
                             </div>
                         </div>

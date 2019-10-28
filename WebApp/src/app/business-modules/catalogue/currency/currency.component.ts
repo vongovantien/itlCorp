@@ -22,7 +22,6 @@ declare var $: any;
 @Component({
   selector: 'app-currency',
   templateUrl: './currency.component.html',
-  styleUrls: ['./currency.component.scss']
 })
 export class CurrencyComponent implements OnInit {
   currencies: Array<Currency>;
@@ -112,11 +111,9 @@ export class CurrencyComponent implements OnInit {
     this.onSearch(event);
   }
   onSortChange(column) {
-    if (column.dataType != 'boolean') {
-      let property = column.primaryKey;
-      this.isDesc = !this.isDesc;
-      this.currencies = this.sortService.sort(this.currencies, property, this.isDesc);
-    }
+    let property = column.primaryKey;
+    this.isDesc = !this.isDesc;
+    this.currencies = this.sortService.sort(this.currencies, property, this.isDesc);
   }
   showAdd() {
     this.isAddnew = true;

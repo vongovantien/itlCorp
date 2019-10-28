@@ -73,8 +73,8 @@ namespace eFMS.API.System.DL.Services
 
 
             var responseData = mapper.Map<List<SysCompanyModel>>(bu).ToList(); // maping BU sang SysCompanyModel ( hoặc object # => define trong Mapper.cs);
-
-            return responseData;
+            var result = responseData.OrderByDescending(x => x.DatetimeModified).ToList();
+            return result;
         }
 
         public HandleState Update(Guid id, SysCompanyAddModel model)
@@ -150,9 +150,12 @@ namespace eFMS.API.System.DL.Services
                 SysCompany.DatetimeCreated = SysCompany.DatetimeModified = DateTime.Now;
                 SysCompany.UserCreated = SysCompany.UserModified = userCurrent;
 
-                DataContext.Add(SysCompany);
-
-                var hs = new HandleState();
+                var hs = DataContext.Add(SysCompany);
+               
+                if (hs.Success)
+                {
+                    model.Id = DataContext.Get(x => x.Code == model.CompanyCode).FirstOrDefault().Id; // lấy ra company vừa tạo.
+                }
                 return hs;
 
             }

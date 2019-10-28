@@ -64,6 +64,8 @@
     <Compile Remove="Models\SysAuthorization.cs" />
     <Compile Remove="Models\SysAuthorizationDetail.cs" />
     <Compile Remove="Models\SysMenuPermissionInstruction.cs" />
+    <Compile Remove="Models\SysPermissionGeneral.cs" />
+    <Compile Remove="Models\SysPermissionGeneralDetail.cs" />
     <Compile Remove="Models\SysSentEmailHistory.cs" />
     <Compile Remove="Models\SysUserLog.cs" />
     <Compile Remove="Models\SysUserOtherWorkPlace.cs" />

@@ -28,7 +28,7 @@ export class AssignStagePopupComponent extends PopupBase {
     selectedStageData: any;
 
     users: User[] = [];
-    selectedUser: User = null;
+    selectedUser: any = null;
 
     description: string = '';
 
@@ -65,6 +65,8 @@ export class AssignStagePopupComponent extends PopupBase {
     getListUser() {
         if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SYSTEM_USER)) {
             this.users = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SYSTEM_USER) || [];
+            this.users = <any>this.utility.prepareNg2SelectData(this.users, 'id', 'username');
+
         } else {
             this._sysRepo.getListSystemUser()
                 .pipe(
@@ -74,6 +76,8 @@ export class AssignStagePopupComponent extends PopupBase {
                 .subscribe(
                     (data: any) => {
                         this.users = data || [];
+
+                        this.users = <any>this.utility.prepareNg2SelectData(this.users, 'id', 'username');
                     },
                 );
         }
@@ -101,7 +105,8 @@ export class AssignStagePopupComponent extends PopupBase {
                     } else {
                         this._toastService.warning(res.message);
                     }
-                });
+                },
+            );
     }
 
     onSelectStage(stage: any) {
@@ -114,7 +119,7 @@ export class AssignStagePopupComponent extends PopupBase {
 
         // * Reset value
         this.description = '';
-        this.selectedUser = null;
+        // this.selectedUser = null;
         this.selectedStage = {};
         this.isSubmitted = false;
     }

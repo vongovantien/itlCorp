@@ -100,9 +100,10 @@ export class AddGroupComponent extends AppForm implements OnInit {
         .subscribe(
           (res: CommonInterface.IResult) => {
             if (res.status) {
+              this._router.navigate([`home/system/group/${res.data.id}`]);
               this._toastService.success(res.message, '');
               this.isSubmitted = false;
-              this.initForm();
+              // this.initForm();
             } else {
               this._toastService.error(res.message, '');
             }
