@@ -14,6 +14,7 @@ using eFMS.API.System.DL.Common;
 using Microsoft.Extensions.Caching.Distributed;
 using eFMS.API.System.Service.Contexts;
 using Microsoft.Extensions.Localization;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.System.DL.Services
 {
@@ -23,14 +24,20 @@ namespace eFMS.API.System.DL.Services
         private readonly IContextBase<SysUserGroup> usergroupRepository;
         private readonly IDistributedCache cache;
         private readonly IStringLocalizer stringLocalizer;
+        private readonly ISysEmployeeService sysEmployeeService;
+        private readonly ICurrentUser currentUser;
+
 
         public SysUserService(IContextBase<SysUser> repository, IMapper mapper,
             IContextBase<SysEmployee> employeeRepo,
-            IContextBase<SysUserGroup> usergroupRepo, IDistributedCache distributedCache) : base(repository, mapper)
+            IContextBase<SysUserGroup> usergroupRepo, IDistributedCache distributedCache, IStringLocalizer<LanguageSub> localizer, ISysEmployeeService employeeService, ICurrentUser currUser) : base(repository, mapper)
         {
             employeeRepository = employeeRepo;
             usergroupRepository = usergroupRepo;
             cache = distributedCache;
+            stringLocalizer = localizer;
+            sysEmployeeService = employeeService;
+            currentUser = currUser;
         }
 
         public List<SysUserViewModel> GetAll()
@@ -172,6 +179,17 @@ namespace eFMS.API.System.DL.Services
                     item.IsValid = false;
                     item.UsernameValid = false;
                 }
+                else
+                {
+                    var isFound = DataContext.Get().Any(x => x.Username == userName);
+                    if (isFound)
+                    {
+                        item.IsValid = false;
+                        item.UsernameValid = false;
+                        item.Username = stringLocalizer[LanguageSub.MSG_NAME_EXISTED];
+                    }
+
+                }
                 //check empty Name EN
                 string nameEN = item.EmployeeNameEn;
                 item.EmployeeNameEnValid = true;
@@ -191,7 +209,35 @@ namespace eFMS.API.System.DL.Services
                     item.IsValid = false;
                     item.EmployeeNameVnValid = false;
                 }
+                //check empty and existed staff code
+                string staffCode = item.StaffCode;
+                item.StaffCodeValid = true;
+                if (string.IsNullOrEmpty(staffCode))
+                {
+                    item.StaffCode = stringLocalizer[LanguageSub.MSG_USER_STAFFCODE_EMPTY];
+                    item.IsValid = false;
+                    item.StaffCodeValid = false;
+                }
+                else
+                {
+                    var isFound = sysEmployeeService.Get().Any(x => x.StaffCode == staffCode);
+                    if (isFound)
+                    {
+                        item.IsValid = false;
+                        item.StaffCodeValid = false;
+                        item.StaffCode = stringLocalizer[LanguageSub.MSG_CODE_EXISTED];
+                    }
+                }
 
+                ////chek empty title
+                //string title = item.Title;
+                //item.TitleValid = true;
+                //if (string.IsNullOrEmpty(title))
+                //{
+                //    item.Title = stringLocalizer[LanguageSub.MSG_USER_TITLE_EMPTY];
+                //    item.IsValid = false;
+                //    item.TitleValid = false;
+                //}
                 //check empty and valid User Type
                 string userType = item.UserType;
                 item.UserTypeValid = true;
@@ -272,6 +318,53 @@ namespace eFMS.API.System.DL.Services
                     cache.Remove(Templates.SysBranch.NameCaching.ListName);
                 }
                 return hs;
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
+
+        public HandleState Import(List<SysUserViewModel> data)
+        {
+            try
+            {
+
+                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
+                List<SysUser> sysUsers = new List<SysUser>();
+                List<SysEmployee> sysEmployees = new List<SysEmployee>();
+                foreach(var item in data)
+                {
+                    var objUser = new SysUserModel();
+                    var objEmployee = new SysEmployee();
+                    objEmployee.Id = Guid.NewGuid().ToString();
+                    objEmployee.DatetimeCreated = objEmployee.DatetimeModified = DateTime.Now;
+                    objEmployee.EmployeeNameEn = item.EmployeeNameEn;
+                    objEmployee.EmployeeNameVn = item.EmployeeNameVn;
+                    objEmployee.Tel = item.Tel;
+                    objEmployee.Title = item.Title;
+                    
+                    sysEmployees.Add(objEmployee);
+
+                    objUser.Username = item.Username;
+                    objUser.UserType = item.UserType;
+                    objUser.WorkingStatus = item.WorkingStatus;
+                    objUser.Active = item.Active;
+                    objUser.EmployeeId = objEmployee.Id;
+                    objUser.Id = Guid.NewGuid().ToString();
+                    objUser.UserCreated = objUser.UserModified = currentUser.UserID;
+        
+
+                    sysUsers.Add(objUser);
+
+                }
+               
+                dc.SysEmployee.AddRange(sysEmployees);
+                dc.SysUser.AddRange(sysUsers);
+                
+                //cache.Remove(Templates.SysUser.n.ListName);
+                dc.SaveChanges();
+                return new HandleState();
             }
             catch (Exception ex)
             {

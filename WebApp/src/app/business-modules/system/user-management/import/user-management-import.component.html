@@ -55,7 +55,8 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="import()">
                         <span>
                             <i class="la la-save"></i>
                             <span>
@@ -64,7 +65,7 @@
                         </span>
                     </button>
                     <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                        routerLink="/home/operation/custom-clearance">
+                        routerLink="/home/system/user-management">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -93,6 +94,36 @@
                             </td>
                             <td>
                                 <span [ngClass]="{'m--font-danger' : !item.username}">{{ item.username }}</span>
+                            </td>
+                            <td>
+                                <span
+                                    [ngClass]="{'m--font-danger' : !item.employeeNameEn}">{{ item.employeeNameEn }}</span>
+                            </td>
+                            <td>
+                                <span
+                                    [ngClass]="{'m--font-danger' : !item.employeeNameVn}">{{ item.employeeNameVn }}</span>
+                            </td>
+                            <td> <span [ngClass]="{'m--font-danger' : !item.title}">{{ item.title }}</span></td>
+
+
+                            <td>
+                                <span [ngClass]="{'m--font-danger' : !item.tel}">{{ item.tel }}</span>
+                            </td>
+                            <td>
+                                <span [ngClass]="{'m--font-danger' : !item.userType}">{{ item.userType }}</span>
+                            </td>
+                            <td><span></span></td>
+                            <td><span></span></td>
+                            <td><span></span></td>
+                            <td><span></span></td>
+                            <td><span></span></td>
+                            <td><span></span></td>
+
+                            <td>
+                                <span [ngClass]="{'m--font-danger' : !item.userType}">{{ item.workingStatus }}</span>
+                            </td>
+                            <td>
+                                <span [ngClass]="{'m--font-danger' : !item.userType}">{{ item.status }}</span>
                             </td>
                         </tr>
                     </tbody>

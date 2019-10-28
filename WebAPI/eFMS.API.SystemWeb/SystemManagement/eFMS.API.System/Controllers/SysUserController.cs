@@ -19,6 +19,7 @@ using eFMS.API.Common.Helpers;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using OfficeOpenXml;
+using eFMS.API.System.DL.ViewModels;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -279,18 +280,21 @@ namespace eFMS.API.System.Controllers
                     var userobj = new SysUserImportModel
                     {
                         IsValid = true,
-                        Username =  worksheet.Cells[row, 2].Value?.ToString(),
-                        EmployeeNameEn = worksheet.Cells[row, 3].Value?.ToString(),
-                        EmployeeNameVn = worksheet.Cells[row, 4].Value?.ToString(),
-                        Title =  worksheet.Cells[row, 5].Value?.ToString(),
-                        UserType =  worksheet.Cells[row, 6].Value?.ToString(),
-                        Role =  worksheet.Cells[row, 7].Value?.ToString(),
-                        LevelPermission = worksheet.Cells[row, 8].Value?.ToString(),
-                        Company = worksheet.Cells[row, 9].Value?.ToString(),
-                        Office = worksheet.Cells[row, 10].Value?.ToString(),
-                        Deparment = worksheet.Cells[row, 11].Value?.ToString(),
-                        WorkingStatus = worksheet.Cells[row, 12].Value?.ToString(),
-                        Status = worksheet.Cells[row, 13].Value?.ToString()
+                        StaffCode = worksheet.Cells[row, 2].Value?.ToString(),
+
+                        Username =  worksheet.Cells[row, 3].Value?.ToString(),
+                        EmployeeNameEn = worksheet.Cells[row, 4].Value?.ToString(),
+                        EmployeeNameVn = worksheet.Cells[row, 5].Value?.ToString(),
+                        Title =  worksheet.Cells[row, 6].Value?.ToString(),
+                        Tel = worksheet.Cells[row, 7].Value?.ToString(),
+                        UserType =  worksheet.Cells[row, 8].Value?.ToString(),
+                        Role =  worksheet.Cells[row, 9].Value?.ToString(),
+                        LevelPermission = worksheet.Cells[row, 10].Value?.ToString(),
+                        Company = worksheet.Cells[row, 11].Value?.ToString(),
+                        Office = worksheet.Cells[row, 12].Value?.ToString(),
+                        Deparment = worksheet.Cells[row, 13].Value?.ToString(),
+                        WorkingStatus = worksheet.Cells[row, 15].Value?.ToString(),
+                        Status =worksheet.Cells[row, 16].Value?.ToString()
                     };
                     list.Add(userobj);
                 }
@@ -302,6 +306,23 @@ namespace eFMS.API.System.Controllers
             }
             return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
 
+        }
+
+        [HttpPost]
+        [Route("Import")]
+        [Authorize]
+        public IActionResult Import([FromBody]List<SysUserViewModel> data)
+        {
+            var result = sysUserService.Import(data);
+            if (result != null)
+            {
+                
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+            }
         }
 
 

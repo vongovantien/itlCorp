@@ -84,7 +84,6 @@ namespace eFMS.API.System.DL.Services
                 rowsCount = 0;
                 return null;
             }
-            list = list.OrderByDescending(x => x.DatetimeCreated).ToList();
             rowsCount = list.ToList().Count;
             if (size > 1)
             {
