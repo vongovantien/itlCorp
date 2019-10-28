@@ -65,8 +65,8 @@ export class SystemRepo {
 
     getCompany(page?: number, size?: number, body: any = {}) {
         return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysCompany/paging`, body, {
-            page: '' + page,
-            size: '' + size
+            page: '' + page || 1,
+            size: '' + size || 10
         }).pipe(
             map((data: any) => data)
         );
