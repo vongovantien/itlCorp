@@ -20,15 +20,20 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<SysGroup, SysGroupModel>();
             CreateMap<SysImage, SysImageModel>();
             CreateMap<SysUserGroup, SysUserGroupModel>();
+            CreateMap<SysPermissionSample, SysPermissionSampleModel>();
+            CreateMap<SysPermissionSampleGeneral, SysPermissionSampleGeneralModel>();
+            CreateMap<SysPermissionSampleSpecial, SysPermissionSampleSpecialModel>();
 
             //map view model to entity model
             CreateMap<SysOfficeEditModel, SysOfficeModel>();
             CreateMap<SysGroupModel, SysGroup>();
             CreateMap<SysEmployeeModel, SysEmployee>();
+            CreateMap<SysPermissionSampleModel, SysPermissionSample>();
+            CreateMap<SysPermissionSampleGeneralModel, SysPermissionSampleGeneral>();
             CreateMap<SysUser, SysUserModel>();
             CreateMap<SysEmployee, SysEmployeeModel>();
-
-
+            CreateMap<SysPermissionSampleGeneralViewModel, SysPermissionSampleGeneral>();
+            CreateMap<SysPermissionSampleSpecialModel, SysPermissionSampleSpecial>();
 
 
         }

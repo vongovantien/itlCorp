@@ -20,7 +20,7 @@ namespace eFMS.API.System.DL.Services
     {
         private readonly ICurrentUser currentUser;
         //private readonly ICurrentUser currentUser;
-        public SysCompanyService(IContextBase<SysCompany> repository, IMapper mapper , ICurrentUser icurrentUser) : base(repository, mapper)
+        public SysCompanyService(IContextBase<SysCompany> repository, IMapper mapper, ICurrentUser icurrentUser) : base(repository, mapper)
         {
             currentUser = icurrentUser;
             //currentUser = user;
@@ -56,21 +56,25 @@ namespace eFMS.API.System.DL.Services
 
             if (criteria.All == null)
             {
-               bu = bu.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-               && ((x.BunameEn ?? "").IndexOf(criteria.BuNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-               && ((x.BunameVn ?? "").IndexOf(criteria.BuNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
+                bu = bu.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                && ((x.BunameEn ?? "").IndexOf(criteria.BuNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                && ((x.BunameVn ?? "").IndexOf(criteria.BuNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                && ((x.BunameAbbr ?? "").IndexOf(criteria.BuNameAbbr ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                );
             }
             else
             {
                 bu = bu.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                 || ((x.BunameEn ?? "").IndexOf(criteria.BuNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                || ((x.BunameVn ?? "").IndexOf(criteria.BuNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
+                || ((x.BunameVn ?? "").IndexOf(criteria.BuNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                || ((x.BunameAbbr ?? "").IndexOf(criteria.BuNameAbbr ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                );
             }
-           
+
 
             var responseData = mapper.Map<List<SysCompanyModel>>(bu).ToList(); // maping BU sang SysCompanyModel ( hoặc object # => define trong Mapper.cs);
-
-            return responseData;
+            var result = responseData.OrderByDescending(x => x.DatetimeModified).ToList();
+            return result;
         }
 
         public HandleState Update(Guid id, SysCompanyAddModel model)
@@ -146,9 +150,12 @@ namespace eFMS.API.System.DL.Services
                 SysCompany.DatetimeCreated = SysCompany.DatetimeModified = DateTime.Now;
                 SysCompany.UserCreated = SysCompany.UserModified = userCurrent;
 
-                DataContext.Add(SysCompany);
-
-                var hs = new HandleState();
+                var hs = DataContext.Add(SysCompany);
+               
+                if (hs.Success)
+                {
+                    model.Id = DataContext.Get(x => x.Code == model.CompanyCode).FirstOrDefault().Id; // lấy ra company vừa tạo.
+                }
                 return hs;
 
             }

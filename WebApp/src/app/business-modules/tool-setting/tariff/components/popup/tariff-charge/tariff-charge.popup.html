@@ -219,13 +219,13 @@
                                     </span>
                                 </span>
                             </button>
-                            <button
+                            <button *ngIf="ACTION === 'CREATE'"
                                 class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
                                 title="Update & Continue" (click)="updateToContinue()">
                                 <span>
                                     <i class="la la-download"></i>
                                     <span>
-                                        {{ACTION === 'CREATE' ? 'Add' : 'Update'}} & Continue
+                                        Add & Continue
                                     </span>
                                 </span>
                             </button>

@@ -27,13 +27,13 @@ namespace eFMS.API.Setting.DL.Services
         private readonly IContextBase<CatPartner> catPartnerRepo;
         private readonly IContextBase<CatPlace> catPlaceRepo;
 
-        public TariffService(IContextBase<SetTariff> repository, 
-            IMapper mapper, 
-            ICurrentUser user, 
-            IContextBase<SetTariffDetail> setTariffDetail, 
-            IContextBase<CatCharge> catCharge, 
-            IContextBase<CatCommodityGroup> catCommodityGroup, 
-            IContextBase<CatPartner> catPartner, 
+        public TariffService(IContextBase<SetTariff> repository,
+            IMapper mapper,
+            ICurrentUser user,
+            IContextBase<SetTariffDetail> setTariffDetail,
+            IContextBase<CatCharge> catCharge,
+            IContextBase<CatCommodityGroup> catCommodityGroup,
+            IContextBase<CatPartner> catPartner,
             IContextBase<CatPlace> catPlace) : base(repository, mapper)
         {
             currentUser = user;
@@ -145,7 +145,7 @@ namespace eFMS.API.Setting.DL.Services
                         }
                     }
                 }
-                
+
                 return new HandleState();
             }
             catch (Exception ex)
@@ -341,22 +341,29 @@ namespace eFMS.API.Setting.DL.Services
             else
             {
                 query = query.Where(x =>
-                   ((x.t.DatetimeCreated.HasValue && x.t.DatetimeCreated.Value.Date >= criteria.FromDate || criteria.FromDate == null) &&
-                   (x.t.DatetimeCreated.Value.Date <= criteria.ToDate || criteria.ToDate == null))
+                   (((x.t.DatetimeCreated.HasValue && x.t.DatetimeCreated.Value.Date >= criteria.FromDate) &&
+                   (x.t.DatetimeCreated.Value.Date <= criteria.ToDate))
+                    && ((x.t.EffectiveDate.Date >= criteria.FromDate)
+                     && (x.t.EffectiveDate.Date <= criteria.ToDate))
+                    && ((x.t.DatetimeModified.HasValue && x.t.DatetimeModified.Value.Date >= criteria.FromDate)
+                     && (x.t.DatetimeModified.Value.Date <= criteria.ToDate))
+                     && ((x.t.ExpiredDate.Date >= criteria.FromDate)
+                     && (x.t.ExpiredDate.Date <= criteria.ToDate)) || criteria.FromDate == null || criteria.ToDate == null)
+                   );
 
-                   || ((x.t.EffectiveDate.Date >= criteria.FromDate || criteria.FromDate == null)
-                   && (x.t.EffectiveDate.Date <= criteria.ToDate || criteria.ToDate == null))
 
-                   || ((x.t.DatetimeModified.HasValue && x.t.DatetimeModified >= criteria.FromDate || criteria.FromDate == null)
-                   && (x.t.DatetimeModified <= criteria.ToDate || criteria.ToDate == null))
+                //|| ((x.t.EffectiveDate.Date >= criteria.FromDate)
+                //&& (x.t.EffectiveDate.Date <= criteria.ToDate))
 
-                   //|| ((x.t.DatetimeModified.HasValue ? x.t.DatetimeModified.Value.Date >= criteria.FromDate || criteria.FromDate == null : x.t.DatetimeModified >= criteria.FromDate || criteria.FromDate == null)
-                   //&& (x.t.DatetimeModified.HasValue ? x.t.DatetimeModified.Value.Date <= criteria.ToDate || criteria.ToDate == null : x.t.DatetimeModified <= criteria.ToDate || criteria.ToDate == null))
+                //|| ((x.t.DatetimeModified.HasValue && x.t.DatetimeModified.Value.Date >= criteria.FromDate)
+                //&& (x.t.DatetimeModified.Value.Date <= criteria.ToDate))
 
-                   || ((x.t.ExpiredDate.Date >= criteria.FromDate || criteria.FromDate == null)
-                   && (x.t.ExpiredDate.Date <= criteria.ToDate || criteria.ToDate == null))
+                ////|| ((x.t.DatetimeModified.HasValue ? x.t.DatetimeModified.Value.Date >= criteria.FromDate || criteria.FromDate == null : x.t.DatetimeModified >= criteria.FromDate || criteria.FromDate == null)
+                ////&& (x.t.DatetimeModified.HasValue ? x.t.DatetimeModified.Value.Date <= criteria.ToDate || criteria.ToDate == null : x.t.DatetimeModified <= criteria.ToDate || criteria.ToDate == null))
 
-                  );
+                //|| ((x.t.ExpiredDate.Date >=  criteria.FromDate.Value.Date)
+                //&& (x.t.ExpiredDate.Date <= criteria.ToDate.Value.Date)) || criteria.FromDate == null || criteria.ToDate == null);
+
 
             }
 

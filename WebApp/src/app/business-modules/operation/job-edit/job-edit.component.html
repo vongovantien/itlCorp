@@ -51,7 +51,7 @@
             <tabset type="tabs">
                 <tab heading="Job detail" (selectTab)="selectTab($event,'job-edit')">
                     <div *ngIf="tab === 'job-edit'">
-                        <form novalidate #addOpsForm="ngForm" name="addOpsForm" (ngSubmit)="addOpsForm.form.valid">
+                        <form novalidate #addOpsForm="ngForm" name="addOpsForm" (ngSubmit)="saveShipment(addOpsForm)">
                             <div class="m-form m-form--state">
                                 <div class="m-portlet">
                                     <div class="alert-block__heading">
@@ -59,9 +59,8 @@
                                     </div>
                                     <div class="m-portlet__body" id="edit-ops-job-form">
                                         <div class="form-actions m--align-right">
-                                            <button appLoadingButton [state]="opsTransaction.isLocked"
-                                                class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                                                (click)="saveShipment(addOpsForm)">
+                                            <button type="submit" appLoadingButton [state]="opsTransaction.isLocked"
+                                                class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                                                 <span>
                                                     <i class="la la la-save"></i>
                                                     <span>

@@ -185,8 +185,7 @@
                             </thead>
                             <tbody class="tbody-group">
                                 <ng-container *ngIf="!!users">
-                                    <tr *ngFor="let user of users; let i = index; trackBy: trackByFn"
-                                        class="text-center">
+                                    <tr *ngFor="let user of users; let i = index; trackBy: trackByFn">
                                         <td class="table-actions-col" style="width: 70px">
                                             <div class="table-actions">
                                                 <button type="button" title="Detail" (click)="viewUserGroup(user)"

@@ -4,7 +4,7 @@ import { AppForm } from 'src/app/app.form';
 import { FormGroup, Validators, FormBuilder, AbstractControl } from '@angular/forms';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
-import { Params, ActivatedRoute, Router } from '@angular/router';
+import { Params, ActivatedRoute } from '@angular/router';
 import { Group } from 'src/app/shared/models/system/group';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
@@ -43,7 +43,6 @@ export class GroupDetailComponent extends AppForm implements OnInit {
     allUsers: any[] = null;
 
     constructor(private _systemRepo: SystemRepo,
-        private _router: Router,
         private _progressService: NgProgress,
         private _fb: FormBuilder,
         private _activedRouter: ActivatedRoute,
@@ -180,7 +179,11 @@ export class GroupDetailComponent extends AppForm implements OnInit {
                 nameVn: this.groupNameVN.value,
                 shortName: this.groupNameAbbr.value,
                 departmentId: this.department.value.id,
-                active: this.active.value.value
+                active: this.active.value.value,
+                userCreated: this.group.userCreated,
+                datetimeCreated: this.group.datetimeCreated,
+                userModified: this.group.userModified,
+                datetimeModified: this.group.datetimeModified
             };
             this._systemRepo.updateGroup(body)
                 .pipe(

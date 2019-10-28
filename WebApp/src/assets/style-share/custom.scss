@@ -291,6 +291,9 @@ a {
         tr {
             th,
             td {
+                &.table-actions-col {
+                    min-width: 90px;
+                }
                 min-width: 130px;
             }
         }
@@ -637,6 +640,17 @@ table.dataTable {
     .m-portlet__body {
         padding-top: 1rem;
         padding-bottom: 1rem;
+    }
+}
+
+.m-portlet__body {
+    .custom-class-tab {
+        ul {
+            margin-bottom: 0px;
+            .nav-link {
+                font-size: 15px;
+            }
+        }
     }
 }
 

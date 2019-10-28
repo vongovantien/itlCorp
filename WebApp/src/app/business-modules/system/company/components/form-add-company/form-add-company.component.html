@@ -11,7 +11,7 @@
                                 <img #image [src]="photoUrl" alt="" class="img-responsive img-inputImage"
                                     id="imageUpload" onerror="this.src = 'assets/app/media/img/emptydata.png'">
                             </div>
-                            <div class="text-primary text-underline pointer">
+                            <div class="text-primary pointer">
                                 {{!!photoUrl ? 'Click to change image' : 'Upload Image'}}</div>
                         </div>
                     </div>
@@ -27,7 +27,7 @@
                                 <input type="text" class="form-control m-input m-input--square"
                                     placeholder="Company Code" formControlName="code" [attr.disabled]="isDisabled">
                                 <div class="form-control-feedback" *ngIf="isSubmitted && !code.valid">
-                                    Company code is required!
+                                    Company Code is required!
                                 </div>
                             </div>
                         </div>
@@ -46,8 +46,8 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': (bunameVn.dirty && !bunameVn.valid) || (isSubmitted && !bunameVn.valid)}">
                                 <label for="">Name Local <span class="text-danger">(*)</span></label>
-                                <input type="text" class="form-control m-input m-input--square"
-                                    placeholder="Company Code" formControlName="bunameVn">
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Name Local"
+                                    formControlName="bunameVn">
                                 <div class="form-control-feedback" *ngIf="isSubmitted && !bunameVn.valid">
                                     Name Local is required!
                                 </div>
@@ -57,7 +57,7 @@
                             <div class="form-group">
                                 <label for="">Website</label>
                                 <input type="text" class="form-control text-underline text-primary"
-                                    placeholder="Company Code" formControlName="website">
+                                    placeholder="Website" formControlName="website">
 
                             </div>
                         </div>
@@ -66,7 +66,7 @@
                                 [ngClass]="{'m-form__group has-danger': (bunameEn.dirty && !bunameEn.valid) || (isSubmitted && !bunameEn.valid)}">
                                 <label for="">Name English <span class="text-danger">(*)</span></label>
                                 <input type="text" class="form-control m-input m-input--square"
-                                    placeholder="Company Code" formControlName="bunameEn">
+                                    placeholder="Name English" formControlName="bunameEn">
                                 <div class="form-control-feedback" *ngIf="isSubmitted && !bunameEn.valid">
                                     Name English is required!
                                 </div>

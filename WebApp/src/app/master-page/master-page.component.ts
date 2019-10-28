@@ -8,7 +8,6 @@ import { BaseService } from 'src/app/shared/services/base.service';
 @Component({
     selector: 'app-master-page',
     templateUrl: './master-page.component.html',
-    styleUrls: ['./master-page.component.css']
 })
 export class MasterPageComponent implements OnInit, AfterViewInit {
 
@@ -21,7 +20,12 @@ export class MasterPageComponent implements OnInit, AfterViewInit {
         this.Page_Info = this.Page_side_bar.Page_Info;
     }
 
-    constructor(private baseServices: BaseService, private router: Router, private cdRef: ChangeDetectorRef, private oauthService: OAuthService, ) { }
+    constructor(
+        private baseServices: BaseService,
+        private router: Router,
+        private cdRef: ChangeDetectorRef,
+        private oauthService: OAuthService,
+    ) { }
 
     ngOnInit() {
         this.cdRef.detectChanges();

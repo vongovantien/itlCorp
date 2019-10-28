@@ -165,16 +165,8 @@
                                 <label class="form-control-label" for="">
                                     Internal Reference No
                                 </label>
-                                <input type="text" minlength="3" maxlength="10"
-                                    [(ngModel)]="partner.internalReferenceNo" name="internalReferenceNo"
-                                    #parnetinternalReferenceNo="ngModel" readonly="readonly"
-                                    class="form-control m-input m-input--square"
-                                    [ngClass]="{ 'm-input--square': formAddEdit.submitted && parnetinternalReferenceNo.invalid }"
-                                    required />
-                                <div class="form-control-feedback"
-                                    *ngIf="formAddEdit.submitted && parnetinternalReferenceNo.invalid">
-                                    Internal Reference No required least 3 characters
-                                </div>
+                                <input type="text" [(ngModel)]="partner.internalReferenceNo" name="internalReferenceNo"
+                                    readonly="readonly" class="form-control m-input m-input--square" />
                             </div>
                         </div>
 
@@ -645,7 +637,7 @@
                         </div>
 
                     </div>
-                    <div class="table-wrapper text-center" id="">
+                    <div class="table-wrapper" id="">
                         <table class="table table-striped table-brand dataTable">
                             <thead app-table-header [headers]="headerSaleman" (onClick)="sortBySaleMan($event)">
                             </thead>

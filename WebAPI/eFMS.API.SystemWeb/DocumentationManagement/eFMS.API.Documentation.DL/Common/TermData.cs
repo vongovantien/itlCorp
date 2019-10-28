@@ -65,15 +65,15 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string Warning = "Warning";
         public static readonly string Finish = "Finish";
 
-        public static readonly string InlandTrucking = "InlandTrucking";
-        public static readonly string AirExport  = "AirExport";
-        public static readonly string AirImport  = "AirImport";
-        public static readonly string SeaConsolExport = "SeaConsolExport";
-        public static readonly string SeaConsolImport = "SeaConsolImport";
-        public static readonly string SeaFCLExport = "SeaFCLExport";
-        public static readonly string SeaFCLImport = "SeaFCLImport";
-        public static readonly string SeaLCLExport = "SeaLCLExport";
-        public static readonly string SeaLCLImport = "SeaLCLImport";
+        public static readonly string InlandTrucking = "IT";//"InlandTrucking";
+        public static readonly string AirExport = "AE";//"AirExport";
+        public static readonly string AirImport = "AI";//"AirImport";
+        public static readonly string SeaConsolExport = "SCE";//"SeaConsolExport";
+        public static readonly string SeaConsolImport = "SCI";//"SeaConsolImport";
+        public static readonly string SeaFCLExport = "SFE";//"SeaFCLExport";
+        public static readonly string SeaFCLImport = "SFI";//"SeaFCLImport";
+        public static readonly string SeaLCLExport = "SLE";//"SeaLCLExport";
+        public static readonly string SeaLCLImport = "SLE";//"SeaLCLImport";
 
         public static readonly List<FreightTerm> FreightTerms = new List<FreightTerm>
         {

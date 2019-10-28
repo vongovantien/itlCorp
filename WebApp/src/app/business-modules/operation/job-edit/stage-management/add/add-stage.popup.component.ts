@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, Input, EventEmitter, Output } from "@angular/core";
+import { Component, Input, EventEmitter, Output } from "@angular/core";
 import { moveItemInArray, CdkDragDrop } from "@angular/cdk/drag-drop";
 
 import { PopupBase } from "src/app/popup.base";
@@ -15,7 +15,7 @@ import { Stage } from "src/app/shared/models";
     templateUrl: "./add-stage.popup.component.html",
     styleUrls: ["./add-stage.popup.component.scss"]
 })
-export class OpsModuleStageManagementAddStagePopupComponent extends PopupBase implements OnInit, OnChanges {
+export class OpsModuleStageManagementAddStagePopupComponent extends PopupBase {
 
     @Input() stages: any[] = [];
     @Input() stageSelected: any[] = [];
@@ -115,10 +115,10 @@ export class OpsModuleStageManagementAddStagePopupComponent extends PopupBase im
         ).subscribe(
             (res: any) => {
                 if (!res.status) {
-                    this._toaster.success(res.message, '', { positionClass: 'toast-bottom-right' });
+                    this._toaster.success(res.message, '');
                 } else {
                     this.selectedStages = [];
-                    this._toaster.success(res.message, '', { positionClass: 'toast-bottom-right' });
+                    this._toaster.success(res.message, '');
                     this.onSuccess.emit();
                     this.hide();
                 }
@@ -182,14 +182,5 @@ export class OpsModuleStageManagementAddStagePopupComponent extends PopupBase im
     }
 
 }
-
-interface IStageUnique {
-    code: string;
-    id: string;
-    jobId: string;
-    orderNumberProcessed: number;
-    stageId: number;
-}
-
 
 

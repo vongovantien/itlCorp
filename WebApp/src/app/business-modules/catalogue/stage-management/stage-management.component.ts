@@ -21,7 +21,6 @@ declare var $: any;
 @Component({
     selector: 'app-stage-management',
     templateUrl: './stage-management.component.html',
-    styleUrls: ['./stage-management.component.sass']
 })
 export class StageManagementComponent {
     @ViewChild(ConfirmPopupComponent, { static: false }) popupConfirm: ConfirmPopupComponent;
@@ -107,6 +106,7 @@ export class StageManagementComponent {
 
     async edit_stage(index: number, action: string, form: NgForm) {
 
+        console.log(this.StageToUpdate);
         if (action == "confirm") {
 
             this.index_stage_edit = index;

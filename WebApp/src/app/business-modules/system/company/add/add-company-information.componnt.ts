@@ -33,6 +33,11 @@ export class CompanyInformationAddComponent extends AppPage {
     }
 
     create() {
+        this.formAdd.isSubmitted = true;
+        if (this.formAdd.formGroup.invalid) {
+            return;
+        }
+
         this._progressRef.start();
         const body: ICompanyAdd = {
             companyCode: this.formAdd.code.value,
@@ -53,6 +58,8 @@ export class CompanyInformationAddComponent extends AppPage {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
+                        this._router.navigate([`home/system/company/${res.data.id}`]);
+
                     } else {
                         this._toastService.error(res.message, '');
                     }

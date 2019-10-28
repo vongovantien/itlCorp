@@ -102,6 +102,15 @@ export class PartnerDataAddnewComponent extends AppList {
             this.saleMandetail.push(this.saleManToAdd);
             this.poupSaleman.hide();
             console.log(this.saleMandetail);
+            for (let it of this.saleMandetail) {
+                if (it.status === true) {
+                    it.statusstr = "Active";
+                }
+                else {
+                    it.statusstr = "InActive";
+                }
+            }
+
         }
     }
 
@@ -197,6 +206,10 @@ export class PartnerDataAddnewComponent extends AppList {
                         this.isExistedTaxcode = true;
                         this.deleteMessage = `This Taxcode already Existed in  ${res.shortName}If you want to Create Internal account, Please fille info to Internal Reference Info.`;
                         this.confirmTaxcode.show();
+                    }
+                    else {
+                        this.isExistedTaxcode = false;
+
                     }
                 },
             );

@@ -9,20 +9,18 @@
                 </button>
             </div>
             <div class="modal-body pt-0">
-                <!--begin::Form-->
                 <div class="m-form m-form--state">
-                    <!--begin:: add-stage-block-->
                     <div class="add-stage-block">
                         <div class="row">
                             <div class="col-sm-5 bg-secondary">
-                                <!--begin: add-stage-list-table -->
                                 <h4 class="c-block-title m--margin-top-10 m--margin-bottom-10">Stage List</h4>
                                 <div class="list-group">
                                     <div class="list-group-item title-group-item text-center">
                                         <div class="row">
                                             <div class="col-sm-1">
                                                 <label class="m-checkbox">
-                                                    <input type="checkbox" [(ngModel)]="isMasterStageNotAssigned" (change)="checkUncheckAllStage('stageNotAsigned')" >
+                                                    <input type="checkbox" [(ngModel)]="isMasterStageNotAssigned"
+                                                        (change)="checkUncheckAllStage('stageNotAsigned')">
                                                     <span></span>
                                                 </label>
                                             </div>
@@ -48,8 +46,7 @@
                                 </div>
 
                                 <div class="list-group fit-height-div">
-                                    <div *ngFor="let stage of stages | searchStage:keyword_stage; let i = index"
-                                        class="list-group-item text-center pointer">
+                                    <div *ngFor="let stage of stages " class="list-group-item text-center pointer">
                                         <div class="row">
                                             <div class="col-sm-1">
                                                 <label class="m-checkbox">
@@ -67,7 +64,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!--end: add-stage-list-table -->
                             </div>
 
                             <div class="col-sm-2">
@@ -96,7 +92,6 @@
 
                             <div class="col-sm-5 bg-secondary">
                                 <h4 class="c-block-title  m--margin-top-10 m--margin-bottom-10">Selected Stage</h4>
-                                <!--begin: -->
                                 <div class="list-group">
                                     <div class="list-group-item title-group-item text-center">
                                         <div class="row">
@@ -132,7 +127,7 @@
                                     </div>
                                 </div>
                                 <div class="list-group fit-height-div" cdkDropList (cdkDropListDropped)="drop($event)">
-                                    <div *ngFor="let stage of selectedStages | searchStage:keyword_stageSelected; let i = index"
+                                    <div *ngFor="let stage of selectedStages | searchStage: keyword_stageSelected; let i = index"
                                         class="list-group-item text-center " cdkDrag>
                                         <div class="row">
                                             <div class="col-sm-1">
@@ -156,9 +151,7 @@
                                 </div>
                             </div>
                         </div>
-                        <!--end:: add-stage-block-->
                     </div>
-                    <!--end::Form-->
                 </div>
                 <div class="modal-footer m--align-center">
                     <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="onSaveStage()"

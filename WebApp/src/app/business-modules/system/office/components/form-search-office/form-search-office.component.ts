@@ -24,7 +24,7 @@ export class OfficeFormSearchComponent extends AppForm {
             typeSearch: 'outtab',
             settingFields: <CommonInterface.IValueDisplay[]>[
                 { displayName: 'Office Code', fieldName: 'Code' },
-                { displayName: 'Name En', fieldName: 'NameEn' },
+                { displayName: 'Name EN', fieldName: 'NameEn' },
                 { displayName: 'Name Local', fieldName: 'NameVn' },
                 { displayName: 'Name Abbr', fieldName: 'NameAbbr' },
                 { displayName: 'Taxcode', fieldName: 'Taxcode' },

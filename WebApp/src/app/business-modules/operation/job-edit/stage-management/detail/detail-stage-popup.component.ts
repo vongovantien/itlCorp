@@ -204,7 +204,7 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
                 processTime: form.value.processTime,
                 comment: form.value.comment,
                 description: form.value.description,
-                deadline: !!form.value.deadLineDate.startDate ? formatDate(form.value.deadLineDate.startDate, 'YYYY-MM-DDTHH:mm', 'en') : null,
+                deadline: !!form.value.deadLineDate.startDate ? formatDate(form.value.deadLineDate.startDate, 'yyyy-MM-ddTHH:mm', 'en') : null,
                 status: this.statusStageActive[0].id || this.statusStage[0].id
             };
             this._operationRepo.updateStageToJob(body).pipe(

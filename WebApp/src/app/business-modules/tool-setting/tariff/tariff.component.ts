@@ -60,7 +60,7 @@ export class TariffComponent extends AppList {
                 finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
                 map((data: any) => {
                     return {
-                        data: data.data.map((item: Tariff) => new Tariff(item)),
+                        data: (data.data || []).map((item: Tariff) => new Tariff(item)),
                         totalItems: data.totalItems,
                     };
                 })

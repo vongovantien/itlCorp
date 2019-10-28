@@ -1,3 +1,5 @@
+import { from } from 'rxjs';
+
 export * from './system/user';
 export * from './operation/stage';
 export * from './catalogue/partner.model';
@@ -14,6 +16,8 @@ export * from './operation/surcharge';
 export * from './system/company';
 export * from './system/office';
 export * from './tool-setting/tariff';
+export * from './system/permission';
+
 
 
 

@@ -54,7 +54,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var entity = mapper.Map<CatUnit>(model);
             entity.DatetimeModified = DateTime.Now;
             entity.UserModified = currentUser.UserID;
-            if(entity.Active == true)
+            if(entity.Active == false)
             {
                 entity.InactiveOn = DateTime.Now;
             }
@@ -198,6 +198,13 @@ namespace eFMS.API.Catalogue.DL.Services
                 RedisCacheHelper.SetObject(cache, Templates.CatUnit.NameCaching.ListName, data);
             }
             return data;
+        }
+
+        public CatUnitModel GetDetail(short id)
+        {
+            var data = DataContext.Get(x => x.Id == id).FirstOrDefault();
+            if (data == null) return null;
+            return mapper.Map<CatUnitModel>(data);
         }
     }
 }

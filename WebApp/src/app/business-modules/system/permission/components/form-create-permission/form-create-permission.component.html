@@ -1,0 +1,58 @@
+<div class="m-content form-add-permission">
+    <div class="m-portlet form-search-permission-wrapper">
+        <div class="m-portlet__body">
+            <div class="row">
+                <div class="col-md-6 d-flex align-items-center">
+                    Create Permision
+                </div>
+                <div class="col-md-6">
+                    <div class="form-actions m--align-right">
+                        <app-default-button [buttonSetting]="saveButtonSetting">
+                        </app-default-button>
+                        <app-default-button [buttonSetting]="cancelButtonSetting" class="m--margin-left-10">
+                        </app-default-button>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="m-form">
+                <form [formGroup]="formCreate">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Permission Name</label>
+                                <input type="text" class="form-control" formControlName="permissionName">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Role</label>
+                                <select class="form-control" formControlName="role">
+                                    <option *ngFor="let role of roles" [ngValue]="role">{{role.displayName}}</option>
+                                    <option [ngValue]="null">All</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Type</label>
+                                <select class="form-control" formControlName="type">
+                                    <option *ngFor="let type of types" [ngValue]="type">{{type.displayName}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Status</label>
+                                <select class="form-control" formControlName="status">
+                                    <option [ngValue]="null">All</option>
+                                    <option *ngFor="let item of statuss" [ngValue]="item">{{item.displayName}}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

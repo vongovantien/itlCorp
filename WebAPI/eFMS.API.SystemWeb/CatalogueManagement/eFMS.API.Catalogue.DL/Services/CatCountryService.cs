@@ -62,7 +62,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var entity = mapper.Map<CatCountry>(model);
             entity.DatetimeModified = DateTime.Now;
             entity.UserModified = currentUser.UserID;
-            if (entity.Active == true)
+            if (entity.Active == false)
             {
                 entity.InactiveOn = DateTime.Now;
             }

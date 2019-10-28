@@ -1496,7 +1496,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.SaleManId)
+                entity.Property(e => e.SaleMan_ID)
                     .HasColumnName("SaleMan_ID")
                     .HasMaxLength(50)
                     .IsUnicode(false);

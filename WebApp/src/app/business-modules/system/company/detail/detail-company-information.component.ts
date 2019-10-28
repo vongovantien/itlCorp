@@ -42,7 +42,7 @@ export class CompanyInformationDetailComponent extends AppList {
 
         this.headersOffice = [
             { title: 'Office Code', field: 'code', sortable: true },
-            { title: 'Name En', field: 'branchNameEn', sortable: true },
+            { title: 'Name EN', field: 'branchNameEn', sortable: true },
             { title: 'Name Local', field: 'branchNameVn', sortable: true },
             { title: 'Name Abbr', field: 'shortName', sortable: true },
             { title: 'Address En', field: 'addressEn', sortable: true },
@@ -92,6 +92,16 @@ export class CompanyInformationDetailComponent extends AppList {
         this.formAddCompany.active.setValue(this.formAddCompany.types.filter(i => i.value === company.active)[0]);
     }
 
+    getDetailCompany() {
+        this._systemRepo.getDetailCompany(this.companyId)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res) => {
+                    this.getDataDetail(res);
+                }
+            );
+    }
+
     saveInformation() {
         this.formAddCompany.isSubmitted = true;
         if (this.formAddCompany.formGroup.invalid) {
@@ -116,6 +126,7 @@ export class CompanyInformationDetailComponent extends AppList {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message, 'Save Successfully');
+                            this.getDetailCompany();
                         } else {
                             this._toastService.warning(res.message);
                         }

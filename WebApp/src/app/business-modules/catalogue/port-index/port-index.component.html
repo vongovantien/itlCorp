@@ -175,9 +175,9 @@
                                 <div class="form-group m-form__group">
                                     <div>
                                         <label class="m-checkbox m-checkbox--bold">
-                                            <input type="checkbox" [checked]="!portIndex.active"
-                                                (change)="portIndex.inactive = !portIndex.inactive">
-                                            Inactive
+                                            <input type="checkbox" [checked]="portIndex.active"
+                                                (change)="portIndex.active = !portIndex.active">
+                                            Active
                                             <span></span>
                                         </label>
                                     </div>

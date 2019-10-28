@@ -157,11 +157,9 @@ export class WarehouseComponent extends AppList implements OnInit {
         }
     }
     onSortChange(column) {
-        if (column.dataType != 'boolean') {
-            let property = column.primaryKey;
-            this.isDesc = !this.isDesc;
-            this.warehouses = this.sortService.sort(this.warehouses, property, this.isDesc);
-        }
+        let property = column.primaryKey;
+        this.isDesc = !this.isDesc;
+        this.warehouses = this.sortService.sort(this.warehouses, property, this.isDesc);
     }
     async showDetail(item: Warehouse) {
         this.warehouse = item;
@@ -266,14 +264,13 @@ export class WarehouseComponent extends AppList implements OnInit {
         if (this.form.valid && this.warehouse.countryID != null && this.warehouse.provinceID != null && this.warehouse.districtID != null) {
             if (this.warehouse.id == null) {
                 this.addNew();
-            }
-            else {
+            } else {
                 this.update();
             }
         }
     }
     async update() {
-        let response = await this.baseService.putAsync(this.api_menu.Catalogue.CatPlace.update + this.warehouse.id, this.warehouse, true, true);
+        const response = await this.baseService.putAsync(this.api_menu.Catalogue.CatPlace.update + this.warehouse.id, this.warehouse, true, true);
         if (response != null) {
             if (response.status) {
                 $('#edit-ware-house-modal').modal('hide');
@@ -418,7 +415,7 @@ export class WarehouseComponent extends AppList implements OnInit {
                     item['districtNameEN'],
                     item['provinceNameEN'],
                     item['countryNameEN'],
-                    (item['inactive'] == true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH
+                    (item['active'] == true) ? SystemConstants.STATUS_BY_LANG.ACTIVE.ENGLISH : SystemConstants.STATUS_BY_LANG.INACTIVE.ENGLISH
                 ]
             });
         }
@@ -433,7 +430,7 @@ export class WarehouseComponent extends AppList implements OnInit {
                     item['districtNameVN'],
                     item['provinceNameVN'],
                     item['countryNameVN'],
-                    (item['inactive'] == true) ? SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM
+                    (item['active'] == true) ? SystemConstants.STATUS_BY_LANG.ACTIVE.VIETNAM : SystemConstants.STATUS_BY_LANG.INACTIVE.VIETNAM
                 ]
             });
         }

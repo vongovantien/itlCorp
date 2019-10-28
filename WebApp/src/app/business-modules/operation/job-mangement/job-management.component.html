@@ -109,26 +109,26 @@
                                                 <td>
                                                     <span>{{ item.customerName }}</span>
                                                 </td>
-                                                <td class="text-center">
+                                                <td>
                                                     <span>{{ item.serviceDate | date:'dd/MM/yyyy' }}</span>
                                                 </td>
                                                 <td>
                                                     <span *ngIf="item.serviceMode == 'Import'">{{ item.podName }}</span>
                                                     <span *ngIf="item.serviceMode == 'Export'">{{ item.polName }}</span>
                                                 </td>
-                                                <td class="text-center">
+                                                <td>
                                                     <span>{{ item.sumContainers }}</span>
                                                 </td>
-                                                <td class="text-center">
+                                                <td>
                                                     <span>{{ item.sumPackages }}</span>
                                                 </td>
-                                                <td class="text-center">
+                                                <td>
                                                     <span>{{ item.sumGrossWeight }}</span>
                                                 </td>
-                                                <td class="text-center">
+                                                <td>
                                                     <span>{{ item.sumCbm }}</span>
                                                 </td>
-                                                <td class="text-center">
+                                                <td>
                                                     <span>{{ item.modifiedDate | date:'dd/MM/yyyy' }}</span>
                                                 </td>
                                             </tr>

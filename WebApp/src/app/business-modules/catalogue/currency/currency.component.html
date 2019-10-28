@@ -146,7 +146,7 @@
                             </label>
                             <div class="col-lg-8">
                                 <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
-                                    <input [checked]="currency.inactive" (change)="currency.inactive=!currency.inactive"
+                                    <input [checked]="!currency.active" (change)="currency.active=!currency.active"
                                         name="currencyIsActive" type="checkbox"><span></span></label>
                             </div>
                         </div>

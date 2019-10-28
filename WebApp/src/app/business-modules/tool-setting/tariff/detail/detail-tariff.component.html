@@ -7,15 +7,7 @@
                 Detail/Edit OPS Tariff
             </div>
             <div class="form-actions m--align-right">
-                <!-- <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)="updateTafiff()">
-                    <span>
-                        <i class="la la-copyright"></i>
-                        <span>
-                            Duplicate
-                        </span>
-                    </span>
-                </button> -->
-                <a [routerLink]="'/'" [queryParams]="{action: 'copy'}"
+                <a [routerLink]="[]" [queryParams]="{action: 'copy'}"
                     class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" title="Duplicate" role="button">
                     <i class="la la-copy"></i>
                     Duplicate
@@ -55,7 +47,7 @@
                                 <span>
                                     <i class="la la-save"></i>
                                     <span>
-                                        Update
+                                        {{ACTION === 'UPDATE' ? 'UPDATE': 'COPY'}}
                                     </span>
                                 </span>
                             </button>

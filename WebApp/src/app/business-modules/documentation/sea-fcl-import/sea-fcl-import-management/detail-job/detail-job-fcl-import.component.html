@@ -1,0 +1,53 @@
+<div class="sea-fcl-import-create-job-page">
+    <app-sub-header>
+        <div class="c-button-actions">
+
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-search-plus"></i>
+                    <span>
+                        Duplicate Job Detail
+                    </span>
+                </span>
+            </button>
+
+            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-trash"></i>
+                    <span>
+                        Delete
+                    </span>
+                </span>
+            </button>
+
+            <app-default-button [buttonSetting]="saveButtonSetting"></app-default-button>
+
+            <app-default-button [buttonSetting]="cancelButtonSetting"></app-default-button>
+
+
+
+        </div>
+    </app-sub-header>
+    <div class="m-content">
+        {{selectedTab}}
+        <div class="m-portlet__body">
+            <tabset class="custom-class-tab">
+                <tab heading="Shipment Detail" [active]="selectedTab === 'SHIPMENT'"
+                    (selectTab)="onSelectTab('shipment')">
+                    <form-create-sea-fcl-import></form-create-sea-fcl-import>
+                    <shipment-good-summary></shipment-good-summary>
+                </tab>
+                <tab heading="House Bill List" (selectTab)="onSelectTab('hbl')">
+                </tab>
+                <tab heading="Debit Note & Credit Note" [active]="selectedTab === 'CDNOTE'"
+                    (selectTab)="onSelectTab('cdNote')">
+                    <div class="m-portlet">
+                        <div class="m-portlet__body">
+                            Credit Debit Note List
+                        </div>
+                    </div>
+                </tab>
+            </tabset>
+        </div>
+    </div>
+</div>

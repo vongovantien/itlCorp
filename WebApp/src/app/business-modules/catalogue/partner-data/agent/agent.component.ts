@@ -47,11 +47,9 @@ export class AgentComponent implements OnInit {
     this.pager.totalItems = responses.totalItems;
   }
   onSortChange(column) {
-    if (column.dataType != 'boolean') {
-      let property = column.primaryKey;
-      this.isDesc = !this.isDesc;
-      this.agents = this.sortService.sort(this.agents, property, this.isDesc);
-    }
+    let property = column.primaryKey;
+    this.isDesc = !this.isDesc;
+    this.agents = this.sortService.sort(this.agents, property, this.isDesc);
   }
   showConfirmDelete(item) {
     //this.partner = item;

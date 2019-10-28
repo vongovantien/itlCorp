@@ -114,12 +114,11 @@ namespace eFMS.API.System.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
-            model.UserCreated = currentUser.UserID;
-            model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
+
             var hs = sysGroupService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
 
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
             {
                 return BadRequest(result);

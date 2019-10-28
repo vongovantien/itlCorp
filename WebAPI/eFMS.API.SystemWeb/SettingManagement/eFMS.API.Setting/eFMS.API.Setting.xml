@@ -48,5 +48,12 @@
             <param name="tariffId"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Setting.Controllers.TariffController.CheckDuplicateTariff(eFMS.API.Setting.DL.Models.SetTariffModel)">
+            <summary>
+            Check duplicate tariff
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>

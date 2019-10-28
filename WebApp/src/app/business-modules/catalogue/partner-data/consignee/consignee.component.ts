@@ -47,11 +47,9 @@ export class ConsigneeComponent implements OnInit {
     this.pager.totalItems = responses.totalItems;
   }
   onSortChange(column) {
-    if (column.dataType != 'boolean') {
-      let property = column.primaryKey;
-      this.isDesc = !this.isDesc;
-      this.consignees = this.sortService.sort(this.consignees, property, this.isDesc);
-    }
+    let property = column.primaryKey;
+    this.isDesc = !this.isDesc;
+    this.consignees = this.sortService.sort(this.consignees, property, this.isDesc);
   }
 
   showConfirmDelete(item) {
