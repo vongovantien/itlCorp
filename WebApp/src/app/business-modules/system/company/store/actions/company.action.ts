@@ -4,6 +4,7 @@ export enum CompanyActionTypes {
     LOAD_COMPANY = '[COMPANY] load',
     LOAD_COMPANY_SUCCESS = '[COMPANY] load success',
     LOAD_COMPANY_FAILURE = '[COMPANY] load failure',
+    // TODO delete/detail
 }
 
 export class LoadCompanyAction implements Action {
