@@ -13,13 +13,17 @@
         </div>
     </app-sub-header>
     <div class="m-content">
-
-        <form-search-fcl-import></form-search-fcl-import>
-
-        <div class="m-portlet">
-            <div class="m-portlet__body">
-                list component
-            </div>
+        <div>
+            <tabset>
+                <tab heading="Shippment Detail" id="tab1">Shippment Detail</tab>
+                <tab heading="House Bill List">
+                    <app-house-bill-list></app-house-bill-list>
+                </tab>
+                <tab heading="Debit Note & Credit Note">Debit Note & Credit Note</tab>
+            </tabset>
         </div>
+
+
+
     </div>
 </div>

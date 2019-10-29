@@ -12,7 +12,7 @@ import { SeaFClImportFormCreateComponent } from './sea-fcl-import-management/com
 import { SeaFCLImportShipmentGoodSummaryComponent } from './sea-fcl-import-management/components/shipment-good-summary/shipment-good-summary.component';
 import { SeaFCLImportDetailJobComponent } from './sea-fcl-import-management/detail-job/detail-job-fcl-import.component';
 import { SeaFCLImportCDNoteComponent } from './sea-fcl-import-management/detail-job/cd-note/sea-fcl-import-cd-note.component';
-
+import { HouseBillListComponent } from './sea-fcl-import-management/components/house-bill-list/house-bill-list.component';
 
 const routing: Routes = [
     {
@@ -37,6 +37,7 @@ const COMPONENTS = [
     SeaFCLImportManagementFormSearchComponent,
     SeaFClImportFormCreateComponent,
     SeaFCLImportShipmentGoodSummaryComponent,
+    HouseBillListComponent
 ];
 
 @NgModule({
@@ -56,7 +57,8 @@ const COMPONENTS = [
         TabsModule.forRoot(),
         PaginationModule,
         SelectModule,
-        ModalModule.forRoot()
+        ModalModule.forRoot(),
+
     ],
     exports: [],
     providers: [],
