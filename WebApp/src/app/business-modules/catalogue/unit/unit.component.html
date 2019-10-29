@@ -462,11 +462,11 @@
 
                         <div class="form-group row">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Inactive
+                                Active
                             </label>
                             <div class="col-lg-8">
                                 <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
-                                    <input [checked]="!UnitToUpdate.active"
+                                    <input [checked]="UnitToUpdate.active"
                                         (change)="UnitToUpdate.active=!UnitToUpdate.active"
                                         type="checkbox"><span></span></label>
                             </div>
