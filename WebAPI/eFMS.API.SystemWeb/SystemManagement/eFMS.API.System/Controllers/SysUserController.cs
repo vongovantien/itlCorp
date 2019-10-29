@@ -19,6 +19,7 @@ using eFMS.API.Common.Helpers;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using OfficeOpenXml;
+using eFMS.API.System.DL.ViewModels;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -78,7 +79,7 @@ namespace eFMS.API.System.Controllers
         public IActionResult Add(SysUserModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            model.Password = "12345678";
+            model.Password = Constants.Password;
             model.Password = BCrypt.Net.BCrypt.HashPassword(model.Password);
             var existedMessage = CheckExistCode(model.SysEmployeeModel.StaffCode, "0");
             var existedName = CheckExistUserName(model.Username, "0");
@@ -99,13 +100,13 @@ namespace eFMS.API.System.Controllers
             if (hsEmloyee.Success)
             {
                 model.EmployeeId = model.SysEmployeeModel.Id;
-                model.UserCreated = currentUser.UserID;
+                model.UserCreated = model.UserModified = currentUser.UserID;
                 model.Id = Guid.NewGuid().ToString();
-                model.DatetimeCreated  = DateTime.Now;
+                model.DatetimeCreated = model.DatetimeModified  = DateTime.Now;
                 var hs = sysUserService.Insert(model);
                 var message = HandleError.GetMessage(hs, Crud.Insert);
 
-                ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+                ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value,Data = model.Id };
                 if (!hs.Success)
                 {
                     return BadRequest(result);
@@ -225,7 +226,7 @@ namespace eFMS.API.System.Controllers
         public IActionResult ResetPassword(string id)
         {
             var item = sysUserService.Get(x => x.Id == id).FirstOrDefault();
-            item.Password = "12345678";
+            item.Password = Constants.Password;
             item.Password = BCrypt.Net.BCrypt.HashPassword(item.Password);
             var hs = sysUserService.Update(item, x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Update);
@@ -279,27 +280,49 @@ namespace eFMS.API.System.Controllers
                     var userobj = new SysUserImportModel
                     {
                         IsValid = true,
-                        Username =  worksheet.Cells[row, 2].Value?.ToString(),
-                        EmployeeNameEn = worksheet.Cells[row, 3].Value?.ToString(),
-                        EmployeeNameVn = worksheet.Cells[row, 4].Value?.ToString(),
-                        Title =  worksheet.Cells[row, 5].Value?.ToString(),
-                        UserType =  worksheet.Cells[row, 6].Value?.ToString(),
-                        Role =  worksheet.Cells[row, 7].Value?.ToString(),
-                        LevelPermission = worksheet.Cells[row, 8].Value?.ToString(),
-                        Company = worksheet.Cells[row, 9].Value?.ToString(),
-                        Office = worksheet.Cells[row, 10].Value?.ToString(),
-                        Deparment = worksheet.Cells[row, 11].Value?.ToString(),
-                        WorkingStatus = worksheet.Cells[row, 12].Value?.ToString(),
-                        Status = worksheet.Cells[row, 13].Value?.ToString()
-                    };
-                }
+                        StaffCode = worksheet.Cells[row, 2].Value?.ToString(),
 
-  
-                return Ok();
+                        Username =  worksheet.Cells[row, 3].Value?.ToString(),
+                        EmployeeNameEn = worksheet.Cells[row, 4].Value?.ToString(),
+                        EmployeeNameVn = worksheet.Cells[row, 5].Value?.ToString(),
+                        Title =  worksheet.Cells[row, 6].Value?.ToString(),
+                        Tel = worksheet.Cells[row, 7].Value?.ToString(),
+                        UserType =  worksheet.Cells[row, 8].Value?.ToString(),
+                        Role =  worksheet.Cells[row, 9].Value?.ToString(),
+                        LevelPermission = worksheet.Cells[row, 10].Value?.ToString(),
+                        Company = worksheet.Cells[row, 11].Value?.ToString(),
+                        Office = worksheet.Cells[row, 12].Value?.ToString(),
+                        Deparment = worksheet.Cells[row, 13].Value?.ToString(),
+                        WorkingStatus = worksheet.Cells[row, 15].Value?.ToString(),
+                        Status =worksheet.Cells[row, 16].Value?.ToString()
+                    };
+                    list.Add(userobj);
+                }
+                var data = sysUserService.CheckValidImport(list);
+                var totalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totalValidRows };
+                return Ok(results);
 
             }
             return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
 
+        }
+
+        [HttpPost]
+        [Route("Import")]
+        [Authorize]
+        public IActionResult Import([FromBody]List<SysUserViewModel> data)
+        {
+            var result = sysUserService.Import(data);
+            if (result != null)
+            {
+                
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+            }
         }
 
 

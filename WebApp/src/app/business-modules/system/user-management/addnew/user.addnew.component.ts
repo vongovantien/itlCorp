@@ -59,7 +59,8 @@ export class UserAddNewComponent extends AppPage {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message, '');
-                            this._router.navigate([`home/system/user-management`]);
+                            this._router.navigate([`home/system/user-management/${res.data.id}`]);
+
 
                         } else {
                             this._toastService.error(res.message, '');
