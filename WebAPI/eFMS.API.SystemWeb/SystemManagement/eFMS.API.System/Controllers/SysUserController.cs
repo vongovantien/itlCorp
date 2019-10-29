@@ -106,7 +106,7 @@ namespace eFMS.API.System.Controllers
                 var hs = sysUserService.Insert(model);
                 var message = HandleError.GetMessage(hs, Crud.Insert);
 
-                ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+                ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value,Data = model.Id };
                 if (!hs.Success)
                 {
                     return BadRequest(result);
