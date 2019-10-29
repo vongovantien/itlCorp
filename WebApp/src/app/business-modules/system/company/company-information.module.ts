@@ -1,16 +1,23 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
-import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { PaginationModule, TabsModule } from 'ngx-bootstrap';
-import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
+
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { reducers, effects } from './store';
+
+import { SharedModule } from 'src/app/shared/shared.module';
 import { ComanyInformationComponent } from './company-information.component';
 import { CompanyInformationAddComponent } from './add/add-company-information.componnt';
 import { CompanyInformationDetailComponent } from './detail/detail-company-information.component';
 import { CompanyInformationFormSearchComponent } from './components/form-search-company/form-search-company.component';
 import { CompanyInformationFormAddComponent } from './components/form-add-company/form-add-company.component';
+
+import { PaginationModule, TabsModule } from 'ngx-bootstrap';
+import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { FroalaEditorModule, FroalaViewModule } from 'angular-froala-wysiwyg';
+
 
 const routing: Routes = [
     {
@@ -39,6 +46,7 @@ const routing: Routes = [
         CommonModule,
         SharedModule,
         FormsModule,
+
         TabsModule.forRoot(),
         PaginationModule.forRoot(),
         ReactiveFormsModule,
@@ -46,6 +54,11 @@ const routing: Routes = [
         RouterModule.forChild(routing),
         FroalaEditorModule.forRoot(),
         FroalaViewModule.forRoot(),
+
+        // * STORE
+        StoreModule.forFeature('company', reducers),
+        EffectsModule.forFeature(effects),
+
     ],
     exports: [],
     providers: [],
