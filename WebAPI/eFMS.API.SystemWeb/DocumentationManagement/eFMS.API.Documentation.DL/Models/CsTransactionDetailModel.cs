@@ -20,5 +20,7 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal? CBM { get; set; }
         public decimal? CW { get; set; }
         public decimal? GW { get; set; }
+        public string Packages { get; set; }
+        public string Containers { get; set; }
     }
 }
