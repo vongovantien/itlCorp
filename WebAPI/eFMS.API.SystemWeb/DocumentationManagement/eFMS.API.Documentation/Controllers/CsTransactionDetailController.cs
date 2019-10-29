@@ -51,7 +51,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpPost]
         [Route("addNew")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Add(CsTransactionDetailModel model)
         {
             //ChangeTrackerHelper.currentUser = currentUser.UserID;
@@ -62,7 +62,7 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
-            model.UserCreated = "admin";//currentUser.UserID;
+            model.UserCreated = currentUser.UserID;
             model.DatetimeCreated = DateTime.Now;
             var hs = csTransactionDetailService.AddTransactionDetail(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
@@ -107,7 +107,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpPut]
         [Route("update")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Update(CsTransactionDetailModel model)
         {
             if (!ModelState.IsValid) return BadRequest();

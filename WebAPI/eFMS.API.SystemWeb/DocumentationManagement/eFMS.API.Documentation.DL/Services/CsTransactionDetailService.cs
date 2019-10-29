@@ -90,7 +90,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     new HandleState("Housebill not found !");
                 }
-                hb.UserModified = "admin";//ChangeTrackerHelper.currentUser;
+                hb.UserModified = ChangeTrackerHelper.currentUser;
                 hb.DatetimeModified = DateTime.Now;
                 hb = mapper.Map<CsTransactionDetail>(model);
                 var isUpdateDone = DataContext.Update(hb, x => x.Id == hb.Id);

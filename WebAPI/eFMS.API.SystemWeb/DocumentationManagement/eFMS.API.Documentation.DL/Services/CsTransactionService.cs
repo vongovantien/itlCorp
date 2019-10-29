@@ -29,6 +29,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatPartner> catPartnerRepo;
         readonly IContextBase<CatPlace> catPlaceRepo;
         readonly IContextBase<SysUser> sysUserRepo;
+        readonly IContextBase<SysEmployee> sysEmployeeRepo;
 
         public CsTransactionService(IContextBase<CsTransaction> repository,
             IMapper mapper,
@@ -38,7 +39,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsShipmentSurcharge> csShipmentSurcharge,
             IContextBase<CatPartner> catPartner,
             IContextBase<CatPlace> catPlace,
-            IContextBase<SysUser> sysUser) : base(repository, mapper)
+            IContextBase<SysUser> sysUser,
+            IContextBase<SysEmployee> sysEmployee) : base(repository, mapper)
         {
             currentUser = user;
             csTransactionDetailRepo = csTransactionDetail;
@@ -47,6 +49,7 @@ namespace eFMS.API.Documentation.DL.Services
             catPartnerRepo = catPartner;
             catPlaceRepo = catPlace;
             sysUserRepo = sysUser;
+            sysEmployeeRepo = sysEmployee;
         }
 
         #region -- INSERT & UPDATE --
@@ -120,7 +123,15 @@ namespace eFMS.API.Documentation.DL.Services
                 transaction.UserModified = transaction.UserCreated;
                 transaction.IsLocked = false;
                 transaction.LockedDate = null;
-
+                var employeeId = sysUserRepo.Get(x => x.Id == transaction.UserCreated).FirstOrDefault()?.EmployeeId;
+                if (!string.IsNullOrEmpty(employeeId))
+                {
+                    var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault().WorkPlaceId;
+                    if (branchOfUser != null) {
+                        transaction.BranchId = branchOfUser;
+                    }
+                }
+                
                 var hsTrans = DataContext.Add(transaction);
                 if (hsTrans.Success)
                 {
@@ -181,6 +192,15 @@ namespace eFMS.API.Documentation.DL.Services
                 if (transaction.IsLocked.HasValue)
                 {
                     transaction.LockedDate = DateTime.Now;
+                }
+                var employeeId = sysUserRepo.Get(x => x.Id == transaction.UserCreated).FirstOrDefault()?.EmployeeId;
+                if (!string.IsNullOrEmpty(employeeId))
+                {
+                    var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault().WorkPlaceId;
+                    if (branchOfUser != null)
+                    {
+                        transaction.BranchId = branchOfUser;
+                    }
                 }
                 var hsTrans = DataContext.Update(transaction, x => x.Id == transaction.Id);
                 if (hsTrans.Success)
