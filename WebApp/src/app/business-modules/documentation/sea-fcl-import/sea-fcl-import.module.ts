@@ -13,7 +13,6 @@ import { SeaFCLImportShipmentGoodSummaryComponent } from './sea-fcl-import-manag
 import { SeaFCLImportDetailJobComponent } from './sea-fcl-import-management/detail-job/detail-job-fcl-import.component';
 import { SeaFCLImportCDNoteComponent } from './sea-fcl-import-management/detail-job/cd-note/sea-fcl-import-cd-note.component';
 
-
 const routing: Routes = [
     {
         path: '', pathMatch: 'full', component: SeaFCLImportManagementComponent,
