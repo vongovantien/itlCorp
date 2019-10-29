@@ -8,6 +8,8 @@ import { Router } from '@angular/router';
     styleUrls: ['./create-job-fcl-import.component.scss']
 })
 export class SeaFCLImportCreateJobComponent extends AppForm {
+
+
     constructor(
         protected _router: Router
     ) {
