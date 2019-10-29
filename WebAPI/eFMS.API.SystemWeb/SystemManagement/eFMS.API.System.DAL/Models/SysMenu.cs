@@ -5,7 +5,6 @@ namespace eFMS.API.System.Service.Models
 {
     public partial class SysMenu
     {
-
         public string Id { get; set; }
         public string ParentId { get; set; }
         public string NameVn { get; set; }

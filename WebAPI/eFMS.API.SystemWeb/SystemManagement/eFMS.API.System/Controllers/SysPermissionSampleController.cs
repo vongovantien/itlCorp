@@ -69,8 +69,8 @@ namespace eFMS.API.System.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("{id}")]
-        public IActionResult Get(short id)
+        [HttpGet("Get")]
+        public IActionResult Get(Guid? id)
         {
             var data = permissionGeneralService.GetBy(id);
             return Ok(data);
@@ -82,6 +82,7 @@ namespace eFMS.API.System.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("Add")]
+        [Authorize]
         public IActionResult Add(SysPermissionSampleModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -105,12 +106,12 @@ namespace eFMS.API.System.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("Update")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Update(SysPermissionSampleModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            var hs = permissionGeneralService.Update(model, x => x.Id == model.Id);
+            var hs = permissionGeneralService.Update(model);
 
             var message = HandleError.GetMessage(hs, Crud.Update);
 
@@ -127,11 +128,12 @@ namespace eFMS.API.System.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete]
-        public IActionResult Delete(short id)
+        [HttpDelete("{id}")]
+        [Authorize]
+        public IActionResult Delete(Guid id)
         {
-            var permission = permissionGeneralService.Get(x => x.Id == id && x.Active == false);
-            if (permission != null)
+            var permission = permissionGeneralService.Get(x => x.Id == id);
+            if (permission != null && permission.FirstOrDefault(x => x.Active == true) != null)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED].Value });
             }
@@ -145,6 +147,17 @@ namespace eFMS.API.System.Controllers
                 return Ok(result);
             }
             return Ok(result);
+        }
+
+        /// <summary>
+        /// get all level permission
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetLevelPermissions")]
+        public IActionResult GetLevelPermissions()
+        {
+            var results = permissionGeneralService.GetLevelPermissions();
+            return Ok(results);
         }
     }
 }

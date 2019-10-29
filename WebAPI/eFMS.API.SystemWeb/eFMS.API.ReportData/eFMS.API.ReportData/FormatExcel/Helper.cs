@@ -1247,5 +1247,78 @@ namespace eFMS.API.ReportData
             }
         }
         #endregion -- Accounting --
+        #region User
+        public Stream GenerateUserExcel(List<SysUserModel> listCompany, Stream stream = null)
+        {
+            List<String> headers = new List<String>()
+            {
+                "No",
+                "User Name",
+                "Name EN",
+                "Full Name",
+                "Title",
+                "User Type",
+                "Role",
+                "Level Permission",
+                "Company",
+                "Office",
+                "Department",
+                "Group",
+                "Working Status",
+                "Status"
+            };
+            try
+            {
+                int addressStartContent = 4;
+                int no = 1;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Sheet1");
+                    var worksheet = excelPackage.Workbook.Worksheets[1];
+
+                    BuildHeader(worksheet, headers, "USER INFORMATION");
+
+                    for (int i = 0; i < listCompany.Count; i++)
+                    {
+                        var item = listCompany[i];
+                        worksheet.Cells[i + addressStartContent, 1].Value = no.ToString();
+                        worksheet.Cells[i + addressStartContent, 2].Value = item.UserName;
+                        worksheet.Cells[i + addressStartContent, 3].Value = item.EmployeeNameEN;
+                        worksheet.Cells[i + addressStartContent, 4].Value = item.EmployeeNameVN;
+                        worksheet.Cells[i + addressStartContent, 5].Value = item.Title;
+                        worksheet.Cells[i + addressStartContent, 6].Value = item.UserType;
+                        worksheet.Cells[i + addressStartContent, 7].Value = item.Role;
+                        worksheet.Cells[i + addressStartContent, 8].Value = item.LevelPermission;
+                        worksheet.Cells[i + addressStartContent, 9].Value = item.Company;
+                        worksheet.Cells[i + addressStartContent, 10].Value = item.Office;
+                        worksheet.Cells[i + addressStartContent, 11].Value = item.Department;
+                        worksheet.Cells[i + addressStartContent, 12].Value = item.Group;
+                        worksheet.Cells[i + addressStartContent, 13].Value = item.WorkingStatus;
+
+                        string status = "";
+                        if (item.Active == true)
+                        {
+                            status = "Active";
+                        }
+                        else
+                        {
+                            status = "Inactive";
+                        }
+                        worksheet.Cells[i + addressStartContent, 14].Value = status;
+
+                        no++;
+                    }
+
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+        #endregion
     }
 }

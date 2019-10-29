@@ -105,5 +105,27 @@ namespace eFMS.API.ReportData.Controllers
             var stream = helper.CreateGroupExcelFile(dataObjects.Result);
             return new FileHelper().ExportExcel(stream, FilesNames.GroupName);
         }
+
+        /// <summary>
+        /// Export User
+        /// </summary>
+        /// <param name="sysUserCriteria"></param>
+        /// <returns></returns>
+
+        [Route("ExportUser")]
+        [HttpPost]
+        public async Task<IActionResult> ExportUser(SysUserCriteria sysUserCriteria)
+        {
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(sysUserCriteria, aPis.HostStaging + Urls.System.UserUrl);
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<SysUserModel>>();
+            var stream = new Helper().GenerateUserExcel(dataObjects.Result);
+            if (stream == null)
+            {
+                return null;
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream,FilesNames.UserName);
+            return fileContent;
+
+        }
     }
 }

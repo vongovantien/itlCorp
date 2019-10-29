@@ -5,7 +5,7 @@ namespace eFMS.API.System.Service.Models
 {
     public partial class SysPermissionSample
     {
-        public short Id { get; set; }
+        public Guid Id { get; set; }
         public string Name { get; set; }
         public short? RoleId { get; set; }
         public string Type { get; set; }

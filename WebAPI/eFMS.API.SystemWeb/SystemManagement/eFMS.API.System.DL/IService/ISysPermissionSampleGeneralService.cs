@@ -10,6 +10,6 @@ namespace eFMS.API.System.DL.IService
 {
     public interface ISysPermissionSampleGeneralService : IRepositoryBase<SysPermissionSampleGeneral, SysPermissionSampleGeneralModel>
     {
-        List<SysPermissionSampleGeneralViewModel> GetBy(short permissionId);
+        List<SysPermissionSampleGeneralViewModel> GetBy(Guid? permissionId);
     }
 }

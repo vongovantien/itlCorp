@@ -136,6 +136,7 @@ namespace eFMS.API.System.DL.Services
                 SysOffice.CompanyName = item.companyName;
                 results.Add(SysOffice);
             }
+            results = results.OrderByDescending(x => x.DatetimeModified).ToList();
             return results;
         }
 

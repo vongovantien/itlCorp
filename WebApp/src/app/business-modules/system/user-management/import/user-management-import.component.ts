@@ -1,0 +1,132 @@
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { PAGINGSETTING } from 'src/constants/paging.const';
+import { PagingService, BaseService, SortService } from 'src/app/shared/services';
+import { API_MENU } from 'src/constants/api-menu.const';
+import { ToastrService } from 'ngx-toastr';
+import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
+import { PaginationComponent } from 'ngx-bootstrap';
+import { NgProgressComponent } from '@ngx-progressbar/core';
+import { SystemConstants } from 'src/constants/system.const';
+import { AppList } from 'src/app/app.list';
+
+@Component({
+    selector: 'app-user-management-import',
+    templateUrl: './user-management-import.component.html',
+    styleUrls: ['./user-management-import.component.scss']
+})
+export class UserManagementImportComponent extends AppList {
+    constructor(
+        private pagingService: PagingService,
+        private baseService: BaseService,
+        private api_menu: API_MENU,
+        private sortService: SortService,
+        private toastr: ToastrService) { super(); }
+    data: any[];
+    pagedItems: any[] = [];
+    inValidItems: any[] = [];
+    totalValidRows: number = 0;
+    totalRows: number = 0;
+    isShowInvalid: boolean = true;
+    pager: PagerSetting = PAGINGSETTING;
+    inProgress: boolean = false;
+    headers: CommonInterface.IHeaderTable[];
+    @ViewChild(PaginationComponent, { static: false }) child;
+    @ViewChild(NgProgressComponent, { static: false }) progressBar: NgProgressComponent;
+
+
+    isDesc = true;
+    sortKey: string;
+
+
+    ngOnInit() {
+        this.headers = [
+            { title: 'No', field: 'no', width: 100 },
+            { title: 'User Name', field: 'username', sortable: true },
+            { title: 'Name EN', field: 'employeeNameEn', sortable: true },
+            { title: 'Full Name', field: 'employeeNameEn', sortable: true },
+            { title: 'Title', field: 'title', sortable: true },
+            { title: 'User Type', field: 'userType', sortable: true },
+            { title: 'Role', field: 'role', sortable: true },
+            { title: 'Level permission', field: '', sortable: true },
+            { title: 'Company', field: 'company', sortable: true },
+            { title: 'Office', field: 'office', sortable: true },
+            { title: 'Department', field: 'department', sortable: true },
+            { title: 'Group', field: 'group', sortable: true },
+            { title: 'Working Status', field: 'workingstatus', sortable: true },
+            { title: 'Status', field: 'active', sortable: true },
+        ];
+    }
+
+    resetBeforeSelecedFile() {
+        this.pager.currentPage = 1;
+        this.pager.totalItems = 0;
+        this.totalRows = this.totalValidRows = 0;
+        this.pagedItems = [];
+        this.isShowInvalid = true;
+    }
+
+    chooseFile(file: Event) {
+        if (file.target['files'] == null) return;
+        this.progressBar.start();
+        /**/
+        this.resetBeforeSelecedFile();
+        /**/
+        this.baseService.uploadfile(this.api_menu.Operation.CustomClearance.uploadExel, file.target['files'], "uploadedFile")
+            .subscribe((response: any) => {
+                console.log(response);
+                this.data = response.data;
+                this.pager.totalItems = this.data.length;
+                this.totalValidRows = response.totalValidRows;
+                this.totalRows = this.data.length;
+                this.pagingData(this.data);
+                this.progressBar.complete();
+                console.log(this.data);
+            }, err => {
+                this.progressBar.complete();
+                this.baseService.handleError(err);
+            });
+    }
+
+    pagingData(data: any[]) {
+        this.pager = this.pagingService.getPager(data.length, this.pager.currentPage, this.pager.pageSize);
+        this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
+        this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
+        this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
+    }
+
+    async downloadSample() {
+        await this.baseService.downloadfile(this.api_menu.System.User_Management.downloadExcel, 'UserImportTemplate.xlsx');
+    }
+
+    async setPage(pager: PagerSetting) {
+        this.pager.currentPage = pager.currentPage;
+        this.pager.pageSize = pager.pageSize;
+        this.pager.totalPages = pager.totalPages;
+
+        if (this.isShowInvalid) {
+            this.pagingData(this.data);
+        } else {
+            this.pagingData(this.inValidItems);
+        }
+    }
+
+
+    hideInvalid() {
+        if (this.data == null || this.data == undefined) return;
+        this.isShowInvalid = !this.isShowInvalid;
+        this.sortKey = '';
+        if (this.isShowInvalid) {
+            this.pager.totalItems = this.data.length;
+            this.pagingData(this.data);
+        } else {
+            this.inValidItems = this.data.filter(x => !x.isValid);
+            this.pager.totalItems = this.inValidItems.length;
+            this.setPage(this.pager);
+        }
+
+        this.pager.currentPage = 1;
+        if (this.inValidItems.length > 0) {
+            this.child.setPage(this.pager.currentPage);
+        }
+    }
+}

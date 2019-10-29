@@ -38,7 +38,6 @@ export class OfficeComponent extends AppList {
         typeButton: ButtonType.cancel
     };
     addButtonSetting: ButtonModalSetting = {
-        dataTarget: "add-ware-house-modal",
         typeButton: ButtonType.add
     };
     constructor(

@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using eFMS.API.Common;
+using eFMS.API.Common.Globals;
 using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
 using eFMS.API.System.DL.ViewModels;
 using eFMS.API.System.Service.Models;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
@@ -26,6 +28,7 @@ namespace eFMS.API.System.DL.Services
         private readonly ISysPermissionSampleSpecialService permissionSampleSpecialService;
         private readonly IContextBase<SysPermissionSampleSpecial> permissioSampleSpecialRepository;
         private readonly IStringLocalizer stringLocalizer;
+        private readonly ICurrentUser currentUser;
 
         public SysPermissionSampleService(IContextBase<SysPermissionSample> repository, 
             IMapper mapper, 
@@ -34,7 +37,8 @@ namespace eFMS.API.System.DL.Services
             IContextBase<SysPermissionSampleGeneral> permissionSampleGeneralRepo,
             ISysPermissionSampleSpecialService perSampleSpecialService,
             IContextBase<SysPermissionSampleSpecial> permissioSampleSpecialRepo,
-            IStringLocalizer<LanguageSub> localizer) : base(repository, mapper)
+            IStringLocalizer<LanguageSub> localizer,
+            ICurrentUser currUser) : base(repository, mapper)
         {
             roleRepository = roleRepo;
             permissionSampleGeneralService = perSampleGeneralService;
@@ -42,13 +46,17 @@ namespace eFMS.API.System.DL.Services
             permissionSampleSpecialService = perSampleSpecialService;
             permissioSampleSpecialRepository = permissioSampleSpecialRepo;
             stringLocalizer = localizer;
+            currentUser = currUser;
         }
 
-        public SysPermissionSampleModel GetBy(short id)
+        public SysPermissionSampleModel GetBy(Guid? id)
         {
             var data = DataContext.Get(x => x.Id == id).FirstOrDefault();
-            if (data == null) return null;
-            var result = mapper.Map<SysPermissionSampleModel>(data);
+            var result = new SysPermissionSampleModel();
+            if (data != null)
+            {
+                result = mapper.Map<SysPermissionSampleModel>(data);
+            }
             result.SysPermissionSampleGenerals = permissionSampleGeneralService.GetBy(id);
             result.SysPermissionSampleSpecials = permissionSampleSpecialService.GetBy(id);
             return result;
@@ -77,14 +85,40 @@ namespace eFMS.API.System.DL.Services
         public override HandleState Add(SysPermissionSampleModel entity)
         {
             var permision = mapper.Map<SysPermissionSample>(entity);
-            permision.UserCreated = "admin";
+            permision.UserCreated = currentUser.UserID;
             permision.DatetimeCreated = permision.DatetimeModified = DateTime.Now;
+            permision.Id = Guid.NewGuid();
             var result = DataContext.Add(permision, false);
             if (result.Success)
             {
-                var listGeneral = mapper.Map<List<SysPermissionSampleGeneral>>(entity.SysPermissionSampleGenerals);
-                permissioSampleGeneralRepository.Add(listGeneral);
-                var listSpecial = mapper.Map<List<SysPermissionSampleSpecial>>(entity.SysPermissionSampleSpecials);
+                foreach(var item in entity.SysPermissionSampleGenerals)
+                {
+                    var listGeneral = mapper.Map<List<SysPermissionSampleGeneral>>(item.SysPermissionGenerals);
+                    foreach(var general in listGeneral)
+                    {
+                        general.PermissionId = permision.Id;
+                        permissioSampleGeneralRepository.Add(general, false);
+                    }
+                }
+                foreach (var item in entity.SysPermissionSampleSpecials)
+                {
+                    foreach (var per in item.SysPermissionSpecials)
+                    {
+                        foreach (var s in per.PermissionSpecialActions)
+                        {
+                            var peritem = new SysPermissionSampleSpecial
+                            {
+                                Id = s.Id,
+                                IsAllow = s.IsAllow,
+                                MenuId = s.MenuId,
+                                ModuleId = s.ModuleId,
+                                ActionName = s.NameEn,
+                                PermissionId = permision.Id
+                            };
+                            permissioSampleSpecialRepository.Add(peritem, false);
+                        }
+                    }
+                }
                 permissioSampleSpecialRepository.SubmitChanges();
                 DataContext.SubmitChanges();
                 permissioSampleGeneralRepository.SubmitChanges();
@@ -95,15 +129,19 @@ namespace eFMS.API.System.DL.Services
         public HandleState Update(SysPermissionSampleModel entity)
         {
             var permission = mapper.Map<SysPermissionSample>(entity);
-            permission.UserModified = "admin";
+            permission.UserModified = currentUser.UserID;
             permission.DatetimeModified = DateTime.Now;
             var result = DataContext.Update(permission, x => x.Id == entity.Id, false);
             if (result.Success)
             {
-                var list = mapper.Map<List<SysPermissionSampleGeneral>>(entity.SysPermissionSampleGenerals);
-                foreach(var item in list)
+                foreach(var item in entity.SysPermissionSampleGenerals)
                 {
-                    permissioSampleGeneralRepository.Update(item, x => x.Id == item.Id, false);
+                    var list = mapper.Map<List<SysPermissionSampleGeneral>>(item.SysPermissionGenerals);
+                    foreach(var general in list)
+                    {
+                        general.UserModified = currentUser.UserID;
+                        permissioSampleGeneralRepository.Update(general, x => x.Id == general.Id, false);
+                    }
                 }
                 foreach(var item in entity.SysPermissionSampleSpecials)
                 {
@@ -111,20 +149,23 @@ namespace eFMS.API.System.DL.Services
                     {
                         foreach(var s in per.PermissionSpecialActions)
                         {
-                            var peritem = new SysPermissionSampleSpecial();
-                            peritem.Id = s.Id;
-                            peritem.IsAllow = s.IsAllow;
-                            peritem.MenuId = s.MenuId;
-                            peritem.ModuleId = s.ModuleId;
-                            peritem.ActionName = s.NameEn;
-                            peritem.PermissionId = entity.Id;
                             if(s.Id == 0)
                             {
+                                var peritem = mapper.Map<SysPermissionSampleSpecial>(s);
+                                peritem.Id = s.Id;
+                                peritem.IsAllow = s.IsAllow;
+                                peritem.MenuId = s.MenuId;
+                                peritem.ModuleId = s.ModuleId;
+                                peritem.ActionName = s.NameEn;
+                                peritem.PermissionId = entity.Id;
                                 permissioSampleSpecialRepository.Add(peritem, false);
                             }
                             else
                             {
-                                permissioSampleSpecialRepository.Update(peritem, x => x.Id == entity.Id, false);
+                                var peritem = permissioSampleSpecialRepository.First(x => x.Id == s.Id);
+                                peritem.IsAllow = s.IsAllow;
+                                peritem.UserModified = currentUser.UserID;
+                                var t = permissioSampleSpecialRepository.Update(peritem, x => x.Id == s.Id, false);
                             }
                         }
                     }
@@ -136,7 +177,7 @@ namespace eFMS.API.System.DL.Services
             return result;
         }
 
-        public HandleState Delete(short id)
+        public HandleState Delete(Guid id)
         {
             try
             {
@@ -164,6 +205,20 @@ namespace eFMS.API.System.DL.Services
                 var hs = new HandleState(ex.Message);
                 return hs;
             }
+        }
+
+        public List<Common.CommonData> GetLevelPermissions()
+        {
+            var results = new List<Common.CommonData>
+            {
+                new Common.CommonData { Value = "Owner", DisplayName = "Owner" },
+                new Common.CommonData { Value = "Group", DisplayName = "Group" },
+                new Common.CommonData { Value = "Department", DisplayName = "Department" },
+                new Common.CommonData { Value = "Office", DisplayName = "Office" },
+                new Common.CommonData { Value = "Company", DisplayName = "Company" },
+                new Common.CommonData { Value = "All", DisplayName = "All"}
+            };
+            return results;
         }
     }
 }
