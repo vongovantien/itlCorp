@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { SeaFCLImportCreateJobComponent } from '../create-job/create-job-fcl-import.component';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { SeaFCLImportCreateJobComponent } from '../create-job/create-job-fcl-import.component';
 
 type TAB = 'SHIPMENT' | 'CDNOTE';
 @Component({
