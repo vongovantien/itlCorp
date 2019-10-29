@@ -100,9 +100,9 @@ namespace eFMS.API.System.Controllers
             if (hsEmloyee.Success)
             {
                 model.EmployeeId = model.SysEmployeeModel.Id;
-                model.UserCreated = currentUser.UserID;
+                model.UserCreated = model.UserModified = currentUser.UserID;
                 model.Id = Guid.NewGuid().ToString();
-                model.DatetimeCreated  = DateTime.Now;
+                model.DatetimeCreated = model.DatetimeModified  = DateTime.Now;
                 var hs = sysUserService.Insert(model);
                 var message = HandleError.GetMessage(hs, Crud.Insert);
 
