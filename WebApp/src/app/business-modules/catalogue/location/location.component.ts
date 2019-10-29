@@ -17,6 +17,8 @@ import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { ActivatedRoute } from '@angular/router';
+import { AddCountryComponent } from './country/add-country/add-country.component';
+import { AddProvinceComponent } from './province/add-province/add-province.component';
 declare var $: any;
 
 @Component({
@@ -25,6 +27,8 @@ declare var $: any;
   styleUrls: ['./location.component.sass']
 })
 export class LocationComponent implements OnInit, AfterViewInit {
+  @ViewChild(AddCountryComponent, { static: false }) addCountryPopup: AddCountryComponent;
+  @ViewChild(AddProvinceComponent, { static: false }) addProvincePopup: AddProvinceComponent;
   ngAfterViewInit(): void {
 
 
@@ -169,6 +173,7 @@ export class LocationComponent implements OnInit, AfterViewInit {
   }
 
   showAdd() {
+    this.addProvincePopup.show();
     this.ngSelectDataProvinces = [];
     this.ngSelectDataDistricts = [];
   }
@@ -202,7 +207,7 @@ export class LocationComponent implements OnInit, AfterViewInit {
     // this.getProvinceCities();
     // this.getDistrict();
     // this.getWards();
-    // this.getAllCountries();
+    this.getAllCountries();
   }
   activeTab: string = "country";
   changeTab(activeTab) {
@@ -323,7 +328,9 @@ export class LocationComponent implements OnInit, AfterViewInit {
     this.ConstListCountries = response.data;
     return response.data;
   }
-
+  showAddCountryPopup() {
+    this.addCountryPopup.show();
+  }
   async addCountry(form: NgForm, action) {
     if (action == "yes") {
       delete this.CountryToAdd.id;
@@ -639,8 +646,9 @@ export class LocationComponent implements OnInit, AfterViewInit {
   ngSelectDataDistricts: any = [];
 
   async getAllCountries() {
-    var countries = await this.baseServices.getAsync(this.api_menu.Catalogue.Country.getAll, false, false);
+    const countries = await this.baseServices.getAsync(this.api_menu.Catalogue.Country.getAll, false, false);
     this.ngSelectDataCountries = this.ngSelectData(countries);
+    this.addProvincePopup.ngSelectDataCountries = this.ngSelectDataCountries;
   }
 
 

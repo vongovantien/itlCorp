@@ -5,8 +5,11 @@ import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { SelectModule } from 'ng2-select';
 import { NgProgressModule } from '@ngx-progressbar/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LocationComponent } from './location.component';
+import { AddCountryComponent } from './country/add-country/add-country.component';
+import { ModalModule } from 'ngx-bootstrap';
+import { AddProvinceComponent } from './province/add-province/add-province.component';
 
 const routing: Routes = [
     { path: '', component: LocationComponent, data: { name: "Location", level: 2 } },
@@ -20,12 +23,16 @@ const routing: Routes = [
         SelectModule,
         NgProgressModule,
         FormsModule,
-        RouterModule.forChild(routing)
+        ReactiveFormsModule,
+        RouterModule.forChild(routing),
+        ModalModule.forRoot()
     ],
     exports: [],
     declarations: [
         LocationComponent,
-        LocationImportComponent
+        LocationImportComponent,
+        AddCountryComponent,
+        AddProvinceComponent
     ],
     providers: [],
 })

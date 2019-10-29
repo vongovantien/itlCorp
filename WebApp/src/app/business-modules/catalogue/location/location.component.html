@@ -256,8 +256,17 @@
                                 </div>
                             </div>
                             <div class="col-md-4 col-lg-2 m--align-right">
-                                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                <!-- <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
                                     (click)="showAdd()" data-toggle="modal" data-target="#add-city-province-modal">
+                                    <span>
+                                        <i class="la la-plus"></i>
+                                        <span>
+                                            add new
+                                        </span>
+                                    </span>
+                                </button> -->
+                                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                    (click)="showAdd()">
                                     <span>
                                         <i class="la la-plus"></i>
                                         <span>
@@ -796,8 +805,8 @@
 
 <!-- BEGIN UPDATE COUNTRY MODAL -->
 
-<div class="modal fade" id="update-country-modal" data-backdrop="static" role="dialog"
-    aria-labelledby="" aria-hidden="true">
+<div class="modal fade" id="update-country-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+    aria-hidden="true">
     <div class="modal-dialog modal-xs" role="document">
         <div class="modal-content">
 
@@ -881,9 +890,8 @@
                             </label>
                             <div class="col-lg-8">
                                 <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
-                                    <input type="checkbox" 
-                                    [attr.checked]="CountryToUpdate.active ? 'checked' : null"
-                                    (change)="CountryToUpdate.active = !CountryToUpdate.active">
+                                    <input type="checkbox" [attr.checked]="CountryToUpdate.active ? 'checked' : null"
+                                        (change)="CountryToUpdate.active = !CountryToUpdate.active">
                                     <span></span>
                                 </label>
                             </div>
@@ -923,130 +931,7 @@
 
 
 <!-- BEGIN ADD CITY PROVINCE MODAL -->
-<div class="modal fade" id="add-city-province-modal" data-backdrop="static" role="dialog" aria-labelledby=""
-    aria-hidden="true">
-    <div class="modal-dialog modal-xs" role="document">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h5 class="modal-title">Add City-Province</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!--begin::add-stage-management-form-->
-                <form novalidate #addProvinceForm="ngForm" *ngIf="ProvinceCityToAdd"
-                    (ngSubmit)="addProvinceForm.form.valid">
-                    <div class="m-form m-form m-form--state">
-
-                        <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': addProvinceForm.submitted && province_code.invalid }">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                Province - City Code <span class="m--font-danger">(*)</span>
-                            </label>
-                            <div class="col-lg-8">
-                                <input type="text" [(ngModel)]="ProvinceCityToAdd.code"
-                                    (change)="ProvinceCityToAdd.code=ProvinceCityToAdd.code.trim()"
-                                    class="form-control m-input m-input--square" #province_code="ngModel"
-                                    name="province_code" required placeholder="Please enter province-city code">
-                                <div class="form-control-feedback"
-                                    *ngIf="addProvinceForm.submitted && province_code.invalid">
-                                    Province - City code is required
-                                </div>
-                            </div>
-
-                        </div>
-
-
-                        <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': addProvinceForm.submitted && english_name.invalid }">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                English Name <span class="m--font-danger">(*)</span>
-                            </label>
-                            <div class="col-lg-8">
-                                <input type="text" [(ngModel)]="ProvinceCityToAdd.nameEn"
-                                    (change)="ProvinceCityToAdd.nameEn=ProvinceCityToAdd.nameEn.trim()"
-                                    class="form-control m-input m-input--square" #english_name="ngModel" required
-                                    minlength="3" name="english_name" placeholder="Please enter english name">
-                                <div class="form-control-feedback"
-                                    *ngIf="addProvinceForm.submitted && english_name.invalid">
-                                    English name is required at least 3 characters
-                                </div>
-                            </div>
-
-                        </div>
-
-
-                        <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': addProvinceForm.submitted && local_name.invalid }">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                Local Name <span class="m--font-danger">(*)</span>
-                            </label>
-                            <div class="col-lg-8">
-                                <input type="text" [(ngModel)]="ProvinceCityToAdd.nameVn"
-                                    (change)="ProvinceCityToAdd.nameVn=ProvinceCityToAdd.nameVn.trim()"
-                                    class="form-control m-input m-input--square" #local_name="ngModel" required
-                                    minlength="3" name="local_name" placeholder="Please enter local name">
-                                <div class="form-control-feedback"
-                                    *ngIf="addProvinceForm.submitted && local_name.invalid">
-                                    Local name is required at least 3 characters
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': addProvinceForm.submitted && ProvinceCityToAdd.countryId==null }">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                Country <span class="m--font-danger">(*)</span>
-                            </label>
-                            <div class="col-lg-8">
-                                <ng-select [allowClear]="true" [items]="ngSelectDataCountries"
-                                    *ngIf="resetNg2SelectCountry && ngSelectDataCountries.length>0"
-                                    (data)="refreshValue($event)"
-                                    (selected)="selectedCountry($event,'add','province-city')"
-                                    (removed)="removed($event,'addCountryProvince')" (typed)="typed($event)"
-                                    placeholder="Select department">
-                                </ng-select>
-                                <div class="form-control-feedback"
-                                    *ngIf="addProvinceForm.submitted && ProvinceCityToAdd.countryId==null">
-                                    Country is required
-                                </div>
-                            </div>
-
-                        </div>
-
-
-                    </div>
-                    <div class="modal-footer m--align-center c-button-actions">
-                        <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="addProvinceCity(addProvinceForm,'yes')">
-                            <span>
-                                <i class="la la-save"></i>
-                                <span>
-                                    save
-                                </span>
-                            </span>
-                        </button>
-                        <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="addProvinceCity(addProvinceForm,'cancel')">
-                            <span>
-                                <i class="la la-ban"></i>
-                                <span>
-                                    cancel
-                                </span>
-                            </span>
-                        </button>
-                    </div>
-                </form>
-                <!--end:add-stage-management-form -->
-                <!-- (click)="add_stage()" -->
-            </div>
-
-        </div>
-    </div>
-</div>
+<app-add-province></app-add-province>
 <!-- END ADD CITY PROVINCE MODAL -->
 
 <!-- BEGIN EDIT CITY PROVINCE MODAL -->
@@ -1147,7 +1032,7 @@
                             </label>
                             <div class="col-lg-8">
                                 <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input
-                                        [attr.checked]="ProvinceCityToUpdate.active ? 'Checked': null" 
+                                        [attr.checked]="ProvinceCityToUpdate.active ? 'Checked': null"
                                         (change)="ProvinceCityToUpdate.active = !ProvinceCityToUpdate.active"
                                         type="checkbox"><span></span></label>
                             </div>
@@ -1454,11 +1339,9 @@
                             </label>
                             <div class="col-lg-8">
                                 <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
-                                    <input
-                                        [attr.checked]="DistrictToUpdate.active ? 'Checked' : null" 
-                                        (change)="onChangeDistrictUpdate($event)"
-                                        type="checkbox">
-                                        <span></span>
+                                    <input [attr.checked]="DistrictToUpdate.active ? 'Checked' : null"
+                                        (change)="onChangeDistrictUpdate($event)" type="checkbox">
+                                    <span></span>
                                 </label>
                             </div>
                         </div>
@@ -1802,7 +1685,7 @@
                             </label>
                             <div class="col-lg-8">
                                 <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input
-                                        [attr.checked]="WardToUpdate.active ? 'Checked' : null" 
+                                        [attr.checked]="WardToUpdate.active ? 'Checked' : null"
                                         (change)="WardToUpdate.active = !WardToUpdate.active"
                                         type="checkbox"><span></span></label>
                             </div>
