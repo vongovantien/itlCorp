@@ -52,7 +52,7 @@
                                                         title="Edit">
                                                         <i class="la la-copy"></i>
                                                     </a>
-                                                    <button (click)="showDeletePopup(tariff)"
+                                                    <button (click)="showDeletePopup(tariff)" [disabled]="tariff.status"
                                                         class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
                                                         <i class="la la-trash"></i>
                                                     </button>
