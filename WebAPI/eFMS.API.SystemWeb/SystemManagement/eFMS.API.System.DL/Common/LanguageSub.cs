@@ -131,6 +131,8 @@ namespace eFMS.API.System.DL.Common
         public static readonly string MSG_USER_USERTYPE_EMPTY = "MSG_USER_USERTYPE_EMPTY";
         public static readonly string MSG_USER_WORKINGSTATUS_EMPTY = "MSG_USER_WORKINGSTATUS_EMPTY";
         public static readonly string MSG_USER_STATUS_EMPTY = "MSG_USER_WORKINGSTATUS_EMPTY";
+        public static readonly string MSG_USER_STAFFCODE_EMPTY = "MSG_USER_STAFFCODE_EMPTY";
+        public static readonly string MSG_USER_TITLE_EMPTY = "MSG_USER_TITLE_EMPTY";
 
 
 

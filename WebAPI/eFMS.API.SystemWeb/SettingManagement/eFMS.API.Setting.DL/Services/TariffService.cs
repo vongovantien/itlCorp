@@ -27,13 +27,13 @@ namespace eFMS.API.Setting.DL.Services
         private readonly IContextBase<CatPartner> catPartnerRepo;
         private readonly IContextBase<CatPlace> catPlaceRepo;
 
-        public TariffService(IContextBase<SetTariff> repository, 
-            IMapper mapper, 
-            ICurrentUser user, 
-            IContextBase<SetTariffDetail> setTariffDetail, 
-            IContextBase<CatCharge> catCharge, 
-            IContextBase<CatCommodityGroup> catCommodityGroup, 
-            IContextBase<CatPartner> catPartner, 
+        public TariffService(IContextBase<SetTariff> repository,
+            IMapper mapper,
+            ICurrentUser user,
+            IContextBase<SetTariffDetail> setTariffDetail,
+            IContextBase<CatCharge> catCharge,
+            IContextBase<CatCommodityGroup> catCommodityGroup,
+            IContextBase<CatPartner> catPartner,
             IContextBase<CatPlace> catPlace) : base(repository, mapper)
         {
             currentUser = user;
@@ -145,7 +145,7 @@ namespace eFMS.API.Setting.DL.Services
                         }
                     }
                 }
-                
+
                 return new HandleState();
             }
             catch (Exception ex)

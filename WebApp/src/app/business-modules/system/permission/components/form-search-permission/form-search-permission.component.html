@@ -13,7 +13,7 @@
                         <div class="form-group">
                             <label>Role</label>
                             <select class="form-control" formControlName="role">
-                                <option *ngFor="let role of roles" [ngValue]="role">{{role.displayName}}</option>
+                                <option *ngFor="let role of roles" [ngValue]="role">{{role.name}}</option>
                                 <option [ngValue]="null">All</option>
                             </select>
                         </div>

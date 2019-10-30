@@ -30,7 +30,7 @@ namespace eFMS.API.ReportData.Models
             public const string OfficeUrl = "/System/api/v1/en-US/SysOffice/Query";
             public const string CompanyUrl = "/System/api/v1/en-US/SysCompany/Query";
             public const string GroupUrl = "/System/api/v1/en-US/SysGroup/Query";
-            public const string UserUrl = "/api/v1/en-US/SysUser/Query";
+            public const string UserUrl = "/System/api/v1/en-US/SysUser/Query";
         }
 
         public class Accounting

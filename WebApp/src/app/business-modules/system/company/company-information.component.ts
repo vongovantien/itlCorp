@@ -4,12 +4,13 @@ import { Company } from 'src/app/shared/models';
 import { SystemRepo, ExportRepo } from 'src/app/shared/repositories';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { finalize } from 'rxjs/internal/operators/finalize';
-import { map } from 'rxjs/internal/operators/map';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
+import { Store } from '@ngrx/store';
+import { LoadCompanyAction, ICompanyState, getCompanyState } from './store';
 
 @Component({
     selector: 'app-company-info',
@@ -32,13 +33,15 @@ export class ComanyInformationComponent extends AppList {
         private _toastService: ToastrService,
         private _sortService: SortService,
         private _exportRepo: ExportRepo,
+        private _store: Store<ICompanyState>
 
     ) {
         super();
         this._progressRef = this._progressService.ref();
 
-        this.requestList = this.searchCompany;
+        this.requestList = this.requestSearchComapny;
         this.requestSort = this.sortCompany;
+
     }
 
     ngOnInit() {
@@ -52,32 +55,37 @@ export class ComanyInformationComponent extends AppList {
             { title: 'Status', field: 'active', sortable: true },
         ];
         this.dataSearch = { All: null };
-        this.searchCompany(this.dataSearch);
+
+        this.requestSearchComapny();
+        this.getCompany(this.dataSearch);
     }
 
     onSearchCompany(dataSearch: any) {
         this.dataSearch = dataSearch;
-        this.searchCompany(this.dataSearch);
+        this.requestSearchComapny();
     }
 
-    searchCompany(dataSearch?: any) {
-        this.isLoading = true;
-        this._progressRef.start();
-        this._systemRepo.getCompany(this.page, this.pageSize, Object.assign({}, dataSearch))
+    requestSearchComapny() {
+        this._store.dispatch(new LoadCompanyAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+    }
+
+    getCompany(dataSearch?: any) {
+        // this.isLoading = true;
+        // this._progressRef.start();
+        this._store.select<any>(getCompanyState)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
-                map((data: any) => {
-                    return {
-                        data: data.data.map((item: any) => new Company(item)),
-                        totalItems: data.totalItems,
-                    };
+                finalize(() => {
+                    this.isLoading = false;
+                    this._progressRef.complete();
                 })
-            ).subscribe(
+            )
+            .subscribe(
                 (res: any) => {
                     this.totalItems = res.totalItems || 0;
                     this.companies = res.data;
+
                 },
+
             );
     }
 
@@ -103,7 +111,7 @@ export class ComanyInformationComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this.searchCompany();
+                        this.requestSearchComapny();
                     } else {
                         this._toastService.warning(res.message);
                     }

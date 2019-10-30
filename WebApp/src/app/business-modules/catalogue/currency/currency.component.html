@@ -142,11 +142,11 @@
                         </div>
                         <div class="form-group row" *ngIf="isAddnew == false">
                             <label class="col-lg-4 col-form-label form-control-label">
-                                Inactive
+                                Active
                             </label>
                             <div class="col-lg-8">
                                 <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
-                                    <input [checked]="!currency.active" (change)="currency.active=!currency.active"
+                                    <input [checked]="currency.active" (change)="currency.active=!currency.active"
                                         name="currencyIsActive" type="checkbox"><span></span></label>
                             </div>
                         </div>

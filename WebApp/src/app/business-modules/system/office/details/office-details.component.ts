@@ -103,7 +103,7 @@ export class OfficeDetailsComponent extends AppPage {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message);
-                            this._router.navigate([`home/system/office`]);
+                            this.getDetailOffice(this.officeId);
 
                         } else {
                             this._toastService.warning(res.message);
@@ -114,6 +114,7 @@ export class OfficeDetailsComponent extends AppPage {
         }
 
     }
+
 
 
     getDetailOffice(id: string) {

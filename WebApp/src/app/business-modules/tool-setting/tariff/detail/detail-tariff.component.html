@@ -13,7 +13,7 @@
                     Duplicate
                 </a>
                 <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="deleteTariff()">
+                    (click)="deleteTariff()" [disabled]="tariff.setTariff.status">
                     <span>
                         <i class="la la-remove"></i>
                         <span>
