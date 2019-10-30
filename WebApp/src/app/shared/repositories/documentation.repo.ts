@@ -11,6 +11,10 @@ export class DocumentationRepo {
     constructor(protected _api: ApiService) {
     }
 
+    createTransaction(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction`, body);
+    }
+
     addOPSJob(body: any = {}) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/Add`, body);
     }

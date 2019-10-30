@@ -11,25 +11,17 @@
                 </span>
             </button>
 
-            <app-default-button [buttonSetting]="saveButtonSetting"></app-default-button>
+            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onSave()"></app-default-button>
 
             <app-default-button [buttonSetting]="cancelButtonSetting"></app-default-button>
-            <button role="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                (click)="gotoDetailJob()">
-                <span>
-                    <i class=" la la-search-plus"></i>
-                    <span>
-                        Goto Detal Job
-                    </span>
-                </span>
-            </button>
+
         </div>
     </app-sub-header>
     <div class="m-content">
         <div class="m-portlet__body">
             <tabset class="custom-class-tab">
                 <tab heading="Shipment Detail">
-                    <form-create-sea-fcl-import></form-create-sea-fcl-import>
+                    <form-create-sea-fcl-import [(csTransaction)]="csTransactionModel"></form-create-sea-fcl-import>
 
                     <shipment-good-summary></shipment-good-summary>
                 </tab>

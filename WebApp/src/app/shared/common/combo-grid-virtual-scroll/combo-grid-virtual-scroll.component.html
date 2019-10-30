@@ -25,19 +25,22 @@
                     </table>
                 </div>
             </div>
-            <div class="" *ngIf="DataSources">
+            <div>
                 <cdk-virtual-scroll-viewport [ngStyle]="{'height.px': height}" itemSize="3">
                     <table class="table table-hover">
                         <tbody>
-                            <tr class="data-row pointer"
-                                *cdkVirtualFor="let item of DataSources; let i= index;trackBy: trackByFn"
-                                data-id="{{(i+1)}}" (click)="emitSelected(item);indexSelected = i"
-                                [class.data-selected]="indexSelected !== -1 && i === indexSelected">
+                            <ng-container *ngIf="!!DataSources.length">
+                                <tr class="data-row pointer"
+                                    *cdkVirtualFor="let item of DataSources; let i= index;trackBy: trackByFn"
+                                    data-id="{{(i+1)}}" (click)="emitSelected(item);indexSelected = i"
+                                    [class.data-selected]="indexSelected !== -1 && i === indexSelected">
 
-                                <td *ngFor="let display of DisplayFields; trackBy: trackByFn">
-                                    {{getValue(item,display.field)}}
-                                </td>
-                            </tr>
+                                    <td *ngFor="let display of DisplayFields; trackBy: trackByFn">
+                                        {{getValue(item,display.field)}}
+                                    </td>
+                                </tr>
+                            </ng-container>
+                            <tr app-table-none-record *ngIf="!DataSources.length" [colspan]="DisplayFields.length"></tr>
                         </tbody>
                     </table>
                 </cdk-virtual-scroll-viewport>
