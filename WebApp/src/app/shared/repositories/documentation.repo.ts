@@ -149,4 +149,11 @@ export class DocumentationRepo {
         );
     }
 
+    getShipmentDataCommon() {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/Terminology/GetShipmentCommonData`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
 }

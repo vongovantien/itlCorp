@@ -3,6 +3,7 @@
         data-toggle="dropdown" (keyup)="Search($event.target.value)" placeholder="Please select"
         [value]="displaySelectedStr == '' ? null : displaySelectedStr"
         [tooltip]="isTooltip ? (displaySelectedStr == '' ? null : displaySelectedStr) : ''">
+
     <div class="dropdown-menu  dropdown-menu-right e--combogrid-content">
         <div class="tabel-wrapper table-fixed">
             <div class="table-head-fixed">
@@ -10,7 +11,7 @@
                     <div class="search-field">
                         <input (keyup)="Search($event.target.value)"
                             class="form-control m-input m-input--square cbgr-input-search" type="text"
-                            placeholder="Search..." autoFocus>
+                            placeholder="Search..." autofocus>
                         <i class="icon-search"></i>
                     </div>
                 </div>

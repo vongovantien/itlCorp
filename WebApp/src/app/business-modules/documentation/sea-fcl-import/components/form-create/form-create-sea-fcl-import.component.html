@@ -11,13 +11,33 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Estimated Time of Departure</label>
-                        <input type="text" class="form-control">
+                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                            <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [minDate]="minDate"
+                                name="daterange" placeholder="Please Select" readonly [autoApply]="true"
+                                [singleDatePicker]="true" [alwaysShowCalendars]="true" />
+                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                <span>
+                                    <i class="la la-calendar"></i>
+                                </span>
+                            </span>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
                         <label required>Estimated Time of Arrival</label>
-                        <input type="text" class="form-control">
+                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                            <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [minDate]="minDate"
+                                name="daterange" placeholder="Please Select" readonly [autoApply]="true"
+                                [singleDatePicker]="true" [alwaysShowCalendars]="true" />
+                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                <span>
+                                    <i class="la la-calendar"></i>
+                                </span>
+                            </span>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -29,19 +49,31 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label required>Master Bill of Landing Type</label>
-                        <input type="text" class="form-control">
+                        <select class="form-control">
+                            <option value="null" disabled>Please Select</option>
+                            <option *ngFor="let landingType of ladingTypes" [ngValue]="landingType">
+                                {{landingType.displayName}}</option>
+                        </select>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
                         <label required>Shipment Type</label>
-                        <input type="text" class="form-control">
+                        <select class="form-control">
+                            <option *ngFor="let shipmentType of shipmentTypes" [ngValue]="shipmentType">
+                                {{shipmentType.displayName}}</option>
+                        </select>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Supplier/Co-Loader</label>
-                        <input type="text" class="form-control">
+                        <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCarrier"
+                            (itemSelected)="onSelectDataFormInfo($event, 'carrier')"
+                            [selectedDisplayFields]="configComboGridPartner.selectedDisplayFields"
+                            [dataSources]="carries" [displayFields]="configComboGridPartner.displayFields"
+                            [height]="200">
+                        </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -53,7 +85,12 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Agent</label>
-                        <input type="text" class="form-control">
+                        <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedAgent"
+                            (itemSelected)="onSelectDataFormInfo($event, 'carrier')"
+                            [selectedDisplayFields]="configComboGridPartner.selectedDisplayFields"
+                            [dataSources]="agents" [displayFields]="configComboGridPartner.displayFields"
+                            [height]="200">
+                        </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -95,7 +132,12 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label required>Service Type</label>
-                        <input type="text" class="form-control">
+                        <select class="form-control">
+                            <option value="null" disabled>Please Select</option>
+                            <option *ngFor="let serviceType of serviceTypes" [ngValue]="serviceType">
+                                {{serviceType.displayName}}
+                            </option>
+                        </select>
                     </div>
                 </div>
                 <div class="col-md-4">
