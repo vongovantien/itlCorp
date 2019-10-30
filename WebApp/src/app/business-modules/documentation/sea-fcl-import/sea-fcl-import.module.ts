@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Routes, RouterModule } from '@angular/router';
 
 import { SharedModule } from 'src/app/shared/shared.module';
-import { TabsModule, PaginationModule, ModalModule } from 'ngx-bootstrap';
+import { TabsModule, PaginationModule, ModalModule, CollapseModule } from 'ngx-bootstrap';
 import { SelectModule } from 'ng2-select';
 import { SeaFCLImportManagementComponent } from './sea-fcl-import-management.component';
 import { SeaFCLImportCreateJobComponent } from './create-job/create-job-fcl-import.component';
@@ -13,6 +13,8 @@ import { SeaFCLImportManagementFormSearchComponent } from './components/form-sea
 import { SeaFClImportFormCreateComponent } from './components/form-create/form-create-sea-fcl-import.component';
 import { SeaFCLImportShipmentGoodSummaryComponent } from './components/shipment-good-summary/shipment-good-summary.component';
 import { SeaFCLImportCDNoteComponent } from './detail-job/cd-note/sea-fcl-import-cd-note.component';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 
 
@@ -42,6 +44,16 @@ const COMPONENTS = [
     SeaFCLImportShipmentGoodSummaryComponent,
 ];
 
+const LIB = [
+    CollapseModule.forRoot(),
+    TabsModule.forRoot(),
+    ModalModule.forRoot(),
+    PaginationModule.forRoot(),
+    SelectModule,
+    NgxDaterangepickerMd,
+
+]
+
 @NgModule({
     declarations: [
         ...COMPONENTS,
@@ -56,10 +68,7 @@ const COMPONENTS = [
         RouterModule.forChild(routing),
         FormsModule,
         ReactiveFormsModule,
-        TabsModule.forRoot(),
-        PaginationModule,
-        SelectModule,
-        ModalModule.forRoot()
+        ...LIB
     ],
     exports: [],
     providers: [],

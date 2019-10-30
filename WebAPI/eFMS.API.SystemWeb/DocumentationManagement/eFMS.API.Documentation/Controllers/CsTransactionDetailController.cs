@@ -179,10 +179,10 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
-        [HttpGet("GetGoodSummaryOfAllHBL")]
-        public IActionResult GetGoodSummaryOfAllHBL(Guid HblId)
+        [HttpGet("GetGoodSummaryOfAllHblByJobId")]
+        public IActionResult GetGoodSummaryOfAllHBLByJobId(Guid jobId)
         {
-            var result = csTransactionDetailService.GetGoodSummaryOfAllHBL(HblId);
+            var result = csTransactionDetailService.GetGoodSummaryOfAllHBLByJobId(jobId);
             return Ok(result);
         }
     }

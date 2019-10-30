@@ -9,55 +9,65 @@ export class CsTransaction {
   jobNo: String = null;
   mawb: String = null;
   typeOfService: String = null;
-  etd: Date = null;
-  eta: Date = null;
+  etd: String = null;
+  eta: String = null;
+  serviceDate: String = null;
   mbltype: String = null;
   coloaderId: String = null; // supplier
-  coloaderName: String = null;
+  coloaderName: String = null; //
+  supplierName: String = null; //Used
+  subColoader: String = null;
   bookingNo: String = null;
-  shippingServiceType: String = null;
   agentId: String = null; // agent 
   agentName: String = null;
   pol: String = null;
   polName: String = null;
   pod: String = null;
   podName: String = null;
+  deliveryPlace: String = null;
   paymentTerm: String = null;
-  loadingDate: Date = null;
-  requestedDate: Date = null;
   flightVesselName: String = null;
   voyNo: String = null;
-  flightVesselConfirmedDate: Date = null;
   shipmentType: String = null;
-  serviceMode: String = null;
   commodity: String = null;
-  invoiceNo: String = null;
+  desOfGoods: String = null;
+  packageContainer: String = '';
   pono: String = null;
   personIncharge: String = null;
   personInChargeName: String = null;
-  deliveryPoint: String = null;
-  routeShipment: String = null;
-  quantity: Number = null;
-  unit: Number = null;
+  netWeight: number = 0;
   grossWeight: number = 0;
   chargeWeight: number = 0;
-  netWeight: number = 0;
   cbm: number = 0;
-  containerSize: String = null;
-  dimension: String = null;
-  wareHouseId: String = null;
   notes: String = null;
-  locked: Boolean = null;
-  lockedDate: Date = null;
+  transactionType: String = null;
+  isLocked: Boolean = null;
+  lockedDate: String = null;
   userCreated: String = null;
-  createdDate: Date = null;
+  createdDate: String = null;
   userModified: String = null;
-  modifiedDate: Date = null;
+  modifiedDate: String = null;
   active: Boolean = true;
-  inactiveOn: Date = null;
-  packageContainer: String = '';
-  desOfGoods: String = '';
+  inactiveOn: String = null;
+
   csMawbcontainers: Container[] = null;
   csTransactionDetails: CsTransactionDetail[] = null;
 
+  hwbNo: String = null;
+  customerId: String = null;
+  notifyPartyId: string = null;
+  saleManId: String = null;
+  creatorName: String = null;
+  sumCont: number = 0;
+  sumPackage: number = 0;
+  hblId: String = "00000000-0000-0000-0000-000000000000";
+
+  constructor(object?: any) {
+    const self = this;
+    for (const key in object) {
+      if (self.hasOwnProperty(key.toString())) {
+        self[key] = object[key];
+      }
+    }
+  }
 }

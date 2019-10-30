@@ -354,15 +354,29 @@ namespace eFMS.API.Documentation.DL.Services
             return results;
         }
 
-        public object GetGoodSummaryOfAllHBL(Guid HblId)
+        public object GetGoodSummaryOfAllHBLByJobId(Guid JobId)
         {
-            var containersHbl = csMawbcontainerRepo.Get(x => x.Hblid == HblId);
-            var totalGW = containersHbl.Sum(s => s.Gw);
-            var totalNW = containersHbl.Sum(s => s.Nw);
-            var totalCW = containersHbl.Sum(s => s.ChargeAbleWeight);
-            var totalCbm = containersHbl.Sum(s => s.Cbm);
-            var containers = string.Join(",", containersHbl.OrderByDescending(o => o.ContainerTypeId).Select(s => (s.ContainerTypeId != null || s.Quantity != null) ? (s.Quantity + "x" + GetUnitNameById(s.ContainerTypeId)) : string.Empty));
-            var commodities = string.Join(",", containersHbl.Select(x => GetCommodityNameById(x.CommodityId)));
+            var houserbills = DataContext.Get(x => x.JobId == JobId);
+            decimal? totalGW = 0;
+            decimal? totalNW = 0;
+            decimal? totalCW = 0;
+            decimal? totalCbm = 0;
+            var containers = string.Empty;
+            var commodities = string.Empty;
+
+            if (houserbills.Any())
+            {
+                foreach (var item in houserbills)
+                {
+                    var containersHbl = csMawbcontainerRepo.Get(x => x.Hblid == item.Id);
+                    totalGW += containersHbl.Sum(s => s.Gw);
+                    totalNW += containersHbl.Sum(s => s.Nw);
+                    totalCW += containersHbl.Sum(s => s.ChargeAbleWeight);
+                    totalCbm += containersHbl.Sum(s => s.Cbm);
+                    containers += string.Join(",", containersHbl.OrderByDescending(o => o.ContainerTypeId).Select(s => (s.ContainerTypeId != null || s.Quantity != null) ? (s.Quantity + "x" + GetUnitNameById(s.ContainerTypeId)) : string.Empty));
+                    commodities += string.Join(",", containersHbl.Select(x => GetCommodityNameById(x.CommodityId)));
+                }
+            }
             return new { totalGW, totalNW, totalCW, totalCbm , containers , commodities };
         }
 

@@ -15,7 +15,7 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? ServiceDate { get; set; }
         public string Mbltype { get; set; }
         public string ColoaderId { get; set; }
-        public string SubColoaderId { get; set; }
+        public string SubColoader { get; set; }
         public string BookingNo { get; set; }
         public string AgentId { get; set; }
         public Guid? Pol { get; set; }
