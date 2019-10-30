@@ -11,6 +11,10 @@ const routing: Routes = [
         data: { name: 'House Bill List', path: 'hbl', level: 4 }
     },
     {
+        path: 'new', component: SeaFCLImportHBLComponent,
+        data: { name: 'New House Bill Detail', path: ':id', level: 5 }
+    },
+    {
         path: ':id', component: SeaFCLImportHBLComponent,
         data: { name: 'House Bill Detail', path: ':id', level: 5 }
     }

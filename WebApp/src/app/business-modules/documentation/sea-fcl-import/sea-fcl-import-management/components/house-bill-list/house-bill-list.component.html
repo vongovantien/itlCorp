@@ -14,6 +14,21 @@
                     </div>
                 </div>
             </div>
+            <div class="col-lg-8">
+                <div class="form-group">
+                    <button type="button" style="float:right"
+                        class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                        routerLink="/home/documentation/sea-fcl-import/new-house-bill">
+                        <span>
+                            <i class="la la-plus"></i>
+                            <span>
+                                Add New House Bill
+                            </span>
+                        </span>
+                    </button>
+                </div>
+
+            </div>
         </div>
         <div class="table-wrapper table-scrollabler" id="hoursebill-list-table">
             <table class="table table-striped table-brand table-hover dataTable">
@@ -26,7 +41,7 @@
                 <tbody class="tbody-group">
                     <ng-container *ngIf="!isLoading && !!houseBill.length">
                         <tr
-                            *ngFor="let house of houseBill | filter : keyword : ['hwbno','hwbno']; let i = index; trackBy: trackByFn">
+                            *ngFor="let house of houseBill | filter : keyword : ['hwbno','customerName','saleManName','notifyParty','finalDestinationPlace','containers','packages','gw','cbm']; let i = index; trackBy: trackByFn">
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
 
@@ -71,5 +86,6 @@
             </table>
 
         </div>
+        <ng-content></ng-content>
     </div>
 </div>

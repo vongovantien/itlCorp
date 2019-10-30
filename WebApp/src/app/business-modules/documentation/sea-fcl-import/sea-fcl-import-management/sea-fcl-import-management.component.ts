@@ -28,6 +28,8 @@ export class SeaFCLImportManagementComponent extends AppList {
 
     }
 
+
+
     gotoCreateJob() {
         this._router.navigate(['home/documentation/sea-fcl-import/new']);
     }

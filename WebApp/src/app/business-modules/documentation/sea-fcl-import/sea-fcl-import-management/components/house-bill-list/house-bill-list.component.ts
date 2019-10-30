@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactionDetail';
 import { DocumentationRepo } from 'src/app/shared/repositories';
+import { SortService } from 'src/app/shared/services';
+import { Router } from '@angular/router';
 @Component({
     selector: 'app-house-bill-list',
     templateUrl: './house-bill-list.component.html',
@@ -12,9 +14,14 @@ export class HouseBillListComponent extends AppList {
     houseBill: CsTransactionDetail[] = [];
 
     constructor(
+        private _sortService: SortService,
+        private _router: Router,
+
         private _documentRepo: DocumentationRepo
     ) {
         super();
+        this.requestSort = this.sortLocal;
+
     }
 
     ngOnInit() {
@@ -40,5 +47,14 @@ export class HouseBillListComponent extends AppList {
             },
         );
     }
+
+    sortLocal(sort: string): void {
+        this.houseBill = this._sortService.sort(this.houseBill, sort, this.order);
+    }
+
+    gotoCreateHouseBill() {
+        this._router.navigate(['/home/documentation/sea-fcl-import/new-house-bill']);
+    }
+
 
 }

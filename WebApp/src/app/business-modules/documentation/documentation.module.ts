@@ -44,6 +44,7 @@ import { SeaFCLImportManagementFormSearchComponent } from './sea-fcl-import/sea-
 import { SeaFCLImportManagementComponent } from './sea-fcl-import/sea-fcl-import-management/sea-fcl-import-management.component';
 import { HouseBillListComponent } from './sea-fcl-import/sea-fcl-import-management/components/house-bill-list/house-bill-list.component';
 import { TabsModule } from 'ngx-bootstrap';
+import { FormCreateHouseBillComponent } from './sea-fcl-import/sea-fcl-import-management/components/form-create-house-bill/form-create-house-bill.component';
 
 @NgModule({
   imports: [
@@ -80,7 +81,7 @@ import { TabsModule } from 'ngx-bootstrap';
     CreditAndDebitNoteRemainingChargeComponent,
     ManifestComponent,
     ShippingInstructionComponent,
-    SeaLclExportCreateComponent, SeaLclExportShipmentDetailComponent, SeaLclExportHousebillListComponent, SeaLclExportHousebillAddnewComponent, SeaLclExportDetailImportComponent, SeaLclExportHousebillDetailImportComponent, SeaLclExportCreditAndDebitNoteComponent, SeaLclExportCreditAndDebitNoteAddnewComponent, SeaLclExportCreditAndDebitNoteRemainingChargeComponent, SeaLclExportCreditAndDebitNoteDetailComponent, SeaLclExportCreditAndDebitNoteEditComponent, SeaLclExportManifestComponent, SeaLclExportShippingInstructionComponent, SeaFCLImportManagementFormSearchComponent, SeaFCLImportManagementComponent, HouseBillListComponent
+    SeaLclExportCreateComponent, SeaLclExportShipmentDetailComponent, SeaLclExportHousebillListComponent, SeaLclExportHousebillAddnewComponent, SeaLclExportDetailImportComponent, SeaLclExportHousebillDetailImportComponent, SeaLclExportCreditAndDebitNoteComponent, SeaLclExportCreditAndDebitNoteAddnewComponent, SeaLclExportCreditAndDebitNoteRemainingChargeComponent, SeaLclExportCreditAndDebitNoteDetailComponent, SeaLclExportCreditAndDebitNoteEditComponent, SeaLclExportManifestComponent, SeaLclExportShippingInstructionComponent, SeaFCLImportManagementFormSearchComponent, SeaFCLImportManagementComponent, HouseBillListComponent, FormCreateHouseBillComponent
   ]
 })
 export class DocumentationModule { }

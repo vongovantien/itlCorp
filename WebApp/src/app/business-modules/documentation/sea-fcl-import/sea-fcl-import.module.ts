@@ -13,12 +13,18 @@ import { SeaFCLImportShipmentGoodSummaryComponent } from './sea-fcl-import-manag
 import { SeaFCLImportDetailJobComponent } from './sea-fcl-import-management/detail-job/detail-job-fcl-import.component';
 import { SeaFCLImportCDNoteComponent } from './sea-fcl-import-management/detail-job/cd-note/sea-fcl-import-cd-note.component';
 import { HouseBillListComponent } from './sea-fcl-import-management/components/house-bill-list/house-bill-list.component';
+import { FormCreateHouseBillComponent } from './sea-fcl-import-management/components/form-create-house-bill/form-create-house-bill.component';
 
 const routing: Routes = [
+
     {
         path: '', pathMatch: 'full', component: SeaFCLImportManagementComponent,
         data: { name: "Sea FCL Import", path: "sea-fcl-import", level: 2 }
     },
+    // {
+    //     path: 'new-house-bill', component: FormCreateHouseBillComponent,
+    //     data: { name: "Create New HBL", level: 3 }
+    // },
     {
         path: 'new', component: SeaFCLImportCreateJobComponent,
         data: { name: "Create New Job", path: "new", level: 3 }
@@ -29,7 +35,8 @@ const routing: Routes = [
     },
     {
         path: ':id/hbl', loadChildren: () => import('./sea-fcl-import-management/detail-job/hbl/sea-fcl-import-hbl.module').then(m => m.SeaFCLImportHBLModule),
-    }
+    },
+
 
 ];
 
@@ -46,7 +53,8 @@ const COMPONENTS = [
         SeaFCLImportManagementComponent,
         SeaFCLImportCreateJobComponent,
         SeaFCLImportDetailJobComponent,
-        SeaFCLImportCDNoteComponent
+        SeaFCLImportCDNoteComponent,
+        FormCreateHouseBillComponent
     ],
     imports: [
         CommonModule,

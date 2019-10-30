@@ -18,6 +18,7 @@ import { SeaLclExportShippingInstructionComponent } from './sea-lcl-export-creat
 import { SeaFCLImportManagementComponent } from './sea-fcl-import/sea-fcl-import-management/sea-fcl-import-management.component';
 
 const routes: Routes = [
+
     {
         path: '',
         redirectTo: 'inland-trucking',
@@ -99,7 +100,7 @@ const routes: Routes = [
         path: 'sea-fcl-import',
         component: SeaFCLImportManagementComponent,
         data: {
-            name: "Sea FCL Import / Job Detail",
+            name: "Sea FCL Import",
             level: 2
         }
     },
@@ -135,6 +136,7 @@ const routes: Routes = [
             level: 4
         }
     },
+
     {
         path: 'sea-lcl-export-housebill-addnew',
         component: SeaLclExportHousebillAddnewComponent

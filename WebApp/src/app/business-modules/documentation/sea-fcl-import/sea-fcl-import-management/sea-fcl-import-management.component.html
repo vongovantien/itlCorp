@@ -17,7 +17,23 @@
             <tabset>
                 <tab heading="Shippment Detail" id="tab1">Shippment Detail</tab>
                 <tab heading="House Bill List">
-                    <app-house-bill-list></app-house-bill-list>
+                    <div class="alert-block__heading">
+                        <h3 class="alert-block__title">House Bill List</h3>
+                    </div>
+                    <app-house-bill-list>
+                        <div class="alert-block__heading">
+                            <h3 class="alert-block__title collapse-toggle" data-toggle="collapse"
+                                data-target="#good-summary">
+                                <i class="la la-angle-up m--margin-right-5"></i> Good Summary of all HBL
+                            </h3>
+                        </div>
+                        <div class="m-portlet__body">
+                            <div class="collapse show" id="good-summary">
+                                <h2>hello</h2>
+                            </div>
+                        </div>
+                    </app-house-bill-list>
+
                 </tab>
                 <tab heading="Debit Note & Credit Note">Debit Note & Credit Note</tab>
             </tabset>
