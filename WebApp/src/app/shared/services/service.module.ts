@@ -6,6 +6,7 @@ import { PagingService } from './paging-service';
 import { BaseService } from './base.service';
 import { AuthGuardService } from './auth-guard.service';
 import { DataService } from './data.service';
+import { PreviousRouteService } from './previous-route';
 
 @NgModule({
     declarations: [],
@@ -18,7 +19,8 @@ import { DataService } from './data.service';
         PagingService,
         BaseService,
         AuthGuardService,
-        DataService
+        DataService,
+        PreviousRouteService
     ],
 })
 export class ServiceModule { }

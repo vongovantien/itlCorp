@@ -2,33 +2,35 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { CatPlaceModel } from 'src/app/shared/models/catalogue/catPlace.model';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
-import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
-import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
+import { NgProgress } from '@ngx-progressbar/core';
 
 @Component({
-    selector: 'app-add-province',
-    templateUrl: './add-province.component.html'
+    selector: 'app-update-province',
+    templateUrl: './update-province.component.html'
 })
-export class AddProvinceComponent extends PopupBase implements OnInit {
+export class UpdateProvinceComponent extends PopupBase implements OnInit {
     @Output() isSaveSuccess = new EventEmitter<boolean>();
     formProvince: FormGroup;
-    provinceCityToAdd = new CatPlaceModel();
+    provinceCityToUpdate = new CatPlaceModel();
     resetNg2SelectCountry = true;
     ngSelectDataCountries: any = [];
     isSubmitted = false;
+    currentActiveCountry: any[] = null;
+    currentId: string;
 
     code: AbstractControl;
     nameEn: AbstractControl;
     nameVn: AbstractControl;
     country: AbstractControl;
+    active: AbstractControl;
 
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
-        protected _progressService: NgProgress,
-        private _toastService: ToastrService) {
+        private _toastService: ToastrService,
+        protected _progressService: NgProgress) {
         super();
         this._progressRef = this._progressService.ref();
     }
@@ -36,9 +38,10 @@ export class AddProvinceComponent extends PopupBase implements OnInit {
     ngOnInit() {
         this.initForm();
     }
+
     initForm() {
         this.formProvince = this._fb.group({
-            code: ['', Validators.compose([
+            code: [{ value: '', disabled: true }, Validators.compose([
                 Validators.required
             ])],
             nameEn: ['', Validators.compose([
@@ -47,24 +50,28 @@ export class AddProvinceComponent extends PopupBase implements OnInit {
             nameVn: ['', Validators.compose([
                 Validators.required
             ])],
-            country: ['', Validators.compose([
-                Validators.required
-            ])]
+            active: [false]
         });
         this.code = this.formProvince.controls['code'];
         this.nameEn = this.formProvince.controls['nameEn'];
         this.nameVn = this.formProvince.controls['nameVn'];
-        this.country = this.formProvince.controls['country'];
+        this.active = this.formProvince.controls['active'];
+    }
+    setValueFormGroup(res: any) {
+        this.formProvince.setValue({
+            code: res.code,
+            nameEn: res.nameEn,
+            nameVn: res.nameVn,
+            active: res.active
+        });
     }
     saveProvince() {
         this.isSubmitted = true;
-        if (this.formProvince.valid) {
-            this.provinceCityToAdd.placeType = PlaceTypeEnum.Province;
-            this.provinceCityToAdd.code = this.code.value;
-            this.provinceCityToAdd.nameEn = this.nameEn.value;
-            this.provinceCityToAdd.nameVn = this.nameVn.value;
-            this.provinceCityToAdd.countryId = this.country.value[0].id;
-            this._catalogueRepo.addPlace(this.provinceCityToAdd)
+        if (this.formProvince.valid && this.provinceCityToUpdate.countryId != null) {
+            this.provinceCityToUpdate.nameEn = this.nameEn.value;
+            this.provinceCityToUpdate.nameVn = this.nameVn.value;
+            this.provinceCityToUpdate.active = this.active.value;
+            this._catalogueRepo.updatePlace(this.currentId, this.provinceCityToUpdate)
                 .pipe(
                     catchError(this.catchError),
                     finalize(() => {
@@ -93,6 +100,11 @@ export class AddProvinceComponent extends PopupBase implements OnInit {
     }
     refreshValue(event) { }
     typed(event) { }
-    removed(event) { }
-    selectedCountry(event, s: string, k: string) { }
+    removed(event) {
+        this.provinceCityToUpdate.countryId = null;
+    }
+    selected(event) {
+        this.provinceCityToUpdate.countryId = event.id;
+
+    }
 }

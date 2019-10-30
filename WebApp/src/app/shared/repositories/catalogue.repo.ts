@@ -308,4 +308,23 @@ export class CatalogueRepo {
         }
 
     }
+
+    //#region place
+    addPlace(body: any = {}) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPlace/Add`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+    updatePlace(id: string, body: any = {}) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPlace/` + id, body).pipe(
+            map((data: any) => data)
+        );
+    }
+    getDetaiPlace(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/` + id)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+    //#endregion
 }

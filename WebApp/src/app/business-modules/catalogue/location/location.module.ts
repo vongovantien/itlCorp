@@ -10,6 +10,7 @@ import { LocationComponent } from './location.component';
 import { AddCountryComponent } from './country/add-country/add-country.component';
 import { ModalModule } from 'ngx-bootstrap';
 import { AddProvinceComponent } from './province/add-province/add-province.component';
+import { UpdateProvinceComponent } from './province/update-province/update-province.component';
 
 const routing: Routes = [
     { path: '', component: LocationComponent, data: { name: "Location", level: 2 } },
@@ -32,7 +33,8 @@ const routing: Routes = [
         LocationComponent,
         LocationImportComponent,
         AddCountryComponent,
-        AddProvinceComponent
+        AddProvinceComponent,
+        UpdateProvinceComponent
     ],
     providers: [],
 })

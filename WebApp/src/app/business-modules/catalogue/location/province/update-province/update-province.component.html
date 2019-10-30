@@ -1,35 +1,31 @@
-<div class="modal fade" id="add-city-province-modal" bsModal #popup="bs-modal" role="dialog" (onHide)="onHide($event)"
-    (onShow)="onShow($event)">
+<div class="modal fade" id="update-city-province-modal" bsModal #popup="bs-modal" role="dialog"
+    (onHide)="onHide($event)" (onShow)="onShow($event)">
     <div class="modal-dialog modal-xs" role="document">
         <div class="modal-content">
 
             <div class="modal-header">
-                <h5 class="modal-title">Add City-Province</h5>
-                <button type="button" class="close" aria-label="Close" (click)="cancelAdd()">
+                <h5 class="modal-title">Update City-Province</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="cancelAdd()">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
+                <!--begin::add-stage-management-form-->
                 <form [formGroup]="formProvince">
                     <div class="m-form m-form m-form--state">
-                        <div class="form-group row"
-                            [ngClass]="{'m-form__group has-danger': (code.dirty && !code.valid) || (isSubmitted && !code.valid)}">
+
+                        <div class="form-group row">
                             <label class="col-lg-4 col-form-label form-control-label">
                                 Province - City Code <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <input type="text" formControlName="code" class="form-control m-input m-input--square"
                                     name="code" required placeholder="Please enter province-city code">
-                                <div class="form-control-feedback" *ngIf="isSubmitted && !code.valid">
-                                    Group code is required!
-                                </div>
                             </div>
 
                         </div>
-
-
                         <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': (nameEn.dirty && !nameEn.valid) || (isSubmitted && !nameEn.valid) }">
+                            [ngClass]="{ 'm-form__group has-danger': (isSubmitted && nameEn.dirty && !nameEn.valid) || (isSubmitted && !nameEn.valid) }">
                             <label class="col-lg-4 col-form-label form-control-label">
                                 English Name <span class="m--font-danger">(*)</span>
                             </label>
@@ -42,10 +38,8 @@
                             </div>
 
                         </div>
-
-
                         <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': (nameVn.dirty && !nameVn.valid) || (isSubmitted && !nameVn.valid) }">
+                            [ngClass]="{ 'm-form__group has-danger': (isSubmitted && nameVn.dirty && !nameVn.valid) || (isSubmitted && !nameVn.valid) }">
                             <label class="col-lg-4 col-form-label form-control-label">
                                 Local Name <span class="m--font-danger">(*)</span>
                             </label>
@@ -57,30 +51,35 @@
                                 </div>
                             </div>
                         </div>
-
-
                         <div class="form-group row"
-                            [ngClass]="{'m-form__group has-danger': (country.dirty && !country.valid) || (isSubmitted && !country.valid)}">
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && provinceCityToUpdate.countryId==null }">
                             <label class="col-lg-4 col-form-label form-control-label">
                                 Country <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
-                                <ng-select [allowClear]="true" [items]="ngSelectDataCountries" formControlName="country"
+                                <ng-select [allowClear]="true" [items]="ngSelectDataCountries"
+                                    [active]="currentActiveCountry"
                                     *ngIf="resetNg2SelectCountry && ngSelectDataCountries.length>0"
-                                    (data)="refreshValue($event)"
-                                    (selected)="selectedCountry($event,'add','province-city')"
-                                    (removed)="removed($event,'addCountryProvince')" (typed)="typed($event)"
-                                    placeholder="Select Country">
+                                    (data)="refreshValue($event)" (selected)="selected($event)"
+                                    (removed)="removed($event,'updateCountryProvince')" (typed)="typed($event)"
+                                    placeholder="Select department">
                                 </ng-select>
                                 <div class="form-control-feedback"
-                                    *ngIf="isSubmitted && (country.errors | equalError: 'required') || (country.errors | equalError: 'required') && country.dirty">
+                                    *ngIf="isSubmitted && provinceCityToUpdate.countryId==null">
                                     Country is required
                                 </div>
                             </div>
-
                         </div>
-
-
+                        <div class="form-group row">
+                            <label class="col-lg-4 col-form-label form-control-label">
+                                Active
+                            </label>
+                            <div class="col-lg-8">
+                                <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
+                                    <input type="checkbox" formControlName="active"
+                                        type="checkbox"><span></span></label>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer m--align-center c-button-actions">
                         <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
@@ -103,6 +102,8 @@
                         </button>
                     </div>
                 </form>
+                <!--end:add-stage-management-form -->
+                <!-- (click)="add_stage()" -->
             </div>
 
         </div>

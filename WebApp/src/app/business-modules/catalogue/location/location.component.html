@@ -315,11 +315,16 @@
                                     <tr *ngFor="let item of ListProvinceCities;let index=index;">
                                         <td class="table-actions-col">
                                             <div class="table-actions" style="width: 70px">
-                                                <button type="button"
+                                                <!-- <button type="button"
                                                     class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                     title="Edit stage" data-toggle="modal"
                                                     data-target="#update-city-province-modal"
                                                     (click)="showUpdateProvince(item.id)">
+                                                    <i class="la la-edit"></i>
+                                                </button> -->
+                                                <button type="button"
+                                                    class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                    title="Edit stage" (click)="showUpdateProvince(item.id)">
                                                     <i class="la la-edit"></i>
                                                 </button>
                                                 <button type="button"
@@ -931,143 +936,11 @@
 
 
 <!-- BEGIN ADD CITY PROVINCE MODAL -->
-<app-add-province></app-add-province>
+<app-add-province (isSaveSuccess)="saveProvince($event)"></app-add-province>
 <!-- END ADD CITY PROVINCE MODAL -->
 
 <!-- BEGIN EDIT CITY PROVINCE MODAL -->
-<div class="modal fade" id="update-city-province-modal" data-backdrop="static" role="dialog" aria-labelledby=""
-    aria-hidden="true">
-    <div class="modal-dialog modal-xs" role="document">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h5 class="modal-title">Update City-Province</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!--begin::add-stage-management-form-->
-                <form novalidate #updateProvinceForm="ngForm" *ngIf="ProvinceCityToUpdate"
-                    (ngSubmit)="updateProvinceForm.form.valid">
-                    <div class="m-form m-form m-form--state">
-
-                        <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': updateProvinceForm.submitted && province_code.invalid }">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                Province - City Code <span class="m--font-danger">(*)</span>
-                            </label>
-                            <div class="col-lg-8">
-                                <input type="text" [(ngModel)]="ProvinceCityToUpdate.code"
-                                    class="form-control m-input m-input--square" #province_code="ngModel"
-                                    name="province_code" required placeholder="Please enter province-city code">
-                                <div class="form-control-feedback"
-                                    *ngIf="updateProvinceForm.submitted && province_code.invalid">
-                                    Province - City code is required
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': updateProvinceForm.submitted && english_name.invalid }">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                English Name <span class="m--font-danger">(*)</span>
-                            </label>
-                            <div class="col-lg-8">
-                                <input type="text" [(ngModel)]="ProvinceCityToUpdate.nameEn"
-                                    class="form-control m-input m-input--square" #english_name="ngModel" required
-                                    minlength="3" name="english_name" placeholder="Please enter english name">
-                                <div class="form-control-feedback"
-                                    *ngIf="updateProvinceForm.submitted && english_name.invalid">
-                                    English name is required at least 3 characters
-                                </div>
-                            </div>
-
-                        </div>
-
-
-                        <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': updateProvinceForm.submitted && local_name.invalid }">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                Local Name <span class="m--font-danger">(*)</span>
-                            </label>
-                            <div class="col-lg-8">
-                                <input type="text" [(ngModel)]="ProvinceCityToUpdate.nameVn"
-                                    class="form-control m-input m-input--square" #local_name="ngModel" required
-                                    minlength="3" name="local_name" placeholder="Please enter local name">
-                                <div class="form-control-feedback"
-                                    *ngIf="updateProvinceForm.submitted && local_name.invalid">
-                                    Local name is required at least 3 characters
-                                </div>
-                            </div>
-
-                        </div>
-
-
-                        <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': updateProvinceForm.submitted && ProvinceCityToUpdate.countryId==null }">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                Country <span class="m--font-danger">(*)</span>
-                            </label>
-                            <div class="col-lg-8">
-                                <ng-select [allowClear]="true" [items]="ngSelectDataCountries"
-                                    [active]="currentActiveCountry"
-                                    *ngIf="resetNg2SelectCountry && ngSelectDataCountries.length>0"
-                                    (data)="refreshValue($event)"
-                                    (selected)="selectedCountry($event,'update','province-city')"
-                                    (removed)="removed($event,'updateCountryProvince')" (typed)="typed($event)"
-                                    placeholder="Select department">
-                                </ng-select>
-                                <div class="form-control-feedback"
-                                    *ngIf="updateProvinceForm.submitted && ProvinceCityToUpdate.countryId==null">
-                                    Country is required
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                Active
-                            </label>
-                            <div class="col-lg-8">
-                                <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input
-                                        [attr.checked]="ProvinceCityToUpdate.active ? 'Checked': null"
-                                        (change)="ProvinceCityToUpdate.active = !ProvinceCityToUpdate.active"
-                                        type="checkbox"><span></span></label>
-                            </div>
-                        </div>
-
-
-                    </div>
-                    <div class="modal-footer m--align-center c-button-actions">
-                        <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="updateProvinceCity(updateProvinceForm,'yes')">
-                            <span>
-                                <i class="la la-save"></i>
-                                <span>
-                                    save
-                                </span>
-                            </span>
-                        </button>
-                        <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="updateProvinceCity(updateProvinceForm,'cancel')">
-                            <span>
-                                <i class="la la-ban"></i>
-                                <span>
-                                    cancel
-                                </span>
-                            </span>
-                        </button>
-                    </div>
-                </form>
-                <!--end:add-stage-management-form -->
-                <!-- (click)="add_stage()" -->
-            </div>
-
-        </div>
-    </div>
-</div>
+<app-update-province (isSaveSuccess)="saveProvince($event)"></app-update-province>
 <!-- END EDIT CITY PROVINCE MODAL -->
 
 
