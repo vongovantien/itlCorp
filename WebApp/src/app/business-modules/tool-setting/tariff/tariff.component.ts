@@ -40,8 +40,8 @@ export class TariffComponent extends AppList {
         this.headers = [
             { field: 'tariffName', title: 'Name', sortable: true },
             { field: 'tariffType', title: 'Tariff Type', sortable: true },
-            { field: 'customerID', title: 'Customer', sortable: true },
-            { field: 'supplierID', title: 'Supplier', sortable: true },
+            { field: 'customerName', title: 'Customer', sortable: true },
+            { field: 'supplierName', title: 'Supplier', sortable: true },
             { field: 'serviceMode', title: 'Shipment Mode', sortable: true },
             { field: 'effectiveDate', title: 'Effect Date', sortable: true },
             { field: 'expiredDate', title: 'Expired Date', sortable: true },
@@ -68,7 +68,6 @@ export class TariffComponent extends AppList {
                 (res: any) => {
                     this.totalItems = res.totalItems || 0;
                     this.tariffs = res.data || [];
-                    console.log(this.tariffs);
                 },
             );
     }

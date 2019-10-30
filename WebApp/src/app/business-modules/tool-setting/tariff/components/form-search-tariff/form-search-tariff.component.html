@@ -23,7 +23,6 @@
                     <div class="form-group">
                         <label for="">Tariff Type</label>
                         <select formControlName="tariffType" class="form-control">
-                            <option [ngValue]="null">Select Type</option>
                             <option *ngFor="let type of tariffTypes" [ngValue]="type">{{type.displayName}}</option>
                         </select>
                     </div>
@@ -32,7 +31,6 @@
                     <div class="form-group">
                         <label for="">Shipment Mode</label>
                         <select formControlName="tariffShipmentMode" class="form-control">
-                            <option [ngValue]="null">Select Shipment Mode</option>
                             <option *ngFor="let mode of shipmentModes" [ngValue]="mode">{{mode.displayName}}</option>
                         </select>
                     </div>
@@ -57,7 +55,6 @@
                     <div class="form-group">
                         <label for="">Date Type</label>
                         <select formControlName="tariffDateType" class="form-control">
-                            <option [ngValue]="null">Select Date Type</option>
                             <option *ngFor="let type of dateTypes" [ngValue]="type">{{type.displayName}}</option>
                         </select>
                     </div>
@@ -66,7 +63,6 @@
                     <div class="form-group">
                         <label for="">Status</label>
                         <select formControlName="tariffStatus" class="form-control">
-                            <option [ngValue]="null">Select Status</option>
                             <option *ngFor="let status of status" [ngValue]="status">{{status.displayName}}</option>
                         </select>
                     </div>
