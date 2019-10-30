@@ -19,7 +19,9 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState UpdateTransactionDetail(CsTransactionDetailModel model);
         HandleState DeleteTransactionDetail(Guid hbId);
         //CsTransactionDetailReport GetReportBy(Guid jobId);
+        List<CsTransactionDetailModel> Query(CsTransactionDetailCriteria criteria);
         List<CsTransactionDetailModel> Paging(CsTransactionDetailCriteria criteria, int page, int size, out int rowsCount);
+        object GetGoodSummaryOfAllHBL(Guid HblId);
         object ImportCSTransactionDetail(CsTransactionDetailModel model);
         CsTransactionDetailModel GetHbDetails(Guid JobId, Guid HbId);
         Crystal Preview(CsTransactionDetailModel model);

@@ -54,7 +54,7 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult Add(CsTransactionDetailModel model)
         {
-      //      ChangeTrackerHelper.currentUser = currentUser.UserID;
+            //ChangeTrackerHelper.currentUser = currentUser.UserID;
             if (!ModelState.IsValid) return BadRequest();
             var checkExistMessage = CheckExist(model);
             if (checkExistMessage.Length > 0)
@@ -107,6 +107,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpPut]
         [Route("update")]
+        [Authorize]
         public IActionResult Update(CsTransactionDetailModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -125,7 +126,6 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
-
 
         private string CheckExist(CsTransactionDetailModel model)
         {
@@ -155,6 +155,13 @@ namespace eFMS.API.Documentation.Controllers
     //        return result;
     //}
 
+        [HttpPost("QueryData")]
+        public IActionResult QueryData(CsTransactionDetailCriteria criteria)
+        {
+            var data = csTransactionDetailService.Query(criteria);
+            return Ok(data);
+        }
+
         [HttpPost]
         [Route("Paging")]
         public IActionResult Paging(CsTransactionDetailCriteria criteria, int page, int size)
@@ -163,11 +170,19 @@ namespace eFMS.API.Documentation.Controllers
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
         }
+
         [HttpPost]
         [Route("PreviewSeaHBofLading")]
         public IActionResult PreviewSeaHBofLading(CsTransactionDetailModel model)
         {
             var result = csTransactionDetailService.Preview(model);
+            return Ok(result);
+        }
+
+        [HttpGet("GetGoodSummaryOfAllHBL")]
+        public IActionResult GetGoodSummaryOfAllHBL(Guid HblId)
+        {
+            var result = csTransactionDetailService.GetGoodSummaryOfAllHBL(HblId);
             return Ok(result);
         }
     }

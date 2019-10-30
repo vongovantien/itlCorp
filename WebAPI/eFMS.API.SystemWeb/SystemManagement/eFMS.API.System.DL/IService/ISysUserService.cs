@@ -18,6 +18,8 @@ namespace eFMS.API.System.DL.IService
         IQueryable<SysUserViewModel> Paging(SysUserCriteria criteria, int page, int size, out int rowsCount);
         IQueryable<SysUserViewModel> Query(SysUserCriteria criteria);
         List<SysUserImportModel> CheckValidImport(List<SysUserImportModel> list);
+        HandleState Import(List<SysUserViewModel> data);
+
 
     }
 }

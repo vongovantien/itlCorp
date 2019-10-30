@@ -122,7 +122,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="model">model to add</param>
         /// <returns></returns>
         [HttpPost]
-        //[Authorize]
+        [Authorize]
         public IActionResult Post(CsTransactionEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -131,7 +131,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            model.UserCreated = "admin";//currentUser.UserID;
+            model.UserCreated = currentUser.UserID;
             var result = csTransactionService.AddCSTransaction(model);
             return Ok(result);
         }
@@ -142,7 +142,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="model">model to update</param>
         /// <returns></returns>
         [HttpPut]
-        //[Authorize]
+        [Authorize]
         public IActionResult Put(CsTransactionEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -156,7 +156,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            model.UserModified = "admin";//currentUser.UserID;
+            model.UserModified = currentUser.UserID;
             var hs = csTransactionService.UpdateCSTransaction(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -186,7 +186,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="id">id of existed data that want to delete</param>
         /// <returns></returns>
         [HttpDelete("{id}")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Delete(Guid id)
         {
             if (!ModelState.IsValid) return BadRequest();

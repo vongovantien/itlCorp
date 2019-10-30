@@ -8,6 +8,10 @@ import { PaginationComponent } from 'ngx-bootstrap';
 import { NgProgressComponent } from '@ngx-progressbar/core';
 import { SystemConstants } from 'src/constants/system.const';
 import { AppList } from 'src/app/app.list';
+import { User } from 'src/app/shared/models';
+import { language } from 'src/languages/language.en';
+import { Employee } from 'src/app/shared/models/system/employee';
+declare var $: any;
 
 @Component({
     selector: 'app-user-management-import',
@@ -24,6 +28,7 @@ export class UserManagementImportComponent extends AppList {
     data: any[];
     pagedItems: any[] = [];
     inValidItems: any[] = [];
+    sysUser: User[] = [];
     totalValidRows: number = 0;
     totalRows: number = 0;
     isShowInvalid: boolean = true;
@@ -45,6 +50,7 @@ export class UserManagementImportComponent extends AppList {
             { title: 'Name EN', field: 'employeeNameEn', sortable: true },
             { title: 'Full Name', field: 'employeeNameEn', sortable: true },
             { title: 'Title', field: 'title', sortable: true },
+            { title: 'Phone Number', field: 'tel', sortable: true },
             { title: 'User Type', field: 'userType', sortable: true },
             { title: 'Role', field: 'role', sortable: true },
             { title: 'Level permission', field: '', sortable: true },
@@ -71,7 +77,7 @@ export class UserManagementImportComponent extends AppList {
         /**/
         this.resetBeforeSelecedFile();
         /**/
-        this.baseService.uploadfile(this.api_menu.Operation.CustomClearance.uploadExel, file.target['files'], "uploadedFile")
+        this.baseService.uploadfile(this.api_menu.System.User_Management.uploadExel, file.target['files'], "uploadedFile")
             .subscribe((response: any) => {
                 console.log(response);
                 this.data = response.data;
@@ -129,4 +135,53 @@ export class UserManagementImportComponent extends AppList {
             this.child.setPage(this.pager.currentPage);
         }
     }
+
+    async import() {
+        if (this.data == null || this.data == undefined) {
+            this.toastr.warning('Not selected import file', '', { positionClass: 'toast-bottom-right', closeButton: true, timeOut: 5000 });
+            return;
+        }
+        if (this.totalRows - this.totalValidRows > 0) {
+            $('#upload-alert-modal').modal('show');
+        }
+        else {
+            this.progressBar.start();
+            console.log(this.data);
+            this.data.forEach(element => {
+                if (element.status === 'Active') {
+                    element.active = true;
+                }
+                else {
+                    element.active = false;
+                }
+            });
+            const response = await this.baseService.postAsync(this.api_menu.System.User_Management.import, this.data, true, false);
+            if (response.success) {
+                this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
+                this.reset();
+                this.progressBar.complete();
+            }
+            else {
+                this.progressBar.complete();
+                this.baseService.handleError(response);
+            }
+            console.log(response);
+        }
+    }
+
+    reset() {
+        this.data = null;
+        this.pagedItems = null;
+        $("#inputFile").val('');
+        this.pager.totalItems = 0;
+        this.totalRows = this.totalValidRows = 0;
+    }
+}
+export interface IAddUser {
+    sysEmployeeModel: Employee;
+    username: string;
+    userType: string;
+    workingStatus: string;
+    isLdap: boolean;
+    active: boolean;
 }

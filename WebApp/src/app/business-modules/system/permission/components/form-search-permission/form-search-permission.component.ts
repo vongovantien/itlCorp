@@ -1,6 +1,8 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { SystemRepo } from 'src/app/shared/repositories';
+import { Role } from 'src/app/shared/models';
 
 @Component({
     selector: 'form-search-permission',
@@ -11,23 +13,18 @@ export class PermissionFormSearchComponent extends AppForm {
     @Output() onSearch: EventEmitter<ISearchPermission | any> = new EventEmitter<ISearchPermission | any>();
 
     formSearch: FormGroup;
-    roles: CommonInterface.IValueDisplay[];
+    roles: Role[] = new Array<Role>();
     statuss: CommonInterface.IValueDisplay[];
 
     constructor(
-        protected _fb: FormBuilder
+        protected _fb: FormBuilder,
+        protected _systemRepo: SystemRepo
     ) {
         super();
 
         this.requestReset = this.resetFormSearch;
         this.requestSearch = this.submitSearch;
-        this.roles = [
-            { displayName: 'Customer Service', value: 'CS' },
-            { displayName: 'Field OPS', value: 'OPS' },
-            { displayName: 'Sale', value: "Sale" },
-            { displayName: 'Accountant', value: 'Accountant' },
-            { displayName: 'Admin', value: 'Admin' },
-        ];
+
 
         this.statuss = [
             { displayName: 'Active', value: true },
@@ -36,8 +33,17 @@ export class PermissionFormSearchComponent extends AppForm {
     }
 
     ngOnInit(): void {
-
         this.initFormSearch();
+        this.getSystemRole();
+    }
+
+    getSystemRole() {
+        this._systemRepo.getSystemRole()
+            .subscribe(
+                (res: any[]) => {
+                    this.roles = (res || []).map(role => new Role(role));
+                }
+            );
     }
 
     initFormSearch() {
@@ -51,12 +57,10 @@ export class PermissionFormSearchComponent extends AppForm {
 
     submitSearch() {
         const body: ISearchPermission = {
-            permissionName: '',
-            status: true,
-            role: '',
+            name: this.formSearch.value.permissionName,
+            active: !!this.formSearch.value.status ? this.formSearch.value.status.value : null,
+            roleId: !!this.formSearch.value.role ? this.formSearch.value.role.id : null,
         };
-
-        console.log("submit Search", body);
 
         this.onSearch.emit(body);
     }
@@ -68,9 +72,9 @@ export class PermissionFormSearchComponent extends AppForm {
 }
 
 interface ISearchPermission {
-    permissionName: string;
-    status: boolean;
-    role: string;
+    name: string;
+    active: boolean;
+    roleId: string;
 }
 
 
