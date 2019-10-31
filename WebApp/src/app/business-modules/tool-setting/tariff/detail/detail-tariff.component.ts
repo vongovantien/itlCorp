@@ -128,7 +128,9 @@ export class TariffDetailComponent extends TariffAddComponent {
     }
 
     deleteTariff() {
-        this.confirmDeletePopup.show();
+        if (this.tariff.setTariff.status) {
+            return;
+        } else { this.confirmDeletePopup.show(); }
     }
 
     onDeleteTariff() {

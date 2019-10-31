@@ -1,0 +1,372 @@
+<div class="sea-fcl-create-hbl-page">
+    <app-sub-header>
+    </app-sub-header>
+</div>
+<div class="m-content">
+    <div class="m-portlet__body">
+        <tabset class="custom-class-tab">
+            <tab heading="HBL Detail" [active]="true">
+                <div class=" form-add-house-bill">
+                    <form [formGroup]="formGroup">
+                        <div class="m-portlet">
+                            <div class="m-portlet__body">
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Master Bill of Lading <span class="m--font-danger">(*)</span>
+                                            </label>
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                formControlName="masterBill">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label">
+                                                Customer <span class="m--font-danger">(*)</span>
+                                            </label>
+                                            <!-- <select formControlName="company" class="form-control">
+                                                        <option *ngFor="let company of companies" [ngValue]="company.id">{{company.code}}
+                                                        </option>
+                                                    </select> -->
+                                            <app-combo-grid-virtual-scroll [height]="200">
+                                            </app-combo-grid-virtual-scroll>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label">
+                                                Saleman in Charge
+                                            </label>
+                                            <!-- <select formControlName="company" class="form-control">
+                                                        <option *ngFor="let company of companies" [ngValue]="company.id">{{company.code}}
+                                                        </option>
+                                                    </select> -->
+                                            <app-combo-grid-virtual-scroll [height]="200">
+                                            </app-combo-grid-virtual-scroll>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label">
+                                                Shipper
+                                            </label>
+                                            <!-- <select formControlName="company" class="form-control">
+                                                        <option *ngFor="let company of companies" [ngValue]="company.id">{{company.code}}
+                                                        </option>
+                                                    </select> -->
+                                            <app-combo-grid-virtual-scroll [height]="200">
+                                            </app-combo-grid-virtual-scroll>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label">
+                                                Consignee <span class="m--font-danger">(*)</span>
+                                            </label>
+                                            <!-- <select formControlName="company" class="form-control">
+                                                        <option *ngFor="let company of companies" [ngValue]="company.id">{{company.code}}
+                                                        </option>
+                                                    </select> -->
+                                            <app-combo-grid-virtual-scroll [height]="200">
+                                            </app-combo-grid-virtual-scroll>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label">
+                                                Notify Party
+                                            </label>
+                                            <!-- <select formControlName="company" class="form-control">
+                                                        <option *ngFor="let company of companies" [ngValue]="company.id">{{company.code}}
+                                                        </option>
+                                                    </select> -->
+                                            <app-combo-grid-virtual-scroll [height]="200">
+                                            </app-combo-grid-virtual-scroll>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label">
+                                                Also Notify Party
+                                            </label>
+                                            <!-- <select formControlName="company" class="form-control">
+                                                        <option *ngFor="let company of companies" [ngValue]="company.id">{{company.code}}
+                                                        </option>
+                                                    </select> -->
+                                            <app-combo-grid-virtual-scroll [height]="200">
+                                            </app-combo-grid-virtual-scroll>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                House Bill of Lading No. <span class="m--font-danger">(*)</span>
+                                            </label>
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                formControlName="hbOfladingNo">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                House Bill of Lading Type. <span class="m--font-danger">(*)</span>
+                                            </label>
+                                            <select formControlName="hbOfladingType" class="form-control">
+
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Place of Receipt
+                                            </label>
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                formControlName="placeofReceipt">
+                                        </div>
+
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label">
+                                                Port of Loading <span class="m--font-danger">(*)</span>
+                                            </label>
+                                            <!-- <select formControlName="company" class="form-control">
+                                                                                <option *ngFor="let company of companies" [ngValue]="company.id">{{company.code}}
+                                                                                </option>
+                                                                            </select> -->
+                                            <app-combo-grid-virtual-scroll [height]="200">
+                                            </app-combo-grid-virtual-scroll>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="col-lg-4">
+                                        <label class="form-control-label">
+                                            Port of Discharge <span class="m--font-danger">(*)</span>
+                                        </label>
+                                        <!-- <select formControlName="company" class="form-control">
+                                                            <option *ngFor="let company of companies" [ngValue]="company.id">{{company.code}}
+                                                            </option>
+                                                        </select> -->
+                                        <app-combo-grid-virtual-scroll [height]="200">
+                                        </app-combo-grid-virtual-scroll>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Final Destination
+                                            </label>
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                formControlName="finalDestination">
+                                        </div>
+
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label">
+                                                Supplier
+                                            </label>
+                                            <!-- <select formControlName="company" class="form-control">
+                                                                            <option *ngFor="let company of companies" [ngValue]="company.id">{{company.code}}
+                                                                            </option>
+                                                                        </select> -->
+                                            <app-combo-grid-virtual-scroll [height]="200">
+                                            </app-combo-grid-virtual-scroll>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Feeder Vessel
+                                            </label>
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                formControlName="feederVessel1">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-2">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+
+                                            </label>
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                formControlName="feederVessel2">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-2">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Arrival Vessel
+                                            </label>
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                formControlName="arrivalVessel">
+                                        </div>
+
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Arrival Voyage No
+                                            </label>
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                formControlName="arrivalVoyage">
+
+                                        </div>
+
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Document Date
+                                            </label>
+                                            <div class="m-input-icon">
+                                                <input type="text" class="form-control m-input m-input--square"
+                                                    readonly />
+                                                <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                    <span>
+                                                        <i class="la la-calendar"></i>
+                                                    </span>
+                                                </span>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Document No
+                                            </label>
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                formControlName="documentNo">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                ETA at Warehouse
+                                            </label>
+                                            <div class="m-input-icon">
+                                                <input type="text" class="form-control m-input m-input--square"
+                                                    readonly />
+                                                <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                    <span>
+                                                        <i class="la la-calendar"></i>
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+
+                                            </label>
+                                            <select formControlName="warehousecbo" class="form-control">
+
+                                            </select>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+
+                                            <label class="form-control-label">
+                                                Place of Issued
+                                            </label>
+                                            <!-- <select formControlName="company" class="form-control">
+                                                    <option *ngFor="let company of companies" [ngValue]="company.id">{{company.code}}
+                                                    </option>
+                                                </select> -->
+                                            <app-combo-grid-virtual-scroll [height]="200">
+                                            </app-combo-grid-virtual-scroll>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Date of Issued
+                                            </label>
+                                            <div class="m-input-icon">
+                                                <input type="text" class="form-control m-input m-input--square"
+                                                    readonly />
+                                                <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                    <span>
+                                                        <i class="la la-calendar"></i>
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Reference No
+                                            </label>
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                formControlName="referenceNo">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+
+                                            <label class="form-control-label" for="">
+                                                Warehouse Notice
+                                            </label>
+                                            <textarea class="form-control "
+                                                formControlName="warehousenotice"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Shpping Mark
+                                            </label>
+                                            <textarea class="form-control " formControlName="shppingMark"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Remark
+                                            </label>
+                                            <textarea class="form-control " formControlName="remark"></textarea>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </tab>
+        </tabset>
+    </div>
+</div>

@@ -15,7 +15,6 @@ import { SeaLclExportCreateComponent } from './sea-lcl-export-create/sea-lcl-exp
 import { SeaLclExportHousebillAddnewComponent } from './sea-lcl-export-create/sea-lcl-export-housebill-addnew/sea-lcl-export-housebill-addnew.component';
 import { SeaLclExportManifestComponent } from './sea-lcl-export-create/sea-lcl-export-manifest/sea-lcl-export-manifest.component';
 import { SeaLclExportShippingInstructionComponent } from './sea-lcl-export-create/sea-lcl-export-shipping-instruction/sea-lcl-export-shipping-instruction.component';
-import { SeaFCLImportManagementComponent } from './sea-fcl-import/sea-fcl-import-management/sea-fcl-import-management.component';
 
 const routes: Routes = [
 
@@ -97,12 +96,7 @@ const routes: Routes = [
         }
     },
     {
-        path: 'sea-fcl-import',
-        component: SeaFCLImportManagementComponent,
-        data: {
-            name: "Sea FCL Import",
-            level: 2
-        }
+        path: 'sea-fcl-import', loadChildren: () => import('./sea-fcl-import/sea-fcl-import.module').then(m => m.SeaFCLImportModule),
     },
     {
         path: 'sea-lcl-export',

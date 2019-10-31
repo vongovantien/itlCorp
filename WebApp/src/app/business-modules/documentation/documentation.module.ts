@@ -40,11 +40,8 @@ import { SeaLclExportCreditAndDebitNoteDetailComponent } from './sea-lcl-export-
 import { SeaLclExportCreditAndDebitNoteEditComponent } from './sea-lcl-export-create/sea-lcl-export-credit-and-debit-note/sea-lcl-export-credit-and-debit-note-edit/sea-lcl-export-credit-and-debit-note-edit.component';
 import { SeaLclExportManifestComponent } from './sea-lcl-export-create/sea-lcl-export-manifest/sea-lcl-export-manifest.component';
 import { SeaLclExportShippingInstructionComponent } from './sea-lcl-export-create/sea-lcl-export-shipping-instruction/sea-lcl-export-shipping-instruction.component';
-import { SeaFCLImportManagementFormSearchComponent } from './sea-fcl-import/sea-fcl-import-management/components/form-search/form-search-fcl-import.component';
-import { SeaFCLImportManagementComponent } from './sea-fcl-import/sea-fcl-import-management/sea-fcl-import-management.component';
-import { HouseBillListComponent } from './sea-fcl-import/sea-fcl-import-management/components/house-bill-list/house-bill-list.component';
 import { TabsModule } from 'ngx-bootstrap';
-import { FormCreateHouseBillComponent } from './sea-fcl-import/sea-fcl-import-management/components/form-create-house-bill/form-create-house-bill.component';
+
 
 @NgModule({
   imports: [
@@ -81,7 +78,7 @@ import { FormCreateHouseBillComponent } from './sea-fcl-import/sea-fcl-import-ma
     CreditAndDebitNoteRemainingChargeComponent,
     ManifestComponent,
     ShippingInstructionComponent,
-    SeaLclExportCreateComponent, SeaLclExportShipmentDetailComponent, SeaLclExportHousebillListComponent, SeaLclExportHousebillAddnewComponent, SeaLclExportDetailImportComponent, SeaLclExportHousebillDetailImportComponent, SeaLclExportCreditAndDebitNoteComponent, SeaLclExportCreditAndDebitNoteAddnewComponent, SeaLclExportCreditAndDebitNoteRemainingChargeComponent, SeaLclExportCreditAndDebitNoteDetailComponent, SeaLclExportCreditAndDebitNoteEditComponent, SeaLclExportManifestComponent, SeaLclExportShippingInstructionComponent, SeaFCLImportManagementFormSearchComponent, SeaFCLImportManagementComponent, HouseBillListComponent, FormCreateHouseBillComponent
+    SeaLclExportCreateComponent, SeaLclExportShipmentDetailComponent, SeaLclExportHousebillListComponent, SeaLclExportHousebillAddnewComponent, SeaLclExportDetailImportComponent, SeaLclExportHousebillDetailImportComponent, SeaLclExportCreditAndDebitNoteComponent, SeaLclExportCreditAndDebitNoteAddnewComponent, SeaLclExportCreditAndDebitNoteRemainingChargeComponent, SeaLclExportCreditAndDebitNoteDetailComponent, SeaLclExportCreditAndDebitNoteEditComponent, SeaLclExportManifestComponent, SeaLclExportShippingInstructionComponent,
   ]
 })
 export class DocumentationModule { }

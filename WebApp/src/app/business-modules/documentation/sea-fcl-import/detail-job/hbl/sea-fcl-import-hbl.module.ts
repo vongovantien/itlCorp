@@ -4,6 +4,9 @@ import { SeaFCLImportHBLComponent } from './sea-fcl-import-hbl.component';
 import { Routes, RouterModule } from '@angular/router';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { TabsModule } from 'ngx-bootstrap';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CreateHouseBillComponent } from './create/create-house-bill.component';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 
 const routing: Routes = [
     {
@@ -11,7 +14,7 @@ const routing: Routes = [
         data: { name: 'House Bill List', path: 'hbl', level: 4 }
     },
     {
-        path: 'new', component: SeaFCLImportHBLComponent,
+        path: 'new', component: CreateHouseBillComponent,
         data: { name: 'New House Bill Detail', path: ':id', level: 5 }
     },
     {
@@ -29,13 +32,17 @@ const COMPONENTS = [
 @NgModule({
     declarations: [
         SeaFCLImportHBLComponent,
-        ...COMPONENTS
+        ...COMPONENTS,
+        CreateHouseBillComponent
     ],
     imports: [
         CommonModule,
         SharedModule,
+        FormsModule,
         TabsModule.forRoot(),
-        RouterModule.forChild(routing)
+        ReactiveFormsModule,
+        RouterModule.forChild(routing),
+        NgxDaterangepickerMd
     ],
     exports: [],
     providers: [],
