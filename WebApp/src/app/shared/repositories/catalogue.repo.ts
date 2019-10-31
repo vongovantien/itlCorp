@@ -320,11 +320,40 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
-    getDetaiPlace(id: string) {
+    getDetailPlace(id: string) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/` + id)
             .pipe(
                 map((data: any) => data)
             );
     }
     //#endregion
+
+    addCountry(body: any = {}) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCountry/addNew`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+    updateCountry(body: any = {}) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCountry/update`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    pagingCountry(page: number, size: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCountry/paging`, body, {
+            page: '' + page,
+            size: '' + size
+        }).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+    getDetailCountry(id: number) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCountry/getById/` + id)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
 }

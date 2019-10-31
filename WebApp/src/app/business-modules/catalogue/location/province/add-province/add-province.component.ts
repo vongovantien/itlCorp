@@ -16,7 +16,6 @@ export class AddProvinceComponent extends PopupBase implements OnInit {
     @Output() isSaveSuccess = new EventEmitter<boolean>();
     formProvince: FormGroup;
     provinceCityToAdd = new CatPlaceModel();
-    resetNg2SelectCountry = true;
     ngSelectDataCountries: any = [];
     isSubmitted = false;
 

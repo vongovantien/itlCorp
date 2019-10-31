@@ -115,7 +115,7 @@
                             </div>
                             <div class="col-md-4 col-lg-2 m--align-right">
                                 <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                                    data-toggle="modal" data-target="#add-country-modal">
+                                    (click)="showAddCountryPopup()">
                                     <span>
                                         <i class="la la-plus"></i>
                                         <span>
@@ -159,11 +159,16 @@
                                     <tr *ngFor="let country of ListCountries">
                                         <td class="table-actions-col">
                                             <div class="table-actions" style="width: 70px">
-                                                <button type="button"
+                                                <!-- <button type="button"
                                                     class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                     title="Edit stage" data-toggle="modal"
                                                     data-target="#update-country-modal"
                                                     (click)="showUpdateCountry(country.id)">
+                                                    <i class="la la-edit"></i>
+                                                </button> -->
+                                                <button type="button"
+                                                    class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                    title="Edit stage" (click)="showUpdateCountry(country.id)">
                                                     <i class="la la-edit"></i>
                                                 </button>
                                                 <button type="button"
@@ -266,7 +271,7 @@
                                     </span>
                                 </button> -->
                                 <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                                    (click)="showAdd()">
+                                    (click)="showAddProvince()">
                                     <span>
                                         <i class="la la-plus"></i>
                                         <span>
@@ -418,8 +423,17 @@
                                 </div>
                             </div>
                             <div class="col-md-4 col-lg-2 m--align-right">
-                                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                <!-- <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
                                     (click)="showAdd()" data-toggle="modal" data-target="#add-district-modal">
+                                    <span>
+                                        <i class="la la-plus"></i>
+                                        <span>
+                                            add new
+                                        </span>
+                                    </span>
+                                </button> -->
+                                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                    (click)="showAddDistrict()">
                                     <span>
                                         <i class="la la-plus"></i>
                                         <span>
@@ -473,10 +487,15 @@
                                     <tr *ngFor="let district of ListDistricts">
                                         <td class="table-actions-col">
                                             <div class="table-actions" style="width: 70px">
-                                                <button type="button"
+                                                <!-- <button type="button"
                                                     class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                     (click)="showUpdateDistrict(district.id)" title="Edit stage"
                                                     data-toggle="modal" data-target="#update-district-modal">
+                                                    <i class="la la-edit"></i>
+                                                </button> -->
+                                                <button type="button"
+                                                    class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                    (click)="showUpdateDistrict(district.id)" title="Edit stage">
                                                     <i class="la la-edit"></i>
                                                 </button>
                                                 <button type="button"
@@ -706,232 +725,11 @@
 
 
 <!-- BEGIN ADD COUNTRY MODAL -->
-<div class="modal fade" id="add-country-modal" data-backdrop="static" role="dialog" aria-labelledby=""
-    aria-hidden="true">
-    <div class="modal-dialog modal-xs" role="document">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h5 class="modal-title">Add Country</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!--begin::add-stage-management-form-->
-                <form novalidate #addCountryForm="ngForm" *ngIf="CountryToAdd" (ngSubmit)="addCountryForm.form.valid">
-                    <div class="m-form m-form m-form--state">
-
-                        <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': addCountryForm.submitted && country_code.invalid }">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                Country Code <span class="m--font-danger">(*)</span>
-                            </label>
-                            <div class="col-lg-8">
-                                <input type="text" [(ngModel)]="CountryToAdd.code"
-                                    (change)="CountryToAdd.code=CountryToAdd.code.trim()"
-                                    class="form-control m-input m-input--square" #country_code="ngModel"
-                                    name="country_code" required placeholder="Please enter country code">
-                                <div class="form-control-feedback"
-                                    *ngIf="addCountryForm.submitted && country_code.invalid">
-                                    Country code is required
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': addCountryForm.submitted && english_name.invalid }">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                English Name <span class="m--font-danger">(*)</span>
-                            </label>
-                            <div class="col-lg-8">
-                                <input type="text" [(ngModel)]="CountryToAdd.nameEn"
-                                    (change)="CountryToAdd.nameEn=CountryToAdd.nameEn.trim()"
-                                    class="form-control m-input m-input--square" #english_name="ngModel" required
-                                    minlength="3" name="english_name" placeholder="Please enter english name">
-                                <div class="form-control-feedback"
-                                    *ngIf="addCountryForm.submitted && english_name.invalid">
-                                    English name is required at least 3 characters
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': addCountryForm.submitted && local_name.invalid }">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                Local Name <span class="m--font-danger">(*)</span>
-                            </label>
-
-                            <div class="col-lg-8">
-                                <input type="text" [(ngModel)]="CountryToAdd.nameVn"
-                                    (change)="CountryToAdd.nameVn=CountryToAdd.nameVn.trim()"
-                                    class="form-control m-input m-input--square" #local_name="ngModel" required
-                                    minlength="3" name="local_name" placeholder="Please enter local name">
-                                <div class="form-control-feedback"
-                                    *ngIf="addCountryForm.submitted && local_name.invalid">
-                                    Local name is required at least 3 characters
-                                </div>
-                            </div>
-                        </div>
-
-
-                    </div>
-                    <div class="modal-footer m--align-center c-button-actions">
-                        <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="addCountry(addCountryForm,'yes')">
-                            <span>
-                                <i class="la la-save"></i>
-                                <span>
-                                    save
-                                </span>
-                            </span>
-                        </button>
-                        <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="addCountry(addCountryForm,'cancel')">
-                            <span>
-                                <i class="la la-ban"></i>
-                                <span>
-                                    cancel
-                                </span>
-                            </span>
-                        </button>
-                    </div>
-                </form>
-                <!--end:add-stage-management-form -->
-                <!-- (click)="add_stage()" -->
-            </div>
-
-        </div>
-    </div>
-</div>
+<app-add-country (isSaveSuccess)="saveCountry($event)"></app-add-country>
 <!-- END ADD COUNTRY MODAL -->
 
 <!-- BEGIN UPDATE COUNTRY MODAL -->
-
-<div class="modal fade" id="update-country-modal" data-backdrop="static" role="dialog" aria-labelledby=""
-    aria-hidden="true">
-    <div class="modal-dialog modal-xs" role="document">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h5 class="modal-title">Update Country</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!--begin::add-stage-management-form-->
-                <form novalidate #updateCountryForm="ngForm" *ngIf="CountryToUpdate"
-                    (ngSubmit)="updateCountryForm.form.valid">
-                    <div class="m-form m-form--state">
-
-
-                        <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': updateCountryForm.submitted && country_code.invalid }">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                Country Code <span class="m--font-danger">(*)</span>
-                            </label>
-                            <div class="col-lg-8">
-                                <input type="text" [(ngModel)]="CountryToUpdate.code"
-                                    (change)="CountryToUpdate.code=CountryToUpdate.code.trim()"
-                                    class="form-control m-input m-input-group--square" #country_code="ngModel"
-                                    name="country_code" required placeholder="Please enter country code">
-                                <div class="form-control-feedback"
-                                    *ngIf="updateCountryForm.submitted && country_code.invalid">
-                                    Country code is required
-                                </div>
-                            </div>
-
-                        </div>
-
-
-
-
-                        <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': updateCountryForm.submitted && english_name.invalid }">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                English Name <span class="m--font-danger">(*)</span>
-                            </label>
-                            <div class="col-lg-8">
-                                <input type="text" [(ngModel)]="CountryToUpdate.nameEn"
-                                    (change)="CountryToUpdate.nameEn=CountryToUpdate.nameEn.trim()"
-                                    class="form-control m-input m-input--square" #english_name="ngModel" required
-                                    minlength="3" name="english_name" placeholder="Please enter english name">
-                                <div class="form-control-feedback"
-                                    *ngIf="updateCountryForm.submitted && english_name.invalid">
-                                    English name is required at least 3 characters
-                                </div>
-                            </div>
-
-                        </div>
-
-
-
-                        <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': updateCountryForm.submitted && local_name.invalid }">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                Local Name <span class="m--font-danger">(*)</span>
-                            </label>
-                            <div class="col-lg-8">
-                                <input type="text" [(ngModel)]="CountryToUpdate.nameVn"
-                                    (change)="CountryToUpdate.nameVn=CountryToUpdate.nameVn.trim()"
-                                    class="form-control m-input m-input--square" #local_name="ngModel" required
-                                    minlength="3" name="local_name" placeholder="Please enter local name">
-                                <div class="form-control-feedback"
-                                    *ngIf="updateCountryForm.submitted && local_name.invalid">
-                                    Local name is required at least 3 characters
-                                </div>
-                            </div>
-
-                        </div>
-
-
-
-                        <div class="form-group row">
-                            <label class="col-lg-4 col-form-label form-control-label">
-                                Active
-                            </label>
-                            <div class="col-lg-8">
-                                <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
-                                    <input type="checkbox" [attr.checked]="CountryToUpdate.active ? 'checked' : null"
-                                        (change)="CountryToUpdate.active = !CountryToUpdate.active">
-                                    <span></span>
-                                </label>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="modal-footer m--align-center c-button-actions">
-                        <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="updateCountry(updateCountryForm,'yes')">
-                            <span>
-                                <i class="la la-save"></i>
-                                <span>
-                                    save
-                                </span>
-                            </span>
-                        </button>
-                        <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="updateCountry(updateCountryForm,'cancel')">
-                            <span>
-                                <i class="la la-ban"></i>
-                                <span>
-                                    cancel
-                                </span>
-                            </span>
-                        </button>
-                    </div>
-                </form>
-                <!--end:add-stage-management-form -->
-                <!-- (click)="add_stage()" -->
-            </div>
-
-        </div>
-    </div>
-</div>
-
+<app-update-country (isSaveSuccess)="saveCountry($event)"></app-update-country>
 <!-- END UPDATE COUNTRY MODAL -->
 
 
@@ -945,7 +743,8 @@
 
 
 <!-- BEGIN ADD DISTRICT MODAL -->
-<div class="modal fade" id="add-district-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+<app-add-district (isSaveSuccess)="saveDistrict($event)"></app-add-district>
+<!-- <div class="modal fade" id="add-district-modal" data-backdrop="static" role="dialog" aria-labelledby=""
     aria-hidden="true">
     <div class="modal-dialog modal-xs" role="document">
         <div class="modal-content">
@@ -957,7 +756,6 @@
                 </button>
             </div>
             <div class="modal-body">
-                <!--begin::add-stage-management-form-->
                 <form novalidate #addDistrictForm="ngForm" *ngIf="DistrictToAdd"
                     (ngSubmit)="addDistrictForm.form.valid">
                     <div class="m-form m-form m-form--state">
@@ -1082,18 +880,16 @@
                         </button>
                     </div>
                 </form>
-                <!--end:add-stage-management-form -->
-                <!-- (click)="add_stage()" -->
             </div>
 
         </div>
     </div>
-</div>
+</div> -->
 <!-- END ADD DISTRICT MODAL -->
 
 
 <!-- BEGIN EDIT DISTRICT MODAL -->
-<div class="modal fade" id="update-district-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+<!-- <div class="modal fade" id="update-district-modal" data-backdrop="static" role="dialog" aria-labelledby=""
     aria-hidden="true">
     <div class="modal-dialog modal-xs" role="document">
         <div class="modal-content">
@@ -1105,7 +901,6 @@
                 </button>
             </div>
             <div class="modal-body">
-                <!--begin::add-stage-management-form-->
                 <form novalidate #updateDistrictForm="ngForm" *ngIf="DistrictToUpdate"
                     (ngSubmit)="updateDistrictForm.form.valid">
                     <div class="m-form m-form m-form--state">
@@ -1242,13 +1037,11 @@
                         </button>
                     </div>
                 </form>
-                <!--end:add-stage-management-form -->
-                <!-- (click)="add_stage()" -->
             </div>
 
         </div>
     </div>
-</div>
+</div> -->
 <!-- END EDIT DISTRICT MODAL -->
 
 
