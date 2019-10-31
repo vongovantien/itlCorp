@@ -33,8 +33,8 @@ export class CsTransactionDetail {
   coloaderId: String = null;
   freightPayment: String = null;
   placeFreightPay: String = null;
-  closingDate: String = null;
-  sailingDate: String = null;
+  closingDate: any = null;
+  sailingDate: any = null;
   forwardingAgentDescription: String = null;
   forwardingAgentId: String = null;
   goodsDeliveryDescription: String = null;
@@ -84,6 +84,7 @@ export class CsTransactionDetail {
   gw: Number = 0;
   packages: String = null;
   containers: String = null;
+  issueHblplaceAndDate: any = null;
   constructor(object?: any) {
     const self = this;
     for (const key in object) {
