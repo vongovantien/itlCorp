@@ -46,13 +46,13 @@ const COMPONENTS = [
 
 const LIB = [
     CollapseModule.forRoot(),
+    ModalModule.forRoot(),
     TabsModule.forRoot(),
     ModalModule.forRoot(),
     PaginationModule.forRoot(),
     SelectModule,
-    NgxDaterangepickerMd,
-
-]
+    NgxDaterangepickerMd.forRoot()
+];
 
 @NgModule({
     declarations: [

@@ -11,6 +11,10 @@ export class DocumentationRepo {
     constructor(protected _api: ApiService) {
     }
 
+    createTransaction(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction`, body);
+    }
+
     addOPSJob(body: any = {}) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/Add`, body);
     }
@@ -180,4 +184,11 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+    getShipmentDataCommon() {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/Terminology/GetShipmentCommonData`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
 }

@@ -3,6 +3,7 @@ import { Router, ActivatedRoute, Params } from '@angular/router';
 import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { SeaFCLImportCreateJobComponent } from '../create-job/create-job-fcl-import.component';
+import { DocumentationRepo } from 'src/app/shared/repositories';
 
 type TAB = 'SHIPMENT' | 'CDNOTE';
 @Component({
@@ -17,9 +18,10 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
 
     constructor(
         protected _router: Router,
+        protected _documenRepo: DocumentationRepo,
         private _activedRoute: ActivatedRoute
     ) {
-        super(_router);
+        super(_router, _documenRepo);
     }
 
     ngOnInit(): void {
