@@ -41,13 +41,13 @@ export class CsTransaction {
     cbm: number = 0;
     notes: string = null;
     transactionType: string = null;
-    isLocked: Boolean = null;
+    isLocked: boolean = null;
     lockedDate: string = null;
     userCreated: string = null;
     createdDate: string = null;
     userModified: string = null;
     modifiedDate: string = null;
-    active: Boolean = true;
+    active: boolean = true;
     inactiveOn: string = null;
 
     csMawbcontainers: Container[] = new Array<Container>();
