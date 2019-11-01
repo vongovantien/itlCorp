@@ -93,5 +93,5 @@ export class AddProvinceComponent extends PopupBase implements OnInit {
     refreshValue(event) { }
     typed(event) { }
     removed(event) { }
-    selectedCountry(event, s: string, k: string) { }
+    selected(event) { }
 }

@@ -66,10 +66,8 @@
                             </label>
                             <div class="col-lg-8">
                                 <ng-select [allowClear]="true" [items]="ngSelectDataCountries" formControlName="country"
-                                    (data)="refreshValue($event)"
-                                    (selected)="selectedCountry($event,'add','province-city')"
-                                    (removed)="removed($event,'addCountryProvince')" (typed)="typed($event)"
-                                    placeholder="Select Country">
+                                    (data)="refreshValue($event)" (selected)="selected($event)"
+                                    (removed)="removed($event)" (typed)="typed($event)" placeholder="Select Country">
                                 </ng-select>
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmitted && (country.errors | equalError: 'required') || (country.errors | equalError: 'required') && country.dirty">

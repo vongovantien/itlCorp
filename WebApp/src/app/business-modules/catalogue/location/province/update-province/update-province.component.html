@@ -61,8 +61,7 @@
                                     [active]="currentActiveCountry"
                                     *ngIf="resetNg2SelectCountry && ngSelectDataCountries.length>0"
                                     (data)="refreshValue($event)" (selected)="selected($event)"
-                                    (removed)="removed($event,'updateCountryProvince')" (typed)="typed($event)"
-                                    placeholder="Select department">
+                                    (removed)="removed($event)" (typed)="typed($event)" placeholder="Select department">
                                 </ng-select>
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmitted && provinceCityToUpdate.countryId==null">
