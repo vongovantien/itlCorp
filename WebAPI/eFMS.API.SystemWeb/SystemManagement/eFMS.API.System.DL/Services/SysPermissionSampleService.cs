@@ -65,7 +65,7 @@ namespace eFMS.API.System.DL.Services
         public IQueryable<SysPermissionSampleModel> Query(SysPermissionGeneralCriteria criteria)
         {
             IQueryable<SysPermissionSample> data = null;
-            data = DataContext.Get(x => x.Name.IndexOf(criteria.Name ?? "", StringComparison.OrdinalIgnoreCase) > -1
+            data = DataContext.Get(x => (x.Name ?? "").IndexOf(criteria.Name ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.RoleId == criteria.RoleId || criteria.RoleId == null)
                                 && (x.Active == criteria.Active || criteria.Active == null)
                             );

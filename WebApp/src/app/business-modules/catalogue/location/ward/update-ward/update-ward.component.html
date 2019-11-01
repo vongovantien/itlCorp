@@ -1,0 +1,156 @@
+<div class="modal fade" id="update-ward-modal" bsModal #popup="bs-modal" role="dialog" (onHide)="onHide($event)"
+    (onShow)="onShow($event)">
+    <div class="modal-dialog modal-xs" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Upadte Town - Ward</h5>
+                <button type="button" class="close" aria-label="Close" (click)="cancelAdd()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="formEditWard">
+                    <div class="m-form m-form m-form--state">
+
+                        <div class="form-group row"
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && code.invalid }">
+                            <label class="col-lg-4 col-form-label form-control-label">
+                                Town - Ward Code <span class="m--font-danger">(*)</span>
+                            </label>
+                            <div class="col-lg-8">
+                                <input type="text" formControlName="code" class="form-control m-input m-input--square"
+                                    name="ward_code" required minlength="3" placeholder="Please enter town - ward code">
+                                <div class="form-control-feedback" *ngIf="isSubmitted && code.invalid">
+                                    District code is required at least 3 characters
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-group row"
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && nameEn.invalid }">
+                            <label class="col-lg-4 col-form-label form-control-label">
+                                English Name <span class="m--font-danger">(*)</span>
+                            </label>
+                            <div class="col-lg-8">
+                                <input type="text" formControlName="nameEn" class="form-control m-input m-input--square"
+                                    required minlength="3" name="english_name" placeholder="Please enter english name">
+                                <div class="form-control-feedback" *ngIf="isSubmitted && nameEn.invalid">
+                                    English name is required at least 3 characters
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-group row"
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && nameVn.invalid }">
+                            <label class="col-lg-4 col-form-label form-control-label">
+                                Local Name <span class="m--font-danger">(*)</span>
+                            </label>
+                            <div class="col-lg-8">
+                                <input type="text" formControlName="nameVn" class="form-control m-input m-input--square"
+                                    required minlength="3" name="local_name" placeholder="Please enter local name">
+                                <div class="form-control-feedback" *ngIf="isSubmitted && nameVn.invalid">
+                                    Local name is required at least 3 characters
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group row"
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && wardToUpdate.countryId==null }">
+                            <label class="col-lg-4 col-form-label form-control-label">
+                                Country <span class="m--font-danger">(*)</span>
+                            </label>
+                            <div class="col-lg-8">
+                                <ng-select [allowClear]="true" [items]="ngSelectDataCountries"
+                                    [active]="currentActiveCountry" (data)="refreshValue($event)"
+                                    (selected)="selected($event,'country')" (removed)="removed($event,'country')"
+                                    placeholder="Select Country">
+                                </ng-select>
+                                <div class="form-control-feedback" *ngIf="isSubmitted && wardToUpdate.countryId==null">
+                                    Country is required
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row"
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && wardToUpdate.provinceId==null }">
+                            <label class="col-lg-4 col-form-label form-control-label">
+                                Province - City <span class="m--font-danger">(*)</span>
+                            </label>
+                            <div class="col-lg-8">
+                                <ng-select [allowClear]="true" [items]="ngSelectDataProvinces"
+                                    [active]="currentActiveProvince" *ngIf="resetNg2SelectProvince"
+                                    (data)="refreshValue($event)" (selected)="selected($event,'province')"
+                                    (removed)="removed($event,'province')" placeholder="Select province">
+                                </ng-select>
+                                <div class="form-control-feedback" *ngIf="isSubmitted && wardToUpdate.provinceId==null">
+                                    Province is required
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group row"
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && wardToUpdate.districtId==null }">
+                            <label class="col-lg-4 col-form-label form-control-label">
+                                District <span class="m--font-danger">(*)</span>
+                            </label>
+                            <div class="col-lg-8">
+                                <ng-select [allowClear]="true" [items]="ngSelectDataProvinces"
+                                    [active]="currentActiveDistrict" *ngIf="resetNg2SelectProvince"
+                                    (selected)="selected($event,'province')" (removed)="removed($event,'province')"
+                                    placeholder="Select Province">
+                                </ng-select>
+                                <div class="form-control-feedback" *ngIf="isSubmitted && wardToUpdate.districtId==null">
+                                    District is required
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-lg-4 col-form-label form-control-label">
+                                Active
+                            </label>
+                            <div class="col-lg-8">
+                                <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
+                                    <input type="checkbox" formControlName="active"
+                                        type="checkbox"><span></span></label>
+                            </div>
+                        </div>
+
+
+
+
+                    </div>
+                    <div class="modal-footer m--align-center c-button-actions">
+                        <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                            (click)="saveWard()">
+                            <span>
+                                <i class="la la-save"></i>
+                                <span>
+                                    save
+                                </span>
+                            </span>
+                        </button>
+                        <button type="reset" class="btn m-btn--square m-btn--icon m-btn--uppercase"
+                            (click)="cancelAdd()">
+                            <span>
+                                <i class="la la-ban"></i>
+                                <span>
+                                    cancel
+                                </span>
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>

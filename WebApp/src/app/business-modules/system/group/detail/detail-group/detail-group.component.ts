@@ -4,13 +4,14 @@ import { AppForm } from 'src/app/app.form';
 import { FormGroup, Validators, FormBuilder, AbstractControl } from '@angular/forms';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
-import { Params, ActivatedRoute } from '@angular/router';
+import { Params, ActivatedRoute, Router } from '@angular/router';
 import { Group } from 'src/app/shared/models/system/group';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { FormUserGroupComponent } from '../../components/form-user-group/form-user-group.component';
 import { UserGroup } from 'src/app/shared/models/system/userGroup.model';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { PreviousRouteService } from 'src/app/shared/services/previous-route';
 
 @Component({
     selector: 'app-detail-group',
@@ -41,15 +42,19 @@ export class GroupDetailComponent extends AppForm implements OnInit {
     userHeaders: CommonInterface.IHeaderTable[];
     userGroup: UserGroup = new UserGroup();
     allUsers: any[] = null;
+    previousUrl: string;
 
     constructor(private _systemRepo: SystemRepo,
         private _progressService: NgProgress,
         private _fb: FormBuilder,
         private _activedRouter: ActivatedRoute,
         private _toastService: ToastrService,
-        private _location: Location) {
+        private _location: Location,
+        private previousRouteService: PreviousRouteService,
+        private router: Router) {
         super();
         this._progressRef = this._progressService.ref();
+        this.previousUrl = this.previousRouteService.getPreviousUrl();
     }
 
     ngOnInit() {
@@ -165,7 +170,11 @@ export class GroupDetailComponent extends AppForm implements OnInit {
     }
 
     cancel() {
-        this._location.back();
+        if (this.previousUrl === '/home/system/department') {
+            this._location.back();
+        } else {
+            this.router.navigate(['/home/system/group']);
+        }
     }
 
     update() {

@@ -63,7 +63,6 @@ export class GroupComponent extends AppList implements OnInit {
         (res: any) => {
           this.totalItems = res.totalItems || 0;
           this.groups = res.data;
-          console.log(this.groups);
         },
       );
   }
