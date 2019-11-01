@@ -16,8 +16,8 @@ namespace eFMS.API.Setting.Service.Models
         public Guid? WarehouseId { get; set; }
         public string Type { get; set; }
         public string RangeType { get; set; }
-        public string RangeFrom { get; set; }
-        public string RangeTo { get; set; }
+        public decimal? RangeFrom { get; set; }
+        public decimal? RangeTo { get; set; }
         public decimal? UnitPrice { get; set; }
         public decimal? Min { get; set; }
         public decimal? Max { get; set; }

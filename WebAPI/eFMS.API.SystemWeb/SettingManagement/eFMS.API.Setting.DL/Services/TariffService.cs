@@ -222,12 +222,12 @@ namespace eFMS.API.Setting.DL.Services
                                                                                  && !listIdTariffDetail.Contains(x.Id)).Select(x => x.Id);
                     if (listIdTariffDetailNeedRemove.Count() > 0)
                     {
-                        setTariffDetailRepo.Delete(x => listIdTariffDetailNeedRemove.Contains(x.Id));
+                        var hsTariffDetailDel = setTariffDetailRepo.Delete(x => listIdTariffDetailNeedRemove.Contains(x.Id));
                     }
 
                     //Update các tariff detail cũ
-                    var tariffDetailOld = tariffDetails.Where(x => x.Id != Guid.Empty
-                                                                && setTariffDetailRepo.Get(g => g.TariffId == tariff.Id).Select(s => s.Id).Contains(x.Id));
+                    var tariffDetailOld = tariffDetails.Where(x => x.Id != Guid.Empty);
+                                                                //&& setTariffDetailRepo.Get(g => g.TariffId == tariff.Id).Select(s => s.Id).Contains(x.Id));
                     if (tariffDetailOld.Count() > 0)
                     {
                         foreach (var item in tariffDetailOld)
@@ -235,8 +235,8 @@ namespace eFMS.API.Setting.DL.Services
                             //item.UserCreated = setTariffDetailRepo.Get(x => x.Id == item.Id).FirstOrDefault().UserCreated;
                             item.UserModified = userCurrent;
                             //item.DatetimeCreated = setTariffDetailRepo.Get(x => x.Id == item.Id).FirstOrDefault().DatetimeCreated;
-                            item.DatetimeModified = today;
-                            setTariffDetailRepo.Update(item, x => x.Id == item.Id);
+                            item.DatetimeModified = DateTime.Now;
+                            var hsTariffDetailUpdate= setTariffDetailRepo.Update(item, x => x.Id == item.Id);
                         }
                     }
 
@@ -249,9 +249,9 @@ namespace eFMS.API.Setting.DL.Services
                             r.Id = Guid.NewGuid();
                             r.TariffId = tariff.Id;
                             r.UserCreated = r.UserModified = userCurrent;
-                            r.DatetimeCreated = r.DatetimeModified = today;
+                            r.DatetimeCreated = r.DatetimeModified = DateTime.Now;
                         });
-                        setTariffDetailRepo.Add(tariffDetailNew);
+                        var hsTariffDetailAdd = setTariffDetailRepo.Add(tariffDetailNew);
                     }
                 }
 
