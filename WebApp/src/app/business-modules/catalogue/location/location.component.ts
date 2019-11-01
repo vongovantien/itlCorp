@@ -49,26 +49,17 @@ export class LocationComponent implements OnInit, AfterViewInit {
      */
 	ListCountries: any = [];
 	ConstListCountries: any = [];
-	CountryToAdd = new CountryModel();
-	CountryToUpdate = new CountryModel();
 	indexCountryDelete: Number = -1;
 	indexCountryUpdate: Number = -1;
 	ObjectToDelete: String = "";
 	deleteWhat: any = null;
 	idCountryToDelete: any = null;
-	currentActiveCountry: any = [];
 
 	ListProvinceCities: any = [];
 	ConstListProvinceCities: any = [];
-	ProvinceCityToAdd = new CatPlaceModel();
-	ProvinceCityToUpdate = new CatPlaceModel();
-	currentActiveProvince: any = [];
 
 	ListDistricts: any = [];
 	ConstListDistrict: any = [];
-	DistrictToAdd = new CatPlaceModel();
-	DistrictToUpdate = new CatPlaceModel();
-	currentActiveDistrict: any = [];
 
 	ListWards: any = [];
 	ConstListWards: any = [];
@@ -89,7 +80,7 @@ export class LocationComponent implements OnInit, AfterViewInit {
 	searchKeyDistrictTab: string = "";
 	searchKeyWardTab: string = "";
 	CURRENT_LANGUAGE = localStorage.getItem(SystemConstants.CURRENT_LANGUAGE);
-	idDistrictToUpdate: string = "";
+	// idDistrictToUpdate: string = "";
 
 	fieldNameByLanguage(field) {
 		if (this.CURRENT_LANGUAGE.toLowerCase() === SystemConstants.DEFAULT_LANGUAGE.toLowerCase()) {
@@ -302,20 +293,21 @@ export class LocationComponent implements OnInit, AfterViewInit {
 	}
 
 	async showUpdateCountry(id) {
+		let countryToUpdate = null;
 		// this.CountryToUpdate = await this.baseServices.getAsync(this.api_menu.Catalogue.Country.getById + id, true, true);
 		this.catalogueRepo.getDetailCountry(id)
 			.pipe(
 				finalize(() => {
-					if (this.CountryToUpdate != null) {
+					if (countryToUpdate != null) {
 						this.editCountryPopup.currentId = id;
-						this.editCountryPopup.countryToUpdate = this.CountryToUpdate;
-						this.editCountryPopup.setValueFormGroup(this.CountryToUpdate);
+						this.editCountryPopup.countryToUpdate = countryToUpdate;
+						this.editCountryPopup.setValueFormGroup(countryToUpdate);
 						this.editCountryPopup.show();
 					}
 				})
 			).subscribe(
 				(res: any) => {
-					this.CountryToUpdate = res;
+					countryToUpdate = res;
 				});
 	}
 
@@ -404,27 +396,27 @@ export class LocationComponent implements OnInit, AfterViewInit {
 	}
 
 	async showUpdateProvince(id) {
+		let provinceCityToUpdate = null;
 		this.catalogueRepo.getDetailPlace(id)
 			.pipe(
 				finalize(() => {
-					if (this.ProvinceCityToUpdate != null) {
-						const countryId = this.ProvinceCityToUpdate.countryId;
+					if (provinceCityToUpdate != null) {
+						const countryId = provinceCityToUpdate.countryId;
 						const indexCurrentCountry = lodash.findIndex(this.ngSelectDataCountries, function (o) {
 							return o['id'] === countryId;
 						});
 						if (indexCurrentCountry > -1) {
-							this.currentActiveCountry = [this.ngSelectDataCountries[indexCurrentCountry]];
+							this.editProvincePopup.currentActiveCountry = [this.ngSelectDataCountries[indexCurrentCountry]];
 						}
 						this.editProvincePopup.currentId = id;
-						this.editProvincePopup.provinceCityToUpdate = this.ProvinceCityToUpdate;
-						this.editProvincePopup.currentActiveCountry = this.currentActiveCountry;
+						this.editProvincePopup.provinceCityToUpdate = provinceCityToUpdate;
 						this.editProvincePopup.setValueFormGroup(this.editProvincePopup.provinceCityToUpdate);
 						this.editProvincePopup.show();
 					}
 				})
 			).subscribe(
 				(res: any) => {
-					this.ProvinceCityToUpdate = res;
+					provinceCityToUpdate = res;
 				});
 	}
 
@@ -484,37 +476,36 @@ export class LocationComponent implements OnInit, AfterViewInit {
 	}
 
 	async showUpdateDistrict(id) {
+		let districtToUpdate = null;
 		this.catalogueRepo.getDetailPlace(id)
 			.pipe(
 				finalize(() => {
-					if (this.DistrictToUpdate != null) {
-						const countryId = this.DistrictToUpdate.countryId;
-						const provinceId = this.DistrictToUpdate.provinceId;
+					if (districtToUpdate != null) {
+						const countryId = districtToUpdate.countryId;
+						const provinceId = districtToUpdate.provinceId;
+						this.editDistrictPopup.getProvinceByCountry(countryId);
 						const indexCurrentCountry = lodash.findIndex(this.ngSelectDataCountries, function (o) {
 							return o['id'] === countryId;
 						});
 						if (indexCurrentCountry > -1) {
-							this.currentActiveCountry = [this.ngSelectDataCountries[indexCurrentCountry]];
+							this.editDistrictPopup.currentActiveCountry = [this.ngSelectDataCountries[indexCurrentCountry]];
 						}
-						const indexCurrentProvince = lodash.findIndex(this.ngSelectDataProvinces, function (o) {
-							return o['id'] === countryId;
+						const indexCurrentProvince = lodash.findIndex(this.editDistrictPopup.ngSelectDataProvinces, function (o) {
+							return o['id'] === provinceId;
 						});
-						if (indexCurrentCountry > -1) {
-							this.currentActiveProvince = [this.ngSelectDataProvinces[indexCurrentProvince]];
+						if (indexCurrentProvince > -1) {
+							this.editDistrictPopup.currentActiveProvince = [this.editDistrictPopup.ngSelectDataProvinces[indexCurrentProvince]];
 						}
 						this.editDistrictPopup.currentId = id;
 						this.editDistrictPopup.ngSelectDataCountries = this.ngSelectDataCountries;
-						this.editDistrictPopup.districtToUpdate = this.DistrictToUpdate;
-						this.editDistrictPopup.currentActiveCountry = this.currentActiveCountry;
-						this.editDistrictPopup.currentActiveProvince = this.currentActiveProvince;
-						this.editDistrictPopup.getProvinceByCountry(countryId);
-						this.editDistrictPopup.setValueFormGroup(this.DistrictToUpdate);
+						this.editDistrictPopup.districtToUpdate = districtToUpdate;
+						this.editDistrictPopup.setValueFormGroup(districtToUpdate);
 						this.editDistrictPopup.show();
 					}
 				})
 			).subscribe(
 				(res: any) => {
-					this.DistrictToUpdate = res;
+					districtToUpdate = res;
 				});
 	}
 	idDistrictToDelete: string = "";
@@ -928,11 +919,6 @@ export class LocationComponent implements OnInit, AfterViewInit {
 		exportModel.data = wards;
 		this.excelService.generateExcel(exportModel);
 
-	}
-
-	onChangeDistrictUpdate(event: any) {
-		console.log(event);
-		this.DistrictToUpdate.active = event.target.checked;
 	}
 	async saveProvince(event) {
 		if (event) {
