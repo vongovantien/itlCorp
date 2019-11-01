@@ -23,13 +23,17 @@
                                     <div class="col-lg-4">
                                         <div class="form-group">
                                             <label class="form-control-label">
-                                                Customer <span class="m--font-danger">(*)</span>
+                                                Customer(Payer) <span class="m--font-danger">(*)</span>
                                             </label>
                                             <!-- <select formControlName="company" class="form-control">
                                                         <option *ngFor="let company of companies" [ngValue]="company.id">{{company.code}}
                                                         </option>
                                                     </select> -->
-                                            <app-combo-grid-virtual-scroll [height]="200">
+                                            <app-combo-grid-virtual-scroll
+                                                [currentActiveItemId]="{field:'taxCode',value:strCustomerCurrent,hardValue:''}"
+                                                [selectedDisplayFields]="['partnerNameEn']" [dataSources]="listCustomer"
+                                                (itemSelected)="strCustomerCurrent=$event.taxCode"
+                                                [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                             </app-combo-grid-virtual-scroll>
 
                                         </div>
@@ -59,7 +63,11 @@
                                                         <option *ngFor="let company of companies" [ngValue]="company.id">{{company.code}}
                                                         </option>
                                                     </select> -->
-                                            <app-combo-grid-virtual-scroll [height]="200">
+                                            <app-combo-grid-virtual-scroll
+                                                [currentActiveItemId]="{field:'taxCode',value:strShipperCurrent,hardValue:''}"
+                                                [selectedDisplayFields]="['partnerNameEn']" [dataSources]="listShipper"
+                                                (itemSelected)="strShipperCurrent=$event.taxCode"
+                                                [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                             </app-combo-grid-virtual-scroll>
                                         </div>
                                     </div>
@@ -72,7 +80,13 @@
                                                         <option *ngFor="let company of companies" [ngValue]="company.id">{{company.code}}
                                                         </option>
                                                     </select> -->
-                                            <app-combo-grid-virtual-scroll [height]="200">
+
+                                            <app-combo-grid-virtual-scroll
+                                                [currentActiveItemId]="{field:'taxCode',value:strConsigneeCurrent,hardValue:''}"
+                                                [selectedDisplayFields]="['partnerNameEn']"
+                                                [dataSources]="listConsignee"
+                                                (itemSelected)="strConsigneeCurrent=$event.taxCode"
+                                                [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                             </app-combo-grid-virtual-scroll>
                                         </div>
                                     </div>
@@ -85,7 +99,12 @@
                                                         <option *ngFor="let company of companies" [ngValue]="company.id">{{company.code}}
                                                         </option>
                                                     </select> -->
-                                            <app-combo-grid-virtual-scroll [height]="200">
+                                            <app-combo-grid-virtual-scroll
+                                                [currentActiveItemId]="{field:'taxCode',value:strNotifyParty,hardValue:''}"
+                                                [selectedDisplayFields]="['partnerNameEn']"
+                                                [dataSources]="listConsignee"
+                                                (itemSelected)="strNotifyParty=$event.taxCode"
+                                                [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                             </app-combo-grid-virtual-scroll>
                                         </div>
                                     </div>
@@ -100,7 +119,12 @@
                                                         <option *ngFor="let company of companies" [ngValue]="company.id">{{company.code}}
                                                         </option>
                                                     </select> -->
-                                            <app-combo-grid-virtual-scroll [height]="200">
+                                            <app-combo-grid-virtual-scroll
+                                                [currentActiveItemId]="{field:'taxCode',value:strAlsoNotifyParty,hardValue:''}"
+                                                [selectedDisplayFields]="['partnerNameEn']"
+                                                [dataSources]="listConsignee"
+                                                (itemSelected)="strAlsoNotifyParty=$event.taxCode"
+                                                [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                             </app-combo-grid-virtual-scroll>
                                         </div>
                                     </div>
@@ -145,7 +169,11 @@
                                                                                 <option *ngFor="let company of companies" [ngValue]="company.id">{{company.code}}
                                                                                 </option>
                                                                             </select> -->
-                                            <app-combo-grid-virtual-scroll [height]="200">
+                                            <app-combo-grid-virtual-scroll
+                                                [currentActiveItemId]="{field:'code',value:strPortLoadingCurrent,hardValue:''}"
+                                                [selectedDisplayFields]="['partnerNameEn']" [dataSources]="listPort"
+                                                (itemSelected)="strPortLoadingCurrent=$event.code"
+                                                [displayFields]="[{'field':'nameVn','label':'Name Vn'},{'field':'nameEn','label':'Name EN'},{'field':'code','label':'Code'}]">
                                             </app-combo-grid-virtual-scroll>
                                         </div>
 
@@ -159,7 +187,11 @@
                                                             <option *ngFor="let company of companies" [ngValue]="company.id">{{company.code}}
                                                             </option>
                                                         </select> -->
-                                        <app-combo-grid-virtual-scroll [height]="200">
+                                        <app-combo-grid-virtual-scroll
+                                            [currentActiveItemId]="{field:'code',value:strPortDischarge,hardValue:''}"
+                                            [selectedDisplayFields]="['partnerNameEn']" [dataSources]="listPort"
+                                            (itemSelected)="strPortDischarge=$event.code"
+                                            [displayFields]="[{'field':'nameVn','label':'Name Vn'},{'field':'nameEn','label':'Name EN'},{'field':'code','label':'Code'}]">
                                         </app-combo-grid-virtual-scroll>
                                     </div>
                                 </div>
@@ -183,22 +215,26 @@
                                                                             <option *ngFor="let company of companies" [ngValue]="company.id">{{company.code}}
                                                                             </option>
                                                                         </select> -->
-                                            <app-combo-grid-virtual-scroll [height]="200">
+                                            <app-combo-grid-virtual-scroll
+                                                [currentActiveItemId]="{field:'taxCode',value:strSupplier,hardValue:''}"
+                                                [selectedDisplayFields]="['partnerNameEn']" [dataSources]="listSupplier"
+                                                (itemSelected)="strSupplier=$event.taxCode"
+                                                [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                             </app-combo-grid-virtual-scroll>
                                         </div>
 
                                     </div>
-                                    <div class="col-lg-2">
+                                    <div class="col-lg-4">
                                         <div class="form-group">
                                             <label class="form-control-label" for="">
-                                                Feeder Vessel
+                                                Feeder Vessel No
                                             </label>
                                             <input type="text" class="form-control m-input m-input--square"
                                                 formControlName="feederVessel1">
                                         </div>
                                     </div>
 
-                                    <div class="col-lg-2">
+                                    <!-- <div class="col-lg-2">
                                         <div class="form-group">
                                             <label class="form-control-label" for="">
 
@@ -206,10 +242,21 @@
                                             <input type="text" class="form-control m-input m-input--square"
                                                 formControlName="feederVessel2">
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                                 <div class="row">
-                                    <div class="col-lg-2">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Feeder Voyage No
+                                            </label>
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                formControlName="feederVoyageNo">
+
+                                        </div>
+
+                                    </div>
+                                    <div class="col-lg-4">
                                         <div class="form-group">
                                             <label class="form-control-label" for="">
                                                 Arrival Vessel
@@ -217,9 +264,8 @@
                                             <input type="text" class="form-control m-input m-input--square"
                                                 formControlName="arrivalVessel">
                                         </div>
-
                                     </div>
-                                    <div class="col-lg-2">
+                                    <div class="col-lg-4">
                                         <div class="form-group">
                                             <label class="form-control-label" for="">
                                                 Arrival Voyage No
@@ -230,7 +276,17 @@
                                         </div>
 
                                     </div>
-                                    <div class="col-lg-2">
+                                    <!-- <div class="col-lg-2">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Arrival Vessel
+                                            </label>
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                formControlName="arrivalVessel">
+                                        </div>
+
+                                    </div> -->
+                                    <!-- <div class="col-lg-2">
                                         <div class="form-group">
                                             <label class="form-control-label" for="">
                                                 Document Date
@@ -255,8 +311,8 @@
                                             <input type="text" class="form-control m-input m-input--square"
                                                 formControlName="documentNo">
                                         </div>
-                                    </div>
-                                    <div class="col-lg-2">
+                                    </div> -->
+                                    <!-- <div class="col-lg-2">
                                         <div class="form-group">
                                             <label class="form-control-label" for="">
                                                 ETA at Warehouse
@@ -283,29 +339,14 @@
                                             </select>
                                         </div>
 
-                                    </div>
+                                    </div> -->
 
                                 </div>
                                 <div class="row">
                                     <div class="col-lg-4">
                                         <div class="form-group">
-
-                                            <label class="form-control-label">
-                                                Place of Issued
-                                            </label>
-                                            <!-- <select formControlName="company" class="form-control">
-                                                    <option *ngFor="let company of companies" [ngValue]="company.id">{{company.code}}
-                                                    </option>
-                                                </select> -->
-                                            <app-combo-grid-virtual-scroll [height]="200">
-                                            </app-combo-grid-virtual-scroll>
-
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <div class="form-group">
                                             <label class="form-control-label" for="">
-                                                Date of Issued
+                                                Document Date
                                             </label>
                                             <div class="m-input-icon">
                                                 <input type="text" class="form-control m-input m-input--square"
@@ -317,15 +358,32 @@
                                                 </span>
                                             </div>
                                         </div>
-
                                     </div>
                                     <div class="col-lg-4">
                                         <div class="form-group">
                                             <label class="form-control-label" for="">
-                                                Reference No
+                                                Document No
                                             </label>
                                             <input type="text" class="form-control m-input m-input--square"
-                                                formControlName="referenceNo">
+                                                formControlName="documentNo">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+
+                                            <label class="form-control-label" for="">
+                                                ETA at Warehouse
+                                            </label>
+                                            <div class="m-input-icon">
+                                                <input type="text" class="form-control m-input m-input--square"
+                                                    readonly />
+                                                <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                    <span>
+                                                        <i class="la la-calendar"></i>
+                                                    </span>
+                                                </span>
+                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -356,9 +414,75 @@
                                             <textarea class="form-control " formControlName="remark"></textarea>
                                         </div>
                                     </div>
-
-
                                 </div>
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+
+                                            <label class="form-control-label">
+                                                Place of Issued
+                                            </label>
+                                            <!-- <select formControlName="company" class="form-control">
+                                                    <option *ngFor="let company of companies" [ngValue]="company.id">{{company.code}}
+                                                    </option>
+                                                </select> -->
+                                            <app-combo-grid-virtual-scroll
+                                                [currentActiveItemId]="{field:'code',value:strProvince,hardValue:''}"
+                                                [selectedDisplayFields]="['partnerNameEn']" [dataSources]="listProvince"
+                                                (itemSelected)="strProvince=$event.code"
+                                                [displayFields]="[{'field':'name_VN','label':'Name Vn'},{'field':'name_EN','label':'Name EN'},{'field':'code','label':'Code'}]">
+                                            </app-combo-grid-virtual-scroll>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Date of Issued
+                                            </label>
+                                            <div class="m-input-icon">
+                                                <input type="text" class="form-control m-input m-input--square"
+                                                    readonly />
+                                                <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                    <span>
+                                                        <i class="la la-calendar"></i>
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <!-- <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Reference No
+                                            </label>
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                formControlName="referenceNo">
+                                        </div> -->
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Number of Origin B/L <span class="m--font-danger">(*)</span>
+                                            </label>
+                                            <select formControlName="numberOfOrigin" class="form-control">
+                                                <option *ngFor="let item of numberOfOrigins" [ngValue]="item">
+                                                    {{item.title}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Reference No
+                                            </label>
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                formControlName="referenceNo">
+                                        </div>
+                                    </div>
+                                </div>
+
 
 
                             </div>
