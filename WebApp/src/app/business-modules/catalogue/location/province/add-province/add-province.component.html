@@ -66,7 +66,6 @@
                             </label>
                             <div class="col-lg-8">
                                 <ng-select [allowClear]="true" [items]="ngSelectDataCountries" formControlName="country"
-                                    *ngIf="resetNg2SelectCountry && ngSelectDataCountries.length>0"
                                     (data)="refreshValue($event)"
                                     (selected)="selectedCountry($event,'add','province-city')"
                                     (removed)="removed($event,'addCountryProvince')" (typed)="typed($event)"

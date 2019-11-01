@@ -104,9 +104,9 @@ export class AddDistrictComponent extends PopupBase implements OnInit {
         this.resetNg2SelectProvince = false;
         setTimeout(() => {
             this.resetNg2SelectProvince = true;
-        }, 300);
+        }, 10);
     }
-    saveProvince() {
+    saveDistrict() {
         this.isSubmitted = true;
         if (this.formAddDistrict.valid && this.districtToAdd.countryId != null && this.districtToAdd.provinceId != null) {
             this.districtToAdd.placeType = PlaceTypeEnum.District;

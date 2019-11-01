@@ -10,80 +10,63 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form novalidate #updateDistrictForm="ngForm" *ngIf="districtToUpdate"
-                    (ngSubmit)="updateDistrictForm.form.valid">
+                <form [formGroup]="formUpdateDistrict">
                     <div class="m-form m-form m-form--state">
-
                         <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': updateDistrictForm.submitted && district_code.invalid }">
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && code.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
                                 Province - City Code <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
-                                <input type="text" [(ngModel)]="districtToUpdate.code"
-                                    class="form-control m-input m-input--square" #district_code="ngModel"
+                                <input type="text" formControlName="code" class="form-control m-input m-input--square"
                                     name="district_code" required placeholder="Please enter province-city code">
-                                <div class="form-control-feedback"
-                                    *ngIf="updateDistrictForm.submitted && district_code.invalid">
+                                <div class="form-control-feedback" *ngIf="isSubmitted && code.invalid">
                                     Province - City code is required
                                 </div>
                             </div>
                         </div>
-
-
                         <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': updateDistrictForm.submitted && english_name.invalid }">
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && nameEn.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
                                 English Name <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
-                                <input type="text" [(ngModel)]="districtToUpdate.nameEn"
-                                    (change)="districtToUpdate.nameEn=districtToUpdate.nameEn.trim()"
-                                    class="form-control m-input m-input--square" #english_name="ngModel" required
-                                    minlength="3" name="english_name" placeholder="Please enter english name">
-                                <div class="form-control-feedback"
-                                    *ngIf="updateDistrictForm.submitted && english_name.invalid">
+                                <input type="text" formControlName="nameEn" class="form-control m-input m-input--square"
+                                    required minlength="3" name="english_name" placeholder="Please enter english name">
+                                <div class="form-control-feedback" *ngIf="isSubmitted && nameEn.invalid">
                                     English name is required at least 3 characters
                                 </div>
                             </div>
-
                         </div>
-
-
                         <div class="form-group row"
-                            [ngClass]="{ 'm-form__group has-danger': updateDistrictForm.submitted && local_name.invalid }">
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && nameVn.invalid }">
                             <label class="col-lg-4 col-form-label form-control-label">
                                 Local Name <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
-                                <input type="text" [(ngModel)]="districtToUpdate.nameVn"
-                                    (change)="districtToUpdate.nameVn=districtToUpdate.nameVn.trim()"
-                                    class="form-control m-input m-input--square" #local_name="ngModel" required
-                                    minlength="3" name="local_name" placeholder="Please enter local name">
-                                <div class="form-control-feedback"
-                                    *ngIf="updateDistrictForm.submitted && local_name.invalid">
+                                <input type="text" formControlName="nameVn" class="form-control m-input m-input--square"
+                                    required minlength="3" name="local_name" placeholder="Please enter local name">
+                                <div class="form-control-feedback" *ngIf="isSubmitted && nameVn.invalid">
                                     Local name is required at least 3 characters
                                 </div>
                             </div>
-
                         </div>
                         <div class="form-group row"
-                            [ngClass]="{'m-form__group has-danger': isSubmitted && districtToUpdate.countryId == null}">
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && districtToUpdate.countryId==null }">
                             <label class="col-lg-4 col-form-label form-control-label">
                                 Country <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="col-lg-8">
                                 <ng-select [allowClear]="true" [items]="ngSelectDataCountries"
                                     [active]="currentActiveCountry" (data)="refreshValue($event)"
-                                    (selected)="selected($event,'country')" (removed)="removed($event,'country')"
-                                    placeholder="Select Country">
+                                    (selected)="selected($event, 'country')" (removed)="removed($event,'country')"
+                                    placeholder="Select department">
                                 </ng-select>
                                 <div class="form-control-feedback"
-                                    *ngIf="isSubmitted && districtToUpdate.countryId == null">
+                                    *ngIf="isSubmitted && districtToUpdate.countryId==null">
                                     Country is required
                                 </div>
                             </div>
-
                         </div>
                         <div class="form-group row"
                             [ngClass]="{ 'm-form__group has-danger': isSubmitted && districtToUpdate.provinceId==null }">
@@ -92,15 +75,17 @@
                             </label>
                             <div class="col-lg-8">
                                 <ng-select [allowClear]="true" [items]="ngSelectDataProvinces"
-                                    [active]="currentActiveProvince" *ngIf="resetNg2SelectProvince"
-                                    (data)="refreshValue($event)" (selected)="selected($event,'country')"
-                                    (removed)="removed($event,'country')" placeholder="Select department">
+                                    [active]="currentActiveProvince"
+                                    *ngIf="resetNg2SelectProvince && ngSelectDataProvinces.length >= 0"
+                                    (selected)="selected($event,'province')" (removed)="removed($event,'province')"
+                                    placeholder="Select Province">
                                 </ng-select>
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmitted && districtToUpdate.provinceId==null">
                                     Province is required
                                 </div>
                             </div>
+
                         </div>
 
                         <div class="form-group row">
@@ -109,9 +94,8 @@
                             </label>
                             <div class="col-lg-8">
                                 <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
-                                    <input type="checkbox" formControlName="active" type="checkbox">
-                                    <span></span>
-                                </label>
+                                    <input type="checkbox" formControlName="active"
+                                        type="checkbox"><span></span></label>
                             </div>
                         </div>
 

@@ -56,8 +56,16 @@ export class UpdateDistrictComponent extends PopupBase implements OnInit {
         this.code = this.formUpdateDistrict.controls['code'];
         this.nameEn = this.formUpdateDistrict.controls['nameEn'];
         this.nameVn = this.formUpdateDistrict.controls['nameVn'];
+        this.active = this.formUpdateDistrict.controls['active'];
     }
-
+    setValueFormGroup(res: any) {
+        this.formUpdateDistrict.setValue({
+            code: res.code,
+            nameEn: res.nameEn,
+            nameVn: res.nameVn,
+            active: res.active
+        });
+    }
     getProvinceByCountry(id: any) {
         this.ngSelectDataProvinces = this.provinces.length === 0 ? [] : this.ngSelectData(this.provinces, id);
     }
@@ -68,6 +76,7 @@ export class UpdateDistrictComponent extends PopupBase implements OnInit {
         if (type === 'country') {
             this.districtToUpdate.countryId = value.id;
             this.districtToUpdate.provinceId = null;
+            this.currentActiveProvince = [];
             this.getProvinceByCountry(value.id);
             this.resetNgSelect();
         }
@@ -80,6 +89,7 @@ export class UpdateDistrictComponent extends PopupBase implements OnInit {
             this.districtToUpdate.countryId = null;
             this.districtToUpdate.provinceId = null;
             this.ngSelectDataProvinces = [];
+            this.currentActiveProvince = [];
             this.resetNgSelect();
         }
         if (type === 'province') {
@@ -95,7 +105,7 @@ export class UpdateDistrictComponent extends PopupBase implements OnInit {
         this.resetNg2SelectProvince = false;
         setTimeout(() => {
             this.resetNg2SelectProvince = true;
-        }, 300);
+        }, 10);
     }
     cancelAdd() {
         this.hide();

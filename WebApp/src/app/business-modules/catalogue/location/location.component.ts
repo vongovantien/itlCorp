@@ -25,6 +25,8 @@ import { catchError, finalize } from 'rxjs/operators';
 import { UpdateCountryComponent } from './country/update-country/update-country.component';
 import { AddDistrictComponent } from './district/add-district/add-district.component';
 import { UpdateDistrictComponent } from './district/update-district/update-district.component';
+import { AddWardComponent } from './ward/add-ward/add-ward.component';
+import { UpdateWardComponent } from './ward/update-ward/update-ward.component';
 declare var $: any;
 
 @Component({
@@ -35,14 +37,16 @@ export class LocationComponent implements OnInit, AfterViewInit {
 	@ViewChild(AddCountryComponent, { static: false }) addCountryPopup: AddCountryComponent;
 	@ViewChild(AddProvinceComponent, { static: false }) addProvincePopup: AddProvinceComponent;
 	@ViewChild(AddDistrictComponent, { static: false }) addDistrictPopup: AddDistrictComponent;
-	@ViewChild(UpdateProvinceComponent, { static: false }) editProvicePopup: UpdateProvinceComponent;
+	@ViewChild(AddWardComponent, { static: false }) addWardPopup: AddWardComponent;
+	@ViewChild(UpdateProvinceComponent, { static: false }) editProvincePopup: UpdateProvinceComponent;
 	@ViewChild(UpdateCountryComponent, { static: false }) editCountryPopup: UpdateCountryComponent;
 	@ViewChild(UpdateDistrictComponent, { static: false }) editDistrictPopup: UpdateDistrictComponent;
+	@ViewChild(UpdateWardComponent, { static: false }) editWardPopup: UpdateWardComponent;
 	ngAfterViewInit(): void { }
 
-	/**
-	 *START VARIABLES DEFINITIONS
-	 */
+    /**
+     *START VARIABLES DEFINITIONS
+     */
 	ListCountries: any = [];
 	ConstListCountries: any = [];
 	CountryToAdd = new CountryModel();
@@ -68,8 +72,6 @@ export class LocationComponent implements OnInit, AfterViewInit {
 
 	ListWards: any = [];
 	ConstListWards: any = [];
-	WardToAdd = new CatPlaceModel();
-	WardToUpdate = new CatPlaceModel();
 
 	importButtonSetting: ButtonModalSetting = {
 		typeButton: ButtonType.import
@@ -143,46 +145,6 @@ export class LocationComponent implements OnInit, AfterViewInit {
 
 	}
 
-	resetNg2SelectCountry = true;
-	resetNg2SelectProvince = true;
-	resetNg2SelectDistrict = true;
-
-	resetNgSelect(type) {
-		if (type == "country") {
-			this.resetNg2SelectCountry = false;
-			setTimeout(() => {
-				this.resetNg2SelectCountry = true;
-			}, 300);
-		}
-		if (type == "province") {
-			this.resetNg2SelectProvince = false;
-			setTimeout(() => {
-				this.resetNg2SelectProvince = true;
-			}, 300);
-		}
-		if (type == "district") {
-			this.resetNg2SelectDistrict = false;
-			setTimeout(() => {
-				this.resetNg2SelectDistrict = true;
-			}, 300);
-		}
-
-		if (type == "all") {
-			this.resetNg2SelectCountry = false;
-			this.resetNg2SelectProvince = false;
-			this.resetNg2SelectDistrict = false;
-			setTimeout(() => {
-				this.resetNg2SelectCountry = true;
-				this.resetNg2SelectProvince = true;
-				this.resetNg2SelectDistrict = true;
-			}, 300);
-		}
-
-	}
-	showAdd() {
-		this.ngSelectDataProvinces = [];
-		this.ngSelectDataDistricts = [];
-	}
 	showAddProvince() {
 		this.addProvincePopup.show();
 	}
@@ -217,31 +179,29 @@ export class LocationComponent implements OnInit, AfterViewInit {
 		this.getDistrict();
 		this.getWards();
 		this.getAllCountries();
+		this.getAllProvinces();
+		this.getAllDistricts();
 	}
 	activeTab: string = "country";
 	changeTab(activeTab) {
 		this.activeTab = activeTab;
 		if (activeTab === "country") {
 			this.pager.currentPage = 1;
-			//this.pager.pageSize = 10;
 			this.pager.totalItems = this.totalItemCountries;
 			this.child.setPage(this.pager.currentPage);
 		}
 		if (activeTab === "province") {
 			this.pager.currentPage = 1;
-			//this.pager.pageSize = 10;
 			this.pager.totalItems = this.totalItemProvinces;
 			this.child.setPage(this.pager.currentPage);
 		}
 		if (activeTab === "district") {
 			this.pager.currentPage = 1;
-			//this.pager.pageSize = 10;
 			this.pager.totalItems = this.totalItemDistricts;
 			this.child.setPage(this.pager.currentPage);
 		}
 		if (activeTab === "ward") {
 			this.pager.currentPage = 1;
-			//this.pager.pageSize = 10;
 			this.pager.totalItems = this.totalItemWards;
 			this.child.setPage(this.pager.currentPage);
 		}
@@ -340,26 +300,6 @@ export class LocationComponent implements OnInit, AfterViewInit {
 	showAddCountryPopup() {
 		this.addCountryPopup.show();
 	}
-	// async addCountry(form: NgForm, action) {
-	// 	if (action == "yes") {
-	// 		delete this.CountryToAdd.id;
-	// 		if (form.form.status != "INVALID") {
-	// 			const response = await this.baseServices.postAsync(this.api_menu.Catalogue.Country.addNew, this.CountryToAdd, true, true);
-	// 			this.pager.totalItems = 0;
-	// 			await this.getCountries();
-	// 			this.getAllCountries();
-	// 			if (response) {
-	// 				//this.setPageAfterAdd();
-	// 				form.onReset();
-	// 				$('#add-country-modal').modal('hide');
-	// 			}
-	// 		}
-	// 	} else {
-	// 		this.CountryToAdd = new CountryModel();
-	// 		form.onReset();
-	// 		$('#add-country-modal').modal('hide');
-	// 	}
-	// }
 
 	async showUpdateCountry(id) {
 		// this.CountryToUpdate = await this.baseServices.getAsync(this.api_menu.Catalogue.Country.getById + id, true, true);
@@ -377,23 +317,6 @@ export class LocationComponent implements OnInit, AfterViewInit {
 				(res: any) => {
 					this.CountryToUpdate = res;
 				});
-	}
-
-	async updateCountry(form: NgForm, action) {
-		if (action == "yes") {
-			if (form.form.status != "INVALID") {
-				const res = await this.baseServices.putAsync(this.api_menu.Catalogue.Country.update, this.CountryToUpdate);
-				if (res) {
-					await this.getCountries();
-					await this.getProvinceCities();
-					form.onReset();
-					$('#update-country-modal').modal('hide');
-				}
-			}
-		} else {
-			form.onReset();
-			$('#update-country-modal').modal('hide');
-		}
 	}
 
 	prepareDeleteCountry(id) {
@@ -477,7 +400,6 @@ export class LocationComponent implements OnInit, AfterViewInit {
 		this.ConstListProvinceCities = response.data;
 		this.totalItemProvinces = response.totalItems;
 		this.pager.totalItems = this.totalItemProvinces;
-		this.addDistrictPopup.provinces = this.ListProvinceCities;
 		return response.data;
 	}
 
@@ -493,11 +415,11 @@ export class LocationComponent implements OnInit, AfterViewInit {
 						if (indexCurrentCountry > -1) {
 							this.currentActiveCountry = [this.ngSelectDataCountries[indexCurrentCountry]];
 						}
-						this.editProvicePopup.currentId = id;
-						this.editProvicePopup.provinceCityToUpdate = this.ProvinceCityToUpdate;
-						this.editProvicePopup.currentActiveCountry = this.currentActiveCountry;
-						this.editProvicePopup.setValueFormGroup(this.editProvicePopup.provinceCityToUpdate);
-						this.editProvicePopup.show();
+						this.editProvincePopup.currentId = id;
+						this.editProvincePopup.provinceCityToUpdate = this.ProvinceCityToUpdate;
+						this.editProvincePopup.currentActiveCountry = this.currentActiveCountry;
+						this.editProvincePopup.setValueFormGroup(this.editProvincePopup.provinceCityToUpdate);
+						this.editProvincePopup.show();
 					}
 				})
 			).subscribe(
@@ -561,94 +483,40 @@ export class LocationComponent implements OnInit, AfterViewInit {
 		return response.data;
 	}
 
-	// async addDistrict(form: NgForm, action) {
-	// 	console.log(this.DistrictToAdd);
-	// 	if (action == "yes") {
-	// 		if (form.form.status != "INVALID" && this.DistrictToAdd.countryId != null && this.DistrictToAdd.provinceId != null) {
-	// 			this.DistrictToAdd.placeType = PlaceTypeEnum.District;
-	// 			const response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.add, this.DistrictToAdd);
-	// 			this.pager.totalItems = 0;
-	// 			await this.getDistrict();
-	// 			if (response) {
-	// 				this.setPageAfterAdd();
-	// 				form.onReset();
-	// 				this.resetNgSelect("all");
-	// 				$('#add-district-modal').modal('hide');
-	// 			}
-
-	// 		}
-	// 	} else {
-	// 		this.DistrictToAdd = new CatPlaceModel();
-	// 		form.onReset();
-	// 		this.resetNgSelect("all");
-	// 		$('#add-district-modal').modal('hide');
-	// 	}
-	// }
-
-
-
 	async showUpdateDistrict(id) {
 		this.catalogueRepo.getDetailPlace(id)
 			.pipe(
 				finalize(() => {
 					if (this.DistrictToUpdate != null) {
 						const countryId = this.DistrictToUpdate.countryId;
+						const provinceId = this.DistrictToUpdate.provinceId;
 						const indexCurrentCountry = lodash.findIndex(this.ngSelectDataCountries, function (o) {
 							return o['id'] === countryId;
 						});
 						if (indexCurrentCountry > -1) {
 							this.currentActiveCountry = [this.ngSelectDataCountries[indexCurrentCountry]];
 						}
+						const indexCurrentProvince = lodash.findIndex(this.ngSelectDataProvinces, function (o) {
+							return o['id'] === countryId;
+						});
+						if (indexCurrentCountry > -1) {
+							this.currentActiveProvince = [this.ngSelectDataProvinces[indexCurrentProvince]];
+						}
 						this.editDistrictPopup.currentId = id;
+						this.editDistrictPopup.ngSelectDataCountries = this.ngSelectDataCountries;
 						this.editDistrictPopup.districtToUpdate = this.DistrictToUpdate;
 						this.editDistrictPopup.currentActiveCountry = this.currentActiveCountry;
-						// this.editDistrictPopup.setValueFormGroup(this.editProvicePopup.provinceCityToUpdate);
+						this.editDistrictPopup.currentActiveProvince = this.currentActiveProvince;
+						this.editDistrictPopup.getProvinceByCountry(countryId);
+						this.editDistrictPopup.setValueFormGroup(this.DistrictToUpdate);
 						this.editDistrictPopup.show();
 					}
 				})
 			).subscribe(
 				(res: any) => {
-					this.ProvinceCityToUpdate = res;
+					this.DistrictToUpdate = res;
 				});
-		// this.idDistrictToUpdate = id;
-		// this.DistrictToUpdate = await this.baseServices.getAsync(this.api_menu.Catalogue.CatPlace.getById + id);
-		// console.log(this.DistrictToUpdate);
-		// var countryId = this.DistrictToUpdate.countryId;
-		// var provinceId = this.DistrictToUpdate.provinceId;
-
-		// var indexCurrentCountry = lodash.findIndex(this.ngSelectDataCountries, function (o) {
-		// 	return o['id'] == countryId
-		// });
-
-		// var provinces = await dataHelper.getProvinces(countryId, this.baseServices, this.api_menu);
-		// this.ngSelectDataProvinces = this.ngSelectData(provinces);
-		// this.resetNgSelect("province");
-
-		// var indexCurrentProvince = lodash.findIndex(this.ngSelectDataProvinces, function (o) {
-		// 	return o['id'] == provinceId;
-		// });
-
-		// this.currentActiveCountry = [this.ngSelectDataCountries[indexCurrentCountry]];
-		// this.currentActiveProvince = [this.ngSelectDataProvinces[indexCurrentProvince]];
-
 	}
-
-	async updateDistrict(form: NgForm, action) {
-		if (action == "yes") {
-			if (form.form.status != "INVALID" && this.DistrictToUpdate.countryId != null && this.DistrictToUpdate.provinceId != null) {
-				const res = await this.baseServices.putAsync(this.api_menu.Catalogue.CatPlace.update + this.idDistrictToUpdate, this.DistrictToUpdate);
-				if (res) {
-					await this.getDistrict();
-					form.onReset();
-					$('#update-district-modal').modal('hide');
-				}
-			}
-		} else {
-			form.onReset();
-			$('#update-district-modal').modal('hide');
-		}
-	}
-
 	idDistrictToDelete: string = "";
 	prepareDeleteDistrict(id) {
 		this.idDistrictToDelete = id;
@@ -664,11 +532,53 @@ export class LocationComponent implements OnInit, AfterViewInit {
 		const countries = await this.baseServices.getAsync(this.api_menu.Catalogue.Country.getAll, false, false);
 		this.ngSelectDataCountries = this.ngSelectData(countries);
 		this.addProvincePopup.ngSelectDataCountries = this.ngSelectDataCountries;
-		this.editProvicePopup.ngSelectDataCountries = this.ngSelectDataCountries;
+		this.editProvincePopup.ngSelectDataCountries = this.ngSelectDataCountries;
+
 		this.addDistrictPopup.ngSelectDataCountries = this.ngSelectDataCountries;
 		this.addDistrictPopup.ngSelectDataProvinces = [];
+		this.editDistrictPopup.ngSelectDataCountries = this.ngSelectDataCountries;
+
+		this.addWardPopup.ngSelectDataCountries = this.ngSelectDataCountries;
+		this.addWardPopup.ngSelectDataProvinces = [];
+		this.addWardPopup.ngSelectDataDistricts = [];
+		this.editDistrictPopup.ngSelectDataCountries = this.ngSelectDataCountries;
 	}
 
+	async getAllProvinces() {
+		let searchObj = {
+			placeType: PlaceTypeEnum.Province
+		};
+		let provinces = [];
+		this.catalogueRepo.getPlace(searchObj)
+			.pipe(
+				finalize(() => {
+					this.addDistrictPopup.provinces = provinces;
+					this.editDistrictPopup.provinces = provinces;
+					this.addWardPopup.provinces = provinces;
+					this.editWardPopup.provinces = provinces;
+				})
+			).subscribe(
+				(res: any) => {
+					provinces = res;
+				});
+	}
+
+	async getAllDistricts() {
+		let searchObj = {
+			placeType: PlaceTypeEnum.District
+		};
+		let districts = [];
+		this.catalogueRepo.getPlace(searchObj)
+			.pipe(
+				finalize(() => {
+					this.addWardPopup.districts = districts;
+					this.editWardPopup.districts = districts;
+				})
+			).subscribe(
+				(res: any) => {
+					districts = res;
+				});
+	}
 
 	/**
 	 * END DISTRICT METHODS
@@ -717,84 +627,49 @@ export class LocationComponent implements OnInit, AfterViewInit {
 		return response.data;
 	}
 
-
-
-	async addWard(form: NgForm, action) {
-		console.log(this.WardToAdd);
-		if (action == "yes") {
-			if (form.form.status != "INVALID" && this.WardToAdd.countryId != null && this.WardToAdd.provinceId != null && this.WardToAdd.districtId != null) {
-				this.WardToAdd.placeType = PlaceTypeEnum.Ward;
-				const response = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.add, this.WardToAdd);
-				this.pager.totalItems = 0;
-				await this.getWards();
-				if (response) {
-					//this.setPageAfterAdd();
-					form.onReset();
-					this.resetNgSelect("all");
-					$('#add-ward-modal').modal('hide');
-				}
-
-			}
-		} else {
-			this.WardToAdd = new CatPlaceModel();
-			form.onReset();
-			this.resetNgSelect("all");
-			$('#add-ward-modal').modal('hide');
-		}
-	}
-
-
-	idWardoUpdate: string = ""
 	async showUpdateWard(id) {
-		this.idWardoUpdate = id;
-		this.WardToUpdate = await this.baseServices.getAsync(this.api_menu.Catalogue.CatPlace.getById + id);
+		let wardToUpdate = null;
+		this.catalogueRepo.getDetailPlace(id)
+			.pipe(
+				finalize(() => {
+					if (wardToUpdate != null) {
+						this.editWardPopup.currentId = id;
+						this.editWardPopup.ngSelectDataCountries = this.ngSelectDataCountries;
+						this.editWardPopup.wardToUpdate = wardToUpdate;
 
-		var countryId = this.WardToUpdate.countryId;
-		var provinceId = this.WardToUpdate.provinceId;
-		var districtId = this.WardToUpdate.districtId;
+						const countryId = wardToUpdate.countryId;
+						const provinceId = wardToUpdate.provinceId;
+						const districtId = wardToUpdate.districtId;
 
-		var provinces = await dataHelper.getProvinces(countryId, this.baseServices, this.api_menu);
-		var districts = await dataHelper.getDistricts(countryId, provinceId, this.baseServices, this.api_menu)
-
-		this.ngSelectDataProvinces = this.ngSelectData(provinces);
-		this.ngSelectDataDistricts = this.ngSelectData(districts);
-
-		console.log({ provinces: this.ngSelectDataProvinces }, { districts: this.ngSelectDataDistricts });
-
-		var indexCurrentCountry = lodash.findIndex(this.ngSelectDataCountries, function (o) {
-			return o['id'] == countryId
-		});
-
-		var indexCurrentProvince = lodash.findIndex(this.ngSelectDataProvinces, function (o) {
-			return o['id'] == provinceId;
-		});
-
-		var indexCurrentDistrict = lodash.findIndex(this.ngSelectDataDistricts, function (o) {
-			return o['id'] == districtId;
-		});
-		this.currentActiveCountry = [this.ngSelectDataCountries[indexCurrentCountry]];
-		this.currentActiveProvince = [this.ngSelectDataProvinces[indexCurrentProvince]];
-		this.currentActiveDistrict = [this.ngSelectDataDistricts[indexCurrentDistrict]];
+						const indexCurrentCountry = lodash.findIndex(this.ngSelectDataCountries, function (o) {
+							return o['id'] === countryId;
+						});
+						if (indexCurrentCountry > -1) {
+							this.editWardPopup.currentActiveCountry = [this.ngSelectDataCountries[indexCurrentCountry]];
+						}
+						this.editWardPopup.getProvinceByCountry(countryId);
+						var indexCurrentProvince = lodash.findIndex(this.editWardPopup.ngSelectDataProvinces, function (o) {
+							return o['id'] == provinceId;
+						});
+						if (indexCurrentProvince > -1) {
+							this.editWardPopup.currentActiveProvince = [this.editWardPopup.ngSelectDataProvinces[indexCurrentProvince]];
+						}
+						this.editWardPopup.getWardByProvince(provinceId);
+						var indexCurrentDistrict = lodash.findIndex(this.editWardPopup.ngSelectDataDistricts, function (o) {
+							return o['id'] == districtId;
+						});
+						if (indexCurrentDistrict > -1) {
+							this.editWardPopup.currentActiveDistrict = [this.editWardPopup.ngSelectDataDistricts[indexCurrentDistrict]];
+						}
+						this.editWardPopup.setValueFormGroup(wardToUpdate);
+						this.editWardPopup.show();
+					}
+				})
+			).subscribe(
+				(res: any) => {
+					wardToUpdate = res;
+				});
 	}
-
-	async updateWard(form: NgForm, action) {
-		console.log(this.WardToUpdate);
-		if (action == "yes") {
-			if (form.form.status != "INVALID" && this.WardToUpdate.countryId != null && this.WardToUpdate.provinceId != null && this.WardToUpdate.districtId) {
-				const res = await this.baseServices.putAsync(this.api_menu.Catalogue.CatPlace.update + this.idWardoUpdate, this.WardToUpdate);
-				if (res) {
-					await this.getWards();
-					form.onReset();
-					$('#update-ward-modal').modal('hide');
-				}
-
-			}
-		} else {
-			form.onReset();
-			$('#update-ward-modal').modal('hide');
-		}
-	}
-
 	idWardToDelete: any = null;
 	prepareDeleteWard(id) {
 		this.idWardToDelete = id;
@@ -813,197 +688,6 @@ export class LocationComponent implements OnInit, AfterViewInit {
 	private value: any = {};
 	private _disabledV: string = '0';
 	private disabled: boolean = false;
-
-	private get disabledV(): string {
-		return this._disabledV;
-	}
-
-	private set disabledV(value: string) {
-		this._disabledV = value;
-		this.disabled = this._disabledV === '1';
-	}
-
-	public async selectedCountry(value: any, action, type_location) {
-
-		if (action == "add") {
-			if (type_location == "province-city") {
-				this.ProvinceCityToAdd.countryId = value.id;
-			}
-			if (type_location == "district") {
-				this.DistrictToAdd.countryId = value.id;
-				this.DistrictToAdd.provinceId = null;
-				let provinces = await dataHelper.getProvinces(value.id, this.baseServices, this.api_menu);
-				this.ngSelectDataProvinces = provinces.length == 0 ? [] : this.ngSelectData(provinces);
-				this.resetNgSelect("province");
-			}
-			if (type_location == "ward") {
-				this.WardToAdd.countryId = value.id;
-				this.WardToAdd.provinceId = null;
-				this.WardToAdd.districtId = null;
-				this.ngSelectDataDistricts = [];
-				this.ngSelectDataProvinces = [];
-				let provinces = await dataHelper.getProvinces(value.id, this.baseServices, this.api_menu);
-				this.ngSelectDataProvinces = provinces.length == 0 ? [] : this.ngSelectData(provinces);
-				this.resetNgSelect("province");
-				this.resetNgSelect("district");
-			}
-		} else {
-			if (type_location == "province-city") {
-				this.ProvinceCityToUpdate.countryId = value.id;
-			}
-			if (type_location == "district") {
-				this.DistrictToUpdate.countryId = value.id;
-				this.DistrictToUpdate.provinceId = null;
-				let provinces = await dataHelper.getProvinces(value.id, this.baseServices, this.api_menu);
-				this.ngSelectDataProvinces = provinces.length == 0 ? [] : this.ngSelectData(provinces);
-				this.resetNgSelect("province");
-			}
-			if (type_location == "ward") {
-				this.WardToUpdate.countryId = value.id;
-				this.WardToUpdate.provinceId = null;
-				this.WardToUpdate.districtId = null;
-				this.currentActiveDistrict = [];
-				this.currentActiveProvince = [];
-				let provinces = await dataHelper.getProvinces(value.id, this.baseServices, this.api_menu);
-				this.ngSelectDataProvinces = provinces.length == 0 ? [] : this.ngSelectData(provinces);
-				this.resetNgSelect("province");
-				this.resetNgSelect("district");
-			}
-		}
-
-	}
-
-
-	public async selectedProvince(value: any, action, type_location) {
-		if (action == "add") {
-			if (type_location == "district") {
-				this.DistrictToAdd.provinceId = value.id
-			}
-			if (type_location == "ward") {
-				this.WardToAdd.provinceId = value.id;
-				this.WardToAdd.districtId = null;
-				let districts = await dataHelper.getDistricts(this.WardToAdd.countryId, this.WardToAdd.provinceId, this.baseServices, this.api_menu);
-				this.ngSelectDataDistricts = districts.length == 0 ? [] : this.ngSelectData(districts);
-				this.resetNgSelect("ward");
-			}
-
-		}
-		else {
-			if (type_location == "district") {
-				this.DistrictToUpdate.provinceId = value.id;
-			}
-			if (type_location == "ward") {
-				this.WardToUpdate.provinceId = value.id;
-				this.WardToAdd.districtId = null;
-				this.currentActiveDistrict = [];
-				// this.currentActiveProvince = [value]
-				let districts = await dataHelper.getDistricts(this.WardToUpdate.countryId, this.WardToUpdate.provinceId, this.baseServices, this.api_menu);
-				this.ngSelectDataDistricts = districts.length == 0 ? [] : this.ngSelectData(districts);
-				this.resetNgSelect("district");
-			}
-		}
-	}
-
-
-
-	public async selectedDistrict(value: any, action, type_location) {
-		if (action == "add") {
-			if (type_location == "ward") {
-				this.WardToAdd.districtId = value.id
-			}
-
-		}
-		else {
-			if (type_location == "ward") {
-				this.WardToUpdate.districtId = value.id;
-			}
-		}
-	}
-
-
-	public removed(value: any, action): void {
-		if (action == "addCountryProvince") {
-			this.ProvinceCityToAdd.countryId = null;
-		}
-		if (action == "updateCountryProvince") {
-			this.ProvinceCityToUpdate.countryId = null;
-		}
-
-		if (action == "addCountryDistrict") {
-			this.DistrictToAdd.countryId = null;
-			this.DistrictToAdd.provinceId = null;
-			this.ngSelectDataProvinces = [];
-			this.resetNgSelect("province");
-		}
-		if (action == "updateCountryDistrict") {
-			this.DistrictToUpdate.countryId = null;
-			this.DistrictToUpdate.provinceId = null;
-			this.ngSelectDataProvinces = [];
-			this.currentActiveProvince = [];
-			this.resetNgSelect("province");
-		}
-
-		if (action == "updateProvinceDistrict") {
-			this.DistrictToUpdate.provinceId = null;
-		}
-
-		if (action == "addProvinceDistrict") {
-			this.DistrictToAdd.provinceId = null;
-		}
-
-		if (action == "addCountryWard") {
-			this.WardToAdd.countryId = null;
-			this.WardToAdd.districtId = null
-			this.WardToAdd.provinceId = null;
-			this.ngSelectDataProvinces = [];
-			this.ngSelectDataDistricts = [];
-			this.currentActiveProvince = [];
-			this.currentActiveDistrict = [];
-			this.resetNgSelect("all");
-
-		}
-
-		if (action == "addProvinceWard") {
-			this.WardToAdd.provinceId = null;
-			this.WardToAdd.districtId = null;
-			this.resetNgSelect("district");
-		}
-
-		if (action == "updateCountryWard") {
-			this.WardToUpdate.countryId = null;
-			this.WardToUpdate.provinceId = null;
-			this.WardToUpdate.districtId = null;
-			this.currentActiveCountry = [];
-			this.currentActiveDistrict = [];
-			this.currentActiveProvince = [];
-			this.ngSelectDataProvinces = [];
-			this.ngSelectDataDistricts = []
-			this.resetNgSelect("province");
-			this.resetNgSelect("district");
-		}
-
-		if (action == "updateProvinceWard") {
-			this.WardToUpdate.provinceId = null;
-			this.WardToUpdate.districtId = null;
-			this.ngSelectDataDistricts = [];
-			this.currentActiveDistrict = [];
-			this.resetNgSelect("district");
-		}
-
-		if (action == "updateDistrictWard") {
-			this.WardToUpdate.districtId = null;
-		}
-		console.log('Removed value is: ', value);
-	}
-
-	public typed(value: any): void {
-
-	}
-
-	public refreshValue(value: any): void {
-		this.value = value;
-	}
-
 	isDesc = true;
 	sortKey: string = "code";
 	sort(property) {
@@ -1265,7 +949,15 @@ export class LocationComponent implements OnInit, AfterViewInit {
 			this.ListDistricts = await this.getDistrict();
 		}
 	}
+	async saveWard(event) {
+		if (event == true) {
+			this.ListWards = await this.getWards();
+		}
+	}
 	showAddDistrict() {
 		this.addDistrictPopup.show();
+	}
+	showAddWard() {
+		this.addWardPopup.show();
 	}
 }

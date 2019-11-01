@@ -14,6 +14,8 @@ import { UpdateProvinceComponent } from './province/update-province/update-provi
 import { UpdateCountryComponent } from './country/update-country/update-country.component';
 import { AddDistrictComponent } from './district/add-district/add-district.component';
 import { UpdateDistrictComponent } from './district/update-district/update-district.component';
+import { AddWardComponent } from './ward/add-ward/add-ward.component';
+import { UpdateWardComponent } from './ward/update-ward/update-ward.component';
 
 const routing: Routes = [
     { path: '', component: LocationComponent, data: { name: "Location", level: 2 } },
@@ -40,7 +42,9 @@ const routing: Routes = [
         UpdateProvinceComponent,
         UpdateCountryComponent,
         AddDistrictComponent,
-        UpdateDistrictComponent
+        UpdateDistrictComponent,
+        AddWardComponent,
+        UpdateWardComponent
     ],
     providers: [],
 })
