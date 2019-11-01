@@ -17,11 +17,15 @@ namespace eFMS.API.System.DL.Models
         public string Group { get; set; }
         public string WorkingStatus { get; set; }
         public string Status { get; set; }
+        
         public bool EmployeeNameEnValid { get; set; }
         public bool EmployeeNameVnValid { get; set; }
         public bool UserTypeValid { get; set; }
         public bool WorkingStatusValid { get; set; }
         public bool StatusValid { get; set; }
+        public bool StaffCodeValid { get; set; }
+        public bool TitleValid { get; set; }
+
 
         public bool IsValid { get; set; }
 

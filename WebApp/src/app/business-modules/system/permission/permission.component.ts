@@ -7,6 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
 import { AppList } from 'src/app/app.list';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { catchError, finalize } from 'rxjs/operators';
 
 @Component({
     selector: 'app-permission',
@@ -16,7 +17,7 @@ export class PermissionComponent extends AppList {
     @ViewChild(ConfirmPopupComponent, { static: false }) configmDeletePopup: ConfirmPopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
-    permissions: Permission[] = [];
+    permissions: Permission[] = new Array<Permission>();
 
     dataSearch: any = {};
 
@@ -47,7 +48,16 @@ export class PermissionComponent extends AppList {
     }
 
     searchPermission(dataSearch?: any) {
-        this.permissions.push(new Permission());
+        this._progressRef.start();
+
+        this._systemRepo.getListPermissionGeneral(dataSearch)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (res: any) => {
+                    this.permissions = (res || []).map(p => new Permission(p));
+                    console.log(this.permissions);
+                }
+            );
     }
 
     sortPermission() {
@@ -60,7 +70,24 @@ export class PermissionComponent extends AppList {
     }
 
     onDeletePermission() {
+        this.configmDeletePopup.hide();
 
+        this._progressRef.start();
+
+        this._systemRepo.deletePermissionGeneral(this.selectedPermission.id)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+
+                        // * search again.
+                        this.searchPermission(this.dataSearch);
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                }
+            );
     }
 
 }

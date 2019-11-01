@@ -90,7 +90,7 @@ export class TariffFormSearchComponent extends AppForm {
             tariffName: [],
             tariffType: [],
             tariffShipmentMode: [],
-            tariffDate: [new Date()],
+            tariffDate: [],
             tariffDateType: [],
             tariffStatus: [],
         });
@@ -132,10 +132,8 @@ export class TariffFormSearchComponent extends AppForm {
             { displayName: 'Import', value: 'Import' },
         ];
 
-        this.tariffType.setValue(this.tariffTypes[4]);
-        this.tariffShipmentMode.setValue(this.shipmentModes[0]);
-        this.tariffDateType.setValue(this.dateTypes[0]);
-        this.tariffStatus.setValue(this.status[0]);
+        this.updateDefaultValue();
+
     }
 
     getCustomer() {
@@ -209,16 +207,30 @@ export class TariffFormSearchComponent extends AppForm {
             customerID: !!this.selectedCustomer.data ? this.selectedCustomer.data.id : null,
             supplierID: !!this.selectedSupplier.data ? this.selectedSupplier.data.id : null,
             officeId: !!this.selectedOffice.data ? this.selectedOffice.data.id : '00000000-0000-0000-0000-000000000000',
-            fromDate: formatDate(formSearch.tariffDate.startDate, "yyyy-MM-dd", 'en'),
-            toDate: formatDate(formSearch.tariffDate.endDate, "yyyy-MM-dd", 'en'),
+            fromDate: !!formSearch.tariffDate ? formatDate(formSearch.tariffDate.startDate, "yyyy-MM-dd", 'en') : null,
+            toDate: !!formSearch.tariffDate ? formatDate(formSearch.tariffDate.endDate, "yyyy-MM-dd", 'en') : null,
         };
         this.onSearch.emit(bodySearch);
+    }
+
+    updateDefaultValue() {
+        this.tariffType.setValue(this.tariffTypes[4]);
+        this.tariffShipmentMode.setValue(this.shipmentModes[0]);
+        this.tariffDateType.setValue(this.dateTypes[0]);
+        this.tariffStatus.setValue(this.status[1]);
     }
 
     resetForm() {
         this.selectedCustomer = {};
         this.selectedOffice = {};
         this.selectedSupplier = {};
+
+        this.updateDefaultValue();
+
+        this.resetFormControl(this.tariffName);
+        this.resetFormControl(this.tariffDate);
+
+
         this.onSearch.emit({});
     }
 }

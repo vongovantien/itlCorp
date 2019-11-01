@@ -31,7 +31,6 @@ export class TariffAddComponent extends AppList {
     }
 
     ngOnInit(): void {
-        console.log("khoi tao tariff tạo mới ", this.tariff);
     }
 
     checkValidateFormTariff() {
@@ -77,7 +76,7 @@ export class TariffAddComponent extends AppList {
     }
 
     createTariff() {
-        if (this.checkValidateFormTariff()) {
+        if (!this.checkValidateFormTariff()) {
             return;
         }
         this.onSubmitData();

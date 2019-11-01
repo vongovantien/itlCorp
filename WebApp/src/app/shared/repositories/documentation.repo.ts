@@ -11,6 +11,10 @@ export class DocumentationRepo {
     constructor(protected _api: ApiService) {
     }
 
+    createTransaction(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction`, body);
+    }
+
     addOPSJob(body: any = {}) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/Add`, body);
     }
@@ -145,6 +149,44 @@ export class DocumentationRepo {
 
     getShipmentBySearchOption(searchOption: string, keywords: string[] = []) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetShipmentsCopyListBySearchOption`, { searchOption: searchOption, keywords: keywords }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getListShipmentDocumentation(page?: number, size?: number, body: any = {}){
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/Paging`, body, {
+            page: '' + page,
+            size: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getListHouseBillOfJob(data: any = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/QueryData`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    checkMasterBillAllowToDelete(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/CheckAllowDelete/${id}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    deleteMasterBill(id: string) {
+        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/${id}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+    getShipmentDataCommon() {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/Terminology/GetShipmentCommonData`).pipe(
+            catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }

@@ -1,17 +1,22 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SeaFCLImportManagementComponent } from './sea-fcl-import-management/sea-fcl-import-management.component';
-import { Routes, RouterModule } from '@angular/router';
-import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { TabsModule, PaginationModule, ModalModule } from 'ngx-bootstrap';
+import { Routes, RouterModule } from '@angular/router';
+
+import { SharedModule } from 'src/app/shared/shared.module';
+import { TabsModule, PaginationModule, ModalModule, CollapseModule } from 'ngx-bootstrap';
 import { SelectModule } from 'ng2-select';
-import { SeaFCLImportManagementFormSearchComponent } from './sea-fcl-import-management/components/form-search/form-search-fcl-import.component';
-import { SeaFCLImportCreateJobComponent } from './sea-fcl-import-management/create-job/create-job-fcl-import.component';
-import { SeaFClImportFormCreateComponent } from './sea-fcl-import-management/components/form-create/form-create-sea-fcl-import.component';
-import { SeaFCLImportShipmentGoodSummaryComponent } from './sea-fcl-import-management/components/shipment-good-summary/shipment-good-summary.component';
-import { SeaFCLImportDetailJobComponent } from './sea-fcl-import-management/detail-job/detail-job-fcl-import.component';
-import { SeaFCLImportCDNoteComponent } from './sea-fcl-import-management/detail-job/cd-note/sea-fcl-import-cd-note.component';
+import { SeaFCLImportManagementComponent } from './sea-fcl-import-management.component';
+import { SeaFCLImportCreateJobComponent } from './create-job/create-job-fcl-import.component';
+import { SeaFCLImportDetailJobComponent } from './detail-job/detail-job-fcl-import.component';
+import { SeaFCLImportManagementFormSearchComponent } from './components/form-search/form-search-fcl-import.component';
+import { SeaFClImportFormCreateComponent } from './components/form-create/form-create-sea-fcl-import.component';
+import { SeaFCLImportShipmentGoodSummaryComponent } from './components/shipment-good-summary/shipment-good-summary.component';
+import { SeaFCLImportCDNoteComponent } from './detail-job/cd-note/sea-fcl-import-cd-note.component';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+
 
 
 const routing: Routes = [
@@ -28,7 +33,7 @@ const routing: Routes = [
         data: { name: "Job Detail", path: ":id", level: 3 },
     },
     {
-        path: ':id/hbl', loadChildren: () => import('./sea-fcl-import-management/detail-job/hbl/sea-fcl-import-hbl.module').then(m => m.SeaFCLImportHBLModule),
+        path: ':id/hbl', loadChildren: () => import('./detail-job/hbl/sea-fcl-import-hbl.module').then(m => m.SeaFCLImportHBLModule),
     }
 
 ];
@@ -37,6 +42,16 @@ const COMPONENTS = [
     SeaFCLImportManagementFormSearchComponent,
     SeaFClImportFormCreateComponent,
     SeaFCLImportShipmentGoodSummaryComponent,
+];
+
+const LIB = [
+    CollapseModule.forRoot(),
+    ModalModule.forRoot(),
+    TabsModule.forRoot(),
+    ModalModule.forRoot(),
+    PaginationModule.forRoot(),
+    SelectModule,
+    NgxDaterangepickerMd.forRoot()
 ];
 
 @NgModule({
@@ -53,10 +68,7 @@ const COMPONENTS = [
         RouterModule.forChild(routing),
         FormsModule,
         ReactiveFormsModule,
-        TabsModule.forRoot(),
-        PaginationModule,
-        SelectModule,
-        ModalModule.forRoot()
+        ...LIB
     ],
     exports: [],
     providers: [],

@@ -4,7 +4,6 @@ using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
-//using eFMS.API.Shipment.Service.Helpers;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
@@ -20,37 +19,62 @@ namespace eFMS.API.Documentation.DL.Services
 {
     public class CsTransactionDetailService : RepositoryBase<CsTransactionDetail, CsTransactionDetailModel>, ICsTransactionDetailService
     {
-        public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository, IMapper mapper) : base(repository, mapper)
+        readonly IContextBase<CsTransaction> csTransactionRepo;
+        readonly IContextBase<CsMawbcontainer> csMawbcontainerRepo;
+        readonly IContextBase<CatPartner> catPartnerRepo;
+        readonly IContextBase<CatPlace> catPlaceRepo;
+        readonly IContextBase<SysUser> sysUserRepo;
+        readonly IContextBase<CatUnit> catUnitRepo;
+        readonly IContextBase<CatCommodity> catCommodityRepo;
+
+        public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
+            IMapper mapper,
+            IContextBase<CsTransaction> csTransaction,
+            IContextBase<CsMawbcontainer> csMawbcontainer,
+            IContextBase<CatPartner> catPartner,
+            IContextBase<CatPlace> catPlace,
+            IContextBase<SysUser> sysUser,
+            IContextBase<CatUnit> catUnit,
+            IContextBase<CatCommodity> catCommodity) : base(repository, mapper)
         {
+            csTransactionRepo = csTransaction;
+            csMawbcontainerRepo = csMawbcontainer;
+            catPartnerRepo = catPartner;
+            catPlaceRepo = catPlace;
+            sysUserRepo = sysUser;
+            catUnitRepo = catUnit;
+            catCommodityRepo = catCommodity;
         }
 
+        #region -- INSERT & UPDATE HOUSEBILLS --
         public HandleState AddTransactionDetail(CsTransactionDetailModel model)
         {
             var detail = mapper.Map<CsTransactionDetail>(model);
             detail.Id = Guid.NewGuid();
             detail.UserModified = detail.UserCreated;
             detail.DatetimeModified = detail.DatetimeCreated = DateTime.Now;
-            detail.Active = true;           
+            detail.Active = true;
             try
             {
-                var hs = DataContext.Add(detail, false);
-                if(hs.Success == true)
+                var hs = DataContext.Add(detail);
+                if (hs.Success)
                 {
                     foreach (var x in model.CsMawbcontainers)
                     {
                         var cont = mapper.Map<CsMawbcontainer>(x);
-                        cont.Hblid = detail.Id;
-                        cont.Mblid = Guid.Empty;
                         cont.Id = Guid.NewGuid();
-                        ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Add(cont);
-
+                        cont.Hblid = detail.Id;
+                        cont.Mblid = Guid.Empty;                        
+                        cont.UserModified = detail.UserModified;
+                        cont.DatetimeModified = DateTime.Now;
+                        //((eFMSDataContext)DataContext.DC).CsMawbcontainer.Add(cont);
+                        var hsContainer = csMawbcontainerRepo.Add(cont);
                     }
                 }
-                 ((eFMSDataContext)DataContext.DC).SaveChanges();
+                //((eFMSDataContext)DataContext.DC).SaveChanges();
                 return hs;
-
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 var hs = new HandleState(ex.Message);
                 return hs;
@@ -72,17 +96,23 @@ namespace eFMS.API.Documentation.DL.Services
                 var isUpdateDone = DataContext.Update(hb, x => x.Id == hb.Id);
                 if (isUpdateDone.Success)
                 {
-                   
-
                     if (model.CsMawbcontainers.Count > 0)
                     {
+                        //var listConts = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == hb.Id).ToList();
+                        var listConts = csMawbcontainerRepo.Get(x => x.Hblid == hb.Id).ToList();
+                        foreach (var item in listConts)
+                        {
+                            var isExist = model.CsMawbcontainers.Where(x => x.Id == item.Id).FirstOrDefault();
+                            if (isExist == null)
+                            {
+                                //((eFMSDataContext)DataContext.DC).CsMawbcontainer.Remove(item);
+                                var hsContainerDetele = csMawbcontainerRepo.Delete(x => x.Id == item.Id);
+                            }
+                        }
 
                         foreach (var item in model.CsMawbcontainers)
                         {
-                            //var cont = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Id == item.Id).FirstOrDefault();
-
-
-               
+                            //var cont = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Id == item.Id).FirstOrDefault();               
                             var cont = mapper.Map<CsMawbcontainer>(item);
 
                             if (cont.Id == Guid.Empty)
@@ -91,59 +121,44 @@ namespace eFMS.API.Documentation.DL.Services
                                 cont.Hblid = hb.Id;
                                 cont.UserModified = hb.UserModified;
                                 cont.DatetimeModified = DateTime.Now;
-
-                                ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Add(cont);
+                                //((eFMSDataContext)DataContext.DC).CsMawbcontainer.Add(cont);
+                                var hsContainerAdd = csMawbcontainerRepo.Add(cont);
                             }
                             else
                             {
                                 cont.Hblid = hb.Id;
                                 cont.UserModified = hb.UserModified;
                                 cont.DatetimeModified = DateTime.Now;
-                                ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Update(cont);
+                                //((eFMSDataContext)DataContext.DC).CsMawbcontainer.Update(cont);
+                                var hsContainerUpdate = csMawbcontainerRepo.Update(cont, x => x.Id == cont.Id);
                             }
-                        }
-                        var listConts = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == hb.Id).ToList();
-                        foreach (var item in listConts)
-                        {
-                            var isExist = model.CsMawbcontainers.Where(x => x.Id == item.Id).FirstOrDefault();
-                            if (isExist == null)
-                            {
-                                ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Remove(item);
-                            }
-
-                        }
+                        }                        
                     }
                     else
                     {
-                        var conts = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == hb.Id).ToList();
+                        //var conts = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == hb.Id).ToList();
+                        var conts = csMawbcontainerRepo.Get(x => x.Hblid == hb.Id).ToList();
                         foreach (var item in conts)
                         {
-                            ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Remove(item);
+                            //((eFMSDataContext)DataContext.DC).CsMawbcontainer.Remove(item);
+                            var hsContainerDetele = csMawbcontainerRepo.Delete(x => x.Id == item.Id);
                         }
                     }
-
                 }
-
-                ((eFMSDataContext)DataContext.DC).SaveChanges();
-                var hs = new HandleState();
-                return hs;
+                //((eFMSDataContext)DataContext.DC).SaveChanges();
+                return isUpdateDone;
             }
             catch (Exception ex)
             {
                 var hs = new HandleState(ex.Message);
                 return hs;
-            }       
-
+            }
         }
-
-        private HandleState BadRequest(ResultHandle resultHandle)
-        {
-            throw new NotImplementedException();
-        }
+        #endregion -- INSERT & UPDATE HOUSEBILLS --
 
         public CsTransactionDetailModel GetHbDetails(Guid JobId, Guid HbId)
         {
-            var listHB = GetByJob(new CsTransactionDetailCriteria { JobId=JobId});
+            var listHB = GetByJob(new CsTransactionDetailCriteria { JobId = JobId });
             var returnHB = listHB.Where(x => x.Id == HbId).FirstOrDefault();
             return returnHB;
 
@@ -158,21 +173,21 @@ namespace eFMS.API.Documentation.DL.Services
             //        unit => unit.Id, (container, unit) => new { container, unit })
             //        .ToList();
             var containers = (from container in ((eFMSDataContext)DataContext.DC).CsMawbcontainer
-            join unit in ((eFMSDataContext)DataContext.DC).CatUnit on container.ContainerTypeId equals unit.Id
-            join unitMeasure in ((eFMSDataContext)DataContext.DC).CatUnit on container.UnitOfMeasureId equals unitMeasure.Id into grMeasure
-            from measure in grMeasure.DefaultIfEmpty()
-            join packageType in ((eFMSDataContext)DataContext.DC).CatUnit on container.PackageTypeId equals packageType.Id into grPackage
-            from packType in grPackage.DefaultIfEmpty()
-            join commodity in ((eFMSDataContext)DataContext.DC).CatCommodity on container.CommodityId equals commodity.Id into grCommodity
-            from commo in grCommodity.DefaultIfEmpty()
-                select new
-                {
-                    container,
-                    unit,
-                    UnitOfMeasureName = measure.UnitNameEn,
-                    PackageTypeName = packType.UnitNameEn,
-                    CommodityName = commo.CommodityNameEn
-                });
+                              join unit in ((eFMSDataContext)DataContext.DC).CatUnit on container.ContainerTypeId equals unit.Id
+                              join unitMeasure in ((eFMSDataContext)DataContext.DC).CatUnit on container.UnitOfMeasureId equals unitMeasure.Id into grMeasure
+                              from measure in grMeasure.DefaultIfEmpty()
+                              join packageType in ((eFMSDataContext)DataContext.DC).CatUnit on container.PackageTypeId equals packageType.Id into grPackage
+                              from packType in grPackage.DefaultIfEmpty()
+                              join commodity in ((eFMSDataContext)DataContext.DC).CatCommodity on container.CommodityId equals commodity.Id into grCommodity
+                              from commo in grCommodity.DefaultIfEmpty()
+                              select new
+                              {
+                                  container,
+                                  unit,
+                                  UnitOfMeasureName = measure.UnitNameEn,
+                                  PackageTypeName = packType.UnitNameEn,
+                                  CommodityName = commo.CommodityNameEn
+                              });
 
             if (containers.Count() == 0) return results;
             results.ForEach(detail =>
@@ -227,14 +242,14 @@ namespace eFMS.API.Documentation.DL.Services
                          from noti in detailNotis.DefaultIfEmpty()
                          join port in ((eFMSDataContext)DataContext.DC).CatPlace on detail.Pod equals port.Id into portDetail
                          from pod in portDetail.DefaultIfEmpty()
-                         join fwd in ((eFMSDataContext)DataContext.DC).CatPartner on  detail.ForwardingAgentId equals fwd.Id into forwarding
+                         join fwd in ((eFMSDataContext)DataContext.DC).CatPartner on detail.ForwardingAgentId equals fwd.Id into forwarding
                          from f in forwarding.DefaultIfEmpty()
                          join saleman in ((eFMSDataContext)DataContext.DC).SysUser on detail.SaleManId equals saleman.Id into prods
                          from x in prods.DefaultIfEmpty()
-                         select new { detail, customer = y, notiParty = noti, saleman = x ,agent = f, pod}
+                         select new { detail, customer = y, notiParty = noti, saleman = x, agent = f, pod }
                           );
             if (query == null) return null;
-            foreach(var item in query)
+            foreach (var item in query)
             {
                 var detail = mapper.Map<CsTransactionDetailModel>(item.detail);
                 detail.CustomerName = item.customer?.PartnerNameEn;
@@ -248,18 +263,20 @@ namespace eFMS.API.Documentation.DL.Services
             return results.AsQueryable();
         }
 
+        #region -- LIST & PAGING HOUSEBILLS --
         public List<CsTransactionDetailModel> Query(CsTransactionDetailCriteria criteria)
         {
-            var query = (from detail in ((eFMSDataContext)DataContext.DC).CsTransactionDetail
-                         join tran in ((eFMSDataContext)DataContext.DC).CsTransaction on detail.JobId equals tran.Id
-                         join customer in ((eFMSDataContext)DataContext.DC).CatPartner on detail.CustomerId equals customer.Id into customers
+            var query = (from detail in DataContext.Get()
+                         join tran in csTransactionRepo.Get() on detail.JobId equals tran.Id
+                         join customer in catPartnerRepo.Get() on detail.CustomerId equals customer.Id into customers
                          from cus in customers.DefaultIfEmpty()
-                         join saleman in ((eFMSDataContext)DataContext.DC).SysUser on detail.SaleManId equals saleman.Id into salemans
+                         join saleman in sysUserRepo.Get() on detail.SaleManId equals saleman.Id into salemans
                          from sale in salemans.DefaultIfEmpty()
                          select new { detail, tran, cus, sale });
             if (criteria.All == null)
             {
-                query = query.Where(x => x.tran.Mawb.IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                query = query.Where(x => criteria.JobId != Guid.Empty && criteria.JobId != null ? x.detail.JobId == criteria.JobId : true 
+                                      && x.tran.Mawb.IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                                       && (x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                       && (x.cus.PartnerNameEn.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                       && (x.tran.Etd >= criteria.FromDate || criteria.FromDate == null)
@@ -269,49 +286,116 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                query = query.Where(x => (x.tran.Mawb.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                query = query.Where(x => criteria.JobId != Guid.Empty && criteria.JobId != null ? x.detail.JobId == criteria.JobId : true
+                                      || (x.tran.Mawb.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                                       || (x.detail.Hwbno.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                       || (x.cus.PartnerNameEn.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                       || (x.sale.Username.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0))
-                                       && ((x.tran.Etd ?? null) >= (criteria.FromDate ?? null) && (x.tran.Etd ?? null) <= (criteria.ToDate ?? null))
+                                      && ((x.tran.Etd ?? null) >= (criteria.FromDate ?? null) && (x.tran.Etd ?? null) <= (criteria.ToDate ?? null))
                                     );
             }
+            //List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
+            //foreach (var item in query)
+            //{
+            //    var detail = mapper.Map<CsTransactionDetailModel>(item.detail);
+            //    detail.CustomerName = item.cus?.PartnerNameEn;
+            //    detail.SaleManName = item.sale?.Username;
+            //    detail.Etd = item.tran.Etd;
+            //    detail.Mawb = item.tran.Mawb;
+            //    results.Add(detail);
+            //}
+            var res = from detail in query.Select(s => s.detail)
+                      join tran in csTransactionRepo.Get() on detail.JobId equals tran.Id
+                      join customer in catPartnerRepo.Get() on detail.CustomerId equals customer.Id into customers
+                      from cus in customers.DefaultIfEmpty()
+                      join saleman in sysUserRepo.Get() on detail.SaleManId equals saleman.Id into salemans
+                      from sale in salemans.DefaultIfEmpty()
+                      join notify in catPartnerRepo.Get() on detail.NotifyPartyId equals notify.Id into notifys
+                      from notify in notifys.DefaultIfEmpty()
+                      select new CsTransactionDetailModel {
+                          Id = detail.Id,
+                          JobId = detail.JobId,
+                          Hwbno = detail.Hwbno,
+                          SaleManId = detail.SaleManId,
+                          SaleManName = sale.Username,
+                          CustomerId =  detail.CustomerId,
+                          CustomerName = cus.ShortName,
+                          NotifyPartyId = detail.NotifyPartyId,
+                          NotifyParty = notify.ShortName,
+                          FinalDestinationPlace = detail.FinalDestinationPlace
+                      };
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
-            foreach (var item in query)
-            {
-                var detail = mapper.Map<CsTransactionDetailModel>(item.detail);
-                detail.CustomerName = item.cus?.PartnerNameEn;
-                detail.SaleManName = item.sale?.Username;
-                detail.Etd = item.tran.Etd;
-                detail.Mawb = item.tran.Mawb;
-                results.Add(detail);
-            }
+            results = res.ToList();
+            results.ForEach(fe => {
+                fe.Containers = string.Join(",", csMawbcontainerRepo.Get(x => x.Hblid == fe.Id)
+                                                                        .Select(s => (s.ContainerTypeId != null || s.Quantity != null) ? (s.Quantity + "x" + GetUnitNameById(s.ContainerTypeId)) : string.Empty));
+                fe.Packages = string.Join(",", csMawbcontainerRepo.Get(x => x.Hblid == fe.Id)
+                                                                        .Select(s => (s.PackageTypeId != null || s.PackageQuantity != null) ? (s.PackageQuantity + "x" + GetUnitNameById(s.PackageTypeId)) : string.Empty));
+                fe.GW = csMawbcontainerRepo.Get(x => x.Hblid == fe.Id).Sum(s => s.Gw);
+                fe.CBM = csMawbcontainerRepo.Get(x => x.Hblid == fe.Id).Sum(s => s.Cbm);
+            });
             return results;
         }
+
         public List<CsTransactionDetailModel> Paging(CsTransactionDetailCriteria criteria, int page, int size, out int rowsCount)
         {
-            var data = Query(criteria).AsQueryable();
+            var data = Query(criteria);
             rowsCount = data.Count();
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
-            if (size > 1)
+            if (size > 0)
             {
                 if (page < 1)
                 {
                     page = 1;
                 }
-                data = data.Skip((page - 1) * size).Take(size);
+                results = data.Skip((page - 1) * size).Take(size).ToList();
             }
-            foreach (var item  in data)
-            {
-                var detail = mapper.Map<CsTransactionDetailModel>(item);
-                detail.CustomerName = item.CustomerName;
-                detail.SaleManName = item.SaleManName;
-                detail.Etd = item.Etd;
-                detail.Mawb = item.Mawb;
-                results.Add(detail);
-            }
+            
             return results;
         }
+
+        public object GetGoodSummaryOfAllHBLByJobId(Guid JobId)
+        {
+            var houserbills = DataContext.Get(x => x.JobId == JobId);
+            decimal? totalGW = 0;
+            decimal? totalNW = 0;
+            decimal? totalCW = 0;
+            decimal? totalCbm = 0;
+            var containers = string.Empty;
+            var commodities = string.Empty;
+
+            if (houserbills.Any())
+            {
+                foreach (var item in houserbills)
+                {
+                    var containersHbl = csMawbcontainerRepo.Get(x => x.Hblid == item.Id);
+                    totalGW += containersHbl.Sum(s => s.Gw);
+                    totalNW += containersHbl.Sum(s => s.Nw);
+                    totalCW += containersHbl.Sum(s => s.ChargeAbleWeight);
+                    totalCbm += containersHbl.Sum(s => s.Cbm);
+                    containers += string.Join(",", containersHbl.OrderByDescending(o => o.ContainerTypeId).Select(s => (s.ContainerTypeId != null || s.Quantity != null) ? (s.Quantity + "x" + GetUnitNameById(s.ContainerTypeId)) : string.Empty));
+                    commodities += string.Join(",", containersHbl.Select(x => GetCommodityNameById(x.CommodityId)));
+                }
+            }
+            return new { totalGW, totalNW, totalCW, totalCbm , containers , commodities };
+        }
+
+        private string GetUnitNameById(short? id)
+        {
+            var result = string.Empty;
+            var data = catUnitRepo.Get(g => g.Id == id).FirstOrDefault();
+            result = (data != null) ? data.UnitNameEn : string.Empty;
+            return result;
+        }
+
+        private string GetCommodityNameById(int? id)
+        {
+            var result = string.Empty;
+            var data = catCommodityRepo.Get(x => x.Id == id).FirstOrDefault();
+            result = (data != null) ? data.CommodityNameEn : string.Empty;
+            return result;
+        }
+        #endregion -- LIST & PAGING HOUSEBILLS --
 
         public object ImportCSTransactionDetail(CsTransactionDetailModel model)
         {
@@ -329,7 +413,7 @@ namespace eFMS.API.Documentation.DL.Services
                 detail.Commodity = null;
                 detail.PackageContainer = null;
                 dc.CsTransactionDetail.Add(detail);
-                
+
                 List<CsMawbcontainer> containers = null;
                 if (model.CsMawbcontainers.Count > 0)
                 {
@@ -394,7 +478,7 @@ namespace eFMS.API.Documentation.DL.Services
             var hs = new HandleState();
             try
             {
-                
+
                 var hbl = DataContext.Where(x => x.Id == hbId).FirstOrDefault();
                 if (hbl == null)
                 {
@@ -404,24 +488,24 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Hblid == hbl.Id).ToList();
                     var isSOA = false;
-                    foreach(var item in charges)
+                    foreach (var item in charges)
                     {
-                        if(item.CreditNo!=null || item.DebitNo != null || item.Soano!=null)
+                        if (item.CreditNo != null || item.DebitNo != null || item.Soano != null)
                         {
                             isSOA = true;
                         }
                     }
-                    if ( isSOA == true)
+                    if (isSOA == true)
                     {
                         hs = new HandleState("Cannot delete, this house bill is containing at least one charge have Credit Debit Note/SOA no!");
                     }
                     else
                     {
-                        foreach(var item in charges)
+                        foreach (var item in charges)
                         {
                             ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Remove(item);
                         }
-                        DataContext.Delete(x=>x.Id==hbl.Id);
+                        DataContext.Delete(x => x.Id == hbl.Id);
                         ((eFMSDataContext)DataContext.DC).SaveChanges();
                     }
                 }
@@ -432,7 +516,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             return hs;
-          
+
         }
 
         public Crystal Preview(CsTransactionDetailModel model)

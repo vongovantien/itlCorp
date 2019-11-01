@@ -28,4 +28,9 @@ export class ConfirmPopupComponent extends PopupBase {
     onConfirm() {
         this.onSubmit.emit(true);
     }
+
+    close() {
+        this.hide();
+        this.onCancel.emit();
+    }
 }

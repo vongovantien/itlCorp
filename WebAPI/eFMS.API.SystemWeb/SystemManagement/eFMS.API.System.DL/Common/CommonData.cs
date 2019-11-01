@@ -11,5 +11,8 @@ namespace eFMS.API.System.DL.Common
     public static class Constants
     {
         public static readonly string Owner = "Owner";
+        public static readonly string Password = "12345678";
+
+
     }
 }

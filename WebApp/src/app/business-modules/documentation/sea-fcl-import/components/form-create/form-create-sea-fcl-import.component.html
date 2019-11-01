@@ -1,0 +1,193 @@
+<div class="m-portlet">
+    <div class="m-portlet__body" *ngIf="!!formCreate">
+        <div [formGroup]="formCreate" class="m-form m-form--state">
+            <div class="form" formGroupName="csTransaction">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Job ID</label>
+                            <input type="text" class="form-control" formControlName="jobId">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Estimated Time of Departure</label>
+                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                    [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
+                                    placeholder="Please Select" readonly [autoApply]="true" [singleDatePicker]="true"
+                                    [alwaysShowCalendars]="true" formControlName="etd" />
+                                <span class="m-input-icon__icon m-input-icon__icon--right">
+                                    <span>
+                                        <i class="la la-calendar"></i>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label required>Estimated Time of Arrival</label>
+                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                    [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [minDate]="minDate"
+                                    name="daterange" placeholder="Please Select" readonly [autoApply]="true"
+                                    [singleDatePicker]="true" [alwaysShowCalendars]="true" formControlName="eta" />
+                                <span class="m-input-icon__icon m-input-icon__icon--right">
+                                    <span>
+                                        <i class="la la-calendar"></i>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label required>Master Bill of Landing No</label>
+                            <input type="text" class="form-control" formControlName="mawb">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label required>Master Bill of Landing Type</label>
+                            <select class="form-control" formControlName="mbltype">
+                                <option value="null" disabled>Please Select</option>
+                                <option *ngFor="let landingType of ladingTypes" [ngValue]="landingType">
+                                    {{landingType.displayName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label required>Shipment Type</label>
+                            <select class="form-control" formControlName="shipmentType">
+                                <option *ngFor="let shipmentType of shipmentTypes" [ngValue]="shipmentType">
+                                    {{shipmentType.displayName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Supplier/Co-Loader</label>
+                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedSupplier"
+                                (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
+                                [selectedDisplayFields]="configComboGridPartner.selectedDisplayFields"
+                                [dataSources]="carries" [displayFields]="configComboGridPartner.displayFields"
+                                [height]="200">
+                            </app-combo-grid-virtual-scroll>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Sub Co-Loader</label>
+                            <input type="text" class="form-control" formControlName="subColoader">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Agent</label>
+                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedAgent"
+                                (itemSelected)="onSelectDataFormInfo($event, 'agent')"
+                                [selectedDisplayFields]="configComboGridPartner.selectedDisplayFields"
+                                [dataSources]="agents" [displayFields]="configComboGridPartner.displayFields"
+                                [height]="200">
+                            </app-combo-grid-virtual-scroll>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Port of Loading</label>
+                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPortLoading"
+                                (itemSelected)="onSelectDataFormInfo($event, 'port-loading')"
+                                [selectedDisplayFields]="configComboGridPort.selectedDisplayFields"
+                                [dataSources]="configComboGridPort.dataSource"
+                                [displayFields]="configComboGridPort.displayFields" [height]="200">
+                            </app-combo-grid-virtual-scroll>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label required>Port of Destination</label>
+                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPortDestination"
+                                (itemSelected)="onSelectDataFormInfo($event, 'port-destination')"
+                                [selectedDisplayFields]="configComboGridPort.selectedDisplayFields"
+                                [dataSources]="configComboGridPort.dataSource"
+                                [displayFields]="configComboGridPort.displayFields" [height]="200">
+                            </app-combo-grid-virtual-scroll>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Place of Delivery</label>
+                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPortDelivery"
+                                (itemSelected)="onSelectDataFormInfo($event, 'port-delivery')"
+                                [selectedDisplayFields]="configComboGridPort.selectedDisplayFields"
+                                [dataSources]="configComboGridPort.dataSource"
+                                [displayFields]="configComboGridPort.displayFields" [height]="200">
+                            </app-combo-grid-virtual-scroll>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Vessel Name</label>
+                            <input type="text" class="form-control" formControlName="flightVesselName">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Voy Name</label>
+                            <input type="text" class="form-control" formControlName="voyNo">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Purchase Order(P/O) No</label>
+                            <input type="text" class="form-control" formControlName="pono">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label required>Service Type</label>
+                            <select class="form-control" formControlName="typeOfService">
+                                <option value="null" disabled>Please Select</option>
+                                <option *ngFor="let serviceType of serviceTypes" [ngValue]="serviceType">
+                                    {{serviceType.displayName}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Service Date</label>
+                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                    [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
+                                    placeholder="Please Select" readonly [autoApply]="true" [singleDatePicker]="true"
+                                    [alwaysShowCalendars]="true" formControlName="serviceDate" />
+                                <span class="m-input-icon__icon m-input-icon__icon--right">
+                                    <span>
+                                        <i class="la la-calendar"></i>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label required>Personal In Charge</label>
+                            <input type="text" class="form-control" formControlName="personIncharge">
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Note</label>
+                            <textarea name="" id="" cols="30" rows="5" class="form-control"
+                                formControlName="notes"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -195,7 +195,10 @@ export class API_MENU {
             login: this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser/login",
             getUserByID: this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser/GetById/",
             paging: this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser/Paging",
-            downloadExcel: this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser/DownloadExcel"
+            downloadExcel: this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser/DownloadExcel",
+            uploadExel: this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser/upLoadFile",
+            import: this.getUrlMainPath(SystemConstants.MODULE_NAME.SYSTEM) + "SysUser/Import"
+
         },
         Group: {
 
