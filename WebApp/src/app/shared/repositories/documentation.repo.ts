@@ -158,4 +158,10 @@ export class DocumentationRepo {
         );
     }
 
+    createHousebill(body: any = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/addNew`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }
