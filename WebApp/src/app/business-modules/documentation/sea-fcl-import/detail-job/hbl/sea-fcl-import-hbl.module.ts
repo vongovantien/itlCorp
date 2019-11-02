@@ -7,6 +7,7 @@ import { TabsModule } from 'ngx-bootstrap';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CreateHouseBillComponent } from './create/create-house-bill.component';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { FormAddHouseBillComponent } from './components/form-add-house-bill/form-add-house-bill.component';
 
 const routing: Routes = [
     {
@@ -33,7 +34,8 @@ const COMPONENTS = [
     declarations: [
         SeaFCLImportHBLComponent,
         ...COMPONENTS,
-        CreateHouseBillComponent
+        CreateHouseBillComponent,
+        FormAddHouseBillComponent
     ],
     imports: [
         CommonModule,

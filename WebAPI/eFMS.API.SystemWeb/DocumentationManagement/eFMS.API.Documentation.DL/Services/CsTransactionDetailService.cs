@@ -72,7 +72,7 @@ namespace eFMS.API.Documentation.DL.Services
                 //        var hsContainer = csMawbcontainerRepo.Add(cont);
                 //    }
                 //}
-                //((eFMSDataContext)DataContext.DC).SaveChanges();
+                ((eFMSDataContext)DataContext.DC).SaveChanges();
                 return hs;
             }
             catch (Exception ex)
