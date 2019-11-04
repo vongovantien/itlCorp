@@ -20,8 +20,8 @@
                     <div class="col-lg-4">
                         <form #form>
                             <input type="file" id="inputFile" class="form-control m-input m-input--square"
-                                placeholder="" (change)="chooseFile($event)" onclick="this.value=inputFile=null;"
-                                [(ngModel)]="inputFile" accept=".xlsx">
+                                name="inputimport" placeholder="" (change)="chooseFile($event)"
+                                onclick="this.value=inputFile=null;" [(ngModel)]="inputFile" accept=".xlsx">
                         </form>
                         <span class="m-form__help">
                             <a class="btn-link" href="javascript:void(0)" (click)="downloadSample()">Download sample</a>

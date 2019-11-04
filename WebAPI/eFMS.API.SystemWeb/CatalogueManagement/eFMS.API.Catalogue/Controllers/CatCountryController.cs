@@ -236,10 +236,10 @@ namespace eFMS.API.Catalogue.Controllers
                     var country = new CatCountryImportModel
                     {
                         IsValid = true,
-                        Code = worksheet.Cells[row, 1].Value?.ToString(),
-                        NameEn = worksheet.Cells[row, 2].Value?.ToString(),
-                        NameVn = worksheet.Cells[row, 3].Value?.ToString(),
-                        Status = worksheet.Cells[row, 4].Value?.ToString()
+                        Code = worksheet.Cells[row, 1].Value?.ToString().Trim(),
+                        NameEn = worksheet.Cells[row, 2].Value?.ToString().Trim(),
+                        NameVn = worksheet.Cells[row, 3].Value?.ToString().Trim(),
+                        Status = worksheet.Cells[row, 4].Value?.ToString().Trim().ToLower()
                     };
                     list.Add(country);
                 }
@@ -262,14 +262,15 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Import([FromBody]List<CatCountryImportModel> data)
         {
-            var hs = catCountryService.Import(data);
-            var message = HandleError.GetMessage(hs, Crud.Delete);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            if (!hs.Success)
+            var result = catCountryService.Import(data);
+            if (result.Success)
             {
-                return BadRequest(result);
+                return Ok(result);
             }
-            return Ok(result);
+            else
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = result.Exception.Message });
+            }
         }
         private string CheckExist(int id, CatCountryModel model)
         {
