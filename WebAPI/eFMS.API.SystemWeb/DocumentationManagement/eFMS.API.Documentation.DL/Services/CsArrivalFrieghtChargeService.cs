@@ -14,12 +14,20 @@ namespace eFMS.API.Documentation.DL.Services
     public class CsArrivalFrieghtChargeService : RepositoryBase<CsArrivalFrieghtCharge, CsArrivalFrieghtChargeModel>, ICsArrivalFrieghtChargeService
     {
         private readonly IContextBase<CsTransactionDetail> detailTransactionRepository;
+        private readonly IContextBase<CsArrivalFrieghtChargeDefault> freightChargeDefaultRepository;
         public CsArrivalFrieghtChargeService(IContextBase<CsArrivalFrieghtCharge> repository, 
             IMapper mapper,
-            IContextBase<CsTransactionDetail> detailTransaction
+            IContextBase<CsTransactionDetail> detailTransaction,
+            IContextBase<CsArrivalFrieghtChargeDefault> freightChargeDefault
             ) : base(repository, mapper)
         {
             detailTransactionRepository = detailTransaction;
+            freightChargeDefaultRepository = freightChargeDefault;
+        }
+
+        public HandleState SetArrivalChargeDefault(CsArrivalFrieghtChargeDefaultModel model)
+        {
+            throw new NotImplementedException();
         }
 
         public HandleState UpdateArrival(CsArrivalFrieghtChargeEditModel model)
