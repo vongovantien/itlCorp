@@ -54,24 +54,25 @@ namespace eFMS.API.Documentation.DL.Services
             detail.UserModified = detail.UserCreated;
             detail.DatetimeModified = detail.DatetimeCreated = DateTime.Now;
             detail.Active = true;
+            detail.SailingDate = DateTime.Now;
             try
             {
                 var hs = DataContext.Add(detail);
-                if (hs.Success)
-                {
-                    foreach (var x in model.CsMawbcontainers)
-                    {
-                        var cont = mapper.Map<CsMawbcontainer>(x);
-                        cont.Id = Guid.NewGuid();
-                        cont.Hblid = detail.Id;
-                        cont.Mblid = Guid.Empty;                        
-                        cont.UserModified = detail.UserModified;
-                        cont.DatetimeModified = DateTime.Now;
-                        //((eFMSDataContext)DataContext.DC).CsMawbcontainer.Add(cont);
-                        var hsContainer = csMawbcontainerRepo.Add(cont);
-                    }
-                }
-                //((eFMSDataContext)DataContext.DC).SaveChanges();
+                //if (hs.Success)
+                //{
+                //    foreach (var x in model.CsMawbcontainers)
+                //    {
+                //        var cont = mapper.Map<CsMawbcontainer>(x);
+                //        cont.Id = Guid.NewGuid();
+                //        cont.Hblid = detail.Id;
+                //        cont.Mblid = Guid.Empty;                        
+                //        cont.UserModified = detail.UserModified;
+                //        cont.DatetimeModified = DateTime.Now;
+                //        //((eFMSDataContext)DataContext.DC).CsMawbcontainer.Add(cont);
+                //        var hsContainer = csMawbcontainerRepo.Add(cont);
+                //    }
+                //}
+                ((eFMSDataContext)DataContext.DC).SaveChanges();
                 return hs;
             }
             catch (Exception ex)

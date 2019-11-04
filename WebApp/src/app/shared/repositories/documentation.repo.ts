@@ -161,6 +161,10 @@ export class DocumentationRepo {
         );
     }
 
+    getListHourseBill(data: any = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/QueryData`, data)
+    }
+
     getListShipmentDocumentation(page?: number, size?: number, body: any = {}) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/Paging`, body, {
             page: '' + page,
@@ -177,6 +181,10 @@ export class DocumentationRepo {
                 return res;
             })
         );
+    }
+
+    createHousebill(body: any = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/addNew`, body)
     }
 
     checkMasterBillAllowToDelete(id: string) {
@@ -199,6 +207,5 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
-
 
 }

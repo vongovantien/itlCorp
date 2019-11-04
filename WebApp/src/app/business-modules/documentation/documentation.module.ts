@@ -40,6 +40,8 @@ import { SeaLclExportCreditAndDebitNoteDetailComponent } from './sea-lcl-export-
 import { SeaLclExportCreditAndDebitNoteEditComponent } from './sea-lcl-export-create/sea-lcl-export-credit-and-debit-note/sea-lcl-export-credit-and-debit-note-edit/sea-lcl-export-credit-and-debit-note-edit.component';
 import { SeaLclExportManifestComponent } from './sea-lcl-export-create/sea-lcl-export-manifest/sea-lcl-export-manifest.component';
 import { SeaLclExportShippingInstructionComponent } from './sea-lcl-export-create/sea-lcl-export-shipping-instruction/sea-lcl-export-shipping-instruction.component';
+import { TabsModule } from 'ngx-bootstrap';
+
 
 @NgModule({
   imports: [
@@ -50,7 +52,8 @@ import { SeaLclExportShippingInstructionComponent } from './sea-lcl-export-creat
     NgxDaterangepickerMd,
     SelectModule,
     FormsModule,
-    PerfectScrollbarModule, // Scrollbar
+    PerfectScrollbarModule,
+    TabsModule.forRoot()// Scrollbar
   ],
   declarations: [
     // TwoDigitDecimaNumberDirective,
@@ -75,7 +78,7 @@ import { SeaLclExportShippingInstructionComponent } from './sea-lcl-export-creat
     CreditAndDebitNoteRemainingChargeComponent,
     ManifestComponent,
     ShippingInstructionComponent,
-    SeaLclExportCreateComponent, SeaLclExportShipmentDetailComponent, SeaLclExportHousebillListComponent, SeaLclExportHousebillAddnewComponent, SeaLclExportDetailImportComponent, SeaLclExportHousebillDetailImportComponent, SeaLclExportCreditAndDebitNoteComponent, SeaLclExportCreditAndDebitNoteAddnewComponent, SeaLclExportCreditAndDebitNoteRemainingChargeComponent, SeaLclExportCreditAndDebitNoteDetailComponent, SeaLclExportCreditAndDebitNoteEditComponent, SeaLclExportManifestComponent, SeaLclExportShippingInstructionComponent
+    SeaLclExportCreateComponent, SeaLclExportShipmentDetailComponent, SeaLclExportHousebillListComponent, SeaLclExportHousebillAddnewComponent, SeaLclExportDetailImportComponent, SeaLclExportHousebillDetailImportComponent, SeaLclExportCreditAndDebitNoteComponent, SeaLclExportCreditAndDebitNoteAddnewComponent, SeaLclExportCreditAndDebitNoteRemainingChargeComponent, SeaLclExportCreditAndDebitNoteDetailComponent, SeaLclExportCreditAndDebitNoteEditComponent, SeaLclExportManifestComponent, SeaLclExportShippingInstructionComponent,
   ]
 })
 export class DocumentationModule { }

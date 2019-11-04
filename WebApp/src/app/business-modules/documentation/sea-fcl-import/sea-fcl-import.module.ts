@@ -24,6 +24,7 @@ import { CdNoteAddPopupComponent } from './components/popup/add-cd-note/add-cd-n
 
 
 const routing: Routes = [
+
     {
         path: '', pathMatch: 'full', component: SeaFCLImportManagementComponent,
         data: { name: "Sea FCL Import", path: "sea-fcl-import", level: 2 }
@@ -46,8 +47,7 @@ const COMPONENTS = [
     SeaFCLImportManagementFormSearchComponent,
     SeaFClImportFormCreateComponent,
     SeaFCLImportShipmentGoodSummaryComponent,
-    CdNoteAddPopupComponent
-    SeaFCLImportContainerListPopupComponent
+
 ];
 
 const LIB = [
@@ -67,9 +67,12 @@ const LIB = [
         SeaFCLImportManagementComponent,
         SeaFCLImportCreateJobComponent,
         SeaFCLImportDetailJobComponent,
-        SeaFCLImportCDNoteComponent
+        SeaFCLImportCDNoteComponent,
+        SeaFCLImportContainerListPopupComponent,
+        CdNoteAddPopupComponent,
     ],
     imports: [
+        NgxDaterangepickerMd,
         CommonModule,
         SharedModule,
         RouterModule.forChild(routing),

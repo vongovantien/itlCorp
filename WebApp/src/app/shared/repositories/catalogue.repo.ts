@@ -208,6 +208,15 @@ export class CatalogueRepo {
         }
     }
 
+    getListPortByTran() {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/GetByModeTran`).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+
     getListAllCountry() {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCountry/getAll`).pipe(
             map((res: any) => {
@@ -231,6 +240,15 @@ export class CatalogueRepo {
             })
         );
     }
+
+    getAllProvinces() {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/GetAllProvinces`).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
 
     getDistricts() {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPlace/GetDistricts`).pipe(

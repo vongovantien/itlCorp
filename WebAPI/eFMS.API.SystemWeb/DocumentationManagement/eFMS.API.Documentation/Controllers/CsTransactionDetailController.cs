@@ -51,7 +51,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpPost]
         [Route("addNew")]
-        [Authorize]
+        //[Authorize]
         public IActionResult Add(CsTransactionDetailModel model)
         {
             //ChangeTrackerHelper.currentUser = currentUser.UserID;
@@ -132,7 +132,7 @@ namespace eFMS.API.Documentation.Controllers
             string message = string.Empty;
             if(model.Id == Guid.Empty)
             { 
-                if (csTransactionDetailService.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower()))
+                if (csTransactionDetailService.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower() || x.Mawb.ToLower() == model.Mawb.ToLower()))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }

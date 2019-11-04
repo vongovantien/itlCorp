@@ -1,0 +1,23 @@
+<div class="sea-fcl-create-hbl-page">
+    <app-sub-header>
+    </app-sub-header>
+
+</div>
+
+<div class="m-content">
+    <div class="m-portlet__body">
+        <button type="button" (click)="create()" style="float:right;"
+            class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+            <span>
+                <i class="la la-save"></i>
+                <span> Save </span>
+            </span>
+        </button>
+        <tabset class="custom-class-tab">
+            <tab heading="HBL Detail" [active]="true">
+                <app-form-add-house-bill>
+                </app-form-add-house-bill>
+            </tab>
+        </tabset>
+    </div>
+</div>
