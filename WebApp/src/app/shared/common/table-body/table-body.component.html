@@ -1,0 +1,47 @@
+<ng-container *ngFor="let item of data; let i = index; trackBy: trackByFn">
+    <tr>
+        <td *ngIf="!!actions.length" class="table-actions-col">
+            <div class="table-actions">
+                <ng-container *ngFor="let action of actions; let i = index; trackBy: trackByFn">
+                    <ng-container [ngSwitch]="action">
+                        <ng-container *ngSwitchCase="'DELETE'">
+                            <button type="button" (click)="delete(item)"
+                                class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Remove">
+                                <i class="la la-trash"></i>
+                            </button>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'EDIT'">
+                            <button type="button" (click)="edit(item)"
+                                class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit">
+                                <i class="la la-edit"></i>
+                            </button>
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+            </div>
+        </td>
+        <td *ngFor="let header of headers">
+            <ng-container [ngSwitch]="header.dataType">
+                <ng-container *ngSwitchCase="'BOOLEAN'">
+                    <span [ngClass]="header.dataType ? 'text-success' : 'text-danger'">
+                        {{header.dataType ? 'Active' : 'Inactive'}}
+                    </span>
+                </ng-container>
+                <ng-container *ngSwitchCase="'LINK'">
+                    <a class="text-underline pointer" [title]="item[header.field]" (click)="link(item)">
+                        {{item[header.field]}}
+                    </a>
+                </ng-container>
+                <ng-container *ngSwitchCase="'DATE'">
+                    <span class="text-underline pointer" [title]="item[header.field]">
+                        {{item[header.field] | date: 'dd/MM/yyyy'}}
+                    </span>
+                </ng-container>
+                <span *ngSwitchDefault>
+                    {{item[header.field]}}
+                </span>
+            </ng-container>
+        </td>
+    </tr>
+</ng-container>
+<tr app-table-none-record *ngIf="!data.length"></tr>

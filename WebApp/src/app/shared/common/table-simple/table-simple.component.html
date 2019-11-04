@@ -2,15 +2,6 @@
     <table class="table table-striped table-brand dataTable">
         <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField ? $event.sortField : '')">
         </thead>
-        <tbody>
-            <ng-container *ngFor="let item of data; let i = index; trackBy: trackByFn">
-                <tr class="text-center">
-                    <td *ngFor="let header of headers">
-                        {{item[header.field]}}
-                    </td>
-                </tr>
-                <tr app-table-none-record *ngIf="!data.length" [colspan]="headers.length"></tr>
-            </ng-container>
-        </tbody>
+        <tbody app-table-body [data]="data" [headers]="headers"> </tbody>
     </table>
 </div>

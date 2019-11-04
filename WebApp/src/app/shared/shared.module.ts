@@ -19,6 +19,7 @@ import { CollapseModule } from "ngx-bootstrap/collapse";
 import { UploadAlertComponent } from './common/popup/upload-alert/upload-alert.component';
 import { TooltipModule } from "ngx-bootstrap/tooltip";
 import { LoadModuleDirective } from "./directives/load-module.directive";
+import { TableBodyComponent } from "./common/table-body/table-body.component";
 
 const Libary = [
   ModalModule,
@@ -66,6 +67,7 @@ const APP_COMPONENTS = [
   AppTableComponent,
   AppComboGridComponent,
   SwitchToggleComponent,
+  TableBodyComponent,
   ...APP_POPUP
 ];
 
