@@ -130,13 +130,15 @@
                             </div>
                         </div>
                         <div class="col-md-4 m--margin-bottom-10">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': isSubmitted && formChargeTariff.value.tariffChargeDetail.rangeFrom < formChargeTariff.value.tariffChargeDetail.rangeTo}">
                                 <label>Range From</label>
                                 <input currencyMask type="text" class="form-control" formControlName="rangeFrom">
                             </div>
                         </div>
                         <div class="col-md-4 m--margin-bottom-10">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': isSubmitted && !formChargeTariff.value.tariffChargeDetail.route}">
                                 <label>Range To</label>
                                 <input currencyMask type="text" class="form-control" formControlName="rangeTo">
                             </div>
