@@ -46,12 +46,10 @@ export class SeaFCLImportShipmentGoodSummaryComponent extends AppForm {
                 (action: fromStore.ContainerAction) => {
                     if (action.type === fromStore.ContainerActionTypes.SAVE_CONTAINER) {
 
-                        console.log(action.payload);
                         // * Description, Commondity.
                         this.description = (action.payload || []).reduce((acc: string, curr: Container) => acc += curr.description + "\n", '');
                         this.commodities = (action.payload || []).reduce((acc: string, curr: any) => acc += !!curr.commodityName ? curr.commodityName + ', ' : '', '');
 
-                        console.log(this.commodities);
                         // * GW, Nw, CW, CBM
                         this.grossWeight = (action.payload || []).reduce((acc: string, curr: Container) => acc += curr.gw, 0);
                         this.netWeight = (action.payload || []).reduce((acc: string, curr: Container) => acc += curr.nw, 0);
@@ -78,10 +76,14 @@ export class SeaFCLImportShipmentGoodSummaryComponent extends AppForm {
                             this.containerDetail += this.handleStringCont(item);
                         }
 
-                        let packageObject: any[] = (action.payload || []).map((container: Container | any) => ({
-                            package: container.packageTypeName,
-                            quantity: container.packageQuantity
-                        }));
+                        let packageObject: any[] = (action.payload || []).map((container: Container | any) => {
+                            if (container.packageTypeName && container.packageQuantity) {
+                                return {
+                                    package: container.packageTypeName,
+                                    quantity: container.packageQuantity
+                                };
+                            }
+                        });
 
                         // ? If has PackageType & Quantity Package
                         if (!!packageObject.filter(i => Boolean(i)).length) {

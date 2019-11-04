@@ -11,6 +11,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
+                            {{etd.value | json}}
                             <label>Estimated Time of Departure</label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
@@ -27,7 +28,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': (eta.dirty && !eta.value) || (isSubmitted && !eta.value)}">
+                            [ngClass]="{'m-form__group has-danger': (eta.dirty && !eta.value) || (isSubmitted && !eta.value) || (isSubmitted && !eta.value.startDate)}">
                             <label required>Estimated Time of Arrival</label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
