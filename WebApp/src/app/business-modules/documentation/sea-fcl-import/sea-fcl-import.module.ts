@@ -14,7 +14,10 @@ import { SeaFClImportFormCreateComponent } from './components/form-create/form-c
 import { SeaFCLImportShipmentGoodSummaryComponent } from './components/shipment-good-summary/shipment-good-summary.component';
 import { SeaFCLImportCDNoteComponent } from './detail-job/cd-note/sea-fcl-import-cd-note.component';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { SeaFCLImportContainerListPopupComponent } from './components/popup/container-list/container-list.popup';
+import { StoreModule } from '@ngrx/store';
+import { reducers, effects } from './store';
+import { EffectsModule } from '@ngrx/effects';
 
 
 
@@ -42,6 +45,7 @@ const COMPONENTS = [
     SeaFCLImportManagementFormSearchComponent,
     SeaFClImportFormCreateComponent,
     SeaFCLImportShipmentGoodSummaryComponent,
+    SeaFCLImportContainerListPopupComponent
 ];
 
 const LIB = [
@@ -53,6 +57,7 @@ const LIB = [
     SelectModule,
     NgxDaterangepickerMd.forRoot()
 ];
+
 
 @NgModule({
     declarations: [
@@ -68,7 +73,10 @@ const LIB = [
         RouterModule.forChild(routing),
         FormsModule,
         ReactiveFormsModule,
-        ...LIB
+        ...LIB,
+        StoreModule.forFeature('seaFClImport', reducers),
+        EffectsModule.forFeature(effects),
+
     ],
     exports: [],
     providers: [],

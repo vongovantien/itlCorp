@@ -85,6 +85,16 @@ export class CsTransactionDetail {
   packages: string = null;
   containers: string = null;
   issueHblplaceAndDate: any = null;
+
+  // * SEA FCL
+  serviceDate: string = '';
+  mbltype: string = '';
+  shipmentType: string = '';
+  flightVesselName: string = '';
+  voyNo: string = '';
+  pono: string = '';
+  typeOfService: string = '';
+  notes: string = '';
   constructor(object?: any) {
     const self = this;
     for (const key in object) {

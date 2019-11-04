@@ -1,7 +1,7 @@
 <div class="m-portlet">
-    <div class="m-portlet__body" *ngIf="!!formCreate">
+    <div class="m-portlet__body">
         <div [formGroup]="formCreate" class="m-form m-form--state">
-            <div class="form" formGroupName="csTransaction">
+            <div class="form">
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-group">
@@ -26,7 +26,8 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': (eta.dirty && !eta.value) || (isSubmitted && !eta.value)}">
                             <label required>Estimated Time of Arrival</label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
@@ -42,17 +43,19 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': (mawb.dirty && !mawb.valid) || (isSubmitted && !mawb.valid)}">
                             <label required>Master Bill of Landing No</label>
                             <input type="text" class="form-control" formControlName="mawb">
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': (mbltype.dirty && !mbltype.valid) || (isSubmitted && !mbltype.valid)}">
                             <label required>Master Bill of Landing Type</label>
                             <select class="form-control" formControlName="mbltype">
                                 <option value="null" disabled>Please Select</option>
-                                <option *ngFor="let landingType of ladingTypes" [ngValue]="landingType">
+                                <option *ngFor="let landingType of ladingTypes" [ngValue]="landingType.value">
                                     {{landingType.displayName}}</option>
                             </select>
                         </div>
@@ -61,7 +64,7 @@
                         <div class="form-group">
                             <label required>Shipment Type</label>
                             <select class="form-control" formControlName="shipmentType">
-                                <option *ngFor="let shipmentType of shipmentTypes" [ngValue]="shipmentType">
+                                <option *ngFor="let shipmentType of shipmentTypes" [ngValue]="shipmentType.value">
                                     {{shipmentType.displayName}}</option>
                             </select>
                         </div>
@@ -80,7 +83,8 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>Sub Co-Loader</label>
-                            <input type="text" class="form-control" formControlName="subColoader">
+                            <input type="text" class="form-control" formControlName="subColoader"
+                                placeholder="Sub Co-Loader">
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -106,7 +110,8 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedPortDestination.value}">
                             <label required>Port of Destination</label>
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPortDestination"
                                 (itemSelected)="onSelectDataFormInfo($event, 'port-destination')"
@@ -130,27 +135,30 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>Vessel Name</label>
-                            <input type="text" class="form-control" formControlName="flightVesselName">
+                            <input type="text" class="form-control" formControlName="flightVesselName"
+                                placeholder="Vessel Name">
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>Voy Name</label>
-                            <input type="text" class="form-control" formControlName="voyNo">
+                            <input type="text" class="form-control" formControlName="voyNo" placeholder="Voy Name">
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>Purchase Order(P/O) No</label>
-                            <input type="text" class="form-control" formControlName="pono">
+                            <input type="text" class="form-control" formControlName="pono"
+                                placeholder="Purchase Order(P/O) No">
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': (typeOfService.dirty && !typeOfService.valid) || (isSubmitted && !typeOfService.valid)}">
                             <label required>Service Type</label>
                             <select class="form-control" formControlName="typeOfService">
                                 <option value="null" disabled>Please Select</option>
-                                <option *ngFor="let serviceType of serviceTypes" [ngValue]="serviceType">
+                                <option *ngFor="let serviceType of serviceTypes" [ngValue]="serviceType.value">
                                     {{serviceType.displayName}}
                                 </option>
                             </select>
@@ -181,13 +189,13 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <label>Note</label>
-                            <textarea name="" id="" cols="30" rows="5" class="form-control"
-                                formControlName="notes"></textarea>
+                            <textarea name="" id="" cols="30" rows="5" class="form-control" formControlName="notes"
+                                placeholder="Note"></textarea>
                         </div>
                     </div>
                 </div>
             </div>
+            <ng-content></ng-content>
         </div>
-
     </div>
 </div>

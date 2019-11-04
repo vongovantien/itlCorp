@@ -4,7 +4,7 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { NgForm } from '@angular/forms';
-import { CatUnitModel } from 'src/app/shared/models/catalogue/catUnit.model';
+import { Unit } from 'src/app/shared/models/catalogue/catUnit.model';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import * as lodash from 'lodash';
@@ -26,8 +26,8 @@ export class UnitComponent implements OnInit {
   pager: PagerSetting = PAGINGSETTING;
   searchKey: string = "";
   ListUnits: any = [];
-  UnitToAdd: CatUnitModel = new CatUnitModel();
-  UnitToUpdate: CatUnitModel = new CatUnitModel();
+  UnitToAdd: Unit = new Unit();
+  UnitToUpdate: Unit = new Unit();
   idUnitToUpdate: any = "";
   idUnitToDelete: any = "";
   searchObject: any = {};
@@ -168,7 +168,7 @@ export class UnitComponent implements OnInit {
         }
       }
     } else {
-      this.UnitToAdd = new CatUnitModel();
+      this.UnitToAdd = new Unit();
       form.onReset();
       $('#add-unit-modal').modal('hide');
     }

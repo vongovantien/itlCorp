@@ -5,6 +5,7 @@ namespace CommonInterface {
         sortable?: boolean;
         class?: string;
         width?: number;
+        required?: boolean;
         dataType?: CommonType.DataType;
     }
 
