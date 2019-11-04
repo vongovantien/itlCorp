@@ -11,14 +11,13 @@ import { SeaFCLImportCreateJobComponent } from './create-job/create-job-fcl-impo
 import { SeaFCLImportDetailJobComponent } from './detail-job/detail-job-fcl-import.component';
 import { SeaFCLImportManagementFormSearchComponent } from './components/form-search/form-search-fcl-import.component';
 import { SeaFClImportFormCreateComponent } from './components/form-create/form-create-sea-fcl-import.component';
-import { SeaFCLImportShipmentGoodSummaryComponent } from './components/shipment-good-summary/shipment-good-summary.component';
 import { SeaFCLImportCDNoteComponent } from './detail-job/cd-note/sea-fcl-import-cd-note.component';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { SeaFCLImportContainerListPopupComponent } from './components/popup/container-list/container-list.popup';
 import { StoreModule } from '@ngrx/store';
 import { reducers, effects } from './store';
 import { EffectsModule } from '@ngrx/effects';
 import { CdNoteAddPopupComponent } from './components/popup/add-cd-note/add-cd-note.popup';
+import { FCLImportShareModule } from './share-fcl-import.module';
 
 
 
@@ -46,13 +45,11 @@ const routing: Routes = [
 const COMPONENTS = [
     SeaFCLImportManagementFormSearchComponent,
     SeaFClImportFormCreateComponent,
-    SeaFCLImportShipmentGoodSummaryComponent,
-
+    CdNoteAddPopupComponent,
 ];
 
 const LIB = [
     CollapseModule.forRoot(),
-    ModalModule.forRoot(),
     TabsModule.forRoot(),
     ModalModule.forRoot(),
     PaginationModule.forRoot(),
@@ -68,11 +65,11 @@ const LIB = [
         SeaFCLImportCreateJobComponent,
         SeaFCLImportDetailJobComponent,
         SeaFCLImportCDNoteComponent,
-        SeaFCLImportContainerListPopupComponent,
         CdNoteAddPopupComponent,
     ],
     imports: [
         NgxDaterangepickerMd,
+        FCLImportShareModule,
         CommonModule,
         SharedModule,
         RouterModule.forChild(routing),
