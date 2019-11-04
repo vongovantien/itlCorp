@@ -11,18 +11,10 @@
                 </span>
             </button>
 
-            <app-default-button [buttonSetting]="saveButtonSetting"></app-default-button>
+            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onCreateJob()"></app-default-button>
 
             <app-default-button [buttonSetting]="cancelButtonSetting"></app-default-button>
-            <button role="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                (click)="gotoDetailJob()">
-                <span>
-                    <i class=" la la-search-plus"></i>
-                    <span>
-                        Goto Detal Job
-                    </span>
-                </span>
-            </button>
+
         </div>
     </app-sub-header>
     <div class="m-content">
@@ -37,3 +29,6 @@
         </div>
     </div>
 </div>
+
+<info-popup [body]="'Opps, It looks like your missed something, Please recheck the highlighted field below.'"
+    [title]="'Cannot Create Job'"></info-popup>

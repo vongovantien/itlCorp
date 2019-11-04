@@ -191,7 +191,10 @@ namespace eFMS.API.Documentation.DL.Services
                 transaction.ModifiedDate = DateTime.Now;
                 if (transaction.IsLocked.HasValue)
                 {
-                    transaction.LockedDate = DateTime.Now;
+                    if (transaction.IsLocked == true)
+                    {
+                        transaction.LockedDate = DateTime.Now;
+                    }
                 }
                 var employeeId = sysUserRepo.Get(x => x.Id == transaction.UserCreated).FirstOrDefault()?.EmployeeId;
                 if (!string.IsNullOrEmpty(employeeId))
@@ -371,7 +374,7 @@ namespace eFMS.API.Documentation.DL.Services
                             ServiceDate = masterBill.ServiceDate,
                             Mbltype = masterBill.Mbltype,
                             ColoaderId = masterBill.ColoaderId,
-                            SubColoaderId = masterBill.SubColoaderId,
+                            SubColoader = masterBill.SubColoader,
                             BookingNo = masterBill.BookingNo,
                             AgentId = masterBill.AgentId,
                             Pol = masterBill.Pol,
@@ -400,8 +403,8 @@ namespace eFMS.API.Documentation.DL.Services
                             ModifiedDate = masterBill.ModifiedDate,
                             Active = masterBill.Active,
                             InactiveOn = masterBill.InactiveOn,
-                            SupplierName = coloader.PartnerNameEn,
-                            AgentName = agent.PartnerNameEn,
+                            SupplierName = coloader.ShortName,
+                            AgentName = agent.ShortName,
                             HWBNo = houseBill.Hwbno,
                             CustomerId = houseBill.CustomerId,
                             NotifyPartyId = houseBill.NotifyPartyId,
@@ -575,7 +578,7 @@ namespace eFMS.API.Documentation.DL.Services
                     && ((x.transaction.Etd ?? null) >= (criteria.FromDate ?? null))
                     && ((x.transaction.Etd ?? null) <= (criteria.ToDate ?? null))
                     );
-                query = query.OrderByDescending(x => x.transaction.ModifiedDate);//.ThenByDescending(x => x.transaction.CreatedDate);
+                //query = query.OrderByDescending(x => x.transaction.ModifiedDate);//.ThenByDescending(x => x.transaction.CreatedDate);
             }
             else
             {
@@ -591,9 +594,12 @@ namespace eFMS.API.Documentation.DL.Services
                              || (x.ContainerNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                              && ((x.transaction.Etd ?? null) >= (criteria.FromDate ?? null) && (x.transaction.Etd ?? null) <= (criteria.ToDate ?? null))
                     );
-                query = query.OrderByDescending(x => x.transaction.ModifiedDate);//.ThenByDescending(x => x.transaction.CreatedDate);
+                //query = query.OrderByDescending(x => x.transaction.ModifiedDate);//.ThenByDescending(x => x.transaction.CreatedDate);
             }
-            return query.Select(x => x.transaction).Distinct();
+            //return query.Select(x => x.transaction).Distinct();
+            var jobNos = query.Select(s => s.transaction.JobNo).Distinct();
+            var result = list.Where(x => jobNos.Contains(x.JobNo)).OrderByDescending(x => x.ModifiedDate);
+            return result;
         }
 
         /// <summary>
@@ -649,7 +655,7 @@ namespace eFMS.API.Documentation.DL.Services
                         || (criteria.FromDate == null && criteria.ToDate == null)
                     )
                 );
-                query = query.OrderByDescending(x => x.transaction.ModifiedDate);
+                //query = query.OrderByDescending(x => x.transaction.ModifiedDate);
             }
             else
             {
@@ -678,9 +684,11 @@ namespace eFMS.API.Documentation.DL.Services
                         || (criteria.FromDate == null && criteria.ToDate == null)
                     )
                 );
-                query = query.OrderByDescending(x => x.transaction.ModifiedDate);
+                //query = query.OrderByDescending(x => x.transaction.ModifiedDate);
             }
-            return query.Select(x => x.transaction).Distinct();
+            var jobNos = query.Select(s => s.transaction.JobNo).Distinct();
+            var result = list.Where(x => jobNos.Contains(x.JobNo)).OrderByDescending(x => x.ModifiedDate);
+            return result;
         }
 
         /// <summary>

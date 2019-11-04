@@ -1,15 +1,24 @@
-export class CatUnitModel {
-     id: number;
-     code: String;
-     unitNameVn: String;
-     unitNameEn: String;
-     unitType: String;
-     userCreated: String;
-     datetimeCreated: Date;
-     userModified: String;
-     datetimeModified: Date;
-     active: Boolean;
-     inactiveOn: Date;
-     descriptionEn: String;
-     descriptionVn: String;
+export class Unit {
+     id: any = null;
+     code: string = '';
+     unitNameVn: string = '';
+     unitNameEn: string = '';
+     unitType: string = '';
+     userCreated: string = '';
+     datetimeCreated: any = '';
+     userModified: string = '';
+     datetimeModified: any = '';
+     active: boolean = true;
+     inactiveOn: any = '';
+     descriptionEn: string = '';
+     descriptionVn: string = '';
+
+     constructor(data?: any) {
+          const self = this;
+          for (const key in data) {
+               if (self.hasOwnProperty(key)) {
+                    self[key] = data[key];
+               }
+          }
+     }
 }

@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Routes, RouterModule } from '@angular/router';
 
 import { SharedModule } from 'src/app/shared/shared.module';
-import { TabsModule, PaginationModule, ModalModule } from 'ngx-bootstrap';
+import { TabsModule, PaginationModule, ModalModule, CollapseModule } from 'ngx-bootstrap';
 import { SelectModule } from 'ng2-select';
 import { SeaFCLImportManagementComponent } from './sea-fcl-import-management.component';
 import { SeaFCLImportCreateJobComponent } from './create-job/create-job-fcl-import.component';
@@ -14,6 +14,11 @@ import { SeaFClImportFormCreateComponent } from './components/form-create/form-c
 import { SeaFCLImportShipmentGoodSummaryComponent } from './components/shipment-good-summary/shipment-good-summary.component';
 import { SeaFCLImportCDNoteComponent } from './detail-job/cd-note/sea-fcl-import-cd-note.component';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { SeaFCLImportContainerListPopupComponent } from './components/popup/container-list/container-list.popup';
+import { StoreModule } from '@ngrx/store';
+import { reducers, effects } from './store';
+import { EffectsModule } from '@ngrx/effects';
+import { CdNoteAddPopupComponent } from './components/popup/add-cd-note/add-cd-note.popup';
 
 
 
@@ -44,10 +49,17 @@ const COMPONENTS = [
     SeaFCLImportShipmentGoodSummaryComponent,
 
 ];
+
 const LIB = [
-    SelectModule,
+    CollapseModule.forRoot(),
+    ModalModule.forRoot(),
+    TabsModule.forRoot(),
+    ModalModule.forRoot(),
     PaginationModule.forRoot(),
+    SelectModule,
+    NgxDaterangepickerMd.forRoot()
 ];
+
 
 @NgModule({
     declarations: [
@@ -55,8 +67,9 @@ const LIB = [
         SeaFCLImportManagementComponent,
         SeaFCLImportCreateJobComponent,
         SeaFCLImportDetailJobComponent,
-        SeaFCLImportCDNoteComponent
-
+        SeaFCLImportCDNoteComponent,
+        SeaFCLImportContainerListPopupComponent,
+        CdNoteAddPopupComponent,
     ],
     imports: [
         NgxDaterangepickerMd,
@@ -65,13 +78,9 @@ const LIB = [
         RouterModule.forChild(routing),
         FormsModule,
         ReactiveFormsModule,
-        TabsModule.forRoot(),
-        PaginationModule,
-        SelectModule,
-        ModalModule.forRoot(),
-        ReactiveFormsModule,
-
-
+        ...LIB,
+        StoreModule.forFeature('seaFClImport', reducers),
+        EffectsModule.forFeature(effects),
 
     ],
     exports: [],

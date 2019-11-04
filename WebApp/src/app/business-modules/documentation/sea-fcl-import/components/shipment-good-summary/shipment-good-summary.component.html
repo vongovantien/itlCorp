@@ -9,36 +9,51 @@
                     <div class="col-md-8">
                         <div class="row">
                             <div class="col-md-6">
-                                <textarea name="" id="" cols="30" rows="8" class="form-control"></textarea>
+                                <label for="">Commodities</label>
+                                <textarea name="" id="" cols="30" rows="5" class="form-control"
+                                    [(ngModel)]="commodities" name="commodities"></textarea>
                             </div>
                             <div class="col-md-6">
-                                <textarea name="" id="" cols="30" rows="8" class="form-control"></textarea>
+                                <label for="">Detail Container & Package</label>
+                                <textarea name="" id="" cols="30" rows="5" class="form-control"
+                                    [(ngModel)]="containerDetail" name="containerDetail"></textarea>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <ul class="list-group">
-                            <li class="list-group-item">
-                                Total Gross Weight: <span>AAA</span>
+                            <li
+                                class="list-group-item font-weight-bold list-group-item d-flex justify-content-between align-items-center">
+                                Total Gross Weight:
+                                <span class="m-badge m-badge--primary m-badge--wide">{{grossWeight}} Kgs</span>
                             </li>
-                            <li class="list-group-item">
-                                Total Gross Weight: <span>AAA</span>
+                            <li
+                                class="list-group-item font-weight-bold list-group-item d-flex justify-content-between align-items-center">
+                                Total Net Weight:
+                                <span class="m-badge m-badge--primary m-badge--wide">{{netWeight}} Kgs</span>
                             </li>
-                            <li class="list-group-item">
-                                Total Gross Weight: <span>AAA</span>
+                            <li
+                                class="list-group-item font-weight-bold list-group-item d-flex justify-content-between align-items-center">
+                                Total Chargeable Weight:
+                                <span class="m-badge m-badge--primary m-badge--wide">{{totalChargeWeight}} Kgs</span>
                             </li>
-                            <li class="list-group-item">
-                                Total Gross Weight: <span>AAA</span>
+                            <li
+                                class="list-group-item font-weight-bold list-group-item d-flex justify-content-between align-items-center">
+                                Total CBM:
+                                <span class="m-badge m-badge--primary m-badge--wide">{{totalCBM}} CBM</span>
                             </li>
                         </ul>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-8">
-                        <textarea name="" id="" cols="30" rows="10" class="form-control"></textarea>
+                        <label for="">Description</label>
+                        <textarea name="" id="" cols="30" rows="8" class="form-control" [(ngModel)]="description"
+                            name="description"></textarea>
                     </div>
                     <div class="col-md-4">
-                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                            (click)="openContainerListPopup()">
                             <span>
                                 <i class="la la-list"></i>
                                 <span>
@@ -52,3 +67,5 @@
         </div>
     </div>
 </div>
+
+<container-list-popup></container-list-popup>

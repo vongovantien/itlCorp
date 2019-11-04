@@ -2545,9 +2545,9 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.SubColoaderId)
-                    .HasColumnName("SubColoaderID")
-                    .HasMaxLength(50)
+                entity.Property(e => e.SubColoader)
+                    .HasColumnName("SubColoader")
+                    .HasMaxLength(800)
                     .IsUnicode(false);
 
                 entity.Property(e => e.TransactionType)

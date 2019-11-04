@@ -3190,13 +3190,13 @@ namespace eFMS.API.Setting.Service.Models
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
-                entity.Property(e => e.Max).HasColumnType("decimal(18, 4)");
+                entity.Property(e => e.Max).HasColumnType("decimal(18, 3)");
 
-                entity.Property(e => e.Min).HasColumnType("decimal(18, 4)");
+                entity.Property(e => e.Min).HasColumnType("decimal(18, 3)");
 
-                entity.Property(e => e.NextUnit).HasColumnType("decimal(18, 4)");
+                entity.Property(e => e.NextUnit).HasColumnType("decimal(18, 3)");
 
-                entity.Property(e => e.NextUnitPrice).HasColumnType("decimal(18, 4)");
+                entity.Property(e => e.NextUnitPrice).HasColumnType("decimal(18, 3)");
 
                 entity.Property(e => e.PayerId)
                     .HasColumnName("PayerID")
@@ -3205,13 +3205,9 @@ namespace eFMS.API.Setting.Service.Models
 
                 entity.Property(e => e.PortId).HasColumnName("PortID");
 
-                entity.Property(e => e.RangeFrom)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
+                entity.Property(e => e.RangeFrom).HasColumnType("decimal(18, 3)");
 
-                entity.Property(e => e.RangeTo)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
+                entity.Property(e => e.RangeTo).HasColumnType("decimal(18, 3)");
 
                 entity.Property(e => e.RangeType)
                     .HasMaxLength(10)
@@ -3230,7 +3226,7 @@ namespace eFMS.API.Setting.Service.Models
 
                 entity.Property(e => e.UnitId).HasColumnName("UnitID");
 
-                entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 4)");
+                entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 3)");
 
                 entity.Property(e => e.UseFor)
                     .IsRequired()
@@ -3247,7 +3243,7 @@ namespace eFMS.API.Setting.Service.Models
 
                 entity.Property(e => e.Vatrate)
                     .HasColumnName("VATRate")
-                    .HasColumnType("decimal(18, 4)");
+                    .HasColumnType("decimal(18, 3");
 
                 entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
             });

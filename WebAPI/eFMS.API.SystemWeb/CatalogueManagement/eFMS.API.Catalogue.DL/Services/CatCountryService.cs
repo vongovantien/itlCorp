@@ -122,11 +122,11 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             try
             {
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var newList = new List<CatCountry>();
                 foreach (var item in data)
                 {
                     DateTime? Active = null;
+                    bool isActive = item.Status.Contains("active");
                     var country = new CatCountry
                     {
                         Code = item.Code,
@@ -134,12 +134,13 @@ namespace eFMS.API.Catalogue.DL.Services
                         NameVn = item.NameVn,
                         DatetimeCreated = DateTime.Now,
                         UserCreated = currentUser.UserID,
-                        Active = (item.Status ?? "").Contains("active"),
-                        InactiveOn = item.Status != null? DateTime.Now: Active
+                        Active = isActive, // item.Status == "active",// (item.Status ?? "").Contains("active"),
+                        InactiveOn = isActive == false? DateTime.Now: Active
                     };
-                    dc.CatCountry.Add(country);
+                    DataContext.Add(country, false);
                 }
-                dc.SaveChanges();
+                //dc.SaveChanges();
+                DataContext.SubmitChanges();
                 cache.Remove(Templates.CatCountry.NameCaching.ListName);
 
                 return new HandleState();

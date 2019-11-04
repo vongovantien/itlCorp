@@ -13,8 +13,7 @@ import { InfoPopupComponent } from 'src/app/shared/common/popup';
 
 @Component({
   selector: 'app-location-import',
-  templateUrl: './location-import.component.html',
-  styleUrls: ['./location-import.component.scss']
+  templateUrl: './location-import.component.html'
 })
 export class LocationImportComponent implements OnInit {
   data: any[];
@@ -118,6 +117,10 @@ export class LocationImportComponent implements OnInit {
       this.pager = this.pagingService.getPager(this.inValidItems.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
       this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
       this.pagedItems = this.inValidItems.slice(this.pager.startIndex, this.pager.endIndex + 1);
+
+      if (this.inValidItems.length === 0) {
+        this.pager.totalItems = 1;
+      }
     }
   }
   hideInvalid() {
@@ -127,7 +130,6 @@ export class LocationImportComponent implements OnInit {
       this.pager.totalItems = this.data.length;
     } else {
       this.inValidItems = this.data.filter(x => !x.isValid);
-      this.pager.totalItems = this.inValidItems.length;
     }
     this.child.setPage(this.pager.currentPage);
   }

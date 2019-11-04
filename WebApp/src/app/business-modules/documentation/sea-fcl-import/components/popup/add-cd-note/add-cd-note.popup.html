@@ -1,0 +1,262 @@
+<div class="modal fade new-adv-payment-popup" role="dialog" bsModal #popup="bs-modal" aria-hidden="true">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Credit/Debit Note</h5>
+                <!-- <ng-template #updateTitle class="modal-title">
+                    <h5 class="modal-title">Update Credit/Debit Note</h5>
+                </ng-template> -->
+
+                <button type="button" (click)="closePopup()" class="close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="m-form m-form--state">
+                    <div class="div-inside bg-secondary m--margin-bottom-15">
+                        <div class="row">
+                            <div class="col-lg-4"
+                                >
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Note type
+                                    </label>
+                                    <!-- <ng-select [allowClear]="true" [items]="noteTypes" [disabled]="disabled"
+                                        (data)="refreshValue($event)" (selected)="CDNoteWorking.type=$event.id"
+                                        (removed)="CDNoteWorking.type=null" (typed)="typed($event)"
+                                        placeholder="Select filter"> 
+                                    </ng-select>-->
+                                    <ng-select placeholder="Select filter"></ng-select>
+                                    <!-- <div class="form-control-feedback"
+                                        *ngIf="addCDNoteFormOps.submitted && CDNoteWorking.type==null">
+                                        Note type is required !
+                                    </div> -->
+                                </div>
+                            </div>
+                            <div class="col-lg-8"
+                                >
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Subject to Partner
+                                    </label>
+                                    <!-- <app-combo-grid-virtual-scroll [dataSources]="listSubjectPartner"
+                                        [currentActiveItemId]="{field:'id',value:CDNoteWorking.partnerId}"
+                                        (itemSelected)="CDNoteWorking.partnerId=$event.id;CDNoteWorking.partnerName=$event.partnerNameEn;confirmYes($event.id);totalCreditDebitCalculate()"
+                                        [selectedDisplayFields]="['partnerNameEn']"
+                                        [displayFields]="[{'field':'accountNo','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Partner Name'},{'field':'taxCode','label':'Tax Code'}]">
+                                    </app-combo-grid-virtual-scroll> -->
+                                    <ng-select placeholder="Select filter"></ng-select>
+                                    <!-- <div class="form-control-feedback"
+                                        *ngIf="addCDNoteFormOps.submitted && CDNoteWorking.partnerId==null">
+                                        Partner is required !
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="m-form m-form--label-align-right">
+                        <div class="row align-items-center">
+                            <div class="col-lg-4 order-2 order-lg-1">
+                                <div class="form-group">
+                                    <div class="m-input-icon m-input-icon--left">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            placeholder="Search...">
+                                        <span class="m-input-icon__icon m-input-icon__icon--left">
+                                            <span>
+                                                <i class="la la-search"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
+                                <button type="button" 
+                                    class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+                                    <span>
+                                        <i class="la la-trash"></i>
+                                        <span>
+                                            remove selected
+                                        </span>
+                                    </span>
+                                </button>
+                                <button type="button"
+                                    class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                    data-toggle="modal" >
+                                    <span>
+                                        <i class="la la-plus"></i>
+                                        <span>
+                                            add charge
+                                        </span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-wrapper fit-height-div">
+                        <table class="table table-striped table-brand dataTable">
+                            <thead>
+                                <tr>
+                                    <th class="table-actions-col no-sorting">
+                                        <label class="m-checkbox">
+                                            <input type="checkbox">
+                                            <span></span>
+                                        </label>
+                                    </th>
+                                    <th class="sorting">
+                                        <span>Code</span>
+                                    </th>
+                                    <th class="sorting">
+                                        <span>Charge name</span>
+                                    </th>
+                                    <th class="sorting">
+                                        <span>Quantity</span>
+                                    </th>
+                                    <th class="sorting">
+                                        <span>Unit</span>
+                                    </th>
+                                    <th class="sorting">
+                                        <span>Unit price</span>
+                                    </th>
+                                    <th class="sorting">
+                                        <span>Currency</span>
+                                    </th>
+                                    <th class="no-sorting">
+                                        <span>VAT</span>
+                                    </th>
+                                    <th class="no-sorting">
+                                        <span>Credit value (Local)</span>
+                                    </th>
+                                    <th class="no-sorting">
+                                        <span>Debit value (Local)</span>
+                                    </th>
+                                    <th class="no-sorting">
+                                        <span>Note</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="tbody-group" >
+
+                                <!-- <tr class="collapse-toggle-row tgroup" *ngIf="checkToDisplay(item)">
+                                    <td colspan="12">
+                                        <label class="m-checkbox">
+                                            <input type="checkbox" name="" attr.data-id="{{i}}"
+                                                class="group-charge-hb-select"
+                                                (change)="selectAllChargeInGroup($event,i)">
+                                                    HBL No: {{item.hwbno}}
+                                            <span></span>
+                                        </label>
+                                    </td>
+                                </tr> -->
+                                <ng-container >
+                                    <tr class="child" >
+                                        <td class="table-actions-col">
+                                            <div class="table-actions">
+                                                <label class="m-checkbox">
+                                                    <!-- <input type="checkbox" name="" attr.data-id="{{k}}"
+                                                        class="single-charge-select"
+                                                        (change)="selectSingleCharge($event,k)"> -->
+                                                    <input type="checkbox" name="" >
+                                                    <span></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <!-- <td>
+                                                <span>{{item.hwbno}}</span>
+                                            </td> -->
+                                        <td>
+                                            <span>charge.chargeCode</span>
+                                        </td>
+                                        <td>
+                                            <span>charge.nameEn</span>
+                                        </td>
+                                        <td>
+                                            <span>charge.quantity</span>
+                                        </td>
+                                        <td>
+                                            <span>charge.unit</span>
+                                        </td>
+                                        <td>
+                                            <span>charge.unitPrice</span>
+                                        </td>
+                                        <td>
+                                            <span>charge.currency</span>
+                                        </td>
+                                        <td>
+                                            <span>charge.vatrate</span>
+                                        </td>
+                                        <td>
+                                            <span class="credit-value">
+                                                charge.total*charge.exchangeRate  number:1.3-3
+                                            </span>
+                                            <!-- <span class="credit-value" *ngIf="charge.type==='BUY' || charge.type=='LOGISTIC' || (charge.type==='OBH' && CDNoteWorking.partnerId===charge.receiverId)">{{charge.total | number:'1.3-3'}}</span>                                                                              -->
+                                        </td>
+                                        <td>
+                                            <span class="debit-value"
+                                                >
+                                                charge.total*charge.exchangeRate | number:'1.3-3'
+                                            </span>
+                                            <!-- <span class="debit-value" *ngIf="charge.type==='SELL' || (charge.type==='OBH' && CDNoteWorking.partnerId===charge.payerId)">{{charge.total | number:'1.3-3'}}</span>                                            -->
+                                        </td>
+                                        <td>
+                                            <span>charge.notes</span>
+                                        </td>
+                                    </tr>
+
+                                </ng-container>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="m--margin-top-10">
+                        <div class="m-alert m-alert--square alert alert-info m--align-right m--marginless">
+                            <div class="row">
+                                <div class="col">
+                                    <strong>Total Credit:</strong><span
+                                        class="m--margin-left-5">totalCredit | number:'1.3-3' </span>
+                                </div>
+                                <div class="col-md-auto">
+                                    <strong>Total Dedit:</strong> <span
+                                        class="m--margin-left-5"> totalDebit | number:'1.3-3'</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="m-alert m-alert--square alert alert-brand m--align-right m--marginless">
+                            <strong>Balance Amount:</strong><span class="m--margin-left-5">
+                                (totalDebit - totalCredit) | number:'1.3-3'</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer m--align-center">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    >
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Create
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
+                    >
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 
+<confirm-popup #confirmDuplicatePopup (onSubmit)="onSubmitDuplicatePopup()" [title]="'Warning'" [body]="'Data already exists, do you want to save or not ?'" [labelCancel]="'No'" >
+</confirm-popup>-->
+
+<!-- <confirm-popup #exitPopup (onSubmit)="onSubmitExitPopup()" [title]="'Warning'" [body]="'Do you want to exit ?'" [labelCancel]="'No'">
+</confirm-popup> -->
+
+<!-- <confirm-popup #existedPopup (onSubmit)="onSubmitShipmentExisted()" [title]="'Warning'" [body]="'Shipment has existed in another Advance'"
+    [title]="'Warning'">
+</confirm-popup>  -->

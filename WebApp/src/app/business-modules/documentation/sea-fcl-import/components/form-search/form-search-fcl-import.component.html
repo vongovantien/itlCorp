@@ -1,5 +1,151 @@
 <div class="m-portlet">
     <div class="m-portlet__body">
-        search component
+        <!--begin::Form-->
+        <form class="m-form m-form--state" [formGroup]="formSearch">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="form-group">
+                        <label class="form-control-label" for="">
+                            Search text
+                        </label>
+                        <input type="text" class="form-control m-input m-input--square" autocomplete="nope"
+                            placeholder="Search text" formControlName="searchText">
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="form-control-label" >
+                            Select filter
+                        </label>
+                        <select class="form-control" formControlName="filterType">
+                            <option *ngFor="let type of filterTypes" [ngValue]="type">{{type.title}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <!--begin::Advance-search-->
+            <div class="collapse" [collapse]="isCollapsed" [isAnimated]="true" 
+                (collapsed)="collapsed()"
+                (expanded)="expanded()">
+                <div class="div-inside bg-secondary">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Customer
+                                </label>
+                                <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCustomer"
+                                    (itemSelected)="onSelectDataFormInfo($event, 'customer')"
+                                    [selectedDisplayFields]="configCustomer.selectedDisplayFields"
+                                    [dataSources]="configCustomer.dataSource"
+                                    [displayFields]="configCustomer.displayFields" [height]="200">
+                                </app-combo-grid-virtual-scroll>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Supplier/Co-Loader
+                                </label>
+                                <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedSupplier"
+                                    (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
+                                    [selectedDisplayFields]="configSupplier.selectedDisplayFields"
+                                    [dataSources]="configSupplier.dataSource"
+                                    [displayFields]="configSupplier.displayFields" [height]="200">
+                                </app-combo-grid-virtual-scroll>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Agent
+                                </label>
+                                <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedAgent"
+                                    (itemSelected)="onSelectDataFormInfo($event, 'agent')"
+                                    [selectedDisplayFields]="configAgent.selectedDisplayFields"
+                                    [dataSources]="configAgent.dataSource" [displayFields]="configAgent.displayFields"
+                                    [height]="200">
+                                </app-combo-grid-virtual-scroll>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Saleman
+                                </label>
+                                <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedSaleman"
+                                    (itemSelected)="onSelectDataFormInfo($event, 'saleman')"
+                                    [selectedDisplayFields]="configSaleman.selectedDisplayFields"
+                                    [dataSources]="configSaleman.dataSource"
+                                    [displayFields]="configSaleman.displayFields" [height]="200">
+                                </app-combo-grid-virtual-scroll>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">
+                                    Creator
+                                </label>
+                                <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCreator"
+                                    (itemSelected)="onSelectDataFormInfo($event, 'creator')"
+                                    [selectedDisplayFields]="configCreator.selectedDisplayFields"
+                                    [dataSources]="configCreator.dataSource"
+                                    [displayFields]="configCreator.displayFields" [height]="200">
+                                </app-combo-grid-virtual-scroll>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group form-control-serviceDateFromTo daterange-rtl">
+                                <label class="form-control-label" for="">
+                                    Service Date From - To
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                    [autoApply]="true" [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                    [ranges]="ranges" [maxDate]="maxDate" [alwaysShowCalendars]="true"
+                                    formControlName="serviceDate" name="daterange" placeholder="From date - to date"
+                                    readonly />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--end::Advance-search-->
+            <div class="form-actions">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <a class="btn btn-link collapsed collapse-toggle" role="button" 
+                            (click)="isCollapsed = !isCollapsed">
+                            <span>
+                                <i class="la la-angle-up"></i>
+                                <span>Advance search</span>
+                            </span>
+                        </a>
+                    </div>
+                    <div class="col-lg-6 m--align-right">
+                        <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                            (click)="searchShipment()">
+                            <span>
+                                <i class="la la-search"></i>
+                                <span>
+                                    Search
+                                </span>
+                            </span>
+                        </button>
+                        <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                            (click)="resetSearch()">
+                            <span>
+                                <i class="la la-refresh"></i>
+                                <span>
+                                    Reset
+                                </span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!--end::Form-->
     </div>
 </div>

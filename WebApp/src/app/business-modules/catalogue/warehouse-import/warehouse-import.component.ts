@@ -31,6 +31,9 @@ export class WarehouseImportComponent implements OnInit {
   @ViewChild('form', { static: false }) form: any;
   @ViewChild(PaginationComponent, { static: false }) child: any;
   @ViewChild(NgProgressComponent, { static: false }) progressBar: NgProgressComponent;
+
+  isDesc = true;
+  sortKey: string;
   closeButtonSetting: ButtonModalSetting = {
     typeButton: ButtonType.cancel,
     buttonAttribute: {
@@ -50,7 +53,7 @@ export class WarehouseImportComponent implements OnInit {
     this.pager.totalItems = 0;
   }
   chooseFile(file: Event) {
-    if (file.target['files'] == null) return;
+    if (file.target['files'] == null) { return; }
     this.progressBar.start();
     this.baseService.uploadfile(this.api_menu.Catalogue.CatPlace.uploadExel + "?type=" + PlaceTypeEnum.Warehouse, file.target['files'], "uploadedFile")
       .subscribe((response: any) => {
@@ -77,26 +80,24 @@ export class WarehouseImportComponent implements OnInit {
   }
 
   hideInvalid() {
-    if (this.data == null) return;
+    if (this.data == null) { return; }
     this.isShowInvalid = !this.isShowInvalid;
     this.sortKey = '';
     if (this.isShowInvalid) {
       this.pager.totalItems = this.data.length;
-    }
-    else {
+    } else {
       this.inValidItems = this.data.filter(x => !x.isValid);
       this.pager.totalItems = this.inValidItems.length;
     }
     this.child.setPage(this.pager.currentPage);
   }
   async import() {
-    if (this.data == null) return;
+    if (this.data == null) { return; }
     if (this.totalRows - this.totalValidRows > 0) {
       $('#upload-alert-modal').modal('show');
-    }
-    else {
-      let data = this.data.filter(x => x.isValid);
-      var response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.import, data);
+    } else {
+      const data = this.data.filter(x => x.isValid);
+      const response = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.import, data);
       if (response) {
         this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
         this.pager.totalItems = 0;
@@ -104,8 +105,6 @@ export class WarehouseImportComponent implements OnInit {
       }
     }
   }
-  isDesc = true;
-  sortKey: string;
   sort(property: string) {
     this.isDesc = !this.isDesc;
     this.sortKey = property;
@@ -119,11 +118,13 @@ export class WarehouseImportComponent implements OnInit {
       this.pager = this.pagingService.getPager(this.data.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
       this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
       this.pagedItems = this.data.slice(this.pager.startIndex, this.pager.endIndex + 1);
-    }
-    else {
+    } else {
       this.pager = this.pagingService.getPager(this.inValidItems.length, this.pager.currentPage, this.pager.pageSize, this.pager.numberPageDisplay);
       this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
       this.pagedItems = this.inValidItems.slice(this.pager.startIndex, this.pager.endIndex + 1);
+      if (this.inValidItems.length === 0) {
+        this.pager.totalItems = 1;
+      }
     }
   }
   reset() {

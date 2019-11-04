@@ -524,6 +524,7 @@ namespace eFMS.API.Documentation.DL.Services
                         foreach(var item in clearances)
                         {
                             item.JobNo = null;
+                            item.ConvertTime = null;
                             customDeclarationRepository.Update(item, x => x.Id == item.Id, false);
                         }
                     }
