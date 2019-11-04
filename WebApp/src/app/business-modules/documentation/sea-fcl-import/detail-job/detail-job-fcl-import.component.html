@@ -20,22 +20,33 @@
                 </span>
             </button>
 
-            <app-default-button [buttonSetting]="saveButtonSetting"></app-default-button>
+            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onUpdateShipmenetDetail()">
+            </app-default-button>
 
             <app-default-button [buttonSetting]="cancelButtonSetting"></app-default-button>
-
-
 
         </div>
     </app-sub-header>
     <div class="m-content">
-        {{selectedTab}}
         <div class="m-portlet__body">
             <tabset class="custom-class-tab">
                 <tab heading="Shipment Detail" [active]="selectedTab === 'SHIPMENT'"
                     (selectTab)="onSelectTab('shipment')">
-                    <form-create-sea-fcl-import></form-create-sea-fcl-import>
+
+                    <form-create-sea-fcl-import>
+                        <div class="row" *ngIf="!!fclImportDetail">
+                            <div class="col-md-4">
+                                <span>Created: {{fclImportDetail.createdDate | date: 'dd/MM/yyyy HH:mm'}} by </span>
+                                <span class="text-success">{{fclImportDetail.userCreated}}</span>
+                            </div>
+                            <div class="col-md-4">
+                                <span>Modified: {{fclImportDetail.modifiedDate | date: 'dd/MM/yyyy HH:mm'}} by
+                                </span> <span class="text-success">{{fclImportDetail.userModified}}</span>
+                            </div>
+                        </div>
+                    </form-create-sea-fcl-import>
                     <shipment-good-summary></shipment-good-summary>
+
                 </tab>
                 <tab heading="House Bill List" (selectTab)="onSelectTab('hbl')">
                 </tab>
