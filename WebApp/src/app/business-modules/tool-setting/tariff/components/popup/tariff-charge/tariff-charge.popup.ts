@@ -140,6 +140,17 @@ export class TariffChargePopupComponent extends PopupBase {
             })
         });
 
+
+        // * Update unitPrice follow min.
+        this.formChargeTariff.controls['tariffChargeDetail'].get('min').valueChanges
+            .pipe(
+                distinctUntilChanged((prev, curr) => prev === curr),
+            )
+            .subscribe((value: any) => {
+                this.formChargeTariff.controls['tariffChargeDetail'].get('unitPrice').setValue(value);
+            });
+
+
         for (const control of ["rangeFrom", "rangeTo", "min", "max", "nextUnit", "nextUnitPrice", ""]) {
             this.enableDisabledFormControl(this.formChargeTariff.controls['tariffChargeDetail'].get(control), 'disabled');
         }
@@ -157,6 +168,7 @@ export class TariffChargePopupComponent extends PopupBase {
 
         this.configComondity = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
+                { field: 'id', label: 'ID' },
                 { field: 'groupNameEn', label: 'Name EN' },
                 { field: 'groupNameVn', label: 'Name Local' },
             ]
@@ -432,7 +444,6 @@ export class TariffChargePopupComponent extends PopupBase {
 
         setTimeout(() => {
             this.selectedCommondityGroup = { field: 'id', value: this.tariffCharge.commodityId };
-            console.log(this.selectedCommondityGroup);
             this.show();
         }, 500);
     }
