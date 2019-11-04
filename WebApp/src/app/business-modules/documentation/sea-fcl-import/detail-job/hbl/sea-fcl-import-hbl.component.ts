@@ -59,7 +59,7 @@ export class SeaFCLImportHBLComponent extends AppList {
     }
 
     gotoCreateHouseBill(id: any) {
-        id = "123213";
+        id = this.jobId;
         this._router.navigate([`/home/documentation/sea-fcl-import/${id}/hbl/new`]);
     }
 
