@@ -41,11 +41,7 @@
                 </tab>
                 <tab heading="Debit Note & Credit Note" [active]="selectedTab === 'CDNOTE'"
                     (selectTab)="onSelectTab('cdNote')">
-                    <div class="m-portlet">
-                        <div class="m-portlet__body">
-                            Credit Debit Note List
-                        </div>
-                    </div>
+                    <sea-fcl-import-cd-note></sea-fcl-import-cd-note>
                 </tab>
             </tabset>
         </div>

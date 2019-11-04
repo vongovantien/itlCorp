@@ -15,6 +15,7 @@ import { SeaFCLImportShipmentGoodSummaryComponent } from './components/shipment-
 import { SeaFCLImportCDNoteComponent } from './detail-job/cd-note/sea-fcl-import-cd-note.component';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { CdNoteAddPopupComponent } from './components/popup/add-cd-note/add-cd-note.popup';
 
 
 
@@ -42,6 +43,7 @@ const COMPONENTS = [
     SeaFCLImportManagementFormSearchComponent,
     SeaFClImportFormCreateComponent,
     SeaFCLImportShipmentGoodSummaryComponent,
+    CdNoteAddPopupComponent
 ];
 
 const LIB = [
