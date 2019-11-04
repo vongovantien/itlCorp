@@ -65,8 +65,7 @@
                                 (itemSelected)="onSelectDataFormInfo($event, 'Shipper')"
                                 [displayFields]="configShipper.displayFields">
                             </app-combo-grid-virtual-scroll>
-                            <textarea rows="3" [(ngModel)]="shipperdescriptionModel"
-                                class="form-control m-input m-input--square"
+                            <textarea rows="3" class="form-control m-input m-input--square"
                                 formControlName="ShipperDescription"></textarea>
                         </div>
 
@@ -83,8 +82,7 @@
                                 (itemSelected)="onSelectDataFormInfo($event, 'Consignee')"
                                 [displayFields]="configConsignee.displayFields">
                             </app-combo-grid-virtual-scroll>
-                            <textarea [(ngModel)]="consigneedescriptionModel" rows="3"
-                                class="form-control m-input m-input--square"
+                            <textarea rows="3" class="form-control m-input m-input--square"
                                 formControlName="ConsigneeDescription"></textarea>
                             <div class="form-control-feedback" *ngIf="isSubmited && !selectedConsignee.value ">
                                 Consignee is required!
@@ -104,7 +102,7 @@
                                 [displayFields]="configNotifyParty.displayFields">
                             </app-combo-grid-virtual-scroll>
                             <textarea rows="3" class="form-control m-input m-input--square"
-                                formControlName="NotifyPartyDescription" [(ngModel)]="notifyPartyModel"></textarea>
+                                formControlName="NotifyPartyDescription"></textarea>
                         </div>
                     </div>
                 </div>
@@ -121,8 +119,7 @@
                                 [displayFields]="configAlsoNotifyParty.displayFields">
                             </app-combo-grid-virtual-scroll>
                             <textarea rows="3" class="form-control m-input m-input--square"
-                                formControlName="AlsoNotifyPartyDescription"
-                                [(ngModel)]="alsoNotifyPartyDescriptionModel"></textarea>
+                                formControlName="AlsoNotifyPartyDescription"></textarea>
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -135,7 +132,7 @@
                                 formControlName="hbOfladingNo">
                             <div class="form-control-feedback"
                                 *ngIf="isSubmited && (hwbno.errors | equalError: 'required') || (hwbno.errors | equalError: 'required') && hwbno.dirty">
-                                House Bill of Lading Nois required!
+                                House Bill of Lading No required!
                             </div>
                         </div>
                         <div class="form-group">
@@ -145,8 +142,7 @@
                             <div class="m-input-icon">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                    [(ngModel)]="selectedETD" [singleDatePicker]="true" formControlName="ETDTime"
-                                    readonly />
+                                    [singleDatePicker]="true" formControlName="etd" readonly />
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
                                         <i class="la la-calendar"></i>
@@ -157,7 +153,7 @@
 
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmited && !hbOfladingType}">
+                        <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmited && !hbltype.value}">
                             <label class="form-control-label" for="">
                                 House Bill of Lading Type. <span class="m--font-danger">(*)</span>
                             </label>
@@ -166,26 +162,26 @@
                                 <option *ngFor="let item of hbOfladingTypes" [ngValue]="item">
                                     {{item.title}}</option>
                             </select>
-                            <div class="form-control-feedback" *ngIf="isSubmited && !hbOfladingType">
+                            <div class="form-control-feedback" *ngIf="isSubmited && !hbltype.value">
                                 House Bill of Lading Type is required !
                             </div>
                         </div>
-                        <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmited && !ETATime }">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': isSubmited && ( !minDate.value )}">
                             <label class="form-control-label" for="">
                                 Estimated Time of Arrival <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="m-input-icon">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                    [minDate]="minDate" [(ngModel)]="selectedETA" [singleDatePicker]="true"
-                                    formControlName="ETATime" readonly />
+                                    [minDate]="minDate" [singleDatePicker]="true" formControlName="eta" readonly />
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
                                         <i class="la la-calendar"></i>
                                     </span>
                                 </span>
                             </div>
-                            <div class="form-control-feedback" *ngIf="isSubmited && !ETATime">
+                            <div class="form-control-feedback" *ngIf="isSubmited && ( !eta.value )">
                                 Estimated Time of Arrival is required !
                             </div>
                         </div>
@@ -322,8 +318,8 @@
                             <div class="m-input-icon">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                    [(ngModel)]="selectedDocDate" [singleDatePicker]="true" name="singledater"
-                                    formControlName="documnentDate" readonly />
+                                    [singleDatePicker]="true" name="singledater" formControlName="documnentDate"
+                                    readonly />
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
                                         <i class="la la-calendar"></i>
@@ -350,7 +346,7 @@
                             <div class="m-input-icon">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                    [(ngModel)]="selectedETAWareHouse" [singleDatePicker]="true" name="singledater"
+                                    [minDate]="minDate" [singleDatePicker]="true" name="singledater"
                                     formControlName="dateETA" readonly />
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
@@ -413,8 +409,7 @@
                             <div class="m-input-icon">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                    [(ngModel)]="selectedDateOfIssued" [singleDatePicker]="true"
-                                    formControlName="dateOfIssued" readonly />
+                                    [singleDatePicker]="true" formControlName="dateOfIssued" readonly />
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
                                         <i class="la la-calendar"></i>
