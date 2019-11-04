@@ -3,7 +3,15 @@
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add OPS Tariff Detail</h5>
+                <h5 class="modal-title">
+                    <ng-container *ngIf="ACTION === 'CREATE'">
+                        Add OPS Tariff Detail
+                    </ng-container>
+
+                    <ng-container *ngIf="ACTION !== 'CREATE'">
+                        View/Edit OPS Tariff Charge
+                    </ng-container>
+                </h5>
                 <button type="button" (click)="closePopup()" class="close">
                     <span aria-hidden="true">&times;</span>
                 </button>
