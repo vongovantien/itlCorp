@@ -224,7 +224,7 @@
 
                     <div class="col-lg-4">
                         <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': isSubmited && !selectedPortOfDischarge.value }">
+                            [ngClass]="{'m-form__group has-danger': isSubmited  && (!selectedPortOfDischarge.value || PortChargeLikePortLoading == true) }">
                             <label class="form-control-label">
                                 Port of Discharge <span class="m--font-danger">(*)</span>
                             </label>
