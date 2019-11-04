@@ -25,9 +25,24 @@ namespace eFMS.API.Documentation.DL.Services
             freightChargeDefaultRepository = freightChargeDefault;
         }
 
-        public HandleState SetArrivalChargeDefault(CsArrivalFrieghtChargeDefaultModel model)
+        public HandleState SetArrivalChargeDefault(CsArrivalFrieghtChargeDefaultEditModel model)
         {
-            throw new NotImplementedException();
+            var charges = freightChargeDefaultRepository.Get(x => x.UserDefault == model.UserDefault && x.TransactionType == model.TransactionType);
+            if(charges != null)
+            {
+                foreach(var item in charges)
+                {
+                    freightChargeDefaultRepository.Delete(x => x.UserDefault == model.UserDefault && x.TransactionType == model.TransactionType, false);
+                }
+            }
+            foreach(var item in model.CsArrivalFrieghtChargeDefaults)
+            {
+                item.UserDefault = model.UserDefault;
+                item.TransactionType = model.TransactionType;
+                freightChargeDefaultRepository.Add(item, false);
+            }
+            freightChargeDefaultRepository.SubmitChanges();
+            return new HandleState();
         }
 
         public HandleState UpdateArrival(CsArrivalFrieghtChargeEditModel model)

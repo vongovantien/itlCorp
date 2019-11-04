@@ -17,6 +17,20 @@
             <param name="freightChargeService"></param>
             <param name="user"></param>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalController.Update(eFMS.API.Documentation.DL.Models.CsArrivalFrieghtChargeEditModel)">
+            <summary>
+            update arrival info
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalController.DeleteCharge(System.Guid)">
+            <summary>
+            delete an existed charge
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsManifestController">
             <summary>
             

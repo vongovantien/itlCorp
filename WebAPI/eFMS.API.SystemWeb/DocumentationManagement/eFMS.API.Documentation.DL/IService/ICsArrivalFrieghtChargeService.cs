@@ -11,6 +11,6 @@ namespace eFMS.API.Documentation.DL.IService
     public interface ICsArrivalFrieghtChargeService: IRepositoryBase<CsArrivalFrieghtCharge, CsArrivalFrieghtChargeModel>
     {
         HandleState UpdateArrival(CsArrivalFrieghtChargeEditModel model);
-        HandleState SetArrivalChargeDefault(CsArrivalFrieghtChargeDefaultModel model);
+        HandleState SetArrivalChargeDefault(CsArrivalFrieghtChargeDefaultEditModel model);
     }
 }
