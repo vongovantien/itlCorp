@@ -1,13 +1,16 @@
-import { Component, Output, EventEmitter, Input } from '@angular/core';
+import { Component, Output, EventEmitter, Input, ViewChild } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { DocumentationRepo, CatalogueRepo } from 'src/app/shared/repositories';
 import { forkJoin } from 'rxjs';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { catchError, distinctUntilChanged, map } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
-import { FormGroup, FormBuilder, AbstractControl } from '@angular/forms';
+import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { TransactionTypeEnum } from 'src/app/shared/enums';
-import { CsTransaction } from 'src/app/shared/models';
+import { User } from 'src/app/shared/models';
+import { BaseService } from 'src/app/shared/services';
+import { ActionsSubject } from '@ngrx/store';
+
 
 @Component({
     selector: 'form-create-sea-fcl-import',
@@ -15,11 +18,8 @@ import { CsTransaction } from 'src/app/shared/models';
 })
 export class SeaFClImportFormCreateComponent extends AppForm {
 
-    @Input() csTransaction: CsTransaction;
-    @Output() csTransactionChange: EventEmitter<ICSTransaction> = new EventEmitter<ICSTransaction>();
-
     ladingTypes: CommonInterface.IValueDisplay[];
-    shipmentTypes: CommonInterface.IValueDisplay[];
+    shipmentTypes: CommonInterface.IValueDisplay[] = [];
     serviceTypes: CommonInterface.IValueDisplay[];
 
     configComboGridPartner: CommonInterface.IComboGirdConfig;
@@ -39,23 +39,28 @@ export class SeaFClImportFormCreateComponent extends AppForm {
     jobId: AbstractControl;
     etd: AbstractControl;
     eta: AbstractControl;
-    landingNo: AbstractControl;
-    landingType: AbstractControl;
+    mawb: AbstractControl;
+    mbltype: AbstractControl;
     shipmentType: AbstractControl;
     subSupplier: AbstractControl;
-    vesselName: AbstractControl;
+    flightVesselName: AbstractControl;
     voyNo: AbstractControl;
-    poNo: AbstractControl;
-    serviceType: AbstractControl;
+    pono: AbstractControl;
+    typeOfService: AbstractControl;
     serviceDate: AbstractControl;
-    user: AbstractControl;
-    note: AbstractControl;
+    personIncharge: AbstractControl;
+    notes: AbstractControl;
+    subColoader: AbstractControl;
+
+    userLogged: User;
 
 
     constructor(
-        private _documentRepo: DocumentationRepo,
-        private _catalogueRepo: CatalogueRepo,
-        private _fb: FormBuilder
+        protected _documentRepo: DocumentationRepo,
+        protected _catalogueRepo: CatalogueRepo,
+        protected _fb: FormBuilder,
+        protected _baseService: BaseService,
+
     ) {
         super();
     }
@@ -81,59 +86,80 @@ export class SeaFClImportFormCreateComponent extends AppForm {
             ]
         }, { selectedDisplayFields: ['nameEn'], });
 
-
+        this.initForm();
+        this.getUserLogged();
         this.getMasterData();
+
 
     }
 
     initForm() {
-
         this.formCreate = this._fb.group({
-            csTransaction: this._fb.group({
-                jobId: [], // * disabled
-                etd: [!!this.csTransaction.etd ? new Date(this.csTransaction.etd) : null], // * Date
-                eta: [!!this.csTransaction.etd ? new Date(this.csTransaction.eta) : null], // * Date
-                mawb: [this.csTransaction.mawb],
-                mbltype: [this.csTransaction.mbltype], // * select
-                shipmentType: [!!this.csTransaction.shipmentType ? this.shipmentTypes.filter(type => type.value === this.csTransaction.shipmentType)[0] : this.shipmentTypes[0]], // * select
-                subColoader: [this.csTransaction.subColoader],
-                flightVesselName: [this.csTransaction.flightVesselName],
-                voyNo: [this.csTransaction.voyNo],
-                pono: [this.csTransaction.pono],
-                typeOfService: [this.csTransaction.typeOfService], // * select
-                serviceDate: [!!this.csTransaction.serviceDate ? new Date(this.csTransaction.serviceDate) : null],
-                personIncharge: [this.csTransaction.personIncharge],  // * select
-                notes: [this.csTransaction.notes],
-            })
-
+            jobId: [{ value: null, disabled: true }], // * disabled
+            etd: [], // * Date
+            eta: [], // * Date
+            mawb: ['', Validators.required],
+            mbltype: [null, Validators.required], // * select
+            shipmentType: [null, Validators.required], // * select
+            subColoader: [],
+            flightVesselName: [],
+            voyNo: [],
+            pono: [],
+            typeOfService: [null, Validators.required], // * select
+            serviceDate: [],
+            personIncharge: [],  // * select
+            notes: [],
         });
+
+        this.jobId = this.formCreate.controls["jobId"];
+        this.etd = this.formCreate.controls["etd"];
+        this.eta = this.formCreate.controls["eta"];
+        this.mawb = this.formCreate.controls["mawb"];
+        this.mbltype = this.formCreate.controls["mbltype"];
+        this.shipmentType = this.formCreate.controls["shipmentType"];
+        this.flightVesselName = this.formCreate.controls["flightVesselName"];
+        this.voyNo = this.formCreate.controls["voyNo"];
+        this.pono = this.formCreate.controls["pono"];
+        this.typeOfService = this.formCreate.controls["typeOfService"];
+        this.personIncharge = this.formCreate.controls["personIncharge"];
+        this.notes = this.formCreate.controls["notes"];
+        this.serviceDate = this.formCreate.controls["serviceDate"];
+        this.subColoader = this.formCreate.controls["subColoader"];
 
         // * Handle etd, eta change.
 
-        this.formCreate.controls['csTransaction'].get("etd").valueChanges
+        this.formCreate.controls['etd'].valueChanges
             .pipe(
                 distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
+                takeUntil(this.ngUnsubscribe)
             )
             .subscribe((value: { startDate: any, endDate: any }) => {
                 this.minDate = value.startDate; // * Update min date
 
-                this.resetFormControl(this.formCreate.controls['csTransaction'].get("eta"));
-                this.formCreate.controls['csTransaction'].get("serviceDate").setValue(null);
+                this.resetFormControl(this.formCreate.controls["eta"]);
+                this.formCreate.controls["serviceDate"].setValue(null);
             });
 
-        this.formCreate.controls['csTransaction'].get("eta").valueChanges
+        this.formCreate.controls["eta"].valueChanges
             .pipe(
                 distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
+                takeUntil(this.ngUnsubscribe)
             )
             .subscribe((value: { startDate: any, endDate: any }) => {
                 if (!!value.startDate) {
-                    this.formCreate.controls['csTransaction'].get("serviceDate").setValue(value);
+                    this.formCreate.controls["serviceDate"].setValue(value);
                 } else {
-                    this.formCreate.controls['csTransaction'].get("serviceDate").setValue(null);
+                    this.formCreate.controls["serviceDate"].setValue(null);
                 }
             });
 
         console.log("initForm done");
+    }
+
+    getUserLogged() {
+        this.userLogged = this._baseService.getUserLogin();
+        this.personIncharge.setValue(this.userLogged.id);
+        this.personIncharge.disable();
 
     }
 
@@ -154,7 +180,9 @@ export class SeaFClImportFormCreateComponent extends AppForm {
                     this.ladingTypes = commonData.billOfLadings;
                     this.shipmentTypes = commonData.shipmentTypes;
 
-                    this.initForm();
+                    // * Set Default
+                    this.shipmentType.setValue(this.shipmentTypes[0].value);
+
                 }
             );
     }

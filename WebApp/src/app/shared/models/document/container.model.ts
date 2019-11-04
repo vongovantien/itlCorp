@@ -7,14 +7,14 @@ export class Container {
   containerNo: string = null;
   sealNo: string = null;
   markNo: string = null;
-  unitOfMeasureId: number = null;
+  unitOfMeasureId: any = null;
   commodityId: number = null;
   packageTypeId: number = null;
   packageQuantity: number = null;
-  description: string = null;
+  description: string = '';
   gw: number = 0;
   nw: number = 0;
-  chargeAbleWeight :number = 0;
+  chargeAbleWeight: number = 0;
   cbm: number = 0;
   partof: boolean = null;
   ownerId: string = null;
@@ -26,4 +26,13 @@ export class Container {
   containerTypeName: string = null;
   commodityName: string = null;
   packageTypeName: string;
+
+  constructor(object?: any) {
+    const self = this;
+    for (const key in object) {
+      if (self.hasOwnProperty(key.toString())) {
+        self[key] = object[key];
+      }
+    }
+  }
 }

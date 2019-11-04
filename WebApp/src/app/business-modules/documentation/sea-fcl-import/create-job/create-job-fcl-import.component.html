@@ -11,7 +11,7 @@
                 </span>
             </button>
 
-            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onSave()"></app-default-button>
+            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onCreateJob()"></app-default-button>
 
             <app-default-button [buttonSetting]="cancelButtonSetting"></app-default-button>
 
@@ -21,7 +21,7 @@
         <div class="m-portlet__body">
             <tabset class="custom-class-tab">
                 <tab heading="Shipment Detail">
-                    <form-create-sea-fcl-import [(csTransaction)]="csTransactionModel"></form-create-sea-fcl-import>
+                    <form-create-sea-fcl-import></form-create-sea-fcl-import>
 
                     <shipment-good-summary></shipment-good-summary>
                 </tab>
@@ -29,3 +29,6 @@
         </div>
     </div>
 </div>
+
+<info-popup [body]="'Opps, It looks like your missed something, Please recheck the highlighted field below.'"
+    [title]="'Cannot Create Job'"></info-popup>

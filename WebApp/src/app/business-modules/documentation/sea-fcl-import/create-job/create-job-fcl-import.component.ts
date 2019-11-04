@@ -1,13 +1,20 @@
 import { Component, ViewChild } from '@angular/core';
-import { AppForm } from 'src/app/app.form';
 import { Router } from '@angular/router';
-import { CsTransaction } from 'src/app/shared/models';
-import { SeaFClImportFormCreateComponent } from '../components/form-create/form-create-sea-fcl-import.component';
+import { Store, ActionsSubject } from '@ngrx/store';
 import { formatDate } from '@angular/common';
+
+import { AppForm } from 'src/app/app.form';
+import { FCLImportAddModel } from 'src/app/shared/models';
+import { SeaFClImportFormCreateComponent } from '../components/form-create/form-create-sea-fcl-import.component';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { catchError } from 'rxjs/operators';
-import { Container } from 'src/app/shared/models/document/container.model';
 import { TransactionTypeEnum } from 'src/app/shared/enums';
+
+import * as fromStore from './../store/index';
+import { SeaFCLImportShipmentGoodSummaryComponent } from '../components/shipment-good-summary/shipment-good-summary.component';
+import { InfoPopupComponent } from 'src/app/shared/common/popup';
+import { ToastrService } from 'ngx-toastr';
+import { catchError, takeUntil } from 'rxjs/operators';
+
 
 @Component({
     selector: 'app-create-job-fcl-import',
@@ -16,25 +23,51 @@ import { TransactionTypeEnum } from 'src/app/shared/enums';
 })
 export class SeaFCLImportCreateJobComponent extends AppForm {
     @ViewChild(SeaFClImportFormCreateComponent, { static: false }) formCreateComponent: SeaFClImportFormCreateComponent;
+    @ViewChild(SeaFCLImportShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: SeaFCLImportShipmentGoodSummaryComponent;
+    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
 
-    csTransactionModel: CsTransaction = new CsTransaction();
+    fclImportAddModel: FCLImportAddModel = new FCLImportAddModel();
+
     constructor(
         protected _router: Router,
-        protected _documenRepo: DocumentationRepo
+        protected _documenRepo: DocumentationRepo,
+        protected _actionStoreSubject: ActionsSubject,
+        protected _toastService: ToastrService,
     ) {
         super();
     }
 
     ngOnInit(): void {
+
+        this._actionStoreSubject
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (action: fromStore.ContainerAction) => {
+                    if (action.type === fromStore.ContainerActionTypes.SAVE_CONTAINER) {
+                        this.fclImportAddModel.csMawbcontainers = action.payload;
+
+                        // * Update model object to integer.
+                        for (const container of <any>this.fclImportAddModel.csMawbcontainers) {
+                            container.containerTypeId = container.containerTypeId.id;
+                            container.commodityId = !!container.commodityId ? container.commodityId.id : null;
+                            container.packageTypeId = !!container.packageTypeId ? container.packageTypeId.id : null;
+                        }
+
+                        console.log("list container add success", this.fclImportAddModel.csMawbcontainers);
+                    }
+                });
     }
 
     ngAfterViewInit() {
-
+        this.shipmentGoodSummaryComponent.initContainer();
     }
 
-    onSave() {
-        const form: any = this.formCreateComponent.formCreate.value.csTransaction;
+    onSubmitData() {
 
+        const form: any = this.formCreateComponent.formCreate.getRawValue();
+        console.log(form);
         const formData = {
             eta: !!form.eta ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
             etd: !!form.etd ? formatDate(form.etd.startDate, 'yyyy-MM-dd', 'en') : null,
@@ -44,35 +77,80 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
             voyNo: form.voyNo,
             pono: form.pono,
             notes: form.notes,
-            personIncharge: 'admin', // TODO Role = CS.
-            subColoader: form.subColoader,
+            personIncharge: this.formCreateComponent.personIncharge.value, // TODO user with Role = CS.
+            subColoader: form.subColoader || null,
 
-            shipmentType: form.shipmentType.value,
+            shipmentType: form.shipmentType,
             flightVesselName: form.flightVesselName,
-            typeOfService: !!form.typeOfService ? form.typeOfService.value : null,
-            mbltype: form.mbltype.value,
+            typeOfService: !!form.typeOfService ? form.typeOfService : null,
+            mbltype: form.mbltype,
 
-            agentId: this.formCreateComponent.selectedAgent.value,
-            pol: this.formCreateComponent.selectedPortLoading.value,
-            pod: this.formCreateComponent.selectedPortDestination.value,
-            deliveryPlace: this.formCreateComponent.selectedPortDelivery.value,
-            coloaderId: this.formCreateComponent.selectedSupplier.value,
+            agentId: !!this.formCreateComponent.selectedAgent.value ? this.formCreateComponent.selectedAgent.value : null,
+            pol: !!this.formCreateComponent.selectedPortLoading.value ? this.formCreateComponent.selectedPortLoading.value : null,
+            pod: !!this.formCreateComponent.selectedPortDestination.value ? this.formCreateComponent.selectedPortDestination.value : null,
+            deliveryPlace: !!this.formCreateComponent.selectedPortDelivery.value ? this.formCreateComponent.selectedPortDelivery.value : null,
+            coloaderId: !!this.formCreateComponent.selectedSupplier.value ? this.formCreateComponent.selectedSupplier.value : null,
+
+            // * containers summary
+            commodity: this.shipmentGoodSummaryComponent.commodities,
+            desOfGoods: this.shipmentGoodSummaryComponent.description,
+            packageContainer: this.shipmentGoodSummaryComponent.containerDetail,
+            netWeight: this.shipmentGoodSummaryComponent.netWeight,
+            grossWeight: this.shipmentGoodSummaryComponent.grossWeight,
+            chargeWeight: this.shipmentGoodSummaryComponent.totalChargeWeight,
+            cbm: this.shipmentGoodSummaryComponent.totalCBM,
+
         };
 
-        this.csTransactionModel = new CsTransaction(formData);
-        this.csTransactionModel.transactionTypeEnum = TransactionTypeEnum.SeaFCLImport;
-        this.csTransactionModel.csMawbcontainers.push(new Container());
-        console.log(this.csTransactionModel);
+        const fclImportAddModel = new FCLImportAddModel(formData);
+        fclImportAddModel.transactionTypeEnum = TransactionTypeEnum.SeaFCLImport;
 
-        this._documenRepo.createTransaction(this.csTransactionModel)
+        return fclImportAddModel;
+
+    }
+
+    checkValidateForm() {
+        let valid: boolean = true;
+        if (!this.formCreateComponent.formCreate.valid) {
+            valid = false;
+        }
+        return valid;
+    }
+
+    onCreateJob() {
+        this.formCreateComponent.isSubmitted = true;
+        if (!this.checkValidateForm()) {
+            this.infoPopup.show();
+            return;
+        }
+        if (!this.fclImportAddModel.csMawbcontainers.length) {
+            this._toastService.warning('Please add container to create new job');
+            return;
+        }
+
+        const modelAdd = this.onSubmitData();
+        modelAdd.csMawbcontainers = this.fclImportAddModel.csMawbcontainers;
+        this.createJob(modelAdd);
+    }
+
+    createJob(body: any) {
+        this._documenRepo.createTransaction(body)
             .pipe(
                 catchError(this.catchError)
             )
             .subscribe(
                 (res: any) => {
-                    console.log(res);
+                    if (res.result.success) {
+                        this._toastService.success("New data added");
+
+                        // TODO goto detail.
+                        this._router.navigate([`home/documentation/sea-fcl-import/${res.model.id}`]);
+                    } else {
+                        this._toastService.error("Opps", "Something getting error!");
+                    }
                 }
-            )
-        // console.log(this.csTransactionModel);
+            );
     }
 }
+
+

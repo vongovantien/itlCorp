@@ -15,6 +15,14 @@ export class DocumentationRepo {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction`, body);
     }
 
+    getDetailTransaction(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction/${id}`);
+    }
+
+    updateCSTransaction(body: any) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction`, body);
+    }
+
     addOPSJob(body: any = {}) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/Add`, body);
     }
@@ -153,7 +161,11 @@ export class DocumentationRepo {
         );
     }
 
-    getListShipmentDocumentation(page?: number, size?: number, body: any = {}){
+    getListHourseBill(data: any = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/QueryData`, data)
+    }
+
+    getListShipmentDocumentation(page?: number, size?: number, body: any = {}) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/Paging`, body, {
             page: '' + page,
             size: '' + size
@@ -171,6 +183,10 @@ export class DocumentationRepo {
         );
     }
 
+    createHousebill(body: any = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/addNew`, body)
+    }
+
     checkMasterBillAllowToDelete(id: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/CheckAllowDelete/${id}`).pipe(
             catchError((error) => throwError(error)),
@@ -184,6 +200,7 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+
     getShipmentDataCommon() {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/Terminology/GetShipmentCommonData`).pipe(
             catchError((error) => throwError(error)),

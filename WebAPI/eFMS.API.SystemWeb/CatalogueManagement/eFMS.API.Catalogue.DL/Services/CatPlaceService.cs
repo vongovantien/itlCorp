@@ -762,6 +762,21 @@ namespace eFMS.API.Catalogue.DL.Services
                 return new HandleState(ex.Message);
             }
         }
+        public IQueryable<CatPlaceModel> GetByModeOfTran()
+        {
+            IQueryable<CatPlace> data = null;
+            data = DataContext.Get();
+            var results = data?.Select(x => mapper.Map<CatPlaceModel>(x));
+            results = results.Where(x => ((x.ModeOfTransport ?? "").IndexOf("INLAND - SEA" ?? "", StringComparison.OrdinalIgnoreCase) > -1));
+            return results;
+
+        }
+
+        public List<vw_catProvince> GetAllProvinces()
+        {
+            var data = GetProvinces().ToList();
+            return data;
+        }
 
     }
 }
