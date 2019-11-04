@@ -4,6 +4,19 @@
         <name>eFMS.API.Documentation</name>
     </assembly>
     <members>
+        <member name="T:eFMS.API.Documentation.Controllers.CsArrivalController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.LanguageSub},eFMS.API.Documentation.DL.IService.ICsArrivalFrieghtChargeService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+            <summary>
+            constructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="freightChargeService"></param>
+            <param name="user"></param>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsManifestController">
             <summary>
             
