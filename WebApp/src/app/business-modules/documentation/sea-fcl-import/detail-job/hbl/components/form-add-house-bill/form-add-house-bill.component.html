@@ -177,8 +177,8 @@
                             <div class="m-input-icon">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                    [(ngModel)]="selectedETA" [singleDatePicker]="true" formControlName="ETATime"
-                                    readonly />
+                                    [minDate]="minDate" [(ngModel)]="selectedETA" [singleDatePicker]="true"
+                                    formControlName="ETATime" readonly />
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
                                         <i class="la la-calendar"></i>

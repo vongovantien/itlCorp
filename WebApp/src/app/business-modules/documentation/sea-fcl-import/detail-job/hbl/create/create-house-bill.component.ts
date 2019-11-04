@@ -8,6 +8,7 @@ import { finalize } from 'rxjs/internal/operators/finalize';
 import { FormAddHouseBillComponent } from '../components/form-add-house-bill/form-add-house-bill.component';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
+import { ActivatedRoute, Params } from '@angular/router';
 @Component({
     selector: 'app-create-house-bill',
     templateUrl: './create-house-bill.component.html',
@@ -15,31 +16,38 @@ import { NgProgress } from '@ngx-progressbar/core';
 })
 export class CreateHouseBillComponent extends AppForm {
     @ViewChild(FormAddHouseBillComponent, { static: false }) formHouseBill: FormAddHouseBillComponent;
+    jobId: string = '';
     constructor(
         private _progressService: NgProgress,
         private _fb: FormBuilder,
         private _documentationRepo: DocumentationRepo,
         private _toastService: ToastrService,
+        protected _activedRoute: ActivatedRoute,
 
     ) {
         super();
         this._progressRef = this._progressService.ref();
     }
     ngOnInit() {
+        this._activedRoute.params.subscribe((param: Params) => {
+            if (param.id) {
+                this.jobId = param.id;
+            }
+        });
     }
 
 
     create() {
         this.formHouseBill.isSubmited = true;
+
         if (this.formHouseBill.selectedPortOfLoading.data.id === this.formHouseBill.selectedPortOfDischarge.data.id) {
             this.formHouseBill.PortChargeLikePortLoading = true;
         } else {
             this.formHouseBill.PortChargeLikePortLoading = false;
         }
-
         if (this.formHouseBill.formGroup.valid && this.formHouseBill.selectedPortOfLoading) {
             const body: ITransactionDetail = {
-                jobId: "6A42E788-663A-409D-8F64-7A92582E1679",
+                jobId: this.jobId,
                 mawb: this.formHouseBill.mtBill.value,
                 saleManId: this.formHouseBill.selectedSaleman.data.saleMan_ID,
                 shipperId: this.formHouseBill.selectedShipper.data.id,
@@ -73,7 +81,8 @@ export class CreateHouseBillComponent extends AppForm {
                 originBLNumber: this.formHouseBill.originBLNumber.value.value,
                 referenceNo: this.formHouseBill.referenceNo.value,
                 customerId: this.formHouseBill.selectedCustomer.value
-            }
+            };
+
             this._documentationRepo.createHousebill(body)
                 .pipe(
                     catchError(this.catchError),

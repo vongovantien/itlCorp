@@ -3,12 +3,14 @@ import { AppList } from 'src/app/app.list';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
+import { catchError, distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
+import { AppForm } from 'src/app/app.form';
 
 @Component({
     selector: 'app-form-add-house-bill',
     templateUrl: './form-add-house-bill.component.html'
 })
-export class FormAddHouseBillComponent extends AppList {
+export class FormAddHouseBillComponent extends AppForm {
     formGroup: FormGroup;
     mtBill: AbstractControl;
     hwbno: AbstractControl;
@@ -254,6 +256,19 @@ export class FormAddHouseBillComponent extends AppList {
         this.getListPort();
         this.getListSupplier();
         this.getListProvince();
+
+        this.formGroup.controls['ETDTime'].valueChanges
+            .pipe(
+                distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe((value: { startDate: any, endDate: any }) => {
+                this.minDate = value.startDate; // * Update min date
+
+                this.resetFormControl(this.formGroup.controls["ETATime"]);
+
+            });
+
     }
 
 
@@ -308,6 +323,8 @@ export class FormAddHouseBillComponent extends AppList {
                 break;
         }
     }
+
+
 
 
 

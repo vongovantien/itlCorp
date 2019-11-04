@@ -7,7 +7,7 @@ export const environment = {
         ACCOUNTING: "test.api-efms.itlvn.com/Accounting",
         DOCUMENTATION: "localhost:44366",
         // CATALOGUE: "localhost:44361",
-        CATALOGUE: "localhost:44361",
+        CATALOGUE: "test.api-efms.itlvn.com/Catalogue",
         OPERATION: "test.api-efms.itlvn.com/Operation",
         // SYSTEM: "localhost:44360",
         SYSTEM: "test.api-efms.itlvn.com/System",
