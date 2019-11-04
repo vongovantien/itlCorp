@@ -1,12 +1,15 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace eFMS.API.Documentation.DL.Services
@@ -15,14 +18,178 @@ namespace eFMS.API.Documentation.DL.Services
     {
         private readonly IContextBase<CsTransactionDetail> detailTransactionRepository;
         private readonly IContextBase<CsArrivalFrieghtChargeDefault> freightChargeDefaultRepository;
+        private readonly IContextBase<CsArrivalAndDeliveryDefault> arrivalDeliveryDefaultRepository;
+        private readonly IContextBase<CsTransaction> transactionRepository;
+        private readonly ICurrentUser currentUser;
+        private readonly IContextBase<CatCharge> chargeRepository;
+        private readonly IContextBase<CatUnit> unitRepository;
+
         public CsArrivalFrieghtChargeService(IContextBase<CsArrivalFrieghtCharge> repository, 
             IMapper mapper,
             IContextBase<CsTransactionDetail> detailTransaction,
-            IContextBase<CsArrivalFrieghtChargeDefault> freightChargeDefault
+            IContextBase<CsArrivalFrieghtChargeDefault> freightChargeDefault,
+            IContextBase<CsArrivalAndDeliveryDefault> arrivalDeliveryDefault,
+            ICurrentUser currUser,
+            IContextBase<CsTransaction> transactionRepo,
+            IContextBase<CatCharge> chargeRepo,
+            IContextBase<CatUnit> unitRepo
             ) : base(repository, mapper)
         {
             detailTransactionRepository = detailTransaction;
             freightChargeDefaultRepository = freightChargeDefault;
+            arrivalDeliveryDefaultRepository = arrivalDeliveryDefault;
+            currentUser = currUser;
+            transactionRepository = transactionRepo;
+            chargeRepository = chargeRepo;
+            unitRepository = unitRepo;
+        }
+
+        public CsArrivalViewModel GetArrival(Guid hblid, string transactionType)
+        {
+            CsArrivalViewModel result = new CsArrivalViewModel { HBLID = hblid };
+            var data = detailTransactionRepository.Get(x => x.Id == hblid)?.FirstOrDefault();
+            if(data != null)
+            {
+                result.ArrivalNo = data.ArrivalNo;
+                result.ArrivalHeader = data.ArrivalHeader;
+                result.ArrivalFirstNotice = data.ArrivalFirstNotice;
+                result.ArrivalSecondNotice = data.ArrivalSecondNotice;
+                result.ArrivalFooter = data.ArrivalFooter;
+
+                result.CsArrivalFrieghtCharges = GetFreightCharge(hblid);
+            }
+            else
+            {
+                var arrivalDefault = GetArrivalDefault(transactionType, currentUser.UserID);
+                if (arrivalDefault != null)
+                {
+                    result.ArrivalHeader = arrivalDefault.ArrivalHeader;
+                    result.ArrivalFooter = arrivalDefault.ArrivalFooter;
+                }
+                result.CsArrivalFrieghtCharges = GetFreightChargeDefault(hblid, transactionType);
+            }
+            return result;
+        }
+
+        private List<CsArrivalFrieghtChargeModel> GetFreightCharge(Guid hblid)
+        {
+            var result = new List<CsArrivalFrieghtChargeModel>();
+            var freightCharges = DataContext.Get(x => x.Hblid == hblid).ProjectTo<CsArrivalFrieghtChargeModel>(mapper.ConfigurationProvider);
+            if (freightCharges.Count() > 0)
+            {
+                var charges = chargeRepository.Get();
+                var units = unitRepository.Get();
+                var tempdata = freightCharges.Join(charges, x => x.ChargeId, y => y.Id, (x, y) => new { ArrivalFrieghtCharge = x, ChargeCode = y.Code })
+                    .Join(units, x => x.ArrivalFrieghtCharge.UnitId, y => y.Id, (x, y) => new { CsArrivalFrieghtCharge = x, UnitName = y.Code });
+                foreach (var item in tempdata)
+                {
+                    var charge = item.CsArrivalFrieghtCharge.ArrivalFrieghtCharge;
+                    charge.CurrencyName = charge.CurrencyId;
+                    charge.ChargeName = item.CsArrivalFrieghtCharge.ChargeCode;
+                    charge.UnitName = item.UnitName;
+                    result.Add(charge);
+                }
+            }
+            return result;
+        }
+
+        private List<CsArrivalFrieghtChargeModel> GetFreightChargeDefault(Guid hblid, string transactionType)
+        {
+            var results = new List<CsArrivalFrieghtChargeModel>();
+            var defaultFreightCharges = freightChargeDefaultRepository.Get(x => x.UserDefault == currentUser.UserID && x.TransactionType == transactionType)
+                .Select(x => new CsArrivalFrieghtChargeModel
+                {
+                    Id = Guid.Empty,
+                    Hblid = hblid,
+                    Description = null,
+                    ChargeId = x.ChargeId,
+                    Quantity = x.Quantity,
+                    UnitId = x.UnitId,
+                    UnitPrice = x.UnitPrice,
+                    CurrencyId = x.CurrencyId,
+                    Vatrate = x.Vatrate,
+                    Total = x.Total,
+                    ExchangeRate = x.ExchangeRate,
+                    Notes = x.Notes,
+                    IsShow = x.IsShow,
+                    IsFull = x.IsFull,
+                    IsTick = x.IsTick
+                });
+            if (defaultFreightCharges.Count() > 0)
+            {
+                var charges = chargeRepository.Get();
+                var units = unitRepository.Get();
+                var tempdata = defaultFreightCharges.Join(charges, x => x.ChargeId, y => y.Id, (x, y) => new { FreightCharge = x, ChargeName = y.Code })
+                    .Join(units, x => x.FreightCharge.UnitId, y => y.Id, (x, y) => new { x, y.Code });
+                results = new List<CsArrivalFrieghtChargeModel>();
+                foreach (var item in tempdata)
+                {
+                    var charge = item.x.FreightCharge;
+                    charge.ChargeName = item.x.ChargeName;
+                    charge.UnitName = item.Code;
+                    results.Add(charge);
+                }
+            }
+            return results;
+        }
+
+        public CsArrivalDefaultModel GetArrivalDefault(string transactionType, string userDefault)
+        {
+            var data = arrivalDeliveryDefaultRepository.Get(x => x.TransactionType == transactionType && x.UserDefault == userDefault)?.FirstOrDefault();
+            if(data != null)
+            {
+                var result = new CsArrivalDefaultModel
+                {
+                    UserDefault = userDefault,
+                    TransactionType = transactionType,
+                    ArrivalHeader = data.ArrivalHeader,
+                    ArrivalFooter = data.ArrivalFooter
+                };
+                return result;
+            }
+            return null;
+        }
+
+        public DeliveryOrderViewModel GetDeliveryOrder(Guid hblid, string transactionType)
+        {
+            DeliveryOrderViewModel result = new DeliveryOrderViewModel
+            {
+                HBLID = hblid
+            };
+            var data = detailTransactionRepository.Get(x => x.Id == hblid)?.FirstOrDefault();
+            if (data != null)
+            {
+                result.Doheader1 = data.DosentTo1;
+                result.Doheader2 = data.DosentTo2;
+                result.Dofooter = data.Dofooter;
+            }
+            else
+            {
+                var deliveryOrder = GetDeliveryOrderDefault(transactionType, currentUser.UserID);
+                if(deliveryOrder != null)
+                {
+                    result.Doheader1 = deliveryOrder.Doheader1;
+                    result.Doheader2 = deliveryOrder.Doheader2;
+                    result.Dofooter = deliveryOrder.Dofooter;
+                }
+            }
+            return result;
+        }
+
+        public CsDeliveryOrderDefaultModel GetDeliveryOrderDefault(string transactionType, string userDefault)
+        {
+            CsDeliveryOrderDefaultModel result = null;
+            var data = arrivalDeliveryDefaultRepository.Get(x => x.TransactionType == transactionType && x.UserDefault == userDefault)?.FirstOrDefault();
+            if (data != null)
+            {
+                result = new CsDeliveryOrderDefaultModel
+                {
+                    Doheader1 = data.Doheader1,
+                    Doheader2 = data.Doheader2,
+                    Dofooter = data.Dofooter
+                };
+            }
+            return result;
         }
 
         public HandleState SetArrivalChargeDefault(CsArrivalFrieghtChargeDefaultEditModel model)
@@ -39,13 +206,67 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 item.UserDefault = model.UserDefault;
                 item.TransactionType = model.TransactionType;
+                item.UserCreated = item.UserModified = currentUser.UserID;
+                item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                 freightChargeDefaultRepository.Add(item, false);
             }
             freightChargeDefaultRepository.SubmitChanges();
             return new HandleState();
         }
 
-        public HandleState UpdateArrival(CsArrivalFrieghtChargeEditModel model)
+        public HandleState SetArrivalHeaderFooterDefault(CsArrivalDefaultModel model)
+        {
+            var result = new HandleState();
+            var data = arrivalDeliveryDefaultRepository.Get(x => x.UserDefault == model.UserDefault && x.TransactionType == model.TransactionType)?.FirstOrDefault();
+            if(data != null)
+            {
+                var arrivalHeaderDefault = data;
+                arrivalHeaderDefault.ArrivalHeader = model.ArrivalHeader;
+                arrivalHeaderDefault.ArrivalFooter = model.ArrivalFooter;
+                result = arrivalDeliveryDefaultRepository.Update(arrivalHeaderDefault, x => x.UserDefault == model.UserDefault && x.TransactionType == model.TransactionType);
+            }
+            else
+            {
+                var arrivalHeaderDefault = new CsArrivalAndDeliveryDefault
+                {
+                    ArrivalHeader = model.ArrivalHeader,
+                    ArrivalFooter = model.ArrivalFooter,
+                    UserDefault = model.UserDefault,
+                    TransactionType = model.TransactionType
+                };
+                result = arrivalDeliveryDefaultRepository.Add(arrivalHeaderDefault);
+            }
+            return result;
+        }
+
+        public HandleState SetDeliveryOrderHeaderFooterDefault(CsDeliveryOrderDefaultModel model)
+        {
+            var result = new HandleState();
+            var data = arrivalDeliveryDefaultRepository.Get(x => x.UserDefault == model.UserDefault && x.TransactionType == model.TransactionType);
+            if (data != null)
+            {
+                var doDefault = data.FirstOrDefault();
+                doDefault.Doheader1 = model.Doheader1;
+                doDefault.Doheader2 = model.Doheader2;
+                doDefault.ArrivalFooter = model.Dofooter;
+                result = arrivalDeliveryDefaultRepository.Update(doDefault, x => x.UserDefault == model.UserDefault && x.TransactionType == model.TransactionType);
+            }
+            else
+            {
+                var doDefault = new CsArrivalAndDeliveryDefault
+                {
+                    Doheader1 = model.Doheader1,
+                    Doheader2 = model.Doheader2,
+                    Dofooter = model.Dofooter,
+                    UserDefault = model.UserDefault,
+                    TransactionType = model.TransactionType
+                };
+                result = arrivalDeliveryDefaultRepository.Add(doDefault);
+            }
+            return result;
+        }
+
+        public HandleState UpdateArrival(CsArrivalViewModel model)
         {
             var detailTransaction = detailTransactionRepository.First(x => x.Id == model.HBLID);
             if (detailTransaction == null) return new HandleState("Not found");
@@ -66,7 +287,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     item.Id = Guid.NewGuid();
                     item.Hblid = model.HBLID;
-                    item.UserCreated = item.UserModified = "admin";
+                    item.UserCreated = item.UserModified = currentUser.UserID;
                     item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                     DataContext.Add(item, false);
                 }
@@ -74,6 +295,17 @@ namespace eFMS.API.Documentation.DL.Services
                 DataContext.SubmitChanges();
             }
             return hs;
+        }
+
+        public HandleState UpdateDeliveryOrder(DeliveryOrderViewModel model)
+        {
+            var detailTransaction = detailTransactionRepository.First(x => x.Id == model.HBLID);
+            if (detailTransaction == null) return new HandleState("Not found");
+            detailTransaction.DosentTo1 = model.Doheader1;
+            detailTransaction.DosentTo2 = model.Doheader2;
+            detailTransaction.Dofooter = model.Dofooter;
+            var result = detailTransactionRepository.Update(detailTransaction, x => x.Id == model.HBLID);
+            return result;
         }
     }
 }

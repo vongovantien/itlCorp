@@ -4,12 +4,12 @@
         <name>eFMS.API.Documentation</name>
     </assembly>
     <members>
-        <member name="T:eFMS.API.Documentation.Controllers.CsArrivalController">
+        <member name="T:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController">
             <summary>
             
             </summary>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.LanguageSub},eFMS.API.Documentation.DL.IService.ICsArrivalFrieghtChargeService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.LanguageSub},eFMS.API.Documentation.DL.IService.ICsArrivalFrieghtChargeService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
             <summary>
             constructor
             </summary>
@@ -17,14 +17,58 @@
             <param name="freightChargeService"></param>
             <param name="user"></param>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalController.Update(eFMS.API.Documentation.DL.Models.CsArrivalFrieghtChargeEditModel)">
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.GetArrival(System.Guid,eFMS.API.Documentation.DL.Common.TransactionTypeEnum)">
+            <summary>
+            get arrival by housebill id
+            </summary>
+            <param name="hblid"></param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.GetDeliveryOrder(System.Guid,eFMS.API.Documentation.DL.Common.TransactionTypeEnum)">
+            <summary>
+            get delivery order by housebill id
+            </summary>
+            <param name="hblid"></param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.UpdateArrival(eFMS.API.Documentation.DL.Models.CsArrivalViewModel)">
             <summary>
             update arrival info
             </summary>
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalController.DeleteCharge(System.Guid)">
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.UpdateDeliveryOrder(eFMS.API.Documentation.DL.Models.DeliveryOrderViewModel)">
+            <summary>
+            update delivery order
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.SetArrivalChargeDefault(eFMS.API.Documentation.DL.Models.CsArrivalFrieghtChargeDefaultEditModel)">
+            <summary>
+            set freight charge default of an user in a shipment type
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.SetArrivalHeaderFooterDefault(eFMS.API.Documentation.DL.Models.CsArrivalDefaultModel)">
+            <summary>
+            set header - footer default of arrival
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.SetDeliveryOrderHeaderFooterDefault(eFMS.API.Documentation.DL.Models.CsDeliveryOrderDefaultModel)">
+            <summary>
+            set header - footer default of delivery order
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.DeleteCharge(System.Guid)">
             <summary>
             delete an existed charge
             </summary>

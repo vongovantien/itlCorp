@@ -10,7 +10,14 @@ namespace eFMS.API.Documentation.DL.IService
 {
     public interface ICsArrivalFrieghtChargeService: IRepositoryBase<CsArrivalFrieghtCharge, CsArrivalFrieghtChargeModel>
     {
-        HandleState UpdateArrival(CsArrivalFrieghtChargeEditModel model);
+        CsArrivalViewModel GetArrival(Guid hblid, string transactionType);
+        CsArrivalDefaultModel GetArrivalDefault(string transactionType, string userDefault);
+        DeliveryOrderViewModel GetDeliveryOrder(Guid hblid, string transactionType);
+        CsDeliveryOrderDefaultModel GetDeliveryOrderDefault(string transactionType, string userDefault);
+        HandleState UpdateArrival(CsArrivalViewModel model);
+        HandleState UpdateDeliveryOrder(DeliveryOrderViewModel model);
         HandleState SetArrivalChargeDefault(CsArrivalFrieghtChargeDefaultEditModel model);
+        HandleState SetArrivalHeaderFooterDefault(CsArrivalDefaultModel model);
+        HandleState SetDeliveryOrderHeaderFooterDefault(CsDeliveryOrderDefaultModel model);
     }
 }
