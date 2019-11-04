@@ -19,6 +19,7 @@ import { StoreModule } from '@ngrx/store';
 import { reducers, effects } from './store';
 import { EffectsModule } from '@ngrx/effects';
 import { CdNoteAddPopupComponent } from './components/popup/add-cd-note/add-cd-note.popup';
+import { FCLImportShareModule } from './share-fcl-import.module';
 
 
 
@@ -46,13 +47,11 @@ const routing: Routes = [
 const COMPONENTS = [
     SeaFCLImportManagementFormSearchComponent,
     SeaFClImportFormCreateComponent,
-    SeaFCLImportShipmentGoodSummaryComponent,
-
+    CdNoteAddPopupComponent,
 ];
 
 const LIB = [
     CollapseModule.forRoot(),
-    ModalModule.forRoot(),
     TabsModule.forRoot(),
     ModalModule.forRoot(),
     PaginationModule.forRoot(),
@@ -73,6 +72,7 @@ const LIB = [
     ],
     imports: [
         NgxDaterangepickerMd,
+        FCLImportShareModule,
         CommonModule,
         SharedModule,
         RouterModule.forChild(routing),
