@@ -16,6 +16,7 @@ namespace eFMS.API.Setting.DL.Models
         public DateTime? EffectiveDate { get; set; }
         public DateTime? ExpiredDate { get; set; }
         public DateTime? DatetimeCreated { get; set; }
+        public DateTime? DatetimeModified { get; set; }
         public bool? Status { get; set; }
 
     }
