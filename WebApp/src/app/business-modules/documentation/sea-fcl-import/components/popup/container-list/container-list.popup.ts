@@ -17,7 +17,6 @@ import { Commodity } from 'src/app/shared/models/catalogue/commodity.model';
 @Component({
     selector: 'container-list-popup',
     templateUrl: './container-list.popup.html',
-    styleUrls: ['./container-list.popup.scss']
 })
 export class SeaFCLImportContainerListPopupComponent extends PopupBase {
 
