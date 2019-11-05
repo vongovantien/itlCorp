@@ -46,7 +46,7 @@ const COMPONENTS = [
     SeaFCLImportManagementFormSearchComponent,
     SeaFClImportFormCreateComponent,
     SeaFCLImportShipmentGoodSummaryComponent,
-    CdNoteAddPopupComponent
+    CdNoteAddPopupComponent,
     SeaFCLImportContainerListPopupComponent
 ];
 
