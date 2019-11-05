@@ -29,7 +29,6 @@ export class SeaFClImportFormCreateComponent extends AppForm {
     selectedPortDestination: Partial<CommonInterface.IComboGridData | any> = {};
     selectedPortDelivery: Partial<CommonInterface.IComboGridData | any> = {};
 
-
     carries: any[] = [];
     agents: any[] = [];
 
