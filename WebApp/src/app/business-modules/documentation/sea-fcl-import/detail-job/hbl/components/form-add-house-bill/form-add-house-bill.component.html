@@ -1,3 +1,4 @@
+<ng-content></ng-content>
 <div class=" form-add-house-bill">
     <form [formGroup]="formGroup">
         <div class="m-portlet">
@@ -36,6 +37,7 @@
                         </div>
                     </div>
                     <div class="col-lg-4">
+                        <!-- {{configSaleman.dataSource | json}} -->
                         <div class="form-group" [ngClass]="{'m-form__group has-danger': !selectedSaleman.value }">
                             <label class="form-control-label">
                                 Saleman in Charge <span class="m--font-danger">(*)</span>

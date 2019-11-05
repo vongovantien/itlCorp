@@ -89,9 +89,10 @@ export class CreateHouseBillComponent extends AppForm {
     }
 
 
+
     create() {
         this.formHouseBill.isSubmited = true;
-        if (!!this.formHouseBill.selectedPortOfLoading && this.formHouseBill.selectedPortOfDischarge) {
+        if (this.formHouseBill.selectedPortOfLoading.data !== undefined && this.formHouseBill.selectedPortOfDischarge.data !== undefined) {
             if (this.formHouseBill.selectedPortOfLoading.data.id === this.formHouseBill.selectedPortOfDischarge.data.id) {
                 this.formHouseBill.PortChargeLikePortLoading = true;
             } else {
@@ -138,6 +139,7 @@ export class CreateHouseBillComponent extends AppForm {
                 originBLNumber: this.formHouseBill.originBLNumber.value.value,
                 referenceNo: this.formHouseBill.referenceNo.value,
                 customerId: this.formHouseBill.selectedCustomer.value,
+                oceanVoyNo: this.formHouseBill.oceanVoyNo.value,
                 csMawbcontainers: this.fclImportAddModel.csMawbcontainers
             };
 
@@ -165,6 +167,7 @@ export interface ITransactionDetail {
     jobId: string;
     mawb: string;
     saleManId: string;
+    oceanVoyNo: string;
     shipperId: string;
     shipperDescription: string;
     consigneeId: string;

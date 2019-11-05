@@ -14,5 +14,6 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public string SaleManName { get; set; }
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
+        public Guid? Id { get; set; }
     }
 }

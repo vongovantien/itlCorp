@@ -9,6 +9,7 @@ import { CreateHouseBillComponent } from './create/create-house-bill.component';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { FormAddHouseBillComponent } from './components/form-add-house-bill/form-add-house-bill.component';
 import { FCLImportShareModule } from '../../share-fcl-import.module';
+import { DetailHouseBillComponent } from './detail/detail-house-bill.component';
 
 const routing: Routes = [
     {
@@ -20,7 +21,7 @@ const routing: Routes = [
         data: { name: 'New House Bill Detail', path: ':id', level: 5 }
     },
     {
-        path: ':id', component: SeaFCLImportHBLComponent,
+        path: ':id', component: DetailHouseBillComponent,
         data: { name: 'House Bill Detail', path: ':id', level: 5 }
     }
 ];
@@ -36,7 +37,8 @@ const COMPONENTS = [
         SeaFCLImportHBLComponent,
         ...COMPONENTS,
         CreateHouseBillComponent,
-        FormAddHouseBillComponent
+        FormAddHouseBillComponent,
+        DetailHouseBillComponent
     ],
     imports: [
         CommonModule,

@@ -43,6 +43,16 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [HttpGet]
+        [Route("GetById")]
+        public IActionResult GetById(Guid Id)
+        {
+            CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { Id = Id };
+            var hbl = csTransactionDetailService.GetById(criteria);
+            ResultHandle hs = new ResultHandle { Data = hbl, Status = true };
+            return Ok(hs);
+        }
+
+        [HttpGet]
         [Route("GetHbDetails")]
         public CsTransactionDetailModel GetHbDetails(Guid JobId,Guid HbId)
         {
@@ -125,6 +135,22 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("{id}")]
+        public IActionResult GetBy(Guid id)
+        {
+            var result = csTransactionDetailService.First(x => x.Id == id);
+           
+            if (result == null)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = "Error", Data = result });
+            }
+            else
+            {
+                return Ok(new ResultHandle { Status = true, Message = "Success", Data = result });
+            }
         }
 
         private string CheckExist(CsTransactionDetailModel model)

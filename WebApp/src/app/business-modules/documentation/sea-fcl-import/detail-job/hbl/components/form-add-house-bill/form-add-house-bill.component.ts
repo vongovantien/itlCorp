@@ -3,7 +3,7 @@ import { AppList } from 'src/app/app.list';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { catchError, distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, map, takeUntil, tap } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
 import { FCLImportAddModel } from 'src/app/shared/models';
 
@@ -32,6 +32,9 @@ export class FormAddHouseBillComponent extends AppForm {
     issueHBLDate: AbstractControl;
     originBLNumber: AbstractControl;
     referenceNo: AbstractControl;
+    consigneeDescription: AbstractControl;
+    shipperDescription: AbstractControl;
+    oceanVoyNo: AbstractControl;
 
 
     configCustomer: CommonInterface.IComboGirdConfig | any = {};
@@ -92,7 +95,6 @@ export class FormAddHouseBillComponent extends AppForm {
 
     ngOnInit() {
 
-        this.initForm();
 
         this.configCustomer = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
@@ -107,7 +109,6 @@ export class FormAddHouseBillComponent extends AppForm {
         this.configSaleman = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
                 { field: 'saleMan_ID', label: 'Sale Man' },
-
             ],
         }, { selectedDisplayFields: ['saleMan_ID'], });
 
@@ -181,9 +182,12 @@ export class FormAddHouseBillComponent extends AppForm {
                 { field: 'code', label: 'Code' }
             ],
         }, { selectedDisplayFields: ['name_EN'], });
+        this.initForm();
 
+    }
 
-
+    update(formdata: any) {
+        // this.formGroup.patchValue(formdata);
     }
 
     initForm() {
@@ -239,7 +243,8 @@ export class FormAddHouseBillComponent extends AppForm {
         this.finalDestinationPlace = this.formGroup.controls['finalDestination'];
         this.localVessel = this.formGroup.controls['feederVessel1'];
         this.localVoyNo = this.formGroup.controls['feederVoyageNo'];
-        this.oceanVessel = this.formGroup.controls['arrivalVoyage'];
+        this.oceanVessel = this.formGroup.controls['arrivalVessel'];
+        this.oceanVoyNo = this.formGroup.controls['arrivalVoyage'];
         this.documentDate = this.formGroup.controls['documnentDate'];
         this.documentNo = this.formGroup.controls['documentNo'];
         this.etawarehouse = this.formGroup.controls['dateETA'];
@@ -249,7 +254,8 @@ export class FormAddHouseBillComponent extends AppForm {
         this.issueHBLDate = this.formGroup.controls['dateOfIssued'];
         this.originBLNumber = this.formGroup.controls['numberOfOrigin'];
         this.referenceNo = this.formGroup.controls['referenceNo'];
-
+        this.consigneeDescription = this.formGroup.controls['ConsigneeDescription'];
+        this.shipperDescription = this.formGroup.controls['ShipperDescription'];
         console.log(this.eta);
         this.etd.valueChanges
             .pipe(
@@ -273,6 +279,7 @@ export class FormAddHouseBillComponent extends AppForm {
                 this.resetFormControl(this.etawarehouse);
 
             });
+
         this.getListCustomer();
         this.getListShipper();
         this.getListConsignee();
@@ -281,20 +288,37 @@ export class FormAddHouseBillComponent extends AppForm {
         this.getListProvince();
 
 
+
     }
 
+    bindDescriptionModel(data: any, key: string) {
+        switch (key) {
+            case 'Customer':
+                const checkConsigneeExistence = idParam => this.configConsignee.dataSource.some(({ id }) => id === idParam);
+                if (this.selectedConsignee.value === undefined && checkConsigneeExistence(this.selectedCustomer.data.id)) {
+                    this.selectedConsignee = { field: 'id', value: data.id, data: data };
+                    this.consigneedescriptionModel = this.selectedConsignee.data.partnerNameEn + "\n" +
+                        this.selectedConsignee.data.addressShippingEn + "\n" +
+                        "Tel: " + this.selectedConsignee.data.tel + "\n" +
+                        "Fax: " + this.selectedConsignee.data.fax + "\n";
+                    this.formGroup.controls['ConsigneeDescription'].setValue(this.consigneedescriptionModel);
+                }
+                break;
+
+        }
+
+    }
 
     onSelectDataFormInfo(data: any, key: string) {
         switch (key) {
             case 'Customer':
-                this.selectedCustomer = { field: 'shortName', value: data.id, data: data };
-                if (this.selectedConsignee === {}) {
-                    this.selectedConsignee = { field: 'id', value: data.id };
-                }
+                this.selectedCustomer = { field: 'id', value: data.id, data: data };
+                this.bindDescriptionModel(data, 'Customer');
+
                 this.getListSaleman(this.selectedCustomer.data.id);
                 break;
             case 'Saleman':
-                this.selectedSaleman = { field: 'saleMan_ID', value: data.saleMan_ID, data: data };
+                this.selectedSaleman = { field: 'id', value: data.saleMan_ID, data: data };
                 break;
             case 'Shipper':
                 this.selectedShipper = { field: 'shortName', value: data.id, data: data };
@@ -385,42 +409,14 @@ export class FormAddHouseBillComponent extends AppForm {
     }
 
     getListSaleman(id: any) {
-        this._catalogueRepo.getListSaleman(id).subscribe((res: any) => { this.configSaleman.dataSource = res; });
+        this._catalogueRepo.getListSaleman(id).subscribe((res: any) => {
+            if (!!res) {
+                this.configSaleman.dataSource = res;
+            }
+            else {
+                this.configSaleman.dataSource = [];
+            }
+
+        });
     }
 }
-
-// export interface ITransactionDetail {
-//     jobId: string;
-//     mawb: string;
-//     saleManId: string;
-//     shipperId: string;
-//     shipperDescription: string;
-//     consigneeId: string;
-//     consigneeDescription: string;
-//     notifyPartyId: string;
-//     notifyPartyDescription: string;
-//     alsoNotifyPartyId: string;
-//     alsoNotifyPartyDescription: string;
-//     hwbno: string;
-//     hbltype: string;
-//     etd: string;
-//     eta: string;
-//     pickupPlace: string;
-//     pol: string;
-//     pod: string;
-//     finalDestinationPlace: string;
-//     coloaderId: string;
-//     localVessel: string;
-//     localVoyNo: string;
-//     oceanVessel: string;
-//     documentDate: string;
-//     documentNo: string;
-//     etawarehouse: string;
-//     warehouseNotice: string;
-//     shippingMark: string;
-//     remark: string;
-//     issueHBLPlace: string;
-//     issueHBLDate: string;
-//     originBLNumber: number;
-//     referenceNo: string;
-// }
