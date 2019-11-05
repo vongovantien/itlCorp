@@ -17,7 +17,8 @@ namespace eFMS.API.Documentation.DL.IService
         List<object> GroupChargeByHB(Guid id,string partnerId,bool isHouseBillID);
         List<CatPartner> GetAllParner(Guid id,bool isHouseBillID);
         ChargeShipmentResult GetListChargeShipment(ChargeShipmentCriteria criteria);
-        HousbillProfit GetTotalProfit(Guid hblid);
+        HousbillProfit GetHouseBillTotalProfit(Guid hblid);
+        List<HousbillProfit> GetShipmentTotalProfit(Guid jobId);
         HandleState DeleteMultiple(List<Guid> listId);
         HandleState AddAndUpate(List<CsShipmentSurchargeModel> list);
     }

@@ -26,24 +26,35 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<OpsTransaction> opsTransRepository;
         private readonly IContextBase<CsTransaction> csTransRepository;
+        private readonly IContextBase<CsTransactionDetail> detailRepository;
+        private readonly IContextBase<CatUnit> catUnitRepository;
+        private readonly IContextBase<CatCommodity> catCommodityRepository;
+
         public CsMawbcontainerService(IContextBase<CsMawbcontainer> repository, 
             IContextBase<OpsTransaction> opsTransRepo,
             IContextBase<CsTransaction> csTransRepo,
-            IMapper mapper, ICurrentUser user, IStringLocalizer<LanguageSub> localize) : base(repository, mapper)
+            IMapper mapper, ICurrentUser user, 
+            IStringLocalizer<LanguageSub> localize,
+            IContextBase<CsTransactionDetail> detailRepo,
+            IContextBase<CatUnit> unitRepo,
+            IContextBase<CatCommodity> catCommodityRepo) : base(repository, mapper)
         {
             stringLocalizer = localize;
             currentUser = user;
             opsTransRepository = opsTransRepo;
             csTransRepository = csTransRepo;
+            detailRepository = detailRepo;
+            catUnitRepository = unitRepo;
+            catCommodityRepository = catCommodityRepo;
         }
 
         public List<object> ListContOfHB(Guid JobId)
         {
-            var houseBills = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == JobId).ToList();
+            var houseBills = detailRepository.Get(x => x.JobId == JobId).ToList();
             List<object> returnList = new List<object>();
             foreach(var item in houseBills)
             {
-                var conts = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == item.Id).ToList();
+                var conts = DataContext.Get(x => x.Hblid == item.Id).ToList();
                 foreach(var c in conts)
                 {
                     var obj = new { c.ContainerTypeId, c.Quantity,hblid=item.Id };
@@ -207,7 +218,6 @@ namespace eFMS.API.Documentation.DL.Services
         }
 
         private List<vw_csMAWBContainer> GetView(){
-            
             List<vw_csMAWBContainer> results = ((eFMSDataContext)DataContext.DC).GetViewData<vw_csMAWBContainer>();
             return results;
         }
@@ -215,16 +225,15 @@ namespace eFMS.API.Documentation.DL.Services
         {
             try
             {
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 foreach (var item in data)
                 {
                     var container = mapper.Map<CsMawbcontainer>(item);
                     container.DatetimeModified = DateTime.Now;
                     container.UserModified = currentUser.UserID;
                     container.Id = Guid.NewGuid();
-                    dc.CsMawbcontainer.Add(container);
+                    DataContext.Add(container, false);
                 }
-                dc.SaveChanges();
+                DataContext.SubmitChanges();
                 return new HandleState();
             }
             catch (Exception ex)
@@ -234,12 +243,12 @@ namespace eFMS.API.Documentation.DL.Services
         }
         public List<CsMawbcontainerImportModel> CheckValidContainerImport(List<CsMawbcontainerImportModel> list)
         {
-            var units = ((eFMSDataContext)DataContext.DC).CatUnit.ToList();
-            var commpdities = ((eFMSDataContext)DataContext.DC).CatCommodity.ToList();
+            var units = catUnitRepository.Get().ToList();
+            var commodities = catCommodityRepository.Get();
             var containers = units.Where(x => x.UnitType == "Container");
             var packages = units.Where(x => x.UnitType == "Package");
             var unitOfMeasures = units.Where(x => x.UnitType == "Weight Measurement");
-            var containerShipments = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.ToList();
+            var containerShipments = DataContext.Get().ToList();
             list.ForEach(item => {
                 if (string.IsNullOrEmpty(item.ContainerTypeName))
                 {
@@ -381,7 +390,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 if (!string.IsNullOrEmpty(item.CommodityName))
                 {
-                    var commodity = commpdities.FirstOrDefault(x => x.CommodityNameEn == item.CommodityName);
+                    var commodity = commodities.FirstOrDefault(x => x.CommodityNameEn == item.CommodityName);
                     if (commodity == null)
                     {
                         item.IsValid = false;
