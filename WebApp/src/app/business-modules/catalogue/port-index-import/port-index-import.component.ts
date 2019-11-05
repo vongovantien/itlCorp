@@ -3,7 +3,7 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { PagingService } from 'src/app/shared/services/paging-service';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { BaseService } from 'src/app/shared/services/base.service';
-import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
+import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { SystemConstants } from 'src/constants/system.const';
@@ -27,7 +27,7 @@ export class PortIndexImportComponent implements OnInit {
   pager: PagerSetting = PAGINGSETTING;
   inProgress: boolean = false;
   @ViewChild('form', { static: false }) form: any;
-  @ViewChild(PaginationComponent, { static: false }) child: any;
+  @ViewChild(AppPaginationComponent, { static: false }) child: any;
   @ViewChild(NgProgressComponent, { static: false }) progressBar: NgProgressComponent;
 
   constructor(

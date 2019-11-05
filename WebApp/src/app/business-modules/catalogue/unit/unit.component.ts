@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
+import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { NgForm } from '@angular/forms';
 import { Unit } from 'src/app/shared/models/catalogue/catUnit.model';
 import { SortService } from 'src/app/shared/services/sort.service';
@@ -34,7 +34,7 @@ export class UnitComponent implements OnInit {
   unitTypes: any[];
   currentUnitType: any = [];
   titleConfirmDelete = "Do you want to delete this unit";
-  @ViewChild(PaginationComponent, { static: false }) child;
+  @ViewChild(AppPaginationComponent, { static: false }) child;
 
   constructor(
     private excelService: ExcelService,

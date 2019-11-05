@@ -16,7 +16,7 @@ import { Router } from '@angular/router';
 import { AirShipSupComponent } from './air-ship-sup/air-ship-sup.component';
 import { CarrierComponent } from './carrier/carrier.component';
 import { ShipperComponent } from './shipper/shipper.component';
-import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
+import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { SystemConstants } from 'src/constants/system.const';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
@@ -54,7 +54,7 @@ export class PartnerComponent implements OnInit {
     typeButton: ButtonType.export
   };
   activeTab: string = this.tabName.allTab;
-  @ViewChild(PaginationComponent, { static: false }) child: any;
+  @ViewChild(AppPaginationComponent, { static: false }) child: any;
   // partnerType: any;
 
   @ViewChild(AgentComponent, { static: false }) agentComponent: any;

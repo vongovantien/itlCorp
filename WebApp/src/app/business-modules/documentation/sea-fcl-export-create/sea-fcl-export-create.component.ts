@@ -1,6 +1,6 @@
 import moment from 'moment/moment'
 import { Component, OnInit, ViewChild, ChangeDetectorRef, Output, EventEmitter, ElementRef } from '@angular/core';
-// import { PaginationComponent } from 'ngx-bootstrap';
+// import { AppPaginationComponent } from 'ngx-bootstrap';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';

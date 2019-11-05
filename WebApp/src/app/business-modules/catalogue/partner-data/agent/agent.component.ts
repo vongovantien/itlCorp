@@ -8,7 +8,7 @@ import { SortService } from 'src/app/shared/services/sort.service';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { PARTNERDATACOLUMNSETTING } from '../partner-data.columns';
 import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
-import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
+import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
@@ -27,7 +27,7 @@ export class AgentComponent implements OnInit {
   criteria: any = { partnerGroup: PartnerGroupEnum.AGENT };
   isDesc: boolean = false;
   keySortDefault = "id";
-  @ViewChild(PaginationComponent, { static: false }) child;
+  @ViewChild(AppPaginationComponent, { static: false }) child;
   @Output() deleteConfirm = new EventEmitter<any>();
   @Output() detail = new EventEmitter<any>();
 
