@@ -23,19 +23,22 @@ namespace eFMS.API.Documentation.DL.Services
     public class CsShipmentSurchargeService : RepositoryBase<CsShipmentSurcharge, CsShipmentSurchargeModel>, ICsShipmentSurchargeService
     {
         private readonly IStringLocalizer stringLocalizer;
-        IContextBase<CsTransactionDetail> tranDetailRepository;
-        IContextBase<CatPartner> partnerRepository;
-        IContextBase<OpsTransaction> opsTransRepository;
+        private readonly IContextBase<CsTransactionDetail> tranDetailRepository;
+        private readonly IContextBase<CatPartner> partnerRepository;
+        private readonly IContextBase<OpsTransaction> opsTransRepository;
+        private readonly IContextBase<CatCurrencyExchange> currentExchangeRateRepository;
 
         public CsShipmentSurchargeService(IContextBase<CsShipmentSurcharge> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer,
             IContextBase<CsTransactionDetail> tranDetailRepo,
             IContextBase<CatPartner> partnerRepo,
-            IContextBase<OpsTransaction> opsTransRepo) : base(repository, mapper)
+            IContextBase<OpsTransaction> opsTransRepo,
+            IContextBase<CatCurrencyExchange> currentExchangeRateRepo) : base(repository, mapper)
         {
             stringLocalizer = localizer;
             tranDetailRepository = tranDetailRepo;
             partnerRepository = partnerRepo;
             opsTransRepository = opsTransRepo;
+            currentExchangeRateRepository = currentExchangeRateRepo;
         }
 
         public HandleState DeleteCharge(Guid chargeId)
@@ -46,7 +49,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var charge = DataContext.Where(x => x.Id == chargeId).FirstOrDefault();
                 if (charge == null)
                     hs = new HandleState(stringLocalizer[LanguageSub.MSG_SURCHARGE_NOT_FOUND].Value);
-                if (charge != null && (charge.CreditNo != null || charge.Soano != null))
+                if (charge != null && (charge.CreditNo != null || charge.Soano != null || charge.DebitNo != null || charge.PaySoano != null))
                 {
                     hs = new HandleState(stringLocalizer[LanguageSub.MSG_SURCHARGE_NOT_ALLOW_DELETED].Value);
                 }
@@ -377,6 +380,70 @@ namespace eFMS.API.Documentation.DL.Services
                 results.Add(charge);
             }
             return results;
+        }
+
+        public HousbillProfit GetTotalProfit(Guid hblid)
+        {
+            throw new NotImplementedException();
+        }
+
+        public HandleState DeleteMultiple(List<Guid> listId)
+        {
+            var hs = new HandleState();
+            try
+            {
+                foreach(var item in listId)
+                {
+                    var charge = DataContext.Where(x => x.Id == item).FirstOrDefault();
+                    if (charge == null)
+                    {
+                        hs = new HandleState(stringLocalizer[LanguageSub.MSG_SURCHARGE_NOT_FOUND].Value);
+                        return hs;
+                    }
+                    if (charge != null && (charge.CreditNo != null || charge.Soano != null || charge.DebitNo != null || charge.PaySoano != null))
+                    {
+                        hs = new HandleState(stringLocalizer[LanguageSub.MSG_SURCHARGE_NOT_ALLOW_DELETED].Value);
+                        return hs;
+                    }
+                    hs = DataContext.Delete(x => x.Id == item, false);
+                    if (hs.Success == false)
+                    {
+                        return hs;
+                    }
+                }
+                DataContext.SubmitChanges();
+            }
+            catch (Exception ex)
+            {
+                hs = new HandleState(ex.Message);
+            }
+            return hs;
+        }
+
+        public HandleState AddAndUpate(List<CsShipmentSurchargeModel> list)
+        {
+            var result = new HandleState();
+            var surcharges = mapper.Map<List<CsShipmentSurcharge>>(list);
+            try
+            {
+                foreach (var item in surcharges)
+                {
+                    if (item.Id == Guid.Empty)
+                    {
+                        DataContext.Add(item, false);
+                    }
+                    else
+                    {
+                        DataContext.Update(item, x => x.Id == item.Id);
+                    }
+                }
+                DataContext.SubmitChanges();
+            }
+            catch (Exception ex)
+            {
+                result = new HandleState(ex.Message);
+            }
+            return result;
         }
     }
 }

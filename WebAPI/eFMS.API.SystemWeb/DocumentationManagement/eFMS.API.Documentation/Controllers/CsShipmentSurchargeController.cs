@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
@@ -123,6 +124,33 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
+        /// add list surcharge
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        [HttpPost("AddAndUpdate")]
+        [Authorize]
+        public IActionResult Add(List<CsShipmentSurchargeModel> list)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            var query = list.Where(x => x.InvoiceNo != null).GroupBy(x => x.InvoiceNo)
+                                      .Where(g => g.Count() > 1)
+                                      .Select(y => y.Key);
+            if (query.Any())
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_SURCHARGE_ARE_DUPLICATE_INVOICE].Value });
+            }
+            var hs = csShipmentSurchargeService.AddAndUpate(list);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        /// <summary>
         /// update an existed surcharge
         /// </summary>
         /// <param name="model"></param>
@@ -153,7 +181,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpDelete]
         [Route("Delete")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Delete(Guid chargId)
         {
             var hs = csShipmentSurchargeService.DeleteCharge(chargId);
