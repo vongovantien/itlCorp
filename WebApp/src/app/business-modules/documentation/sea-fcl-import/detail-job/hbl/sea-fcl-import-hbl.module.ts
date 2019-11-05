@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 import { SeaFCLImportHBLComponent } from './sea-fcl-import-hbl.component';
 import { Routes, RouterModule } from '@angular/router';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { TabsModule } from 'ngx-bootstrap';
+import { TabsModule, ModalModule } from 'ngx-bootstrap';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CreateHouseBillComponent } from './create/create-house-bill.component';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { FormAddHouseBillComponent } from './components/form-add-house-bill/form-add-house-bill.component';
 import { FCLImportShareModule } from '../../share-fcl-import.module';
+import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
 
 const routing: Routes = [
     {
@@ -25,22 +26,16 @@ const routing: Routes = [
     }
 ];
 
-
-
-const COMPONENTS = [
-
-];
-
 @NgModule({
     declarations: [
         SeaFCLImportHBLComponent,
-        ...COMPONENTS,
         CreateHouseBillComponent,
         FormAddHouseBillComponent
     ],
     imports: [
         CommonModule,
         SharedModule,
+        ShareBussinessModule,
         FormsModule,
         TabsModule.forRoot(),
         ReactiveFormsModule,

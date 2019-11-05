@@ -1,0 +1,13 @@
+<div class="table-wrapper table-scrollable table-editable m--margin-top-20">
+    <table class="table dataTable table-bordered">
+        <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+            <th class="m--w-50 first table-actions-col">
+                Action
+            </th>
+        </thead>
+        <tbody>
+            <tr app-table-none-record [colspan]="headers.length  + 1">
+            </tr>
+        </tbody>
+    </table>
+</div>

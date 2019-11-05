@@ -6,7 +6,7 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
+import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { SystemConstants } from 'src/constants/system.const';
 import { language } from 'src/languages/language.en';
 declare var $: any;
@@ -34,7 +34,7 @@ export class CommodityGroupImportComponent implements OnInit {
     private sortService: SortService
   ) { }
 
-  @ViewChild(PaginationComponent,{static:false}) child: any;
+  @ViewChild(AppPaginationComponent,{static:false}) child: any;
   @ViewChild('form',{static:false}) form: any;
   @ViewChild(NgProgressComponent,{static:false}) progressBar: NgProgressComponent;
 

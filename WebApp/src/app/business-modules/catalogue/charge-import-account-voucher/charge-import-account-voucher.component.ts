@@ -6,7 +6,7 @@ import { SortService } from 'src/app/shared/services/sort.service';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { SystemConstants } from 'src/constants/system.const';
-import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
+import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { language } from 'src/languages/language.en';
 import { NgProgress, NgProgressComponent } from '@ngx-progressbar/core';
 declare var $: any;
@@ -33,7 +33,7 @@ export class ChargeImportAccountVoucherComponent implements OnInit {
     private menu_api: API_MENU,
     private sortService: SortService
   ) { }
-  @ViewChild(PaginationComponent,{static:false}) child: any;
+  @ViewChild(AppPaginationComponent,{static:false}) child: any;
   @ViewChild('form',{static:false}) form: any;
   @ViewChild(NgProgressComponent,{static:false}) progressBar: NgProgressComponent;
 

@@ -4,13 +4,13 @@ import { PagingService, BaseService, SortService } from 'src/app/shared/services
 import { API_MENU } from 'src/constants/api-menu.const';
 import { ToastrService } from 'ngx-toastr';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { PaginationComponent } from 'ngx-bootstrap';
 import { NgProgressComponent } from '@ngx-progressbar/core';
 import { SystemConstants } from 'src/constants/system.const';
 import { AppList } from 'src/app/app.list';
 import { User } from 'src/app/shared/models';
 import { language } from 'src/languages/language.en';
 import { Employee } from 'src/app/shared/models/system/employee';
+import { AppPaginationComponent } from 'src/app/shared/common';
 declare var $: any;
 
 @Component({
@@ -35,7 +35,7 @@ export class UserManagementImportComponent extends AppList {
     pager: PagerSetting = PAGINGSETTING;
     inProgress: boolean = false;
     headers: CommonInterface.IHeaderTable[];
-    @ViewChild(PaginationComponent, { static: false }) child;
+    @ViewChild(AppPaginationComponent, { static: false }) child;
     @ViewChild(NgProgressComponent, { static: false }) progressBar: NgProgressComponent;
 
 

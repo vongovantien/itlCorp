@@ -14,12 +14,15 @@ import { SearchStage, FilterPipe, NegativeNumberePipe, EqualErrorPipe, AbsPipe, 
 import { InfoPopupComponent, ConfirmPopupComponent } from "./common/popup";
 import { DecimalNumberGreaterThan0Directive, StyleCellDirective, AutofocusDirective, TwoDigitDecimaNumberDirective, ThreeDigitDecimaNumberDirective, IntergerInputDirective, SpecialCharacterDirective, EcusSpecicalCharacterAllowSpaceDirective, EcusSpecicalCharacterNoSpaceDirective, ClickOutSideDirective, AppLoadingButtonDirective, AppRequiredDirective } from "./directives";
 
-import { PaginationComponent, TableLayoutComponent, InputTableLayoutComponent, BreadcrumbComponent, DefaultButtonComponent, DeleteConfirmModalComponent, SearchOptionsComponent, InputFormComponent, TableDetailComponent, CloseModalButtonComponent, ReportPreviewComponent, ComboGridVirtualScrollComponent, CfBeforeLeaveModalComponent, AppMultipleSelectComponent, TableNoneRecordComponent, TableHeaderComponent, TableRowLoadingComponent, SubHeaderComponent, TableCollapseRowComponent, AppTableComponent, AppComboGridComponent, SwitchToggleComponent } from "./common";
+import { AppPaginationComponent, TableLayoutComponent, InputTableLayoutComponent, BreadcrumbComponent, DefaultButtonComponent, DeleteConfirmModalComponent, SearchOptionsComponent, InputFormComponent, TableDetailComponent, CloseModalButtonComponent, ReportPreviewComponent, ComboGridVirtualScrollComponent, CfBeforeLeaveModalComponent, AppMultipleSelectComponent, TableNoneRecordComponent, TableHeaderComponent, TableRowLoadingComponent, SubHeaderComponent, TableCollapseRowComponent, AppTableComponent, AppComboGridComponent, SwitchToggleComponent } from "./common";
 import { CollapseModule } from "ngx-bootstrap/collapse";
 import { UploadAlertComponent } from './common/popup/upload-alert/upload-alert.component';
 import { TooltipModule } from "ngx-bootstrap/tooltip";
 import { LoadModuleDirective } from "./directives/load-module.directive";
 import { TableBodyComponent } from "./common/table-body/table-body.component";
+import { CommonComponentModule } from "./common/common.module";
+import { DirectiveModule } from "./directives/directive.module";
+import { PipeModule } from "./pipes/pipe.module";
 
 const Libary = [
   ModalModule,
@@ -50,7 +53,7 @@ const APP_COMPONENTS = [
   InputTableLayoutComponent,
   BreadcrumbComponent,
   DefaultButtonComponent,
-  PaginationComponent,
+  AppPaginationComponent,
   DeleteConfirmModalComponent,
   SearchOptionsComponent,
   InputFormComponent,
@@ -86,23 +89,31 @@ const APP_DIRECTIVES = [
   AppLoadingButtonDirective,
   AppRequiredDirective
 ];
+
+const APP_MODULES = [
+  DirectiveModule,
+  CommonComponentModule,
+  PipeModule,
+
+];
 @NgModule({
   imports: [
     CommonModule,
     RepositoryModule,
-    ServiceModule,
     FormsModule,
-    ...Libary
+    ...APP_MODULES
+    // ...Libary
   ],
   declarations: [
-    ...APP_COMPONENTS,
-    ...APP_PIPES,
-    ...APP_DIRECTIVES
+    // ...APP_COMPONENTS,
+    // ...APP_PIPES,
+    // ...APP_DIRECTIVES
   ],
   exports: [
-    ...APP_PIPES,
-    ...APP_DIRECTIVES,
-    ...APP_COMPONENTS
+    ...APP_MODULES
+    // ...APP_PIPES,
+    // ...APP_DIRECTIVES,
+    // ...APP_COMPONENTS
   ],
   providers: [API_MENU]
 })

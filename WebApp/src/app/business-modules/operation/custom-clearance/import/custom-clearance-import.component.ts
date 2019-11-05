@@ -5,7 +5,7 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
-import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
+import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { NgProgressComponent } from '@ngx-progressbar/core';
 import { SystemConstants } from 'src/constants/system.const';
 import { language } from 'src/languages/language.en';
@@ -25,7 +25,7 @@ export class CustomClearanceImportComponent implements OnInit {
     isShowInvalid: boolean = true;
     pager: PagerSetting = PAGINGSETTING;
     inProgress: boolean = false;
-    @ViewChild(PaginationComponent, { static: false }) child;
+    @ViewChild(AppPaginationComponent, { static: false }) child;
     @ViewChild(NgProgressComponent, { static: false }) progressBar: NgProgressComponent;
     constructor(
         private pagingService: PagingService,
