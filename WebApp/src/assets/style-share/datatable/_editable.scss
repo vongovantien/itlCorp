@@ -108,55 +108,84 @@
                     &.sortable {
                         cursor: pointer;
                         padding-right: 18px;
-
-                        .sort-indicator {
-                            padding-right: 18px;
-                            position: absolute;
+                        span {
+                            padding-right: 16px;
+                            background: #3966b6
+                                url(../app/component/datatable/images/sort_both.png)
+                                no-repeat center right;
                             display: inline-block;
-                            top: 50%;
-                            // right: 0;
-                            transform: translateY(-50%);
-
-                            &:after,
-                            &:before {
-                                content: "";
-                                border-width: 0 4px 4px;
-                                border-style: solid;
-                                border-color: #fff transparent;
-                                visibility: visible;
-                                right: 5px;
-                                top: 50%;
-                                position: absolute;
-                                opacity: 0.9;
-                                margin-top: -4px;
-                            }
-
-                            &:before {
-                                margin-top: 2px;
-                                border-bottom: none;
-                                border-left: 4px solid transparent;
-                                border-right: 4px solid transparent;
-                                border-top: 4px solid #fff;
+                        }
+                        &.sort-asc {
+                            span {
+                                padding-right: 16px;
+                                background: #3966b6
+                                    url(../app/component/datatable/images/sort_asc.png)
+                                    no-repeat center right;
+                                display: inline-block;
                             }
                         }
-
-                        &.sort-asc .sort-indicator:before,
-                        &.sort-desc .sort-indicator:after {
-                            visibility: hidden;
+                        &.sort-desc {
+                            span {
+                                padding-right: 16px;
+                                background: #3966b6
+                                    url(../app/component/datatable/images/sort_desc.png)
+                                    no-repeat center right;
+                                display: inline-block;
+                            }
                         }
+                        // .sort-indicator {
+                        // padding-right: 18px;
+                        // position: absolute;
+                        // display: inline-block;
+                        // top: 50%;
+                        // // right: 0;
+                        // transform: translateY(-50%);
+                        //     padding-right: 16px;
+                        //     background: #3966b6
+                        //         url(../app/component/datatable/images/sort_both.png)
+                        //         no-repeat center right;
+                        //     display: inline-block;
 
-                        &.sort-asc .sort-indicator:after,
-                        &.sort-desc .sort-indicator:before {
-                            border-color: #000 transparent;
-                        }
+                        //     &:after,
+                        //     &:before {
+                        //         content: "";
+                        //         border-width: 0 4px 4px;
+                        //         border-style: solid;
+                        //         border-color: #fff transparent;
+                        //         visibility: visible;
+                        //         right: 5px;
+                        //         top: 50%;
+                        //         position: absolute;
+                        //         opacity: 0.9;
+                        //         margin-top: -4px;
+                        //     }
 
-                        &.sort-desc .sort-indicator:after {
-                            border-bottom: none;
-                            border-left: 4px solid transparent;
-                            border-right: 4px solid transparent;
-                            border-top: 4px solid #fff;
-                            box-shadow: none;
-                        }
+                        //     &:before {
+                        //         margin-top: 2px;
+                        //         border-bottom: none;
+                        //         border-left: 4px solid transparent;
+                        //         border-right: 4px solid transparent;
+                        //         border-top: 4px solid #fff;
+                        //     }
+                        // }
+
+                        // &.sort-asc .sort-indicator:before,
+                        // &.sort-desc .sort-indicator:after {
+                        //     visibility: hidden;
+                        // }
+
+                        // &.sort-asc .sort-indicator:after,
+                        // &.sort-desc .sort-indicator:before {
+                        //     border-color: #000 transparent;
+                        // }
+
+                        // &.sort-desc .sort-indicator:after {
+                        //     border-bottom: none;
+                        //     border-left: 4px solid transparent;
+                        //     border-right: 4px solid transparent;
+                        //     border-top: 4px solid #fff;
+                        //     box-shadow: none;
+                        // }
                     }
                 }
             }
