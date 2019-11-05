@@ -288,6 +288,9 @@ export class FormAddHouseBillComponent extends AppForm {
         switch (key) {
             case 'Customer':
                 this.selectedCustomer = { field: 'shortName', value: data.id, data: data };
+                if (this.selectedConsignee === {}) {
+                    this.selectedConsignee = { field: 'id', value: data.id };
+                }
                 this.getListSaleman(this.selectedCustomer.data.id);
                 break;
             case 'Saleman':

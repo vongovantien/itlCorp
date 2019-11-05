@@ -91,11 +91,14 @@ export class CreateHouseBillComponent extends AppForm {
 
     create() {
         this.formHouseBill.isSubmited = true;
-        // if (this.formHouseBill.selectedPortOfLoading.data.id === this.formHouseBill.selectedPortOfDischarge.data.id) {
-        //     this.formHouseBill.PortChargeLikePortLoading = true;
-        // } else {
-        //     this.formHouseBill.PortChargeLikePortLoading = false;
-        // }
+        if (!!this.formHouseBill.selectedPortOfLoading && this.formHouseBill.selectedPortOfDischarge) {
+            if (this.formHouseBill.selectedPortOfLoading.data.id === this.formHouseBill.selectedPortOfDischarge.data.id) {
+                this.formHouseBill.PortChargeLikePortLoading = true;
+            } else {
+                this.formHouseBill.PortChargeLikePortLoading = false;
+            }
+        }
+
         if (!this.checkValidateForm()) {
             this.infoPopup.show();
         }
