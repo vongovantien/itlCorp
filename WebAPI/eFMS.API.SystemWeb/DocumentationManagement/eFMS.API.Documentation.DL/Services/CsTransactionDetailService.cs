@@ -58,20 +58,20 @@ namespace eFMS.API.Documentation.DL.Services
             try
             {
                 var hs = DataContext.Add(detail);
-                //if (hs.Success)
-                //{
-                //    foreach (var x in model.CsMawbcontainers)
-                //    {
-                //        var cont = mapper.Map<CsMawbcontainer>(x);
-                //        cont.Id = Guid.NewGuid();
-                //        cont.Hblid = detail.Id;
-                //        cont.Mblid = Guid.Empty;                        
-                //        cont.UserModified = detail.UserModified;
-                //        cont.DatetimeModified = DateTime.Now;
-                //        //((eFMSDataContext)DataContext.DC).CsMawbcontainer.Add(cont);
-                //        var hsContainer = csMawbcontainerRepo.Add(cont);
-                //    }
-                //}
+                if (hs.Success)
+                {
+                    foreach (var x in model.CsMawbcontainers)
+                    {
+                        var cont = mapper.Map<CsMawbcontainer>(x);
+                        cont.Id = Guid.NewGuid();
+                        cont.Hblid = detail.Id;
+                        cont.Mblid = Guid.Empty;
+                        cont.UserModified = detail.UserModified;
+                        cont.DatetimeModified = DateTime.Now;
+                        //((eFMSDataContext)DataContext.DC).CsMawbcontainer.Add(cont);
+                        var hsContainer = csMawbcontainerRepo.Add(cont);
+                    }
+                }
                 ((eFMSDataContext)DataContext.DC).SaveChanges();
                 return hs;
             }

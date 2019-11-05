@@ -3,12 +3,15 @@ import { AppList } from 'src/app/app.list';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
+import { catchError, distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
+import { AppForm } from 'src/app/app.form';
+import { FCLImportAddModel } from 'src/app/shared/models';
 
 @Component({
     selector: 'app-form-add-house-bill',
     templateUrl: './form-add-house-bill.component.html'
 })
-export class FormAddHouseBillComponent extends AppList {
+export class FormAddHouseBillComponent extends AppForm {
     formGroup: FormGroup;
     mtBill: AbstractControl;
     hwbno: AbstractControl;
@@ -64,6 +67,7 @@ export class FormAddHouseBillComponent extends AppList {
     alsoNotifyPartyDescriptionModel: string;
     isSubmited: boolean = false;
     PortChargeLikePortLoading: boolean = false;
+    countChangePort: number = 0;
     hbOfladingTypes: CommonInterface.ICommonTitleValue[] = [
         { title: 'Copy', value: 'Copy' },
         { title: 'Original', value: 'Original' },
@@ -87,7 +91,9 @@ export class FormAddHouseBillComponent extends AppList {
     }
 
     ngOnInit() {
+
         this.initForm();
+
         this.configCustomer = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
                 { field: 'id', label: 'Partner ID' },
@@ -175,34 +181,29 @@ export class FormAddHouseBillComponent extends AppList {
                 { field: 'code', label: 'Code' }
             ],
         }, { selectedDisplayFields: ['name_EN'], });
+
+
+
     }
 
     initForm() {
         this.formGroup = this._fb.group({
             masterBill: ['',
-                Validators.compose([
-                    Validators.required
-                ])],
+
+                Validators.required
+            ],
             hbOfladingNo: ['',
-                Validators.compose([
-                    Validators.required
-                ])],
+
+                Validators.required
+            ],
             hbOfladingType: [],
             finalDestination: [
 
             ],
-            placeofReceipt: ['',
-                Validators.compose([
-                    Validators.required
-                ])],
-            feederVessel1: ['',
-                Validators.compose([
-                    Validators.required
-                ])],
-            feederVessel2: ['',
-                Validators.compose([
-                    Validators.required
-                ])],
+            placeofReceipt: [
+            ],
+            feederVessel1: [
+            ],
             arrivalVessel: [
             ],
             arrivalVoyage: [
@@ -221,8 +222,8 @@ export class FormAddHouseBillComponent extends AppList {
             numberOfOrigin: [this.numberOfOrigins[0]],
             dateETA: [],
             dateOfIssued: [],
-            ETDTime: [],
-            ETATime: [],
+            etd: [],
+            eta: [],
             ShipperDescription: [],
             ConsigneeDescription: [],
             NotifyPartyDescription: [],
@@ -232,8 +233,8 @@ export class FormAddHouseBillComponent extends AppList {
         this.mtBill = this.formGroup.controls['masterBill'];
         this.hwbno = this.formGroup.controls['hbOfladingNo'];
         this.hbltype = this.formGroup.controls['hbOfladingType'];
-        this.etd = this.formGroup.controls['ETDTime'];
-        this.eta = this.formGroup.controls['ETATime'];
+        this.etd = this.formGroup.controls['etd'];
+        this.eta = this.formGroup.controls['eta'];
         this.pickupPlace = this.formGroup.controls['placeofReceipt'];
         this.finalDestinationPlace = this.formGroup.controls['finalDestination'];
         this.localVessel = this.formGroup.controls['feederVessel1'];
@@ -248,66 +249,105 @@ export class FormAddHouseBillComponent extends AppList {
         this.issueHBLDate = this.formGroup.controls['dateOfIssued'];
         this.originBLNumber = this.formGroup.controls['numberOfOrigin'];
         this.referenceNo = this.formGroup.controls['referenceNo'];
+
+        console.log(this.eta);
+        this.etd.valueChanges
+            .pipe(
+                distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe((value: { startDate: any, endDate: any }) => {
+                this.minDate = value.startDate; // * Update min date
+
+                this.resetFormControl(this.eta);
+
+            });
+        this.eta.valueChanges
+            .pipe(
+                distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe((value: { startDate: any, endDate: any }) => {
+                this.minDate = value.startDate; // * Update min date
+
+                this.resetFormControl(this.etawarehouse);
+
+            });
         this.getListCustomer();
         this.getListShipper();
         this.getListConsignee();
         this.getListPort();
         this.getListSupplier();
         this.getListProvince();
+
+
     }
 
 
     onSelectDataFormInfo(data: any, key: string) {
         switch (key) {
             case 'Customer':
-                this.selectedCustomer = { field: 'shortName', value: data.shortName, data: data };
+                this.selectedCustomer = { field: 'shortName', value: data.id, data: data };
                 this.getListSaleman(this.selectedCustomer.data.id);
                 break;
             case 'Saleman':
                 this.selectedSaleman = { field: 'saleMan_ID', value: data.saleMan_ID, data: data };
                 break;
             case 'Shipper':
-                this.selectedShipper = { field: 'shortName', value: data.shortName, data: data };
+                this.selectedShipper = { field: 'shortName', value: data.id, data: data };
                 this.shipperdescriptionModel = this.selectedShipper.data.partnerNameEn + "\n" +
                     this.selectedShipper.data.addressShippingEn + "\n" +
                     "Tel: " + this.selectedShipper.data.tel + "\n" +
                     "Fax: " + this.selectedShipper.data.fax + "\n";
+                this.formGroup.controls['ShipperDescription'].setValue(this.shipperdescriptionModel);
                 break;
             case 'Consignee':
-                this.selectedConsignee = { field: 'shortName', value: data.shortName, data: data };
+                this.selectedConsignee = { field: 'shortName', value: data.id, data: data };
                 this.consigneedescriptionModel = this.selectedConsignee.data.partnerNameEn + "\n" +
                     this.selectedConsignee.data.addressShippingEn + "\n" +
                     "Tel: " + this.selectedConsignee.data.tel + "\n" +
                     "Fax: " + this.selectedConsignee.data.fax + "\n";
+                this.formGroup.controls['ConsigneeDescription'].setValue(this.consigneedescriptionModel);
+
                 break;
             case 'NotifyParty':
-                this.selectedNotifyParty = { field: 'shortName', value: data.shortName, data: data };
+                this.selectedNotifyParty = { field: 'shortName', value: data.id, data: data };
                 this.notifyPartyModel = this.selectedNotifyParty.data.partnerNameEn + "\n" +
                     this.selectedNotifyParty.data.addressShippingEn + "\n" +
                     "Tel: " + this.selectedNotifyParty.data.tel + "\n" +
                     "Fax: " + this.selectedNotifyParty.data.fax + "\n";
+                this.formGroup.controls['NotifyPartyDescription'].setValue(this.notifyPartyModel);
+
                 break;
             case 'AlsoNotifyParty':
-                this.selectedAlsoNotifyParty = { field: 'shortName', value: data.shortName, data: data };
+                this.selectedAlsoNotifyParty = { field: 'shortName', value: data.id, data: data };
                 this.alsoNotifyPartyDescriptionModel = this.selectedAlsoNotifyParty.data.partnerNameEn + "\n" +
                     this.selectedAlsoNotifyParty.data.addressShippingEn + "\n" +
                     "Tel: " + this.selectedAlsoNotifyParty.data.tel + "\n" +
                     "Fax: " + this.selectedAlsoNotifyParty.data.fax + "\n";
+                this.formGroup.controls['AlsoNotifyPartyDescription'].setValue(this.alsoNotifyPartyDescriptionModel);
+
                 break;
             case 'PortOfLoading':
-                this.selectedPortOfLoading = { field: 'nameVn', value: data.nameVn, data: data };
+                this.selectedPortOfLoading = { field: 'nameVn', value: data.id, data: data };
                 break;
             case 'PortOfDischarge':
-                this.selectedPortOfDischarge = { field: 'nameVn', value: data.nameVn, data: data };
+                this.selectedPortOfDischarge = { field: 'nameVn', value: data.id, data: data };
+                if (this.countChangePort === 0) {
+                    this.finalDestinationPlace.setValue(data.nameEn);
+                }
+                this.countChangePort++;
                 break;
             case 'Supplier':
-                this.selectedSupplier = { field: 'shortName', value: data.shortName, data: data };
+                this.selectedSupplier = { field: 'shortName', value: data.id, data: data };
                 break;
             case 'PlaceOfIssued':
-                this.selectedPlaceOfIssued = { field: 'code', value: data.code, data: data };
+                this.selectedPlaceOfIssued = { field: 'code', value: data.id, data: data };
                 break;
         }
     }
+
+
 
 
 
@@ -346,38 +386,38 @@ export class FormAddHouseBillComponent extends AppList {
     }
 }
 
-export interface ITransactionDetail {
-    jobId: string;
-    mawb: string;
-    saleManId: string;
-    shipperId: string;
-    shipperDescription: string;
-    consigneeId: string;
-    consigneeDescription: string;
-    notifyPartyId: string;
-    notifyPartyDescription: string;
-    alsoNotifyPartyId: string;
-    alsoNotifyPartyDescription: string;
-    hwbno: string;
-    hbltype: string;
-    etd: string;
-    eta: string;
-    pickupPlace: string;
-    pol: string;
-    pod: string;
-    finalDestinationPlace: string;
-    coloaderId: string;
-    localVessel: string;
-    localVoyNo: string;
-    oceanVessel: string;
-    documentDate: string;
-    documentNo: string;
-    etawarehouse: string;
-    warehouseNotice: string;
-    shippingMark: string;
-    remark: string;
-    issueHBLPlace: string;
-    issueHBLDate: string;
-    originBLNumber: number;
-    referenceNo: string;
-}
+// export interface ITransactionDetail {
+//     jobId: string;
+//     mawb: string;
+//     saleManId: string;
+//     shipperId: string;
+//     shipperDescription: string;
+//     consigneeId: string;
+//     consigneeDescription: string;
+//     notifyPartyId: string;
+//     notifyPartyDescription: string;
+//     alsoNotifyPartyId: string;
+//     alsoNotifyPartyDescription: string;
+//     hwbno: string;
+//     hbltype: string;
+//     etd: string;
+//     eta: string;
+//     pickupPlace: string;
+//     pol: string;
+//     pod: string;
+//     finalDestinationPlace: string;
+//     coloaderId: string;
+//     localVessel: string;
+//     localVoyNo: string;
+//     oceanVessel: string;
+//     documentDate: string;
+//     documentNo: string;
+//     etawarehouse: string;
+//     warehouseNotice: string;
+//     shippingMark: string;
+//     remark: string;
+//     issueHBLPlace: string;
+//     issueHBLDate: string;
+//     originBLNumber: number;
+//     referenceNo: string;
+// }

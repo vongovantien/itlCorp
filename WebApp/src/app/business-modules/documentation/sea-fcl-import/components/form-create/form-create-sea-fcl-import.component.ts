@@ -133,6 +133,7 @@ export class SeaFClImportFormCreateComponent extends AppForm {
             )
             .subscribe((value: { startDate: any, endDate: any }) => {
                 this.minDate = value.startDate; // * Update min date
+                console.log(value);
 
                 this.isSubmitted = false;
                 this.resetFormControl(this.formCreate.controls["eta"]);

@@ -8,6 +8,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CreateHouseBillComponent } from './create/create-house-bill.component';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { FormAddHouseBillComponent } from './components/form-add-house-bill/form-add-house-bill.component';
+import { FCLImportShareModule } from '../../share-fcl-import.module';
 
 const routing: Routes = [
     {
@@ -44,7 +45,8 @@ const COMPONENTS = [
         TabsModule.forRoot(),
         ReactiveFormsModule,
         RouterModule.forChild(routing),
-        NgxDaterangepickerMd
+        NgxDaterangepickerMd,
+        FCLImportShareModule
     ],
     exports: [],
     providers: [],
