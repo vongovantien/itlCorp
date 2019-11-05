@@ -37,6 +37,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<OpsStageAssigned> opsStageAssignedRepository;
         private readonly IContextBase<CsShipmentSurcharge> surchargeRepository;
         private readonly IContextBase<CustomsDeclaration> customDeclarationRepository;
+        private readonly IContextBase<AcctCdnote> acctCdNoteRepository;
 
         public OpsTransactionService(IContextBase<OpsTransaction> repository, 
             IMapper mapper, 
@@ -49,7 +50,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatPlace> placeRepo,
             IContextBase<OpsStageAssigned> opsStageAssignedRepo,
             IContextBase<CsShipmentSurcharge> surchargeRepo,
-            IContextBase<CustomsDeclaration> customDeclarationRepo) : base(repository, mapper)
+            IContextBase<CustomsDeclaration> customDeclarationRepo,
+            IContextBase<AcctCdnote> acctCdNoteRepo) : base(repository, mapper)
         {
             //catStageApi = stageApi;
             //catplaceApi = placeApi;
@@ -65,6 +67,7 @@ namespace eFMS.API.Documentation.DL.Services
             opsStageAssignedRepository = opsStageAssignedRepo;
             surchargeRepository = surchargeRepo;
             customDeclarationRepository = customDeclarationRepo;
+            acctCdNoteRepository = acctCdNoteRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -94,7 +97,7 @@ namespace eFMS.API.Documentation.DL.Services
             var result = Delete(x => x.Id == id, false);
             if (result.Success)
             {
-                var assigneds = opsStageAssignedRepository.Get(x => x.JobId == id);//((eFMSDataContext)DataContext.DC).OpsStageAssigned.Where(x => x.JobId == id);
+                var assigneds = opsStageAssignedRepository.Get(x => x.JobId == id);
                 if (assigneds != null)
                 {
                     RemoveStageAssigned(assigneds);
@@ -180,11 +183,9 @@ namespace eFMS.API.Documentation.DL.Services
         }
         public bool CheckAllowDelete(Guid jobId)
         {
-            var query = (from detail in ((eFMSDataContext)DataContext.DC).OpsTransaction
-                         where detail.Id == jobId && detail.CurrentStatus != TermData.Canceled
-                         join surcharge in ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge on detail.Hblid equals surcharge.Hblid
-                         where surcharge.CreditNo != null || surcharge.DebitNo != null || surcharge.Soano != null || surcharge.PaymentRefNo != null
-                         select detail);
+            var detail = DataContext.Get(x => x.Id == jobId && x.CurrentStatus != TermData.Canceled)?.FirstOrDefault();
+            if (detail == null) return false;
+            var query = surchargeRepository.Get(x => x.Hblid == detail.Id && (x.CreditNo != null || x.DebitNo != null || x.Soano != null || x.PaymentRefNo != null));
             if (query.Any())
             {
                 return false;
@@ -201,7 +202,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             if(criteria.ClearanceNo != null)
             {
-                var listCustomsDeclaration = ((eFMSDataContext)DataContext.DC).CustomsDeclaration.Where(x => x.ClearanceNo.ToLower().Contains(criteria.ClearanceNo.ToLower()));
+                var listCustomsDeclaration = customDeclarationRepository.Get(x => x.ClearanceNo.ToLower().Contains(criteria.ClearanceNo.ToLower()));
                 if(listCustomsDeclaration.Count() > 0)
                 {
                     datajoin = from custom in listCustomsDeclaration
@@ -219,7 +220,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             if(criteria.CreditDebitInvoice != null)
             {
-                var listDebit = ((eFMSDataContext)DataContext.DC).AcctCdnote.Where(x => x.Code.ToLower().Contains(criteria.CreditDebitInvoice.ToLower()));
+                var listDebit = acctCdNoteRepository.Get(x => x.Code.ToLower().Contains(criteria.CreditDebitInvoice.ToLower()));
                 if(listDebit.Count() > 0)
                 {
                     datajoin = from acctnote in listDebit
@@ -590,16 +591,16 @@ namespace eFMS.API.Documentation.DL.Services
                     decimal revenue = 0;
                     decimal saleProfit = 0;
                     string partnerName = string.Empty;
-                    if (item.Type == "OBH")
+                    if (item.Type == Constants.CHARGE_OBH_TYPE)
                     {
                         isOBH = true;
                         partnerName = item.PayerName;
                     }
-                    if(item.Type == "BUY")
+                    if(item.Type == Constants.CHARGE_BUY_TYPE)
                     {
                         cost = item.Total;
                     }
-                    if(item.Type == "SELL")
+                    if(item.Type == Constants.CHARGE_SELL_TYPE)
                     {
                         revenue = item.Total;
                     }

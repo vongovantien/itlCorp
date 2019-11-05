@@ -209,6 +209,20 @@
             <param name="IsHouseBillID"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetHouseBillProfit(System.Guid)">
+            <summary>
+            get profit of a house bill
+            </summary>
+            <param name="hblid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetshipmentProfit(System.Guid)">
+            <summary>
+            get profit of a shipment
+            </summary>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.AddNew(eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel)">
             <summary>
             add new surcharge

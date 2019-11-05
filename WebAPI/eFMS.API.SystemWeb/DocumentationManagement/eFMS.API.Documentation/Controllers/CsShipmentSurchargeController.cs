@@ -98,6 +98,32 @@ namespace eFMS.API.Documentation.Controllers
             return csShipmentSurchargeService.GetAllParner(Id, IsHouseBillID);
         }
 
+
+        /// <summary>
+        /// get profit of a house bill
+        /// </summary>
+        /// <param name="hblid"></param>
+        /// <returns></returns>
+        [HttpGet("GetHouseBillProfit")]
+        public IActionResult GetHouseBillProfit(Guid hblid)
+        {
+            var result = csShipmentSurchargeService.GetHouseBillTotalProfit(hblid);
+            return Ok(result);
+        }
+
+
+        /// <summary>
+        /// get profit of a shipment
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        [HttpGet("GetshipmentProfit")]
+        public IActionResult GetshipmentProfit(Guid jobId)
+        {
+            var result = csShipmentSurchargeService.GetShipmentTotalProfit(jobId);
+            return Ok(result);
+        }
+
         /// <summary>
         /// add new surcharge
         /// </summary>

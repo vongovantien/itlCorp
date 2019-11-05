@@ -26,5 +26,9 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string STATUS_APPROVAL_LEADERAPPROVED = "LeaderApproved";
         public static readonly string STATUS_APPROVAL_DEPARTMENTAPPROVED = "DepartmentManagerApproved";
         public static readonly string STATUS_APPROVAL_ACCOUNTANTAPPRVOVED = "AccountantManagerApproved";
+
+        public static readonly string CHARGE_BUY_TYPE = "BUY";
+        public static readonly string CHARGE_SELL_TYPE = "SELL";
+        public static readonly string CHARGE_OBH_TYPE = "OBH";
     }
 }
