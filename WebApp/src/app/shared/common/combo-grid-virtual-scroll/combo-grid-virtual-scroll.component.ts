@@ -117,10 +117,14 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
         if (data.value != null) {
             this.CurrentActiveItemIdObj = data;
             const context = this;
-            const itemIndex = findIndex(this.ConstDataSources, function (o) {
-                const val = context.getValue(o, data.field);
-                return val === data.value;
-            });
+
+            // const itemIndex = findIndex(this.ConstDataSources, function (o) {
+            //     const val = context.getValue(o, data.field);
+            //     return val === data.value;
+            // });
+
+            const itemIndex = this.ConstDataSources.findIndex(i => i[data.field] === data.value); // TODO key = id
+
             if (itemIndex !== -1) {
                 this.indexSelected = itemIndex;
                 const item = this.ConstDataSources[itemIndex];
@@ -191,7 +195,7 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
 
     }
 
-    getValue(item: any, field: string) {
+    getValue(item: any, field: string): string {
         try {
 
             if (field.includes(".")) {

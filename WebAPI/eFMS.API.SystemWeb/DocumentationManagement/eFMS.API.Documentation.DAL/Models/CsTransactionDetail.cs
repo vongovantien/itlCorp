@@ -72,5 +72,17 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
+        public string ArrivalNo { get; set; }
+        public DateTime? ArrivalFirstNotice { get; set; }
+        public DateTime? ArrivalSecondNotice { get; set; }
+        public string ArrivalHeader { get; set; }
+        public string ArrivalFooter { get; set; }
+        public string DeliveryOrderNo { get; set; }
+        public DateTime? DeliveryOrderPrintedDate { get; set; }
+        public string DosentTo1 { get; set; }
+        public string DosentTo2 { get; set; }
+        public string Dofooter { get; set; }
+
+        public virtual CsTransaction Job { get; set; }
     }
 }

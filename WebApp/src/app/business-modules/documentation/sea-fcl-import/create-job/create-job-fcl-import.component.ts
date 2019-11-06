@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { Store, ActionsSubject } from '@ngrx/store';
+import { ActionsSubject } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 
 import { AppForm } from 'src/app/app.form';
@@ -14,6 +14,7 @@ import { SeaFCLImportShipmentGoodSummaryComponent } from '../components/shipment
 import { InfoPopupComponent } from 'src/app/shared/common/popup';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, takeUntil } from 'rxjs/operators';
+import { Container } from 'src/app/shared/models/document/container.model';
 
 
 @Component({
@@ -22,11 +23,12 @@ import { catchError, takeUntil } from 'rxjs/operators';
     styleUrls: ['./create-job-fcl-import.component.scss']
 })
 export class SeaFCLImportCreateJobComponent extends AppForm {
+
     @ViewChild(SeaFClImportFormCreateComponent, { static: false }) formCreateComponent: SeaFClImportFormCreateComponent;
     @ViewChild(SeaFCLImportShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: SeaFCLImportShipmentGoodSummaryComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
 
-    fclImportAddModel: FCLImportAddModel = new FCLImportAddModel();
+    containers: Container[] = [];
 
     constructor(
         protected _router: Router,
@@ -38,7 +40,6 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
     }
 
     ngOnInit(): void {
-
         this._actionStoreSubject
             .pipe(
                 takeUntil(this.ngUnsubscribe)
@@ -46,26 +47,18 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
             .subscribe(
                 (action: fromStore.ContainerAction) => {
                     if (action.type === fromStore.ContainerActionTypes.SAVE_CONTAINER) {
-                        this.fclImportAddModel.csMawbcontainers = action.payload;
-
-                        // * Update model object to integer.
-                        for (const container of <any>this.fclImportAddModel.csMawbcontainers) {
-                            container.containerTypeId = container.containerTypeId.id;
-                            container.commodityId = !!container.commodityId ? container.commodityId.id : null;
-                            container.packageTypeId = !!container.packageTypeId ? container.packageTypeId.id : null;
-                        }
-
-                        console.log("list container add success", this.fclImportAddModel.csMawbcontainers);
+                        this.containers = action.payload;
+                        console.log("list container add success", this.containers);
                     }
                 });
     }
 
     ngAfterViewInit() {
+        // * Init container
         this.shipmentGoodSummaryComponent.initContainer();
     }
 
     onSubmitData() {
-
         const form: any = this.formCreateComponent.formCreate.getRawValue();
         console.log(form);
         const formData = {
@@ -111,7 +104,7 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
 
     checkValidateForm() {
         let valid: boolean = true;
-        if (!this.formCreateComponent.formCreate.valid) {
+        if (!this.formCreateComponent.formCreate.valid || (!!this.formCreateComponent.eta.value && !this.formCreateComponent.eta.value.startDate)) {
             valid = false;
         }
         return valid;
@@ -123,13 +116,14 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
             this.infoPopup.show();
             return;
         }
-        if (!this.fclImportAddModel.csMawbcontainers.length) {
+        if (!this.containers.length) {
             this._toastService.warning('Please add container to create new job');
             return;
         }
 
         const modelAdd = this.onSubmitData();
-        modelAdd.csMawbcontainers = this.fclImportAddModel.csMawbcontainers;
+        modelAdd.csMawbcontainers = this.containers; // * Update containers model
+
         this.createJob(modelAdd);
     }
 

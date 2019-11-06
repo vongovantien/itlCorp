@@ -214,4 +214,18 @@ export class DocumentationRepo {
         );
     }
 
+    getPartners(id: any){
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsShipmentSurcharge/GetPartners`,{ Id: id, IsHouseBillID : true}).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    getChargesByPartner(id: any, partnerId: any){
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsShipmentSurcharge/GroupByListHB`,{ Id: id, partnerID: partnerId, IsHouseBillID: true}).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
 }

@@ -4,10 +4,15 @@ import { Action } from '@ngrx/store';
  * For each action type in an action group, make a simple
  * enum object for all of this group's action types.
  */
+
 export enum SeaFCLImportActionTypes {
     GET_DETAIL = '[CSTransaction] Get Detail',
     GET_DETAIL_SUCCESS = '[CSTransaction] Get Detail Success',
     GET_DETAIL_FAIL = '[CSTransaction] Get Detail Fail',
+
+    UPDATE = '[CSTransaction] Update',
+    UPDATE_SUCCESS = '[CSTransaction] Update Success',
+    UPDATE_FAIL = '[CSTransaction] Update Fail'
 }
 
 /**
@@ -33,9 +38,32 @@ export class SeaFCLImportGetDetailFailAction implements Action {
     constructor(public payload: any) { }
 }
 
+export class SeaFCLImportUpdateAction implements Action {
+    readonly type = SeaFCLImportActionTypes.UPDATE;
+
+    constructor(public payload: any) { }
+}
+
+export class SeaFCLImportUpdateSuccessAction implements Action {
+    readonly type = SeaFCLImportActionTypes.UPDATE_SUCCESS;
+
+    constructor(public payload: any) { }
+}
+
+export class SeaFCLImportUpdateFailAction implements Action {
+    readonly type = SeaFCLImportActionTypes.UPDATE_FAIL;
+
+    constructor(public payload: any) { }
+}
 
 /**
  * Export a type alias of all actions in this action group
  * so that reducers can easily compose action types
  */
-export type SeaFCLImportActions = SeaFCLImportGetDetailAction | SeaFCLImportGetDetailSuccessAction | SeaFCLImportGetDetailFailAction;
+export type SeaFCLImportActions =
+    | SeaFCLImportUpdateAction
+    | SeaFCLImportUpdateSuccessAction
+    | SeaFCLImportUpdateFailAction
+    | SeaFCLImportGetDetailAction
+    | SeaFCLImportGetDetailSuccessAction
+    | SeaFCLImportGetDetailFailAction;

@@ -36,7 +36,8 @@
                                     [class.data-selected]="indexSelected !== -1 && i === indexSelected">
 
                                     <td *ngFor="let display of DisplayFields; trackBy: trackByFn">
-                                        {{getValue(item,display.field)}}
+                                        <!-- {{getValue(item,display.field)}} -->
+                                        {{item[display.field]}}
                                     </td>
                                 </tr>
                             </ng-container>

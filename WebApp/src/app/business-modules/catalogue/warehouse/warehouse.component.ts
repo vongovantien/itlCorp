@@ -10,7 +10,7 @@ import { NgForm } from '@angular/forms';
 import { SystemConstants } from '../../../../constants/system.const';
 import { API_MENU } from '../../../../constants/api-menu.const';
 import { SelectComponent } from 'ng2-select';
-import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
+import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
 import { ExcelService } from 'src/app/shared/services/excel.service';
@@ -64,7 +64,7 @@ export class WarehouseComponent extends AppList implements OnInit {
     @ViewChild('chooseCountry', { static: false }) public ngSelectCountry: SelectComponent;
     @ViewChild('chooseProvince', { static: false }) public ngSelectProvince: SelectComponent;
     @ViewChild('chooseDistrict', { static: false }) public ngSelectDistrict: SelectComponent;
-    @ViewChild(PaginationComponent, { static: false }) child;
+    @ViewChild(AppPaginationComponent, { static: false }) child;
     @ViewChild('formAddEdit', { static: false }) form: NgForm;
     warehouseSettings: ColumnSetting[] = language.Warehouse;//= WAREHOUSECOLUMNSETTING;
     isDesc: boolean = true;

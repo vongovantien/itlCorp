@@ -5,7 +5,7 @@ import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PARTNERDATACOLUMNSETTING } from '../partner-data.columns';
 import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-// import { PaginationComponent } from 'ngx-bootstrap';
+// import { AppPaginationComponent } from 'ngx-bootstrap';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';

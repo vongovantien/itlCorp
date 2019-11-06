@@ -38,10 +38,10 @@ export class PermissionComponent extends AppList {
 
     ngOnInit() {
         this.headers = [
-            { field: 'name', title: 'Permission Name', sortable: true },
+            { field: 'name', title: 'Permission Name', sortable: true, dataType: 'LINK' },
             { field: 'type', title: 'Type', sortable: true },
             { field: 'role', title: 'Role', sortable: true },
-            { field: 'status', title: 'Status', sortable: true },
+            { field: 'active', title: 'Status', sortable: true, dataType: 'BOOLEAN' },
         ];
 
         this.searchPermission(this.dataSearch);
@@ -62,6 +62,10 @@ export class PermissionComponent extends AppList {
 
     sortPermission() {
         this.permissions = this._sortService.sort(this.permissions, this.sort, this.order);
+    }
+
+    gotoDetail(permission: Permission) {
+        this._router.navigate([`home/system/permission/${permission.id}`]);
     }
 
     deletePermission(permission: Permission) {

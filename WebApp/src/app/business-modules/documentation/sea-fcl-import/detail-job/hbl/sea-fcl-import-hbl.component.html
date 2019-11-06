@@ -41,12 +41,10 @@
                 <tab heading="House Bill List" (selectTab)="onSelectTab('hbl')" [active]="true">
                     <div class="m-portlet">
                         <div class="m-portlet__body">
-
                             <div class="m-portlet">
                                 <div class="alert-block__heading">
                                     <h3 class="alert-block__title"> HBL List</h3>
                                 </div>
-
                                 <div class="m-portlet__body">
                                     <div class="row">
                                         <div class="col-lg-4">
@@ -156,11 +154,17 @@
                                     <h3 class="alert-block__title">Profit Per House Bill</h3>
                                 </div>
                                 <div class="m-portlet__body">
-                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptas excepturi adipisci
-                                    deserunt asperiores a eum debitis repellat mollitia, placeat sunt quae accusantium
-                                    in, sequi velit ullam quas enim nobis rem laudantium doloribus cum veniam corrupti.
-                                    Mollitia, architecto fuga porro quaerat distinctio adipisci neque sequi. Cumque
-                                    perferendis et repudiandae. Consequuntur, placeat!
+                                    <tabset class="custom-class-tab">
+                                        <tab heading="Buying">
+                                            <buying-charge></buying-charge>
+                                        </tab>
+                                        <tab heading="Selling">
+
+                                        </tab>
+                                        <tab heading="OBH">
+
+                                        </tab>
+                                    </tabset>
                                 </div>
                             </div>
                             <div class="m-portlet">

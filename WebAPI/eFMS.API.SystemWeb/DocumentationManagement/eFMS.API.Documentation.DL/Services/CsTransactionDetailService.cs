@@ -26,6 +26,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<SysUser> sysUserRepo;
         readonly IContextBase<CatUnit> catUnitRepo;
         readonly IContextBase<CatCommodity> catCommodityRepo;
+        readonly IContextBase<CsShipmentSurcharge> surchareRepository;
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
             IMapper mapper,
@@ -35,7 +36,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatPlace> catPlace,
             IContextBase<SysUser> sysUser,
             IContextBase<CatUnit> catUnit,
-            IContextBase<CatCommodity> catCommodity) : base(repository, mapper)
+            IContextBase<CatCommodity> catCommodity,
+            IContextBase<CsShipmentSurcharge> surchareRepo) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
             csMawbcontainerRepo = csMawbcontainer;
@@ -44,6 +46,7 @@ namespace eFMS.API.Documentation.DL.Services
             sysUserRepo = sysUser;
             catUnitRepo = catUnit;
             catCommodityRepo = catCommodity;
+            surchareRepository = surchareRepo;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -584,7 +587,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Hblid == hbl.Id).ToList();
+                    var charges = surchareRepository.Get(x => x.Hblid == hbl.Id).ToList();
                     var isSOA = false;
                     foreach (var item in charges)
                     {
@@ -601,10 +604,11 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         foreach (var item in charges)
                         {
-                            ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Remove(item);
+                            surchareRepository.Delete(x => x.Id == item.Id, false);
                         }
                         DataContext.Delete(x => x.Id == hbl.Id);
-                        ((eFMSDataContext)DataContext.DC).SaveChanges();
+                        DataContext.SubmitChanges();
+                        surchareRepository.SubmitChanges();
                     }
                 }
             }

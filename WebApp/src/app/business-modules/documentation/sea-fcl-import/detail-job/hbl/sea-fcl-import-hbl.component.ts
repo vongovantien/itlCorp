@@ -58,9 +58,8 @@ export class SeaFCLImportHBLComponent extends AppList {
         this.houseBill = this._sortService.sort(this.houseBill, sort, this.order);
     }
 
-    gotoCreateHouseBill(id: any) {
-        id = this.jobId;
-        this._router.navigate([`/home/documentation/sea-fcl-import/${id}/hbl/new`]);
+    gotoCreateHouseBill() {
+        this._router.navigate([`/home/documentation/sea-fcl-import/${this.jobId}/hbl/new`]);
     }
 
 

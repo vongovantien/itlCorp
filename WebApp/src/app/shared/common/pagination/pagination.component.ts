@@ -6,7 +6,7 @@ import { PagingService } from '../../services/paging-service';
   selector: 'app-pagination',
   templateUrl: './pagination.component.html'
 })
-export class PaginationComponent implements OnInit {
+export class AppPaginationComponent implements OnInit {
    @Input() config: PagerSetting = {};
    @Output() pagerObject = new EventEmitter<any[]>();
    @Input() _pager : any = {};

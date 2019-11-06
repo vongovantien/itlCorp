@@ -46,6 +46,9 @@ const COMPONENTS = [
     SeaFCLImportManagementFormSearchComponent,
     SeaFClImportFormCreateComponent,
     CdNoteAddPopupComponent,
+    SeaFCLImportShipmentGoodSummaryComponent,
+    CdNoteAddPopupComponent,
+    SeaFCLImportContainerListPopupComponent
 ];
 
 const LIB = [

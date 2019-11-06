@@ -4,6 +4,77 @@
         <name>eFMS.API.Documentation</name>
     </assembly>
     <members>
+        <member name="T:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.LanguageSub},eFMS.API.Documentation.DL.IService.ICsArrivalFrieghtChargeService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+            <summary>
+            constructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="freightChargeService"></param>
+            <param name="user"></param>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.GetArrival(System.Guid,eFMS.API.Documentation.DL.Common.TransactionTypeEnum)">
+            <summary>
+            get arrival by housebill id
+            </summary>
+            <param name="hblid"></param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.GetDeliveryOrder(System.Guid,eFMS.API.Documentation.DL.Common.TransactionTypeEnum)">
+            <summary>
+            get delivery order by housebill id
+            </summary>
+            <param name="hblid"></param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.UpdateArrival(eFMS.API.Documentation.DL.Models.CsArrivalViewModel)">
+            <summary>
+            update arrival info
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.UpdateDeliveryOrder(eFMS.API.Documentation.DL.Models.DeliveryOrderViewModel)">
+            <summary>
+            update delivery order
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.SetArrivalChargeDefault(eFMS.API.Documentation.DL.Models.CsArrivalFrieghtChargeDefaultEditModel)">
+            <summary>
+            set freight charge default of an user in a shipment type
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.SetArrivalHeaderFooterDefault(eFMS.API.Documentation.DL.Models.CsArrivalDefaultModel)">
+            <summary>
+            set header - footer default of arrival
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.SetDeliveryOrderHeaderFooterDefault(eFMS.API.Documentation.DL.Models.CsDeliveryOrderDefaultModel)">
+            <summary>
+            set header - footer default of delivery order
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.DeleteCharge(System.Guid)">
+            <summary>
+            delete an existed charge
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsManifestController">
             <summary>
             
@@ -138,11 +209,32 @@
             <param name="IsHouseBillID"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetHouseBillProfit(System.Guid)">
+            <summary>
+            get profit of a house bill
+            </summary>
+            <param name="hblid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetshipmentProfit(System.Guid)">
+            <summary>
+            get profit of a shipment
+            </summary>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.AddNew(eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel)">
             <summary>
             add new surcharge
             </summary>
             <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.Add(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel})">
+            <summary>
+            add list surcharge
+            </summary>
+            <param name="list"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.Update(eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel)">

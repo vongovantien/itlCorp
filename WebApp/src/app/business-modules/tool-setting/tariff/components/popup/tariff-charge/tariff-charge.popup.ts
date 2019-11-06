@@ -140,6 +140,17 @@ export class TariffChargePopupComponent extends PopupBase {
             })
         });
 
+
+        // * Update unitPrice follow min.
+        this.formChargeTariff.controls['tariffChargeDetail'].get('min').valueChanges
+            .pipe(
+                distinctUntilChanged((prev, curr) => prev === curr),
+            )
+            .subscribe((value: any) => {
+                this.formChargeTariff.controls['tariffChargeDetail'].get('unitPrice').setValue(value);
+            });
+
+
         for (const control of ["rangeFrom", "rangeTo", "min", "max", "nextUnit", "nextUnitPrice", ""]) {
             this.enableDisabledFormControl(this.formChargeTariff.controls['tariffChargeDetail'].get(control), 'disabled');
         }
@@ -157,6 +168,7 @@ export class TariffChargePopupComponent extends PopupBase {
 
         this.configComondity = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
+                { field: 'id', label: 'ID' },
                 { field: 'groupNameEn', label: 'Name EN' },
                 { field: 'groupNameVn', label: 'Name Local' },
             ]
@@ -432,7 +444,6 @@ export class TariffChargePopupComponent extends PopupBase {
 
         setTimeout(() => {
             this.selectedCommondityGroup = { field: 'id', value: this.tariffCharge.commodityId };
-            console.log(this.selectedCommondityGroup);
             this.show();
         }, 500);
     }
@@ -451,7 +462,6 @@ export class TariffChargePopupComponent extends PopupBase {
 
     submitData() {
         const tariffChargeDetailForm: any = this.formChargeTariff.value.tariffChargeDetail;
-
         const body: TariffCharge | any = {
             chargeName: this.tariffCharge.chargeName,
             chargeCode: this.tariffCharge.chargeCode,
@@ -459,8 +469,8 @@ export class TariffChargePopupComponent extends PopupBase {
             payerName: this.tariffCharge.payerName,
             portName: this.tariffCharge.portName,
             warehouseName: this.tariffCharge.warehouseName,
-            id: SystemConstants.EMPTY_GUID,
-            tariffId: SystemConstants.EMPTY_GUID,
+            id: this.ACTION === 'CREATE' ? SystemConstants.EMPTY_GUID : this.tariffCharge.id,
+            tariffId: this.ACTION === 'CREATE' ? SystemConstants.EMPTY_GUID : this.tariffCharge.tariffId,
             chargeId: this.tariffCharge.chargeId,
             commodityId: this.tariffCharge.commodityId,
             payerId: this.tariffCharge.payerId,
@@ -491,7 +501,12 @@ export class TariffChargePopupComponent extends PopupBase {
 
     validateFormGroup() {
         let valid: boolean = true;
-        if (!this.selectedCharge || !this.formChargeTariff.value.tariffChargeDetail.useFor || !this.formChargeTariff.value.tariffChargeDetail.route) {
+        if (
+            !this.selectedCharge
+            || !this.formChargeTariff.value.tariffChargeDetail.useFor
+            || !this.formChargeTariff.value.tariffChargeDetail.route
+            || this.formChargeTariff.value.tariffChargeDetail.rangeFrom < this.formChargeTariff.value.tariffChargeDetail.rangeTo
+        ) {
             valid = false;
         }
         return valid;

@@ -1,0 +1,14 @@
+﻿using eFMS.API.Documentation.Service.Models;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace eFMS.API.Documentation.DL.Models
+{
+    public class CsArrivalFrieghtChargeModel: CsArrivalFrieghtCharge
+    {
+        public string ChargeName { get; set; }
+        public string UnitName { get; set; }
+        public string CurrencyName { get; set; }
+    }
+}

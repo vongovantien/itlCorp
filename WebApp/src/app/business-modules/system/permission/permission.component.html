@@ -25,30 +25,9 @@
                             <th class="m--w-50 first table-actions-col">
                             </th>
                         </thead>
-                        <tbody class="tbody-group">
-                            <ng-container *ngIf="!isLoading && !!permissions.length">
-                                <tr *ngFor="let permission of permissions; trackBy:trackByFn">
-                                    <td class="table-actions-col">
-                                        <div class="table-actions">
-                                            <button type="button"
-                                                class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                title="Remove" (click)="deletePermission(permission)">
-                                                <i class="la la-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                    <td class="text-underline">
-                                        <a [routerLink]="[permission.id]">{{permission.name}}</a>
-                                    </td>
-                                    <td>{{permission.type}}</td>
-                                    <td>{{permission.roleName}}</td>
-                                    <td [ngClass]="permission.active ? 'text-success' : 'text-danger'">
-                                        {{permission.active ? 'Active' : 'Inactive'}}</td>
-                                </tr>
-                            </ng-container>
-                            <tr *ngIf="!isLoading && !permissions.length" app-table-none-record
-                                [colspan]="headers.length + 1"></tr>
-                            <tr *ngIf="isLoading" app-table-row-loading></tr>
+                        <tbody class="tbody-group" app-table-body [data]="permissions" [headers]="headers"
+                            [actions]="['DELETE']" (onClickDelete)="deletePermission($event)"
+                            (onClickLink)="gotoDetail($event)">
                         </tbody>
                     </table>
                 </div>

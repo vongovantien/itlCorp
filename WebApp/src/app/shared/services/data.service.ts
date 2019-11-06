@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map, take, skip } from 'rxjs/operators';
-@Injectable()
+import { BehaviorSubject } from 'rxjs';
+@Injectable({
+    providedIn: 'root'
+})
 export class DataService {
 
     private messageSource = new BehaviorSubject({ "default": "hello world !" });

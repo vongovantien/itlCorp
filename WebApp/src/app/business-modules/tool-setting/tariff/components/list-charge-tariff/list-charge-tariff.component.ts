@@ -61,7 +61,6 @@ export class TariffListChargeComponent extends AppList {
         } else {
             this.charges.push(tariffCharge);
         }
-        console.log(this.charges);
     }
 
     viewDetailTariffCharge(tariffCharge: TariffCharge, index: number, action: CommonType.ACTION_FORM = 'UPDATE') {

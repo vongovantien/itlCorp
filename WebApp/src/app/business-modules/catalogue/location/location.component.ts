@@ -3,7 +3,7 @@ import * as lodash from 'lodash';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
+import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { NgForm } from '@angular/forms';
 import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
 import { CatPlaceModel } from 'src/app/shared/models/catalogue/catPlace.model';
@@ -120,7 +120,7 @@ export class LocationComponent implements OnInit, AfterViewInit {
 		condition: "OR",
 	}
 	searchObject: any = { condition: "OR" };
-	@ViewChild(PaginationComponent, { static: false }) child;
+	@ViewChild(AppPaginationComponent, { static: false }) child;
 
 	/**
 	 * END OF VARIABLES DEFINITIONS

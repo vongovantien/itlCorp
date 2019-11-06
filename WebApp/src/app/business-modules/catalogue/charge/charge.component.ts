@@ -3,7 +3,7 @@ import * as lodash from 'lodash';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
+import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { Router } from '@angular/router';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PAGINGSETTING } from 'src/constants/paging.const';
@@ -45,7 +45,7 @@ export class ChargeComponent implements OnInit {
   searchObject: any = {};
 
 
-  @ViewChild(PaginationComponent, { static: false }) child: any;
+  @ViewChild(AppPaginationComponent, { static: false }) child: any;
 
   async ngOnInit() {
     this.pager.totalItems = 0;

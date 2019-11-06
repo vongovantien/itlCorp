@@ -10,7 +10,7 @@ import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
-import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
+import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { NgForm } from '@angular/forms';
 import { Commodity } from 'src/app/shared/models/catalogue/commodity.model';
 import { COMMODITYCOLUMNSETTING } from './commodity.column';
@@ -31,7 +31,7 @@ export class CommodityComponent implements OnInit {
   /*
   declare variable
   */
-  @ViewChild(PaginationComponent, { static: false }) child;
+  @ViewChild(AppPaginationComponent, { static: false }) child;
   @ViewChild(SearchOptionsComponent, { static: false }) searchOption;
   @ViewChild('formCommodity', { static: false }) formCommodity: NgForm;
   @ViewChild('formGroupCommodity', { static: false }) formGroupCommodity: NgForm;
