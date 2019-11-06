@@ -111,8 +111,10 @@ export class DetailHouseBillComponent extends AppForm {
                             this.formHouseBill.shippingMark.setValue(res.data.shippingMark);
                             this.formHouseBill.remark.setValue(res.data.remark);
                             this.formHouseBill.issueHBLDate.setValue(res.data.issueHbldate);
+                            this.formHouseBill.referenceNo.setValue(res.data.referenceNo);
 
-                            this.formHouseBill.originBLNumber.setValue(this.formHouseBill.numberOfOrigins.filter(i => i.value === res.data.originBlNumber)[0]);
+
+                            this.formHouseBill.originBLNumber.setValue(this.formHouseBill.numberOfOrigins.filter(i => i.value === res.data.originBlnumber)[0]);
 
 
 
