@@ -368,6 +368,7 @@ namespace eFMS.API.Setting.DL.Services
             }
 
             if (query.Count() == 0) return null;
+            query = query.OrderByDescending(x => x.t.DatetimeModified);
             List<TariffViewModel> results = new List<TariffViewModel>();
             foreach (var item in query)
             {
