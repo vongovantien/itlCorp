@@ -45,10 +45,7 @@ const routing: Routes = [
 const COMPONENTS = [
     SeaFCLImportManagementFormSearchComponent,
     SeaFClImportFormCreateComponent,
-    CdNoteAddPopupComponent,
-    SeaFCLImportShipmentGoodSummaryComponent,
-    CdNoteAddPopupComponent,
-    SeaFCLImportContainerListPopupComponent
+    CdNoteAddPopupComponent
 ];
 
 const LIB = [
