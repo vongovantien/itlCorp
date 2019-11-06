@@ -1,15 +1,13 @@
-import { Component, Output, EventEmitter, Input, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { DocumentationRepo, CatalogueRepo } from 'src/app/shared/repositories';
 import { forkJoin } from 'rxjs';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { catchError, distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
-import { TransactionTypeEnum } from 'src/app/shared/enums';
 import { User } from 'src/app/shared/models';
 import { BaseService } from 'src/app/shared/services';
-import { ActionsSubject } from '@ngrx/store';
 
 
 @Component({
@@ -30,7 +28,6 @@ export class SeaFClImportFormCreateComponent extends AppForm {
     selectedPortLoading: Partial<CommonInterface.IComboGridData | any> = {};
     selectedPortDestination: Partial<CommonInterface.IComboGridData | any> = {};
     selectedPortDelivery: Partial<CommonInterface.IComboGridData | any> = {};
-
 
     carries: any[] = [];
     agents: any[] = [];
@@ -97,7 +94,7 @@ export class SeaFClImportFormCreateComponent extends AppForm {
         this.formCreate = this._fb.group({
             jobId: [{ value: null, disabled: true }], // * disabled
             etd: [], // * Date
-            eta: [], // * Date
+            eta: [null, Validators.required], // * Date
             mawb: ['', Validators.required],
             mbltype: [null, Validators.required], // * select
             shipmentType: [null, Validators.required], // * select
@@ -135,7 +132,9 @@ export class SeaFClImportFormCreateComponent extends AppForm {
             )
             .subscribe((value: { startDate: any, endDate: any }) => {
                 this.minDate = value.startDate; // * Update min date
+                console.log(value);
 
+                this.isSubmitted = false;
                 this.resetFormControl(this.formCreate.controls["eta"]);
                 this.formCreate.controls["serviceDate"].setValue(null);
             });
@@ -208,55 +207,4 @@ export class SeaFClImportFormCreateComponent extends AppForm {
                 break;
         }
     }
-}
-
-interface ICommonShipmentData {
-    billOfLadings: CommonInterface.IValueDisplay[];
-    freightTerms: CommonInterface.IValueDisplay[];
-    serviceTypes: CommonInterface.IValueDisplay[];
-    shipmentTypes: CommonInterface.IValueDisplay[];
-    typeOfMoves: CommonInterface.IValueDisplay[];
-}
-
-interface ICSTransaction {
-    transactionTypeEnum: TransactionTypeEnum;
-    id: string;
-    branchId: string;
-    jobNo: string;
-    mawb: string;
-    typeOfService: string;
-    etd: string;
-    eta: string;
-    serviceDate: string;
-    mbltype: string;
-    coloaderId: string;
-    subColoaderId: string;
-    bookingNo: string;
-    agentId: string;
-    pol: string;
-    pod: string;
-    deliveryPlace: string;
-    paymentTerm: string;
-    flightVesselName: string;
-    voyNo: string;
-    shipmentType: string;
-    commodity: string;
-    desOfGoods: string;
-    packageContainer: string;
-    pono: string;
-    personIncharge: string;
-    netWeight: number;
-    grossWeight: number;
-    chargeWeight: number;
-    cbm: number;
-    notes: string;
-    transactionType: string;
-    userCreated: string;
-    isLocked: boolean;
-    lockedDate: string;
-    createdDate: string;
-    userModified: string;
-    modifiedDate: string;
-    active: boolean;
-    inactiveOn: string;
 }

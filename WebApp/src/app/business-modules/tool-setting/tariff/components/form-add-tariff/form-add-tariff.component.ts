@@ -59,7 +59,8 @@ export class TariffFormAddComponent extends TariffFormSearchComponent {
                 { field: 'shortName', label: 'Office' },
                 { field: 'companyName', label: 'Company' },
             ],
-        }, { selectedDisplayFields: ['shortName'], });
+        }, { selectedDisplayFields: ['shortName', 'companyName'], });
+
 
         this.initFormAdd();
 

@@ -10,7 +10,7 @@ import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { SystemConstants } from 'src/constants/system.const';
-import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
+import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
 import * as _ from 'lodash';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
@@ -59,7 +59,7 @@ export class PortIndexComponent implements OnInit {
   @ViewChild('chooseCountry', { static: false }) public ngSelectCountry: SelectComponent;
   @ViewChild('chooseArea', { static: false }) public ngSelectArea: SelectComponent;
   @ViewChild('chooseMode', { static: false }) public ngSelectMode: SelectComponent;
-  @ViewChild(PaginationComponent, { static: false }) child;
+  @ViewChild(AppPaginationComponent, { static: false }) child;
   countries: any[];
   areas: any[];
   modes: any[];

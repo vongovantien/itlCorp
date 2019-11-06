@@ -3,7 +3,7 @@ import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { StageModel } from 'src/app/shared/models/catalogue/stage.model';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
+import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { NgForm } from '@angular/forms';
 import { SortService } from 'src/app/shared/services/sort.service';
 
@@ -56,7 +56,7 @@ export class StageManagementComponent {
 
     isDesc = true;
     sortKey: string = "id";
-    @ViewChild(PaginationComponent, { static: false }) child;
+    @ViewChild(AppPaginationComponent, { static: false }) child;
 
     constructor(
         private excelService: ExcelService,

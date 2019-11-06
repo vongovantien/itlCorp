@@ -89,7 +89,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             //Chỉ lấy ra những phí Credit(BUY) & Payer (chưa bị lock)
             var surcharge = surCharge.Get(x =>
-                    (x.Type == "BUY" || (x.PayerId != null && x.CreditNo != null))
+                    (x.Type == Common.Constants.CHARGE_BUY_TYPE || (x.PayerId != null && x.CreditNo != null))
                 && (x.PayerId == partner || x.PaymentObjectId == partner)
             );
 
@@ -227,7 +227,7 @@ namespace eFMS.API.Documentation.DL.Services
                 HBL = x.HBL,
                 HBLID = x.HBLID,
                 CustomNo = x.CustomNo,
-                Service = CustomData.Services.Where(s => s.Value == x.Service).FirstOrDefault()?.DisplayName
+                Service = CustomData.Services.FirstOrDefault(s => s.Value == x.Service)?.DisplayName
             }).ToList();
             return dataList;
         }

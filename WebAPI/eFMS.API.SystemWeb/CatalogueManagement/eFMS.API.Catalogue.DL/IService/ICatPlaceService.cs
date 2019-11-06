@@ -16,10 +16,13 @@ namespace eFMS.API.Catalogue.DL.IService
 {
     public interface ICatPlaceService : IRepositoryBase<CatPlace, CatPlaceModel>
     {
+        IQueryable<CatPlaceModel> GetByModeOfTran();
         IQueryable<CatPlaceModel> GetCatPlaces();
         IQueryable<sp_GetCatPlace> Query(CatPlaceCriteria criteria);
         List<CatPlaceViewModel> Paging(CatPlaceCriteria criteria, int page, int size, out int rowsCount);
         List<vw_catProvince> GetProvinces(short? countryId);
+
+
         List<vw_catDistrict> GetDistricts(Guid? provinceId);
         List<ModeOfTransport> GetModeOfTransport();
         List<CatPlaceImportModel> CheckValidImport(List<CatPlaceImportModel> list, CatPlaceTypeEnum placeType);
@@ -27,5 +30,7 @@ namespace eFMS.API.Catalogue.DL.IService
         //HandleState Add(CatPlaceModel model);
         HandleState Update(CatPlaceModel model);
         HandleState Delete(Guid id);
+        List<vw_catProvince> GetAllProvinces();
+
     }
 }

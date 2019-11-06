@@ -1,0 +1,38 @@
+<div class="sea-fcl-create-hbl-page">
+    <app-sub-header>
+        <div class="c-button-actions">
+            <!-- <button type="button" (click)="showCreatePpoup()" style="float:right;"
+                class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                <span>
+                    <i class="la la-save"></i>
+                    <span> Save </span>
+                </span>
+            </button> -->
+
+            <app-default-button (click)="showCreatePpoup()" [buttonSetting]="saveButtonSetting"></app-default-button>
+            <app-default-button (click)="combackToHBLList()" [buttonSetting]="cancelButtonSetting"></app-default-button>
+        </div>
+
+    </app-sub-header>
+
+</div>
+
+<div class="m-content">
+    <div class="m-portlet__body">
+
+        <tabset class="custom-class-tab">
+            <tab heading="HBL Detail" [active]="true">
+
+                <app-form-add-house-bill> </app-form-add-house-bill>
+
+                <shipment-good-summary></shipment-good-summary>
+            </tab>
+        </tabset>
+    </div>
+</div>
+<info-popup [body]="'Opps, It looks like your missed something, Please recheck the highlighted field below.'"
+    [title]="'Cannot Create HBL'"></info-popup>
+
+<confirm-popup [body]="'You are about to create a new  HBL, are you sure all entered details are correct?'"
+    [labelCancel]="'No'" (onSubmit)="oncreate()">
+</confirm-popup>

@@ -30,6 +30,8 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatPlace> catPlaceRepo;
         readonly IContextBase<SysUser> sysUserRepo;
         readonly IContextBase<SysEmployee> sysEmployeeRepo;
+        readonly IContextBase<CsTransaction> transactionRepository;
+        readonly IContextBase<CatCurrencyExchange> currencyExchangeRepository;
 
         public CsTransactionService(IContextBase<CsTransaction> repository,
             IMapper mapper,
@@ -40,7 +42,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatPartner> catPartner,
             IContextBase<CatPlace> catPlace,
             IContextBase<SysUser> sysUser,
-            IContextBase<SysEmployee> sysEmployee) : base(repository, mapper)
+            IContextBase<SysEmployee> sysEmployee,
+            IContextBase<CsTransaction> transactionRepo,
+            IContextBase<CatCurrencyExchange> currencyExchangeRepo) : base(repository, mapper)
         {
             currentUser = user;
             csTransactionDetailRepo = csTransactionDetail;
@@ -50,6 +54,8 @@ namespace eFMS.API.Documentation.DL.Services
             catPlaceRepo = catPlace;
             sysUserRepo = sysUser;
             sysEmployeeRepo = sysEmployee;
+            transactionRepository = transactionRepo;
+            currencyExchangeRepository = currencyExchangeRepo;
         }
 
         #region -- INSERT & UPDATE --
@@ -127,11 +133,12 @@ namespace eFMS.API.Documentation.DL.Services
                 if (!string.IsNullOrEmpty(employeeId))
                 {
                     var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault().WorkPlaceId;
-                    if (branchOfUser != null) {
+                    if (branchOfUser != null)
+                    {
                         transaction.BranchId = branchOfUser;
                     }
                 }
-                
+
                 var hsTrans = DataContext.Add(transaction);
                 if (hsTrans.Success)
                 {
@@ -338,17 +345,20 @@ namespace eFMS.API.Documentation.DL.Services
             return list;
         }
 
-        private IQueryable<CsTransactionModel> GetTransaction(string transactionType)
+        private IQueryable<CsTransactionModel> GetTransaction(string transactionType, bool isSearch)
         {
             var masterBills = DataContext.Get();
-            var houseBills = csTransactionDetailRepo.Get();
+            
             var coloaders = catPartnerRepo.Get();
             var agents = catPartnerRepo.Get();
             var pols = catPlaceRepo.Get();
             var pods = catPlaceRepo.Get();
             var creators = sysUserRepo.Get();
-
-            var query = from masterBill in masterBills
+            IQueryable<CsTransactionModel> query = null;
+            if (isSearch)
+            {
+                var houseBills = csTransactionDetailRepo.Get();
+                query = from masterBill in masterBills
                         join houseBill in houseBills on masterBill.Id equals houseBill.JobId into houseBill2
                         from houseBill in houseBill2.DefaultIfEmpty()
                         join coloader in coloaders on masterBill.ColoaderId equals coloader.Id into coloader2
@@ -412,10 +422,71 @@ namespace eFMS.API.Documentation.DL.Services
                             PODName = pod.NameEn,
                             POLName = pol.NameEn,
                             CreatorName = creator.Username,
-                            SumCont = 0,
-                            SumPackage = 0,
                             HblId = houseBill.Id == Guid.Empty || houseBill.Id == null ? Guid.Empty : houseBill.Id,
                         };
+            }
+            else
+            {
+                query = from masterBill in masterBills
+                        join coloader in coloaders on masterBill.ColoaderId equals coloader.Id into coloader2
+                        from coloader in coloader2.DefaultIfEmpty()
+                        join agent in agents on masterBill.AgentId equals agent.Id into agent2
+                        from agent in agent2.DefaultIfEmpty()
+                        join pod in pods on masterBill.Pod equals pod.Id into pod2
+                        from pod in pod2.DefaultIfEmpty()
+                        join pol in pols on masterBill.Pol equals pol.Id into pol2
+                        from pol in pol2.DefaultIfEmpty()
+                        join creator in creators on masterBill.UserCreated equals creator.Id into creator2
+                        from creator in creator2.DefaultIfEmpty()
+                        where masterBill.TransactionType == transactionType
+                        select new CsTransactionModel
+                        {
+                            Id = masterBill.Id,
+                            BranchId = masterBill.BranchId,
+                            JobNo = masterBill.JobNo,
+                            Mawb = masterBill.Mawb,
+                            TypeOfService = masterBill.TypeOfService,
+                            Etd = masterBill.Etd,
+                            Eta = masterBill.Eta,
+                            ServiceDate = masterBill.ServiceDate,
+                            Mbltype = masterBill.Mbltype,
+                            ColoaderId = masterBill.ColoaderId,
+                            SubColoader = masterBill.SubColoader,
+                            BookingNo = masterBill.BookingNo,
+                            AgentId = masterBill.AgentId,
+                            Pol = masterBill.Pol,
+                            Pod = masterBill.Pod,
+                            DeliveryPlace = masterBill.DeliveryPlace,
+                            PaymentTerm = masterBill.PaymentTerm,
+                            FlightVesselName = masterBill.FlightVesselName,
+                            VoyNo = masterBill.VoyNo,
+                            ShipmentType = masterBill.ShipmentType,
+                            Commodity = masterBill.Commodity,
+                            DesOfGoods = masterBill.DesOfGoods,
+                            PackageContainer = masterBill.PackageContainer,
+                            Pono = masterBill.Pono,
+                            PersonIncharge = masterBill.PersonIncharge,
+                            NetWeight = masterBill.NetWeight,
+                            GrossWeight = masterBill.GrossWeight,
+                            ChargeWeight = masterBill.ChargeWeight,
+                            Cbm = masterBill.Cbm,
+                            Notes = masterBill.Notes,
+                            TransactionType = masterBill.TransactionType,
+                            UserCreated = masterBill.UserCreated,
+                            IsLocked = masterBill.IsLocked,
+                            LockedDate = masterBill.LockedDate,
+                            CreatedDate = masterBill.CreatedDate,
+                            UserModified = masterBill.UserModified,
+                            ModifiedDate = masterBill.ModifiedDate,
+                            Active = masterBill.Active,
+                            InactiveOn = masterBill.InactiveOn,
+                            SupplierName = coloader.ShortName,
+                            AgentName = agent.ShortName,
+                            PODName = pod.NameEn,
+                            POLName = pol.NameEn,
+                            CreatorName = creator.Username,
+                        };
+            }
             return query;
         }
 
@@ -428,7 +499,7 @@ namespace eFMS.API.Documentation.DL.Services
                 rowsCount = 0;
                 return results;
             }
-            var tempList = list;            
+            var tempList = list;
             rowsCount = tempList.Count();
             if (size > 0)
             {
@@ -450,8 +521,9 @@ namespace eFMS.API.Documentation.DL.Services
         public IQueryable<CsTransactionModel> Query(CsTransactionCriteria criteria)
         {
             var transactionType = DataTypeEx.GetType(criteria.TransactionType);
-            var list = GetTransaction(transactionType);
-            if (list == null || list.Any() == false) return null;
+            var listSearch = GetTransaction(transactionType, true);
+            var listData = GetTransaction(transactionType, false);
+            if (listSearch == null || listSearch.Any() == false) return null;
 
             IQueryable<CsTransactionModel> results = null;
 
@@ -473,10 +545,10 @@ namespace eFMS.API.Documentation.DL.Services
                     //results = QuerySIC(criteria, list);
                     break;
                 case TransactionTypeEnum.SeaFCLExport:
-                    results = QuerySEF(criteria, list);
+                    results = QuerySEF(criteria, listSearch, listData);
                     break;
                 case TransactionTypeEnum.SeaFCLImport:
-                    results = QuerySIF(criteria, list);
+                    results = QuerySIF(criteria, listSearch, listData);
                     break;
                 case TransactionTypeEnum.SeaLCLExport:
                     //results = QuerySEL(criteria, list);
@@ -551,10 +623,10 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="criteria"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        private IQueryable<CsTransactionModel> QuerySEF(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> list)
+        private IQueryable<CsTransactionModel> QuerySEF(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch, IQueryable<CsTransactionModel> listData)
         {
             var containers = csMawbcontainerRepo.Get();
-            var query = (from transaction in list
+            var query = (from transaction in listSearch
                          join container in containers on transaction.Id equals container.Mblid into containerTrans
                          from cont in containerTrans.DefaultIfEmpty()
                          select new
@@ -598,7 +670,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             //return query.Select(x => x.transaction).Distinct();
             var jobNos = query.Select(s => s.transaction.JobNo).Distinct();
-            var result = list.Where(x => jobNos.Contains(x.JobNo)).OrderByDescending(x => x.ModifiedDate);
+            var result = listData.Where(x => jobNos.Contains(x.JobNo)).OrderByDescending(x => x.ModifiedDate);
             return result;
         }
 
@@ -608,11 +680,11 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="criteria"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        private IQueryable<CsTransactionModel> QuerySIF(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> list)
+        private IQueryable<CsTransactionModel> QuerySIF(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch, IQueryable<CsTransactionModel> listData)
         {
             var containers = csMawbcontainerRepo.Get();
             var surcharges = csShipmentSurchargeRepo.Get();
-            var query = (from transaction in list
+            var query = (from transaction in listSearch
                          join container in containers on transaction.Id equals container.Mblid into containerTrans
                          from cont in containerTrans.DefaultIfEmpty()
                          join surcharge in surcharges on transaction.HblId equals surcharge.Hblid into surchargeTrans
@@ -687,7 +759,7 @@ namespace eFMS.API.Documentation.DL.Services
                 //query = query.OrderByDescending(x => x.transaction.ModifiedDate);
             }
             var jobNos = query.Select(s => s.transaction.JobNo).Distinct();
-            var result = list.Where(x => jobNos.Contains(x.JobNo)).OrderByDescending(x => x.ModifiedDate);
+            var result = listData.Where(x => jobNos.Contains(x.JobNo)).OrderByDescending(x => x.ModifiedDate);
             return result;
         }
 
@@ -718,7 +790,7 @@ namespace eFMS.API.Documentation.DL.Services
         public List<object> GetListTotalHB(Guid JobId)
         {
             List<object> returnList = new List<object>();
-            var housebills = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == JobId).ToList();
+            var housebills = csTransactionDetailRepo.Get(x => x.JobId == JobId).ToList();
             foreach (var item in housebills)
             {
                 var totalBuying = (decimal?)0;
@@ -732,25 +804,25 @@ namespace eFMS.API.Documentation.DL.Services
                 var totalobhUSD = (decimal?)0;
                 var totallogisticUSD = (decimal?)0;
 
-                var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Hblid == item.Id).ToList();
+                var charges = csShipmentSurchargeRepo.Get(x => x.Hblid == item.Id).ToList();
 
                 foreach (var c in charges)
                 {
-                    var exchangeRate = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == c.ExchangeDate.Value.Date && x.CurrencyFromId == c.CurrencyId && x.CurrencyToId == "VND" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-                    var UsdToVnd = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == c.ExchangeDate.Value.Date && x.CurrencyFromId == "USD" && x.CurrencyToId == "VND" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                    var exchangeRate = currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == c.ExchangeDate.Value.Date && x.CurrencyFromId == c.CurrencyId && x.CurrencyToId == "VND" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                    var UsdToVnd = currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == c.ExchangeDate.Value.Date && x.CurrencyFromId == "USD" && x.CurrencyToId == "VND" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
                     var rate = exchangeRate == null ? 1 : exchangeRate.Rate;
                     var usdToVndRate = UsdToVnd == null ? 1 : UsdToVnd.Rate;
-                    if (c.Type.ToLower() == "buy")
+                    if (c.Type.ToLower() == Constants.CHARGE_BUY_TYPE.ToLower())
                     {
                         totalBuying += c.Total * rate;
                         totalBuyingUSD += (totalBuying / usdToVndRate);
                     }
-                    if (c.Type.ToLower() == "sell")
+                    if (c.Type.ToLower() == Constants.CHARGE_SELL_TYPE.ToLower())
                     {
                         totalSelling += c.Total * rate;
                         totalSellingUSD += (totalSelling / usdToVndRate);
                     }
-                    if (c.Type.ToLower() == "obh")
+                    if (c.Type.ToLower() == Constants.CHARGE_OBH_TYPE.ToLower())
                     {
                         totalobh += c.Total * rate;
                         totalobhUSD += (totalobh / usdToVndRate);
@@ -769,16 +841,15 @@ namespace eFMS.API.Documentation.DL.Services
         {
             try
             {
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var transaction = mapper.Map<CsTransaction>(model);
                 transaction.Id = Guid.NewGuid();
-                int countNumberJob = dc.CsTransaction.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
+                int countNumberJob = transactionRepository.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
                 transaction.JobNo = GenerateID.GenerateJobID(Constants.SEF_SHIPMENT, countNumberJob);
-                //transaction.UserCreated = "01";
+                transaction.UserCreated = currentUser.UserID;
                 transaction.CreatedDate = transaction.ModifiedDate = DateTime.Now;
                 transaction.UserModified = model.UserCreated;
                 transaction.Active = true;
-                var hsTrans = dc.CsTransaction.Add(transaction);
+                var hsTrans = transactionRepository.Add(transaction, false);
                 List<CsMawbcontainer> containers = null;
                 if (model.CsMawbcontainers.Count > 0)
                 {
@@ -790,12 +861,12 @@ namespace eFMS.API.Documentation.DL.Services
                         container.Mblid = transaction.Id;
                         container.UserModified = transaction.UserCreated;
                         container.DatetimeModified = DateTime.Now;
-                        dc.CsMawbcontainer.Add(container);
+                        csMawbcontainerRepo.Add(container, false);
                     }
                 }
                 else
                 {
-                    containers = dc.CsMawbcontainer.Where(x => x.Mblid == model.Id).ToList();
+                    containers = csMawbcontainerRepo.Get(x => x.Mblid == model.Id).ToList();
                     foreach (var container in containers)
                     {
                         container.ContainerNo = string.Empty;
@@ -805,18 +876,18 @@ namespace eFMS.API.Documentation.DL.Services
                         container.Mblid = transaction.Id;
                         container.UserModified = transaction.UserCreated;
                         container.DatetimeModified = DateTime.Now;
-                        dc.CsMawbcontainer.Add(container);
+                        csMawbcontainerRepo.Add(container);
                     }
                 }
-                var detailTrans = dc.CsTransactionDetail.Where(x => x.JobId == model.Id);
+                var detailTrans = csTransactionDetailRepo.Get(x => x.JobId == model.Id);
                 if (detailTrans != null)
                 {
-                    int countDetail = dc.CsTransactionDetail.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                    int countDetail = csTransactionDetailRepo.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
                                                                         && x.DatetimeCreated.Value.Day == DateTime.Now.Day);
                     string generatePrefixHouse = GenerateID.GeneratePrefixHousbillNo();
 
-                    if (dc.CsTransactionDetail.Any(x => x.Hwbno.IndexOf(generatePrefixHouse, StringComparison.OrdinalIgnoreCase) >= 0))
+                    if (csTransactionDetailRepo.Any(x => x.Hwbno.IndexOf(generatePrefixHouse, StringComparison.OrdinalIgnoreCase) >= 0))
                     {
                         generatePrefixHouse = Constants.SEF_HBL
                             + GenerateID.GeneratePrefixHousbillNo();
@@ -831,8 +902,8 @@ namespace eFMS.API.Documentation.DL.Services
                         item.Active = true;
                         item.UserCreated = transaction.UserCreated;  //ChangeTrackerHelper.currentUser;
                         item.DatetimeCreated = DateTime.Now;
-                        dc.CsTransactionDetail.Add(item);
-                        var houseContainers = dc.CsMawbcontainer.Where(x => x.Hblid == houseId);
+                        csTransactionDetailRepo.Add(item);
+                        var houseContainers = csMawbcontainerRepo.Get(x => x.Hblid == houseId);
                         if (houseContainers != null)
                         {
                             foreach (var x in houseContainers)
@@ -845,10 +916,10 @@ namespace eFMS.API.Documentation.DL.Services
                                 x.MarkNo = string.Empty;
                                 x.UserModified = transaction.UserCreated;
                                 x.DatetimeModified = DateTime.Now;
-                                dc.CsMawbcontainer.Add(x);
+                                csMawbcontainerRepo.Add(x);
                             }
                         }
-                        var charges = dc.CsShipmentSurcharge.Where(x => x.Hblid == houseId);
+                        var charges = csShipmentSurchargeRepo.Get(x => x.Hblid == houseId);
                         if (charges != null)
                         {
                             foreach (var charge in charges)
@@ -866,12 +937,14 @@ namespace eFMS.API.Documentation.DL.Services
                                 charge.UnlockedSoadirectorDate = null;
                                 charge.UnlockedSoadirectorStatus = null;
                                 charge.UnlockedSoasaleMan = null;
-                                dc.CsShipmentSurcharge.Add(charge);
+                                csShipmentSurchargeRepo.Add(charge);
                             }
                         }
                     }
                 }
-                dc.SaveChanges();
+                transactionRepository.SubmitChanges();
+                csMawbcontainerRepo.SubmitChanges();
+                csShipmentSurchargeRepo.SubmitChanges();
                 var result = new HandleState();
                 return new { model = transaction, result };
             }

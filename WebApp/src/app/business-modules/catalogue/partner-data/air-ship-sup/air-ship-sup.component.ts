@@ -5,7 +5,7 @@ import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
 import { PARTNERDATACOLUMNSETTING } from '../partner-data.columns';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
+import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
@@ -27,7 +27,7 @@ export class AirShipSupComponent implements OnInit {
   criteria: any = { partnerGroup: PartnerGroupEnum.AIRSHIPSUP };
   isDesc: boolean = false;
   keySortDefault: string = "id";
-  @ViewChild(PaginationComponent, { static: false }) child;
+  @ViewChild(AppPaginationComponent, { static: false }) child;
   @Output() deleteConfirm = new EventEmitter<any>();
   @Output() detail = new EventEmitter<any>();
   constructor(private baseService: BaseService,

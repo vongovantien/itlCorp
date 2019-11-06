@@ -13,7 +13,7 @@ import { Component, Input } from '@angular/core';
 })
 
 export class TableNoneRecordComponent {
-    @Input() colspan: number = 10;
+    @Input() colspan: number = 100;
 
 }
 

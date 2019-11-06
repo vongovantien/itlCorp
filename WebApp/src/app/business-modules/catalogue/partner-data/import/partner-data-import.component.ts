@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
+import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { NgProgressComponent } from '@ngx-progressbar/core';
 import { PagingService } from 'src/app/shared/services/paging-service';
 import { BaseService } from 'src/app/shared/services/base.service';
@@ -25,7 +25,7 @@ export class PartnerDataImportComponent implements OnInit {
   isShowInvalid: boolean = true;
   pager: PagerSetting = PAGINGSETTING;
   inProgress: boolean = false;
-  @ViewChild(PaginationComponent, { static: false }) child;
+  @ViewChild(AppPaginationComponent, { static: false }) child;
   @ViewChild(NgProgressComponent, { static: false }) progressBar: NgProgressComponent;
 
   constructor(

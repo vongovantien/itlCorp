@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
@@ -97,6 +98,32 @@ namespace eFMS.API.Documentation.Controllers
             return csShipmentSurchargeService.GetAllParner(Id, IsHouseBillID);
         }
 
+
+        /// <summary>
+        /// get profit of a house bill
+        /// </summary>
+        /// <param name="hblid"></param>
+        /// <returns></returns>
+        [HttpGet("GetHouseBillProfit")]
+        public IActionResult GetHouseBillProfit(Guid hblid)
+        {
+            var result = csShipmentSurchargeService.GetHouseBillTotalProfit(hblid);
+            return Ok(result);
+        }
+
+
+        /// <summary>
+        /// get profit of a shipment
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        [HttpGet("GetshipmentProfit")]
+        public IActionResult GetshipmentProfit(Guid jobId)
+        {
+            var result = csShipmentSurchargeService.GetShipmentTotalProfit(jobId);
+            return Ok(result);
+        }
+
         /// <summary>
         /// add new surcharge
         /// </summary>
@@ -114,6 +141,33 @@ namespace eFMS.API.Documentation.Controllers
             model.DatetimeCreated = DateTime.Now;
             var hs = csShipmentSurchargeService.Add(model);           
             var message = HandleError.GetMessage(hs, Crud.Insert);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// add list surcharge
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        [HttpPost("AddAndUpdate")]
+        [Authorize]
+        public IActionResult Add(List<CsShipmentSurchargeModel> list)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            var query = list.Where(x => x.InvoiceNo != null).GroupBy(x => x.InvoiceNo)
+                                      .Where(g => g.Count() > 1)
+                                      .Select(y => y.Key);
+            if (query.Any())
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_SURCHARGE_ARE_DUPLICATE_INVOICE].Value });
+            }
+            var hs = csShipmentSurchargeService.AddAndUpate(list);
+            var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
@@ -153,7 +207,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpDelete]
         [Route("Delete")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Delete(Guid chargId)
         {
             var hs = csShipmentSurchargeService.DeleteCharge(chargId);

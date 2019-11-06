@@ -57,6 +57,17 @@ namespace eFMS.API.Catalogue.Controllers
             var results = catPlaceService.Get();
             return Ok(results);
         }
+        /// <summary>
+        /// get by mode tran
+        /// </summary>
+        /// <returns></returns>
+        [Route("GetByModeTran")]
+        [HttpGet]
+        public IActionResult GetByModeTran()
+        {
+            var results = catPlaceService.GetByModeOfTran();
+            return Ok(results);
+        }
 
         /// <summary>
         /// get the list of all places
@@ -111,6 +122,19 @@ namespace eFMS.API.Catalogue.Controllers
             var results = catPlaceService.GetProvinces(countryId);
             return Ok(results);
         }
+
+        /// <summary>
+        /// get all province
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetAllProvinces")]
+        public IActionResult GetAllProvinces()
+        {
+            var results = catPlaceService.GetAllProvinces();
+            return Ok(results);
+        }
+
 
         /// <summary>
         /// get the list of districts by province

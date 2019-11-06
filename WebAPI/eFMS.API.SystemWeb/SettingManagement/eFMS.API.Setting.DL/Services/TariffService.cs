@@ -389,7 +389,7 @@ namespace eFMS.API.Setting.DL.Services
                 rowsCount = 0;
                 return null;
             }
-            //list = list.OrderByDescending(x => x.DatetimeCreated).ToList();
+            list = list.OrderByDescending(x => x.DatetimeModified).ToList();
             rowsCount = list.ToList().Count;
             if (size > 1)
             {

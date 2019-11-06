@@ -1,11 +1,11 @@
 
 export const environment = {
     production: false,
-    local: true,
+    local: false,
     HOST: {
         WEB_URL: "test.api-efms.itlvn.com",
         ACCOUNTING: "test.api-efms.itlvn.com/Accounting",
-        DOCUMENTATION: "test.api-efms.itlvn.com/Documentation",
+        DOCUMENTATION: "localhost:44366",//"test.api-efms.itlvn.com/Documentation",
         // CATALOGUE: "localhost:44361",
         CATALOGUE: "test.api-efms.itlvn.com/Catalogue",
         OPERATION: "test.api-efms.itlvn.com/Operation",

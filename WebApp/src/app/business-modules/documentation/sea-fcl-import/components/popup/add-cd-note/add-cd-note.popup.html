@@ -1,4 +1,4 @@
-<div class="modal fade new-adv-payment-popup" role="dialog" bsModal #popup="bs-modal" aria-hidden="true">
+<div class="modal fade" role="dialog" bsModal #popup="bs-modal" aria-hidden="true">
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -74,7 +74,7 @@
                                     </span>
                                 </button>
                                 <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                                    data-toggle="modal" [disabled]="(selectedPartner | json) === '{}'">
+                                    data-toggle="modal" [disabled]="(selectedPartner | json) === '{}'" (click)="openPopupAddCharge()">
                                     <span>
                                         <i class="la la-plus"></i>
                                         <span>
@@ -99,7 +99,7 @@
                             </thead>
                             <tbody class="tbody-group">
                                 <ng-container
-                                    *ngFor="let charges of listChargePartner;  let i = index; trackBy: trackByFn">
+                                    *ngFor="let charges of listChargePartner; let i = index; trackBy: trackByFn">
                                     <tr class="collapse-toggle-row tgroup">
                                         <td colspan="12">
                                             <label class="m-checkbox">
@@ -219,3 +219,5 @@
     [body]="'Look like you have not selected any charges for the C/D Note. Please recheck and try again!'"
     [title]="'Alert'">
 </info-popup>
+
+<add-remaining-charge-popup></add-remaining-charge-popup>

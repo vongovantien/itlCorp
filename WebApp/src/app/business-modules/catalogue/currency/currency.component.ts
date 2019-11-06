@@ -10,7 +10,7 @@ import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { NgForm } from '@angular/forms';
-import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
+import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import * as lodash from 'lodash';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
@@ -52,7 +52,7 @@ export class CurrencyComponent implements OnInit {
     typeButton: ButtonType.cancel
   };
   isAddnew: boolean;
-  @ViewChild(PaginationComponent, { static: false }) child;
+  @ViewChild(AppPaginationComponent, { static: false }) child;
   @ViewChild('formAddEdit', { static: false }) form: NgForm;
   totalPages: number;
   constructor(private sortService: SortService, private baseService: BaseService,

@@ -17,6 +17,7 @@ import { SeaLclExportManifestComponent } from './sea-lcl-export-create/sea-lcl-e
 import { SeaLclExportShippingInstructionComponent } from './sea-lcl-export-create/sea-lcl-export-shipping-instruction/sea-lcl-export-shipping-instruction.component';
 
 const routes: Routes = [
+
     {
         path: '',
         redirectTo: 'inland-trucking',
@@ -129,6 +130,7 @@ const routes: Routes = [
             level: 4
         }
     },
+
     {
         path: 'sea-lcl-export-housebill-addnew',
         component: SeaLclExportHousebillAddnewComponent

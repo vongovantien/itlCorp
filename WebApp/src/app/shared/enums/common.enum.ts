@@ -61,5 +61,10 @@ export namespace CommonEnum {
         CHARGE = "CHARGE"
     }
 
+    export enum TableActions {
+        EDIT = 'EDIT',
+        DELETE = 'DELETE'
+    }
+
 }
 

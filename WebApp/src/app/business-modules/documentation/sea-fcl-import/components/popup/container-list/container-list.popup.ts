@@ -1,12 +1,11 @@
-import { Component } from '@angular/core';
-import { Store, ActionsSubject } from '@ngrx/store';
+import { Component, ChangeDetectorRef } from '@angular/core';
+import { Store } from '@ngrx/store';
 
 import { PopupBase } from 'src/app/popup.base';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { Unit } from 'src/app/shared/models';
-import { getContainerSaveState } from './../../../store';
 
 import { catchError, takeUntil } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
@@ -18,7 +17,6 @@ import { Commodity } from 'src/app/shared/models/catalogue/commodity.model';
 @Component({
     selector: 'container-list-popup',
     templateUrl: './container-list.popup.html',
-    styleUrls: ['./container-list.popup.scss']
 })
 export class SeaFCLImportContainerListPopupComponent extends PopupBase {
 
@@ -38,7 +36,7 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _store: Store<fromStore.IContainerState>,
-        private _actionStoreSubject: ActionsSubject
+        private cdRef: ChangeDetectorRef
 
     ) {
         super();
@@ -61,11 +59,12 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
             { title: 'Unit', field: '' },
             { title: 'CBM', field: '' },
         ];
+        this.cdRef.detectChanges(); // * tell ChangeDetect update view in app-table-header (field required).
         this.getMasterData();
 
 
         // * GET DATA FROM STORE.
-        this._store.select(getContainerSaveState)
+        this._store.select(fromStore.getContainerSaveState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (res: fromStore.IContainerState | any) => {
@@ -77,7 +76,6 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
 
     addNewContainer() {
         this.isSubmitted = false;
-        // * unitOfMeasureId = kgs.
         this._store.dispatch(new fromStore.AddContainerAction(new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: 119 }))); // * DISPATCH Add ACTION 
     }
 
@@ -91,7 +89,6 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
             this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE }),
             this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.WEIGHT }),
             this._catalogueRepo.getCommondity({ active: true }),
-
         ])
             .pipe(
                 catchError(this.catchError)
@@ -117,6 +114,7 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
                 container.packageTypeName = this.getPackageTypeName(container.packageTypeId);
             }
             this._store.dispatch(new fromStore.SaveContainerAction(this.containers));
+
             this.isSubmitted = false;
             this.hide();
         }

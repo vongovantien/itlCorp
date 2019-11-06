@@ -20,6 +20,6 @@ namespace eFMS.API.Documentation.DL.IService
         List<object> GroupCDNoteByPartner(Guid id,bool IsHouseBillID);
         AcctCDNoteDetailsModel GetCDNoteDetails(Guid JobId, string cdNo);
         Crystal Preview(AcctCDNoteDetailsModel model);
-
+        bool CheckAllowDelete(Guid cdNoteId);
     }
 }

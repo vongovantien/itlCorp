@@ -108,11 +108,11 @@ namespace eFMS.API.Documentation.DL.Services
                         var charge = surchargeRepository.Get(x => x.Id == c.Id).FirstOrDefault();
                         if (charge != null)
                         {
-                            if(charge.Type == "BUY")
+                            if(charge.Type == Constants.CHARGE_BUY_TYPE)
                             {
                                 charge.CreditNo = model.Code;
                             }
-                            else if(charge.Type == "SELL")
+                            else if(charge.Type == Constants.CHARGE_SELL_TYPE)
                             {
                                 charge.DebitNo = model.Code;
                             }
@@ -248,8 +248,9 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var jobId = IsHouseBillID == true ? opstransRepository.Get(x => x.Hblid == id).FirstOrDefault()?.Id : id;
                     var cdNotes = DataContext.Where(x => x.PartnerId == item.Id && x.JobId== jobId).ToList();
+                    var cdNotesModel = mapper.Map<List<AcctCdnoteModel>>(cdNotes);
                     List<object> listCDNote = new List<object>();
-                    foreach(var cdNote in cdNotes)
+                    foreach(var cdNote in cdNotesModel)
                     {
                         // -to continue
                         //var chargesOfCDNote = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Cdno == cdNote.Code).ToList();
@@ -258,22 +259,24 @@ namespace eFMS.API.Documentation.DL.Services
                         decimal totalCredit = 0;
                         foreach(var charge in chargesOfCDNote)
                         {
-                            if (charge.Type == "BUY" || charge.Type == "LOGISTIC" || (charge.Type == "OBH" && cdNote.PartnerId == charge.PayerId))
+                            if (charge.Type == Constants.CHARGE_BUY_TYPE || charge.Type == "LOGISTIC" || (charge.Type == Constants.CHARGE_OBH_TYPE && cdNote.PartnerId == charge.PayerId))
                             {
                                 // calculate total credit
                                 totalCredit += (decimal)(charge.Total * charge.ExchangeRate);
                             }
-                            if (charge.Type == "SELL" || (charge.Type == "OBH" && cdNote.PartnerId == charge.PaymentObjectId))
+                            if (charge.Type == Constants.CHARGE_SELL_TYPE || (charge.Type == Constants.CHARGE_OBH_TYPE && cdNote.PartnerId == charge.PaymentObjectId))
                             {
                                 // calculate total debit 
                                 totalDebit += (decimal)(charge.Total * charge.ExchangeRate);
                             }
                         }
                         cdNote.Total = totalDebit - totalCredit;
-                        listCDNote.Add(new { cdNote, total_charge= chargesOfCDNote.Count() });                      
-
+                        cdNote.soaNo = String.Join(",", chargesOfCDNote.Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano ).Distinct());
+                        cdNote.total_charge = chargesOfCDNote.Count();
+                        //listCDNote.Add(new { cdNote, total_charge= chargesOfCDNote.Count()});
+                        listCDNote.Add(cdNote);
                     }
-
+                    
                     var obj = new { item.PartnerNameEn, item.PartnerNameVn, item.Id, listCDNote };
                     if (listCDNote.Count > 0)
                     {
@@ -416,7 +419,6 @@ namespace eFMS.API.Documentation.DL.Services
             foreach(var item in HBList)
             {
                 hbOfLadingNo += (item.Hwbno + ", ");
-                //mbOfLadingNo += (item.JobNo + ", ");
                 var conts = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == item.Id).ToList();
                 foreach(var cont in conts)
                 {
@@ -474,9 +476,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    //to continue
-                    //var charges = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Cdno == cdNote.Code).ToList();
-                    var charges = surchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code); //((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code).ToList();
+                    var charges = surchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
                     var isOtherSOA = false;
                     foreach(var item in charges)
                     {
@@ -514,11 +514,11 @@ namespace eFMS.API.Documentation.DL.Services
                                 //        item.CreditNo = null;
                                 //    }
                                 //}
-                                if (item.Type == "BUY")
+                                if (item.Type == Constants.CHARGE_BUY_TYPE)
                                 {
                                     item.CreditNo = null;
                                 }
-                                else if (item.Type == "SELL")
+                                else if (item.Type == Constants.CHARGE_SELL_TYPE)
                                 {
                                     item.DebitNo = null;
                                 }
@@ -537,7 +537,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 item.DatetimeModified = DateTime.Now;
                                 surchargeRepository.Update(item, x => x.Id == item.Id, false);
                             }
-                            ((eFMSDataContext)DataContext.DC).SaveChanges();
+                            DataContext.SubmitChanges();
                             var jobOpsTrans = opstransRepository.Get(x => x.Id == cdNote.JobId).FirstOrDefault();//((eFMSDataContext)DataContext.DC).OpsTransaction.FirstOrDefault();
                             if (jobOpsTrans != null)
                             {
@@ -720,6 +720,18 @@ namespace eFMS.API.Documentation.DL.Services
                 jobCSTrans.ModifiedDate = DateTime.Now;
                 cstransRepository.Update(jobCSTrans, x => x.Id == jobId, false);
             }
+        }
+
+        public bool CheckAllowDelete(Guid cdNoteId)
+        {
+            var cdNote = DataContext.Get(x => x.Id == cdNoteId).FirstOrDefault();
+            var query = surchargeRepository.Get(x => (x.CreditNo == cdNote.Code && !string.IsNullOrEmpty(x.PaySoano)) 
+                                                  || (x.DebitNo == cdNote.Code && !string.IsNullOrEmpty(x.Soano)) ); 
+            if (query.Any())
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

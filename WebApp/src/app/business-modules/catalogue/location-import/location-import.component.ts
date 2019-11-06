@@ -3,7 +3,7 @@ import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { SystemConstants } from 'src/constants/system.const';
-import { PaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
+import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
 import { language } from 'src/languages/language.en';
 import { ActivatedRoute } from '@angular/router';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
@@ -29,7 +29,7 @@ export class LocationImportComponent implements OnInit {
   sortKey: string;
 
   @ViewChild('form', { static: false }) form: any;
-  @ViewChild(PaginationComponent, { static: false }) child: any;
+  @ViewChild(AppPaginationComponent, { static: false }) child: any;
   @ViewChild(NgProgressComponent, { static: false }) progressBar: NgProgressComponent;
   @ViewChild(InfoPopupComponent, { static: false }) invaliDataAlert: InfoPopupComponent;
   constructor(

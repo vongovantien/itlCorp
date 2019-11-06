@@ -161,6 +161,10 @@ export class DocumentationRepo {
         );
     }
 
+    getListHourseBill(data: any = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/QueryData`, data)
+    }
+
     getListShipmentDocumentation(page?: number, size?: number, body: any = {}) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/Paging`, body, {
             page: '' + page,
@@ -177,6 +181,10 @@ export class DocumentationRepo {
                 return res;
             })
         );
+    }
+
+    createHousebill(body: any = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/addNew`, body)
     }
 
     checkMasterBillAllowToDelete(id: string) {
@@ -201,14 +209,35 @@ export class DocumentationRepo {
     }
 
     getPartners(id: any){
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsShipmentSurcharge/GetPartners`,{ Id: id, IsHouseBillID : true}).pipe(
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GetPartners`,{ Id: id, IsHouseBillID : true}).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     getChargesByPartner(id: any, partnerId: any){
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsShipmentSurcharge/GroupByListHB`,{ Id: id, partnerID: partnerId, IsHouseBillID: true}).pipe(
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GroupByListHB`,{ Id: id, partnerID: partnerId, IsHouseBillID: true}).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    getListCdNoteByMasterBill(id: string){
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/Get`,{ Id: id, IsHouseBillID: false}).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    checkCdNoteAllowToDelete(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/CheckAllowDelete/${id}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    deleteCdNote(cdNoteId: string){
+        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/Delete`,{cdNoteId: cdNoteId}).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

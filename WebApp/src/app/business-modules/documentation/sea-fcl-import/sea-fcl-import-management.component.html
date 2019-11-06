@@ -159,9 +159,8 @@
                         </div>
                         <div class="col-sm-6" *ngIf="totalItems > pageSize">
                             <div class="float-right">
-                                <pagination [boundaryLinks]="true" [totalItems]="totalItems"
-                                    [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
-                                    [(ngModel)]="page">
+                                <pagination [boundaryLinks]="true" [totalItems]="totalItems" [itemsPerPage]="pageSize"
+                                    (pageChanged)="pageChanged($event)" [(ngModel)]="page">
                                 </pagination>
                             </div>
                         </div>
