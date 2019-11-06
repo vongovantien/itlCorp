@@ -8,6 +8,7 @@ import { AppList } from 'src/app/app.list';
 export class ShareBussinessBuyingChargeComponent extends AppList {
 
     headers: CommonInterface.IHeaderTable[] = [];
+    charges: any[] = [1, 2];
 
     constructor() {
         super();
@@ -15,13 +16,13 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     ngOnInit(): void {
         this.headers = [
-            { title: 'Charge', field: '' },
-            { title: 'Partner', field: '' },
-            { title: 'Q`ty', field: '' },
-            { title: 'Unit', field: '' },
-            { title: 'Unit Price', field: '' },
-            { title: 'Currency', field: '' },
-            { title: 'VAT', field: '' },
+            { title: 'Charge', field: '', required: true },
+            { title: 'Partner', field: '', required: true },
+            { title: 'Q`ty', field: '', required: true },
+            { title: 'Unit', field: '', required: true },
+            { title: 'Unit Price', field: '', required: true },
+            { title: 'Currency', field: '', required: true },
+            { title: 'VAT', field: '', required: true },
             { title: 'Total Amount', field: '' },
             { title: 'Invoice No', field: '' },
             { title: 'Series No', field: '' },
