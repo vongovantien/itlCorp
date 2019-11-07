@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { DocumentationRepo, CatalogueRepo } from 'src/app/shared/repositories';
 import { forkJoin } from 'rxjs';
@@ -13,6 +13,7 @@ import { BaseService } from 'src/app/shared/services';
 @Component({
     selector: 'form-create-sea-fcl-import',
     templateUrl: './form-create-sea-fcl-import.component.html',
+    encapsulation: ViewEncapsulation.None
 })
 export class SeaFClImportFormCreateComponent extends AppForm {
 

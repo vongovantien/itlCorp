@@ -100,9 +100,13 @@
         .form-group {
             padding: 0;
             .form-control {
-                background: none;
+                background: #fff;
                 border: 0;
                 padding: 0;
+                &:disabled {
+                    background: #f4f5f8;
+                    cursor: not-allowed;
+                }
             }
 
             &.has-danger {

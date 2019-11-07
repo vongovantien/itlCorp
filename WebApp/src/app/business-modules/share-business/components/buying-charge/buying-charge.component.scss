@@ -1,0 +1,47 @@
+:host /deep/ {
+    .table-wrapper {
+        &.h {
+            min-height: 330px;
+        }
+    }
+    .cdk-virtual-scroll-viewport {
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    .table-editable {
+        .table-date {
+            .table-condensed {
+                tr {
+                    th:not(:first-child) {
+                        min-width: 40px;
+                    }
+                    td:not(:first-child) {
+                        min-width: auto;
+                    }
+                }
+            }
+        }
+        .e--combogrid {
+            .form-control {
+                border: unset;
+                background: inherit;
+                padding: 4px 8px;
+            }
+            tr {
+                th:not(:first-child) {
+                    min-width: 130px;
+                }
+                td:not(:first-child) {
+                    min-width: 130px;
+                }
+                th:first-child {
+                    min-width: 130px;
+                }
+                td:first-child {
+                    min-width: 130px;
+                }
+            }
+        }
+        // * Calendar
+    }
+}

@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonComponentModule } from 'src/app/shared/common/common.module';
 import { DirectiveModule } from 'src/app/shared/directives/directive.module';
 import { ShareBussinessBuyingChargeComponent } from './components';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 
 const COMPONENTS = [
     ShareBussinessBuyingChargeComponent
@@ -19,6 +20,7 @@ const COMPONENTS = [
         CommonComponentModule,
         FormsModule,
         ModalModule.forRoot(),
+        NgxDaterangepickerMd.forRoot(),
         DirectiveModule
     ],
     exports: [

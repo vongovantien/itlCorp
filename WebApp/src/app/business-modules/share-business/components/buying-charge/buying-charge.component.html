@@ -1,90 +1,202 @@
-<div class="table-wrapper table-scrollable table-editable m--margin-top-20">
-    <table class="table dataTable table-bordered">
-        <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField ? $event.sortField : '')">
-            <th class="m--w-50 first table-actions-col">
+<div class="buying-charge-wrapper">
+    <div class="table-wrapper table-editable m--margin-top-20" [class.h]="!!charges.length">
+        <table class="table dataTable table-bordered">
+            <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                <th class="m--w-50 first table-actions-col">
+                </th>
+            </thead>
+            <tbody>
+                <ng-container *ngIf="!!charges.length">
+                    <tr *ngFor="let charge of charges; let i = index; trackBy: trackByFn" class="m-form m-form--state">
+                        <td class="table-actions-col">
+                            <div class="table-actions">
+                                <button type="button"
+                                    class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    title="Remove">
+                                    <i class="la la-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group ">
+                                <input type="text" class="form-control">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                <app-combo-grid-virtual-scroll
+                                    [currentActiveItemId]="{field:'id', value:charge.chargeId}"
+                                    (itemSelected)="onSelectDataFormInfo($event, 'charge', charge)"
+                                    [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
+                                    [dataSources]="listCharges" [displayFields]="configComboGridCharge.displayFields"
+                                    [height]="200">
+                                </app-combo-grid-virtual-scroll>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group ">
+                                <input type="number" class="form-control" [(ngModel)]="charge.quantity">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group ">
+                                <select class="form-control" [(ngModel)]="charge.unitId">
+                                    <option value="null" disabled>Please select</option>
+                                    <option *ngFor="let unit of listUnits" [ngValue]="unit.id">{{unit.code}}</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group ">
+                                <input type="number" class="form-control" [(ngModel)]="charge.unitPrice"
+                                    (ngModelChange)="onChangeUnitPrice($event, charge)">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group ">
+                                <select class="form-control" [(ngModel)]="charge.currencyId">
+                                    <option *ngFor="let currency of listCurrency" [ngValue]="currency.id">
+                                        {{currency.id}}
+                                    </option>
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group ">
+                                <input type="number" class="form-control" [(ngModel)]="charge.vatrate"
+                                    (ngModelChange)="onChangeVat($event, charge)">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group ">
+                                <input type="number" class="form-control" [(ngModel)]="charge.total" readonly>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group ">
+                                <input type="text" class="form-control" [(ngModel)]="charge.notes" placeholder="Note">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group ">
+                                <input type="text" class="form-control" [(ngModel)]="charge.invoiceNo"
+                                    placeholder="Invoice No">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group ">
+                                <input type="text" class="form-control" [(ngModel)]="charge.seriesNo"
+                                    placeholder="Series No">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group table-date">
+                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [minDate]="minDate"
+                                        name="daterange" placeholder="Please Select" readonly [autoApply]="true"
+                                        [singleDatePicker]="true" [alwaysShowCalendars]="true"
+                                        [(ngModel)]="charge.invoiceDate" />
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group ">
+                                <input type="text" class="form-control" [(ngModel)]="charge.soano" disabled readonly
+                                    placeholder="SOA">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group ">
+                                <input type="text" class="form-control" [(ngModel)]="charge.cdno" disabled readonly
+                                    placeholder="CD Note">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group ">
+                                <input type="text" class="form-control" [(ngModel)]="charge.settlementCode" disabled
+                                    readonly placeholder="Settlement">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group table-date">
+                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [minDate]="minDate"
+                                        name="daterange" placeholder="Please Select" readonly [autoApply]="true"
+                                        [singleDatePicker]="true" [alwaysShowCalendars]="true"
+                                        [(ngModel)]="charge.exchangeDate" />
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group ">
+                                <input type="text" class="form-control" disabled readonly placeholder="Voucher ID"
+                                    [(ngModel)]="charge.voucherId">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group ">
+                                <input type="text" class="form-control" disabled readonly placeholder="Voucher ID Date"
+                                    [(ngModel)]="charge.voucherIddate">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group ">
+                                <input type="text" class="form-control" disabled readonly placeholder="Voucher IDRE"
+                                    [(ngModel)]="charge.voucherIdre">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group ">
+                                <input type="text" class="form-control" disabled readonly
+                                    placeholder="Voucher IDRE Date" [(ngModel)]="charge.voucherIdredate">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group ">
+                                <input type="text" class="form-control" disabled readonly
+                                    placeholder="Final Exchange Date" [(ngModel)]="charge.finalExchangeRate">
+                            </div>
+                        </td>
+                        <td>
+                            <app-switch [(toggle)]="charge.kickBack">
+                            </app-switch>
+                        </td>
+                    </tr>
 
-            </th>
-        </thead>
-        <tbody>
-            <ng-container *ngFor="let charge of charges; let i = index; trackBy: trackByFn">
+                </ng-container>
+                <tr app-table-none-record [colspan]="headers.length  + 1" *ngIf="!charges.length">
+                </tr>
                 <tr>
-                    <td class="table-actions-col">
-                        <div class="table-actions">
-                            <button type="button"
-                                class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Remove">
-                                <i class="la la-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="form-group ">
-                            <input type="text" class="form-control">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="form-group ">
-                            <input type="text" class="form-control">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="form-group ">
-                            <input type="text" class="form-control">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="form-group ">
-                            <input type="text" class="form-control">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="form-group ">
-                            <input type="text" class="form-control">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="form-group ">
-                            <input type="text" class="form-control">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="form-group ">
-                            <input type="text" class="form-control">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="form-group ">
-                            <input type="text" class="form-control">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="form-group ">
-                            <input type="text" class="form-control">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="form-group ">
-                            <input type="text" class="form-control">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="form-group ">
-                            <input type="text" class="form-control">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="form-group ">
-                            <input type="text" class="form-control">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="form-group ">
-                            <input type="text" class="form-control">
-                        </div>
+                    <td colspan=100>
+                        <a class="btn m-btn--icon m-btn--icon-only m--font-success" title="Add" (click)="addCharge()">
+                            <i class="la la-plus-circle"></i>
+                        </a>
                     </td>
                 </tr>
-            </ng-container>
-            <!-- <tr app-table-none-record [colspan]="headers.length  + 1">
-            </tr> -->
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
+    <div class="m--align-right">
+        <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase"
+            (click)="saveSurcharge()">
+            <span>
+                <i class="la la-plus"></i>
+                <span>
+                    save
+                </span>
+            </span>
+        </button>
+    </div>
 </div>
