@@ -2,6 +2,10 @@
     .table-wrapper {
         &.h {
             min-height: 330px;
+            padding-bottom: 175px;
+        }
+        .form-group {
+            font-size: 11px;
         }
     }
     .cdk-virtual-scroll-viewport {
@@ -43,5 +47,14 @@
             }
         }
         // * Calendar
+    }
+
+    .quantity-hint {
+        .p-l-none {
+            padding-left: 0;
+        }
+        .p-r-none {
+            padding-right: 0;
+        }
     }
 }

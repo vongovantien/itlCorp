@@ -23,6 +23,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     configComboGridCharge: Partial<CommonInterface.IComboGirdConfig> = {};
     selectedCharge: Partial<CommonInterface.IComboGridData> = {};
 
+    quantityHints: CommonInterface.IValueDisplay[];
+    selectedQuantityHint: CommonInterface.IValueDisplay = null;
+
     constructor(
         private _catalogueRepo: CatalogueRepo
     ) {
@@ -31,9 +34,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     ngOnInit(): void {
         this.headers = [
-            { title: 'Partner Name', field: 's', required: true, sortable: true },
-            { title: 'Charge Name', field: 's', required: true, sortable: true },
-            { title: 'Quantity', field: 's', required: true, sortable: true },
+            { title: 'Partner Name', field: 's', required: true, sortable: true, width: 200 },
+            { title: 'Charge Name', field: 's', required: true, sortable: true, width: 200 },
+            { title: 'Quantity', field: 's', required: true, sortable: true, width: 200 },
             { title: 'Unit', field: 's', required: true, sortable: true },
             { title: 'Unit Price', field: '', required: true, sortable: true },
             { title: 'Currency', field: '', required: true, sortable: true },
@@ -62,7 +65,16 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 { field: 'unitId', label: 'Unit' },
                 { field: 'code', label: 'Code' },
             ]
-        }, { selectedDisplayFields: ['chargeNameEn'], })
+        }, { selectedDisplayFields: ['chargeNameEn'], });
+
+        this.quantityHints = [
+            { displayName: 'G.W', value: 'gw' },
+            { displayName: 'C.W', value: 'cw' },
+            { displayName: 'CBM', value: 'cbm' },
+            { displayName: 'Package', value: 'package' },
+            { displayName: 'Cont', value: 'cont' },
+            { displayName: 'N.W', value: 'nw' },
+        ]
         this.getMasterData();
     }
 
@@ -105,11 +117,17 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     addCharge() {
         const newSurCharge: CsShipmentSurcharge = new CsShipmentSurcharge();
         newSurCharge.currencyId = "USD"; // * Set default.
+        newSurCharge.quantity = 0;
+        newSurCharge.quantityHint = null;
         newSurCharge.exchangeDate = { startDate: new Date(), endDate: new Date() };
 
         this.charges.push(newSurCharge);
 
         console.log(this.charges);
+    }
+
+    deleteCharge(index: number) {
+        this.charges.splice(index, 1);
     }
 
     onChangeVat(vat: number, chargeItem: CsShipmentSurcharge) {
@@ -127,5 +145,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     saveSurcharge() {
         console.log(this.charges);
+    }
+
+    onChangeQuantityHint(event: any) {
+        console.log(event);
     }
 }

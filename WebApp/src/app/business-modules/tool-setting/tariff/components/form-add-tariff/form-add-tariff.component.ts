@@ -150,6 +150,7 @@ export class TariffFormAddComponent extends TariffFormSearchComponent {
                 map((data: any) => data.startDate)
             )
             .subscribe((value: any) => {
+                console.log(value);
                 this.resetFormControl(this.formAdd.controls['tariff'].get("expiredDate"));
                 this.minDateExpired = value; // * Update MinDate -> ExpiredDate.
             });
