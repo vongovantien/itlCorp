@@ -1,11 +1,11 @@
-import { Component, OnInit, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 
 @Component({
-  selector: 'app-form-search-group',
-  templateUrl: './form-search-group.component.html'
+  selector: 'form-search-charge',
+  templateUrl: './form-search-charge.component.html'
 })
-export class FormSearchGroupComponent extends AppForm {
+export class FormSearchChargeComponent extends AppForm implements OnInit {
   @Output() onSearch: EventEmitter<ISearchGroup> = new EventEmitter<ISearchGroup>();
   configSearch: any;
 
@@ -19,11 +19,10 @@ export class FormSearchGroupComponent extends AppForm {
     this.configSearch = {
       typeSearch: 'outtab',
       settingFields: <CommonInterface.IValueDisplay[]>[
-        { displayName: 'Group Code', fieldName: 'code' },
-        { displayName: 'Name En', fieldName: 'nameEn' },
-        { displayName: 'Name Local', fieldName: 'nameVn' },
-        { displayName: 'Name Abbr', fieldName: 'shortName' },
-        { displayName: 'Department', fieldName: 'departmentName' }
+        { displayName: 'Code', fieldName: 'code' },
+        { displayName: 'Name EN', fieldName: 'chargeNameEn' },
+        { displayName: 'Name Local', fieldName: 'chargeNameVn' },
+        { displayName: 'Type', fieldName: 'type' }
       ]
     };
   }

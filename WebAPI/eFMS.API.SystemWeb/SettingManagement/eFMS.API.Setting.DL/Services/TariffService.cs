@@ -201,13 +201,11 @@ namespace eFMS.API.Setting.DL.Services
         {
             try
             {
-                var userCurrent = currentUser.UserID;
                 var today = DateTime.Now;
                 //Update SetTariff
                 var tariff = mapper.Map<SetTariff>(model.setTariff);
                 //var tariffCurrent = DataContext.Get(x => x.Id == tariff.Id).FirstOrDefault();
                 //tariff.UserCreated = tariffCurrent.UserCreated;
-                tariff.UserModified = userCurrent;
                 //tariff.DatetimeCreated = tariffCurrent.DatetimeCreated;
                 tariff.DatetimeModified = today;
 
@@ -233,7 +231,7 @@ namespace eFMS.API.Setting.DL.Services
                         foreach (var item in tariffDetailOld)
                         {
                             //item.UserCreated = setTariffDetailRepo.Get(x => x.Id == item.Id).FirstOrDefault().UserCreated;
-                            item.UserModified = userCurrent;
+                            item.UserModified = model.setTariff.UserModified;
                             //item.DatetimeCreated = setTariffDetailRepo.Get(x => x.Id == item.Id).FirstOrDefault().DatetimeCreated;
                             item.DatetimeModified = DateTime.Now;
                             var hsTariffDetailUpdate= setTariffDetailRepo.Update(item, x => x.Id == item.Id);
@@ -248,7 +246,7 @@ namespace eFMS.API.Setting.DL.Services
                         {
                             r.Id = Guid.NewGuid();
                             r.TariffId = tariff.Id;
-                            r.UserCreated = r.UserModified = userCurrent;
+                            r.UserCreated = r.UserModified = model.setTariff.UserModified;
                             r.DatetimeCreated = r.DatetimeModified = DateTime.Now;
                         });
                         var hsTariffDetailAdd = setTariffDetailRepo.Add(tariffDetailNew);

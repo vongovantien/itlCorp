@@ -3,7 +3,7 @@ import { AppPage } from './app.base';
 export abstract class AppList extends AppPage {
 
     page: number = 1;
-    totalItems: number = 0;
+    totalItems: number = 10;
     numberToShow: number[] = [3, 15, 30, 50];
     pageSize: number = this.numberToShow[1];
 
@@ -57,6 +57,7 @@ export abstract class AppList extends AppPage {
     selectPageSize(pageSize: number, data?: any) {
         this.pageSize = pageSize;
         this.page = 1;  // TODO reset page to initial
+        this.totalItems = 0;
         this.requestList(data);
     }
 

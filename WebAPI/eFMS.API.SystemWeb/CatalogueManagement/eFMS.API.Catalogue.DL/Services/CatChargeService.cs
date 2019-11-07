@@ -61,8 +61,6 @@ namespace eFMS.API.Catalogue.DL.Services
                     x.UserCreated = x.UserModified = currentUser.UserID;
                     x.DatetimeCreated = DateTime.Now;
                     chargeDefaultRepository.Add(x, false);
-                    //((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Add(x);
-                    //((eFMSDataContext)DataContext.DC).SaveChanges();
                 }
                 chargeDefaultRepository.SubmitChanges();
                 DataContext.SubmitChanges();
@@ -89,8 +87,6 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.UserModified = currentUser.UserID;
                     item.DatetimeModified = DateTime.Now;
                     chargeDefaultRepository.Update(item, x => x.Id == item.Id, false);
-                    //((eFMSDataContext)DataContext.DC).CatChargeDefaultAccount.Update(x);
-                    //((eFMSDataContext)DataContext.DC).SaveChanges();
                 }
                 chargeDefaultRepository.SubmitChanges();
                 DataContext.SubmitChanges();
@@ -117,38 +113,30 @@ namespace eFMS.API.Catalogue.DL.Services
 
 
 
-        public List<object> GetCharges(CatChargeCriteria criteria, int page, int size, out int rowsCount)
+        public IQueryable<CatChargeModel> Paging(CatChargeCriteria criteria, int page, int size, out int rowsCount)
         {
             var list = Query(criteria);
-            List<object> listReturn = new List<object>();
-            if(criteria.Type!=null && criteria.ServiceTypeId!=null && criteria.Active != null)
-            {
-                list = list.Where(x => (x.Type.Trim().ToLower() == criteria.Type.Trim().ToLower() && x.ServiceTypeId.IndexOf(criteria.ServiceTypeId)>-1 && x.Active == criteria.Active)).ToList();
-            }
-            list = list.OrderByDescending(x => x.DatetimeModified).ToList();
-            rowsCount = list.Count;
+            //if(criteria.Type!=null && criteria.ServiceTypeId!=null && criteria.Active != null)
+            //{
+            //    list = list.Where(x => (x.Type.Trim().ToLower() == criteria.Type.Trim().ToLower() 
+            //            && x.ServiceTypeId.IndexOf(criteria.ServiceTypeId, StringComparison.OrdinalIgnoreCase) > -1 
+            //            && x.Active == criteria.Active));
+            //}
+            list = list.OrderByDescending(x => x.DatetimeModified);
+            rowsCount = list.Count();
+            if (rowsCount == 0) return null;
             if (size > 1)
             {
                 if (page < 1)
                 {
                     page = 1;
                 }
-                list = list.Skip((page - 1) * size).Take(size).ToList();
+                list = list.Skip((page - 1) * size).Take(size);
             }
-            foreach(var charge in list)
-            {
-                var currency = currencyRepository.Get(x => x.Id == charge.CurrencyId).FirstOrDefault();
-                var unit = unitRepository.Get(x => x.Id == charge.UnitId).FirstOrDefault();
-                //var listServices = charge.ServiceTypeId.Split(";");
-                var chargeDefaultAccounts = chargeDefaultRepository.Get(x => x.ChargeId == charge.Id).ToList();
-                var obj = new { currency = currency?.Id, unit = unit?.Code, charge, chargeDefaultAccounts };
-                listReturn.Add(obj);
-            }
-            
-            return listReturn;
+            return list.ProjectTo<CatChargeModel>(mapper.ConfigurationProvider);
         }
 
-        public List<CatCharge> Query(CatChargeCriteria criteria)
+        public IQueryable<CatCharge> Query(CatChargeCriteria criteria)
         {
             var list = DataContext.Where(x => x.Active == criteria.Active || criteria.Active == null);
             var currencies = currencyRepository.Get();
@@ -169,7 +157,7 @@ namespace eFMS.API.Catalogue.DL.Services
                || ((x.Type ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                || ((x.ServiceTypeId ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0));
             }
-            return list.ToList();
+            return list;
         }
 
         public HandleState DeleteCharge(Guid id)
