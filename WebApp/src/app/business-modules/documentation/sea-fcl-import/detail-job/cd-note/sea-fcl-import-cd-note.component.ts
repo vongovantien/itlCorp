@@ -7,6 +7,8 @@ import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { CdNoteDetailPopupComponent } from '../../components/popup/detail-cd-note/detail-cd-note.popup';
+import { ActivatedRoute, Params } from '@angular/router';
+import { SortService } from 'src/app/shared/services';
 
 @Component({
     selector: 'sea-fcl-import-cd-note',
@@ -24,16 +26,27 @@ export class SeaFCLImportCDNoteComponent extends AppList {
     deleteMessage: string = '';
     selectedCdNoteId: string = '';
 
+    jobIdSelected: string = '';
+    cdNoteSelected: string = '';
+
     constructor(
         private _documentationRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _progressService: NgProgress,
+        private _activedRoute: ActivatedRoute,
+        private _sortService: SortService,
     ) {
         super();
         this._progressRef = this._progressService.ref();
+        this.requestSort = this.sortCdNotes;
     }
 
     ngOnInit(): void {
+        this._activedRoute.params.subscribe((param: Params) => {
+            if (param.id) {
+                console.log(param.id);
+            }
+        });
         this.headers = [
             { title: 'Type', field: 'type', sortable: true },
             { title: 'Note No', field: 'code', sortable: true },
@@ -48,12 +61,16 @@ export class SeaFCLImportCDNoteComponent extends AppList {
     }
 
     openPopupAdd() {
-        //this.cdNoteAddPopupComponent.action = 'create';
+        this.cdNoteAddPopupComponent.action = 'create';
         //this.cdNoteAddPopupComponent.advanceNo = this.advanceNo;
         this.cdNoteAddPopupComponent.show({ backdrop: 'static' });
     }
 
-    openPopupDetail(){
+    openPopupDetail(jobId: string, cdNote: string){
+        this.jobIdSelected = jobId;
+        this.cdNoteSelected = cdNote;
+        console.log(this.jobIdSelected)
+        console.log(this.cdNoteSelected)
         this.cdNoteDetailPopupComponent.show({ backdrop: 'static' });
     }
 
@@ -112,5 +129,17 @@ export class SeaFCLImportCDNoteComponent extends AppList {
                     }
                 },
             );
+    }
+
+    sortCdNotes(sort: string): void {
+        this.cdNoteGroups = this._sortService.sort(this.cdNoteGroups, sort, this.order);
+    }
+
+    onRequestCdNoteChange(dataRequest: any){
+        console.log(dataRequest)
+    }
+
+    onUpdateCdNote(dataRequest: any){
+        console.log(dataRequest)
     }
 }

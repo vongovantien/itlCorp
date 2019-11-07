@@ -254,4 +254,5 @@
     </div>
 </div>
 
-<cd-note-add-popup></cd-note-add-popup>
+<cd-note-add-popup (onRequest)="onRequestCdNoteChange($event)"
+(onUpdate)="onUpdateCdNote($event)"></cd-note-add-popup>

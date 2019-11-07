@@ -2,10 +2,10 @@
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Create Credit/Debit Note</h5>
-                <!-- <ng-template #updateTitle class="modal-title">
+                <h5 class="modal-title" *ngIf="action !== 'update' else updateTitle">Create Credit/Debit Note</h5>
+                <ng-template #updateTitle class="modal-title">
                     <h5 class="modal-title">Update Credit/Debit Note</h5>
-                </ng-template> -->
+                </ng-template>
 
                 <button type="button" (click)="closePopup()" class="close">
                     <span aria-hidden="true">&times;</span>
@@ -33,15 +33,26 @@
                                     <label class="form-control-label">
                                         Note Type
                                     </label>
-                                    <div class="m-radio-inline">
+                                    <div class="m-radio-inline" *ngIf="action !== 'update' else noteTypeUpdate">
                                         <label class="m-radio m-radio--bold m-radio--state-brand"
-                                            *ngFor="let item of noteTypes">
-                                            <input type="radio" [(ngModel)]="selectedNoteType"
-                                                name="radio_grp_note_type" value="{{item.id}}">
+                                            *ngFor="let item of noteTypes; let i = index">
+                                            <input type="radio" [checked]="item.id === selectedNoteType"
+                                                name="radio_grp_note_type" (change)="onChangeNoteType(item)">
                                             {{item.text}}
                                             <span></span>
                                         </label>
                                     </div>
+                                    <ng-template #noteTypeUpdate>
+                                        <div class="m-radio-inline">
+                                            <label class="m-radio m-radio--bold m-radio--state-brand"
+                                                *ngFor="let item of noteTypes; let i = index">
+                                                <input disabled type="radio" [checked]="item.id === selectedNoteType"
+                                                    name="radio_grp_note_type_update" (change)="onChangeNoteType(item)">
+                                                {{item.text}}
+                                                <span></span>
+                                            </label>
+                                        </div>
+                                    </ng-template>
                                 </div>
                             </div>
 
@@ -74,7 +85,8 @@
                                     </span>
                                 </button>
                                 <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                                    data-toggle="modal" [disabled]="(selectedPartner | json) === '{}'" (click)="openPopupAddCharge()">
+                                    data-toggle="modal" [disabled]="(selectedPartner | json) === '{}'"
+                                    (click)="openPopupAddCharge()">
                                     <span>
                                         <i class="la la-plus"></i>
                                         <span>
@@ -102,12 +114,18 @@
                                     *ngFor="let charges of listChargePartner; let i = index; trackBy: trackByFn">
                                     <tr class="collapse-toggle-row tgroup">
                                         <td colspan="12">
-                                            <label class="m-checkbox">
+                                            <!-- <label class="m-checkbox">
                                                 <input type="checkbox" (change)="onChangeCheckBoxGrpCharge(charges)"
                                                     value="{{charges}}" [(ngModel)]="charges.isSelected"
                                                     name="{{charges.hwbno}}">
                                                 HBL No: {{charges.hwbno}}
                                                 <span></span>
+                                            </label> -->
+                                            <label>
+                                                <!-- <span (change)="onChangeCheckBoxGrpCharge(charges)"
+                                                    [(ngModel)]="charges.isSelected"
+                                                    ></span> -->
+                                                HBL No: {{charges.hwbno}}                                                
                                             </label>
                                         </td>
                                     </tr>
@@ -148,13 +166,13 @@
                                         </td>
                                         <td>
                                             <span class="credit-value"
-                                            *ngIf="charge.type==='BUY' || (charge.type==='OBH' && partnerCurrent.value===charge.payerId)">
+                                                *ngIf="charge.type==='BUY' || (charge.type==='OBH' && partnerCurrent.value===charge.payerId)">
                                                 {{charge.total | number:'1.3-3'}}
                                             </span>
                                         </td>
                                         <td>
                                             <span class="debit-value"
-                                            *ngIf="charge.type==='SELL' || (charge.type==='OBH' && partnerCurrent.value===charge.paymentObjectId)">
+                                                *ngIf="charge.type==='SELL' || (charge.type==='OBH' && partnerCurrent.value===charge.paymentObjectId)">
                                                 {{charge.total | number:'1.3-3'}}
                                             </span>
                                         </td>
@@ -195,7 +213,8 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" (click)="closePopup()">
+                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)="closePopup()">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
@@ -211,7 +230,8 @@
 <confirm-popup #confirmDuplicatePopup (onSubmit)="onSubmitDuplicatePopup()" [title]="'Warning'" [body]="'Data already exists, do you want to save or not ?'" [labelCancel]="'No'" >
 </confirm-popup>-->
 
-<confirm-popup #changePartnerPopup (onSubmit)="onSubmitChangePartnerPopup()" [title]="'Alert'" (onCancel)="onCancelChangePartnerPopup()"
+<confirm-popup #changePartnerPopup (onSubmit)="onSubmitChangePartnerPopup()" [title]="'Alert'"
+    (onCancel)="onCancelChangePartnerPopup()"
     [body]="'If you change partner, all Selected Charges will be lost. Are you sure about this?'" [labelCancel]="'No'">
 </confirm-popup>
 

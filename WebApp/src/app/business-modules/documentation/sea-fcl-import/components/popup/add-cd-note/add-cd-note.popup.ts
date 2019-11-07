@@ -1,19 +1,25 @@
 import { PopupBase } from "src/app/popup.base";
-import { Component, Input, ViewChild } from "@angular/core";
+import { Component, Input, ViewChild, EventEmitter, Output } from "@angular/core";
 import { OpsTransaction } from "src/app/shared/models/document/OpsTransaction.model";
 import { DocumentationRepo } from "src/app/shared/repositories";
 import { catchError, tap } from "rxjs/operators";
 import { ConfirmPopupComponent, InfoPopupComponent } from "src/app/shared/common/popup";
 import { CdNoteAddRemainingChargePopupComponent } from "../add-remaining-charge/add-remaining-charge.popup";
+import { SortService } from "src/app/shared/services";
 @Component({
     selector: 'cd-note-add-popup',
     templateUrl: './add-cd-note.popup.html'
 })
 export class CdNoteAddPopupComponent extends PopupBase {
+    @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
+    @Output() onUpdate: EventEmitter<any> = new EventEmitter<any>();
+
     @ViewChild('changePartnerPopup', { static: false }) changePartnerPopup: ConfirmPopupComponent;
     @ViewChild('notExistsChargePopup', { static: false }) notExistsChargePopup: InfoPopupComponent;
     @ViewChild(CdNoteAddRemainingChargePopupComponent, { static: false }) addRemainChargePopup: CdNoteAddRemainingChargePopupComponent;
     @Input() currentJob: OpsTransaction = null;
+
+    action: string = 'create';
 
     headers: CommonInterface.IHeaderTable[];
 
@@ -24,7 +30,7 @@ export class CdNoteAddPopupComponent extends PopupBase {
     ];
 
     currentHblID: any = '8F74BE7E-87E9-4D58-9FAF-422EBF24FE18';
-    selectedNoteType: any = null;
+    selectedNoteType: string = '';
 
     listChargePartner: any[] = [];
 
@@ -45,10 +51,15 @@ export class CdNoteAddPopupComponent extends PopupBase {
 
     constructor(
         private _documentationRepo: DocumentationRepo,
+        private _sortService: SortService,
     ) {
         super();
         //this._progressRef = this._progressService.ref();
-        this.selectedNoteType = this.noteTypes[0].id;// "DEBIT";
+        this.selectedNoteType = "DEBIT";
+        console.log(this.selectedNoteType);
+        this.requestList = this.getListCharges;
+        this.requestSort = this.sortCdNoteCharge;
+
     }
 
     ngOnInit() {
@@ -75,6 +86,9 @@ export class CdNoteAddPopupComponent extends PopupBase {
     closePopup() {
         this.hide();
         //this.resetForm();
+        this.selectedNoteType = "DEBIT";
+        this.selectedPartner = {};
+        this.listChargePartner = [];
     }
 
     getListSubjectPartner() {
@@ -116,27 +130,11 @@ export class CdNoteAddPopupComponent extends PopupBase {
                     this.calculatorAmount();
                 },
             );
-
-        // await this._documentationRepo.getChargesByPartner('7186BF67-CE8F-406D-9634-D47E803B6248', '1980912739')
-        //     .pipe(
-        //         catchError(this.catchError),
-        //     ).subscribe(
-        //         (dataCharges: any) => {
-        //             //console.log('list charges')
-        //             console.log(dataCharges);
-        //             for (const item of dataCharges) {
-        //                 this.listChargePartner.push(item);
-        //             }
-        //             //Tính toán Amount Credit, Debit, Balance
-        //             this.calculatorAmount();
-        //             console.log(this.listChargePartner)
-        //         },
-        //     );
     }
 
     onSelectDataFormInfo(data: any) {
         this.selectedPartner = { field: "id", value: data.id };
-
+        console.log(this.selectedPartner)
         if (this.partnerCurrent.value !== this.selectedPartner.value) {
             this.changePartnerPopup.show();
         }
@@ -255,7 +253,15 @@ export class CdNoteAddPopupComponent extends PopupBase {
         );
     }
 
-    openPopupAddCharge(){
-        this.addRemainChargePopup.show({ backdrop: 'static' });
+    openPopupAddCharge() {
+        this.addRemainChargePopup.show();
+    }
+
+    onChangeNoteType(noteType: any) {
+        this.selectedNoteType = noteType.id;
+    }
+
+    sortCdNoteCharge(sort: string): void {
+        this.listChargePartner = this._sortService.sort(this.listChargePartner, sort, this.order);
     }
 }

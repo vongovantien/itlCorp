@@ -1,7 +1,8 @@
-import { Component, ViewChild } from "@angular/core";
+import { Component, ViewChild, Input } from "@angular/core";
 import { PopupBase } from "src/app/popup.base";
 import { DocumentationRepo } from "src/app/shared/repositories";
 import { CdNoteAddPopupComponent } from "../add-cd-note/add-cd-note.popup";
+import { catchError } from "rxjs/operators";
 
 @Component({
     selector: 'cd-note-detail-popup',
@@ -9,14 +10,18 @@ import { CdNoteAddPopupComponent } from "../add-cd-note/add-cd-note.popup";
 })
 export class CdNoteDetailPopupComponent extends PopupBase {
     @ViewChild(CdNoteAddPopupComponent, { static: false }) cdNoteEditPopupComponent: CdNoteAddPopupComponent;
+    @Input() jobId: string = null;
+    @Input() cdNote: string = null;
     
     headers: CommonInterface.IHeaderTable[];
+    
+    CdNoteDetail: any = null;
 
     constructor(
         private _documentationRepo: DocumentationRepo,
     ) {
         super();
-        
+
     }
 
     ngOnInit() {
@@ -33,23 +38,50 @@ export class CdNoteDetailPopupComponent extends PopupBase {
             { title: "Debit Value (Local)", field: 'total', sortable: true },
             { title: 'Note', field: 'notes', sortable: true }
         ];
+        this.getDetailCdNote(this.jobId, this.cdNote);
     }
 
-    closePopup(){
+    getDetailCdNote(jobId: string, cdNote: string) {
+        console.log(jobId);
+        console.log(cdNote);
+        this._documentationRepo.getDetailsCDNote(jobId, cdNote)
+            .pipe(
+                catchError(this.catchError),
+            ).subscribe(
+                (dataCdNote: any) => {
+                    console.log('CdNote detail')
+                    console.log(dataCdNote);
+                    //this.CdNoteDetail = dataCdNote;
+
+                    //Tính toán Amount Credit, Debit, Balance
+                    //this.calculatorAmount();
+                },
+            );
+    }
+
+    closePopup() {
         this.hide();
     }
 
-    deleteCdNote(){
+    deleteCdNote() {
         console.log('delete cd note')
     }
 
     openPopupEdit() {
-        //this.cdNoteAddPopupComponent.action = 'create';
+        this.cdNoteEditPopupComponent.action = 'update';
         //this.cdNoteAddPopupComponent.advanceNo = this.advanceNo;
         this.cdNoteEditPopupComponent.show({ backdrop: 'static' });
     }
 
-    previewCdNote(){
+    previewCdNote() {
         console.log('preview cd note')
+    }
+
+    onRequestCdNoteChange(dataRequest: any) {
+        console.log(dataRequest)
+    }
+
+    onUpdateCdNote(dataRequest: any) {
+        console.log(dataRequest)
     }
 }
