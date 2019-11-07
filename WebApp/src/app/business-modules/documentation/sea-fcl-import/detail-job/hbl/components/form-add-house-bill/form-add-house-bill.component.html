@@ -168,15 +168,16 @@
                                 House Bill of Lading Type is required !
                             </div>
                         </div>
-                        <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': isSubmited && ( !minDate.value )}">
+                        <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmited && ( !eta.value )}">
+                            <!-- {{mindateEta | json}} -->
+
                             <label class="form-control-label" for="">
                                 Estimated Time of Arrival <span class="m--font-danger">(*)</span>
                             </label>
                             <div class="m-input-icon">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                    [minDate]="minDate" [singleDatePicker]="true" formControlName="eta" readonly />
+                                    [minDate]="mindateEta" [singleDatePicker]="true" formControlName="eta" readonly />
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
                                         <i class="la la-calendar"></i>
@@ -348,7 +349,7 @@
                             <div class="m-input-icon">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [autoApply]="true" [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                    [minDate]="minDate" [singleDatePicker]="true" name="singledater"
+                                    [minDate]="mindateEtaWareHouse" [singleDatePicker]="true" name="singledater"
                                     formControlName="dateETA" readonly />
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>

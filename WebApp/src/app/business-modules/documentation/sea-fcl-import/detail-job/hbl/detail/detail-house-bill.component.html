@@ -9,8 +9,8 @@
                     </span>
                 </button> -->
 
-            <app-default-button [buttonSetting]="saveButtonSetting"></app-default-button>
-            <app-default-button [buttonSetting]="cancelButtonSetting"></app-default-button>
+            <app-default-button (click)="onUpdateHblDetail()" [buttonSetting]="saveButtonSetting"></app-default-button>
+            <app-default-button (click)="combackToHBLList()" [buttonSetting]="cancelButtonSetting"></app-default-button>
         </div>
 
     </app-sub-header>
@@ -19,6 +19,8 @@
             <app-form-add-house-bill>
 
             </app-form-add-house-bill>
+            <shipment-good-summary></shipment-good-summary>
+
         </div>
     </div>
 

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -27,11 +29,13 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICsTransactionDetailService csTransactionDetailService;
         private readonly ICurrentUser currentUser;
-        public CsTransactionDetailController(IStringLocalizer<LanguageSub> localizer, ICsTransactionDetailService service, ICurrentUser user)
+        ICsMawbcontainerService containerService;
+        public CsTransactionDetailController(IStringLocalizer<LanguageSub> localizer, ICsTransactionDetailService service, ICurrentUser user , ICsMawbcontainerService mawbcontainerService)
         {
             stringLocalizer = localizer;
             csTransactionDetailService = service;
             currentUser = user;
+            containerService = mawbcontainerService;
         }
 
         [HttpGet]
@@ -47,8 +51,11 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult GetById(Guid Id)
         {
             CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { Id = Id };
+            CsMawbcontainerCriteria criteriaMaw = new CsMawbcontainerCriteria { Hblid = Id };
             var hbl = csTransactionDetailService.GetById(criteria);
-            ResultHandle hs = new ResultHandle { Data = hbl, Status = true };
+            var resultMaw = containerService.Query(criteriaMaw).ToList();
+            hbl.CsMawbcontainers = resultMaw;
+            ResultHandle hs = new ResultHandle { Data = hbl , Status = true };
             return Ok(hs);
         }
 
@@ -85,11 +92,11 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [HttpDelete]
-        [Route("delete")]
-        [Authorize]
-        public IActionResult Delete(Guid hblId)
+        [Route("Delete")]
+        //[Authorize]
+        public IActionResult Delete(Guid id)
         {
-            var hs = csTransactionDetailService.DeleteTransactionDetail(hblId);
+            var hs = csTransactionDetailService.DeleteTransactionDetail(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -116,8 +123,8 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [HttpPut]
-        [Route("update")]
-        [Authorize]
+        [Route("Update")]
+        //[Authorize]
         public IActionResult Update(CsTransactionDetailModel model)
         {
             if (!ModelState.IsValid) return BadRequest();

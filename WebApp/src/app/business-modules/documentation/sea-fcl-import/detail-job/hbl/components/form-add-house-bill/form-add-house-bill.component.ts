@@ -12,6 +12,7 @@ import { FCLImportAddModel } from 'src/app/shared/models';
     templateUrl: './form-add-house-bill.component.html'
 })
 export class FormAddHouseBillComponent extends AppForm {
+
     formGroup: FormGroup;
     mtBill: AbstractControl;
     hwbno: AbstractControl;
@@ -34,6 +35,10 @@ export class FormAddHouseBillComponent extends AppForm {
     referenceNo: AbstractControl;
     consigneeDescription: AbstractControl;
     shipperDescription: AbstractControl;
+    notifyPartyDescription: AbstractControl;
+    alsonotifyPartyDescription: AbstractControl;
+
+
     oceanVoyNo: AbstractControl;
 
 
@@ -66,11 +71,15 @@ export class FormAddHouseBillComponent extends AppForm {
     selectedETA: any;
     shipperdescriptionModel: string;
     consigneedescriptionModel: string;
+    notifyPartydescriptinModel: string;
     notifyPartyModel: string;
     alsoNotifyPartyDescriptionModel: string;
     isSubmited: boolean = false;
     PortChargeLikePortLoading: boolean = false;
     countChangePort: number = 0;
+    mindateEta: any = null;
+    mindateEtaWareHouse: any = null;
+
     hbOfladingTypes: CommonInterface.ICommonTitleValue[] = [
         { title: 'Copy', value: 'Copy' },
         { title: 'Original', value: 'Original' },
@@ -184,6 +193,11 @@ export class FormAddHouseBillComponent extends AppForm {
         }, { selectedDisplayFields: ['name_EN'], });
         this.initForm();
 
+
+
+
+
+
     }
 
     update(formdata: any) {
@@ -227,11 +241,12 @@ export class FormAddHouseBillComponent extends AppForm {
             dateETA: [],
             dateOfIssued: [],
             etd: [],
-            eta: [],
+            eta: ['', Validators.required],
             ShipperDescription: [],
             ConsigneeDescription: [],
             NotifyPartyDescription: [],
-            AlsoNotifyPartyDescription: []
+            AlsoNotifyPartyDescription: [],
+
         });
 
         this.mtBill = this.formGroup.controls['masterBill'];
@@ -256,6 +271,8 @@ export class FormAddHouseBillComponent extends AppForm {
         this.referenceNo = this.formGroup.controls['referenceNo'];
         this.consigneeDescription = this.formGroup.controls['ConsigneeDescription'];
         this.shipperDescription = this.formGroup.controls['ShipperDescription'];
+        this.notifyPartyDescription = this.formGroup.controls['NotifyPartyDescription'];
+        this.alsonotifyPartyDescription = this.formGroup.controls['AlsoNotifyPartyDescription'];
         console.log(this.eta);
         this.etd.valueChanges
             .pipe(
@@ -263,10 +280,10 @@ export class FormAddHouseBillComponent extends AppForm {
                 takeUntil(this.ngUnsubscribe)
             )
             .subscribe((value: { startDate: any, endDate: any }) => {
-                this.minDate = value.startDate; // * Update min date
+                console.log(value);
+                this.mindateEta = value.startDate; // * Update min date
 
                 this.resetFormControl(this.eta);
-
             });
         this.eta.valueChanges
             .pipe(
@@ -274,9 +291,10 @@ export class FormAddHouseBillComponent extends AppForm {
                 takeUntil(this.ngUnsubscribe)
             )
             .subscribe((value: { startDate: any, endDate: any }) => {
-                this.minDate = value.startDate; // * Update min date
+                this.mindateEtaWareHouse = value.startDate; // * Update min date
 
                 this.resetFormControl(this.etawarehouse);
+
 
             });
 
@@ -318,7 +336,7 @@ export class FormAddHouseBillComponent extends AppForm {
                 this.getListSaleman(this.selectedCustomer.data.id);
                 break;
             case 'Saleman':
-                this.selectedSaleman = { field: 'id', value: data.saleMan_ID, data: data };
+                this.selectedSaleman = { field: 'id', value: data.id, data: data };
                 break;
             case 'Shipper':
                 this.selectedShipper = { field: 'shortName', value: data.id, data: data };

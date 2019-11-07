@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { SeaFCLImportHBLComponent } from './sea-fcl-import-hbl.component';
 import { Routes, RouterModule } from '@angular/router';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { TabsModule, ModalModule } from 'ngx-bootstrap';
+import { TabsModule, ModalModule, PaginationModule } from 'ngx-bootstrap';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CreateHouseBillComponent } from './create/create-house-bill.component';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
@@ -43,7 +43,8 @@ const routing: Routes = [
         ReactiveFormsModule,
         RouterModule.forChild(routing),
         NgxDaterangepickerMd,
-        FCLImportShareModule
+        FCLImportShareModule,
+        PaginationModule.forRoot(),
     ],
     exports: [],
     providers: [],
