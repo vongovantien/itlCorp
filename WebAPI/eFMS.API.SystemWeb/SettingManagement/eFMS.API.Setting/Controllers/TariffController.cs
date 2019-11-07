@@ -26,15 +26,18 @@ namespace eFMS.API.Setting.Controllers
     {
         private readonly ITariffService tariffService;
         private readonly IStringLocalizer stringLocalizer;
+        readonly ICurrentUser currentUser;
         /// <summary>
         /// Contructor
         /// </summary>
         /// <param name="localizer"></param>
         /// <param name="service"></param>
-        public TariffController(IStringLocalizer<LanguageSub> localizer, ITariffService service)
+        /// <param name="currUser"></param>
+        public TariffController(IStringLocalizer<LanguageSub> localizer, ITariffService service, ICurrentUser currUser)
         {
             stringLocalizer = localizer;
             tariffService = service;
+            currentUser = currUser;
         }
 
         [HttpPost]
@@ -107,6 +110,7 @@ namespace eFMS.API.Setting.Controllers
             var checkData = tariffService.CheckExistsDataTariff(model);
             if (!checkData.Success) return Ok(new ResultHandle { Status = checkData.Success, Message = checkData.Exception.Message.ToString(), Data = checkData.Code });
 
+            model.setTariff.UserModified = currentUser.UserID;
             var hs = tariffService.UpdateTariff(model);
 
             var message = HandleError.GetMessage(hs, Crud.Update);

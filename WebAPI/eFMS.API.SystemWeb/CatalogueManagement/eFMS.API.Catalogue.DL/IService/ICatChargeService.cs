@@ -12,8 +12,8 @@ namespace eFMS.API.Catalogue.DL.IService
 {
     public interface ICatChargeService : IRepositoryBase<CatCharge,CatChargeModel>
     {
-        List<Object> GetCharges(CatChargeCriteria criteria, int page, int size, out int rowsCount);
-        List<CatCharge> Query(CatChargeCriteria criteria);
+        IQueryable<CatChargeModel> Paging(CatChargeCriteria criteria, int page, int size, out int rowsCount);
+        IQueryable<CatCharge> Query(CatChargeCriteria criteria);
         IQueryable<CatChargeModel> GetBy(string type);
         HandleState AddCharge(CatChargeAddOrUpdateModel model);
         HandleState UpdateCharge(CatChargeAddOrUpdateModel model);

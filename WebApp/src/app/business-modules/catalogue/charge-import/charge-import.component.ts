@@ -13,8 +13,7 @@ declare var $: any;
 
 @Component({
   selector: 'app-charge-import',
-  templateUrl: './charge-import.component.html',
-  styleUrls: ['./charge-import.component.scss']
+  templateUrl: './charge-import.component.html'
 })
 export class ChargeImportComponent implements OnInit {
   data: any[];
@@ -33,9 +32,9 @@ export class ChargeImportComponent implements OnInit {
     private menu_api: API_MENU,
     private sortService: SortService
   ) { }
-  @ViewChild(AppPaginationComponent,{static:false}) child: any;
-  @ViewChild('form',{static:false}) form: any;
-  @ViewChild(NgProgressComponent,{static:false}) progressBar: NgProgressComponent;
+  @ViewChild(AppPaginationComponent, { static: false }) child: any;
+  @ViewChild('form', { static: false }) form: any;
+  @ViewChild(NgProgressComponent, { static: false }) progressBar: NgProgressComponent;
 
   ngOnInit() {
     this.pager.totalItems = 0;
@@ -48,7 +47,6 @@ export class ChargeImportComponent implements OnInit {
     this.baseService.uploadfile(this.menu_api.Catalogue.Charge.uploadExel, file.target['files'], "uploadedFile")
       .subscribe(res => {
         this.data = res['data'];
-        console.log(this.data)
         this.pager.totalItems = this.data.length;
         this.totalValidRows = res['totalValidRows'];
         this.totalRows = this.data.length;
@@ -108,7 +106,7 @@ export class ChargeImportComponent implements OnInit {
 
   async import() {
     if (this.data == null) return;
-    if (this.totalRows-this.totalValidRows > 0) {
+    if (this.totalRows - this.totalValidRows > 0) {
       $('#upload-alert-modal').modal('show');
     }
     else {

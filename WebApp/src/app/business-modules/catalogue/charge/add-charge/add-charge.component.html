@@ -10,7 +10,7 @@
 <!--begin::m-content-->
 <div class="m-content">
     <!--begin::Form-->
-    <form novalidate #updateChargeForm="ngForm" *ngIf="Charge" (ngSubmit)="updateChargeForm.form.valid">
+    <form novalidate #addChargeForm="ngForm" *ngIf="ChargeToAdd" (ngSubmit)="addChargeForm.form.valid">
         <div class="m-form m-form--state">
             <!--begin::m-portlet -->
 
@@ -19,45 +19,45 @@
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': updateChargeForm.submitted && code.invalid }">
+                                [ngClass]="{ 'm-form__group has-danger': addChargeForm.submitted && code.invalid }">
                                 <label class="form-control-label" for="">
                                     Code <span class="m--font-danger">(*)</span>
                                 </label>
-                                <input type="text" [(ngModel)]="Charge.charge.code"
-                                    (change)="Charge.charge.code=Charge.charge.code.trim()" required minlength="3"
-                                    #code="ngModel" name="code" class="form-control m-input m-input--square"
-                                    placeholder="Please Enter Code">
-                                <div class="form-control-feedback" *ngIf="updateChargeForm.submitted && code.invalid">
-                                    Unit code is required at least 3 characters
+                                <input type="text" [(ngModel)]="ChargeToAdd.charge.code"
+                                    (change)="ChargeToAdd.charge.code=ChargeToAdd.charge.code.trim()" required
+                                    minlength="3" maxlength="10" #code="ngModel" name="code"
+                                    class="form-control m-input m-input--square" placeholder="Please Enter Code">
+                                <div class="form-control-feedback" *ngIf="addChargeForm.submitted && code.invalid">
+                                    Unit code is required at least 3 characters and maximum 10 characters
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': updateChargeForm.submitted && nameEn.invalid }">
+                                [ngClass]="{ 'm-form__group has-danger': addChargeForm.submitted && nameEn.invalid }">
                                 <label class="form-control-label" for="">
                                     Name EN <span class="m--font-danger">(*)</span>
                                 </label>
-                                <input type="text" [(ngModel)]="Charge.charge.chargeNameEn" required minlength="3"
+                                <input type="text" [(ngModel)]="ChargeToAdd.charge.chargeNameEn" required minlength="3"
                                     #nameEn="ngModel" name="nameEn" class="form-control m-input m-input--square"
                                     placeholder="Please Enter English Charge Name"
-                                    (change)="Charge.charge.chargeNameEn=Charge.charge.chargeNameEn.trim()">
-                                <div class="form-control-feedback" *ngIf="updateChargeForm.submitted && nameEn.invalid">
+                                    (change)="ChargeToAdd.charge.chargeNameEn=ChargeToAdd.charge.chargeNameEn.trim()">
+                                <div class="form-control-feedback" *ngIf="addChargeForm.submitted && nameEn.invalid">
                                     English name is required at least 3 characters
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': updateChargeForm.submitted && nameVn.invalid }">
+                                [ngClass]="{ 'm-form__group has-danger': addChargeForm.submitted && nameVn.invalid }">
                                 <label class="form-control-label">
                                     Name Local <span class="m--font-danger">(*)</span>
                                 </label>
-                                <input type="text" [(ngModel)]="Charge.charge.chargeNameVn" required minlength="3"
+                                <input type="text" [(ngModel)]="ChargeToAdd.charge.chargeNameVn" required minlength="3"
                                     #nameVn="ngModel" name="nameVn" class="form-control m-input m-input--square"
                                     placeholder="Please Enter Local Charge Name"
-                                    (change)="Charge.charge.chargeNameVn=Charge.charge.chargeNameVn.trim()">
-                                <div class="form-control-feedback" *ngIf="updateChargeForm.submitted && nameVn.invalid">
+                                    (change)="ChargeToAdd.charge.chargeNameVn=ChargeToAdd.charge.chargeNameVn.trim()">
+                                <div class="form-control-feedback" *ngIf="addChargeForm.submitted && nameVn.invalid">
                                     Local name is required at least 3 characters
                                 </div>
                             </div>
@@ -66,47 +66,46 @@
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': updateChargeForm.submitted && Charge.charge.unitId==null }">
+                                [ngClass]="{ 'm-form__group has-danger': addChargeForm.submitted && ChargeToAdd.charge.unitId==null }">
                                 <label class="form-control-label">
                                     Unit <span class="m--font-danger">(*)</span>
                                 </label>
                                 <ng-select [allowClear]="true" [items]="ngDataUnit" (data)="refreshValue($event)"
-                                    [active]="activeUnit" (selected)="selected($event,'unit')"
-                                    (removed)="removed($event,'unit')" placeholder="Select Unit">
+                                    (selected)="selected($event,'unit')" (removed)="removed($event,'unit')"
+                                    placeholder="Select Unit">
                                 </ng-select>
                                 <div class="form-control-feedback"
-                                    *ngIf="updateChargeForm.submitted && Charge.charge.unitId==null">
+                                    *ngIf="addChargeForm.submitted && ChargeToAdd.charge.unitId==null">
                                     Unit is required
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': updateChargeForm.submitted && unitPrice.invalid }">
+                                [ngClass]="{ 'm-form__group has-danger': addChargeForm.submitted && unitPrice.invalid }">
                                 <label class="form-control-label">
                                     Unit Price <span class="m--font-danger">(*)</span>
                                 </label>
-                                <input type="number" [(ngModel)]="Charge.charge.unitPrice" required min="0"
-                                    name="unitPrice" #unitPrice="ngModel" class="form-control m-input m-input--square"
-                                    placeholder="0000.00">
-                                <div class="form-control-feedback"
-                                    *ngIf="updateChargeForm.submitted && unitPrice.invalid">
+                                <input appTwoDigitDecimaNumber type="number" [(ngModel)]="ChargeToAdd.charge.unitPrice"
+                                    required min="0" name="unitPrice" #unitPrice="ngModel"
+                                    class="form-control m-input m-input--square" placeholder="0000.00">
+                                <div class="form-control-feedback" *ngIf="addChargeForm.submitted && unitPrice.invalid">
                                     Unit price is required
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': updateChargeForm.submitted && Charge.charge.currencyId==null }">
+                                [ngClass]="{ 'm-form__group has-danger': addChargeForm.submitted && ChargeToAdd.charge.currencyId==null }">
                                 <label class="form-control-label">
                                     Currency <span class="m--font-danger">(*)</span>
                                 </label>
                                 <ng-select [allowClear]="true" [items]="ngDataCurrency" (data)="refreshValue($event)"
-                                    [active]="activeCurrency" (selected)="selected($event,'currency')"
-                                    (removed)="removed($event,'currency')" placeholder="Select Currency">
+                                    (selected)="selected($event,'currency')" (removed)="removed($event,'currency')"
+                                    placeholder="Select Currency">
                                 </ng-select>
                                 <div class="form-control-feedback"
-                                    *ngIf="updateChargeForm.submitted && Charge.charge.currencyId==null">
+                                    *ngIf="addChargeForm.submitted && ChargeToAdd.charge.currencyId==null">
                                     Currency is required
                                 </div>
                             </div>
@@ -115,70 +114,50 @@
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': updateChargeForm.submitted && vat.invalid }">
+                                [ngClass]="{ 'm-form__group has-danger': addChargeForm.submitted && vat.invalid }">
                                 <label class="form-control-label">
                                     VAT <span class="m--font-danger">(*)</span>
                                 </label>
-                                <input type="number" [(ngModel)]="Charge.charge.vatrate" required name="vat"
+                                <input type="number" [(ngModel)]="ChargeToAdd.charge.vatrate" required name="vat"
                                     #vat="ngModel" class="form-control m-input m-input--square" placeholder="VAT">
-                                <div class="form-control-feedback" *ngIf="updateChargeForm.submitted && vat.invalid">
+                                <div class="form-control-feedback" *ngIf="addChargeForm.submitted && vat.invalid">
                                     VAT is required
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': updateChargeForm.submitted && Charge.charge.type==null }">
+                                [ngClass]="{ 'm-form__group has-danger': addChargeForm.submitted && ChargeToAdd.charge.type==null }">
                                 <label class="form-control-label">
                                     Type <span class="m--font-danger">(*)</span>
                                 </label>
                                 <ng-select [allowClear]="true" [items]="ngDataType" (data)="refreshValue($event)"
-                                    [active]="activeType" (selected)="selected($event,'type')"
-                                    (removed)="removed($event,'type')" placeholder="Select Type">
+                                    (selected)="selected($event,'type')" (removed)="removed($event,'type')"
+                                    placeholder="Select Type">
                                 </ng-select>
                                 <div class="form-control-feedback"
-                                    *ngIf="updateChargeForm.submitted && Charge.charge.type==null">
+                                    *ngIf="addChargeForm.submitted && ChargeToAdd.charge.type==null">
                                     Type is required
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': updateChargeForm.submitted && (Charge.charge.serviceTypeId==null || Charge.charge.serviceTypeId=='')}">
+                                [ngClass]="{ 'm-form__group has-danger': addChargeForm.submitted && (ChargeToAdd.charge.serviceTypeId==null || ChargeToAdd.charge.serviceTypeId=='')}">
                                 <label class="form-control-label">
                                     Service <span class="m--font-danger">(*)</span>
                                 </label>
                                 <ng-select [multiple]="true" [items]="ngDataService" (data)="refreshValue($event)"
-                                    [active]="activeServices" (selected)="selected($event,'service')"
-                                    (removed)="removed($event,'service')" placeholder="Select Services">
+                                    (selected)="selected($event,'service')" (removed)="removed($event,'service')"
+                                    placeholder="Select Services">
                                 </ng-select>
                                 <div class="form-control-feedback"
-                                    *ngIf="updateChargeForm.submitted && (Charge.charge.serviceTypeId==null || Charge.charge.serviceTypeId=='')">
+                                    *ngIf="addChargeForm.submitted && (ChargeToAdd.charge.serviceTypeId==null || ChargeToAdd.charge.serviceTypeId=='')">
                                     Service is required at least 1 service
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label">
-                                    Active
-                                </label>
-                                <div class="col-lg-8">
-                                    <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold"><input
-                                            [checked]="Charge.charge.active"
-                                            (change)="Charge.charge.active=!Charge.charge.active"
-                                            type="checkbox"><span></span></label>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-
-
                 </div>
             </div>
 
@@ -221,18 +200,19 @@
                                         <span>Account Debit No (VAT)</span>
                                     </th>
                                     <th>
-                                        <span>Account Credit No (VAT)</span>
+                                        <span>Account Crebit No (VAT)</span>
                                     </th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- *ngFor="let item of Charge.listChargeDefaultAccount;let index=index;"/ -->
+                                <!-- *ngFor="let item of ChargeToAdd.listChargeDefaultAccount;let index=index;"/ -->
 
 
-                                <tr *ngFor="let item of Charge.listChargeDefaultAccount;let index=index;" [ngClass]="{ 'm-form__group has-danger': 
+                                <tr *ngFor="let item of ChargeToAdd.listChargeDefaultAccount;let index=index;"
+                                    [ngClass]="{ 'm-form__group has-danger': 
                                 validatateDefaultAcountLine()!=true
                                 && isAddNewLine
-                                && index == Charge.listChargeDefaultAccount.length-1}">
+                                && index == ChargeToAdd.listChargeDefaultAccount.length-1}">
                                     <td class="table-actions-col">
                                         <div class="table-actions" style="width: 40px">
                                             <button type="button"
@@ -244,26 +224,29 @@
                                     </td>
                                     <td>
                                         <ng-select [allowClear]="true" [items]="ngDataTypeChargeDefault"
-                                            [active]="getActiveVoucherType(index)" (data)="refreshValue($event)"
-                                            (selected)="selectedTypeDefault($event,index)"
+                                            (data)="refreshValue($event)" (selected)="selectedTypeDefault($event,index)"
                                             (removed)="removedTypeDefault($event,index)" placeholder="Select Type">
                                         </ng-select>
 
                                     </td>
                                     <td>
-                                        <input class="form-control m-input m-input--square" type="number" min="0"
+                                        <input appIntergerInputCheck minlength="3" maxlength="7"
+                                            class="form-control m-input m-input--square" type="number"
                                             [(ngModel)]="item.debitAccountNo" [name]="'debitAccountNo'+index" />
                                     </td>
                                     <td>
-                                        <input class="form-control m-input m-input--square" type="number" min="0"
+                                        <input appIntergerInputCheck minlength="3" maxlength="7"
+                                            class="form-control m-input m-input--square" type="number"
                                             [(ngModel)]="item.creditAccountNo" [name]="'creditAccountNo'+index" />
                                     </td>
                                     <td>
-                                        <input class="form-control m-input m-input--square" type="number" min="0"
+                                        <input appIntergerInputCheck minlength="3" maxlength="7"
+                                            class="form-control m-input m-input--square" type="number"
                                             [(ngModel)]="item.debitVat" [name]="'debitVat'+index" />
                                     </td>
                                     <td>
-                                        <input class="form-control m-input m-input--square" type="number" min="0"
+                                        <input appIntergerInputCheck minlength="3" maxlength="7"
+                                            class="form-control m-input m-input--square" type="number"
                                             [(ngModel)]="item.creditVat" [name]="'creditVat'+index" />
                                     </td>
 
@@ -277,7 +260,7 @@
                             Required voucher type and at least one of other fields
                         </div>
                         <div class="form-control-feedback"
-                            *ngIf="updateChargeForm.submitted && Charge.listChargeDefaultAccount.length==0"
+                            *ngIf="addChargeForm.submitted && ChargeToAdd.listChargeDefaultAccount.length==0"
                             style="color: #f4516c">
                             Required at least 1 row of account info
                         </div>
@@ -296,7 +279,7 @@
             <!--begin:: form-actions-->
             <div class="form-actions m--align-right">
                 <button type="submit" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="updateCharge(updateChargeForm)">
+                    (click)="addCharge(addChargeForm)">
                     <span>
                         <i class="la la la-save"></i>
                         <span>
