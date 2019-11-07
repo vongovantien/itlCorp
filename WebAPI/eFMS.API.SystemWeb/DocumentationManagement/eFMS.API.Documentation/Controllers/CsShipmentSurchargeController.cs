@@ -231,5 +231,29 @@ namespace eFMS.API.Documentation.Controllers
             var data = csShipmentSurchargeService.GetListChargeShipment(criteria);
             return data;
         }
+
+        /// <summary>
+        /// get total profit of a house bill
+        /// </summary>
+        /// <param name="hblid"></param>
+        /// <returns></returns>
+        [HttpGet("GetHouseBillTotalProfit")]
+        public IActionResult GetHouseBillTotalProfit(Guid hblid)
+        {
+            var result = csShipmentSurchargeService.GetHouseBillTotalProfit(hblid);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// get total profit of a shipment
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        [HttpGet("GetShipmentTotalProfit")]
+        public IActionResult GetShipmentTotalProfit(Guid jobId)
+        {
+            var result = csShipmentSurchargeService.GetShipmentTotalProfit(jobId);
+            return Ok(result);
+        }
     }
 }
