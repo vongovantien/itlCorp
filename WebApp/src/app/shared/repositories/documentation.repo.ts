@@ -17,6 +17,8 @@ export class DocumentationRepo {
         );
     }
 
+
+
     updateHbl(body: any) {
         return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/Update`, body).pipe(
             catchError((error) => throwError(error)),
@@ -26,6 +28,14 @@ export class DocumentationRepo {
 
     deleteHbl(id: string) {
         return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/Delete`, { id: id }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+
+    getGoodSummaryOfAllHbl(jobId: any) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/GetGoodSummaryOfAllHblByJobId`, { jobId: jobId }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

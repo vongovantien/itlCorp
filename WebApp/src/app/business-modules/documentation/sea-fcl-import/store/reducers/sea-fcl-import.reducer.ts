@@ -1,11 +1,18 @@
 import { CsTransaction } from "src/app/shared/models";
 import { SeaFCLImportActionTypes, SeaFCLImportActions } from "../actions";
 
+export interface ICsTransaction {
+    cstransaction: CsTransaction;
+}
 
-export function CSTransactionReducer(state = new CsTransaction(), action: SeaFCLImportActions): CsTransaction | any {
+export const initState: ICsTransaction = {
+    cstransaction: new CsTransaction()
+}
+
+export function CSTransactionReducer(state = initState, action: SeaFCLImportActions): CsTransaction | any {
     switch (action.type) {
         case SeaFCLImportActionTypes.GET_DETAIL_SUCCESS: {
-            return { ...state, ...action.payload };
+            return { ...state, cstransaction: action.payload };
         }
 
         case SeaFCLImportActionTypes.UPDATE_SUCCESS: {
