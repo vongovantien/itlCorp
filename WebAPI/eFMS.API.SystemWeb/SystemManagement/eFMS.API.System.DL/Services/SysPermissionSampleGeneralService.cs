@@ -28,7 +28,7 @@ namespace eFMS.API.System.DL.Services
         {
             List<SysPermissionSampleGeneralViewModel> results = new List<SysPermissionSampleGeneralViewModel>();
             var menus = menuRepository.Get().ToList();
-            var modules = menus.Where(x => x.ParentId == null);
+            var modules = menus.Where(x => x.ParentId == null).OrderBy(x => x.NameEn);
             var permissionDetails = DataContext.Get(x => x.PermissionId == permissionId).ToList();
             if (modules == null) return results;
             foreach(var module in modules)

@@ -1,0 +1,257 @@
+<div id="detail-cd-note-modal" class="modal fade" role="dialog" bsModal #popup="bs-modal" aria-hidden="true">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detail<span class="m--margin-left-5">Credit Note</span> No: CDNoteEditing.soa.code</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closePopup()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <div class="modal-actions c-button-actions">
+                    <button class="btn btn-sm btn-default m-btn--square m-btn--icon" (click)="previewCdNote()">
+                        <span>
+                            <i class="la la-file-text-o"></i>
+                            <span>
+                                Preview
+                            </span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body" >
+                <!--begin::Form-->
+                <div class="m-form m-form--state">
+                    <div class="div-inside bg-secondary m--margin-bottom-15">
+                        <div class="row">
+                            <div class="col-xl-4">
+                                <div class="m--margin-bottom-10">
+                                    <div class="m--margin-top-5">
+                                        <span class="m--font-bolder">
+                                            Subject To :
+                                        </span>
+                                        <span>CDNoteEditing.partnerNameEn</span>
+                                    </div>
+                                    <div class="m--margin-top-5">
+                                        <span class="m--font-bolder">
+                                            Address:
+                                        </span>
+                                        <span>CDNoteEditing.partnerShippingAddress</span>
+                                    </div>
+                                    <div class="m--margin-top-5">
+                                        <span class="m--font-bolder">
+                                            Tel:
+                                        </span>
+                                        <span>CDNoteEditing.partnerTel</span>
+                                    </div>
+                                    <div class="m--margin-top-5">
+                                        <span class="m--font-bolder">
+                                            Taxcode:
+                                        </span>
+                                        <span>CDNoteEditing.partnerTaxcode</span>
+                                    </div>
+                                </div>
+                                <div class="m--margin-bottom-10">
+                                    <span class="m--font-bolder">
+                                        House Bill of Lading
+                                    </span>
+                                    <span>CDNoteEditing.partnerTaxcode</span>
+                                </div>
+                            </div>
+                            <div class="col-xl-8">
+                                <div class="row">
+                                    <div class="col-xl-6">
+                                        <div class="m--margin-bottom-10">
+                                            <span class="m--font-bolder">
+                                                Job ID:
+                                            </span>
+                                            <span>CDNoteEditing.jobId</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6">
+                                        <div class="m--margin-bottom-10">
+                                            <span class="m--font-bolder">
+                                                Master Bill of Lading:
+                                            </span>
+                                            <span>CDNoteEditing.mbLadingNo</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xl-6">
+                                        <div class="m--margin-bottom-10">
+                                            <span class="m--font-bolder">
+                                                Port of loading:
+                                            </span>
+                                            <span>CDNoteEditing.pol , CDNoteEditing.polCountry</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6">
+                                        <div class="m--margin-bottom-10">
+                                            <span class="m--font-bolder">
+                                                Port of destination:
+                                            </span>
+                                            <span>CDNoteEditing.pod , CDNoteEditing.podCountry</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xl-6">
+                                        <div class="m--margin-bottom-10">
+                                            <span class="m--font-bolder">
+                                                Estimated Time of Departure:
+                                            </span>
+                                            <span>CDNoteEditing.etd | date : 'dd/MM/yyyy'</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6">
+                                        <div class="m--margin-bottom-10">
+                                            <span class="m--font-bolder">
+                                                Estimated Time of Arrival:
+                                            </span>
+                                            <span>CDNoteEditing.eta | date : 'dd/MM/yyyy'</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xl-6">
+                                        <div class="m--margin-bottom-10">
+                                            <span class="m--font-bolder">
+                                                Vessel:
+                                            </span>
+                                            <span>CDNoteEditing.vessel</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6">
+                                        <div class="m--margin-bottom-10">
+                                            <span class="m--font-bolder">
+                                                Volume:
+                                            </span>
+                                            <span>CDNoteEditing.volum CBM</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xl-6">
+                                        <div class="m--margin-bottom-10">
+                                            <span class="m--font-bolder">
+                                                Package Quantity:
+                                            </span>
+                                            <span>CDNoteEditing.hbConstainers</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6">
+                                        <div class="m--margin-bottom-10">
+                                            <span class="m--font-bolder">
+                                                SOA:
+                                            </span>
+                                            <span>CDNoteEditing.soa.code</span>
+                                        </div>
+                                        <div class="m--margin-bottom-10">
+                                            <span class="m--font-bolder">
+                                                Locked:
+                                            </span>
+                                            <span class="m--font-brand">CDNoteEditing.isLoocked</span>
+                                            <!-- <span class="m--font-danger">Yes</span> -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--begin: Datatable-->
+                    <div class="table-wrapper fit-height-div">
+                        <table class="table table-striped table-brand dataTable">
+                            <thead app-table-header [headers]="headers"></thead>
+                            <tbody class="tbody-group">
+                                <tr class=""  >
+                                    <td>
+                                        <span>item.hwbno</span>
+                                    </td>
+                                    <td>
+                                        <span>item.chargeCode</span>
+                                    </td>
+                                    <td>
+                                        <span>item.nameEn</span>
+                                    </td>
+                                    <td>
+                                        <span>item.quantity</span>
+                                    </td>
+                                    <td>
+                                        <span>item.unit</span>
+                                    </td>
+                                    <td>
+                                        <span>item.unitPrice</span>
+                                    </td>
+                                    <td>
+                                        <span>item.currencyId</span>
+                                    </td>
+                                    <td>
+                                        <span>item.vatrate</span>
+                                    </td>
+                                    <td>
+                                        <span class="credit-value"
+                                            >item.total | number:'1.3-3'</span>
+                                    </td>
+                                    <td>
+                                        <span class="debit-value"
+                                            >item.total | number:'1.3-3'</span>
+                                    </td>
+                                    <td>
+                                        <span>item.notes</span>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <!--end: Datatable-->
+                    <div class="m--margin-top-10">
+                        <div class="m-alert m-alert--square alert alert-info m--align-right m--marginless">
+                            <div class="row">
+                                <div class="col">
+                                    <strong>Total Credit:</strong><span class="m--margin-left-5">123456789</span>
+                                </div>
+                                <div class="col-md-auto">
+                                    <strong>Total Dedit:</strong> <span class="m--margin-left-5">123456789</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="m-alert m-alert--square alert alert-brand m--align-right m--marginless">
+                            <strong>Balance Amount:</strong><span class="m--margin-left-5">Total Dedit - Total Credit</span>
+                        </div>
+                    </div>
+                    <!--end::m-portlet -->
+                </div>
+                <!--end::Form-->
+            </div>
+            <div class="modal-footer m--align-center">
+                <button class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="deleteCdNote()">
+                    <span>
+                        <i class="la la-trash"></i>
+                        <span>
+                            Delete note
+                        </span>
+                    </span>
+                </button>
+                <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)="openPopupEdit()">
+                    <span>
+                        <i class="la la-edit"></i>
+                        <span>
+                            Edit detail
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal" (click)="closePopup()">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            Return
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<cd-note-add-popup></cd-note-add-popup>

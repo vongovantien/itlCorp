@@ -9,6 +9,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { DirectiveModule } from '../directives/directive.module';
 import { FormsModule } from '@angular/forms';
 import { AppPaginationComponent } from './pagination/pagination.component';
+import { TableCellComponent } from './table-cell/table-cell.component';
 
 const COMPONENTS = [
     SubHeaderComponent,
@@ -36,7 +37,8 @@ const COMPONENTS = [
     TableBodyComponent,
     ConfirmPopupComponent,
     InfoPopupComponent,
-    UploadAlertComponent
+    UploadAlertComponent,
+    TableCellComponent
 
 ];
 

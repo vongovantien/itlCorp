@@ -106,6 +106,15 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
-
+        /// <summary>
+        /// check allow delete an existed item
+        /// </summary>
+        /// <param name="cdNoteId"></param>
+        /// <returns></returns>
+        [HttpGet("CheckAllowDelete/{cdNoteId}")]
+        public IActionResult CheckAllowDelete(Guid cdNoteId)
+        {
+            return Ok(cdNoteServices.CheckAllowDelete(cdNoteId));
+        }
     }
 }

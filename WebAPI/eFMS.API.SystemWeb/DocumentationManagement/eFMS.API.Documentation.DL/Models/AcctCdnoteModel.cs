@@ -8,5 +8,7 @@ namespace eFMS.API.Documentation.DL.Models
     public class AcctCdnoteModel : AcctCdnote
     {
         public List<CsShipmentSurcharge> listShipmentSurcharge { get; set; }
+        public int total_charge { get; set; }
+        public string soaNo { get; set; }
     }
 }

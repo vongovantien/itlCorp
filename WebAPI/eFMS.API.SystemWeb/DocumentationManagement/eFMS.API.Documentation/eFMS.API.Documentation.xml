@@ -4,6 +4,13 @@
         <name>eFMS.API.Documentation</name>
     </assembly>
     <members>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.CheckAllowDelete(System.Guid)">
+            <summary>
+            check allow delete an existed item
+            </summary>
+            <param name="cdNoteId"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController">
             <summary>
             
@@ -255,6 +262,20 @@
             <summary>
             Get list charge shipment by conditions
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetHouseBillTotalProfit(System.Guid)">
+            <summary>
+            get total profit of a house bill
+            </summary>
+            <param name="hblid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetShipmentTotalProfit(System.Guid)">
+            <summary>
+            get total profit of a shipment
+            </summary>
+            <param name="jobId"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsTransactionController">

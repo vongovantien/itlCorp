@@ -248,8 +248,9 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var jobId = IsHouseBillID == true ? opstransRepository.Get(x => x.Hblid == id).FirstOrDefault()?.Id : id;
                     var cdNotes = DataContext.Where(x => x.PartnerId == item.Id && x.JobId== jobId).ToList();
+                    var cdNotesModel = mapper.Map<List<AcctCdnoteModel>>(cdNotes);
                     List<object> listCDNote = new List<object>();
-                    foreach(var cdNote in cdNotes)
+                    foreach(var cdNote in cdNotesModel)
                     {
                         // -to continue
                         //var chargesOfCDNote = ((eFMSDataContext)DataContext.DC).CsShipmentSurcharge.Where(x => x.Cdno == cdNote.Code).ToList();
@@ -270,10 +271,12 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                         }
                         cdNote.Total = totalDebit - totalCredit;
-                        listCDNote.Add(new { cdNote, total_charge= chargesOfCDNote.Count() });                      
-
+                        cdNote.soaNo = String.Join(",", chargesOfCDNote.Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano ).Distinct());
+                        cdNote.total_charge = chargesOfCDNote.Count();
+                        //listCDNote.Add(new { cdNote, total_charge= chargesOfCDNote.Count()});
+                        listCDNote.Add(cdNote);
                     }
-
+                    
                     var obj = new { item.PartnerNameEn, item.PartnerNameVn, item.Id, listCDNote };
                     if (listCDNote.Count > 0)
                     {
@@ -717,6 +720,18 @@ namespace eFMS.API.Documentation.DL.Services
                 jobCSTrans.ModifiedDate = DateTime.Now;
                 cstransRepository.Update(jobCSTrans, x => x.Id == jobId, false);
             }
+        }
+
+        public bool CheckAllowDelete(Guid cdNoteId)
+        {
+            var cdNote = DataContext.Get(x => x.Id == cdNoteId).FirstOrDefault();
+            var query = surchargeRepository.Get(x => (x.CreditNo == cdNote.Code && !string.IsNullOrEmpty(x.PaySoano)) 
+                                                  || (x.DebitNo == cdNote.Code && !string.IsNullOrEmpty(x.Soano)) ); 
+            if (query.Any())
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

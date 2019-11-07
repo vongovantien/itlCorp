@@ -18,9 +18,8 @@ import { reducers, effects } from './store';
 import { EffectsModule } from '@ngrx/effects';
 import { CdNoteAddPopupComponent } from './components/popup/add-cd-note/add-cd-note.popup';
 import { FCLImportShareModule } from './share-fcl-import.module';
-
-
-
+import { CdNoteDetailPopupComponent } from './components/popup/detail-cd-note/detail-cd-note.popup';
+import { CdNoteAddRemainingChargePopupComponent } from './components/popup/add-remaining-charge/add-remaining-charge.popup';
 
 const routing: Routes = [
 
@@ -45,7 +44,9 @@ const routing: Routes = [
 const COMPONENTS = [
     SeaFCLImportManagementFormSearchComponent,
     SeaFClImportFormCreateComponent,
-    CdNoteAddPopupComponent
+    CdNoteAddPopupComponent,
+    CdNoteDetailPopupComponent,
+    CdNoteAddRemainingChargePopupComponent
 ];
 
 const LIB = [
@@ -65,7 +66,6 @@ const LIB = [
         SeaFCLImportCreateJobComponent,
         SeaFCLImportDetailJobComponent,
         SeaFCLImportCDNoteComponent,
-        CdNoteAddPopupComponent,
     ],
     imports: [
         NgxDaterangepickerMd,

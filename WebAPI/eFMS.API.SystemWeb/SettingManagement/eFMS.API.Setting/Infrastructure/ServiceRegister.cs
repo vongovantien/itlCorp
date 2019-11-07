@@ -38,9 +38,9 @@ namespace eFMS.API.Setting.Infrastructure
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
             services.AddTransient<ICategoryLogService, CategoryLogService>();
             services.AddTransient<ICurrentUser, CurrentUser>();
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-            services.AddSingleton<ITariffService, TariffService>();
+            services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddTransient<IActionContextAccessor, ActionContextAccessor>();
+            services.AddTransient<ITariffService, TariffService>();
 
         }
 

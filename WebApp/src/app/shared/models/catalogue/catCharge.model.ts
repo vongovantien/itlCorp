@@ -4,10 +4,10 @@ export class Charge {
     chargeNameVn: string = '';
     chargeNameEn: string = '';
     serviceTypeId: string = '';
-    type: string = '';
-    currencyId: string = '';
+    type: string = null;
+    currencyId: string = null;
     unitPrice: number = 0;
-    unitId: number = 0;
+    unitId: number = null;
     vatrate: number = 0;
     userCreated: string = '';
     datetimeCreated: string = '';

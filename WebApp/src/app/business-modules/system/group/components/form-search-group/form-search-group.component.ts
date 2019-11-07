@@ -6,7 +6,7 @@ import { AppForm } from 'src/app/app.form';
   templateUrl: './form-search-group.component.html'
 })
 export class FormSearchGroupComponent extends AppForm {
-  @Output() onSearch: EventEmitter<ISearchCompany> = new EventEmitter<ISearchCompany>();
+  @Output() onSearch: EventEmitter<ISearchGroup> = new EventEmitter<ISearchGroup>();
   configSearch: any;
 
   constructor() {
@@ -28,7 +28,7 @@ export class FormSearchGroupComponent extends AppForm {
     };
   }
   searchData(searchObject: ISearchObject) {
-    const searchData: ISearchCompany = {
+    const searchData: ISearchGroup = {
       type: searchObject.field,
       keyword: searchObject.searchString
     };
@@ -41,7 +41,7 @@ export class FormSearchGroupComponent extends AppForm {
     this.onSearch.emit(data);
   }
 }
-interface ISearchCompany {
+interface ISearchGroup {
   type: string;
   keyword: string;
 }

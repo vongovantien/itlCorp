@@ -2362,6 +2362,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.FinalExchangeRate).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.Hblid).HasColumnName("HBLID");
 
                 entity.Property(e => e.IncludedVat).HasColumnName("IncludedVAT");
@@ -2371,6 +2373,10 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.InvoiceNo).HasMaxLength(50);
 
                 entity.Property(e => e.IsFromShipment).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.Kb)
+                    .HasColumnName("KB")
+                    .HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.Notes).HasMaxLength(500);
 
@@ -2402,6 +2408,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Quantity).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.QuantityType)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.SeriesNo).HasMaxLength(50);
 
@@ -2489,6 +2499,22 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.Vatrate)
                     .HasColumnName("VATRate")
                     .HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.VoucherId)
+                    .HasColumnName("VoucherID")
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.VoucherIddate)
+                    .HasColumnName("VoucherIDDate")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.VoucherIdre)
+                    .HasColumnName("VoucherIDRE")
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.VoucherIdredate)
+                    .HasColumnName("VoucherIDREDate")
+                    .HasColumnType("datetime");
             });
 
             modelBuilder.Entity<CsShippingInstruction>(entity =>

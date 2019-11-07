@@ -37,6 +37,8 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<CsMawbcontainerImportModel, CsMawbcontainer>();
 
             CreateMap<spc_GetSurchargeByHouseBill, CsShipmentSurchargeDetailsModel>();
+
+            CreateMap<AcctCdnote, AcctCdnoteModel>();
         }
     }
 }

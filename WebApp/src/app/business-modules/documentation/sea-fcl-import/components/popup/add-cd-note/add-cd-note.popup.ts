@@ -4,6 +4,7 @@ import { OpsTransaction } from "src/app/shared/models/document/OpsTransaction.mo
 import { DocumentationRepo } from "src/app/shared/repositories";
 import { catchError, tap } from "rxjs/operators";
 import { ConfirmPopupComponent, InfoPopupComponent } from "src/app/shared/common/popup";
+import { CdNoteAddRemainingChargePopupComponent } from "../add-remaining-charge/add-remaining-charge.popup";
 @Component({
     selector: 'cd-note-add-popup',
     templateUrl: './add-cd-note.popup.html'
@@ -11,6 +12,7 @@ import { ConfirmPopupComponent, InfoPopupComponent } from "src/app/shared/common
 export class CdNoteAddPopupComponent extends PopupBase {
     @ViewChild('changePartnerPopup', { static: false }) changePartnerPopup: ConfirmPopupComponent;
     @ViewChild('notExistsChargePopup', { static: false }) notExistsChargePopup: InfoPopupComponent;
+    @ViewChild(CdNoteAddRemainingChargePopupComponent, { static: false }) addRemainChargePopup: CdNoteAddRemainingChargePopupComponent;
     @Input() currentJob: OpsTransaction = null;
 
     headers: CommonInterface.IHeaderTable[];
@@ -51,17 +53,17 @@ export class CdNoteAddPopupComponent extends PopupBase {
 
     ngOnInit() {
         this.headers = [
-            { title: 'HBL No', field: 'jobNo', sortable: true },
-            { title: 'Code', field: 'jobNo', sortable: true },
-            { title: 'Charge Name', field: 'mawb', sortable: true },
-            { title: 'Quantity', field: 'eta', sortable: true },
-            { title: 'Unit', field: 'supplierName', sortable: true },
-            { title: 'Unit Price', field: 'agentName', sortable: true },
-            { title: 'Currency', field: 'polName', sortable: true },
-            { title: 'VAT', field: 'podName', sortable: true },
-            { title: "Credit Value", field: 'sumCont', sortable: true },
-            { title: "Debit Value", field: 'sumPackage', sortable: true },
-            { title: 'Note', field: 'grossWeight', sortable: true }
+            { title: 'HBL No', field: 'hwbno', sortable: true },
+            { title: 'Code', field: 'chargeCode', sortable: true },
+            { title: 'Charge Name', field: 'nameEn', sortable: true },
+            { title: 'Quantity', field: 'quantity', sortable: true },
+            { title: 'Unit', field: 'unit', sortable: true },
+            { title: 'Unit Price', field: 'unitPrice', sortable: true },
+            { title: 'Currency', field: 'currency', sortable: true },
+            { title: 'VAT', field: 'vatrate', sortable: true },
+            { title: "Credit Value", field: 'total', sortable: true },
+            { title: "Debit Value", field: 'total', sortable: true },
+            { title: 'Note', field: 'notes', sortable: true }
         ];
         // if (this.currentJob != null) {
         //     this.currentHblID = this.currentJob.hblid;
@@ -133,7 +135,6 @@ export class CdNoteAddPopupComponent extends PopupBase {
     }
 
     onSelectDataFormInfo(data: any) {
-        //console.log('seleted partner ' + data.partnerNameEn);
         this.selectedPartner = { field: "id", value: data.id };
 
         if (this.partnerCurrent.value !== this.selectedPartner.value) {
@@ -142,7 +143,6 @@ export class CdNoteAddPopupComponent extends PopupBase {
     }
 
     onSubmitChangePartnerPopup() {
-        //console.log('confirm change partner')        
         this.isCheckAllCharge = false;
         //Gán this.selectedPartner cho this.partnerCurrent
         this.partnerCurrent = Object.assign({}, this.selectedPartner);
@@ -255,4 +255,7 @@ export class CdNoteAddPopupComponent extends PopupBase {
         );
     }
 
+    openPopupAddCharge(){
+        this.addRemainChargePopup.show({ backdrop: 'static' });
+    }
 }
