@@ -71,7 +71,6 @@ export class TariffAddComponent extends AppList {
             supplierId: this.tariff.setTariff.supplierId
         };
 
-
         this.tariff.setTariff = Object.assign({}, this.tariff.setTariff, setTariff);
     }
 

@@ -69,11 +69,11 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-group"
-                        [ngClass]="{'m-form__group has-danger': isSubmitted && !formAdd.value.tariff.expiredDate}">
+                        [ngClass]="{'m-form__group has-danger': isSubmitted && (!formAdd.value.tariff.expiredDate.startDate)}">
                         <label required>Expired Date</label>
                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [minDate]="minDate"
+                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [minDate]="minDateExpired"
                                 name="daterange" placeholder="Please Select" readonly [autoApply]="true"
                                 [singleDatePicker]="true" formControlName="expiredDate" [alwaysShowCalendars]="true" />
                             <span class="m-input-icon__icon m-input-icon__icon--right">
@@ -82,7 +82,8 @@
                                 </span>
                             </span>
                         </div>
-                        <div class="form-control-feedback" *ngIf="isSubmitted && !formAdd.value.tariff.expiredDate">
+                        <div class="form-control-feedback"
+                            *ngIf="isSubmitted && !formAdd.value.tariff.expiredDate.startDate">
                             Expired Date is required !
                         </div>
                     </div>
