@@ -4,7 +4,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class FilterPipe implements PipeTransform {
     transform(sources: any[], args: RegExp, keys: string[]): any {
         const searchText = new RegExp(args, 'ig');
-        if (!!sources.length) {
+        if (!!sources.length && !!keys.length) {
             return sources.filter((item: any) => {
                 for (const key of keys) {
                     if (item.hasOwnProperty(key) && !!item[key]) {

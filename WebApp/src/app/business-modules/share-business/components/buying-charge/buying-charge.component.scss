@@ -1,11 +1,32 @@
 :host /deep/ {
     .table-wrapper {
+        padding-bottom: 300px !important;
         &.h {
             min-height: 330px;
             padding-bottom: 175px;
         }
         .form-group {
-            font-size: 11px;
+            .form-control {
+                font-size: 11px;
+            }
+        }
+    }
+    .dropdown-partner {
+        .dropdown-partner__content {
+            width: 500px;
+            min-height: 294px;
+            border-radius: 20px;
+            padding: 0px 2px;
+            .dropdown-partner__header {
+                padding: 10px 0px;
+                border-bottom: 1px solid #dfdfdf;
+
+                // * Combo grid
+                .e--combogrid-content {
+                    border-bottom-left-radius: 20px;
+                    border-bottom-right-radius: 20px;
+                }
+            }
         }
     }
     .cdk-virtual-scroll-viewport {

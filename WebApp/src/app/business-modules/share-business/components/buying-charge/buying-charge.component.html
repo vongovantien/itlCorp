@@ -1,6 +1,6 @@
 <div class="buying-charge-wrapper">
     <div class="table-wrapper table-editable m--margin-top-20" [class.h]="!!charges.length">
-        <table class="table dataTable table-bordered table-hover">
+        <table class="table dataTable table-bordered">
             <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                 <th class="m--w-50 first table-actions-col">
                 </th>
@@ -18,8 +18,20 @@
                             </div>
                         </td>
                         <td>
-                            <div class="form-group ">
-                                <input type="text" class="form-control">
+                            <div class="form-group col-md-12 dropdown-partner" dropdown>
+                                <input type="text" class="dropdown-toggle form-control" dropdownToggle readonly
+                                    [(ngModel)]="charge.partnerName">
+                                <div *dropdownMenu class="dropdown-menu dropdown-partner__content">
+                                    <div class="d-flex justify-content-end dropdown-partner__header">
+                                        <div class="text-primary text-underline m--margin-right-20">Customer</div>
+                                        <div class="text-primary text-underline m--margin-right-20">Carrier</div>
+                                        <div class="text-primary text-underline m--margin-right-20">Agent</div>
+                                    </div>
+                                    <app-combo-grid [headers]="headerPartner" [data]="listPartner"
+                                        [fields]="['taxCode','partnerNameEn']"
+                                        (onClick)="onSelectPartner($event, charge)">
+                                    </app-combo-grid>
+                                </div>
                             </div>
                         </td>
                         <td>
@@ -41,7 +53,8 @@
                                             currencyMask>
                                     </div>
                                     <div class="col-md-6 p-l-none">
-                                        <select class="form-control border" [(ngModel)]="charge.quantityHint">
+                                        <select class="form-control border" [(ngModel)]="charge.quantityHint"
+                                            (ngModelChange)="onChangeQuantityHint(charge.quantityHint)">
                                             <option value="null"></option>
                                             <option *ngFor="let hint of quantityHints" [ngValue]="hint">
                                                 {{hint.displayName}}</option>
@@ -119,6 +132,26 @@
                             </div>
                         </td>
                         <td>
+                            <div class="form-group table-date">
+                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [minDate]="minDate"
+                                        name="daterange" placeholder="Please Select" readonly [autoApply]="true"
+                                        [singleDatePicker]="true" [alwaysShowCalendars]="true"
+                                        [(ngModel)]="charge.exchangeDate" />
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <app-switch [(toggle)]="charge.kickBack">
+                            </app-switch>
+                        </td>
+                        <td>
                             <div class="form-group ">
                                 <input type="text" class="form-control" [(ngModel)]="charge.soano" disabled readonly
                                     placeholder="SOA">
@@ -134,22 +167,6 @@
                             <div class="form-group ">
                                 <input type="text" class="form-control" [(ngModel)]="charge.settlementCode" disabled
                                     readonly placeholder="Settlement">
-                            </div>
-                        </td>
-                        <td>
-                            <div class="form-group table-date">
-                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                        [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [minDate]="minDate"
-                                        name="daterange" placeholder="Please Select" readonly [autoApply]="true"
-                                        [singleDatePicker]="true" [alwaysShowCalendars]="true"
-                                        [(ngModel)]="charge.exchangeDate" />
-                                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                                        <span>
-                                            <i class="la la-calendar"></i>
-                                        </span>
-                                    </span>
-                                </div>
                             </div>
                         </td>
                         <td>
@@ -182,10 +199,7 @@
                                     placeholder="Final Exchange Date" [(ngModel)]="charge.finalExchangeRate">
                             </div>
                         </td>
-                        <td>
-                            <app-switch [(toggle)]="charge.kickBack">
-                            </app-switch>
-                        </td>
+
                     </tr>
 
                 </ng-container>

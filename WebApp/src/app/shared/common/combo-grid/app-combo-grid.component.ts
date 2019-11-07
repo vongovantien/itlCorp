@@ -11,9 +11,11 @@ export class AppComboGridComponent<T> extends AppList {
     @Input() headers: CommonInterface.IHeaderTable[];
     @Input() data: any = [];
     @Input() height: 200;
+    @Input() fields: string[] = [];
     @Output() onClick: EventEmitter<any> = new EventEmitter<any>();
 
     selectedItem: any = null;
+
 
     constructor() {
         super();
@@ -24,5 +26,10 @@ export class AppComboGridComponent<T> extends AppList {
     selectItem(item: any) {
         this.selectedItem = item;
         this.onClick.emit(this.selectedItem);
+    }
+
+    clickSearch($event: Event) {
+        $event.stopPropagation();
+        $event.stopImmediatePropagation();
     }
 }

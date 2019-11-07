@@ -3,7 +3,7 @@ import { AppList } from 'src/app/app.list';
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { forkJoin } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { Surcharge, Charge, Unit, CsShipmentSurcharge, Currency } from 'src/app/shared/models';
+import { Surcharge, Charge, Unit, CsShipmentSurcharge, Currency, Partner } from 'src/app/shared/models';
 
 @Component({
     selector: 'buying-charge',
@@ -14,11 +14,13 @@ import { Surcharge, Charge, Unit, CsShipmentSurcharge, Currency } from 'src/app/
 export class ShareBussinessBuyingChargeComponent extends AppList {
 
     headers: CommonInterface.IHeaderTable[] = [];
+    headerPartner: CommonInterface.IHeaderTable[] = [];
     charges: CsShipmentSurcharge[] = new Array<CsShipmentSurcharge>();
 
     listCharges: Charge[] = new Array<Charge>();
     listUnits: Unit[] = new Array<Unit>();
     listCurrency: Currency[] = new Array<Currency>();
+    listPartner: Partner[] = new Array<Partner>();
 
     configComboGridCharge: Partial<CommonInterface.IComboGirdConfig> = {};
     selectedCharge: Partial<CommonInterface.IComboGridData> = {};
@@ -46,16 +48,21 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             { title: 'Invoice No', field: '', sortable: true },
             { title: 'Series No', field: '', sortable: true },
             { title: 'Invoice Date', field: '', sortable: true },
+            { title: 'Exchange Rate Date', field: '', sortable: true },
+            { title: 'KB', field: '', sortable: true },
             { title: 'SOA', field: '', sortable: true },
             { title: 'Credit/Debit Note', field: '', sortable: true },
             { title: 'Settle Payment', field: '', sortable: true },
-            { title: 'Exchange Rate Date', field: '', sortable: true },
             { title: 'Voucher ID', field: '', sortable: true },
             { title: 'Voucher ID Date', field: '', sortable: true },
             { title: 'Voucher IDRE', field: '', sortable: true },
             { title: 'Voucher IDRE Date', field: '', sortable: true },
             { title: 'Final Exchange Rate', field: '', sortable: true },
-            { title: 'KB', field: '', sortable: true },
+        ];
+
+        this.headerPartner = [
+            { title: 'Name', field: 'partnerNameEn' },
+            { title: 'Partner Code', field: 'taxCode' },
         ];
 
         this.configComboGridCharge = Object.assign({}, this.configComoBoGrid, {
@@ -76,20 +83,23 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             { displayName: 'N.W', value: 'nw' },
         ]
         this.getMasterData();
+        this.addCharge();
     }
 
     getMasterData() {
         forkJoin([
             this._catalogueRepo.getCharges({ active: true }),
             this._catalogueRepo.getUnit({ active: true }),
-            this._catalogueRepo.getCurrencyBy({ active: true })
+            this._catalogueRepo.getCurrencyBy({ active: true }),
+            this._catalogueRepo.getListPartner(null, null, { active: true })
         ])
             .pipe(catchError(this.catchError))
             .subscribe(
-                ([charges, units, currencies]: any[] = [[], []]) => {
+                ([charges, units, currencies, partners]: any[] = [[], [], [], []]) => {
                     this.listCharges = charges;
                     this.listUnits = units;
                     this.listCurrency = currencies;
+                    this.listPartner = partners;
                 }
             );
     }
@@ -131,7 +141,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     onChangeVat(vat: number, chargeItem: CsShipmentSurcharge) {
-        console.log(vat, chargeItem);
         chargeItem.total = this.calculateTotalAmount(vat, chargeItem.quantity, chargeItem.unitPrice);
     }
 
@@ -147,7 +156,17 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         console.log(this.charges);
     }
 
-    onChangeQuantityHint(event: any) {
-        console.log(event);
+    onChangeQuantityHint(hintType: any) {
+        console.log(hintType);
+        // TODO get data from house bill with hinType.
+    }
+
+    onSelectPartner(partnerData: Partner, chargeItem: CsShipmentSurcharge) {
+        if (!!partnerData) {
+            chargeItem.partnerName = partnerData.shortName;
+            chargeItem.paymentObjectId = partnerData.id,
+                chargeItem.objectBePaid = "CUSTOMER/AGENT/CARRIER";  // nếu chọn customer/agent/carrier
+
+        }
     }
 }

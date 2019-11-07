@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ModalModule } from 'ngx-bootstrap';
+import { ModalModule, BsDropdownModule } from 'ngx-bootstrap';
 import { FormsModule } from '@angular/forms';
 import { CommonComponentModule } from 'src/app/shared/common/common.module';
 import { DirectiveModule } from 'src/app/shared/directives/directive.module';
@@ -35,6 +35,7 @@ const customCurrencyMaskConfig = {
         ModalModule.forRoot(),
         NgxDaterangepickerMd.forRoot(),
         DirectiveModule,
+        BsDropdownModule.forRoot(),
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
 
     ],
