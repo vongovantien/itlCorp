@@ -1,7 +1,7 @@
-import {Charge} from './catCharge.model';
-import {CatChargeDefaultAccount} from './catChargeDefaultAccount.model';
+import { Charge } from './catCharge.model';
+import { CatChargeDefaultAccount } from './catChargeDefaultAccount.model';
 
-export class CatChargeToAddOrUpdate{
+export class CatChargeToAddOrUpdate {
     charge: Charge = new Charge();
-    listChargeDefaultAccount :CatChargeDefaultAccount[] = [];
+    listChargeDefaultAccount: CatChargeDefaultAccount[] = [];
 }

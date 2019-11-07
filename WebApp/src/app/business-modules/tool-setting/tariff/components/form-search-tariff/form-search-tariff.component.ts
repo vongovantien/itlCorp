@@ -152,6 +152,12 @@ export class TariffFormSearchComponent extends AppForm {
     }
 
     getCarrierAndShipper() {
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER) && !!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER)) {
+            this.configCustomer.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER) || [];
+
+            this.suppliers = [...this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER), ...this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPPER)];
+            this.suppliers = _uniqBy(this.suppliers, 'id');
+        }
         forkJoin([
             this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CARRIER),
             this._catalogueRepo.getPartnersByType(PartnerGroupEnum.SHIPPER),
@@ -162,6 +168,7 @@ export class TariffFormSearchComponent extends AppForm {
                     this.suppliers = _uniqBy(this.suppliers, 'id');
 
                     this._dataService.setDataService(SystemConstants.CSTORAGE.CARRIER, carries || []);
+                    this._dataService.setDataService(SystemConstants.CSTORAGE.SHIPPER, carries || []);
                 }
             );
     }

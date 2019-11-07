@@ -54,7 +54,6 @@ export class PermissionDetailComponent extends PermissionCreateComponent {
                             type: this.formCreateComponent.types.filter(type => type.value === this.permissionSample.type)[0],
                             status: this.formCreateComponent.statuss.filter(status => status.value === this.permissionSample.active)[0],
                         });
-                        console.log(this.permissionSample);
                     }, 100);
 
                 }
@@ -66,11 +65,22 @@ export class PermissionDetailComponent extends PermissionCreateComponent {
         this.updatePermissionModel(formDataCreate);
 
         this._systemRepo.updatePermissionGeneral(this.permissionSample)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete()),
+            )
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
+
+                        // * get detail
+                        this._systemRepo.getPermissionSample(this.permissionId)
+                            .subscribe(
+                                (res: any) => {
+                                    this.permissionSample = new PermissionSample(res);
+                                }
+                            )
                     } else {
                         this._toastService.error(res.message);
                     }

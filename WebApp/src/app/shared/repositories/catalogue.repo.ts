@@ -116,11 +116,11 @@ export class CatalogueRepo {
         }
     }
 
-    getListCharge(page?: number, size?: number) {
+    getListCharge(page?: number, size?: number, body: any = {}) {
         if (!!page && !!size) {
-            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/paging`, {}, {
-                page: '' + page,
-                size: '' + size
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/paging`, body, {
+                pageNumber: '' + page,
+                pageSize: '' + size
             }).pipe(
                 catchError((error) => throwError(error)),
                 map((res: any) => {
@@ -128,7 +128,7 @@ export class CatalogueRepo {
                 })
             );
         } else {
-            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/Query`, {}).pipe(
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/Query`, body).pipe(
                 catchError((error) => throwError(error)),
                 map((res: any) => {
                     return res;
