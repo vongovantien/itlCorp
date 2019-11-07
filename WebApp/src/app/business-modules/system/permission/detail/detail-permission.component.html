@@ -54,39 +54,45 @@
                                                         </app-switch>
                                                     </div>
                                                     <div class="col ">
-                                                        <select class="form-control" [(ngModel)]="permission.detail">
+                                                        <select class="form-control" [(ngModel)]="permission.detail"
+                                                            [disabled]="!permission.access">
                                                             <option *ngFor="let item of levelPermissions"
                                                                 [value]="item">{{item}}
                                                             </option>
                                                         </select>
                                                     </div>
                                                     <div class="col">
-                                                        <select class="form-control" [(ngModel)]="permission.write">
+                                                        <select class="form-control" [(ngModel)]="permission.write"
+                                                            [disabled]="!permission.access">
                                                             <option *ngFor="let item of levelPermissions"
                                                                 [value]="item">{{item}}
                                                             </option>
                                                         </select>
                                                     </div>
                                                     <div class="col">
-                                                        <select class="form-control" [(ngModel)]="permission.delete">
+                                                        <select class="form-control" [(ngModel)]="permission.delete"
+                                                            [disabled]="!permission.access">
                                                             <option *ngFor="let item of levelPermissions"
                                                                 [value]="item">{{item}}
                                                             </option>
                                                         </select>
                                                     </div>
                                                     <div class="col">
-                                                        <select class="form-control" [(ngModel)]="permission.list">
+                                                        <select class="form-control" [(ngModel)]="permission.list"
+                                                            [disabled]="!permission.access">
                                                             <option *ngFor="let item of levelPermissions"
                                                                 [value]="item">{{item}}
                                                             </option>
                                                         </select>
                                                     </div>
                                                     <div class="col text-center">
-                                                        <app-switch [(toggle)]="permission.import">
+                                                        <app-switch [(toggle)]="permission.import"
+                                                            [disabled]="!permission.access">
                                                         </app-switch>
                                                     </div>
                                                     <div class="col text-center">
-                                                        <app-switch [(toggle)]="permission.export">
+                                                        <app-switch [(toggle)]="permission.export"
+                                                            [disabled]="!permission.access">
                                                         </app-switch>
                                                     </div>
                                                 </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { Permission } from 'src/app/shared/models';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -40,7 +40,7 @@ export class PermissionComponent extends AppList {
         this.headers = [
             { field: 'name', title: 'Permission Name', sortable: true, dataType: 'LINK' },
             { field: 'type', title: 'Type', sortable: true },
-            { field: 'role', title: 'Role', sortable: true },
+            { field: 'roleName', title: 'Role', sortable: true },
             { field: 'active', title: 'Status', sortable: true, dataType: 'BOOLEAN' },
         ];
 
@@ -69,8 +69,11 @@ export class PermissionComponent extends AppList {
     }
 
     deletePermission(permission: Permission) {
-        this.selectedPermission = new Permission(permission);
-        this.configmDeletePopup.show();
+        if (!permission.active) {
+            this.selectedPermission = new Permission(permission);
+            this.configmDeletePopup.show();
+        }
+
     }
 
     onDeletePermission() {
