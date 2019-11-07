@@ -12,6 +12,8 @@ import { forkJoin } from 'rxjs';
 
 import * as fromStore from './../../../store';
 import { Commodity } from 'src/app/shared/models/catalogue/commodity.model';
+import { DataService } from 'src/app/shared/services';
+import { SystemConstants } from 'src/constants/system.const';
 
 
 @Component({
@@ -36,7 +38,8 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _store: Store<fromStore.IContainerState>,
-        private cdRef: ChangeDetectorRef
+        private cdRef: ChangeDetectorRef,
+        private _dataService: DataService
 
     ) {
         super();
@@ -69,7 +72,6 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
             .subscribe(
                 (res: fromStore.IContainerState | any) => {
                     this.containers = res;
-                    console.log("get container from store", this.containers);
                 }
             );
     }
@@ -84,23 +86,33 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
     }
 
     getMasterData() {
-        forkJoin([
-            this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.CONTAINER }),
-            this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE }),
-            this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.WEIGHT }),
-            this._catalogueRepo.getCommondity({ active: true }),
-        ])
-            .pipe(
-                catchError(this.catchError)
-            )
-            .subscribe(
-                (res: any[] = [[], [], [], []]) => {
-                    this.containerUnits = res[0];
-                    this.packageUnits = res[1];
-                    this.weightUnits = res[2];
-                    this.commodities = res[3];
-                }
-            );
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.UNIT) && !!this._dataService.getDataByKey(SystemConstants.CSTORAGE.UNIT).length) {
+            const res: any[] = this._dataService.getDataByKey(SystemConstants.CSTORAGE.UNIT);
+            this.containerUnits = res[0] || [];
+            this.packageUnits = res[1] || [];
+            this.weightUnits = res[2] || [];
+            this.commodities = res[3] || [];
+        } else {
+            forkJoin([
+                this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.CONTAINER }),
+                this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE }),
+                this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.WEIGHT }),
+                this._catalogueRepo.getCommondity({ active: true }),
+            ])
+                .pipe(
+                    catchError(this.catchError)
+                )
+                .subscribe(
+                    (res: any[] = [[], [], [], []]) => {
+                        this.containerUnits = res[0];
+                        this.packageUnits = res[1];
+                        this.weightUnits = res[2];
+                        this.commodities = res[3];
+
+                        this._dataService.setDataService(SystemConstants.CSTORAGE.UNIT, [...res]);
+                    }
+                );
+        }
     }
 
     onSaveContainerList() {
@@ -168,10 +180,6 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
     }
 
     closePopup() {
-        //  * Reset containers
-        // this._store.dispatch(new fromStore.ClearContainerAction());
-
-        // this.containers = [];
         this.isSubmitted = false;
         this.hide();
     }

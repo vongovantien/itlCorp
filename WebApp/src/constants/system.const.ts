@@ -82,7 +82,8 @@ export class SystemConstants {
         COMPANY: 'efms:company',
         DEPARTMENT: 'efms:department',
         CARRIER: 'efms:carrier',
-        SHIPPER: 'efms:shipper'
+        SHIPPER: 'efms:shipper',
+        SHIPMENT_COMMON_DATA: 'efms:shipment-common-data'
 
     };
 
