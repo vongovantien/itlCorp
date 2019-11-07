@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, ViewChild } from '@angular/core
 import { AppList } from 'src/app/app.list';
 import { TariffChargePopupComponent } from '../popup/tariff-charge/tariff-charge.popup';
 import { TariffCharge, Currency, Charge } from 'src/app/shared/models';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'list-charge-tariff',
@@ -59,6 +60,7 @@ export class TariffListChargeComponent extends AppList {
         if (this.tariffChargePopup.ACTION === 'UPDATE') {
             this.charges[this.selectedIndex] = tariffCharge;
         } else {
+            tariffCharge.id = SystemConstants.EMPTY_GUID;  // * Update ID action = create/copy
             this.charges.push(tariffCharge);
         }
     }
