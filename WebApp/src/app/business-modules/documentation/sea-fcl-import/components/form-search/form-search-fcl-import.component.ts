@@ -113,6 +113,9 @@ export class SeaFCLImportManagementFormSearchComponent extends AppForm {
                     (dataCustomer: any) => {
                         //console.log(dataCustomer)
                         this.getCustomerData(dataCustomer);
+
+                        this._dataService.setDataService(SystemConstants.CSTORAGE.CUSTOMER, dataCustomer);
+
                     },
                 );
         }
@@ -139,6 +142,9 @@ export class SeaFCLImportManagementFormSearchComponent extends AppForm {
                     (dataSupplier: any) => {
                         //console.log(dataSupplier)
                         this.getSupplierData(dataSupplier);
+
+                        this._dataService.setDataService(SystemConstants.CSTORAGE.CARRIER, dataSupplier);
+
                     },
                 );
         }
@@ -165,6 +171,8 @@ export class SeaFCLImportManagementFormSearchComponent extends AppForm {
                     (dataAgent: any) => {
                         //console.log(dataAgent)
                         this.getAgentData(dataAgent);
+
+                        this._dataService.setDataService(SystemConstants.CSTORAGE.AGENT, dataAgent);
                     },
                 );
         }

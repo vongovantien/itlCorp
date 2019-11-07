@@ -168,7 +168,7 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
         const displayFields = this.DisplayFields;
         const context = this;
 
-        this.DataSources = filter(constData, function (o) {
+        const data = filter(constData, function (o) {
             let matched: boolean = false;
             for (const i of displayFields) {
                 const field: string = i.field;
@@ -179,12 +179,22 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
                     matched = true;
                 }
 
-                if (valueType !== 'boolean' && value.toLowerCase().includes(key)) {
+                if (valueType === 'string' && value.toLowerCase().includes(key)) {
+                    matched = true;
+                }
+
+                if (valueType === 'number' && +value === +key) {
                     matched = true;
                 }
             }
             return matched;
         });
+
+        if (!!data.length) {
+            this.DataSources = data;
+        } else {
+            this.DataSources = constData;
+        }
 
         if (this.CurrentActiveItemIdObj !== null && this.CurrentActiveItemIdObj.value !== null) {
             const _CurrentActiveItemIdObj: { field: string, value: any, hardValue: any } = this.CurrentActiveItemIdObj;
@@ -195,7 +205,7 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
 
     }
 
-    getValue(item: any, field: string): string {
+    getValue(item: any, field: string) {
         try {
 
             if (field.includes(".")) {

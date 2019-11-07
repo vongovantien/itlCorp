@@ -33,7 +33,7 @@ export class TariffFormAddComponent extends TariffFormSearchComponent {
     isDisabledCustomer: boolean = true;
     isDisabledSupplier: boolean = true;
     isDisabledAgent: boolean = true;
-
+    minDateExpired: any = null;
     constructor(
         protected _dataService: DataService,
         protected _catalogueRepo: CatalogueRepo,
@@ -72,19 +72,24 @@ export class TariffFormAddComponent extends TariffFormSearchComponent {
         this.getOffice();
     }
 
-    ngOnChanges() {
-
-    }
-
     getOPSShipmentCommonData() {
-        this._documentRepo.getOPSShipmentCommonData()
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: CommonInterface.ICommonShipmentData) => {
-                    this.productSerices = res.productServices;
-                    this.serviceModes = res.serviceModes;
-                }
-            );
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.OPS_COMMON_DATA)) {
+            const res: any = this._dataService.getDataByKey(SystemConstants.CSTORAGE.OPS_COMMON_DATA);
+            this.productSerices = res.productServices || [];
+            this.serviceModes = res.serviceModes || [];
+        } else {
+            this._documentRepo.getOPSShipmentCommonData()
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (res: CommonInterface.ICommonShipmentData) => {
+                        this.productSerices = res.productServices;
+                        this.serviceModes = res.serviceModes;
+
+                        this._dataService.setDataService(SystemConstants.CSTORAGE.OPS_COMMON_DATA, res);
+                    }
+                );
+        }
+
     }
 
     initBasicDataAdd() {
@@ -145,21 +150,34 @@ export class TariffFormAddComponent extends TariffFormSearchComponent {
                 map((data: any) => data.startDate)
             )
             .subscribe((value: any) => {
-                this.minDate = value; // * Update MinDate -> ExpiredDate.
+                console.log(value);
+                this.resetFormControl(this.formAdd.controls['tariff'].get("expiredDate"));
+                this.minDateExpired = value; // * Update MinDate -> ExpiredDate.
             });
     }
 
     getCarrierAndAgent() {
-        forkJoin([
-            this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CARRIER),
-            this._catalogueRepo.getPartnersByType(PartnerGroupEnum.AGENT),
-        ]).pipe(catchError(this.catchError))
-            .subscribe(
-                ([carries, agents]: any[] = [[], []]) => {
-                    this.carries = carries;
-                    this.agents = agents;
-                }
-            );
+        if (this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER)) {
+            this.carries = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER);
+        }
+        if (this._dataService.getDataByKey(SystemConstants.CSTORAGE.AGENT)) {
+            this.agents = this._dataService.getDataByKey(SystemConstants.CSTORAGE.AGENT);
+        } else {
+            forkJoin([
+                this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CARRIER),
+                this._catalogueRepo.getPartnersByType(PartnerGroupEnum.AGENT),
+            ]).pipe(catchError(this.catchError))
+                .subscribe(
+                    ([carries, agents]: any[] = [[], []]) => {
+                        this.carries = carries;
+                        this.agents = agents;
+
+                        this._dataService.setDataService(SystemConstants.CSTORAGE.CARRIER, carries);
+                        this._dataService.setDataService(SystemConstants.CSTORAGE.AGENT, agents);
+                    }
+                );
+        }
+
     }
 
     onSelectDataFormInfo(data: Customer | Partner | Company | any, key: string | any) {
