@@ -100,7 +100,7 @@
 
                     <div class="table-wrapper fit-height-div">
                         <table class="table table-striped table-brand dataTable">
-                            <thead app-table-header [headers]="headers">
+                            <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
                                 <th class="table-actions-col no-sorting first">
                                     <label class="m-checkbox">
                                         <input type="checkbox" [(ngModel)]="isCheckAllCharge"
@@ -121,16 +121,16 @@
                                                 HBL No: {{charges.hwbno}}
                                                 <span></span>
                                             </label> -->
-                                            <label>
+                                            <!-- <label> -->
                                                 <!-- <span (change)="onChangeCheckBoxGrpCharge(charges)"
                                                     [(ngModel)]="charges.isSelected"
                                                     ></span> -->
                                                 HBL No: {{charges.hwbno}}                                                
-                                            </label>
+                                            <!-- </label> -->
                                         </td>
                                     </tr>
                                     <tr class="child"
-                                        *ngFor="let charge of charges.listCharges | filter: keyword:['chargeCode', 'nameEn']; let j = index; trackBy: trackByFn">
+                                        *ngFor="let charge of charges.listCharges | filter: keyword:['hwbno','chargeCode', 'nameEn']; let j = index; trackBy: trackByFn">
                                         <td class="table-actions-col">
                                             <div class="table-actions">
                                                 <label class="m-checkbox">
@@ -141,7 +141,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <span>{{charges.hwbno}}</span>
+                                            <span>{{charge.hwbno}}</span>
                                         </td>
                                         <td>
                                             <span>{{charge.chargeCode}}</span>
@@ -240,4 +240,4 @@
     [title]="'Alert'">
 </info-popup>
 
-<add-remaining-charge-popup></add-remaining-charge-popup>
+<add-remaining-charge-popup (onAddCharge)="onAddMoreCharge($event)"></add-remaining-charge-popup>

@@ -13,6 +13,7 @@ using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Newtonsoft.Json;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 namespace eFMS.API.Documentation.Controllers
@@ -36,7 +37,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="localizer"></param>
         /// <param name="service"></param>
         /// <param name="user"></param>
-        public CsShipmentSurchargeController(IStringLocalizer<LanguageSub> localizer,ICsShipmentSurchargeService service, ICurrentUser user)
+        public CsShipmentSurchargeController(IStringLocalizer<LanguageSub> localizer, ICsShipmentSurchargeService service, ICurrentUser user)
         {
             stringLocalizer = localizer;
             csShipmentSurchargeService = service;
@@ -51,10 +52,10 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("GetByHB")]
-        public IActionResult GetByHouseBill(Guid hbId,string type)
+        public IActionResult GetByHouseBill(Guid hbId, string type)
         {
 
-            return Ok(csShipmentSurchargeService.GetByHB(hbId,type));
+            return Ok(csShipmentSurchargeService.GetByHB(hbId, type));
         }
 
         /// <summary>
@@ -66,10 +67,9 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("GroupByListHB")]
-        public List<object> GetByListHouseBill(Guid Id,string partnerID,bool IsHouseBillID)
+        public List<GroupChargeModel> GetByListHouseBill(Guid Id, string partnerID, bool IsHouseBillID)
         {
-
-            return csShipmentSurchargeService.GroupChargeByHB(Id, partnerID,IsHouseBillID);
+            return csShipmentSurchargeService.GroupChargeByHB(Id, partnerID, IsHouseBillID);
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("GetPartners")]
-        public List<CatPartner> GetPartners(Guid Id,bool IsHouseBillID)
+        public List<CatPartner> GetPartners(Guid Id, bool IsHouseBillID)
         {
 
             return csShipmentSurchargeService.GetAllParner(Id, IsHouseBillID);
@@ -139,7 +139,7 @@ namespace eFMS.API.Documentation.Controllers
             model.Id = Guid.NewGuid();
             model.ExchangeDate = DateTime.Now;
             model.DatetimeCreated = DateTime.Now;
-            var hs = csShipmentSurchargeService.Add(model);           
+            var hs = csShipmentSurchargeService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -189,7 +189,7 @@ namespace eFMS.API.Documentation.Controllers
             if (!ModelState.IsValid) return BadRequest();
             model.UserModified = currentUser.UserID;
             model.DatetimeModified = DateTime.Now;
-            var hs = csShipmentSurchargeService.Update(model, x => x.Id == model.Id);            
+            var hs = csShipmentSurchargeService.Update(model, x => x.Id == model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -255,5 +255,44 @@ namespace eFMS.API.Documentation.Controllers
             var result = csShipmentSurchargeService.GetShipmentTotalProfit(jobId);
             return Ok(result);
         }
+
+        /// <summary>
+        /// get list of surcharge not exists in cd note by house bill and partner id
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("GroupByListHBNotExistsCDNote")]
+        public List<GroupChargeModel> GroupByListHBNotExists(GroupByListHBCriteria criteria)
+        {
+            var dataSearch = csShipmentSurchargeService.GroupChargeByHB(criteria.Id, criteria.partnerID, criteria.IsHouseBillID);
+            var dataTmp = dataSearch;
+            //Ds idcharge Param            
+            List<Guid> chargeIdParam = new List<Guid>();
+            foreach (var charges in criteria.listData)
+            {
+                foreach (var charge in charges.listCharges)
+                {
+                    chargeIdParam.Add(charge.Id);
+                }
+            }
+            
+            for (int i = 0; i < dataTmp.Count; i++)
+            {
+                //Lấy ra ds charge có chứa idCharge
+                var charge = dataTmp[i].listCharges.Where(x => chargeIdParam.Contains(x.Id)).ToList();
+                for (int j = 0; j < charge.Count(); j++)
+                {
+                    var hs = dataSearch[i].listCharges.Remove(charge[j]);
+                }
+                if (dataTmp[i].listCharges.Count() == 0)
+                {
+                    var hs = dataSearch.Remove(dataTmp[i]);
+                }
+            }
+
+            return dataSearch;
+        }
     }
 }
+
+

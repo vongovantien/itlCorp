@@ -136,9 +136,9 @@ namespace eFMS.API.Documentation.DL.Services
             return Query(hbID,type);
         }
 
-        public List<object> GroupChargeByHB(Guid id, string partnerId, bool isHouseBillID)
+        public List<GroupChargeModel> GroupChargeByHB(Guid id, string partnerId, bool isHouseBillID)
         {
-            List<object> returnList = new List<object>();
+            List<GroupChargeModel> returnList = new List<GroupChargeModel>();
             List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
             if (isHouseBillID == false)
             {
@@ -148,10 +148,13 @@ namespace eFMS.API.Documentation.DL.Services
                     listCharges = Query(houseBill.Id, null);
                     listCharges = listCharges.Where(x => (x.PayerId == partnerId || x.Type == "OBH" || x.PaymentObjectId == partnerId)).ToList();
                     listCharges = listCharges.Where(x => (x.CreditNo == null || x.CreditNo.Trim() == "" || x.DebitNo == null || x.DebitNo.Trim() == "")).ToList();
-                    var returnObj = new { houseBill.Hwbno, houseBill.Hbltype, houseBill.Id, listCharges };
+                    listCharges.ForEach(fe =>
+                    {
+                        fe.Hwbno = houseBill.Hwbno;
+                    });
+                    var returnObj = new GroupChargeModel { Hwbno = houseBill.Hwbno, Hbltype = houseBill.Hbltype, Id = houseBill.Id, listCharges = listCharges };
 
                     returnList.Add(returnObj);
-
                 }
             }
             else
@@ -159,7 +162,11 @@ namespace eFMS.API.Documentation.DL.Services
                 var houseBill = opsTransRepository.Get(x => x.Hblid == id).FirstOrDefault();
                 listCharges = Query(id, null);
                 listCharges = listCharges.Where(x => ((x.PayerId == partnerId && x.Type == "OBH") || x.PaymentObjectId == partnerId)).ToList();
-                var returnObj = new { houseBill.Hwbno, houseBill.Id, listCharges };
+                listCharges.ForEach(fe =>
+                {
+                    fe.Hwbno = houseBill.Hwbno;
+                });
+                var returnObj = new GroupChargeModel { Hwbno = houseBill.Hwbno, Id = houseBill.Id, listCharges = listCharges };
 
                 returnList.Add(returnObj);
             }

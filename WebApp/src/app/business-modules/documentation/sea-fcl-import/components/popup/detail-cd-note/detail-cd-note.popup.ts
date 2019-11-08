@@ -3,6 +3,7 @@ import { PopupBase } from "src/app/popup.base";
 import { DocumentationRepo } from "src/app/shared/repositories";
 import { CdNoteAddPopupComponent } from "../add-cd-note/add-cd-note.popup";
 import { catchError } from "rxjs/operators";
+import { SortService } from "src/app/shared/services";
 
 @Component({
     selector: 'cd-note-detail-popup',
@@ -10,8 +11,8 @@ import { catchError } from "rxjs/operators";
 })
 export class CdNoteDetailPopupComponent extends PopupBase {
     @ViewChild(CdNoteAddPopupComponent, { static: false }) cdNoteEditPopupComponent: CdNoteAddPopupComponent;
-    @Input() jobId: string = null;
-    @Input() cdNote: string = null;
+    jobId: string = null;
+    cdNote: string = null;
     
     headers: CommonInterface.IHeaderTable[];
     
@@ -19,9 +20,10 @@ export class CdNoteDetailPopupComponent extends PopupBase {
 
     constructor(
         private _documentationRepo: DocumentationRepo,
+        private _sortService: SortService,
     ) {
         super();
-
+        this.requestSort = this.sortChargeCdNote;
     }
 
     ngOnInit() {
@@ -38,7 +40,7 @@ export class CdNoteDetailPopupComponent extends PopupBase {
             { title: "Debit Value (Local)", field: 'total', sortable: true },
             { title: 'Note', field: 'notes', sortable: true }
         ];
-        this.getDetailCdNote(this.jobId, this.cdNote);
+        
     }
 
     getDetailCdNote(jobId: string, cdNote: string) {
@@ -51,7 +53,7 @@ export class CdNoteDetailPopupComponent extends PopupBase {
                 (dataCdNote: any) => {
                     console.log('CdNote detail')
                     console.log(dataCdNote);
-                    //this.CdNoteDetail = dataCdNote;
+                    this.CdNoteDetail = dataCdNote;
 
                     //Tính toán Amount Credit, Debit, Balance
                     //this.calculatorAmount();
@@ -83,5 +85,11 @@ export class CdNoteDetailPopupComponent extends PopupBase {
 
     onUpdateCdNote(dataRequest: any) {
         console.log(dataRequest)
+    }
+
+    sortChargeCdNote(sort: string): void {
+        if(this.CdNoteDetail){
+            this.CdNoteDetail.listSurcharges = this._sortService.sort(this.CdNoteDetail.listSurcharges, sort, this.order);
+        }
     }
 }

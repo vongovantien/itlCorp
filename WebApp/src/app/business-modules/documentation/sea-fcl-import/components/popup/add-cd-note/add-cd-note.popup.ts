@@ -2,10 +2,11 @@ import { PopupBase } from "src/app/popup.base";
 import { Component, Input, ViewChild, EventEmitter, Output } from "@angular/core";
 import { OpsTransaction } from "src/app/shared/models/document/OpsTransaction.model";
 import { DocumentationRepo } from "src/app/shared/repositories";
-import { catchError, tap } from "rxjs/operators";
+import { catchError, tap, map } from "rxjs/operators";
 import { ConfirmPopupComponent, InfoPopupComponent } from "src/app/shared/common/popup";
 import { CdNoteAddRemainingChargePopupComponent } from "../add-remaining-charge/add-remaining-charge.popup";
 import { SortService } from "src/app/shared/services";
+import { ChargeCdNote } from "src/app/shared/models/document/chargeCdNote.model";
 @Component({
     selector: 'cd-note-add-popup',
     templateUrl: './add-cd-note.popup.html'
@@ -32,7 +33,7 @@ export class CdNoteAddPopupComponent extends PopupBase {
     currentHblID: any = '8F74BE7E-87E9-4D58-9FAF-422EBF24FE18';
     selectedNoteType: string = '';
 
-    listChargePartner: any[] = [];
+    listChargePartner: ChargeCdNote[] = [];
 
     selectedPartner: any = {};
     partnerCurrent: any = {};
@@ -85,9 +86,9 @@ export class CdNoteAddPopupComponent extends PopupBase {
 
     closePopup() {
         this.hide();
-        //this.resetForm();
         this.selectedNoteType = "DEBIT";
         this.selectedPartner = {};
+        this.partnerCurrent = {};
         this.listChargePartner = [];
     }
 
@@ -120,12 +121,16 @@ export class CdNoteAddPopupComponent extends PopupBase {
         this._documentationRepo.getChargesByPartner(this.currentHblID, partnerId)
             .pipe(
                 catchError(this.catchError),
+                map((data: any) => {
+                    console.log(data);
+                    return data.map((item: any) => new ChargeCdNote(item));
+                })
             ).subscribe(
                 (dataCharges: any) => {
                     //console.log('list charges')
                     console.log(dataCharges);
                     this.listChargePartner = dataCharges;
-
+                    console.log(this.listChargePartner)
                     //Tính toán Amount Credit, Debit, Balance
                     this.calculatorAmount();
                 },
@@ -185,15 +190,15 @@ export class CdNoteAddPopupComponent extends PopupBase {
 
     removeCharge() {
         console.log(this.listChargePartner.filter(group => group.isSelected));
-        let chargesResult = [];
+        let chargesResultNotSelected = [];
         let grpResult = [];
 
         if (this.listChargePartner.length > 0) {
             for (const charges of this.listChargePartner) {
                 console.log(charges.listCharges.filter(group => group.isSelected))
-                chargesResult = charges.listCharges.filter(group => !group.isSelected);
-                if (chargesResult.length > 0) {
-                    grpResult.push({ id: charges.id, hwbno: charges.hwbno, listCharges: chargesResult });
+                chargesResultNotSelected = charges.listCharges.filter(group => !group.isSelected);
+                if (chargesResultNotSelected.length > 0) {
+                    grpResult.push({ id: charges.id, hwbno: charges.hwbno, listCharges: chargesResultNotSelected });
                 }
             }
         }
@@ -254,7 +259,20 @@ export class CdNoteAddPopupComponent extends PopupBase {
     }
 
     openPopupAddCharge() {
-        this.addRemainChargePopup.show();
+        console.log(this.listChargePartner);
+        this.addRemainChargePopup.partner = this.selectedPartner.value;
+        console.log(this.selectedPartner.value);
+        this.addRemainChargePopup.listChargePartner = this.listChargePartner;
+        this._documentationRepo.getChargesByPartnerNotExitstCdNote(this.currentHblID, this.selectedPartner.value, this.listChargePartner)
+            .pipe(
+                catchError(this.catchError),
+            ).subscribe(
+                (dataCharges: any) => {
+                    console.log(dataCharges);
+                    this.addRemainChargePopup.listChargePartnerAddMore = dataCharges;
+                    this.addRemainChargePopup.show();
+                },
+            );
     }
 
     onChangeNoteType(noteType: any) {
@@ -263,5 +281,13 @@ export class CdNoteAddPopupComponent extends PopupBase {
 
     sortCdNoteCharge(sort: string): void {
         this.listChargePartner = this._sortService.sort(this.listChargePartner, sort, this.order);
+    }
+
+    onAddMoreCharge(data: ChargeCdNote[]) {
+        this.listChargePartner = [];
+        console.log(data);
+        this.listChargePartner = data;
+        this.calculatorAmount();
+        console.log(this.listChargePartner)
     }
 }

@@ -26,9 +26,6 @@ export class SeaFCLImportCDNoteComponent extends AppList {
     deleteMessage: string = '';
     selectedCdNoteId: string = '';
 
-    jobIdSelected: string = '';
-    cdNoteSelected: string = '';
-
     constructor(
         private _documentationRepo: DocumentationRepo,
         private _toastService: ToastrService,
@@ -63,15 +60,16 @@ export class SeaFCLImportCDNoteComponent extends AppList {
     openPopupAdd() {
         this.cdNoteAddPopupComponent.action = 'create';
         //this.cdNoteAddPopupComponent.advanceNo = this.advanceNo;
-        this.cdNoteAddPopupComponent.show({ backdrop: 'static' });
+        this.cdNoteAddPopupComponent.show();
     }
 
     openPopupDetail(jobId: string, cdNote: string){
-        this.jobIdSelected = jobId;
-        this.cdNoteSelected = cdNote;
-        console.log(this.jobIdSelected)
-        console.log(this.cdNoteSelected)
-        this.cdNoteDetailPopupComponent.show({ backdrop: 'static' });
+        console.log(jobId)
+        console.log(cdNote)
+        this.cdNoteDetailPopupComponent.jobId = 'C79E1D6C-888F-48D2-8870-776DADE208BE';
+        this.cdNoteDetailPopupComponent.cdNote = 'LGDN191000006';
+        this.cdNoteDetailPopupComponent.getDetailCdNote('C79E1D6C-888F-48D2-8870-776DADE208BE','LGDN191000006');
+        this.cdNoteDetailPopupComponent.show();
     }
 
     getListCdNote(id: string) {

@@ -243,4 +243,11 @@ export class DocumentationRepo {
         );
     }
 
+    getChargesByPartnerNotExitstCdNote(id: any, partnerId: any, listData: any[]){
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GroupByListHBNotExistsCDNote`,{ Id: id, partnerID: partnerId, IsHouseBillID: true, listData: listData}).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
 }
