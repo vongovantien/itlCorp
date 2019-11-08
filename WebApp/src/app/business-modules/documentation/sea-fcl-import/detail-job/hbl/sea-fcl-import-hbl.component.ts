@@ -24,6 +24,8 @@ export class SeaFCLImportHBLComponent extends AppList {
     headers: CommonInterface.IHeaderTable[];
     houseBill: CsTransactionDetail[] = [];
     selectedHbl: CsTransactionDetail;
+    goodSummary: any = {};
+
 
     containers: Container[] = new Array<Container>();
 
@@ -71,6 +73,8 @@ export class SeaFCLImportHBLComponent extends AppList {
                     console.log(this.containers);
                 }
             );
+
+        this.getGoodSumaryOfHbl();
     }
 
     onSelectTab(tabName: string) {
@@ -122,6 +126,21 @@ export class SeaFCLImportHBLComponent extends AppList {
     onDeleteHbl() {
         this.confirmDeletePopup.hide();
         this.deleteHbl(this.selectedHbl.id);
+    }
+
+
+    getGoodSumaryOfHbl() {
+        this.isLoading = true;
+        this._documentRepo.getGoodSummaryOfAllHbl(this.jobId).pipe(
+            catchError(this.catchError),
+            finalize(() => { this.isLoading = false; }),
+        ).subscribe(
+            (res: any) => {
+
+                this.goodSummary = res;
+                console.log(this.goodSummary);
+            },
+        );
     }
 
 

@@ -211,8 +211,8 @@ namespace eFMS.API.Documentation.Controllers
             var result = csTransactionDetailService.Preview(model);
             return Ok(result);
         }
-
-        [HttpGet("GetGoodSummaryOfAllHblByJobId")]
+        [HttpGet]
+        [Route("GetGoodSummaryOfAllHblByJobId")]
         public IActionResult GetGoodSummaryOfAllHBLByJobId(Guid jobId)
         {
             var result = csTransactionDetailService.GetGoodSummaryOfAllHBLByJobId(jobId);

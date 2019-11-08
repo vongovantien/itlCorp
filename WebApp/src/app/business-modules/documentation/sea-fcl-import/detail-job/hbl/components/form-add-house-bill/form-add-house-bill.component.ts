@@ -1,18 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { catchError, distinctUntilChanged, map, takeUntil, tap } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
-import { FCLImportAddModel } from 'src/app/shared/models';
+import { SeaFClImportFormCreateComponent } from '../../../../components/form-create/form-create-sea-fcl-import.component';
+import { SeaFCLImportCreateJobComponent } from '../../../../create-job/create-job-fcl-import.component';
 
 @Component({
     selector: 'app-form-add-house-bill',
     templateUrl: './form-add-house-bill.component.html'
 })
 export class FormAddHouseBillComponent extends AppForm {
-
     formGroup: FormGroup;
     mtBill: AbstractControl;
     hwbno: AbstractControl;
@@ -195,9 +195,6 @@ export class FormAddHouseBillComponent extends AppForm {
 
 
 
-
-
-
     }
 
     update(formdata: any) {
@@ -273,14 +270,12 @@ export class FormAddHouseBillComponent extends AppForm {
         this.shipperDescription = this.formGroup.controls['ShipperDescription'];
         this.notifyPartyDescription = this.formGroup.controls['NotifyPartyDescription'];
         this.alsonotifyPartyDescription = this.formGroup.controls['AlsoNotifyPartyDescription'];
-        console.log(this.eta);
         this.etd.valueChanges
             .pipe(
                 distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
                 takeUntil(this.ngUnsubscribe)
             )
             .subscribe((value: { startDate: any, endDate: any }) => {
-                console.log(value);
                 this.mindateEta = value.startDate; // * Update min date
 
                 this.resetFormControl(this.eta);
@@ -380,6 +375,13 @@ export class FormAddHouseBillComponent extends AppForm {
                 this.selectedPortOfDischarge = { field: 'nameVn', value: data.id, data: data };
                 if (this.countChangePort === 0) {
                     this.finalDestinationPlace.setValue(data.nameEn);
+                }
+                if (this.selectedPortOfLoading.value !== undefined && this.selectedPortOfDischarge.value !== undefined) {
+                    if (this.selectedPortOfLoading.value === this.selectedPortOfDischarge.value) {
+                        this.PortChargeLikePortLoading = true;
+                    } else {
+                        this.PortChargeLikePortLoading = false;
+                    }
                 }
                 this.countChangePort++;
                 break;

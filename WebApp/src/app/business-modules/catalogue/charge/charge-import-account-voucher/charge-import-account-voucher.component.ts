@@ -12,10 +12,11 @@ import { NgProgress, NgProgressComponent } from '@ngx-progressbar/core';
 declare var $: any;
 
 @Component({
-  selector: 'app-charge-import',
-  templateUrl: './charge-import.component.html'
+  selector: 'app-charge-import-account-voucher',
+  templateUrl: './charge-import-account-voucher.component.html'
 })
-export class ChargeImportComponent implements OnInit {
+export class ChargeImportAccountVoucherComponent implements OnInit {
+
   data: any[];
   pagedItems: any[] = [];
   inValidItems: any[] = [];
@@ -23,7 +24,6 @@ export class ChargeImportComponent implements OnInit {
   totalRows: number = 0;
   isShowInvalid: boolean = true;
   pager: PagerSetting = PAGINGSETTING;
-
 
   constructor(
     public ngProgress: NgProgress,
@@ -40,11 +40,10 @@ export class ChargeImportComponent implements OnInit {
     this.pager.totalItems = 0;
   }
 
-
   chooseFile(file: Event) {
     if (file.target['files'] == null) return;
     this.progressBar.start();
-    this.baseService.uploadfile(this.menu_api.Catalogue.Charge.uploadExel, file.target['files'], "uploadedFile")
+    this.baseService.uploadfile(this.menu_api.Catalogue.Charge_DefaultAccount.uploadExel, file.target['files'], "uploadedFile")
       .subscribe(res => {
         this.data = res['data'];
         this.pager.totalItems = this.data.length;
@@ -111,7 +110,7 @@ export class ChargeImportComponent implements OnInit {
     }
     else {
       let validItems = this.data.filter(x => x.isValid);
-      var response = await this.baseService.postAsync(this.menu_api.Catalogue.Charge.import, validItems);
+      var response = await this.baseService.postAsync(this.menu_api.Catalogue.Charge_DefaultAccount.import, validItems);
       if (response) {
         this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
         this.pager.totalItems = 0;
@@ -121,7 +120,7 @@ export class ChargeImportComponent implements OnInit {
   }
 
   async downloadSample() {
-    await this.baseService.downloadfile(this.menu_api.Catalogue.Charge.downloadExcel, 'ImportChargeTemplate.xlsx');
+    await this.baseService.downloadfile(this.menu_api.Catalogue.Charge_DefaultAccount.downloadExcel, 'VoucherTypeAccountTemplate.xlsx');
   }
 
   reset() {
@@ -130,6 +129,5 @@ export class ChargeImportComponent implements OnInit {
     $("#inputFile").val('');
     this.pager.totalItems = 0;
   }
-
 
 }
