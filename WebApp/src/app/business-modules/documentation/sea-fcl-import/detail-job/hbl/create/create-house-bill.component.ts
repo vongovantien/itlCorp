@@ -14,6 +14,7 @@ import { ActionsSubject, Store } from '@ngrx/store';
 import * as fromStore from '../../../store/index';
 import { InfoPopupComponent, ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { SeaFCLImportShipmentGoodSummaryComponent } from '../../../components/shipment-good-summary/shipment-good-summary.component';
+import { ImportHouseBillDetailComponent } from '../popup/import-house-bill-detail/import-house-bill-detail.component';
 
 @Component({
     selector: 'app-create-house-bill',
@@ -25,6 +26,8 @@ export class CreateHouseBillComponent extends AppForm {
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmCreatePopup: ConfirmPopupComponent;
     @ViewChild(SeaFCLImportShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: SeaFCLImportShipmentGoodSummaryComponent;
+    @ViewChild(ImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ImportHouseBillDetailComponent;
+
     fclImportAddModel: FCLImportAddModel = new FCLImportAddModel();
     jobId: string = '';
     shipmentDetail: any = {};
@@ -112,6 +115,10 @@ export class CreateHouseBillComponent extends AppForm {
 
     showCreatePpoup() {
         this.confirmCreatePopup.show();
+    }
+
+    showImportPopup() {
+        this.importHouseBillPopup.show();
     }
 
     combackToHBLList() {

@@ -129,7 +129,7 @@ export class SeaFCLImportHBLComponent extends AppList {
 
     getHourseBill() {
         this.isLoading = true;
-        this._documentRepo.getListHourseBill({}).pipe(
+        this._documentRepo.getListHourseBill({ jobId: this.jobId }).pipe(
             catchError(this.catchError),
             finalize(() => { this.isLoading = false; }),
         ).subscribe(

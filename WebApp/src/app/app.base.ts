@@ -60,6 +60,17 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
         typeButton: ButtonType.search,
     };
 
+    importButtonSetting: ButtonModalSetting = {
+        buttonAttribute: {
+            type: 'button',
+            titleButton: "Import",
+            classStyle: "btn btn-brand m-btn--square m-btn--icon m-btn--uppercase",
+            icon: "la la-download"
+        },
+        typeButton: ButtonType.search,
+    };
+
+
     configComoBoGrid: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
         displayFields: [],

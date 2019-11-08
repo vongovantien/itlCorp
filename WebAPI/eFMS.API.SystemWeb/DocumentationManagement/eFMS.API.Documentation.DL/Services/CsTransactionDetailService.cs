@@ -316,14 +316,14 @@ namespace eFMS.API.Documentation.DL.Services
                          select new { detail, tran, cus, sale });
             if (criteria.All == null)
             {
-                //query = query.Where(x =>  
-                //                       x.tran.Mawb.IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                //                      && (x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                //                      && (x.cus.PartnerNameEn.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                //                      && (x.tran.Etd >= criteria.FromDate || criteria.FromDate == null)
-                //                      && (x.tran.Etd <= criteria.ToDate || criteria.ToDate == null)
-                //                      && (x.sale.Username.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                //                    );
+                query = query.Where(x => criteria.JobId != Guid.Empty && criteria.JobId != null ? x.detail.JobId == criteria.JobId : true
+                                      && (x.tran.Mawb.IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && (x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && (x.cus.PartnerNameEn.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && (x.tran.Etd >= criteria.FromDate || criteria.FromDate == null)
+                                    && (x.tran.Etd <= criteria.ToDate || criteria.ToDate == null)
+                                    && (x.sale.Username.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    );
             }
             else
             {
