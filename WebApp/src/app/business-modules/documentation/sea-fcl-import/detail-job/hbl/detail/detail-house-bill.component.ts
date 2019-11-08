@@ -12,6 +12,7 @@ import { Store, ActionsSubject } from '@ngrx/store';
 import { SeaFCLImportShipmentGoodSummaryComponent } from '../../../components/shipment-good-summary/shipment-good-summary.component';
 import { ToastrService } from 'ngx-toastr';
 import moment from 'moment';
+import { InfoPopupComponent } from 'src/app/shared/common/popup';
 
 @Component({
     selector: 'app-detail-house-bill',
@@ -19,6 +20,7 @@ import moment from 'moment';
     styleUrls: ['./detail-house-bill.component.scss']
 })
 export class DetailHouseBillComponent extends CreateHouseBillComponent {
+    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(FormAddHouseBillComponent, { static: false }) formHouseBill: FormAddHouseBillComponent;
     @ViewChild(SeaFCLImportShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: SeaFCLImportShipmentGoodSummaryComponent;
     hblId: string;
@@ -33,7 +35,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
         protected _router: Router,
         protected _store: Store<fromStore.ISeaFCLImportState>,
     ) {
-        super(_progressService, _documentationRepo, _toastService, _activedRoute, _actionStoreSubject, _router);
+        super(_progressService, _documentationRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store);
 
 
 
@@ -64,15 +66,6 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                     }
                 });
     }
-
-
-    ngAfterViewInit() {
-
-
-
-
-    }
-
 
     getListContainer() {
         this._store.select<any>(fromStore.getContainerSaveState)

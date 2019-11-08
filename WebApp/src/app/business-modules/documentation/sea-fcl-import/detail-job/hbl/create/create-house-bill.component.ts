@@ -10,7 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { FCLImportAddModel } from 'src/app/shared/models';
-import { ActionsSubject } from '@ngrx/store';
+import { ActionsSubject, Store } from '@ngrx/store';
 import * as fromStore from '../../../store/index';
 import { InfoPopupComponent, ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { SeaFCLImportShipmentGoodSummaryComponent } from '../../../components/shipment-good-summary/shipment-good-summary.component';
@@ -27,6 +27,7 @@ export class CreateHouseBillComponent extends AppForm {
     @ViewChild(SeaFCLImportShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: SeaFCLImportShipmentGoodSummaryComponent;
     fclImportAddModel: FCLImportAddModel = new FCLImportAddModel();
     jobId: string = '';
+    shipmentDetail: any = {};
 
     constructor(
         protected _progressService: NgProgress,
@@ -34,7 +35,9 @@ export class CreateHouseBillComponent extends AppForm {
         protected _toastService: ToastrService,
         protected _activedRoute: ActivatedRoute,
         protected _actionStoreSubject: ActionsSubject,
-        protected _router: Router
+        protected _router: Router,
+        protected _store: Store<fromStore.ISeaFCLImportState>,
+
 
     ) {
         super();
@@ -60,15 +63,35 @@ export class CreateHouseBillComponent extends AppForm {
                         console.log("list container add success", this.fclImportAddModel.csMawbcontainers);
                     }
                 });
+
+        this._store.select(fromStore.seaFCLImportTransactionState)
+            .subscribe(
+                (res: any) => {
+                    console.log(res);
+                    this.shipmentDetail = res;
+                }
+            );
     }
 
     ngAfterViewInit() {
         this.shipmentGoodSummaryComponent.initContainer();
+        this.formHouseBill.mtBill.setValue(this.shipmentDetail.mawb);
+
     }
 
     checkValidateForm() {
+        if (this.formHouseBill.selectedPortOfLoading.value !== undefined && this.formHouseBill.selectedPortOfDischarge.value !== undefined) {
+            if (this.formHouseBill.selectedPortOfLoading.value === this.formHouseBill.selectedPortOfDischarge.value) {
+                this.formHouseBill.PortChargeLikePortLoading = true;
+            } else {
+                this.formHouseBill.PortChargeLikePortLoading = false;
+            }
+        }
         let valid: boolean = true;
         if (!this.formHouseBill.formGroup.valid) {
+            valid = false;
+        }
+        if (this.formHouseBill.PortChargeLikePortLoading === true) {
             valid = false;
         }
         return valid;
@@ -77,13 +100,6 @@ export class CreateHouseBillComponent extends AppForm {
     oncreate() {
         this.confirmCreatePopup.hide();
         this.formHouseBill.isSubmited = true;
-        if (this.formHouseBill.selectedPortOfLoading.data !== undefined && this.formHouseBill.selectedPortOfDischarge.data !== undefined) {
-            if (this.formHouseBill.selectedPortOfLoading.data.id === this.formHouseBill.selectedPortOfDischarge.data.id) {
-                this.formHouseBill.PortChargeLikePortLoading = true;
-            } else {
-                this.formHouseBill.PortChargeLikePortLoading = false;
-            }
-        }
         if (!this.checkValidateForm()) {
             this.infoPopup.show();
         }
@@ -153,7 +169,7 @@ export class CreateHouseBillComponent extends AppForm {
             oceanVessel: this.formHouseBill.oceanVessel.value,
             documentDate: !!this.formHouseBill.documentDate.value ? formatDate(this.formHouseBill.documentDate.value.startDate !== undefined ? this.formHouseBill.documentDate.value.startDate : this.formHouseBill.documentDate.value, 'yyyy-MM-dd', 'en') : null,
             documentNo: this.formHouseBill.documentNo.value,
-            etawarehouse: !!this.formHouseBill.etawarehouse.value ? formatDate(this.formHouseBill.etawarehouse.value.startDate !== undefined ? this.formHouseBill.etawarehouse.value.startDate : this.formHouseBill.etawarehouse.value, 'yyyy-MM-dd', 'en') : null,
+            etawarehouse: !!this.formHouseBill.etawarehouse.value.startDate ? formatDate(this.formHouseBill.etawarehouse.value.startDate !== undefined ? this.formHouseBill.etawarehouse.value.startDate : this.formHouseBill.etawarehouse.value, 'yyyy-MM-dd', 'en') : null,
             warehouseNotice: this.formHouseBill.warehouseNotice.value,
             shippingMark: this.formHouseBill.shippingMark.value,
             remark: this.formHouseBill.remark.value,

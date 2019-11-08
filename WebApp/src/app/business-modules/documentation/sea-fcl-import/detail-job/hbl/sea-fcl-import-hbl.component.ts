@@ -19,6 +19,8 @@ export class SeaFCLImportHBLComponent extends AppList {
     headers: CommonInterface.IHeaderTable[];
     houseBill: CsTransactionDetail[] = [];
     selectedHbl: CsTransactionDetail;
+    goodSummary: any = {};
+
 
     constructor(
         private _router: Router,
@@ -52,6 +54,7 @@ export class SeaFCLImportHBLComponent extends AppList {
             { title: 'CBM', field: 'cbm', sortable: true }
         ];
         this.getHourseBill();
+        this.getGoodSumaryOfHbl();
     }
 
     onSelectTab(tabName: string) {
@@ -109,6 +112,21 @@ export class SeaFCLImportHBLComponent extends AppList {
     }
 
 
+    getGoodSumaryOfHbl() {
+        this.isLoading = true;
+        this._documentRepo.getGoodSummaryOfAllHbl(this.jobId).pipe(
+            catchError(this.catchError),
+            finalize(() => { this.isLoading = false; }),
+        ).subscribe(
+            (res: any) => {
+
+                this.goodSummary = res;
+                console.log(this.goodSummary);
+            },
+        );
+    }
+
+
     getHourseBill() {
         this.isLoading = true;
         this._documentRepo.getListHourseBill({}).pipe(
@@ -122,4 +140,6 @@ export class SeaFCLImportHBLComponent extends AppList {
             },
         );
     }
+
+
 }
