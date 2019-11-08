@@ -17,9 +17,10 @@ import { DetailChargeComponent } from './detail-charge/detail-charge.component';
 const routing: Routes = [
     { path: '', component: ChargeComponent, data: { name: "Charge", level: 2 } },
     { path: 'addnew', component: AddChargeComponent, data: { name: "Addnew Charge", level: 3 } },
-    { path: ':id', component: DetailChargeComponent, data: { name: "Edit Charge", level: 3 } },
     { path: 'import', component: ChargeImportComponent, data: { name: "Import", level: 3 } },
     { path: 'import-account-voucher', component: ChargeImportAccountVoucherComponent },
+    { path: ':id', component: DetailChargeComponent, data: { name: "Edit Charge", level: 3 } },
+
 ];
 @NgModule({
     imports: [

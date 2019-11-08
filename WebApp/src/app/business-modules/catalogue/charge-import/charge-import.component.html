@@ -92,34 +92,53 @@
                             <th>
                                 <span>No.</span>
                             </th>
-                            <th class="sorting_asc">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'code'), 'sorting_desc': (!isDesc && sortKey == 'code') }"
+                                (click)="sort('code')">
                                 <span>Code</span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'chargeNameEn'), 'sorting_desc': (!isDesc && sortKey == 'chargeNameEn') }"
+                                (click)="sort('chargeNameEn')">
                                 <span>Name EN</span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'chargeNameVn'), 'sorting_desc': (!isDesc && sortKey == 'chargeNameVn') }"
+                                (click)="sort('chargeNameVn')">
                                 <span>Name Local</span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'unitCode'), 'sorting_desc': (!isDesc && sortKey == 'unitCode') }"
+                                (click)="sort('unitCode')">
                                 <span>Unit</span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'unitPrice'), 'sorting_desc': (!isDesc && sortKey == 'unitPrice') }"
+                                (click)="sort('unitPrice')">
                                 <span>Unit Price</span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'currencyId'), 'sorting_desc': (!isDesc && sortKey == 'currencyId') }"
+                                (click)="sort('currencyId')">
                                 <span>Currency</span>
                             </th>
-                            <th class="sorting">
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'vatrate'), 'sorting_desc': (!isDesc && sortKey == 'vatrate') }"
+                                (click)="sort('vatrate')">
                                 <span>VAT</span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'type'), 'sorting_desc': (!isDesc && sortKey == 'type') }"
+                                (click)="sort('type')">
                                 <span>Type </span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'serviceTypeId'), 'sorting_desc': (!isDesc && sortKey == 'serviceTypeId') }"
+                                (click)="sort('serviceTypeId')">
                                 <span>Sevice </span>
                             </th>
-                            <th class="sorting">
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'status'), 'sorting_desc': (!isDesc && sortKey == 'status') }"
+                                (click)="sort('status')">
                                 <span>Status </span>
                             </th>
                         </tr>
@@ -198,7 +217,7 @@
 </div>
 <!--end::m-content-->
 <!--begin::modal-->
-<div class="modal fade" id="upload-alert-modal" data-backdrop="static" role="dialog" aria-labelledby=""
+<!-- <div class="modal fade" id="upload-alert-modal" data-backdrop="static" role="dialog" aria-labelledby=""
     aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
@@ -225,5 +244,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
+<info-popup [body]="'There are invalid data. Please check Import!'" [title]="'Notification'" [label]="'Ok'">
+</info-popup>
 <!--end::modal-->

@@ -99,7 +99,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// get settle payment charges
         /// </summary>
         /// <param name="keySearch"></param>
-        /// <param name="inActive"></param>
+        /// <param name="active"></param>
         /// <param name="size"></param>
         /// <returns></returns>
         [HttpGet("SettlePaymentCharges")]
