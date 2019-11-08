@@ -13,8 +13,7 @@ declare var $: any;
 
 @Component({
   selector: 'app-charge-import-account-voucher',
-  templateUrl: './charge-import-account-voucher.component.html',
-  styleUrls: ['./charge-import-account-voucher.component.scss']
+  templateUrl: './charge-import-account-voucher.component.html'
 })
 export class ChargeImportAccountVoucherComponent implements OnInit {
 
@@ -33,15 +32,15 @@ export class ChargeImportAccountVoucherComponent implements OnInit {
     private menu_api: API_MENU,
     private sortService: SortService
   ) { }
-  @ViewChild(AppPaginationComponent,{static:false}) child: any;
-  @ViewChild('form',{static:false}) form: any;
-  @ViewChild(NgProgressComponent,{static:false}) progressBar: NgProgressComponent;
+  @ViewChild(AppPaginationComponent, { static: false }) child: any;
+  @ViewChild('form', { static: false }) form: any;
+  @ViewChild(NgProgressComponent, { static: false }) progressBar: NgProgressComponent;
 
   ngOnInit() {
     this.pager.totalItems = 0;
   }
 
-  chooseFile(file: Event) {    
+  chooseFile(file: Event) {
     if (file.target['files'] == null) return;
     this.progressBar.start();
     this.baseService.uploadfile(this.menu_api.Catalogue.Charge_DefaultAccount.uploadExel, file.target['files'], "uploadedFile")
@@ -106,7 +105,7 @@ export class ChargeImportAccountVoucherComponent implements OnInit {
 
   async import() {
     if (this.data == null) return;
-    if (this.totalRows-this.totalValidRows > 0) {
+    if (this.totalRows - this.totalValidRows > 0) {
       $('#upload-alert-modal').modal('show');
     }
     else {
