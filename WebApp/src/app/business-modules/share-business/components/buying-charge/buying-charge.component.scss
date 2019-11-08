@@ -20,11 +20,16 @@
             .dropdown-partner__header {
                 padding: 10px 0px;
                 border-bottom: 1px solid #dfdfdf;
-
-                // * Combo grid
-                .e--combogrid-content {
-                    border-bottom-left-radius: 20px;
-                    border-bottom-right-radius: 20px;
+            }
+            // * Combo grid
+            .e--combogrid-content {
+                border-bottom-left-radius: 20px;
+                border-bottom-right-radius: 20px;
+                .table-header {
+                    padding: 0;
+                    th:first-child {
+                        min-width: 121px;
+                    }
                 }
             }
         }
@@ -34,6 +39,7 @@
         overflow-x: hidden;
     }
     .table-editable {
+        // * Calendar
         .table-date {
             .table-condensed {
                 tr {
@@ -67,7 +73,6 @@
                 }
             }
         }
-        // * Calendar
     }
 
     .quantity-hint {

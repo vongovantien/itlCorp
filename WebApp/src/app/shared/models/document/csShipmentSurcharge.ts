@@ -68,7 +68,7 @@ export class CsShipmentSurcharge {
     voucherIdredate: string = null;
     finalExchangeRate: string = null;
 
-    quantityHint: any = null; // option for editable.
+    quantityType: any = null;
 
     constructor(object?: any) {
         const self = this;

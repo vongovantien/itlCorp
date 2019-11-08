@@ -5,9 +5,13 @@ import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactio
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
+
+import * as fromStore from './../../store';
+import { Store } from '@ngrx/store';
+import { Container } from 'src/app/shared/models/document/container.model';
 
 @Component({
     selector: 'app-sea-fcl-import-hbl',
@@ -15,10 +19,13 @@ import { NgProgress } from '@ngx-progressbar/core';
 })
 export class SeaFCLImportHBLComponent extends AppList {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+
     jobId: string = '';
     headers: CommonInterface.IHeaderTable[];
     houseBill: CsTransactionDetail[] = [];
     selectedHbl: CsTransactionDetail;
+
+    containers: Container[] = new Array<Container>();
 
     constructor(
         private _router: Router,
@@ -27,6 +34,7 @@ export class SeaFCLImportHBLComponent extends AppList {
         private _activedRoute: ActivatedRoute,
         private _toastService: ToastrService,
         private _progressService: NgProgress,
+        private _store: Store<fromStore.ISeaFCLImportState>
     ) {
         super();
         this.requestSort = this.sortLocal;
@@ -52,6 +60,17 @@ export class SeaFCLImportHBLComponent extends AppList {
             { title: 'CBM', field: 'cbm', sortable: true }
         ];
         this.getHourseBill();
+
+        this._store.select(fromStore.getContainerSaveState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: any) => {
+                    this.containers = (res || []).map(contaienr => new Container(contaienr));
+                    console.log(this.containers);
+                }
+            );
     }
 
     onSelectTab(tabName: string) {
@@ -62,9 +81,6 @@ export class SeaFCLImportHBLComponent extends AppList {
             case 'cdNote':
                 this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
-            // case 'hbl':
-            //     this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], { queryParams: { tab: 'HBL' } });
-            //     break;
         }
     }
 
@@ -121,5 +137,12 @@ export class SeaFCLImportHBLComponent extends AppList {
                 console.log(this.houseBill);
             },
         );
+    }
+
+    selectHBL(item: CsTransactionDetail) {
+        this.selectedHbl = new CsTransactionDetail(item);
+
+        // * Get container with hbl id.
+        this._store.dispatch(new fromStore.GetContainerAction({ hblid: this.selectedHbl.id }));
     }
 }

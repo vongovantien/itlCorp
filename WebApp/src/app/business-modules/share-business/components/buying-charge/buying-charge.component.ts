@@ -1,10 +1,24 @@
-import { Component, ViewEncapsulation } from '@angular/core';
-import { AppList } from 'src/app/app.list';
+import { Component, Input } from '@angular/core';
+
 import { CatalogueRepo } from 'src/app/shared/repositories';
+import { Charge, Unit, CsShipmentSurcharge, Currency, Partner } from 'src/app/shared/models';
+import { Container } from 'src/app/shared/models/document/container.model';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
+import { AppList } from 'src/app/app.list';
+
+
 import { forkJoin } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { Surcharge, Charge, Unit, CsShipmentSurcharge, Currency, Partner } from 'src/app/shared/models';
 
+
+enum QUANTITY_TYPE {
+    GW = 'gw',
+    NW = 'nw',
+    CW = 'cw',
+    CBM = 'cbm',
+    PACKAGE = 'package',
+    CONT = 'cont'
+}
 @Component({
     selector: 'buying-charge',
     templateUrl: './buying-charge.component.html',
@@ -12,6 +26,8 @@ import { Surcharge, Charge, Unit, CsShipmentSurcharge, Currency, Partner } from 
 
 })
 export class ShareBussinessBuyingChargeComponent extends AppList {
+
+    @Input() containers: Container[] = []; // * House bill was selected.
 
     headers: CommonInterface.IHeaderTable[] = [];
     headerPartner: CommonInterface.IHeaderTable[] = [];
@@ -28,6 +44,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     quantityHints: CommonInterface.IValueDisplay[];
     selectedQuantityHint: CommonInterface.IValueDisplay = null;
 
+    partnerType: CommonInterface.IValueDisplay[];
     constructor(
         private _catalogueRepo: CatalogueRepo
     ) {
@@ -75,13 +92,20 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }, { selectedDisplayFields: ['chargeNameEn'], });
 
         this.quantityHints = [
-            { displayName: 'G.W', value: 'gw' },
-            { displayName: 'C.W', value: 'cw' },
-            { displayName: 'CBM', value: 'cbm' },
-            { displayName: 'Package', value: 'package' },
-            { displayName: 'Cont', value: 'cont' },
-            { displayName: 'N.W', value: 'nw' },
-        ]
+            { displayName: 'G.W', value: QUANTITY_TYPE.GW },
+            { displayName: 'C.W', value: QUANTITY_TYPE.CW },
+            { displayName: 'CBM', value: QUANTITY_TYPE.CBM },
+            { displayName: 'Package', value: QUANTITY_TYPE.PACKAGE },
+            { displayName: 'Cont', value: QUANTITY_TYPE.CONT },
+            { displayName: 'N.W', value: QUANTITY_TYPE.NW },
+        ];
+
+        this.partnerType = [
+            { displayName: 'Customer', value: CommonEnum.PartnerGroupEnum.CUSTOMER, fieldName: 'CUSTOMER' },
+            { displayName: 'Carrier', value: CommonEnum.PartnerGroupEnum.CARRIER, fieldName: 'CARRIER' },
+            { displayName: 'Agent', value: CommonEnum.PartnerGroupEnum.AGENT, fieldName: 'AGENT' },
+        ];
+
         this.getMasterData();
         this.addCharge();
     }
@@ -128,7 +152,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         const newSurCharge: CsShipmentSurcharge = new CsShipmentSurcharge();
         newSurCharge.currencyId = "USD"; // * Set default.
         newSurCharge.quantity = 0;
-        newSurCharge.quantityHint = null;
+        newSurCharge.quantityType = null;
         newSurCharge.exchangeDate = { startDate: new Date(), endDate: new Date() };
 
         this.charges.push(newSurCharge);
@@ -141,32 +165,73 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     onChangeVat(vat: number, chargeItem: CsShipmentSurcharge) {
-        chargeItem.total = this.calculateTotalAmount(vat, chargeItem.quantity, chargeItem.unitPrice);
+        chargeItem.total = this.utility.calculateTotalAmountWithVat(vat, chargeItem.quantity, chargeItem.unitPrice);
     }
 
     onChangeUnitPrice(unitPrice: number, chargeItem: CsShipmentSurcharge) {
-        chargeItem.total = this.calculateTotalAmount(chargeItem.vatrate, chargeItem.quantity, unitPrice);
+        chargeItem.total = this.utility.calculateTotalAmountWithVat(chargeItem.vatrate, chargeItem.quantity, unitPrice);
     }
 
-    calculateTotalAmount(vat: number, quantity: number, unitPrice: number): number {
-        return this.utility.calculateTotalAmountWithVat(vat, quantity, unitPrice);
+    onChangeQuantity(quantity: number, chargeItem: CsShipmentSurcharge) {
+        chargeItem.total = this.utility.calculateTotalAmountWithVat(chargeItem.vatrate, quantity, chargeItem.unitPrice);
     }
 
     saveSurcharge() {
         console.log(this.charges);
     }
 
-    onChangeQuantityHint(hintType: any) {
-        console.log(hintType);
-        // TODO get data from house bill with hinType.
+    onChangeQuantityHint(hintType: string, chargeItem: CsShipmentSurcharge) {
+        switch (hintType) {
+            case QUANTITY_TYPE.GW:
+                chargeItem.quantity = this.calculateContainer(this.containers, QUANTITY_TYPE.GW);
+                break;
+            case QUANTITY_TYPE.NW:
+                chargeItem.quantity = this.calculateContainer(this.containers, QUANTITY_TYPE.NW);
+                break;
+            case QUANTITY_TYPE.CBM:
+                chargeItem.quantity = this.calculateContainer(this.containers, QUANTITY_TYPE.CBM);
+                break;
+            case QUANTITY_TYPE.CW:
+                chargeItem.quantity = this.calculateContainer(this.containers, 'chargeAbleWeight');
+                break;
+            case QUANTITY_TYPE.PACKAGE:
+                chargeItem.quantity = this.calculateContainer(this.containers, 'packageQuantity');
+                break;
+            default:
+                break;
+
+        }
+
+        // * Update 
+        chargeItem.quantityType = hintType;
+        chargeItem.total = this.utility.calculateTotalAmountWithVat(chargeItem.vatrate, chargeItem.quantity, chargeItem.unitPrice);
+    }
+
+    calculateContainer(containers: Container[], key: string): number {
+        let total: number = 0;
+        total = containers.reduce((acc: any, curr: Container) => acc += curr[key], 0);
+        return total;
     }
 
     onSelectPartner(partnerData: Partner, chargeItem: CsShipmentSurcharge) {
         if (!!partnerData) {
             chargeItem.partnerName = partnerData.shortName;
             chargeItem.paymentObjectId = partnerData.id,
-                chargeItem.objectBePaid = "CUSTOMER/AGENT/CARRIER";  // nếu chọn customer/agent/carrier
+                chargeItem.objectBePaid = null;  // nếu chọn customer/agent/carrier
 
         }
+    }
+
+    selectPartnerType(partnerType: CommonInterface.IValueDisplay, chargeItem: CsShipmentSurcharge) {
+        chargeItem.objectBePaid = partnerType.fieldName;
+        switch (partnerType.value) {
+            case CommonEnum.PartnerGroupEnum.CUSTOMER:
+
+                break;
+
+            default:
+                break;
+        }
+        console.log(partnerType);
     }
 }
