@@ -11,6 +11,36 @@ export class DocumentationRepo {
     constructor(protected _api: ApiService) {
     }
 
+    getDetailHbl(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/GetById?id=${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+
+
+    updateHbl(body: any) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/Update`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    deleteHbl(id: string) {
+        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/Delete`, { id: id }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+
+    getGoodSummaryOfAllHbl(jobId: any) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/GetGoodSummaryOfAllHblByJobId`, { jobId: jobId }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
     createTransaction(body: any) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction`, body);
     }
@@ -208,22 +238,22 @@ export class DocumentationRepo {
         );
     }
 
-    getPartners(id: any){
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GetPartners`,{ Id: id, IsHouseBillID : true}).pipe(
+    getPartners(id: any) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GetPartners`, { Id: id, IsHouseBillID: true }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
-    getChargesByPartner(id: any, partnerId: any){
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GroupByListHB`,{ Id: id, partnerID: partnerId, IsHouseBillID: true}).pipe(
+    getChargesByPartner(id: any, partnerId: any) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GroupByListHB`, { Id: id, partnerID: partnerId, IsHouseBillID: true }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
-    getListCdNoteByMasterBill(id: string){
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/Get`,{ Id: id, IsHouseBillID: false}).pipe(
+    getListCdNoteByMasterBill(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/Get`, { Id: id, IsHouseBillID: false }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -236,8 +266,8 @@ export class DocumentationRepo {
         );
     }
 
-    deleteCdNote(cdNoteId: string){
-        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/Delete`,{cdNoteId: cdNoteId}).pipe(
+    deleteCdNote(cdNoteId: string) {
+        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/Delete`, { cdNoteId: cdNoteId }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

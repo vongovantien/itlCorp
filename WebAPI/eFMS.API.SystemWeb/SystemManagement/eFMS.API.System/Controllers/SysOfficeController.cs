@@ -165,7 +165,7 @@ namespace eFMS.API.System.Controllers
         {
             var offices = sysOfficeService.GetOfficeByCompany(id);
 
-            ResultHandle hs = new ResultHandle { Data = offices, Status = true };
+            ResultHandle hs = new ResultHandle { Data = offices , Status = true };
             return Ok(hs);
         }
         

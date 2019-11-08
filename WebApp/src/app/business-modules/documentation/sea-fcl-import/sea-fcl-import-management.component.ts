@@ -111,8 +111,6 @@ export class SeaFCLImportManagementComponent extends AppList {
     }
 
     showHblList(jobId: string) {
-        //console.log(jobId);
-        //jobId = null;
         this._progressRef.start();
         this._documentationRepo.getListHouseBillOfJob({ jobId: jobId })
             .pipe(
@@ -120,9 +118,8 @@ export class SeaFCLImportManagementComponent extends AppList {
                 finalize(() => { this._progressRef.complete(); this.isLoading = false; })
             ).subscribe(
                 (res: CsTransactionDetail[]) => {
-                    //console.log(res);
                     this.housebills = (res || []).map((item: CsTransactionDetail) => new CsTransactionDetail(item));
-                    console.log(this.housebills)
+                    console.log(this.housebills);
                 },
             );
     }

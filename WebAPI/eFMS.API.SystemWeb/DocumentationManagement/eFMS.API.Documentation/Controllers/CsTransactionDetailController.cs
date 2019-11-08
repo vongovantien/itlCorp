@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -27,11 +29,13 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICsTransactionDetailService csTransactionDetailService;
         private readonly ICurrentUser currentUser;
-        public CsTransactionDetailController(IStringLocalizer<LanguageSub> localizer, ICsTransactionDetailService service, ICurrentUser user)
+        ICsMawbcontainerService containerService;
+        public CsTransactionDetailController(IStringLocalizer<LanguageSub> localizer, ICsTransactionDetailService service, ICurrentUser user , ICsMawbcontainerService mawbcontainerService)
         {
             stringLocalizer = localizer;
             csTransactionDetailService = service;
             currentUser = user;
+            containerService = mawbcontainerService;
         }
 
         [HttpGet]
@@ -40,6 +44,19 @@ namespace eFMS.API.Documentation.Controllers
         {
             CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { JobId = jobId };
             return Ok(csTransactionDetailService.GetByJob(criteria));
+        }
+
+        [HttpGet]
+        [Route("GetById")]
+        public IActionResult GetById(Guid Id)
+        {
+            CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { Id = Id };
+            CsMawbcontainerCriteria criteriaMaw = new CsMawbcontainerCriteria { Hblid = Id };
+            var hbl = csTransactionDetailService.GetById(criteria);
+            var resultMaw = containerService.Query(criteriaMaw).ToList();
+            hbl.CsMawbcontainers = resultMaw;
+            ResultHandle hs = new ResultHandle { Data = hbl , Status = true };
+            return Ok(hs);
         }
 
         [HttpGet]
@@ -75,11 +92,11 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [HttpDelete]
-        [Route("delete")]
-        [Authorize]
-        public IActionResult Delete(Guid hblId)
+        [Route("Delete")]
+        //[Authorize]
+        public IActionResult Delete(Guid id)
         {
-            var hs = csTransactionDetailService.DeleteTransactionDetail(hblId);
+            var hs = csTransactionDetailService.DeleteTransactionDetail(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -106,8 +123,8 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [HttpPut]
-        [Route("update")]
-        [Authorize]
+        [Route("Update")]
+        //[Authorize]
         public IActionResult Update(CsTransactionDetailModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -125,6 +142,22 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("{id}")]
+        public IActionResult GetBy(Guid id)
+        {
+            var result = csTransactionDetailService.First(x => x.Id == id);
+           
+            if (result == null)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = "Error", Data = result });
+            }
+            else
+            {
+                return Ok(new ResultHandle { Status = true, Message = "Success", Data = result });
+            }
         }
 
         private string CheckExist(CsTransactionDetailModel model)
@@ -178,8 +211,8 @@ namespace eFMS.API.Documentation.Controllers
             var result = csTransactionDetailService.Preview(model);
             return Ok(result);
         }
-
-        [HttpGet("GetGoodSummaryOfAllHblByJobId")]
+        [HttpGet]
+        [Route("GetGoodSummaryOfAllHblByJobId")]
         public IActionResult GetGoodSummaryOfAllHBLByJobId(Guid jobId)
         {
             var result = csTransactionDetailService.GetGoodSummaryOfAllHBLByJobId(jobId);

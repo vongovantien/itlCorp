@@ -1,11 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { catchError, distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, map, takeUntil, tap } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
-import { FCLImportAddModel } from 'src/app/shared/models';
+import { SeaFClImportFormCreateComponent } from '../../../../components/form-create/form-create-sea-fcl-import.component';
+import { SeaFCLImportCreateJobComponent } from '../../../../create-job/create-job-fcl-import.component';
 
 @Component({
     selector: 'app-form-add-house-bill',
@@ -32,6 +33,13 @@ export class FormAddHouseBillComponent extends AppForm {
     issueHBLDate: AbstractControl;
     originBLNumber: AbstractControl;
     referenceNo: AbstractControl;
+    consigneeDescription: AbstractControl;
+    shipperDescription: AbstractControl;
+    notifyPartyDescription: AbstractControl;
+    alsonotifyPartyDescription: AbstractControl;
+
+
+    oceanVoyNo: AbstractControl;
 
 
     configCustomer: CommonInterface.IComboGirdConfig | any = {};
@@ -63,11 +71,15 @@ export class FormAddHouseBillComponent extends AppForm {
     selectedETA: any;
     shipperdescriptionModel: string;
     consigneedescriptionModel: string;
+    notifyPartydescriptinModel: string;
     notifyPartyModel: string;
     alsoNotifyPartyDescriptionModel: string;
     isSubmited: boolean = false;
     PortChargeLikePortLoading: boolean = false;
     countChangePort: number = 0;
+    mindateEta: any = null;
+    mindateEtaWareHouse: any = null;
+
     hbOfladingTypes: CommonInterface.ICommonTitleValue[] = [
         { title: 'Copy', value: 'Copy' },
         { title: 'Original', value: 'Original' },
@@ -92,7 +104,6 @@ export class FormAddHouseBillComponent extends AppForm {
 
     ngOnInit() {
 
-        this.initForm();
 
         this.configCustomer = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
@@ -107,7 +118,6 @@ export class FormAddHouseBillComponent extends AppForm {
         this.configSaleman = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
                 { field: 'saleMan_ID', label: 'Sale Man' },
-
             ],
         }, { selectedDisplayFields: ['saleMan_ID'], });
 
@@ -181,9 +191,14 @@ export class FormAddHouseBillComponent extends AppForm {
                 { field: 'code', label: 'Code' }
             ],
         }, { selectedDisplayFields: ['name_EN'], });
+        this.initForm();
 
 
 
+    }
+
+    update(formdata: any) {
+        // this.formGroup.patchValue(formdata);
     }
 
     initForm() {
@@ -223,11 +238,12 @@ export class FormAddHouseBillComponent extends AppForm {
             dateETA: [],
             dateOfIssued: [],
             etd: [],
-            eta: [],
+            eta: ['', Validators.required],
             ShipperDescription: [],
             ConsigneeDescription: [],
             NotifyPartyDescription: [],
-            AlsoNotifyPartyDescription: []
+            AlsoNotifyPartyDescription: [],
+
         });
 
         this.mtBill = this.formGroup.controls['masterBill'];
@@ -239,7 +255,8 @@ export class FormAddHouseBillComponent extends AppForm {
         this.finalDestinationPlace = this.formGroup.controls['finalDestination'];
         this.localVessel = this.formGroup.controls['feederVessel1'];
         this.localVoyNo = this.formGroup.controls['feederVoyageNo'];
-        this.oceanVessel = this.formGroup.controls['arrivalVoyage'];
+        this.oceanVessel = this.formGroup.controls['arrivalVessel'];
+        this.oceanVoyNo = this.formGroup.controls['arrivalVoyage'];
         this.documentDate = this.formGroup.controls['documnentDate'];
         this.documentNo = this.formGroup.controls['documentNo'];
         this.etawarehouse = this.formGroup.controls['dateETA'];
@@ -249,18 +266,19 @@ export class FormAddHouseBillComponent extends AppForm {
         this.issueHBLDate = this.formGroup.controls['dateOfIssued'];
         this.originBLNumber = this.formGroup.controls['numberOfOrigin'];
         this.referenceNo = this.formGroup.controls['referenceNo'];
-
-        console.log(this.eta);
+        this.consigneeDescription = this.formGroup.controls['ConsigneeDescription'];
+        this.shipperDescription = this.formGroup.controls['ShipperDescription'];
+        this.notifyPartyDescription = this.formGroup.controls['NotifyPartyDescription'];
+        this.alsonotifyPartyDescription = this.formGroup.controls['AlsoNotifyPartyDescription'];
         this.etd.valueChanges
             .pipe(
                 distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
                 takeUntil(this.ngUnsubscribe)
             )
             .subscribe((value: { startDate: any, endDate: any }) => {
-                this.minDate = value.startDate; // * Update min date
+                this.mindateEta = value.startDate; // * Update min date
 
                 this.resetFormControl(this.eta);
-
             });
         this.eta.valueChanges
             .pipe(
@@ -268,11 +286,13 @@ export class FormAddHouseBillComponent extends AppForm {
                 takeUntil(this.ngUnsubscribe)
             )
             .subscribe((value: { startDate: any, endDate: any }) => {
-                this.minDate = value.startDate; // * Update min date
+                this.mindateEtaWareHouse = value.startDate; // * Update min date
 
                 this.resetFormControl(this.etawarehouse);
 
+
             });
+
         this.getListCustomer();
         this.getListShipper();
         this.getListConsignee();
@@ -281,17 +301,37 @@ export class FormAddHouseBillComponent extends AppForm {
         this.getListProvince();
 
 
+
     }
 
+    bindDescriptionModel(data: any, key: string) {
+        switch (key) {
+            case 'Customer':
+                const checkConsigneeExistence = idParam => this.configConsignee.dataSource.some(({ id }) => id === idParam);
+                if (this.selectedConsignee.value === undefined && checkConsigneeExistence(this.selectedCustomer.data.id)) {
+                    this.selectedConsignee = { field: 'id', value: data.id, data: data };
+                    this.consigneedescriptionModel = this.selectedConsignee.data.partnerNameEn + "\n" +
+                        this.selectedConsignee.data.addressShippingEn + "\n" +
+                        "Tel: " + this.selectedConsignee.data.tel + "\n" +
+                        "Fax: " + this.selectedConsignee.data.fax + "\n";
+                    this.formGroup.controls['ConsigneeDescription'].setValue(this.consigneedescriptionModel);
+                }
+                break;
+
+        }
+
+    }
 
     onSelectDataFormInfo(data: any, key: string) {
         switch (key) {
             case 'Customer':
-                this.selectedCustomer = { field: 'shortName', value: data.id, data: data };
+                this.selectedCustomer = { field: 'id', value: data.id, data: data };
+                this.bindDescriptionModel(data, 'Customer');
+
                 this.getListSaleman(this.selectedCustomer.data.id);
                 break;
             case 'Saleman':
-                this.selectedSaleman = { field: 'saleMan_ID', value: data.saleMan_ID, data: data };
+                this.selectedSaleman = { field: 'id', value: data.id, data: data };
                 break;
             case 'Shipper':
                 this.selectedShipper = { field: 'shortName', value: data.id, data: data };
@@ -335,6 +375,13 @@ export class FormAddHouseBillComponent extends AppForm {
                 this.selectedPortOfDischarge = { field: 'nameVn', value: data.id, data: data };
                 if (this.countChangePort === 0) {
                     this.finalDestinationPlace.setValue(data.nameEn);
+                }
+                if (this.selectedPortOfLoading.value !== undefined && this.selectedPortOfDischarge.value !== undefined) {
+                    if (this.selectedPortOfLoading.value === this.selectedPortOfDischarge.value) {
+                        this.PortChargeLikePortLoading = true;
+                    } else {
+                        this.PortChargeLikePortLoading = false;
+                    }
                 }
                 this.countChangePort++;
                 break;
@@ -382,42 +429,14 @@ export class FormAddHouseBillComponent extends AppForm {
     }
 
     getListSaleman(id: any) {
-        this._catalogueRepo.getListSaleman(id).subscribe((res: any) => { this.configSaleman.dataSource = res; });
+        this._catalogueRepo.getListSaleman(id).subscribe((res: any) => {
+            if (!!res) {
+                this.configSaleman.dataSource = res;
+            }
+            else {
+                this.configSaleman.dataSource = [];
+            }
+
+        });
     }
 }
-
-// export interface ITransactionDetail {
-//     jobId: string;
-//     mawb: string;
-//     saleManId: string;
-//     shipperId: string;
-//     shipperDescription: string;
-//     consigneeId: string;
-//     consigneeDescription: string;
-//     notifyPartyId: string;
-//     notifyPartyDescription: string;
-//     alsoNotifyPartyId: string;
-//     alsoNotifyPartyDescription: string;
-//     hwbno: string;
-//     hbltype: string;
-//     etd: string;
-//     eta: string;
-//     pickupPlace: string;
-//     pol: string;
-//     pod: string;
-//     finalDestinationPlace: string;
-//     coloaderId: string;
-//     localVessel: string;
-//     localVoyNo: string;
-//     oceanVessel: string;
-//     documentDate: string;
-//     documentNo: string;
-//     etawarehouse: string;
-//     warehouseNotice: string;
-//     shippingMark: string;
-//     remark: string;
-//     issueHBLPlace: string;
-//     issueHBLDate: string;
-//     originBLNumber: number;
-//     referenceNo: string;
-// }

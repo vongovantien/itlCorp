@@ -65,7 +65,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     foreach (var x in model.CsMawbcontainers)
                     {
-                        var cont = mapper.Map<CsMawbcontainer>(x);
+                        var cont = mapper.Map<CsMawbcontainerModel>(x);
                         cont.Id = Guid.NewGuid();
                         cont.Hblid = detail.Id;
                         cont.Mblid = Guid.Empty;
@@ -96,6 +96,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 hb.UserModified = ChangeTrackerHelper.currentUser;
                 hb.DatetimeModified = DateTime.Now;
+                model.SailingDate = DateTime.Now;
                 hb = mapper.Map<CsTransactionDetail>(model);
                 var isUpdateDone = DataContext.Update(hb, x => x.Id == hb.Id);
                 if (isUpdateDone.Success)
@@ -250,8 +251,7 @@ namespace eFMS.API.Documentation.DL.Services
                          from f in forwarding.DefaultIfEmpty()
                          join saleman in ((eFMSDataContext)DataContext.DC).SysUser on detail.SaleManId equals saleman.Id into prods
                          from x in prods.DefaultIfEmpty()
-                         select new { detail, customer = y, notiParty = noti, saleman = x, agent = f, pod }
-                          );
+                         select new { detail, customer = y, notiParty = noti, saleman = x, agent = f, pod });
             if (query == null) return null;
             foreach (var item in query)
             {
@@ -267,6 +267,43 @@ namespace eFMS.API.Documentation.DL.Services
             return results.AsQueryable();
         }
 
+        public IQueryable<CsTransactionDetailModel> QueryById(CsTransactionDetailCriteria criteria)
+        {
+            List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
+            var details = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.Id == criteria.Id);
+            var query = (from detail in details
+                         join customer in ((eFMSDataContext)DataContext.DC).CatPartner on detail.CustomerId equals customer.Id into detailCustomers
+                         from y in detailCustomers.DefaultIfEmpty()
+                         join noti in ((eFMSDataContext)DataContext.DC).CatPartner on detail.NotifyPartyId equals noti.Id into detailNotis
+                         from noti in detailNotis.DefaultIfEmpty()
+                         join port in ((eFMSDataContext)DataContext.DC).CatPlace on detail.Pod equals port.Id into portDetail
+                         from pod in portDetail.DefaultIfEmpty()
+                         join fwd in ((eFMSDataContext)DataContext.DC).CatPartner on detail.ForwardingAgentId equals fwd.Id into forwarding
+                         from f in forwarding.DefaultIfEmpty()
+                         join saleman in ((eFMSDataContext)DataContext.DC).CatSaleman on detail.SaleManId equals saleman.Id.ToString() into prods
+                         from x in prods.DefaultIfEmpty()
+                         select new { detail, customer = y, notiParty = noti, saleman = x, agent = f, pod });
+            if (query == null) return null;
+            foreach (var item in query)
+            {
+                var detail = mapper.Map<CsTransactionDetailModel>(item.detail);
+                detail.CustomerName = item.customer?.PartnerNameEn;
+                detail.CustomerNameVn = item.customer?.PartnerNameVn;
+                detail.SaleManId = item.saleman?.Id.ToString();
+                detail.NotifyParty = item.notiParty?.PartnerNameEn;
+                detail.ForwardingAgentName = item.agent?.PartnerNameEn;
+                detail.PODName = item.pod?.NameEn;
+                results.Add(detail);
+            }
+            return results.AsQueryable();
+        }
+
+        public CsTransactionDetailModel GetById(CsTransactionDetailCriteria criteria)
+        {
+            var results = QueryById(criteria).ToList();
+            return results.FirstOrDefault();
+        }
+
         #region -- LIST & PAGING HOUSEBILLS --
         public List<CsTransactionDetailModel> Query(CsTransactionDetailCriteria criteria)
         {
@@ -279,14 +316,14 @@ namespace eFMS.API.Documentation.DL.Services
                          select new { detail, tran, cus, sale });
             if (criteria.All == null)
             {
-                query = query.Where(x => criteria.JobId != Guid.Empty && criteria.JobId != null ? x.detail.JobId == criteria.JobId : true 
-                                      && x.tran.Mawb.IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                                      && (x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                      && (x.cus.PartnerNameEn.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                      && (x.tran.Etd >= criteria.FromDate || criteria.FromDate == null)
-                                      && (x.tran.Etd <= criteria.ToDate || criteria.ToDate == null)
-                                      && (x.sale.Username.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                    );
+                //query = query.Where(x =>  
+                //                       x.tran.Mawb.IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                //                      && (x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                //                      && (x.cus.PartnerNameEn.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                //                      && (x.tran.Etd >= criteria.FromDate || criteria.FromDate == null)
+                //                      && (x.tran.Etd <= criteria.ToDate || criteria.ToDate == null)
+                //                      && (x.sale.Username.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                //                    );
             }
             else
             {
@@ -554,5 +591,6 @@ namespace eFMS.API.Documentation.DL.Services
             result.SetParameter(parameter);
             return result;
         }
+
     }
 }

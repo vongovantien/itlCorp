@@ -106,17 +106,18 @@
                                                                                                 </span> -->
                                                                 <button type="button"
                                                                     class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                                    title="Detail">
+                                                                    [routerLink]="house.id" title="Detail">
                                                                     <i class="la la-edit"></i>
                                                                 </button>
                                                                 <button type="button"
                                                                     class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                                    title="Remove">
+                                                                    title="Remove" (click)="showDeletePopup(house)">
                                                                     <i class="la la-trash"></i>
                                                                 </button>
                                                             </div>
                                                         </td>
-                                                        <td class="text-underline text-primary pointer">{{house.hwbno}}
+                                                        <td class=" text-primary pointer"><a [routerLink]="house.id">
+                                                                {{house.hwbno}}</a>
                                                         </td>
                                                         <td>{{house.customerName}}</td>
                                                         <td>{{house.saleManName}}</td>
@@ -128,11 +129,42 @@
                                                         <td>{{house.cbm}}</td>
                                                     </tr>
                                                 </ng-container>
+                                                <tr *ngIf="!isLoading && !houseBill.length" app-table-none-record
+                                                    [colspan]="headers.length + 1">
+                                                </tr>
+                                                <tr *ngIf="isLoading" app-table-row-loading></tr>
 
                                             </tbody>
                                         </table>
 
                                     </div>
+                                    <!-- <div class="pagination-nav ">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <div class="tatable__pager-size">
+                                                    <div class="select-box">
+                                                        <select class="form-control" id="" aria-label=""
+                                                            [(ngModel)]="pageSize"
+                                                            (change)="selectPageSize(pageSize, dataSearch)"
+                                                            name="pagesize">
+                                                            <ng-container
+                                                                *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
+                                                                <option [ngValue]="item">{{item}} line / screen</option>
+                                                            </ng-container>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6" *ngIf="totalItems > pageSize">
+                                                <div class="float-right">
+                                                    <pagination [boundaryLinks]="true" [totalItems]="totalItems"
+                                                        [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
+                                                        [(ngModel)]="page">
+                                                    </pagination>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> -->
                                 </div>
                             </div>
 
@@ -141,11 +173,57 @@
                                     <h3 class="alert-block__title">Good Summary Of All HBL</h3>
                                 </div>
                                 <div class="m-portlet__body">
-                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptas excepturi adipisci
-                                    deserunt asperiores a eum debitis repellat mollitia, placeat sunt quae accusantium
-                                    in, sequi velit ullam quas enim nobis rem laudantium doloribus cum veniam corrupti.
-                                    Mollitia, architecto fuga porro quaerat distinctio adipisci neque sequi. Cumque
-                                    perferendis et repudiandae. Consequuntur, placeat!
+
+                                    <div class="row">
+
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                Total Gross Weight:
+                                                <span
+                                                    class="m-badge m-badge--primary m-badge--wide">{{goodSummary.totalGW}}
+                                                    Kgs</span>
+                                            </div>
+
+                                            <div class="form-group">
+                                                Total CBM:
+                                                <span
+                                                    class="m-badge m-badge--primary m-badge--wide">{{goodSummary.totalCbm}}
+                                                    CBM</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                Total Net Weight:
+                                                <span
+                                                    class="m-badge m-badge--primary m-badge--wide">{{goodSummary.totalNW}}
+                                                    Kgs</span>
+                                            </div>
+                                            <div class="form-group">
+                                                Container:
+                                                <span
+                                                    class="m-badge m-badge--primary m-badge--wide">{{goodSummary.containers}}
+                                                </span>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                Total Chargeable Weight:
+                                                <span
+                                                    class="m-badge m-badge--primary m-badge--wide">{{goodSummary.totalNW}}
+                                                    KGS</span>
+                                            </div>
+                                            <div class="form-group">
+                                                Commodities:
+                                                <span
+                                                    class="m-badge m-badge--primary m-badge--wide">{{goodSummary.commodities}}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
                                 </div>
                             </div>
 
@@ -188,3 +266,8 @@
         </div>
     </div>
 </div>
+
+<confirm-popup
+    [body]="'Are you sure you want to delete this House Bill, All related charges added to this House Bill will be lost'"
+    [labelCancel]="'No'" (onSubmit)="onDeleteHbl()">
+</confirm-popup>

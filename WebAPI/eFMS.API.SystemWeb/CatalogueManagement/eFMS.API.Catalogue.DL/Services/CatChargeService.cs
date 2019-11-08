@@ -116,12 +116,6 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<CatChargeModel> Paging(CatChargeCriteria criteria, int page, int size, out int rowsCount)
         {
             var list = Query(criteria);
-            //if(criteria.Type!=null && criteria.ServiceTypeId!=null && criteria.Active != null)
-            //{
-            //    list = list.Where(x => (x.Type.Trim().ToLower() == criteria.Type.Trim().ToLower() 
-            //            && x.ServiceTypeId.IndexOf(criteria.ServiceTypeId, StringComparison.OrdinalIgnoreCase) > -1 
-            //            && x.Active == criteria.Active));
-            //}
             list = list.OrderByDescending(x => x.DatetimeModified);
             rowsCount = list.Count();
             if (rowsCount == 0) return null;
@@ -309,7 +303,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         CurrencyId = item.CurrencyId,
                         Type = item.Type,
                         ServiceTypeId = item.ServiceTypeId,
-                        Active = item.Status.Trim().ToLower() == "active" ? false : true,
+                        Active = item.Status.Trim().ToLower() == "active",
                         DatetimeCreated = DateTime.Now,
                         UserCreated = currentUser.UserID,
                         UserModified = currentUser.UserID
