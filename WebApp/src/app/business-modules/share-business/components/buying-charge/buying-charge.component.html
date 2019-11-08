@@ -1,4 +1,20 @@
 <div class="buying-charge-wrapper">
+    <div class="row m--margin-top-20">
+        <div class="col-md-6"></div>
+        <div class="col-md-6">
+            <div class="m--align-right">
+                <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)="saveBuyingCharge()">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            save
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
     <div class="table-wrapper table-editable m--margin-top-20" [class.h]="!!charges.length">
         <table class="table dataTable table-bordered">
             <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField ? $event.sortField : '')">
@@ -29,7 +45,7 @@
                                             (click)="selectPartnerType(type, charge)">{{type.displayName}}</a>
                                     </div>
                                     <app-combo-grid [headers]="headerPartner" [data]="listPartner"
-                                        [fields]="['taxCode','partnerNameEn']"
+                                        [fields]="['taxCode','partnerNameEn']" [active]="charge.paymentObjectId"
                                         (onClick)="onSelectPartner($event, charge)">
                                     </app-combo-grid>
                                 </div>
@@ -216,16 +232,5 @@
                 </tr>
             </tbody>
         </table>
-    </div>
-    <div class="m--align-right">
-        <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase"
-            (click)="saveSurcharge()">
-            <span>
-                <i class="la la-plus"></i>
-                <span>
-                    save
-                </span>
-            </span>
-        </button>
     </div>
 </div>

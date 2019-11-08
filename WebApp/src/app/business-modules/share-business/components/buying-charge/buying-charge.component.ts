@@ -1,15 +1,17 @@
 import { Component, Input } from '@angular/core';
 
 import { CatalogueRepo } from 'src/app/shared/repositories';
-import { Charge, Unit, CsShipmentSurcharge, Currency, Partner } from 'src/app/shared/models';
+import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, CsTransactionDetail } from 'src/app/shared/models';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { AppList } from 'src/app/app.list';
 
 
 import { forkJoin } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, takeUntil } from 'rxjs/operators';
 
+import * as fromStore from './../../store';
+import { Store } from '@ngrx/store';
 
 enum QUANTITY_TYPE {
     GW = 'gw',
@@ -27,7 +29,9 @@ enum QUANTITY_TYPE {
 })
 export class ShareBussinessBuyingChargeComponent extends AppList {
 
-    @Input() containers: Container[] = []; // * House bill was selected.
+    @Input() containers: Container[] = [];
+    @Input() shipment: any;
+    @Input() hbl: CsTransactionDetail;
 
     headers: CommonInterface.IHeaderTable[] = [];
     headerPartner: CommonInterface.IHeaderTable[] = [];
@@ -46,7 +50,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     partnerType: CommonInterface.IValueDisplay[];
     constructor(
-        private _catalogueRepo: CatalogueRepo
+        private _catalogueRepo: CatalogueRepo,
+        private _store: Store<fromStore.IShareBussinessState>
     ) {
         super();
     }
@@ -107,7 +112,14 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         ];
 
         this.getMasterData();
-        this.addCharge();
+
+        this._store.select(fromStore.getBuyingSurChargeState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (buyings: CsShipmentSurcharge[]) => {
+                    this.charges = buyings;
+                }
+            );
     }
 
     getMasterData() {
@@ -155,13 +167,15 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         newSurCharge.quantityType = null;
         newSurCharge.exchangeDate = { startDate: new Date(), endDate: new Date() };
 
-        this.charges.push(newSurCharge);
+        // this.charges.push(newSurCharge);
 
-        console.log(this.charges);
+        this._store.dispatch(new fromStore.AddBuyingSurchargeAction(newSurCharge));
     }
 
     deleteCharge(index: number) {
-        this.charges.splice(index, 1);
+        this._store.dispatch(new fromStore.DeleteBuyingSurchargeAction(index));
+
+        // this.charges.splice(index, 1);
     }
 
     onChangeVat(vat: number, chargeItem: CsShipmentSurcharge) {
@@ -176,8 +190,14 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         chargeItem.total = this.utility.calculateTotalAmountWithVat(chargeItem.vatrate, quantity, chargeItem.unitPrice);
     }
 
-    saveSurcharge() {
+    saveBuyingCharge() {
         console.log(this.charges);
+
+        // * Update data 
+        for (const charge of this.charges) {
+
+        }
+        this._store.dispatch(new fromStore.SaveBuyingSurchargeAction(this.charges));
     }
 
     onChangeQuantityHint(hintType: string, chargeItem: CsShipmentSurcharge) {
@@ -216,8 +236,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     onSelectPartner(partnerData: Partner, chargeItem: CsShipmentSurcharge) {
         if (!!partnerData) {
             chargeItem.partnerName = partnerData.shortName;
-            chargeItem.paymentObjectId = partnerData.id,
-                chargeItem.objectBePaid = null;  // nếu chọn customer/agent/carrier
+            chargeItem.paymentObjectId = partnerData.id;
+            chargeItem.objectBePaid = null;  // nếu chọn customer/agent/carrier
 
         }
     }
@@ -226,12 +246,19 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         chargeItem.objectBePaid = partnerType.fieldName;
         switch (partnerType.value) {
             case CommonEnum.PartnerGroupEnum.CUSTOMER:
-
+                chargeItem.partnerName = this.hbl.customerName;
+                chargeItem.paymentObjectId = this.hbl.customerId;
                 break;
-
+            case CommonEnum.PartnerGroupEnum.CARRIER:
+                chargeItem.partnerName = this.shipment.supplierName;
+                chargeItem.paymentObjectId = this.shipment.coloaderId;
+                break;
+            case CommonEnum.PartnerGroupEnum.AGENT:
+                chargeItem.partnerName = this.shipment.agentName;
+                chargeItem.paymentObjectId = this.shipment.agentId;
+                break;
             default:
                 break;
         }
-        console.log(partnerType);
     }
 }

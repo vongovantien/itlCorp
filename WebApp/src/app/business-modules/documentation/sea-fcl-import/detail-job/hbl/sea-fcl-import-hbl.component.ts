@@ -5,13 +5,14 @@ import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactio
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, takeUntil, switchMap, mergeMap, mergeAll, tap, take, skip } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import * as fromStore from './../../store';
 import { Store } from '@ngrx/store';
 import { Container } from 'src/app/shared/models/document/container.model';
+import { merge, Observable, of } from 'rxjs';
 
 @Component({
     selector: 'app-sea-fcl-import-hbl',
@@ -23,11 +24,12 @@ export class SeaFCLImportHBLComponent extends AppList {
     jobId: string = '';
     headers: CommonInterface.IHeaderTable[];
     houseBill: CsTransactionDetail[] = [];
-    selectedHbl: CsTransactionDetail;
     goodSummary: any = {};
 
 
     containers: Container[] = new Array<Container>();
+    selectedShipment: any; // TODO model.
+    selectedHbl: CsTransactionDetail;
 
     constructor(
         private _router: Router,
@@ -65,12 +67,23 @@ export class SeaFCLImportHBLComponent extends AppList {
 
         this._store.select(fromStore.getContainerSaveState)
             .pipe(
-                takeUntil(this.ngUnsubscribe)
+                takeUntil(this.ngUnsubscribe),
+                tap(
+                    (containers: Container[]) => {
+                        this.containers = (containers || []).map(contaienr => new Container(contaienr));
+                    }
+                ),
+                switchMap(
+                    () => this._store.select(fromStore.seaFCLImportTransactionState)
+                        .pipe(
+                            takeUntil(this.ngUnsubscribe),
+                        )
+                )
             )
             .subscribe(
-                (res: any) => {
-                    this.containers = (res || []).map(contaienr => new Container(contaienr));
-                    console.log(this.containers);
+                (shipment: any) => {
+                    this.selectedShipment = shipment;
+                    console.log(shipment);
                 }
             );
 
@@ -138,7 +151,6 @@ export class SeaFCLImportHBLComponent extends AppList {
             (res: any) => {
 
                 this.goodSummary = res;
-                console.log(this.goodSummary);
             },
         );
     }
@@ -151,17 +163,17 @@ export class SeaFCLImportHBLComponent extends AppList {
             finalize(() => { this.isLoading = false; }),
         ).subscribe(
             (res: any) => {
-
                 this.houseBill = res;
-                console.log(this.houseBill);
             },
         );
     }
 
-    selectHBL(item: CsTransactionDetail) {
-        this.selectedHbl = new CsTransactionDetail(item);
+    selectHBL(hbl: CsTransactionDetail) {
+        this.selectedHbl = new CsTransactionDetail(hbl);
 
-        // * Get container with hbl id.
-        this._store.dispatch(new fromStore.GetContainerAction({ hblid: this.selectedHbl.id }));
+        // * Get container, HBL detail with hbl id.
+        this._store.dispatch(new fromStore.GetContainerAction({ hblid: hbl.id }));
+        this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(hbl.jobId));
+
     }
 }

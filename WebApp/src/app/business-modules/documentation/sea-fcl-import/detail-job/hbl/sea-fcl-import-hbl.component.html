@@ -191,7 +191,9 @@
                                 <div class="m-portlet__body">
                                     <tabset class="custom-class-tab">
                                         <tab heading="Buying">
-                                            <buying-charge [containers]="containers"></buying-charge>
+                                            <buying-charge [containers]="containers" [shipment]="selectedShipment"
+                                                [hbl]="selectedHbl">
+                                            </buying-charge>
                                         </tab>
                                         <tab heading="Selling">
 

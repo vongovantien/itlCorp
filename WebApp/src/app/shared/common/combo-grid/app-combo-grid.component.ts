@@ -13,6 +13,8 @@ export class AppComboGridComponent<T> extends AppList {
     @Input() height: 200;
     @Input() fields: string[] = [];
     @Output() onClick: EventEmitter<any> = new EventEmitter<any>();
+    @Input() active: any;
+
 
     selectedItem: any = null;
 
@@ -24,6 +26,7 @@ export class AppComboGridComponent<T> extends AppList {
     ngOnInit(): void { }
 
     selectItem(item: any) {
+        this.active = item.id;
         this.selectedItem = item;
         this.onClick.emit(this.selectedItem);
     }

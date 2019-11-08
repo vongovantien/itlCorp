@@ -25,4 +25,4 @@ export class GetDetailHBLFailAction implements Action {
     constructor(public payload: any) { }
 }
 
-export type HBlAction = GetDetailHBLAction | GetDetailHBLSuccessAction | GetDetailHBLFailAction;
+export type HBlActions = GetDetailHBLAction | GetDetailHBLSuccessAction | GetDetailHBLFailAction;
