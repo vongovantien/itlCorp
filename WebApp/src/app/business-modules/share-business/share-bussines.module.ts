@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ModalModule } from 'ngx-bootstrap';
+import { ModalModule, BsDropdownModule } from 'ngx-bootstrap';
 import { FormsModule } from '@angular/forms';
 import { CommonComponentModule } from 'src/app/shared/common/common.module';
 import { DirectiveModule } from 'src/app/shared/directives/directive.module';
@@ -8,6 +8,8 @@ import { ShareBussinessBuyingChargeComponent } from './components';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { NgxCurrencyModule } from 'ngx-currency';
 import { ShareContainerImportComponent } from './components/container-import/container-import.component';
+import { StoreModule } from '@ngrx/store';
+import { reducers } from './store';
 
 const COMPONENTS = [
     ShareBussinessBuyingChargeComponent,
@@ -37,8 +39,9 @@ const customCurrencyMaskConfig = {
         ModalModule.forRoot(),
         NgxDaterangepickerMd.forRoot(),
         DirectiveModule,
+        BsDropdownModule.forRoot(),
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
-
+        StoreModule.forFeature('share-bussiness', reducers)
     ],
     exports: [
         ...COMPONENTS

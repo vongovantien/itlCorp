@@ -1,6 +1,22 @@
 <div class="buying-charge-wrapper">
+    <div class="row m--margin-top-20">
+        <div class="col-md-6"></div>
+        <div class="col-md-6">
+            <div class="m--align-right">
+                <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase"
+                    (click)="saveBuyingCharge()">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            save
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
     <div class="table-wrapper table-editable m--margin-top-20" [class.h]="!!charges.length">
-        <table class="table dataTable table-bordered table-hover">
+        <table class="table dataTable table-bordered">
             <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                 <th class="m--w-50 first table-actions-col">
                 </th>
@@ -18,8 +34,21 @@
                             </div>
                         </td>
                         <td>
-                            <div class="form-group ">
-                                <input type="text" class="form-control">
+                            <div class="form-group col-md-12 dropdown-partner" dropdown>
+                                <input type="text" class="dropdown-toggle form-control" dropdownToggle readonly
+                                    [(ngModel)]="charge.partnerName" placeholder="Partner Name">
+                                <div *dropdownMenu class="dropdown-menu dropdown-partner__content">
+                                    <div class="d-flex justify-content-end dropdown-partner__header">
+                                        <a class="text-primary text-underline m--margin-right-20 pointer"
+                                            *ngFor="let type of partnerType; trackBy: trackByFn"
+                                            [title]="type.displayName"
+                                            (click)="selectPartnerType(type, charge)">{{type.displayName}}</a>
+                                    </div>
+                                    <app-combo-grid [headers]="headerPartner" [data]="listPartner"
+                                        [fields]="['taxCode','partnerNameEn']" [active]="charge.paymentObjectId"
+                                        (onClick)="onSelectPartner($event, charge)">
+                                    </app-combo-grid>
+                                </div>
                             </div>
                         </td>
                         <td>
@@ -38,12 +67,14 @@
                                 <div class="row quantity-hint">
                                     <div class="col-md-6 p-r-none">
                                         <input type="text" class="form-control" [(ngModel)]="charge.quantity"
-                                            currencyMask>
+                                            currencyMask placeholder="Quantity"
+                                            (ngModelChange)="onChangeQuantity($event, charge)">
                                     </div>
                                     <div class="col-md-6 p-l-none">
-                                        <select class="form-control border" [(ngModel)]="charge.quantityHint">
-                                            <option value="null"></option>
-                                            <option *ngFor="let hint of quantityHints" [ngValue]="hint">
+                                        <select class="form-control border" [(ngModel)]="charge.quantityType"
+                                            (ngModelChange)="onChangeQuantityHint($event, charge)">
+                                            <option value="null" disabled></option>
+                                            <option *ngFor="let hint of quantityHints" [ngValue]="hint.value">
                                                 {{hint.displayName}}</option>
                                         </select>
                                     </div>
@@ -61,7 +92,7 @@
                         <td>
                             <div class="form-group ">
                                 <input type="number" class="form-control" [(ngModel)]="charge.unitPrice"
-                                    (ngModelChange)="onChangeUnitPrice($event, charge)">
+                                    (ngModelChange)="onChangeUnitPrice($event, charge)" placeholder="Unit Price">
                             </div>
                         </td>
                         <td>
@@ -76,13 +107,13 @@
                         <td>
                             <div class="form-group ">
                                 <input type="number" class="form-control" [(ngModel)]="charge.vatrate"
-                                    (ngModelChange)="onChangeVat($event, charge)">
+                                    (ngModelChange)="onChangeVat($event, charge)" placeholder="%">
                             </div>
                         </td>
-                        <td>
+                        <td class="disabled">
                             <div class="form-group ">
                                 <input type="text" class="form-control" [(ngModel)]="charge.total" readonly disabled
-                                    currencyMask>
+                                    currencyMask placeholder="Total">
                             </div>
                         </td>
                         <td>
@@ -119,24 +150,6 @@
                             </div>
                         </td>
                         <td>
-                            <div class="form-group ">
-                                <input type="text" class="form-control" [(ngModel)]="charge.soano" disabled readonly
-                                    placeholder="SOA">
-                            </div>
-                        </td>
-                        <td>
-                            <div class="form-group ">
-                                <input type="text" class="form-control" [(ngModel)]="charge.cdno" disabled readonly
-                                    placeholder="CD Note">
-                            </div>
-                        </td>
-                        <td>
-                            <div class="form-group ">
-                                <input type="text" class="form-control" [(ngModel)]="charge.settlementCode" disabled
-                                    readonly placeholder="Settlement">
-                            </div>
-                        </td>
-                        <td>
                             <div class="form-group table-date">
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
@@ -153,39 +166,58 @@
                             </div>
                         </td>
                         <td>
-                            <div class="form-group ">
-                                <input type="text" class="form-control" disabled readonly placeholder="Voucher ID"
-                                    [(ngModel)]="charge.voucherId">
-                            </div>
-                        </td>
-                        <td>
-                            <div class="form-group ">
-                                <input type="text" class="form-control" disabled readonly placeholder="Voucher ID Date"
-                                    [(ngModel)]="charge.voucherIddate">
-                            </div>
-                        </td>
-                        <td>
-                            <div class="form-group ">
-                                <input type="text" class="form-control" disabled readonly placeholder="Voucher IDRE"
-                                    [(ngModel)]="charge.voucherIdre">
-                            </div>
-                        </td>
-                        <td>
-                            <div class="form-group ">
-                                <input type="text" class="form-control" disabled readonly
-                                    placeholder="Voucher IDRE Date" [(ngModel)]="charge.voucherIdredate">
-                            </div>
-                        </td>
-                        <td>
-                            <div class="form-group ">
-                                <input type="text" class="form-control" disabled readonly
-                                    placeholder="Final Exchange Date" [(ngModel)]="charge.finalExchangeRate">
-                            </div>
-                        </td>
-                        <td>
                             <app-switch [(toggle)]="charge.kickBack">
                             </app-switch>
                         </td>
+                        <td class="disabled">
+                            <div class="form-group ">
+                                <input type="text" class="form-control" [(ngModel)]="charge.soano" disabled
+                                    placeholder="SOA">
+                            </div>
+                        </td>
+                        <td class="disabled">
+                            <div class="form-group ">
+                                <input type="text" class="form-control" [(ngModel)]="charge.cdno" disabled
+                                    placeholder="CD Note">
+                            </div>
+                        </td>
+                        <td class="disabled">
+                            <div class="form-group ">
+                                <input type="text" class="form-control" [(ngModel)]="charge.settlementCode" disabled
+                                    readonly placeholder="Settlement">
+                            </div>
+                        </td>
+                        <td class="disabled">
+                            <div class="form-group ">
+                                <input type="text" class="form-control" disabled placeholder="Voucher ID"
+                                    [(ngModel)]="charge.voucherId">
+                            </div>
+                        </td>
+                        <td class="disabled">
+                            <div class="form-group ">
+                                <input type="text" class="form-control" disabled placeholder="Voucher ID Date"
+                                    [(ngModel)]="charge.voucherIddate">
+                            </div>
+                        </td>
+                        <td class="disabled">
+                            <div class="form-group ">
+                                <input type="text" class="form-control" disabled placeholder="Voucher IDRE"
+                                    [(ngModel)]="charge.voucherIdre">
+                            </div>
+                        </td>
+                        <td class="disabled">
+                            <div class="form-group ">
+                                <input type="text" class="form-control" disabled placeholder="Voucher IDRE Date"
+                                    [(ngModel)]="charge.voucherIdredate">
+                            </div>
+                        </td>
+                        <td class="disabled">
+                            <div class="form-group ">
+                                <input type="text" class="form-control" disabled placeholder="Final Exchange Date"
+                                    [(ngModel)]="charge.finalExchangeRate">
+                            </div>
+                        </td>
+
                     </tr>
 
                 </ng-container>
@@ -200,16 +232,5 @@
                 </tr>
             </tbody>
         </table>
-    </div>
-    <div class="m--align-right">
-        <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase"
-            (click)="saveSurcharge()">
-            <span>
-                <i class="la la-plus"></i>
-                <span>
-                    save
-                </span>
-            </span>
-        </button>
     </div>
 </div>

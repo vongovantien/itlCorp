@@ -10,6 +10,7 @@ import { DirectiveModule } from '../directives/directive.module';
 import { FormsModule } from '@angular/forms';
 import { AppPaginationComponent } from './pagination/pagination.component';
 import { TableCellComponent } from './table-cell/table-cell.component';
+import { PipeModule } from '../pipes/pipe.module';
 
 const COMPONENTS = [
     SubHeaderComponent,
@@ -55,6 +56,7 @@ const COMPONENTS = [
         CollapseModule,
         FormsModule,
         DirectiveModule,
+        PipeModule,
         TooltipModule.forRoot()
     ],
     exports: [

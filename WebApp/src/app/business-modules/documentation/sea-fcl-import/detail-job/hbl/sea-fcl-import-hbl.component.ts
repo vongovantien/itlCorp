@@ -5,9 +5,14 @@ import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactio
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil, switchMap, mergeMap, mergeAll, tap, take, skip } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
+
+import * as fromStore from './../../store';
+import { Store } from '@ngrx/store';
+import { Container } from 'src/app/shared/models/document/container.model';
+import { merge, Observable, of } from 'rxjs';
 
 @Component({
     selector: 'app-sea-fcl-import-hbl',
@@ -15,12 +20,16 @@ import { NgProgress } from '@ngx-progressbar/core';
 })
 export class SeaFCLImportHBLComponent extends AppList {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+
     jobId: string = '';
     headers: CommonInterface.IHeaderTable[];
     houseBill: CsTransactionDetail[] = [];
-    selectedHbl: CsTransactionDetail;
     goodSummary: any = {};
 
+
+    containers: Container[] = new Array<Container>();
+    selectedShipment: any; // TODO model.
+    selectedHbl: CsTransactionDetail;
 
     constructor(
         private _router: Router,
@@ -29,6 +38,7 @@ export class SeaFCLImportHBLComponent extends AppList {
         private _activedRoute: ActivatedRoute,
         private _toastService: ToastrService,
         private _progressService: NgProgress,
+        private _store: Store<fromStore.ISeaFCLImportState>
     ) {
         super();
         this.requestSort = this.sortLocal;
@@ -54,6 +64,29 @@ export class SeaFCLImportHBLComponent extends AppList {
             { title: 'CBM', field: 'cbm', sortable: true }
         ];
         this.getHourseBill();
+
+        this._store.select(fromStore.getContainerSaveState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                tap(
+                    (containers: Container[]) => {
+                        this.containers = (containers || []).map(contaienr => new Container(contaienr));
+                    }
+                ),
+                switchMap(
+                    () => this._store.select(fromStore.seaFCLImportTransactionState)
+                        .pipe(
+                            takeUntil(this.ngUnsubscribe),
+                        )
+                )
+            )
+            .subscribe(
+                (shipment: any) => {
+                    this.selectedShipment = shipment;
+                    console.log(shipment);
+                }
+            );
+
         this.getGoodSumaryOfHbl();
     }
 
@@ -65,9 +98,6 @@ export class SeaFCLImportHBLComponent extends AppList {
             case 'cdNote':
                 this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
-            // case 'hbl':
-            //     this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], { queryParams: { tab: 'HBL' } });
-            //     break;
         }
     }
 
@@ -121,7 +151,6 @@ export class SeaFCLImportHBLComponent extends AppList {
             (res: any) => {
 
                 this.goodSummary = res;
-                console.log(this.goodSummary);
             },
         );
     }
@@ -134,12 +163,17 @@ export class SeaFCLImportHBLComponent extends AppList {
             finalize(() => { this.isLoading = false; }),
         ).subscribe(
             (res: any) => {
-
                 this.houseBill = res;
-                console.log(this.houseBill);
             },
         );
     }
 
+    selectHBL(hbl: CsTransactionDetail) {
+        this.selectedHbl = new CsTransactionDetail(hbl);
 
+        // * Get container, HBL detail with hbl id.
+        this._store.dispatch(new fromStore.GetContainerAction({ hblid: hbl.id }));
+        this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(hbl.jobId));
+
+    }
 }
