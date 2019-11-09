@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, Input } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { SeaFCLImportContainerListPopupComponent } from '../popup/container-list/container-list.popup';
 
@@ -18,9 +18,10 @@ import { takeUntil } from 'rxjs/operators';
 
 })
 export class SeaFCLImportShipmentGoodSummaryComponent extends AppForm {
-
+    @Input() inHouseBill: boolean = false;
     @ViewChild(SeaFCLImportContainerListPopupComponent, { static: false }) containerPopup: SeaFCLImportContainerListPopupComponent;
 
+    parentId: string = ''; // housebillId or jobId
     description: string = '';
     commodities: string = '';
     containerDetail: string = '';
@@ -32,7 +33,7 @@ export class SeaFCLImportShipmentGoodSummaryComponent extends AppForm {
 
     constructor(
         private _actionStoreSubject: ActionsSubject,
-        private _store: Store<fromStore.IContainerState>,
+        private _store: Store<fromStore.IContainerState>
     ) {
         super();
     }
@@ -106,7 +107,6 @@ export class SeaFCLImportShipmentGoodSummaryComponent extends AppForm {
             );
     }
 
-
     handleStringCont(contOb: { cont: string, quantity: number }) {
         return contOb.quantity + 'x' + contOb.cont + ', ';
     }
@@ -120,7 +120,7 @@ export class SeaFCLImportShipmentGoodSummaryComponent extends AppForm {
     }
 
     openContainerListPopup() {
-
+        this.containerPopup.inHouseBill = this.inHouseBill;
         this.containerPopup.show();
     }
 }

@@ -15,7 +15,7 @@
                     </div>
                     <div class="col-md-8 text-right">
                         <button class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                            title="Import">
+                            *ngIf="parentId.length>0" title="Import" (click)="showImportPopup()">
                             <span>
                                 <i class="la la-cloud-download"></i>
                                 <span>
@@ -200,3 +200,4 @@
         </div>
     </div>
 </div>
+<app-container-import></app-container-import>

@@ -7,9 +7,11 @@ import { DirectiveModule } from 'src/app/shared/directives/directive.module';
 import { ShareBussinessBuyingChargeComponent } from './components';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { NgxCurrencyModule } from 'ngx-currency';
+import { ShareContainerImportComponent } from './components/container-import/container-import.component';
 
 const COMPONENTS = [
-    ShareBussinessBuyingChargeComponent
+    ShareBussinessBuyingChargeComponent,
+    ShareContainerImportComponent
 ];
 
 const customCurrencyMaskConfig = {

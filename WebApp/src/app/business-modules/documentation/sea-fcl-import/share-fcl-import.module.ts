@@ -5,10 +5,11 @@ import { SeaFCLImportContainerListPopupComponent } from './components/popup/cont
 import { FormsModule } from '@angular/forms';
 import { ModalModule } from 'ngx-bootstrap';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { ShareBussinessModule } from '../../share-business/share-bussines.module';
 
 const COMPONENTS = [
     SeaFCLImportShipmentGoodSummaryComponent,
-    SeaFCLImportContainerListPopupComponent
+    SeaFCLImportContainerListPopupComponent,
 ];
 
 @NgModule({
@@ -20,6 +21,7 @@ const COMPONENTS = [
         SharedModule,
         FormsModule,
         ModalModule.forRoot(),
+        ShareBussinessModule
     ],
     exports: [
         ...COMPONENTS,
