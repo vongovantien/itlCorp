@@ -1,9 +1,11 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { finalize, catchError } from 'rxjs/operators';
 import { UploadAlertComponent } from 'src/app/shared/common/popup/upload-alert/upload-alert.component';
+import { Store } from '@ngrx/store';
+import { GetContainerAction, SaveContainerAction, AddContainersAction } from 'src/app/business-modules/documentation/sea-fcl-import/store';
 
 @Component({
     selector: 'app-container-import',
@@ -11,6 +13,7 @@ import { UploadAlertComponent } from 'src/app/shared/common/popup/upload-alert/u
 })
 export class ShareContainerImportComponent extends PopupBase implements OnInit {
     @ViewChild(UploadAlertComponent, { static: false }) importAlert: UploadAlertComponent;
+
     isShowInvalid: boolean = true;
     totalValidRow: number = 0;
     totalInvalidRow: number = 0;
@@ -19,13 +22,14 @@ export class ShareContainerImportComponent extends PopupBase implements OnInit {
     existedError: string = null;
     duplicatedError: string = null;
     importedData: any[] = [];
-    inHouseBill: boolean = false;
-    parentId: string = '';
-
+    mblid: string = null;
+    hblid: string = null;
     constructor(private _docRepo: DocumentationRepo,
+        private _store: Store<any>,
         private _progressService: NgProgress) {
         super();
         this._progressRef = this._progressService.ref();
+        this.requestList = this.getData;
     }
 
     ngOnInit() {
@@ -49,7 +53,13 @@ export class ShareContainerImportComponent extends PopupBase implements OnInit {
     chooseFile(file: Event) {
         if (file.target['files'] == null) { return; }
         this._progressRef.start();
-        this._docRepo.upLoadContainerFile(file.target['files'])
+        let parentId = this.hblid;
+        let isHouseBill = true;
+        if (parentId == null) {
+            parentId = this.mblid;
+            isHouseBill = false;
+        }
+        this._docRepo.upLoadContainerFile(file.target['files'], parentId, isHouseBill)
             .pipe(
                 finalize(() => {
                     this._progressRef.complete();
@@ -71,6 +81,20 @@ export class ShareContainerImportComponent extends PopupBase implements OnInit {
                 }
             }, err => {
             });
+    }
+    pageChanged(event: any) {
+        if (this.page !== event.page || this.pageSize !== event.itemsPerPage) {
+            this.page = event.page;
+            this.pageSize = event.itemsPerPage;
+
+            this.getData();
+        }
+    }
+    selectPageSize(pageSize: number) {
+        this.pageSize = pageSize;
+        this.page = 1;  // TODO reset page to initial
+        this.totalItems = 0;
+        this.getData();
     }
     getData() {
         this.totalItems = this.data.length;
@@ -105,33 +129,12 @@ export class ShareContainerImportComponent extends PopupBase implements OnInit {
     }
 
     import() {
-        console.log(this.inHouseBill);
-        console.log(this.parentId);
         if (this.data == null) { return; }
         if (this.totalInvalidRow > 0) {
             this.importAlert.show();
         } else {
-            this._progressRef.start();
-            this.data.forEach(x => {
-                if (this.inHouseBill === true) {
-                    x.hblid = this.parentId;
-                } else { x.mblid = this.parentId; }
-            });
-            this._docRepo.importContainerExcel(this.data)
-                .pipe(catchError(this.catchError))
-                .subscribe(
-                    (res: any) => {
-                        if (res.success) {
-                            this.reset();
-                            this._progressRef.complete();
-                            // this.isImportSuccess.emit(true);
-                            this.hide();
-                        }
-                        console.log(res);
-                    },
-                    (errors: any) => { },
-                    () => { }
-                );
+            this._store.dispatch(new AddContainersAction(this.data));
+            this.hide();
         }
     }
     reset() {

@@ -24,8 +24,8 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class SeaFCLImportContainerListPopupComponent extends PopupBase {
     @ViewChild(ShareContainerImportComponent, { static: false }) containerImportPopup: ShareContainerImportComponent;
-    inHouseBill: boolean = false;
-    parentId: string = ''; // housebillId or jobId
+    mblid: string = null;
+    hblid: string = null;
     containers: any[] = [];
 
     headers: CommonInterface.IHeaderTable[];
@@ -43,9 +43,7 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
         private _catalogueRepo: CatalogueRepo,
         private _store: Store<fromStore.IContainerState>,
         private cdRef: ChangeDetectorRef,
-        private _dataService: DataService,
-        private _activedRoute: ActivatedRoute
-
+        private _dataService: DataService
     ) {
         super();
     }
@@ -79,23 +77,6 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
                     this.containers = res;
                 }
             );
-
-        this._activedRoute.params.subscribe(p => {
-            if (this.inHouseBill === false) {
-                this.parentId = p['id'];
-            } else {
-                this.parentId = p['hblId'];
-            }
-        });
-    }
-
-    ngAfterViewInit() {
-        this._activedRoute.params.subscribe(p => {
-            this.parentId = p['id'];
-            console.log(p);
-            console.log(p['id']);
-            console.log(p['hblId']);
-        });
     }
 
     addNewContainer() {
@@ -206,8 +187,25 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
         this.hide();
     }
     showImportPopup() {
-        this.containerImportPopup.inHouseBill = this.inHouseBill;
-        this.containerImportPopup.parentId = this.parentId;
+        this.containerImportPopup.mblid = this.mblid;
+        this.containerImportPopup.hblid = this.hblid;
         this.containerImportPopup.show();
+    }
+    importSuccess(event) {
+        if (event) {
+            this._store.select(fromStore.getContainerSaveState)
+                .pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe(
+                    (res: fromStore.IContainerState | any) => {
+                        this.containers = res;
+                        for (const container of this.containers) {
+                            container.commodityName = this.getCommodityName(container.commodityId);
+                            container.containerTypeName = this.getContainerTypeName(container.containerTypeId);
+                            container.packageTypeName = this.getPackageTypeName(container.packageTypeId);
+                        }
+                        this._store.dispatch(new fromStore.SaveContainerAction(this.containers));
+                    }
+                );
+        }
     }
 }

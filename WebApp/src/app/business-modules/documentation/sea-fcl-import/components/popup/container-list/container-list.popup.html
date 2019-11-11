@@ -11,11 +11,11 @@
                 <div class="row">
                     <div class="col-md-4">
                         <input type="text" class="form-control w-100" [(ngModel)]="keyword" name="keyword"
-                            placeholder="Settlement Id">
+                            placeholder="">
                     </div>
                     <div class="col-md-8 text-right">
                         <button class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                            *ngIf="parentId.length>0" title="Import" (click)="showImportPopup()">
+                            *ngIf="hblid != null || mblid != null" title="Import" (click)="showImportPopup()">
                             <span>
                                 <i class="la la-cloud-download"></i>
                                 <span>

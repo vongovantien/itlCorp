@@ -15,6 +15,7 @@ using Microsoft.Extensions.Localization;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using SystemManagementAPI.Infrastructure.Middlewares;
@@ -134,11 +135,18 @@ namespace eFMS.API.Documentation.Controllers
         /// read data from file excel
         /// </summary>
         /// <param name="uploadedFile"></param>
+        /// <param name="id"></param>
+        /// <param name="isHouseBill"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("UploadFile")]
-        public IActionResult UploadFileContainer(IFormFile uploadedFile)
+        public IActionResult UploadFileContainer(IFormFile uploadedFile, [Required]Guid id, bool isHouseBill = false)
         {
+            Guid? hblid = null;
+            Guid? mblid = null;
+            if (isHouseBill) hblid = id;
+            else mblid = id;
+
             var file = new FileHelper().UploadExcel(uploadedFile);
             if (file != null)
             {
@@ -153,13 +161,13 @@ namespace eFMS.API.Documentation.Controllers
                     {
                         IsValid = true,
                         ContainerTypeName = worksheet.Cells[row, 1].Value == null ? string.Empty : worksheet.Cells[row, 1].Value.ToString().Trim(),
-                        QuantityError = worksheet.Cells[row, 2].Value == null ? null : worksheet.Cells[row, 2].Value.ToString().Trim(),
+                        QuantityError = worksheet.Cells[row, 2].Value?.ToString().Trim(),
                         ContainerNo = worksheet.Cells[row, 3].Value == null ? string.Empty : worksheet.Cells[row, 3].Value.ToString().Trim(),
                         SealNo = worksheet.Cells[row, 4].Value == null ? string.Empty : worksheet.Cells[row, 4].Value.ToString().Trim(),
-                        GwError = worksheet.Cells[row, 5].Value == null ? null : worksheet.Cells[row, 5].Value.ToString().Trim(),
-                        CbmError = worksheet.Cells[row, 6].Value == null ? null : worksheet.Cells[row, 6].Value.ToString().Trim(),
-                        NwError = worksheet.Cells[row, 7].Value == null ? null : worksheet.Cells[row, 7].Value.ToString().Trim(),
-                        PackageQuantityError = worksheet.Cells[row, 8].Value == null ? null : worksheet.Cells[row, 8].Value.ToString().Trim(),
+                        GwError = worksheet.Cells[row, 5].Value?.ToString().Trim(),
+                        CbmError = worksheet.Cells[row, 6].Value?.ToString().Trim(),
+                        NwError = worksheet.Cells[row, 7].Value?.ToString().Trim(),
+                        PackageQuantityError = worksheet.Cells[row, 8].Value?.ToString().Trim(),
                         PackageTypeName = worksheet.Cells[row, 9].Value == null ? string.Empty : worksheet.Cells[row, 9].Value.ToString().Trim(),
                         MarkNo = worksheet.Cells[row, 10].Value == null ? string.Empty : worksheet.Cells[row, 10].Value.ToString().Trim(),
                         Description = worksheet.Cells[row, 11].Value == null ? string.Empty : worksheet.Cells[row, 11].Value.ToString().Trim(),
@@ -168,7 +176,7 @@ namespace eFMS.API.Documentation.Controllers
                     };
                     list.Add(container);
                 }
-                var data = csContainerService.CheckValidContainerImport(list);
+                var data = csContainerService.CheckValidContainerImport(list, mblid, hblid);
                 var totalValidRows = list.Count(x => x.IsValid == true);
                 var duplicatedError = list.FirstOrDefault(x => x.DuplicateError != null)?.DuplicateError;
                 var existedError = list.FirstOrDefault(x => x.ExistedError != null)?.ExistedError;
