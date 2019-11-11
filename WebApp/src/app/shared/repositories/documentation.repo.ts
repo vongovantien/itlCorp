@@ -273,4 +273,22 @@ export class DocumentationRepo {
         );
     }
 
+    addShipmentSurcharge(data) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/Add`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    addShipmentSurcharges(data: any[]) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/AddAndUpdate`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
 }

@@ -17,7 +17,7 @@
             <div class="col-md-8">
                 <div class="m--align-right">
                     <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase"
-                        (click)="saveBuyingCharge()">
+                        (click)="saveOBHSurCharge()">
                         <span>
                             <i class="la la-save"></i>
                             <span>
@@ -54,19 +54,38 @@
                             </td>
                             <td>
                                 <div class="form-group col-md-12 dropdown-partner" dropdown
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.partnerName }">
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.receiverName }">
                                     <input type="text" class="dropdown-toggle form-control" dropdownToggle readonly
-                                        [(ngModel)]="charge.partnerName" placeholder="Partner Name">
+                                        [(ngModel)]="charge.receiverName" placeholder="Partner Name">
                                     <div *dropdownMenu class="dropdown-menu dropdown-partner__content">
                                         <div class="d-flex justify-content-end dropdown-partner__header">
                                             <a class="text-primary text-underline m--margin-right-20 pointer"
                                                 *ngFor="let type of partnerType; trackBy: trackByFn"
                                                 [title]="type.displayName"
-                                                (click)="selectPartnerType(type, charge)">{{type.displayName}}</a>
+                                                (click)="selectPartnerTypes(type, charge, 'receiver')">{{type.displayName}}</a>
                                         </div>
                                         <app-combo-grid [headers]="headerPartner" [data]="listPartner"
                                             [fields]="['taxCode','partnerNameEn']" [active]="charge.paymentObjectId"
-                                            (onClick)="onSelectPartner($event, charge)">
+                                            (onClick)="onSelectPayerReceiver($event, charge,'receiver')">
+                                        </app-combo-grid>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group col-md-12 dropdown-partner" dropdown
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.payerName }">
+                                    <input type="text" class="dropdown-toggle form-control" dropdownToggle readonly
+                                        [(ngModel)]="charge.payerName" placeholder="Partner Name">
+                                    <div *dropdownMenu class="dropdown-menu dropdown-partner__content">
+                                        <div class="d-flex justify-content-end dropdown-partner__header">
+                                            <a class="text-primary text-underline m--margin-right-20 pointer"
+                                                *ngFor="let type of partnerType; trackBy: trackByFn"
+                                                [title]="type.displayName"
+                                                (click)="selectPartnerTypes(type, charge, 'receiver')">{{type.displayName}}</a>
+                                        </div>
+                                        <app-combo-grid [headers]="headerPartner" [data]="listPartner"
+                                            [fields]="['taxCode','partnerNameEn']" [active]="charge.payerId"
+                                            (onClick)="onSelectPayerReceiver($event, charge, 'payer')">
                                         </app-combo-grid>
                                     </div>
                                 </div>

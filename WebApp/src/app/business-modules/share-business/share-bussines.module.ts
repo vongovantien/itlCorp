@@ -8,10 +8,16 @@ import { ShareBussinessBuyingChargeComponent } from './components';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { NgxCurrencyModule } from 'ngx-currency';
 import { StoreModule } from '@ngrx/store';
-import { reducers } from './store';
+import { reducers, effects } from './store';
+import { EffectsModule } from '@ngrx/effects';
+import { PipeModule } from 'src/app/shared/pipes/pipe.module';
+import { ShareBussinessSellingChargeComponent } from './components/selling-charge/selling-charge.component';
+import { ShareBussinessOBHChargeComponent } from './components/obh-charge/obh-charge.component';
 
 const COMPONENTS = [
-    ShareBussinessBuyingChargeComponent
+    ShareBussinessBuyingChargeComponent,
+    ShareBussinessSellingChargeComponent,
+    ShareBussinessOBHChargeComponent
 ];
 
 const customCurrencyMaskConfig = {
@@ -37,9 +43,12 @@ const customCurrencyMaskConfig = {
         ModalModule.forRoot(),
         NgxDaterangepickerMd.forRoot(),
         DirectiveModule,
+        PipeModule,
         BsDropdownModule.forRoot(),
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
-        StoreModule.forFeature('share-bussiness', reducers)
+        StoreModule.forFeature('share-bussiness', reducers),
+        EffectsModule.forFeature(effects),
+
     ],
     exports: [
         ...COMPONENTS

@@ -13,6 +13,10 @@ export const shareBussinessState = createFeatureSelector<IShareBussinessState>('
 export const getShareBussinessState = createSelector(shareBussinessState, (state: IShareBussinessState) => state);
 export const getSurchargeState = createSelector(shareBussinessState, (state: IShareBussinessState) => state.surcharge);
 export const getBuyingSurChargeState = createSelector(shareBussinessState, (state: IShareBussinessState) => state.surcharge.buyings);
+export const getSellingSurChargeState = createSelector(shareBussinessState, (state: IShareBussinessState) => state.surcharge.sellings);
+export const getOBHSurChargeState = createSelector(shareBussinessState, (state: IShareBussinessState) => state.surcharge.obhs);
+
+
 
 
 export const reducers: ActionReducerMap<IShareBussinessState> = {

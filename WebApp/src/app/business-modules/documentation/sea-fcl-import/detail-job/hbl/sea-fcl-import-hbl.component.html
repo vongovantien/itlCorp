@@ -86,7 +86,9 @@
                                             </thead>
                                             <tbody class="tbody-group">
                                                 <ng-container *ngIf="!isLoading && !!houseBill.length">
-                                                    <tr (click)="selectHBL(house)"
+                                                    <tr (click)="selectHBL(house)" class="pointer"
+                                                        title="Select House Bill"
+                                                        [class.selected-row]="selectedHbl.id === house.id"
                                                         *ngFor="let house of houseBill | filter : keyword : ['hwbno','customerName','saleManName','notifyParty','finalDestinationPlace','containers','packages','gw','cbm']; let i = index; trackBy: trackByFn">
                                                         <td class="table-actions-col">
                                                             <div class="table-actions" style="width: 70px">
@@ -190,16 +192,55 @@
                                 </div>
                                 <div class="m-portlet__body">
                                     <tabset class="custom-class-tab">
-                                        <tab heading="Buying">
-                                            <buying-charge [containers]="containers" [shipment]="selectedShipment"
-                                                [hbl]="selectedHbl">
-                                            </buying-charge>
+                                        <tab heading="Buying" (selectTab)="onSelectTabSurcharge('BUY')">
+                                            <ng-container *ngIf="selectedTabSurcharge === 'BUY'">
+                                                <ng-container
+                                                    *ngIf="!!selectedShipment && !!selectedHbl && !!containers; else placeholder">
+                                                    <buying-charge [containers]="containers"
+                                                        [shipment]="selectedShipment" [hbl]="selectedHbl">
+                                                    </buying-charge>
+                                                </ng-container>
+                                                <ng-template #placeholder>
+                                                    <div class="no-data">
+                                                        <i class="flaticon-coins"></i>
+                                                        <span class="no-data-text">No records found</span>
+                                                    </div>
+                                                </ng-template>
+                                            </ng-container>
                                         </tab>
-                                        <tab heading="Selling">
+                                        <tab heading="Selling" (selectTab)="onSelectTabSurcharge('SELL')">
+                                            <ng-container *ngIf="selectedTabSurcharge === 'SELL'">
+                                                <ng-container
+                                                    *ngIf="!!selectedShipment && !!selectedHbl && !!containers; else placeholder">
+                                                    <selling-charge [containers]="containers"
+                                                        [shipment]="selectedShipment" [hbl]="selectedHbl">
+                                                    </selling-charge>
+                                                </ng-container>
 
+                                                <ng-template #placeholder>
+                                                    <div class="no-data">
+                                                        <i class="flaticon-coins"></i>
+                                                        <span class="no-data-text">No records found</span>
+                                                    </div>
+                                                </ng-template>
+                                            </ng-container>
                                         </tab>
-                                        <tab heading="OBH">
+                                        <tab heading="OBH" (selectTab)="onSelectTabSurcharge('OBH')">
+                                            <ng-container *ngIf="selectedTabSurcharge === 'OBH'">
+                                                <ng-container
+                                                    *ngIf="!!selectedShipment && !!selectedHbl && !!containers; else placeholder">
+                                                    <obh-charge [containers]="containers" [shipment]="selectedShipment"
+                                                        [hbl]="selectedHbl">
+                                                    </obh-charge>
+                                                </ng-container>
 
+                                                <ng-template #placeholder>
+                                                    <div class="no-data">
+                                                        <i class="flaticon-coins"></i>
+                                                        <span class="no-data-text">No records found</span>
+                                                    </div>
+                                                </ng-template>
+                                            </ng-container>
                                         </tab>
                                     </tabset>
                                 </div>

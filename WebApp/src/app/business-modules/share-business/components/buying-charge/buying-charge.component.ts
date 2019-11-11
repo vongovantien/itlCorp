@@ -1,6 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectorRef } from '@angular/core';
 
-import { CatalogueRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, CsTransactionDetail } from 'src/app/shared/models';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
@@ -12,6 +12,10 @@ import { catchError, takeUntil } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 import { Store } from '@ngrx/store';
+import { formatDate } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
+import { SortService } from 'src/app/shared/services';
+import { SystemConstants } from 'src/constants/system.const';
 
 enum QUANTITY_TYPE {
     GW = 'gw',
@@ -49,37 +53,49 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     selectedQuantityHint: CommonInterface.IValueDisplay = null;
 
     partnerType: CommonInterface.IValueDisplay[];
+
+    TYPE: CommonEnum.SurchargeTypeEnum.BUYING_RATE = CommonEnum.SurchargeTypeEnum.BUYING_RATE;
+
+    isSubmitted: boolean = false;
+    isDuplicateChargeCode: boolean = false;
+    isDuplicateInvoice: boolean = false;
+
+
     constructor(
-        private _catalogueRepo: CatalogueRepo,
-        private _store: Store<fromStore.IShareBussinessState>
+        protected _catalogueRepo: CatalogueRepo,
+        protected _store: Store<fromStore.IShareBussinessState>,
+        protected _documentRepo: DocumentationRepo,
+        protected _toastService: ToastrService,
+        protected _sortService: SortService,
     ) {
         super();
+        this.requestSort = this.sortSurcharge;
     }
 
     ngOnInit(): void {
         this.headers = [
-            { title: 'Partner Name', field: 's', required: true, sortable: true, width: 200 },
-            { title: 'Charge Name', field: 's', required: true, sortable: true, width: 200 },
-            { title: 'Quantity', field: 's', required: true, sortable: true, width: 200 },
-            { title: 'Unit', field: 's', required: true, sortable: true },
-            { title: 'Unit Price', field: '', required: true, sortable: true },
-            { title: 'Currency', field: '', required: true, sortable: true },
-            { title: 'VAT', field: '', required: true, sortable: true },
-            { title: 'Total', field: '', sortable: true },
-            { title: 'Note', field: '', sortable: true },
-            { title: 'Invoice No', field: '', sortable: true },
-            { title: 'Series No', field: '', sortable: true },
-            { title: 'Invoice Date', field: '', sortable: true },
-            { title: 'Exchange Rate Date', field: '', sortable: true },
-            { title: 'KB', field: '', sortable: true },
-            { title: 'SOA', field: '', sortable: true },
-            { title: 'Credit/Debit Note', field: '', sortable: true },
-            { title: 'Settle Payment', field: '', sortable: true },
-            { title: 'Voucher ID', field: '', sortable: true },
-            { title: 'Voucher ID Date', field: '', sortable: true },
-            { title: 'Voucher IDRE', field: '', sortable: true },
-            { title: 'Voucher IDRE Date', field: '', sortable: true },
-            { title: 'Final Exchange Rate', field: '', sortable: true },
+            { title: 'Partner Name', field: 'partnerName', required: true, sortable: true, width: 200 },
+            { title: 'Charge Name', field: 'chargeId', required: true, sortable: true, width: 400 },
+            { title: 'Quantity', field: 'quantity', required: true, sortable: true, width: 200 },
+            { title: 'Unit', field: 'unitId', required: true, sortable: true },
+            { title: 'Unit Price', field: 'unitPrice', required: true, sortable: true },
+            { title: 'Currency', field: 'currencyId', required: true, sortable: true },
+            { title: 'VAT', field: 'vatrate', required: true, sortable: true },
+            { title: 'Total', field: 'total', sortable: true },
+            { title: 'Note', field: 'notes', sortable: true },
+            { title: 'Invoice No', field: 'invoiceNo', sortable: true },
+            { title: 'Series No', field: 'seriesNo', sortable: true },
+            { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
+            { title: 'Exchange Rate Date', field: 'exchangeDate', sortable: true },
+            { title: 'KB', field: 'kickBack', sortable: true },
+            { title: 'SOA', field: 'soano', sortable: true },
+            { title: 'Credit/Debit Note', field: 'cdno', sortable: true },
+            { title: 'Settle Payment', field: 'settlementCode', sortable: true },
+            { title: 'Voucher ID', field: 'voucherId', sortable: true },
+            { title: 'Voucher ID Date', field: 'voucherIddate', sortable: true },
+            { title: 'Voucher IDRE', field: 'voucherIdre', sortable: true },
+            { title: 'Voucher IDRE Date', field: 'voucherIdredate', sortable: true },
+            { title: 'Final Exchange Rate', field: 'finalExchangeRate', sortable: true },
         ];
 
         this.headerPartner = [
@@ -100,7 +116,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             { displayName: 'G.W', value: QUANTITY_TYPE.GW },
             { displayName: 'C.W', value: QUANTITY_TYPE.CW },
             { displayName: 'CBM', value: QUANTITY_TYPE.CBM },
-            { displayName: 'Package', value: QUANTITY_TYPE.PACKAGE },
+            { displayName: 'P.K', value: QUANTITY_TYPE.PACKAGE },
             { displayName: 'Cont', value: QUANTITY_TYPE.CONT },
             { displayName: 'N.W', value: QUANTITY_TYPE.NW },
         ];
@@ -118,6 +134,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (buyings: CsShipmentSurcharge[]) => {
                     this.charges = buyings;
+                    console.log("get buying charge from store", this.charges);
                 }
             );
     }
@@ -140,7 +157,14 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             );
     }
 
+    sortSurcharge() {
+        this.charges = this._sortService.sort(this.charges, this.sort, this.order);
+    }
+
     onSelectDataFormInfo(data: Charge | any, type: string, chargeItem: CsShipmentSurcharge) {
+
+        [this.isDuplicateChargeCode, this.isDuplicateInvoice] = [false, false];
+
         switch (type) {
             case 'charge':
                 chargeItem.chargeId = data.id;
@@ -151,8 +175,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     chargeItem.unitId = this.listUnits.filter(unit => unit.id === data.unitId)[0].id;
                     chargeItem.unitPrice = data.unitPrice;
                 }
-
-                console.log(data);
                 break;
 
             default:
@@ -161,21 +183,30 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     addCharge() {
+        this.isSubmitted = false;
         const newSurCharge: CsShipmentSurcharge = new CsShipmentSurcharge();
         newSurCharge.currencyId = "USD"; // * Set default.
         newSurCharge.quantity = 0;
         newSurCharge.quantityType = null;
         newSurCharge.exchangeDate = { startDate: new Date(), endDate: new Date() };
-
+        newSurCharge.invoiceDate = null;
         // this.charges.push(newSurCharge);
 
         this._store.dispatch(new fromStore.AddBuyingSurchargeAction(newSurCharge));
     }
 
+    duplicate(index: number) {
+        this.isSubmitted = false;
+        const newCharge = this.charges[index];
+        newCharge.id = SystemConstants.EMPTY_GUID;
+        const newSurCharge: CsShipmentSurcharge = new CsShipmentSurcharge(newCharge);
+
+        this._store.dispatch(new fromStore.AddBuyingSurchargeAction(newSurCharge));
+
+    }
+
     deleteCharge(index: number) {
         this._store.dispatch(new fromStore.DeleteBuyingSurchargeAction(index));
-
-        // this.charges.splice(index, 1);
     }
 
     onChangeVat(vat: number, chargeItem: CsShipmentSurcharge) {
@@ -191,13 +222,52 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     saveBuyingCharge() {
-        console.log(this.charges);
-
         // * Update data 
-        for (const charge of this.charges) {
-
+        this.isSubmitted = true;
+        if (!this.checkValidate()) {
+            return;
         }
-        this._store.dispatch(new fromStore.SaveBuyingSurchargeAction(this.charges));
+        if (this.utility.checkDuplicateInObject("chargeId", this.charges)) {
+            this.isDuplicateChargeCode = true;
+            return;
+        } else {
+            this.isDuplicateChargeCode = false;
+        }
+        if (this.utility.checkDuplicateInObject("invoiceNo", this.charges)) {
+            this.isDuplicateInvoice = true;
+            return;
+        } else {
+            this.isDuplicateInvoice = false;
+        }
+
+        for (const charge of this.charges) {
+            if (!!charge.exchangeDate && !!charge.exchangeDate.startDate) {
+                charge.exchangeDate = formatDate(charge.exchangeDate.startDate, 'yyyy-MM-dd', 'en');
+            }
+
+            if (!!charge.invoiceDate && !!charge.invoiceDate.startDate) {
+                charge.invoiceDate = formatDate(charge.invoiceDate.startDate, 'yyyy-MM-dd', 'en');
+            } else {
+                charge.invoiceDate = null;
+            }
+
+            // Update HBL ID,Type
+            charge.hblid = this.hbl.id;
+            charge.type = this.TYPE;
+        }
+
+        this._documentRepo.addShipmentSurcharges(this.charges)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        // this._store.dispatch(new fromStore.SaveBuyingSurchargeAction(this.charges));
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                }
+            );
     }
 
     onChangeQuantityHint(hintType: string, chargeItem: CsShipmentSurcharge) {
@@ -222,7 +292,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
         }
 
-        // * Update 
+        // * Update quantityType, total.
         chargeItem.quantityType = hintType;
         chargeItem.total = this.utility.calculateTotalAmountWithVat(chargeItem.vatrate, chargeItem.quantity, chargeItem.unitPrice);
     }
@@ -260,5 +330,29 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             default:
                 break;
         }
+
     }
+
+    checkValidate() {
+        let valid: boolean = true;
+        for (const charge of this.charges) {
+            if (
+                !charge.paymentObjectId
+                || !charge.chargeId
+                || !charge.chargeCode
+                || !charge.partnerName
+                || charge.unitPrice === null
+                || charge.unitPrice < 0
+                || charge.vatrate === null
+                || charge.vatrate > 100
+            ) {
+                valid = false;
+                break;
+            }
+        }
+
+        return valid;
+    }
+
+
 }

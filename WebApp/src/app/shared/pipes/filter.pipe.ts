@@ -1,20 +1,26 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({ name: 'filter', pure: true })
+@Pipe({ name: 'filter' })
 export class FilterPipe implements PipeTransform {
-    transform(sources: any[], args: RegExp, keys: string[]): any {
+    transform<T>(sources: T[], args: RegExp, keys: string[]): any {
         const searchText = new RegExp(args, 'ig');
         if (!!sources.length && !!keys.length) {
-            return sources.filter((item: any) => {
+            const filtered = sources.filter((item: T) => {
+                let match = false;
                 for (const key of keys) {
-                    if (item.hasOwnProperty(key) && !!item[key]) {
-                        if (item[key].toString().search(searchText) === -1) {
+                    if (item.hasOwnProperty(key)) {
+                        if ((item[key] || '').toString().search(searchText) === -1) {
                             continue;
                         }
-                        return item[key].toString().search(searchText) !== -1;
+                        if ((item[key] || '').toString().search(searchText) !== -1) {
+                            match = true;
+                            break;
+                        }
                     }
                 }
+                return match;
             });
+            return filtered;
         } return sources;
     }
 }
