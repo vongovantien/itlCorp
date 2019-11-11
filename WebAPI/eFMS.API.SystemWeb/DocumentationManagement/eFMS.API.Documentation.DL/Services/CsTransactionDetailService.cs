@@ -253,7 +253,7 @@ namespace eFMS.API.Documentation.DL.Services
                          from pod in portDetail.DefaultIfEmpty()
                          join fwd in ((eFMSDataContext)DataContext.DC).CatPartner on detail.ForwardingAgentId equals fwd.Id into forwarding
                          from f in forwarding.DefaultIfEmpty()
-                         join saleman in ((eFMSDataContext)DataContext.DC).SysUser on detail.SaleManId equals saleman.Id into prods
+                         join saleman in ((eFMSDataContext)DataContext.DC).CatSaleman on detail.SaleManId equals saleman.Id.ToString() into prods
                          from x in prods.DefaultIfEmpty()
                          select new { detail, customer = y, notiParty = noti, saleman = x, agent = f, pod });
             if (query == null) return null;
@@ -262,7 +262,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var detail = mapper.Map<CsTransactionDetailModel>(item.detail);
                 detail.CustomerName = item.customer?.PartnerNameEn;
                 detail.CustomerNameVn = item.customer?.PartnerNameVn;
-                detail.SaleManName = item.saleman?.Username;
+                detail.SaleManName = item.saleman?.SaleManId;
                 detail.NotifyParty = item.notiParty?.PartnerNameEn;
                 detail.ForwardingAgentName = item.agent?.PartnerNameEn;
                 detail.PODName = item.pod?.NameEn;
@@ -320,12 +320,12 @@ namespace eFMS.API.Documentation.DL.Services
                          select new { detail, tran, cus, sale });
             if (criteria.All == null)
             {
-                query = query.Where(x => criteria.JobId != Guid.Empty && criteria.JobId != null ? x.detail.JobId == criteria.JobId : true
-                                      && (x.tran.Mawb.IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                query = query.Where(x => x.detail.JobId == criteria.JobId || criteria.JobId == null
+                                    && (x.tran.Mawb.IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && (x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && (x.cus.PartnerNameEn.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                    && (x.tran.Etd >= criteria.FromDate || criteria.FromDate == null)
-                                    && (x.tran.Etd <= criteria.ToDate || criteria.ToDate == null)
+                                    && (x.detail.Eta >= criteria.FromDate || criteria.FromDate == null)
+                                    && (x.detail.Eta <= criteria.ToDate || criteria.ToDate == null)
                                     && (x.sale.SaleManId.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     );
             }
@@ -339,21 +339,11 @@ namespace eFMS.API.Documentation.DL.Services
                                       && ((x.tran.Etd ?? null) >= (criteria.FromDate ?? null) && (x.tran.Etd ?? null) <= (criteria.ToDate ?? null))
                                     );
             }
-            //List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
-            //foreach (var item in query)
-            //{
-            //    var detail = mapper.Map<CsTransactionDetailModel>(item.detail);
-            //    detail.CustomerName = item.cus?.PartnerNameEn;
-            //    detail.SaleManName = item.sale?.Username;
-            //    detail.Etd = item.tran.Etd;
-            //    detail.Mawb = item.tran.Mawb;
-            //    results.Add(detail);
-            //}
             var res = from detail in query.Select(s => s.detail)
                       join tran in csTransactionRepo.Get() on detail.JobId equals tran.Id
                       join customer in catPartnerRepo.Get() on detail.CustomerId equals customer.Id into customers
                       from cus in customers.DefaultIfEmpty()
-                      join saleman in sysUserRepo.Get() on detail.SaleManId equals saleman.Id into salemans
+                      join saleman in catSalemanRepo.Get() on detail.SaleManId equals saleman.Id.ToString() into salemans
                       from sale in salemans.DefaultIfEmpty()
                       join notify in catPartnerRepo.Get() on detail.NotifyPartyId equals notify.Id into notifys
                       from notify in notifys.DefaultIfEmpty()
@@ -361,13 +351,30 @@ namespace eFMS.API.Documentation.DL.Services
                           Id = detail.Id,
                           JobId = detail.JobId,
                           Hwbno = detail.Hwbno,
+                          Mawb = detail.Mawb,
                           SaleManId = detail.SaleManId,
-                          SaleManName = sale.Username,
+                          SaleManName = sale.SaleManId,
                           CustomerId =  detail.CustomerId,
                           CustomerName = cus.ShortName,
                           NotifyPartyId = detail.NotifyPartyId,
                           NotifyParty = notify.ShortName,
-                          FinalDestinationPlace = detail.FinalDestinationPlace
+                          FinalDestinationPlace = detail.FinalDestinationPlace, 
+                          Eta = detail.Eta, 
+                          Etd = detail.Etd,
+                          ConsigneeId = detail.ConsigneeId, 
+                          ConsigneeDescription = detail.ConsigneeDescription,
+                          ShipperDescription = detail.ShipperDescription,
+                          ShipperId = detail.ShipperId,
+                          NotifyPartyDescription = detail.NotifyPartyDescription,
+                          Pod = detail.Pod,
+                          Pol = detail.Pol, 
+                          AlsoNotifyPartyId = detail.AlsoNotifyPartyId,
+                          AlsoNotifyPartyDescription = detail.AlsoNotifyPartyDescription,
+                          Hbltype = detail.Hbltype, 
+                          ReferenceNo = detail.ReferenceNo,
+                          ColoaderId = detail.ColoaderId
+                         
+                          
                       };
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
             results = res.ToList();

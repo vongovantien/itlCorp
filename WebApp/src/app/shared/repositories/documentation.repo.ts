@@ -190,6 +190,15 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+    getListHblPaging(page?: number, size?: number, body = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/Paging`, body, {
+            page: '' + page,
+            size: '' + size
+        }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 
     getListHourseBill(data: any = {}) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/QueryData`, data)

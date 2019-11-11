@@ -5,7 +5,7 @@
                 <label class="form-control-label" for="">
                     Search text
                 </label>
-                <input type="text" class="form-control m-input m-input--square" autocomplete="nope" name=""
+                <input type="text" class="form-control m-input m-input--square" formControlName="searchText"
                     placeholder="Search text">
             </div>
         </div>
@@ -36,7 +36,8 @@
         <div class="row">
             <div class="col-lg-6"></div>
             <div class="col-lg-6 m--align-right">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                <button (click)="searchHbl()" type="button"
+                    class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
                     <span>
                         <i class="la la-search"></i>
                         <span>
@@ -44,7 +45,8 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                <button type="button" (click)="resetSearch()"
+                    class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
                     <span>
                         <i class="la la-refresh"></i>
                         <span>
