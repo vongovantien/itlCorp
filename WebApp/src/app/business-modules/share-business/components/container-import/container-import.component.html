@@ -3,7 +3,7 @@
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content m-form m-form--state">
             <div class="modal-header">
-                <h5 class="modal-title">List of container</h5>
+                <h5 class="modal-title">Import container</h5>
                 <button type="button" class="close" aria-label="Close" (click)="close()">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -72,8 +72,6 @@
                             <!--end::Form-->
                         </div>
                     </div>
-                    <!--end::m-portlet-->
-                    <!--begin:: m-portlet-->
                     <div class="m-portlet" style="position: relative">
                         <div class="m-portlet__body">
                             <!--begin: Datatable of trucking-table -->
@@ -176,6 +174,31 @@
                                 </table>
                             </div>
                             <!--end: Datatable of trucking-table -->
+                            <div class="pagination-nav ">
+                                <div class="row">
+                                    <div *ngIf="!!data" class="col-sm-6">
+                                        <div class="tatable__pager-size">
+                                            <div class="select-box">
+                                                <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
+                                                    name="pagesize">
+                                                    <ng-container
+                                                        *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
+                                                        <option [ngValue]="item">{{item}} line / screen</option>
+                                                    </ng-container>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6" *ngIf="totalItems > pageSize">
+                                        <div class="float-right">
+                                            <pagination [boundaryLinks]="true" [totalItems]="totalItems"
+                                                [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
+                                                [(ngModel)]="page">
+                                            </pagination>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -241,7 +241,7 @@ namespace eFMS.API.Documentation.DL.Services
                 return new HandleState(ex.Message);
             }
         }
-        public List<CsMawbcontainerImportModel> CheckValidContainerImport(List<CsMawbcontainerImportModel> list)
+        public List<CsMawbcontainerImportModel> CheckValidContainerImport(List<CsMawbcontainerImportModel> list, Guid? mblid, Guid? hblid)
         {
             var units = catUnitRepository.Get().ToList();
             var commodities = catCommodityRepository.Get();
@@ -318,8 +318,16 @@ namespace eFMS.API.Documentation.DL.Services
                                     cont.PackageTypeNameError = cont.PackageTypeName;
                                 });
                             }
-                            var existedItems = containerShipments.Where(cont => cont.ContainerTypeId == item.ContainerTypeId && cont.Quantity == item.Quantity && cont.ContainerNo == item.ContainerNo && cont.PackageTypeId == item.PackageTypeId && cont.Mblid == item.Mblid);
-                            if (existedItems.Count() > 0)
+                            IEnumerable<CsMawbcontainer> existedItems = null;
+                            if (mblid != null)
+                            {
+                                existedItems = containerShipments.Where(cont => cont.ContainerTypeId == item.ContainerTypeId && cont.Quantity == item.Quantity && cont.ContainerNo == item.ContainerNo && cont.PackageTypeId == item.PackageTypeId && cont.Mblid == mblid);
+                            }
+                            else
+                            {
+                                existedItems = containerShipments.Where(cont => cont.ContainerTypeId == item.ContainerTypeId && cont.Quantity == item.Quantity && cont.ContainerNo == item.ContainerNo && cont.PackageTypeId == item.PackageTypeId && cont.Mblid == hblid);
+                            }
+                            if (existedItems.Any())
                             {
                                 item.IsValid = false;
                                 item.ExistedError = stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_EXISTED, item.ContainerTypeName, item.Quantity.ToString(), item.ContainerNo, item.PackageTypeName].Value;

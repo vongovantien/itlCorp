@@ -214,7 +214,7 @@ export class DocumentationRepo {
     }
 
     createHousebill(body: any = {}) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/addNew`, body)
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/addNew`, body);
     }
 
     checkMasterBillAllowToDelete(id: string) {
@@ -289,6 +289,10 @@ export class DocumentationRepo {
                 return res;
             })
         );
+    }
+
+    upLoadContainerFile(files: any, id: string, isHouseBill: boolean) {
+        return this._api.postFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsMawbcontainer/UploadFile`, files, "uploadedFile", { id: id, isHouseBill: isHouseBill });
     }
 
 }
