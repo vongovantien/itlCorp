@@ -26,6 +26,8 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<SysUser> sysUserRepo;
         readonly IContextBase<CatUnit> catUnitRepo;
         readonly IContextBase<CatCommodity> catCommodityRepo;
+        readonly IContextBase<CatSaleman> catSalemanRepo;
+
         readonly IContextBase<CsShipmentSurcharge> surchareRepository;
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
@@ -37,6 +39,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysUser> sysUser,
             IContextBase<CatUnit> catUnit,
             IContextBase<CatCommodity> catCommodity,
+            IContextBase<CatSaleman> catSaleman,
             IContextBase<CsShipmentSurcharge> surchareRepo) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
@@ -47,6 +50,7 @@ namespace eFMS.API.Documentation.DL.Services
             catUnitRepo = catUnit;
             catCommodityRepo = catCommodity;
             surchareRepository = surchareRepo;
+            catSalemanRepo = catSaleman;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -311,7 +315,7 @@ namespace eFMS.API.Documentation.DL.Services
                          join tran in csTransactionRepo.Get() on detail.JobId equals tran.Id
                          join customer in catPartnerRepo.Get() on detail.CustomerId equals customer.Id into customers
                          from cus in customers.DefaultIfEmpty()
-                         join saleman in sysUserRepo.Get() on detail.SaleManId equals saleman.Id into salemans
+                         join saleman in catSalemanRepo.Get() on detail.SaleManId equals saleman.Id.ToString() into salemans
                          from sale in salemans.DefaultIfEmpty()
                          select new { detail, tran, cus, sale });
             if (criteria.All == null)
@@ -322,7 +326,7 @@ namespace eFMS.API.Documentation.DL.Services
                                     && (x.cus.PartnerNameEn.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && (x.tran.Etd >= criteria.FromDate || criteria.FromDate == null)
                                     && (x.tran.Etd <= criteria.ToDate || criteria.ToDate == null)
-                                    && (x.sale.Username.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && (x.sale.SaleManId.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     );
             }
             else
@@ -331,7 +335,7 @@ namespace eFMS.API.Documentation.DL.Services
                                       || (x.tran.Mawb.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                                       || (x.detail.Hwbno.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                       || (x.cus.PartnerNameEn.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                      || (x.sale.Username.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0))
+                                      || (x.sale.SaleManId.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0))
                                       && ((x.tran.Etd ?? null) >= (criteria.FromDate ?? null) && (x.tran.Etd ?? null) <= (criteria.ToDate ?? null))
                                     );
             }

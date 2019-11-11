@@ -14,18 +14,23 @@
                 <label class="form-control-label" for="">
                     Select filter
                 </label>
-
+                <select class="form-control" formControlName="filterType">
+                    <option *ngFor="let type of filterTypes" [ngValue]="type">{{type.title}}</option>
+                </select>
             </div>
         </div>
         <div class="col-lg-4">
-            <div class="form-group">
+            <div class="form-group form-control-serviceDateFromTo daterange-rtl">
                 <label class="form-control-label" for="">
-                    Shipment date: From - To
+                    Service Date From - To
                 </label>
-
+                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd [autoApply]="true"
+                    [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [ranges]="ranges" [maxDate]="maxDate"
+                    [alwaysShowCalendars]="true" formControlName="serviceDate" name="daterange"
+                    placeholder="From date - to date" readonly />
             </div>
-
         </div>
+
     </div>
     <div class="form-actions">
         <div class="row">
