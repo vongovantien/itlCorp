@@ -8,9 +8,11 @@
                     <span> Save </span>
                 </span>
             </button> -->
+            <app-default-button (click)="showImportPopup()" [buttonSetting]="importButtonSetting"></app-default-button>
 
             <app-default-button (click)="showCreatePpoup()" [buttonSetting]="saveButtonSetting"></app-default-button>
             <app-default-button (click)="combackToHBLList()" [buttonSetting]="cancelButtonSetting"></app-default-button>
+
         </div>
 
     </app-sub-header>
@@ -36,3 +38,4 @@
 <confirm-popup [body]="'You are about to create a new  HBL, are you sure all entered details are correct?'"
     [labelCancel]="'No'" (onSubmit)="oncreate()">
 </confirm-popup>
+<popup-import-house-bill-detail (onImport)="onImport($event)"> </popup-import-house-bill-detail>

@@ -11,6 +11,9 @@ import { FormAddHouseBillComponent } from './components/form-add-house-bill/form
 import { FCLImportShareModule } from '../../share-fcl-import.module';
 import { DetailHouseBillComponent } from './detail/detail-house-bill.component';
 import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
+import { ImportHouseBillDetailComponent } from './popup/import-house-bill-detail/import-house-bill-detail.component';
+import { SelectModule } from 'ng2-select';
+import { FormSearchHouseBillComponent } from './components/form-search-house-bill/form-search-house-bill.component';
 
 const routing: Routes = [
     {
@@ -32,7 +35,9 @@ const routing: Routes = [
         SeaFCLImportHBLComponent,
         CreateHouseBillComponent,
         FormAddHouseBillComponent,
-        DetailHouseBillComponent
+        DetailHouseBillComponent,
+        ImportHouseBillDetailComponent,
+        FormSearchHouseBillComponent
     ],
     imports: [
         CommonModule,
@@ -45,6 +50,9 @@ const routing: Routes = [
         NgxDaterangepickerMd,
         FCLImportShareModule,
         PaginationModule.forRoot(),
+        ModalModule.forRoot(),
+        SelectModule
+
     ],
     exports: [],
     providers: [],
