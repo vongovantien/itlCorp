@@ -71,6 +71,8 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                 this.id = jobId;
                 this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(jobId));
                 this._store.dispatch(new fromStore.GetContainerAction({ mblid: jobId }));
+                this._store.dispatch(new fromStore.SeaFCLImportGetProfitAction(jobId));
+
 
                 this.getDetailSeaFCLImport();
                 this.getListContainer();
@@ -96,7 +98,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                     this.shipmentGoodSummaryComponent.totalChargeWeight = this.fclImportDetail.chargeWeight;
                     this.shipmentGoodSummaryComponent.totalCBM = this.fclImportDetail.cbm;
 
-                    console.log("detail sea fcl import", this.fclImportDetail);
+                    // console.log("detail sea fcl import", this.fclImportDetail);
 
                     // setTimeout(() => {
                     this.updateForm();

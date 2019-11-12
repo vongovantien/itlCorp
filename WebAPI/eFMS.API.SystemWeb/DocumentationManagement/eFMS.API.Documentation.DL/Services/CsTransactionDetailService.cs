@@ -29,6 +29,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatCommodity> catCommodityRepo;
         readonly IContextBase<CatSaleman> catSalemanRepo;
         readonly ICsMawbcontainerService containerService;
+        readonly IContextBase<CsTransactionDetail> csTransactionDetailRepo;
 
         readonly IContextBase<CsShipmentSurcharge> surchareRepository;
 
@@ -42,8 +43,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatUnit> catUnit,
             IContextBase<CatCommodity> catCommodity,
             IContextBase<CatSaleman> catSaleman,
-            IContextBase<CsShipmentSurcharge> surchareRepo,
-            ICsMawbcontainerService contService) : base(repository, mapper)
+            IContextBase<CsShipmentSurcharge> surchareRepo , IContextBase<CsTransactionDetail> csTransactiondetail,
+ICsMawbcontainerService contService) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
             csMawbcontainerRepo = csMawbcontainer;
@@ -55,6 +56,7 @@ namespace eFMS.API.Documentation.DL.Services
             surchareRepository = surchareRepo;
             catSalemanRepo = catSaleman;
             containerService = contService;
+            csTransactionDetailRepo = csTransactiondetail;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -275,42 +277,70 @@ namespace eFMS.API.Documentation.DL.Services
             return results.AsQueryable();
         }
 
-        public IQueryable<CsTransactionDetailModel> QueryById(CsTransactionDetailCriteria criteria)
+        //public IQueryable<CsTransactionDetailModel> QueryById(CsTransactionDetailCriteria criteria)
+        //{
+        //    List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
+        //    var details = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.Id == criteria.Id);
+        //    var query = (from detail in details
+        //                 join customer in ((eFMSDataContext)DataContext.DC).CatPartner on detail.CustomerId equals customer.Id into detailCustomers
+        //                 from y in detailCustomers.DefaultIfEmpty()
+        //                 join noti in ((eFMSDataContext)DataContext.DC).CatPartner on detail.NotifyPartyId equals noti.Id into detailNotis
+        //                 from noti in detailNotis.DefaultIfEmpty()
+        //                 join port in ((eFMSDataContext)DataContext.DC).CatPlace on detail.Pod equals port.Id into portDetail
+        //                 from pod in portDetail.DefaultIfEmpty()
+        //                 join fwd in ((eFMSDataContext)DataContext.DC).CatPartner on detail.ForwardingAgentId equals fwd.Id into forwarding
+        //                 from f in forwarding.DefaultIfEmpty()
+        //                 join saleman in ((eFMSDataContext)DataContext.DC).CatSaleman on detail.SaleManId equals saleman.Id.ToString() into prods
+        //                 from x in prods.DefaultIfEmpty()
+        //                 select new { detail, customer = y, notiParty = noti, saleman = x, agent = f, pod });
+        //    if (query == null) return null;
+        //    foreach (var item in query)
+        //    {
+        //        var detail = mapper.Map<CsTransactionDetailModel>(item.detail);
+        //        detail.CustomerName = item.customer?.PartnerNameEn;
+        //        detail.CustomerNameVn = item.customer?.PartnerNameVn;
+        //        detail.SaleManId = item.saleman?.Id.ToString();
+        //        detail.NotifyParty = item.notiParty?.PartnerNameEn;
+        //        detail.ForwardingAgentName = item.agent?.PartnerNameEn;
+        //        detail.PODName = item.pod?.NameEn;
+        //        results.Add(detail);
+        //    }
+        //    return results.AsQueryable();
+        //}
+
+        public CsTransactionDetailModel GetById(Guid Id)
         {
-            List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
-            var details = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.Id == criteria.Id);
-            var query = (from detail in details
-                         join customer in ((eFMSDataContext)DataContext.DC).CatPartner on detail.CustomerId equals customer.Id into detailCustomers
-                         from y in detailCustomers.DefaultIfEmpty()
-                         join noti in ((eFMSDataContext)DataContext.DC).CatPartner on detail.NotifyPartyId equals noti.Id into detailNotis
-                         from noti in detailNotis.DefaultIfEmpty()
-                         join port in ((eFMSDataContext)DataContext.DC).CatPlace on detail.Pod equals port.Id into portDetail
-                         from pod in portDetail.DefaultIfEmpty()
-                         join fwd in ((eFMSDataContext)DataContext.DC).CatPartner on detail.ForwardingAgentId equals fwd.Id into forwarding
-                         from f in forwarding.DefaultIfEmpty()
-                         join saleman in ((eFMSDataContext)DataContext.DC).CatSaleman on detail.SaleManId equals saleman.Id.ToString() into prods
-                         from x in prods.DefaultIfEmpty()
-                         select new { detail, customer = y, notiParty = noti, saleman = x, agent = f, pod });
-            if (query == null) return null;
-            foreach (var item in query)
+            try
             {
-                var detail = mapper.Map<CsTransactionDetailModel>(item.detail);
-                detail.CustomerName = item.customer?.PartnerNameEn;
-                detail.CustomerNameVn = item.customer?.PartnerNameVn;
-                detail.SaleManId = item.saleman?.Id.ToString();
-                detail.NotifyParty = item.notiParty?.PartnerNameEn;
-                detail.ForwardingAgentName = item.agent?.PartnerNameEn;
-                detail.PODName = item.pod?.NameEn;
-                results.Add(detail);
+                var queryDetail = csTransactionDetailRepo.Get(x => x.Id == Id).FirstOrDefault();
+                var detail = mapper.Map<CsTransactionDetailModel>(queryDetail);
+                if(detail != null)
+                {
+                    var resultPartner = catPartnerRepo.Get(x => x.Id == detail.CustomerId).FirstOrDefault();
+                    var resultNoti = catPartnerRepo.Get(x => x.Id == detail.NotifyPartyId).FirstOrDefault();
+                    var resultSaleman = catSalemanRepo.Get(x => x.Id.ToString() == detail.SaleManId).FirstOrDefault();
+                    detail.CustomerName = resultPartner?.PartnerNameEn;
+                    detail.CustomerNameVn = resultPartner?.PartnerNameVn;
+                    detail.SaleManId = resultSaleman?.Id.ToString();
+                    detail.NotifyParty = resultNoti?.PartnerNameEn;
+                    return detail;
             }
-            return results.AsQueryable();
+        }
+            catch (Exception ex)
+            {
+
+        }
+            return null;
+
         }
 
-        public CsTransactionDetailModel GetById(CsTransactionDetailCriteria criteria)
-        {
-            var results = QueryById(criteria).ToList();
-            return results.FirstOrDefault();
-        }
+
+
+        //public CsTransactionDetailModel GetById(CsTransactionDetailCriteria criteria)
+        //{
+        //    var result = QueryById(criteria).ToList();
+        //    return results.FirstOrDefault();
+        //}
 
         #region -- LIST & PAGING HOUSEBILLS --
         public List<CsTransactionDetailModel> Query(CsTransactionDetailCriteria criteria)
@@ -362,23 +392,26 @@ namespace eFMS.API.Documentation.DL.Services
                           CustomerName = cus.ShortName,
                           NotifyPartyId = detail.NotifyPartyId,
                           NotifyParty = notify.ShortName,
-                          FinalDestinationPlace = detail.FinalDestinationPlace, 
-                          Eta = detail.Eta, 
+                          FinalDestinationPlace = detail.FinalDestinationPlace,
+                          Eta = detail.Eta,
                           Etd = detail.Etd,
-                          ConsigneeId = detail.ConsigneeId, 
+                          ConsigneeId = detail.ConsigneeId,
                           ConsigneeDescription = detail.ConsigneeDescription,
                           ShipperDescription = detail.ShipperDescription,
                           ShipperId = detail.ShipperId,
                           NotifyPartyDescription = detail.NotifyPartyDescription,
                           Pod = detail.Pod,
-                          Pol = detail.Pol, 
+                          Pol = detail.Pol,
                           AlsoNotifyPartyId = detail.AlsoNotifyPartyId,
                           AlsoNotifyPartyDescription = detail.AlsoNotifyPartyDescription,
-                          Hbltype = detail.Hbltype, 
+                          Hbltype = detail.Hbltype,
                           ReferenceNo = detail.ReferenceNo,
-                          ColoaderId = detail.ColoaderId
-                         
-                          
+                          ColoaderId = detail.ColoaderId,
+                          LocalVoyNo = detail.LocalVoyNo,
+                          LocalVessel = detail.LocalVessel,
+                          OceanVessel = detail.OceanVessel, 
+                          OceanVoyNo = detail.OceanVoyNo,
+                          OriginBlnumber = detail.OriginBlnumber 
                       };
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
             results = res.ToList();

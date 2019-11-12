@@ -49,8 +49,8 @@ export class CreateHouseBillComponent extends AppForm {
     }
     ngOnInit() {
         this._activedRoute.params.subscribe((param: Params) => {
-            if (param.hblId) {
-                this.jobId = param.hblId;
+            if (param.id) {
+                this.jobId = param.id;
             }
         });
         this._actionStoreSubject
@@ -123,7 +123,14 @@ export class CreateHouseBillComponent extends AppForm {
             this.formHouseBill.shipperDescription.setValue(this.selectedHbl.shipperDescription);
             this.formHouseBill.notifyPartyDescription.setValue(this.selectedHbl.notifyPartyDescription);
             this.formHouseBill.referenceNo.setValue(this.selectedHbl.referenceNo);
+            this.formHouseBill.localVessel.setValue(this.selectedHbl.localVessel);
+            this.formHouseBill.localVoyNo.setValue(this.selectedHbl.localVoyNo);
+            this.formHouseBill.oceanVessel.setValue(this.selectedHbl.oceanVessel);
+            this.formHouseBill.oceanVoyNo.setValue(this.selectedHbl.oceanVoyNo);
 
+
+
+            this.formHouseBill.originBLNumber.setValue(this.formHouseBill.numberOfOrigins.filter(i => i.value === this.selectedHbl.originBlnumber)[0]);
             this.formHouseBill.alsonotifyPartyDescription.setValue(this.selectedHbl.alsoNotifyPartyDescription);
             this.formHouseBill.selectedCustomer = { field: 'id', value: this.selectedHbl.customerId };
             this.formHouseBill.selectedSaleman = { field: 'id', value: this.selectedHbl.saleManId };
@@ -180,15 +187,15 @@ export class CreateHouseBillComponent extends AppForm {
             mawb: this.formHouseBill.mtBill.value,
             saleManId: !!this.formHouseBill.selectedSaleman.value ? this.formHouseBill.selectedSaleman.value : null,
             shipperId: !!this.formHouseBill.selectedShipper.value ? this.formHouseBill.selectedShipper.value : null,
-            shipperDescription: this.formHouseBill.shipperdescriptionModel,
+            shipperDescription: this.formHouseBill.shipperdescriptionModel !== undefined ? this.formHouseBill.shipperdescriptionModel : this.formHouseBill.shipperDescription.value,
             consigneeId: this.formHouseBill.selectedConsignee.value,
-            consigneeDescription: this.formHouseBill.consigneedescriptionModel,
+            consigneeDescription: this.formHouseBill.consigneedescriptionModel !== undefined ? this.formHouseBill.consigneedescriptionModel : this.formHouseBill.consigneeDescription.value,
             notifyPartyId: !!this.formHouseBill.selectedNotifyParty.value ? this.formHouseBill.selectedNotifyParty.value : null,
-            notifyPartyDescription: this.formHouseBill.notifyPartyModel,
+            notifyPartyDescription: this.formHouseBill.notifyPartyModel !== undefined ? this.formHouseBill.notifyPartyModel : this.formHouseBill.notifyPartyDescription.value,
             alsoNotifyPartyId: !!this.formHouseBill.selectedAlsoNotifyParty.value ? this.formHouseBill.selectedAlsoNotifyParty.value : null,
-            alsoNotifyPartyDescription: this.formHouseBill.alsoNotifyPartyDescriptionModel,
+            alsoNotifyPartyDescription: this.formHouseBill.alsoNotifyPartyDescriptionModel !== undefined ? this.formHouseBill.alsoNotifyPartyDescriptionModel : this.formHouseBill.alsonotifyPartyDescription.value,
             hwbno: this.formHouseBill.hwbno.value,
-            hbltype: this.formHouseBill.hbltype.value.value,
+            hbltype: this.formHouseBill.hbltype.value != null ? this.formHouseBill.hbltype.value.value : null,
             etd: !!this.formHouseBill.etd.value ? formatDate(this.formHouseBill.etd.value.startDate !== undefined ? this.formHouseBill.etd.value.startDate : this.formHouseBill.etd.value, 'yyyy-MM-dd', 'en') : null,
             eta: !!this.formHouseBill.eta.value ? formatDate(this.formHouseBill.eta.value.startDate !== undefined ? this.formHouseBill.eta.value.startDate : this.formHouseBill.eta.value, 'yyyy-MM-dd', 'en') : null,
             pickupPlace: this.formHouseBill.pickupPlace.value,
@@ -199,14 +206,14 @@ export class CreateHouseBillComponent extends AppForm {
             localVessel: this.formHouseBill.localVessel.value,
             localVoyNo: this.formHouseBill.localVoyNo.value,
             oceanVessel: this.formHouseBill.oceanVessel.value,
-            documentDate: !!this.formHouseBill.documentDate.value ? formatDate(this.formHouseBill.documentDate.value.startDate !== undefined ? this.formHouseBill.documentDate.value.startDate : this.formHouseBill.documentDate.value, 'yyyy-MM-dd', 'en') : null,
+            documentDate: !!this.formHouseBill.documentDate.value && this.formHouseBill.documentDate.value.startDate != null ? formatDate(this.formHouseBill.documentDate.value.startDate !== undefined ? this.formHouseBill.documentDate.value.startDate : this.formHouseBill.documentDate.value, 'yyyy-MM-dd', 'en') : null,
             documentNo: this.formHouseBill.documentNo.value,
-            etawarehouse: !!this.formHouseBill.etawarehouse.value.startDate ? formatDate(this.formHouseBill.etawarehouse.value.startDate !== undefined ? this.formHouseBill.etawarehouse.value.startDate : this.formHouseBill.etawarehouse.value, 'yyyy-MM-dd', 'en') : null,
+            etawarehouse: !!this.formHouseBill.etawarehouse.value && this.formHouseBill.etawarehouse.value.startDate != null ? formatDate(this.formHouseBill.etawarehouse.value.startDate !== undefined ? this.formHouseBill.etawarehouse.value.startDate : this.formHouseBill.etawarehouse.value, 'yyyy-MM-dd', 'en') : null,
             warehouseNotice: this.formHouseBill.warehouseNotice.value,
             shippingMark: this.formHouseBill.shippingMark.value,
             remark: this.formHouseBill.remark.value,
             issueHBLPlace: !!this.formHouseBill.selectedPlaceOfIssued.value ? this.formHouseBill.selectedPlaceOfIssued.value : null,
-            issueHBLDate: !!this.formHouseBill.issueHBLDate.value ? formatDate(this.formHouseBill.issueHBLDate.value.startDate !== undefined ? this.formHouseBill.issueHBLDate.value.startDate : this.formHouseBill.issueHBLDate.value, 'yyyy-MM-dd', 'en') : null,
+            issueHBLDate: !!this.formHouseBill.issueHBLDate.value && this.formHouseBill.issueHBLDate.value.startDate != null ? formatDate(this.formHouseBill.issueHBLDate.value.startDate !== undefined ? this.formHouseBill.issueHBLDate.value.startDate : this.formHouseBill.issueHBLDate.value, 'yyyy-MM-dd', 'en') : null,
             originBLNumber: this.formHouseBill.originBLNumber.value.value,
             referenceNo: this.formHouseBill.referenceNo.value,
             customerId: this.formHouseBill.selectedCustomer.value,

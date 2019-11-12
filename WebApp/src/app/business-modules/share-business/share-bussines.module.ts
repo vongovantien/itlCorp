@@ -19,7 +19,7 @@ const COMPONENTS = [
     ShareBussinessBuyingChargeComponent,
     ShareBussinessSellingChargeComponent,
     ShareBussinessOBHChargeComponent,
-    ShareContainerImportComponent
+    ShareContainerImportComponent,
 ];
 
 const customCurrencyMaskConfig = {
