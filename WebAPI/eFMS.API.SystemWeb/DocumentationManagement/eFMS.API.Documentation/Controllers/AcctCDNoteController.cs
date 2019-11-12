@@ -55,8 +55,8 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Update(AcctCdnoteModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            model.UserCreated = currentUser.UserID;
-            model.DatetimeCreated = DateTime.Now;
+            model.UserModified = currentUser.UserID;
+            model.DatetimeModified = DateTime.Now;
             var hs = cdNoteServices.UpdateCDNote(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

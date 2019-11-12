@@ -61,7 +61,7 @@ namespace eFMS.API.Documentation.DL.Services
                     DataContext.Delete(x => x.Id == chargeId);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 hs = new HandleState(ex.Message);
             }
@@ -100,7 +100,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var houseBill = tranDetailRepository.Get(x => x.Id == id).FirstOrDefault();
                     List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
-                   
+
                     listCharges = Query(id, null);
 
                     foreach (var c in listCharges)
@@ -117,28 +117,25 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                     }
                 }
-                
+
                 listPartners = listPartners.Distinct().ToList();
                 return listPartners;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
 
         }
 
-
-       
-
-        public List<CsShipmentSurchargeDetailsModel> GetByHB(Guid hbID,string type)
+        public List<CsShipmentSurchargeDetailsModel> GetByHB(Guid hbID, string type)
         {
-            return Query(hbID,type);
+            return Query(hbID, type);
         }
 
-        public List<object> GroupChargeByHB(Guid id, string partnerId, bool isHouseBillID)
+        public List<GroupChargeModel> GroupChargeByHB(Guid id, string partnerId, bool isHouseBillID, string cdNoteCode)
         {
-            List<object> returnList = new List<object>();
+            List<GroupChargeModel> returnList = new List<GroupChargeModel>();
             List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
             if (isHouseBillID == false)
             {
@@ -146,12 +143,23 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var houseBill in houseBills)
                 {
                     listCharges = Query(houseBill.Id, null);
-                    listCharges = listCharges.Where(x => (x.PayerId == partnerId || x.Type == "OBH" || x.PaymentObjectId == partnerId)).ToList();
-                    listCharges = listCharges.Where(x => (x.CreditNo == null || x.CreditNo.Trim() == "" || x.DebitNo == null || x.DebitNo.Trim() == "")).ToList();
-                    var returnObj = new { houseBill.Hwbno, houseBill.Hbltype, houseBill.Id, listCharges };
+                    //listCharges = listCharges.Where(x => (x.PayerId == partnerId || x.Type == "OBH" || x.PaymentObjectId == partnerId)).ToList();
+                    listCharges = listCharges.Where(x => ((x.PayerId == partnerId && x.Type == "OBH") || x.PaymentObjectId == partnerId)).ToList();
+                    if (!string.IsNullOrEmpty(cdNoteCode))
+                    {
+                        listCharges = listCharges.Where(x => (x.CreditNo == cdNoteCode || x.DebitNo == cdNoteCode)).ToList();
+                    }
+                    else
+                    {
+                        listCharges = listCharges.Where(x => (string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo))).ToList();
+                    }
+                    listCharges.ForEach(fe =>
+                    {
+                        fe.Hwbno = houseBill.Hwbno;
+                    });
+                    var returnObj = new GroupChargeModel { Hwbno = houseBill.Hwbno, Hbltype = houseBill.Hbltype, Id = houseBill.Id, listCharges = listCharges };
 
                     returnList.Add(returnObj);
-
                 }
             }
             else
@@ -159,7 +167,19 @@ namespace eFMS.API.Documentation.DL.Services
                 var houseBill = opsTransRepository.Get(x => x.Hblid == id).FirstOrDefault();
                 listCharges = Query(id, null);
                 listCharges = listCharges.Where(x => ((x.PayerId == partnerId && x.Type == "OBH") || x.PaymentObjectId == partnerId)).ToList();
-                var returnObj = new { houseBill.Hwbno, houseBill.Id, listCharges };
+                if (!string.IsNullOrEmpty(cdNoteCode))
+                {
+                    listCharges = listCharges.Where(x => (x.CreditNo == cdNoteCode || x.DebitNo == cdNoteCode)).ToList();
+                }
+                else
+                {
+                    listCharges = listCharges.Where(x => (string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo))).ToList();
+                }
+                listCharges.ForEach(fe =>
+                {
+                    fe.Hwbno = houseBill.Hwbno;
+                });
+                var returnObj = new GroupChargeModel { Hwbno = houseBill.Hwbno, Id = houseBill.Id, listCharges = listCharges };
 
                 returnList.Add(returnObj);
             }
@@ -171,16 +191,16 @@ namespace eFMS.API.Documentation.DL.Services
         public ChargeShipmentResult GetListChargeShipment(ChargeShipmentCriteria criteria)
         {
             var chargeShipmentList = GetSpcChargeShipment(criteria).ToList();
-            var dataMap = mapper.Map<List<spc_GetListChargeShipmentMaster>,List<ChargeShipmentModel>>(chargeShipmentList);
+            var dataMap = mapper.Map<List<spc_GetListChargeShipmentMaster>, List<ChargeShipmentModel>>(chargeShipmentList);
             var result = new ChargeShipmentResult
             {
                 ChargeShipments = dataMap,
-                TotalShipment = chargeShipmentList.Where(x=>x.HBL != null).GroupBy(x=>x.HBL).Count(),
+                TotalShipment = chargeShipmentList.Where(x => x.HBL != null).GroupBy(x => x.HBL).Count(),
                 TotalCharge = chargeShipmentList.Count(),
-                AmountDebitLocal = chargeShipmentList.Sum(x=>x.AmountDebitLocal),
-                AmountCreditLocal = chargeShipmentList.Sum(x=>x.AmountCreditLocal),
-                AmountDebitUSD = chargeShipmentList.Sum(x=>x.AmountDebitUSD),
-                AmountCreditUSD = chargeShipmentList.Sum(x=>x.AmountCreditUSD),
+                AmountDebitLocal = chargeShipmentList.Sum(x => x.AmountDebitLocal),
+                AmountCreditLocal = chargeShipmentList.Sum(x => x.AmountCreditLocal),
+                AmountDebitUSD = chargeShipmentList.Sum(x => x.AmountDebitUSD),
+                AmountCreditUSD = chargeShipmentList.Sum(x => x.AmountCreditUSD),
             };
             return result;
         }
@@ -235,7 +255,7 @@ namespace eFMS.API.Documentation.DL.Services
             List<CsShipmentSurchargeDetailsModel> results = new List<CsShipmentSurchargeDetailsModel>();
             var data = GetChargeByHouseBill(hblid, string.Empty, null);
             if (data.Count == 0) return results;
-            foreach(var item in data)
+            foreach (var item in data)
             {
                 var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item);
                 charge.Unit = item.UnitNameEn;
@@ -255,7 +275,7 @@ namespace eFMS.API.Documentation.DL.Services
             };
             var surcharges = GetChargeByHouseBill(hblid, string.Empty, null);
             if (!surcharges.Any()) return result;
-            foreach(var item in surcharges)
+            foreach (var item in surcharges)
             {
                 decimal totalLocal = item.Total * item.RateToLocal;
                 decimal totalUSD = item.Total * item.RateToUSD;
@@ -264,7 +284,7 @@ namespace eFMS.API.Documentation.DL.Services
                     result.HouseBillTotalCharge.TotalBuyingLocal = result.HouseBillTotalCharge.TotalBuyingLocal + totalLocal;
                     result.HouseBillTotalCharge.TotalBuyingUSD = result.HouseBillTotalCharge.TotalBuyingUSD + totalUSD;
                 }
-                else if(item.Type == Constants.CHARGE_SELL_TYPE)
+                else if (item.Type == Constants.CHARGE_SELL_TYPE)
                 {
                     result.HouseBillTotalCharge.TotalSellingLocal = result.HouseBillTotalCharge.TotalSellingLocal + totalLocal;
                     result.HouseBillTotalCharge.TotalSellingUSD = result.HouseBillTotalCharge.TotalSellingUSD + totalUSD;
@@ -285,7 +305,7 @@ namespace eFMS.API.Documentation.DL.Services
             var hs = new HandleState();
             try
             {
-                foreach(var item in listId)
+                foreach (var item in listId)
                 {
                     var charge = DataContext.Where(x => x.Id == item).FirstOrDefault();
                     if (charge == null)
@@ -347,10 +367,10 @@ namespace eFMS.API.Documentation.DL.Services
             CsTransaction csShipment = null;
             IQueryable<HousbillProfit> hblids = null;
             opsShipments = opsTransRepository.Get(x => x.Id == jobId);
-            if(opsShipments.Count() == 0)
+            if (opsShipments.Count() == 0)
             {
                 csShipment = csTransactionRepository.Get(x => x.Id == jobId)?.FirstOrDefault();
-                if(csShipment != null)
+                if (csShipment != null)
                 {
                     hblids = tranDetailRepository.Get(x => x.JobId == csShipment.Id).Select(x => 
                                     new HousbillProfit { HBLID = x.Id, HBLNo = x.Hwbno });
@@ -361,7 +381,7 @@ namespace eFMS.API.Documentation.DL.Services
                 hblids = opsShipments.Select(x => new HousbillProfit { HBLID = x.Hblid, HBLNo = x.Hwbno });
             }
             if (hblids.Count() == 0) return results;
-            foreach(var item in hblids)
+            foreach (var item in hblids)
             {
                 var profit = GetHouseBillTotalProfit(item.HBLID);
                 profit.HBLNo = item.HBLNo;

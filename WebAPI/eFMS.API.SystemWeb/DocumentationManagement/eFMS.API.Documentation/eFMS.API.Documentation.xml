@@ -194,13 +194,14 @@
             <param name="type"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetByListHouseBill(System.Guid,System.String,System.Boolean)">
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetByListHouseBill(System.Guid,System.String,System.Boolean,System.String)">
             <summary>
             get list of surcharge by house bill anf partner id
             </summary>
             <param name="Id"></param>
             <param name="partnerID"></param>
             <param name="IsHouseBillID"></param>
+            <param name="cdNoteCode"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetBy(System.Guid)">
@@ -278,6 +279,13 @@
             get total profit of a shipment
             </summary>
             <param name="jobId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GroupByListHBNotExists(eFMS.API.Documentation.DL.Models.Criteria.GroupByListHBCriteria)">
+            <summary>
+            get list of surcharge not exists in cd note by house bill and partner id
+            </summary>
+            <param name="criteria"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsTransactionController">
