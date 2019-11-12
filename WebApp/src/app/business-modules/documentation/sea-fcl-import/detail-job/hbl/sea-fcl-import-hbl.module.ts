@@ -25,7 +25,7 @@ const routing: Routes = [
         data: { name: 'New House Bill Detail', path: ':id', level: 5 }
     },
     {
-        path: ':id', component: DetailHouseBillComponent,
+        path: ':hblId', component: DetailHouseBillComponent,
         data: { name: 'House Bill Detail', path: ':id', level: 5 }
     }
 ];

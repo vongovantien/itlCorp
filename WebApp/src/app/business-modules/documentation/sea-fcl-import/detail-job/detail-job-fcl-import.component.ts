@@ -91,9 +91,12 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
 
                     console.log("detail sea fcl import", this.fclImportDetail);
 
-                    setTimeout(() => {
-                        this.updateForm();
-                    }, 500);
+                    // setTimeout(() => {
+                    this.updateForm();
+                    // }, 500);
+
+                    // this.formCreateComponent.fclImportDetail = this.fclImportDetail;
+                    // this.formCreateComponent.initFormUpdate();
                 },
 
             );

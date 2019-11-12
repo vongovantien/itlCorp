@@ -156,9 +156,11 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPost("AddAndUpdate")]
         [Authorize]
-        public IActionResult Add(List<CsShipmentSurchargeModel> list)
+        public IActionResult Add([FromBody]List<CsShipmentSurchargeModel> list)
         {
             if (!ModelState.IsValid) return BadRequest();
+            var groups = list.Where(x => x.InvoiceNo != null).GroupBy(x => x.InvoiceNo);
+
             var query = list.Where(x => x.InvoiceNo != null).GroupBy(x => x.InvoiceNo)
                                       .Where(g => g.Count() > 1)
                                       .Select(y => y.Key);

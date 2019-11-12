@@ -37,7 +37,7 @@ export class ApiService {
             });
     }
 
-    postFile(url: string, files: any, name: string = null) {
+    postFile(url: string, files: any, name: string = null, params?: any) {
         if (files.length === 0) {
             return;
         }
@@ -45,7 +45,7 @@ export class ApiService {
         for (const file of files) {
             formData.append(name || file.name, file);
         }
-        const params = new HttpParams();
+        // const params = new HttpParams();
         const options = {
             params: params,
             reportProgress: true,

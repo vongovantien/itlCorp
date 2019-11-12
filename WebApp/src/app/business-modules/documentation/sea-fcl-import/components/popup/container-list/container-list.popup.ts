@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 
 import { PopupBase } from 'src/app/popup.base';
@@ -7,13 +7,15 @@ import { CatalogueRepo } from 'src/app/shared/repositories';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { Unit } from 'src/app/shared/models';
 
-import { catchError, takeUntil } from 'rxjs/operators';
-import { forkJoin } from 'rxjs';
+import { catchError, takeUntil, map, tap, switchMap } from 'rxjs/operators';
+import { forkJoin, combineLatest, of } from 'rxjs';
 
 import * as fromStore from './../../../store';
 import { Commodity } from 'src/app/shared/models/catalogue/commodity.model';
 import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
+import { ShareContainerImportComponent } from 'src/app/business-modules/share-business';
+import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -21,7 +23,9 @@ import { SystemConstants } from 'src/constants/system.const';
     templateUrl: './container-list.popup.html',
 })
 export class SeaFCLImportContainerListPopupComponent extends PopupBase {
-
+    @ViewChild(ShareContainerImportComponent, { static: false }) containerImportPopup: ShareContainerImportComponent;
+    mblid: string = null;
+    hblid: string = null;
     containers: any[] = [];
 
     headers: CommonInterface.IHeaderTable[];
@@ -40,7 +44,6 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
         private _store: Store<fromStore.IContainerState>,
         private cdRef: ChangeDetectorRef,
         private _dataService: DataService
-
     ) {
         super();
     }
@@ -182,5 +185,27 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
     closePopup() {
         this.isSubmitted = false;
         this.hide();
+    }
+    showImportPopup() {
+        this.containerImportPopup.mblid = this.mblid;
+        this.containerImportPopup.hblid = this.hblid;
+        this.containerImportPopup.show();
+    }
+    importSuccess(event) {
+        if (event) {
+            this._store.select(fromStore.getContainerSaveState)
+                .pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe(
+                    (res: fromStore.IContainerState | any) => {
+                        this.containers = res;
+                        for (const container of this.containers) {
+                            container.commodityName = this.getCommodityName(container.commodityId);
+                            container.containerTypeName = this.getContainerTypeName(container.containerTypeId);
+                            container.packageTypeName = this.getPackageTypeName(container.packageTypeId);
+                        }
+                        this._store.dispatch(new fromStore.SaveContainerAction(this.containers));
+                    }
+                );
+        }
     }
 }

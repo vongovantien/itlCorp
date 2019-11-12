@@ -43,8 +43,8 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
 
     ngOnInit() {
         this._activedRoute.params.subscribe((param: Params) => {
-            if (param.id) {
-                this.hblId = param.id;
+            if (param.hblId) {
+                this.hblId = param.hblId;
                 this.getDetailHbl(this.hblId);
 
             } else {

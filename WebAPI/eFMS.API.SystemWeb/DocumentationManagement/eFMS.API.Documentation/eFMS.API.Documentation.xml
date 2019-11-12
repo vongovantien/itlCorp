@@ -164,11 +164,13 @@
             <param name="data"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsMawbcontainerController.UploadFileContainer(Microsoft.AspNetCore.Http.IFormFile)">
+        <member name="M:eFMS.API.Documentation.Controllers.CsMawbcontainerController.UploadFileContainer(Microsoft.AspNetCore.Http.IFormFile,System.Guid,System.Boolean)">
             <summary>
             read data from file excel
             </summary>
             <param name="uploadedFile"></param>
+            <param name="id"></param>
+            <param name="isHouseBill"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController">

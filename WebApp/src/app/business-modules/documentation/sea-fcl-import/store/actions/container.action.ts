@@ -10,6 +10,7 @@ export enum ContainerActionTypes {
     GET_CONTAINER_SUCESS = '[Container] Get Success',
     GET_CONTAINER_FAIL = '[Container] Get Fail',
     ADD_CONTAINER = '[Contaner] Add',
+    ADD_CONTAINERS = '[Contaner] Add Multiple',
     DELETE_CONTAINER = '[Container] Delete',
     SAVE_CONTAINER = '[Container] Save',
     CLEAR_CONTAINER = '[Container] Clear'
@@ -51,6 +52,12 @@ export class AddContainerAction implements Action {
     constructor(public payload: any) { }
 }
 
+export class AddContainersAction implements Action {
+    readonly type = ContainerActionTypes.ADD_CONTAINERS;
+
+    constructor(public payload: any[]) { }
+}
+
 export class DeleteContainerAction implements Action {
     readonly type = ContainerActionTypes.DELETE_CONTAINER;
 
@@ -83,4 +90,5 @@ export type ContainerAction =
     | AddContainerAction
     | DeleteContainerAction
     | SaveContainerAction
-    | ClearContainerAction;
+    | ClearContainerAction
+    | AddContainersAction;

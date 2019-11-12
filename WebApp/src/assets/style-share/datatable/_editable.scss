@@ -97,6 +97,11 @@
         }
     }
     &.table-editable {
+        td {
+            &.disabled {
+                background: #f4f5f8;
+            }
+        }
         .form-group {
             padding: 0;
             .form-control {
@@ -112,7 +117,7 @@
             &.has-danger {
                 .form-control {
                     border: 1px solid #f4516b;
-                    padding: initial;
+                    // padding: initial;
                 }
             }
         }
