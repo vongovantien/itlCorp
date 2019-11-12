@@ -14,14 +14,12 @@ import { EffectsModule } from '@ngrx/effects';
 import { PipeModule } from 'src/app/shared/pipes/pipe.module';
 import { ShareBussinessSellingChargeComponent } from './components/selling-charge/selling-charge.component';
 import { ShareBussinessOBHChargeComponent } from './components/obh-charge/obh-charge.component';
-import { ProfitSummaryComponent } from './components/profit-summary/profit-summary.component';
 
 const COMPONENTS = [
     ShareBussinessBuyingChargeComponent,
     ShareBussinessSellingChargeComponent,
     ShareBussinessOBHChargeComponent,
     ShareContainerImportComponent,
-    ProfitSummaryComponent
 ];
 
 const customCurrencyMaskConfig = {

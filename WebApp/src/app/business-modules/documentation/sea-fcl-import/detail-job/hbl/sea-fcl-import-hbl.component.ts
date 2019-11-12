@@ -187,6 +187,7 @@ export class SeaFCLImportHBLComponent extends AppList {
         // * Get container, Job detail, Surcharge with hbl id, JobId.
         this._store.dispatch(new fromStore.GetContainerAction({ hblid: hbl.id }));
         this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(hbl.jobId));
+        this._store.dispatch(new fromStore.GetProfitHBLAction(this.selectedHbl.id));
 
         switch (this.selectedTabSurcharge) {
             case 'BUY':
@@ -210,6 +211,7 @@ export class SeaFCLImportHBLComponent extends AppList {
         if (!!this.selectedHbl) {
             this._store.dispatch(new fromStore.GetContainerAction({ hblid: this.selectedHbl.id }));
             this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(this.selectedHbl.jobId));
+            this._store.dispatch(new fromStore.GetProfitHBLAction(this.selectedHbl.id));
 
             switch (this.selectedTabSurcharge) {
                 case 'BUY':

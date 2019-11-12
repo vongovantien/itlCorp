@@ -53,11 +53,6 @@
                 </tab>
                 <tab heading="House Bill List" (selectTab)="onSelectTab('hbl')">
                 </tab>
-                <!-- <tab heading="Debit Note & Credit Note" [active]="selectedTab === 'CDNOTE'"
-                    (selectTab)="onSelectTab('cdNote')">
-
-                    <sea-fcl-import-cd-note></sea-fcl-import-cd-note>
-                </tab> -->
                 <tab heading="Debit Note & Credit Note" (selectTab)="onSelectTab('cdNote')"
                     [active]="selectedTab === 'CDNOTE'">
                     <ng-container *ngIf="selectedTab === 'CDNOTE'" loadModule="cd">

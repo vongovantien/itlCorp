@@ -27,7 +27,7 @@ export class SeaFCLImportGrantTotalProfitComponent extends AppList {
     }
 
     ngOnInit() {
-        this.shipmentProfits$ = this._store.select(fromStore.getProfitState);
+        this.shipmentProfits$ = this._store.select(fromStore.getShipmentProfitState);
 
         this.totalUSD$ = this.shipmentProfits$.pipe(
             map((profits: any[]) => profits.reduce((acc: number, curr: any) => acc += curr.profitUSD, 0))

@@ -91,7 +91,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                     this.shipmentGoodSummaryComponent.totalChargeWeight = this.fclImportDetail.chargeWeight;
                     this.shipmentGoodSummaryComponent.totalCBM = this.fclImportDetail.cbm;
 
-                    console.log("detail sea fcl import", this.fclImportDetail);
+                    // console.log("detail sea fcl import", this.fclImportDetail);
 
                     // setTimeout(() => {
                     this.updateForm();

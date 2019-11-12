@@ -22,7 +22,7 @@ export enum SurchargeActionTypes {
     GET_OBH_FAIL = '[OBH CHARGE] Get Fail',
     ADD_OBH = '[OBH CHARGE] Add',
     DELETE_OBH = '[OBH CHARGE] Delete',
-    SAVE_OBH = '[OBH CHARGE] SAVE'
+    SAVE_OBH = '[OBH CHARGE] SAVE',
 }
 
 /* BUYING */
