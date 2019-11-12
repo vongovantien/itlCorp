@@ -15,8 +15,8 @@ export enum SeaFCLImportActionTypes {
     UPDATE_FAIL = '[CSTransaction] Update Fail',
 
     GET_PROFIT = '[CSTransaction] Get Profit',
-    GET_PROFIT_SUCCESS = '[CSTransaction] Get Success',
-    GET_PROFIT_FAIL = '[CSTransaction] Get Fail',
+    GET_PROFIT_SUCCESS = '[CSTransaction] Get Profit Success',
+    GET_PROFIT_FAIL = '[CSTransaction] Get Profit Fail',
 
 }
 

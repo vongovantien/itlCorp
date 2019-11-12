@@ -17,12 +17,12 @@ export interface IProfit {
 }
 export interface ICsTransaction {
     cstransaction: CsTransaction;
-    profits: IProfit;
+    profits: IProfit[];
 }
 
 export const initState: ICsTransaction = {
     cstransaction: new CsTransaction(),
-    profits: null
+    profits: []
 };
 
 
@@ -37,7 +37,7 @@ export function CSTransactionReducer(state = initState, action: SeaFCLImportActi
         }
 
         case SeaFCLImportActionTypes.GET_PROFIT_SUCCESS: {
-            return { ...state, profits: action.payload };
+            return { ...state, ...state.profits, profits: [...action.payload] };
         }
 
         default: {
