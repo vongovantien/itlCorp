@@ -26,7 +26,7 @@ export class TariffChargePopupComponent extends PopupBase {
     @Output() tariffDetailChange: EventEmitter<TariffCharge> = new EventEmitter<TariffCharge>();
     @Output() onChange: EventEmitter<any> = new EventEmitter<any>();
 
-    ACTION: CommonType.ACTION_FORM = 'CREATE';
+    ACTION: CommonType.ACTION_FORM = CommonType.ACTION.CREATE;
 
     formChargeTariff: FormGroup;
 

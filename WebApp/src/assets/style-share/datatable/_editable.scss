@@ -98,9 +98,9 @@
     }
     &.table-editable {
         td {
-            &.disabled {
-                background: #f4f5f8;
-            }
+            // &.disabled {
+            //     background: #f4f5f8;
+            // }
         }
         .form-group {
             padding: 0;
@@ -109,7 +109,8 @@
                 border: 0;
                 padding: 4px;
                 &:disabled {
-                    background: #f4f5f8;
+                    // background: #f4f5f8;
+                    font-style: italic;
                     cursor: not-allowed;
                 }
             }

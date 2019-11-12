@@ -2,9 +2,10 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { Action } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { SeaFCLImportActionTypes, SeaFCLImportGetDetailSuccessAction, SeaFCLImportGetDetailFailAction, SeaFCLImportActions, ContainerActionTypes, ContainerAction, GetContainerSuccessAction, GetContainerFailAction, SeaFCLImportUpdateSuccessAction, SeaFCLImportUpdateFailAction, HouseBillActionTypes, GetDetailHBLSuccessAction, GetDetailHBLFailAction } from '../actions';
+import { SeaFCLImportActionTypes, SeaFCLImportGetDetailSuccessAction, SeaFCLImportGetDetailFailAction, SeaFCLImportActions, ContainerActionTypes, ContainerAction, GetContainerSuccessAction, GetContainerFailAction, SeaFCLImportUpdateSuccessAction, SeaFCLImportUpdateFailAction, HouseBillActionTypes, GetDetailHBLSuccessAction, GetDetailHBLFailAction, SeaFCLImportGetProfitSuccessAction, SeaFCLImportGetProfitFailFailAction, GetProfitHBLSuccessAction, GetProfitHBLFailAction } from '../actions';
 import { map, switchMap, catchError } from 'rxjs/operators';
 import { DocumentationRepo } from 'src/app/shared/repositories';
+import { IProfit } from '../reducers';
 
 @Injectable()
 export class SeaFCLImportEffects {
@@ -40,7 +41,7 @@ export class SeaFCLImportEffects {
                         catchError(err => of(new GetContainerFailAction(err)))
                     )
             )
-        )
+        );
 
     @Effect()
     updateCSTransaction$: Observable<Action> = this.actions$
@@ -54,7 +55,7 @@ export class SeaFCLImportEffects {
                         catchError(err => of(new SeaFCLImportUpdateFailAction(err)))
                     )
             )
-        )
+        );
 
     @Effect()
     getDetailHBL$: Observable<Action> = this.actions$
@@ -68,7 +69,35 @@ export class SeaFCLImportEffects {
                         catchError(err => of(new GetDetailHBLFailAction(err)))
                     )
             )
-        )
+        );
+
+    @Effect()
+    getTotalProfitShipmentL$: Observable<Action> = this.actions$
+        .pipe(
+            ofType<ContainerAction>(SeaFCLImportActionTypes.GET_PROFIT),
+            map((payload: any) => payload.payload),
+            switchMap(
+                (jobId: string) => this._documentRepo.getShipmentTotalProfit(jobId)
+                    .pipe(
+                        map((data: IProfit[]) => new SeaFCLImportGetProfitSuccessAction(data)),
+                        catchError(err => of(new SeaFCLImportGetProfitFailFailAction(err)))
+                    )
+            )
+        );
+
+    @Effect()
+    getHBLProfit$: Observable<Action> = this.actions$
+        .pipe(
+            ofType<ContainerAction>(HouseBillActionTypes.GET_PROFIT),
+            map((payload: any) => payload.payload),
+            switchMap(
+                (hblid: string) => this._documentRepo.getHBLTotalProfit(hblid)
+                    .pipe(
+                        map((data: any) => new GetProfitHBLSuccessAction(data)),
+                        catchError(err => of(new GetProfitHBLFailAction(err)))
+                    )
+            )
+        );
 
 }
 

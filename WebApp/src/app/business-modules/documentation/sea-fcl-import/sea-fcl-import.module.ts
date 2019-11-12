@@ -4,22 +4,20 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Routes, RouterModule } from '@angular/router';
 
 import { SharedModule } from 'src/app/shared/shared.module';
-import { TabsModule, PaginationModule, ModalModule, CollapseModule } from 'ngx-bootstrap';
+import { TabsModule, PaginationModule, ModalModule, CollapseModule, AccordionModule } from 'ngx-bootstrap';
 import { SelectModule } from 'ng2-select';
 import { SeaFCLImportManagementComponent } from './sea-fcl-import-management.component';
 import { SeaFCLImportCreateJobComponent } from './create-job/create-job-fcl-import.component';
 import { SeaFCLImportDetailJobComponent } from './detail-job/detail-job-fcl-import.component';
 import { SeaFCLImportManagementFormSearchComponent } from './components/form-search/form-search-fcl-import.component';
 import { SeaFClImportFormCreateComponent } from './components/form-create/form-create-sea-fcl-import.component';
-import { SeaFCLImportCDNoteComponent } from './detail-job/cd-note/sea-fcl-import-cd-note.component';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { StoreModule } from '@ngrx/store';
 import { reducers, effects } from './store';
 import { EffectsModule } from '@ngrx/effects';
-import { CdNoteAddPopupComponent } from './components/popup/add-cd-note/add-cd-note.popup';
 import { FCLImportShareModule } from './share-fcl-import.module';
-import { CdNoteDetailPopupComponent } from './components/popup/detail-cd-note/detail-cd-note.popup';
-import { CdNoteAddRemainingChargePopupComponent } from './components/popup/add-remaining-charge/add-remaining-charge.popup';
+import { SeaFCLImportGrantTotalProfitComponent } from './components/grant-total-profit/grant-total-profit.component';
+import { SeaFCLImportLazyLoadModule } from './sea-fcl-import-lazy-load.module';
 
 const routing: Routes = [
 
@@ -44,9 +42,8 @@ const routing: Routes = [
 const COMPONENTS = [
     SeaFCLImportManagementFormSearchComponent,
     SeaFClImportFormCreateComponent,
-    CdNoteAddPopupComponent,
-    CdNoteDetailPopupComponent,
-    CdNoteAddRemainingChargePopupComponent
+    SeaFCLImportGrantTotalProfitComponent
+
 ];
 
 const LIB = [
@@ -65,7 +62,6 @@ const LIB = [
         SeaFCLImportManagementComponent,
         SeaFCLImportCreateJobComponent,
         SeaFCLImportDetailJobComponent,
-        SeaFCLImportCDNoteComponent,
     ],
     imports: [
         NgxDaterangepickerMd,
@@ -78,6 +74,7 @@ const LIB = [
         ...LIB,
         StoreModule.forFeature('seaFClImport', reducers),
         EffectsModule.forFeature(effects),
+        SeaFCLImportLazyLoadModule // ?  Lazy loading module with  tab component (CD Note).
 
     ],
     exports: [],
