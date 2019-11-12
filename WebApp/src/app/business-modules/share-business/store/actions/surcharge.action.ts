@@ -28,7 +28,7 @@ export enum SurchargeActionTypes {
 /* BUYING */
 export class GetBuyingSurchargeAction implements Action {
     readonly type = SurchargeActionTypes.GET_BUYING;
-    constructor(public payload: any) { }
+    constructor(public payload?: any) { }
 }
 export class GetBuyingSurchargeSuccessAction implements Action {
     readonly type = SurchargeActionTypes.GET_BUYING_SUCCESS;
