@@ -1,13 +1,22 @@
 import { Component, ViewChild } from '@angular/core';
-import { AppList } from 'src/app/app.list';
 import { Router, ActivatedRoute, Params } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { ToastrService } from 'ngx-toastr';
+import { NgProgress } from '@ngx-progressbar/core';
+
+import { AppList } from 'src/app/app.list';
 import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactionDetail';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
-import { catchError, finalize } from 'rxjs/operators';
-import { ToastrService } from 'ngx-toastr';
-import { NgProgress } from '@ngx-progressbar/core';
+
+import { Container } from 'src/app/shared/models/document/container.model';
+import { CsShipmentSurcharge } from 'src/app/shared/models';
+
+import * as fromStore from './../../store';
+import * as fromShareBussiness from './../../../../share-business/store';
+
+import { catchError, finalize, takeUntil, switchMap, tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-sea-fcl-import-hbl',
@@ -15,12 +24,20 @@ import { NgProgress } from '@ngx-progressbar/core';
 })
 export class SeaFCLImportHBLComponent extends AppList {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+
     jobId: string = '';
     headers: CommonInterface.IHeaderTable[];
     houseBill: CsTransactionDetail[] = [];
-    selectedHbl: CsTransactionDetail;
     goodSummary: any = {};
 
+
+    containers: Container[] = new Array<Container>();
+    selectedShipment: any; // TODO model.
+    selectedHbl: CsTransactionDetail = new CsTransactionDetail();
+
+    charges: CsShipmentSurcharge[] = new Array<CsShipmentSurcharge>();
+
+    selectedTabSurcharge: string = 'BUY';
 
     constructor(
         private _router: Router,
@@ -29,6 +46,7 @@ export class SeaFCLImportHBLComponent extends AppList {
         private _activedRoute: ActivatedRoute,
         private _toastService: ToastrService,
         private _progressService: NgProgress,
+        private _store: Store<fromStore.ISeaFCLImportState>,
     ) {
         super();
         this.requestSort = this.sortLocal;
@@ -40,6 +58,8 @@ export class SeaFCLImportHBLComponent extends AppList {
         this._activedRoute.params.subscribe((param: Params) => {
             if (param.id) {
                 this.jobId = param.id;
+                this.getHourseBill(this.jobId);
+
             }
         });
         this.headers = [
@@ -53,7 +73,28 @@ export class SeaFCLImportHBLComponent extends AppList {
             { title: 'G.W', field: 'gw', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true }
         ];
-        this.getHourseBill();
+
+        this._store.select(fromStore.getContainerSaveState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                tap(
+                    (containers: Container[]) => {
+                        this.containers = (containers || []).map(contaienr => new Container(contaienr));
+                    }
+                ),
+                switchMap(
+                    () => this._store.select(fromStore.seaFCLImportTransactionState)
+                        .pipe(
+                            takeUntil(this.ngUnsubscribe),
+                        )
+                )
+            )
+            .subscribe(
+                (shipment: any) => {
+                    this.selectedShipment = shipment;
+                }
+            );
+
         this.getGoodSumaryOfHbl();
     }
 
@@ -65,9 +106,6 @@ export class SeaFCLImportHBLComponent extends AppList {
             case 'cdNote':
                 this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
-            // case 'hbl':
-            //     this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], { queryParams: { tab: 'HBL' } });
-            //     break;
         }
     }
 
@@ -98,13 +136,14 @@ export class SeaFCLImportHBLComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
-                        this.getHourseBill();
+                        this.getHourseBill(this.jobId);
                     } else {
                         this._toastService.error(res.message || 'Có lỗi xảy ra', '');
                     }
                 },
             );
     }
+
 
     onDeleteHbl() {
         this.confirmDeletePopup.hide();
@@ -121,25 +160,67 @@ export class SeaFCLImportHBLComponent extends AppList {
             (res: any) => {
 
                 this.goodSummary = res;
-                console.log(this.goodSummary);
             },
         );
     }
 
 
-    getHourseBill() {
+    getHourseBill(id: string) {
         this.isLoading = true;
-        this._documentRepo.getListHourseBill({}).pipe(
+        this._documentRepo.getListHourseBill({ jobId: this.jobId }).pipe(
             catchError(this.catchError),
             finalize(() => { this.isLoading = false; }),
         ).subscribe(
             (res: any) => {
-
                 this.houseBill = res;
-                console.log(this.houseBill);
+                if (!!this.houseBill.length) {
+                    this.selectHBL(this.houseBill[0])
+                }
             },
         );
     }
 
+    selectHBL(hbl: CsTransactionDetail) {
+        this.selectedHbl = new CsTransactionDetail(hbl);
 
+        // * Get container, Job detail, Surcharge with hbl id, JobId.
+        this._store.dispatch(new fromStore.GetContainerAction({ hblid: hbl.id }));
+        this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(hbl.jobId));
+
+        switch (this.selectedTabSurcharge) {
+            case 'BUY':
+                this._store.dispatch(new fromShareBussiness.GetBuyingSurchargeAction({ type: 'BUY', hblId: this.selectedHbl.id }));
+                break;
+            case 'SELL':
+                this._store.dispatch(new fromShareBussiness.GetSellingSurchargeAction({ type: 'SELL', hblId: this.selectedHbl.id }));
+                break;
+            case 'OBH':
+                this._store.dispatch(new fromShareBussiness.GetOBHSurchargeAction({ type: 'OBH', hblId: this.selectedHbl.id }));
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    onSelectTabSurcharge(tabName: string) {
+        this.selectedTabSurcharge = tabName;
+
+        this._store.dispatch(new fromStore.GetContainerAction({ hblid: this.selectedHbl.id }));
+        this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(this.selectedHbl.jobId));
+
+        switch (this.selectedTabSurcharge) {
+            case 'BUY':
+                this._store.dispatch(new fromShareBussiness.GetBuyingSurchargeAction({ type: 'BUY', hblId: this.selectedHbl.id }));
+                break;
+            case 'SELL':
+                this._store.dispatch(new fromShareBussiness.GetSellingSurchargeAction({ type: 'SELL', hblId: this.selectedHbl.id }));
+                break;
+            case 'OBH':
+                this._store.dispatch(new fromShareBussiness.GetOBHSurchargeAction({ type: 'OBH', hblId: this.selectedHbl.id }));
+                break;
+            default:
+                break;
+        }
+    }
 }

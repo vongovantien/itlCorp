@@ -342,6 +342,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     if (item.Id == Guid.Empty)
                     {
+                        item.Id = Guid.NewGuid();
                         DataContext.Add(item, false);
                     }
                     else

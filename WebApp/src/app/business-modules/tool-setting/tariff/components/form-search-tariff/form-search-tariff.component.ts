@@ -155,7 +155,7 @@ export class TariffFormSearchComponent extends AppForm {
         if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER) && !!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER)) {
             this.configCustomer.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER) || [];
 
-            this.suppliers = [...this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER), ...this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPPER)];
+            this.suppliers = [...this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER) || [], ...this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPPER) || []];
             this.suppliers = _uniqBy(this.suppliers, 'id');
         }
         forkJoin([

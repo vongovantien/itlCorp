@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, Input } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { SeaFCLImportContainerListPopupComponent } from '../popup/container-list/container-list.popup';
 
@@ -9,6 +9,7 @@ import { Container } from 'src/app/shared/models/document/container.model';
 import _uniqBy from 'lodash/uniqBy';
 import _groupBy from 'lodash/groupBy';
 import { takeUntil } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -18,9 +19,11 @@ import { takeUntil } from 'rxjs/operators';
 
 })
 export class SeaFCLImportShipmentGoodSummaryComponent extends AppForm {
-
+    mblid: string = null;
+    hblid: string = null;
     @ViewChild(SeaFCLImportContainerListPopupComponent, { static: false }) containerPopup: SeaFCLImportContainerListPopupComponent;
 
+    // parentId: string = ''; // housebillId or jobId
     description: string = '';
     commodities: string = '';
     containerDetail: string = '';
@@ -33,11 +36,15 @@ export class SeaFCLImportShipmentGoodSummaryComponent extends AppForm {
     constructor(
         private _actionStoreSubject: ActionsSubject,
         private _store: Store<fromStore.IContainerState>,
+        private _activedRoute: ActivatedRoute
     ) {
         super();
     }
-
     ngOnInit(): void {
+        this._activedRoute.params.subscribe(p => {
+            this.hblid = p['hblId'];
+            this.mblid = p['id'];
+        });
         this._actionStoreSubject
             .pipe(
                 takeUntil(this.ngUnsubscribe)
@@ -106,7 +113,6 @@ export class SeaFCLImportShipmentGoodSummaryComponent extends AppForm {
             );
     }
 
-
     handleStringCont(contOb: { cont: string, quantity: number }) {
         return contOb.quantity + 'x' + contOb.cont + ', ';
     }
@@ -120,7 +126,8 @@ export class SeaFCLImportShipmentGoodSummaryComponent extends AppForm {
     }
 
     openContainerListPopup() {
-
+        this.containerPopup.mblid = this.mblid;
+        this.containerPopup.hblid = this.hblid;
         this.containerPopup.show();
     }
 }

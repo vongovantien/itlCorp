@@ -14,6 +14,7 @@ import { ActionsSubject, Store } from '@ngrx/store';
 import * as fromStore from '../../../store/index';
 import { InfoPopupComponent, ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { SeaFCLImportShipmentGoodSummaryComponent } from '../../../components/shipment-good-summary/shipment-good-summary.component';
+import { ImportHouseBillDetailComponent } from '../popup/import-house-bill-detail/import-house-bill-detail.component';
 
 @Component({
     selector: 'app-create-house-bill',
@@ -25,9 +26,12 @@ export class CreateHouseBillComponent extends AppForm {
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmCreatePopup: ConfirmPopupComponent;
     @ViewChild(SeaFCLImportShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: SeaFCLImportShipmentGoodSummaryComponent;
+    @ViewChild(ImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ImportHouseBillDetailComponent;
+
     fclImportAddModel: FCLImportAddModel = new FCLImportAddModel();
     jobId: string = '';
     shipmentDetail: any = {};
+    selectedHbl: any = {};
 
     constructor(
         protected _progressService: NgProgress,
@@ -45,8 +49,8 @@ export class CreateHouseBillComponent extends AppForm {
     }
     ngOnInit() {
         this._activedRoute.params.subscribe((param: Params) => {
-            if (param.id) {
-                this.jobId = param.id;
+            if (param.hblId) {
+                this.jobId = param.hblId;
             }
         });
         this._actionStoreSubject
@@ -109,9 +113,37 @@ export class CreateHouseBillComponent extends AppForm {
         }
 
     }
+    onImport(selectedData: any) {
+        this.selectedHbl = selectedData;
+
+        console.log(this.selectedHbl);
+        if (!!this.selectedHbl) {
+            this.formHouseBill.mtBill.setValue(this.selectedHbl.mawb);
+            this.formHouseBill.consigneeDescription.setValue(this.selectedHbl.consigneeDescription);
+            this.formHouseBill.shipperDescription.setValue(this.selectedHbl.shipperDescription);
+            this.formHouseBill.notifyPartyDescription.setValue(this.selectedHbl.notifyPartyDescription);
+            this.formHouseBill.referenceNo.setValue(this.selectedHbl.referenceNo);
+
+            this.formHouseBill.alsonotifyPartyDescription.setValue(this.selectedHbl.alsoNotifyPartyDescription);
+            this.formHouseBill.selectedCustomer = { field: 'id', value: this.selectedHbl.customerId };
+            this.formHouseBill.selectedSaleman = { field: 'id', value: this.selectedHbl.saleManId };
+            this.formHouseBill.selectedShipper = { field: 'id', value: this.selectedHbl.shipperId };
+            this.formHouseBill.selectedConsignee = { field: 'id', value: this.selectedHbl.consigneeId };
+            this.formHouseBill.selectedNotifyParty = { field: 'id', value: this.selectedHbl.notifyPartyId };
+            this.formHouseBill.selectedPortOfLoading = { field: 'id', value: this.selectedHbl.pol };
+            this.formHouseBill.selectedPortOfDischarge = { field: 'id', value: this.selectedHbl.pod };
+            this.formHouseBill.selectedAlsoNotifyParty = { field: 'id', value: this.selectedHbl.alsoNotifyPartyId };
+            this.formHouseBill.hbltype.setValue(this.formHouseBill.hbOfladingTypes.filter(i => i.value === this.selectedHbl.hbltype)[0]);
+            this.formHouseBill.selectedSupplier = { field: 'id', value: this.selectedHbl.coloaderId };
+        }
+    }
 
     showCreatePpoup() {
         this.confirmCreatePopup.show();
+    }
+
+    showImportPopup() {
+        this.importHouseBillPopup.show();
     }
 
     combackToHBLList() {

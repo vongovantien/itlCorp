@@ -86,24 +86,12 @@
                                             </thead>
                                             <tbody class="tbody-group">
                                                 <ng-container *ngIf="!isLoading && !!houseBill.length">
-                                                    <tr
+                                                    <tr (click)="selectHBL(house)" class="pointer"
+                                                        title="Select House Bill"
+                                                        [class.selected-row]="selectedHbl.id === house.id"
                                                         *ngFor="let house of houseBill | filter : keyword : ['hwbno','customerName','saleManName','notifyParty','finalDestinationPlace','containers','packages','gw','cbm']; let i = index; trackBy: trackByFn">
                                                         <td class="table-actions-col">
                                                             <div class="table-actions" style="width: 70px">
-
-
-
-
-                                                                <!-- <ng-container>
-                                                                                                    <a title="Delete" class="pointer" (click)="showDeletePopup(office)">
-                                                                                                        <i class="la la-trash text-danger"></i>
-                                                                                                    </a>
-                                                                                                </ng-container> -->
-                                                                <!-- <span [class.m--margin-left-20]="!office.status">
-                                                                                                    <a title="Detail" class="pointer" [routerLink]="office.id">
-                                                                                                        <i class="la la-file-text-o"></i>
-                                                                                                    </a>
-                                                                                                </span> -->
                                                                 <button type="button"
                                                                     class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                                     [routerLink]="house.id" title="Detail">
@@ -133,38 +121,9 @@
                                                     [colspan]="headers.length + 1">
                                                 </tr>
                                                 <tr *ngIf="isLoading" app-table-row-loading></tr>
-
                                             </tbody>
                                         </table>
-
                                     </div>
-                                    <!-- <div class="pagination-nav ">
-                                        <div class="row">
-                                            <div class="col-sm-6">
-                                                <div class="tatable__pager-size">
-                                                    <div class="select-box">
-                                                        <select class="form-control" id="" aria-label=""
-                                                            [(ngModel)]="pageSize"
-                                                            (change)="selectPageSize(pageSize, dataSearch)"
-                                                            name="pagesize">
-                                                            <ng-container
-                                                                *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
-                                                                <option [ngValue]="item">{{item}} line / screen</option>
-                                                            </ng-container>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6" *ngIf="totalItems > pageSize">
-                                                <div class="float-right">
-                                                    <pagination [boundaryLinks]="true" [totalItems]="totalItems"
-                                                        [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
-                                                        [(ngModel)]="page">
-                                                    </pagination>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div> -->
                                 </div>
                             </div>
 
@@ -233,14 +192,55 @@
                                 </div>
                                 <div class="m-portlet__body">
                                     <tabset class="custom-class-tab">
-                                        <tab heading="Buying">
-                                            <buying-charge></buying-charge>
+                                        <tab heading="Buying" (selectTab)="onSelectTabSurcharge('BUY')">
+                                            <ng-container *ngIf="selectedTabSurcharge === 'BUY'">
+                                                <ng-container
+                                                    *ngIf="!!selectedShipment && !!selectedHbl && !!containers; else placeholder">
+                                                    <buying-charge [containers]="containers"
+                                                        [shipment]="selectedShipment" [hbl]="selectedHbl">
+                                                    </buying-charge>
+                                                </ng-container>
+                                                <ng-template #placeholder>
+                                                    <div class="no-data">
+                                                        <i class="flaticon-coins"></i>
+                                                        <span class="no-data-text">No records found</span>
+                                                    </div>
+                                                </ng-template>
+                                            </ng-container>
                                         </tab>
-                                        <tab heading="Selling">
+                                        <tab heading="Selling" (selectTab)="onSelectTabSurcharge('SELL')">
+                                            <ng-container *ngIf="selectedTabSurcharge === 'SELL'">
+                                                <ng-container
+                                                    *ngIf="!!selectedShipment && !!selectedHbl && !!containers; else placeholder">
+                                                    <selling-charge [containers]="containers"
+                                                        [shipment]="selectedShipment" [hbl]="selectedHbl">
+                                                    </selling-charge>
+                                                </ng-container>
 
+                                                <ng-template #placeholder>
+                                                    <div class="no-data">
+                                                        <i class="flaticon-coins"></i>
+                                                        <span class="no-data-text">No records found</span>
+                                                    </div>
+                                                </ng-template>
+                                            </ng-container>
                                         </tab>
-                                        <tab heading="OBH">
+                                        <tab heading="OBH" (selectTab)="onSelectTabSurcharge('OBH')">
+                                            <ng-container *ngIf="selectedTabSurcharge === 'OBH'">
+                                                <ng-container
+                                                    *ngIf="!!selectedShipment && !!selectedHbl && !!containers; else placeholder">
+                                                    <obh-charge [containers]="containers" [shipment]="selectedShipment"
+                                                        [hbl]="selectedHbl">
+                                                    </obh-charge>
+                                                </ng-container>
 
+                                                <ng-template #placeholder>
+                                                    <div class="no-data">
+                                                        <i class="flaticon-coins"></i>
+                                                        <span class="no-data-text">No records found</span>
+                                                    </div>
+                                                </ng-template>
+                                            </ng-container>
                                         </tab>
                                     </tabset>
                                 </div>

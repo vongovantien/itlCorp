@@ -30,6 +30,12 @@ export function ContainerReducer(state = initialState, action: ContainerAction):
             };
         }
 
+        case ContainerActionTypes.ADD_CONTAINERS: {
+            return {
+                containers: [...state.containers, ...action.payload]
+            };
+        }
+
         case ContainerActionTypes.DELETE_CONTAINER: {
             return { ...state, ...state.containers.splice(action.payload, 1) };
         }

@@ -190,6 +190,15 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+    getListHblPaging(page?: number, size?: number, body = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/Paging`, body, {
+            page: '' + page,
+            size: '' + size
+        }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 
     getListHourseBill(data: any = {}) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/QueryData`, data)
@@ -214,7 +223,7 @@ export class DocumentationRepo {
     }
 
     createHousebill(body: any = {}) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/addNew`, body)
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/addNew`, body);
     }
 
     checkMasterBillAllowToDelete(id: string) {
@@ -289,6 +298,28 @@ export class DocumentationRepo {
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
+    }
+
+    addShipmentSurcharge(data) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/Add`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    addShipmentSurcharges(data: any[]) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/AddAndUpdate`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    upLoadContainerFile(files: any, id: string, isHouseBill: boolean) {
+        return this._api.postFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsMawbcontainer/UploadFile`, files, "uploadedFile", { id: id, isHouseBill: isHouseBill });
     }
 
 }
