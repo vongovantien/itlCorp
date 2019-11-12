@@ -64,6 +64,8 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                 this.id = jobId;
                 this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(jobId));
                 this._store.dispatch(new fromStore.GetContainerAction({ mblid: jobId }));
+                this._store.dispatch(new fromStore.SeaFCLImportGetProfitAction(jobId));
+
 
                 this.getDetailSeaFCLImport();
                 this.getListContainer();

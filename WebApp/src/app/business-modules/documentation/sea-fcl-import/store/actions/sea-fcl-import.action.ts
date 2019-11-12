@@ -12,7 +12,12 @@ export enum SeaFCLImportActionTypes {
 
     UPDATE = '[CSTransaction] Update',
     UPDATE_SUCCESS = '[CSTransaction] Update Success',
-    UPDATE_FAIL = '[CSTransaction] Update Fail'
+    UPDATE_FAIL = '[CSTransaction] Update Fail',
+
+    GET_PROFIT = '[CSTransaction] Get Profit',
+    GET_PROFIT_SUCCESS = '[CSTransaction] Get Success',
+    GET_PROFIT_FAIL = '[CSTransaction] Get Fail',
+
 }
 
 /**
@@ -31,27 +36,39 @@ export class SeaFCLImportGetDetailSuccessAction implements Action {
 
     constructor(public payload: any) { }
 }
-
 export class SeaFCLImportGetDetailFailAction implements Action {
     readonly type = SeaFCLImportActionTypes.GET_DETAIL_FAIL;
 
     constructor(public payload: any) { }
 }
-
 export class SeaFCLImportUpdateAction implements Action {
     readonly type = SeaFCLImportActionTypes.UPDATE;
 
     constructor(public payload: any) { }
 }
-
 export class SeaFCLImportUpdateSuccessAction implements Action {
     readonly type = SeaFCLImportActionTypes.UPDATE_SUCCESS;
 
     constructor(public payload: any) { }
 }
-
 export class SeaFCLImportUpdateFailAction implements Action {
     readonly type = SeaFCLImportActionTypes.UPDATE_FAIL;
+
+    constructor(public payload: any) { }
+}
+
+export class SeaFCLImportGetProfitAction implements Action {
+    readonly type = SeaFCLImportActionTypes.GET_PROFIT;
+
+    constructor(public payload: any) { }
+}
+export class SeaFCLImportGetProfitSuccessAction implements Action {
+    readonly type = SeaFCLImportActionTypes.GET_PROFIT_SUCCESS;
+
+    constructor(public payload: any) { }
+}
+export class SeaFCLImportGetProfitFailFailAction implements Action {
+    readonly type = SeaFCLImportActionTypes.GET_PROFIT_FAIL;
 
     constructor(public payload: any) { }
 }
@@ -66,4 +83,7 @@ export type SeaFCLImportActions =
     | SeaFCLImportUpdateFailAction
     | SeaFCLImportGetDetailAction
     | SeaFCLImportGetDetailSuccessAction
-    | SeaFCLImportGetDetailFailAction;
+    | SeaFCLImportGetDetailFailAction
+    | SeaFCLImportGetProfitAction
+    | SeaFCLImportGetProfitSuccessAction
+    | SeaFCLImportGetProfitFailFailAction;
