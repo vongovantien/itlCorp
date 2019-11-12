@@ -20,7 +20,7 @@ export class TariffDetailComponent extends TariffAddComponent {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     tariffId: string = '';
     tariff: TariffAdd;
-    ACTION: CommonType.ACTION_FORM = 'UPDATE';
+    ACTION: CommonType.ACTION_FORM = CommonType.ACTION.UPDATE;
 
     constructor(
         protected _settingRepo: SettingRepo,

@@ -17,6 +17,7 @@ import * as fromStore from './../../store';
 import * as fromShareBussiness from './../../../../share-business/store';
 
 import { catchError, finalize, takeUntil, switchMap, tap } from 'rxjs/operators';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'app-sea-fcl-import-hbl',
@@ -33,7 +34,7 @@ export class SeaFCLImportHBLComponent extends AppList {
 
     containers: Container[] = new Array<Container>();
     selectedShipment: any; // TODO model.
-    selectedHbl: CsTransactionDetail = new CsTransactionDetail();
+    selectedHbl: CsTransactionDetail;
 
     charges: CsShipmentSurcharge[] = new Array<CsShipmentSurcharge>();
 
@@ -186,6 +187,7 @@ export class SeaFCLImportHBLComponent extends AppList {
         // * Get container, Job detail, Surcharge with hbl id, JobId.
         this._store.dispatch(new fromStore.GetContainerAction({ hblid: hbl.id }));
         this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(hbl.jobId));
+        this._store.dispatch(new fromStore.GetProfitHBLAction(this.selectedHbl.id));
 
         switch (this.selectedTabSurcharge) {
             case 'BUY':
@@ -206,21 +208,24 @@ export class SeaFCLImportHBLComponent extends AppList {
     onSelectTabSurcharge(tabName: string) {
         this.selectedTabSurcharge = tabName;
 
-        this._store.dispatch(new fromStore.GetContainerAction({ hblid: this.selectedHbl.id }));
-        this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(this.selectedHbl.jobId));
+        if (!!this.selectedHbl) {
+            this._store.dispatch(new fromStore.GetContainerAction({ hblid: this.selectedHbl.id }));
+            this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(this.selectedHbl.jobId));
+            this._store.dispatch(new fromStore.GetProfitHBLAction(this.selectedHbl.id));
 
-        switch (this.selectedTabSurcharge) {
-            case 'BUY':
-                this._store.dispatch(new fromShareBussiness.GetBuyingSurchargeAction({ type: 'BUY', hblId: this.selectedHbl.id }));
-                break;
-            case 'SELL':
-                this._store.dispatch(new fromShareBussiness.GetSellingSurchargeAction({ type: 'SELL', hblId: this.selectedHbl.id }));
-                break;
-            case 'OBH':
-                this._store.dispatch(new fromShareBussiness.GetOBHSurchargeAction({ type: 'OBH', hblId: this.selectedHbl.id }));
-                break;
-            default:
-                break;
+            switch (this.selectedTabSurcharge) {
+                case 'BUY':
+                    this._store.dispatch(new fromShareBussiness.GetBuyingSurchargeAction({ type: 'BUY', hblId: this.selectedHbl.id }));
+                    break;
+                case 'SELL':
+                    this._store.dispatch(new fromShareBussiness.GetSellingSurchargeAction({ type: 'SELL', hblId: this.selectedHbl.id }));
+                    break;
+                case 'OBH':
+                    this._store.dispatch(new fromShareBussiness.GetOBHSurchargeAction({ type: 'OBH', hblId: this.selectedHbl.id }));
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

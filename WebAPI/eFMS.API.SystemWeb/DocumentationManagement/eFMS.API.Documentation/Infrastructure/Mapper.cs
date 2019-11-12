@@ -20,6 +20,7 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<OpsTransaction, OpsTransactionModel>();
             CreateMap<sp_GetOpsTransaction, OpsTransactionModel>();
             CreateMap<CsArrivalFrieghtCharge, CsArrivalFrieghtChargeModel>();
+            CreateMap<CsTransactionDetailAddManifest, CsTransactionDetail>();
 
 
             CreateMap<CsTransactionEditModel, CsTransaction>();

@@ -50,11 +50,13 @@ namespace eFMS.API.Documentation.Controllers
         [Route("GetById")]
         public IActionResult GetById(Guid Id)
         {
-            CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { Id = Id };
+            //CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { Id = Id };
             CsMawbcontainerCriteria criteriaMaw = new CsMawbcontainerCriteria { Hblid = Id };
-            var hbl = csTransactionDetailService.GetById(criteria);
+            var hbl = csTransactionDetailService.GetById(Id);
             var resultMaw = containerService.Query(criteriaMaw).ToList();
-            hbl.CsMawbcontainers = resultMaw;
+            if(resultMaw.Count() > 0) {
+                hbl.CsMawbcontainers = resultMaw;
+            }
             ResultHandle hs = new ResultHandle { Data = hbl , Status = true };
             return Ok(hs);
         }
@@ -68,7 +70,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpPost]
         [Route("addNew")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Add(CsTransactionDetailModel model)
         {
             //ChangeTrackerHelper.currentUser = currentUser.UserID;
@@ -93,7 +95,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpDelete]
         [Route("Delete")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Delete(Guid id)
         {
             var hs = csTransactionDetailService.DeleteTransactionDetail(id);

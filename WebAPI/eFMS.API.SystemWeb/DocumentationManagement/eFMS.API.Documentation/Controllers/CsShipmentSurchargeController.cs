@@ -160,7 +160,6 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Add([FromBody]List<CsShipmentSurchargeModel> list)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var groups = list.Where(x => x.InvoiceNo != null).GroupBy(x => x.InvoiceNo);
 
             var query = list.Where(x => x.InvoiceNo != null).GroupBy(x => x.InvoiceNo)
                                       .Where(g => g.Count() > 1)

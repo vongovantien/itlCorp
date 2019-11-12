@@ -425,5 +425,41 @@ namespace eFMS.API.Documentation.DL.Services
             });
             return list;
         }
+        public HandleState ValidateContainerList(List<CsMawbcontainerModel> csMawbcontainers, Guid? mblId, Guid? hblId)
+        {
+            var groups = csMawbcontainers.GroupBy(x => new { x.ContainerTypeId, x.Quantity, x.ContainerNo, x.PackageTypeId });
+            if (groups.Any(x => x.Count() > 1))
+            {
+                return new HandleState(stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_DUPLICATE].Value);
+            }
+            IQueryable<CsMawbcontainer> containerShipments = null;
+            if (hblId != null)
+            {
+                containerShipments = DataContext.Get(x => x.Hblid == hblId);
+
+                foreach (var item in csMawbcontainers)
+                {
+                    bool existedItems = containerShipments.Any(cont => cont.ContainerTypeId == item.ContainerTypeId && cont.Quantity == item.Quantity && cont.ContainerNo == item.ContainerNo && cont.PackageTypeId == item.PackageTypeId && cont.Mblid == hblId);
+                    if (existedItems)
+                    {
+                        return new HandleState(stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_EXISTED].Value);
+                    }
+                }
+            }
+            if (mblId != null)
+            {
+                containerShipments = DataContext.Get(x => x.Mblid == mblId);
+
+                foreach (var item in csMawbcontainers)
+                {
+                    bool existedItems = containerShipments.Any(cont => cont.ContainerTypeId == item.ContainerTypeId && cont.Quantity == item.Quantity && cont.ContainerNo == item.ContainerNo && cont.PackageTypeId == item.PackageTypeId && cont.Mblid == mblId);
+                    if (existedItems)
+                    {
+                        return new HandleState(stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_EXISTED].Value);
+                    }
+                }
+            }
+            return new HandleState();
+        }
     }
 }

@@ -32,6 +32,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<SysEmployee> sysEmployeeRepo;
         readonly IContextBase<CsTransaction> transactionRepository;
         readonly IContextBase<CatCurrencyExchange> currencyExchangeRepository;
+        readonly ICsMawbcontainerService containerService;
 
         public CsTransactionService(IContextBase<CsTransaction> repository,
             IMapper mapper,
@@ -44,7 +45,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysUser> sysUser,
             IContextBase<SysEmployee> sysEmployee,
             IContextBase<CsTransaction> transactionRepo,
-            IContextBase<CatCurrencyExchange> currencyExchangeRepo) : base(repository, mapper)
+            IContextBase<CatCurrencyExchange> currencyExchangeRepo,
+            ICsMawbcontainerService contService) : base(repository, mapper)
         {
             currentUser = user;
             csTransactionDetailRepo = csTransactionDetail;
@@ -56,6 +58,7 @@ namespace eFMS.API.Documentation.DL.Services
             sysEmployeeRepo = sysEmployee;
             transactionRepository = transactionRepo;
             currencyExchangeRepository = currencyExchangeRepo;
+            containerService = contService;
         }
 
         #region -- INSERT & UPDATE --
@@ -123,6 +126,14 @@ namespace eFMS.API.Documentation.DL.Services
                     return new { model = new object { }, result = new HandleState("Not found type transaction") };
                 var transaction = mapper.Map<CsTransaction>(model);
                 transaction.Id = Guid.NewGuid();
+                if (model.CsMawbcontainers.Count > 0)
+                {
+                    var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, transaction.Id, null);
+                    if (checkDuplicateCont.Success == false)
+                    {
+                        return checkDuplicateCont;
+                    }
+                }
                 transaction.JobNo = CreateJobNoByTransactionType(model.TransactionTypeEnum, model.TransactionType);
                 transaction.CreatedDate = transaction.ModifiedDate = DateTime.Now;
                 transaction.Active = true;
@@ -154,31 +165,6 @@ namespace eFMS.API.Documentation.DL.Services
                             var hsContMBL = csMawbcontainerRepo.Add(container);
                         }
                     }
-                    //if (model.CsTransactionDetails != null && model.CsTransactionDetails.Count > 0)
-                    //{
-                    //    foreach (var item in model.CsTransactionDetails)
-                    //    {
-                    //        var transDetail = mapper.Map<CsTransactionDetail>(item);
-                    //        transDetail.Id = Guid.NewGuid();
-                    //        transDetail.JobId = transaction.Id;
-                    //        transDetail.Active = true;
-                    //        transDetail.UserCreated = transaction.UserModified = transaction.UserCreated;
-                    //        transDetail.DatetimeCreated = transaction.ModifiedDate = DateTime.Now;
-                    //        var hsHBL = csTransactionDetailRepo.Add(transDetail);
-                    //        if (item.CsMawbcontainers == null) continue;
-                    //        else
-                    //        {
-                    //            foreach (var x in item.CsMawbcontainers)
-                    //            {
-                    //                x.Id = Guid.NewGuid();
-                    //                x.Hblid = transDetail.Id;
-                    //                x.UserModified = transaction.UserCreated;
-                    //                x.DatetimeModified = DateTime.Now;
-                    //                var hsContHBL = csMawbcontainerRepo.Add(x);
-                    //            }
-                    //        }
-                    //    }
-                    //}
                 }
                 var result = hsTrans;
                 return new { model = transaction, result };
@@ -194,6 +180,14 @@ namespace eFMS.API.Documentation.DL.Services
         {
             try
             {
+                if (model.CsMawbcontainers.Count > 0)
+                {
+                    var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, model.Id, null);
+                    if (checkDuplicateCont.Success == false)
+                    {
+                        return checkDuplicateCont;
+                    }
+                }
                 var transaction = mapper.Map<CsTransaction>(model);
                 transaction.ModifiedDate = DateTime.Now;
                 if (transaction.IsLocked.HasValue)
