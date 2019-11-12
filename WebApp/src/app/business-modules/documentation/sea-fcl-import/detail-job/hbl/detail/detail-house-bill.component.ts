@@ -183,7 +183,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                             this.formHouseBill.shippingMark.setValue(res.data.shippingMark);
                             this.formHouseBill.remark.setValue(res.data.remark);
                             // this.formHouseBill.issueHBLDate.setValue(res.data.issueHbldate);
-                            !!this.hblDetail.issueHBLdate ? this.formHouseBill.issueHBLDate.setValue({ startDate: new Date(this.hblDetail.issueHBLdate), endDate: new Date(this.hblDetail.issueHBLdate) }) : this.formHouseBill.issueHBLDate.setValue(null), // * Date;
+                            !!this.hblDetail.issueHbldate ? this.formHouseBill.issueHBLDate.setValue({ startDate: new Date(this.hblDetail.issueHbldate), endDate: new Date(this.hblDetail.issueHbldate) }) : this.formHouseBill.issueHBLDate.setValue(null), // * Date;
 
                                 this.formHouseBill.referenceNo.setValue(res.data.referenceNo);
                             this.formHouseBill.originBLNumber.setValue(this.formHouseBill.numberOfOrigins.filter(i => i.value === res.data.originBlnumber)[0]);

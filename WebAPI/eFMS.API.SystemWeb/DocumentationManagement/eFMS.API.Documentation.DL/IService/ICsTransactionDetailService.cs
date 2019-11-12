@@ -26,7 +26,10 @@ namespace eFMS.API.Documentation.DL.IService
         CsTransactionDetailModel GetHbDetails(Guid JobId, Guid HbId);
         Crystal Preview(CsTransactionDetailModel model);
 
-        CsTransactionDetailModel GetById(CsTransactionDetailCriteria csTransactionDetailCriteria);
+        //CsTransactionDetailModel GetById(CsTransactionDetailCriteria csTransactionDetailCriteria);
+        CsTransactionDetailModel GetById(Guid Id);
+
+
 
     }
 }

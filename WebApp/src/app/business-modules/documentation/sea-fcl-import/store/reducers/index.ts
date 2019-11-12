@@ -5,6 +5,7 @@ import { IHBLState, HBLReducer } from './hbl.reducer';
 
 export * from './container.reducer';
 export * from './sea-fcl-import.reducer';
+export * from './hbl.reducer';
 
 export interface ISeaFCLImportState {
     csMawbcontainers: IContainerState;
@@ -21,6 +22,8 @@ export const getCSMawbcontainersState = createSelector(fclImportstate, (state: I
 export const getContainerSaveState = createSelector(fclImportstate, (state: ISeaFCLImportState) => state.csMawbcontainers.containers);
 
 export const getHBLState = createSelector(fclImportstate, (state: ISeaFCLImportState) => state.houseBill.hbl);
+export const getHBLProfitState = createSelector(fclImportstate, (state: ISeaFCLImportState) => state.houseBill.profit);
+export const getShipmentProfitState = createSelector(fclImportstate, (state: ISeaFCLImportState) => state.csTransaction.profits);
 
 export const reducers: ActionReducerMap<ISeaFCLImportState> = {
     csMawbcontainers: ContainerReducer,

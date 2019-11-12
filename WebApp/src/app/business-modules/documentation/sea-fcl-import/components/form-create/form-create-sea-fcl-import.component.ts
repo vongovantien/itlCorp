@@ -250,6 +250,7 @@ export class SeaFClImportFormCreateComponent extends AppForm {
         try {
             if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER)) {
                 this.carries = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER);
+
             } else {
                 const carries: any = await this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CARRIER).toPromise();
                 this.carries = carries;
@@ -271,7 +272,7 @@ export class SeaFClImportFormCreateComponent extends AppForm {
             } else {
                 const agents: any = await this._catalogueRepo.getPartnersByType(PartnerGroupEnum.AGENT).toPromise();
                 this.agents = agents;
-                this._dataService.setDataService(SystemConstants.CSTORAGE.CARRIER, agents);
+                this._dataService.setDataService(SystemConstants.CSTORAGE.AGENT, agents);
             }
         } catch (error) {
 
@@ -290,7 +291,7 @@ export class SeaFClImportFormCreateComponent extends AppForm {
             } else {
                 const ports: any = await this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Port }).toPromise();
                 this.configComboGridPort.dataSource = ports || [];
-                this._dataService.setDataService(SystemConstants.CSTORAGE.CARRIER, ports);
+                this._dataService.setDataService(SystemConstants.CSTORAGE.PORT, ports);
             }
         } catch (error) {
 

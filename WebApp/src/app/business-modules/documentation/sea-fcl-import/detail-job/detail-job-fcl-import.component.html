@@ -45,15 +45,19 @@
                             </div>
                         </div>
                     </form-create-sea-fcl-import>
+
                     <shipment-good-summary></shipment-good-summary>
+
+                    <grant-total-profit></grant-total-profit>
 
                 </tab>
                 <tab heading="House Bill List" (selectTab)="onSelectTab('hbl')">
 
                 </tab>
-                <tab heading="Debit Note & Credit Note" [active]="selectedTab === 'CDNOTE'"
-                    (selectTab)="onSelectTab('cdNote')">
-                    <sea-fcl-import-cd-note></sea-fcl-import-cd-note>
+                <tab heading="Debit Note & Credit Note" (selectTab)="onSelectTab('cdNote')"
+                    [active]="selectedTab === 'CDNOTE'">
+                    <ng-container *ngIf="selectedTab === 'CDNOTE'" loadModule="cd">
+                    </ng-container>
                 </tab>
                 <tab heading="Assignment" [active]="selectedTab === 'ASSIGNMENT'"
                     (selectTab)="onSelectTab('Assignment')">
