@@ -13,6 +13,7 @@ import { map, tap, switchMap, skip, catchError, takeUntil } from 'rxjs/operators
 import { ToastrService } from 'ngx-toastr';
 
 import * as fromStore from './../store';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 
 type TAB = 'SHIPMENT' | 'CDNOTE';
@@ -25,6 +26,7 @@ type TAB = 'SHIPMENT' | 'CDNOTE';
 export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobComponent {
 
     @ViewChild(SeaFClImportFormCreateComponent, { static: false }) formCreateComponent: SeaFClImportFormCreateComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
 
     id: string;
     selectedTab: TAB = 'SHIPMENT';
@@ -93,9 +95,9 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
 
                     // console.log("detail sea fcl import", this.fclImportDetail);
 
-                    // setTimeout(() => {
-                    this.updateForm();
-                    // }, 500);
+                    setTimeout(() => {
+                        this.updateForm();
+                    }, 200);
 
                     // this.formCreateComponent.fclImportDetail = this.fclImportDetail;
                     // this.formCreateComponent.initFormUpdate();
@@ -203,5 +205,13 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                 this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
         }
+    }
+
+    deleteJob() {
+        this.confirmDeletePopup.show();
+    }
+
+    onDeleteJob() {
+        this.confirmDeletePopup.hide();
     }
 }
