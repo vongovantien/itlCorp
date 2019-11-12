@@ -352,7 +352,7 @@ namespace eFMS.API.Documentation.DL.Services
                 csShipment = csTransactionRepository.Get(x => x.Id == jobId)?.FirstOrDefault();
                 if(csShipment != null)
                 {
-                    hblids = tranDetailRepository.Get(x => x.Id == csShipment.Id).Select(x => 
+                    hblids = tranDetailRepository.Get(x => x.JobId == csShipment.Id).Select(x => 
                                     new HousbillProfit { HBLID = x.Id, HBLNo = x.Hwbno });
                 }
             }
