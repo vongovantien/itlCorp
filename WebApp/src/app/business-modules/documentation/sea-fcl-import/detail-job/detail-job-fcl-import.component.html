@@ -49,10 +49,15 @@
 
                 </tab>
                 <tab heading="House Bill List" (selectTab)="onSelectTab('hbl')">
+
                 </tab>
                 <tab heading="Debit Note & Credit Note" [active]="selectedTab === 'CDNOTE'"
                     (selectTab)="onSelectTab('cdNote')">
                     <sea-fcl-import-cd-note></sea-fcl-import-cd-note>
+                </tab>
+                <tab heading="Assignment" [active]="selectedTab === 'ASSIGNMENT'"
+                    (selectTab)="onSelectTab('Assignment')">
+
                 </tab>
             </tabset>
         </div>
