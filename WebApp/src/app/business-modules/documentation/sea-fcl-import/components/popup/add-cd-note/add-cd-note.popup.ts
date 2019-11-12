@@ -1,6 +1,5 @@
 import { PopupBase } from "src/app/popup.base";
-import { Component, Input, ViewChild, EventEmitter, Output } from "@angular/core";
-import { OpsTransaction } from "src/app/shared/models/document/OpsTransaction.model";
+import { Component, ViewChild, EventEmitter, Output } from "@angular/core";
 import { DocumentationRepo } from "src/app/shared/repositories";
 import { catchError, map } from "rxjs/operators";
 import { ConfirmPopupComponent, InfoPopupComponent } from "src/app/shared/common/popup";
@@ -20,7 +19,6 @@ export class CdNoteAddPopupComponent extends PopupBase {
     @ViewChild('changePartnerPopup', { static: false }) changePartnerPopup: ConfirmPopupComponent;
     @ViewChild('notExistsChargePopup', { static: false }) notExistsChargePopup: InfoPopupComponent;
     @ViewChild(CdNoteAddRemainingChargePopupComponent, { static: false }) addRemainChargePopup: CdNoteAddRemainingChargePopupComponent;
-    @Input() currentJob: OpsTransaction = null;
 
     headers: CommonInterface.IHeaderTable[];
 
@@ -34,7 +32,7 @@ export class CdNoteAddPopupComponent extends PopupBase {
     cdNoteCode: string = '';
     cdNoteId: string = '';
 
-    currentHblID: string = '8F74BE7E-87E9-4D58-9FAF-422EBF24FE18';
+    currentMBLId: string = '';
     selectedNoteType: string = '';
 
     CDNote: AcctCDNote = new AcctCDNote();
@@ -43,6 +41,7 @@ export class CdNoteAddPopupComponent extends PopupBase {
 
     selectedPartner: any = {};
     partnerCurrent: any = {};
+    isHouseBillID: boolean = false;
 
     configPartner: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
@@ -81,25 +80,22 @@ export class CdNoteAddPopupComponent extends PopupBase {
             { title: "Debit Value", field: 'total', sortable: true },
             { title: 'Note', field: 'notes', sortable: true }
         ];
-        // if (this.currentJob != null) {
-        //     this.currentHblID = this.currentJob.hblid;
-        //     this.getListSubjectPartner();
-        // }
-        this.getListSubjectPartner();
     }
 
     closePopup() {
         this.hide();
         //Reset popup về default
         this.selectedNoteType = "DEBIT";
-        this.selectedPartner = {};
+        this.selectedPartner = {};;
         this.partnerCurrent = {};
         this.listChargePartner = [];
         this.initGroup = [];
+        console.log(this.selectedPartner);
     }
 
-    getListSubjectPartner() {
-        this._documentationRepo.getPartners(this.currentHblID)
+    getListSubjectPartner(mblId: any) {
+        const isHouseBillID = false;
+        this._documentationRepo.getPartners(mblId, isHouseBillID)
             .pipe(
                 catchError(this.catchError),
             ).subscribe(
@@ -120,9 +116,8 @@ export class CdNoteAddPopupComponent extends PopupBase {
         this.configPartner.selectedDisplayFields = ['partnerNameEn'];
     }
 
-    getListCharges(partnerId: string, isHouseBillID: boolean, cdNoteCode: string) {
-        console.log(partnerId);
-        this._documentationRepo.getChargesByPartner(this.currentHblID, partnerId, isHouseBillID, cdNoteCode)
+    getListCharges(mblId: string, partnerId: string, isHouseBillID: boolean, cdNoteCode: string) {
+        this._documentationRepo.getChargesByPartner(mblId, partnerId, isHouseBillID, cdNoteCode)
             .pipe(
                 catchError(this.catchError),
                 map((data: any) => {
@@ -133,7 +128,6 @@ export class CdNoteAddPopupComponent extends PopupBase {
                     this.listChargePartner = dataCharges;
                     this.initGroup = dataCharges;
                     console.log(this.listChargePartner)
-                    console.log(this.initGroup)
                     //Tính toán Amount Credit, Debit, Balance
                     this.calculatorAmount();
                 },
@@ -146,25 +140,25 @@ export class CdNoteAddPopupComponent extends PopupBase {
         if (this.partnerCurrent.value !== this.selectedPartner.value && this.listChargePartner.length > 0) {
             this.changePartnerPopup.show();
         } else {
-            this.getListCharges(this.selectedPartner.value, true, "");
+            this.getListCharges(this.currentMBLId, this.selectedPartner.value, this.isHouseBillID, "");
             this.partnerCurrent = Object.assign({}, this.selectedPartner);
         }
     }
 
     onSubmitChangePartnerPopup() {
-        //this.keyword = '';
+        this.keyword = '';
         this.isCheckAllCharge = false;
         //Gán this.selectedPartner cho this.partnerCurrent
         this.partnerCurrent = Object.assign({}, this.selectedPartner);
         //console.log(this.partnerCurrent)
-        this.getListCharges(this.selectedPartner.value, true, "");
+        this.getListCharges(this.currentMBLId, this.selectedPartner.value, this.isHouseBillID, "");
         this.changePartnerPopup.hide();
     }
 
     onCancelChangePartnerPopup() {
         //Gán this.partnerCurrent cho this.selectedPartner
         this.selectedPartner = Object.assign({}, this.partnerCurrent);
-        console.log(this.selectedPartner)
+        //console.log(this.selectedPartner)
     }
 
     onSubmitNotExistsChargePopup() {
@@ -199,7 +193,6 @@ export class CdNoteAddPopupComponent extends PopupBase {
 
         if (this.listChargePartner.length > 0) {
             for (const charges of this.listChargePartner) {
-                //console.log(charges.listCharges.filter(group => group.isSelected))
                 chargesNotSelected = charges.listCharges.filter(group => !group.isSelected);
                 if (chargesNotSelected.length > 0) {
                     grpNotSelectedChargeResult.push({ id: charges.id, hwbno: charges.hwbno, listCharges: chargesNotSelected });
@@ -213,14 +206,14 @@ export class CdNoteAddPopupComponent extends PopupBase {
     }
 
     saveCDNote() {
-        console.log(this.selectedNoteType)
+        //console.log(this.selectedNoteType)
         console.log(this.listChargePartner)
 
         //Không được phép create khi chưa có charge
         if (this.listChargePartner.length == 0) {
             this.notExistsChargePopup.show();
         } else {
-            this.CDNote.jobId = "03EA44D1-6DC1-4BD4-AFFD-8C5A5C192D22";//this.currentHblID;
+            this.CDNote.jobId = this.currentMBLId;//"03EA44D1-6DC1-4BD4-AFFD-8C5A5C192D22";
             this.CDNote.partnerId = this.selectedPartner.value;
             this.CDNote.type = this.selectedNoteType;
             this.CDNote.currencyId = "USD" // in the future , this id must be local currency of each country
@@ -237,37 +230,40 @@ export class CdNoteAddPopupComponent extends PopupBase {
             console.log(_totalCredit);
             console.log(_totalDebit);
             this.CDNote.total = _totalDebit - _totalCredit;
-            console.log(this.CDNote);
-            if (this.action == "create") {
-                this._documentationRepo.addCdNote(this.CDNote)
-                    .pipe(catchError(this.catchError))
-                    .subscribe(
-                        (res: CommonInterface.IResult) => {
-                            console.log(res);
-                            if (res.status) {
-                                this._toastService.success(res.message);
-                                this.onRequest.emit();
-                                this.closePopup();
-                            } else {
-                                this._toastService.error(res.message);
-                            }
-                        }
-                    );
+            if (this.CDNote.total > 999999999999999999) {
+                this._toastService.error('Balance amount field exceeds numeric storage size');
+                //return;
             } else {
-                this._documentationRepo.updateCdNote(this.CDNote)
-                    .pipe(catchError(this.catchError))
-                    .subscribe(
-                        (res: CommonInterface.IResult) => {
-                            console.log(res);
-                            if (res.status) {
-                                this._toastService.success(res.message);
-                                this.onUpdate.emit();
-                                this.closePopup();
-                            } else {
-                                this._toastService.error(res.message);
+                console.log(this.CDNote);
+                if (this.action == "create") {
+                    this._documentationRepo.addCdNote(this.CDNote)
+                        .pipe(catchError(this.catchError))
+                        .subscribe(
+                            (res: CommonInterface.IResult) => {
+                                if (res.status) {
+                                    this._toastService.success(res.message);
+                                    this.onRequest.emit();
+                                    this.closePopup();
+                                } else {
+                                    this._toastService.error(res.message);
+                                }
                             }
-                        }
-                    );
+                        );
+                } else {
+                    this._documentationRepo.updateCdNote(this.CDNote)
+                        .pipe(catchError(this.catchError))
+                        .subscribe(
+                            (res: CommonInterface.IResult) => {
+                                if (res.status) {
+                                    this._toastService.success(res.message);
+                                    this.onUpdate.emit();
+                                    this.closePopup();
+                                } else {
+                                    this._toastService.error(res.message);
+                                }
+                            }
+                        );
+                }
             }
         }
     }
@@ -315,17 +311,14 @@ export class CdNoteAddPopupComponent extends PopupBase {
     }
 
     openPopupAddCharge() {
-        //console.log(this.listChargePartner);
         this.addRemainChargePopup.partner = this.selectedPartner.value;
-        //console.log(this.selectedPartner.value);
         this.addRemainChargePopup.listChargePartner = this.listChargePartner;
 
-        this._documentationRepo.getChargesByPartnerNotExitstCdNote(this.currentHblID, this.selectedPartner.value, this.listChargePartner)
+        this._documentationRepo.getChargesByPartnerNotExitstCdNote(this.currentMBLId, this.selectedPartner.value, this.isHouseBillID, this.listChargePartner)
             .pipe(
                 catchError(this.catchError),
             ).subscribe(
                 (dataCharges: any) => {
-                    //console.log(dataCharges);
                     this.addRemainChargePopup.listChargePartnerAddMore = dataCharges;
                     this.addRemainChargePopup.show();
                 },
@@ -346,7 +339,6 @@ export class CdNoteAddPopupComponent extends PopupBase {
         this.initGroup = data;
         //Tính toán giá trị amount, balance
         this.calculatorAmount();
-        //console.log(this.listChargePartner);
     }
 
     //Charge keyword search
@@ -373,5 +365,4 @@ export class CdNoteAddPopupComponent extends PopupBase {
             this.listChargePartner = this.initGroup;
         }
     }
-
 }

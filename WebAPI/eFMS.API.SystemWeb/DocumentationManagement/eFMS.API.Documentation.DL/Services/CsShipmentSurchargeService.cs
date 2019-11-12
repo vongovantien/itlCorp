@@ -143,7 +143,8 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var houseBill in houseBills)
                 {
                     listCharges = Query(houseBill.Id, null);
-                    listCharges = listCharges.Where(x => (x.PayerId == partnerId || x.Type == "OBH" || x.PaymentObjectId == partnerId)).ToList();
+                    //listCharges = listCharges.Where(x => (x.PayerId == partnerId || x.Type == "OBH" || x.PaymentObjectId == partnerId)).ToList();
+                    listCharges = listCharges.Where(x => ((x.PayerId == partnerId && x.Type == "OBH") || x.PaymentObjectId == partnerId)).ToList();
                     if (!string.IsNullOrEmpty(cdNoteCode))
                     {
                         listCharges = listCharges.Where(x => (x.CreditNo == cdNoteCode || x.DebitNo == cdNoteCode)).ToList();

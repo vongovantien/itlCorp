@@ -29,7 +29,7 @@
                             <tbody class="tbody-group">
                                 <ng-container
                                     *ngFor="let charges of listChargePartnerAddMore; let i = index; trackBy: trackByFn">
-                                    <tr class="collapse-toggle-row tgroup">
+                                    <tr class="collapse-toggle-row tgroup" *ngIf='charges.listCharges.length > 0'>
                                         <td colspan="12">
                                             <!-- <label class="m-checkbox">
                                                 <input type="checkbox" (change)="onChangeCheckBoxGrpCharge(charges)"

@@ -35,7 +35,7 @@ export class CdNoteAddRemainingChargePopupComponent extends PopupBase {
     }
 
     addCharge() {
-        console.log('add charge')
+        //console.log('add charge')
         console.log(this.listChargePartnerAddMore);
         let chargesSelected = [];
         let grpChargeSelected = [];
@@ -49,7 +49,7 @@ export class CdNoteAddRemainingChargePopupComponent extends PopupBase {
             }
         }
         let result = [];
-        console.log('grpChargeSelected')
+        //console.log('grpChargeSelected')
         console.log(grpChargeSelected);
         for (const group of grpChargeSelected) {
             if (this.listChargePartner.length > 0) {
@@ -64,25 +64,22 @@ export class CdNoteAddRemainingChargePopupComponent extends PopupBase {
                 result.push({ id: group.id, hwbno: group.hwbno, listCharges: group.listCharges });
             }
         }
-        console.log('result');
-        console.log(result);
         this.listChargePartner = this.listChargePartner.length > 0 ? this.listChargePartner : result;
         console.log(this.listChargePartner);
         this.onAddCharge.emit(this.listChargePartner);
-        
+
         this.isCheckAllCharge = false;
         this.closePopup();
     }
 
     closePopup() {
         this.isCheckAllCharge = false;
-        this.hide();       
+        this.hide();
     }
 
     checkUncheckAllCharge() {
         for (const group of this.listChargePartnerAddMore) {
             group.isSelected = this.isCheckAllCharge;
-
             for (const item of group.listCharges) {
                 item.isSelected = this.isCheckAllCharge;
             }

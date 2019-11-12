@@ -21,10 +21,14 @@ export class SeaFCLImportCDNoteComponent extends AppList {
     @ViewChild(CdNoteDetailPopupComponent, { static: false }) cdNoteDetailPopupComponent: CdNoteDetailPopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
-    idMasterBill: string = '8F74BE7E-87E9-4D58-9FAF-422EBF24FE18';//'11033e5a-01a6-400a-8798-5d23ecf26a4d';
+    idMasterBill: string = '';
     cdNoteGroups: any[] = [];
+    initGroup: any[] = [];
     deleteMessage: string = '';
     selectedCdNoteId: string = '';
+
+    isDesc = true;
+    sortKey: string = '';
 
     constructor(
         private _documentationRepo: DocumentationRepo,
@@ -35,53 +39,54 @@ export class SeaFCLImportCDNoteComponent extends AppList {
     ) {
         super();
         this._progressRef = this._progressService.ref();
-        this.requestSort = this.sortCdNotes;
     }
 
     ngOnInit(): void {
         this._activedRoute.params.subscribe((param: Params) => {
             if (param.id) {
                 console.log(param.id);
+                this.idMasterBill = param.id;
+                this.getListCdNote(this.idMasterBill);
             }
         });
         this.headers = [
             { title: 'Type', field: 'type', sortable: true },
             { title: 'Note No', field: 'code', sortable: true },
-            { title: 'Charges Count', field: 'total_charge', sortable: true },
-            { title: 'Balance Amount', field: 'total', sortable: true },
+            { title: 'Charges Count', field: 'total_charge', sortable: true,  },
+            { title: 'Balance Amount', field: 'total', sortable: true, width: 220},
             { title: 'Creator', field: 'userCreated', sortable: true },
             { title: 'Create Date', field: 'datetimeCreated', sortable: true },
             { title: 'SOA', field: 'soaNo', sortable: true },
         ];
+    }
 
-        this.getListCdNote(this.idMasterBill);
+    ngAfterViewInit() {
+        this.cdNoteAddPopupComponent.getListSubjectPartner(this.idMasterBill);
+        this.cdNoteDetailPopupComponent.cdNoteEditPopupComponent.getListSubjectPartner(this.idMasterBill);
     }
 
     openPopupAdd() {
         this.cdNoteAddPopupComponent.action = 'create';
+        this.cdNoteAddPopupComponent.currentMBLId = this.idMasterBill;
         this.cdNoteAddPopupComponent.show();
     }
 
-    openPopupDetail(jobId: string, cdNote: string){
-        console.log(jobId)
-        console.log(cdNote)
-        this.cdNoteDetailPopupComponent.jobId = jobId;//'C79E1D6C-888F-48D2-8870-776DADE208BE';
-        this.cdNoteDetailPopupComponent.cdNote = cdNote;//'LGDN191000006';
-        //this.cdNoteDetailPopupComponent.getDetailCdNote('C79E1D6C-888F-48D2-8870-776DADE208BE','LGDN191000006');
-        this.cdNoteDetailPopupComponent.getDetailCdNote(jobId,cdNote);
+    openPopupDetail(jobId: string, cdNote: string) {
+        this.cdNoteDetailPopupComponent.jobId = jobId;
+        this.cdNoteDetailPopupComponent.cdNote = cdNote;
+        this.cdNoteDetailPopupComponent.getDetailCdNote(jobId, cdNote);
         this.cdNoteDetailPopupComponent.show();
     }
 
     getListCdNote(id: string) {
-        //getListCdNoteByMasterBill
         //getListCDNoteByHouseBill
-        this._documentationRepo.getListCDNoteByHouseBill(id)
+        this._documentationRepo.getListCdNoteByMasterBill(id)
             .pipe(
                 catchError(this.catchError),
             ).subscribe(
                 (res: any) => {
-                    console.log('list cd note')
                     this.cdNoteGroups = res;
+                    this.initGroup = res;
                     console.log(this.cdNoteGroups)
                 },
             );
@@ -108,7 +113,6 @@ export class SeaFCLImportCDNoteComponent extends AppList {
     }
 
     onDeleteCdNote() {
-        console.log('đang delete CDNote')
         console.log(this.selectedCdNoteId)
         this._progressRef.start();
         this._documentationRepo.deleteCdNote(this.selectedCdNoteId)
@@ -122,25 +126,50 @@ export class SeaFCLImportCDNoteComponent extends AppList {
                 (respone: CommonInterface.IResult) => {
                     if (respone.status) {
                         this._toastService.success(respone.message, 'Delete Success !');
-                        console.log('id master bill ', this.idMasterBill);
                         this.getListCdNote(this.idMasterBill);
                     }
                 },
             );
     }
 
-    sortCdNotes(sort: string): void {
-        this.cdNoteGroups = this._sortService.sort(this.cdNoteGroups, sort, this.order);
+    sortCdNotes(property) {
+        this.isDesc = !this.isDesc;
+        this.sortKey = property;
+        this.cdNoteGroups.forEach(element => {
+            element.listCDNote = this._sortService.sort(element.listCDNote, property, this.isDesc);
+        });
     }
 
-    onRequestCdNoteChange(dataRequest: any){
+    onRequestCdNoteChange(dataRequest: any) {
         this.getListCdNote(this.idMasterBill);
     }
 
-
-    onDeletedCdNote(data: any){
-        console.log(data)
-        console.log(this.idMasterBill)
+    onDeletedCdNote(data: any) {
         this.getListCdNote(this.idMasterBill);
+    }
+
+    //Charge keyword search
+    onChangeKeyWord(keyword: string) {
+        this.cdNoteGroups = this.initGroup;
+        //TODO improve search.
+        if (!!keyword) {
+            keyword = keyword.toLowerCase();
+            // Search group
+            let dataGrp = this.cdNoteGroups.filter((item: any) => item.partnerNameEn.toLowerCase().toString().search(keyword) !== -1)
+            // Không tìm thấy group thì search tiếp list con của group
+            if (dataGrp.length == 0) {
+                let arrayCharge = [];
+                for (const group of this.cdNoteGroups) {
+                    const data = group.listCDNote.filter((item: any) => item.type.toLowerCase().toString().search(keyword) !== -1 || item.code.toLowerCase().toString().search(keyword) !== -1)
+                    if (data.length > 0) {
+                        arrayCharge.push({ id: group.id, partnerNameEn: group.partnerNameEn, partnerNameVn: group.partnerNameVn, listCDNote: data });
+                    }
+                }
+                dataGrp = arrayCharge;
+            }
+            return this.cdNoteGroups = dataGrp;
+        } else {
+            this.cdNoteGroups = this.initGroup;
+        }
     }
 }

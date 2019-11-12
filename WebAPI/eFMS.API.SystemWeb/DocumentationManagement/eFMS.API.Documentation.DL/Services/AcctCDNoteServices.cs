@@ -278,13 +278,14 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     //List<Guid> lst_Hbid = trandetailRepositoty.Get(x => x.JobId == id);//((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == id).ToList().Select(x => x.Id).ToList();
                     List<CsTransactionDetail> housebills = trandetailRepositoty.Get(x => x.JobId == id).ToList();
+                    List<CsShipmentSurchargeDetailsModel> _listCharges = new List<CsShipmentSurchargeDetailsModel>();
                     foreach (var housebill in housebills)
                     {
                         //var houseBill = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.Id == _id).FirstOrDefault();
                         //List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
                         if (housebill != null)
                         {
-                            listCharges = Query(housebill.Id);
+                            _listCharges = Query(housebill.Id);
 
                             foreach (var c in listCharges)
                             {
@@ -300,7 +301,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 }
                             }
                         }
-
+                        listCharges.AddRange(_listCharges);
                     }
                 }
                 else
@@ -468,7 +469,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 charge.Currency = ((eFMSDataContext)DataContext.DC).CatCurrency.First(x => x.Id == charge.CurrencyId).CurrencyName;
                 charge.ExchangeRate = (exchangeRate != null && exchangeRate.Rate != 0) ? exchangeRate.Rate : 1;
-                charge.Hwbno = hb != null ? hb.Hwbno : opsTransaction.Hwbno;
+                charge.Hwbno = hb != null ? hb.Hwbno : opsTransaction?.Hwbno;
                 charge.Unit = ((eFMSDataContext)DataContext.DC).CatUnit.First(x => x.Id == charge.UnitId).UnitNameEn;
                 charge.ChargeCode = catCharge.Code;
                 charge.NameEn = catCharge.ChargeNameEn;
@@ -494,8 +495,8 @@ namespace eFMS.API.Documentation.DL.Services
                 soaDetails.ServiceDate = opsTransaction.ServiceDate;
                 soaDetails.HbLadingNo = opsTransaction?.Hwbno;
                 soaDetails.MbLadingNo = opsTransaction?.Mblno;
-                soaDetails.SumContainers = opsTransaction.SumContainers;
-                soaDetails.SumPackages = opsTransaction.SumPackages;
+                soaDetails.SumContainers = opsTransaction?.SumContainers;
+                soaDetails.SumPackages = opsTransaction?.SumPackages;
             }
             var hbConstainers = string.Empty;
             decimal? volum = 0;
@@ -521,7 +522,7 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.PartnerFax = partner?.Fax;
             soaDetails.PartnerPersonalContact = partner.ContactPerson;
             soaDetails.JobId = transaction != null ? transaction.Id : opsTransaction.Id;
-            soaDetails.JobNo = transaction != null ? transaction.JobNo : opsTransaction.JobNo;
+            soaDetails.JobNo = transaction != null ? transaction.JobNo : opsTransaction?.JobNo;
             soaDetails.Pol = pol?.NameEn;
             if (soaDetails.PolCountry != null)
             {
@@ -540,8 +541,8 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.Volum = volum;
             soaDetails.ListSurcharges = listSurcharges;
             soaDetails.CDNote = cdNote;
-            soaDetails.ProductService = opsTransaction.ProductService;
-            soaDetails.ServiceMode = opsTransaction.ServiceMode;
+            soaDetails.ProductService = opsTransaction?.ProductService;
+            soaDetails.ServiceMode = opsTransaction?.ServiceMode;
             soaDetails.SoaNo = String.Join(",", charges.Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct()); ;
 
             return soaDetails;
