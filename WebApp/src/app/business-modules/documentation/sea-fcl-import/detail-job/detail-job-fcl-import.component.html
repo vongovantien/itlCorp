@@ -51,7 +51,7 @@
                     <grant-total-profit></grant-total-profit>
 
                 </tab>
-                <tab heading="House Bill List" (selectTab)="onSelectTab('hbl')">
+                <tab heading="House Bill List" [active]="selectedTab === 'HBL'" (selectTab)="onSelectTab('hbl')">
 
                 </tab>
                 <tab heading="Debit Note & Credit Note" (selectTab)="onSelectTab('cdNote')"
@@ -59,8 +59,8 @@
                     <ng-container *ngIf="selectedTab === 'CDNOTE'" loadModule="cd">
                     </ng-container>
                 </tab>
-                <tab heading="Assignment" [active]="selectedTab === 'ASSIGNMENT'"
-                    (selectTab)="onSelectTab('Assignment')">
+                <tab heading="Assignment" (selectTab)="onSelectTab('assignment')"
+                    [active]="selectedTab === 'ASSIGNMENT'">
 
                 </tab>
             </tabset>
