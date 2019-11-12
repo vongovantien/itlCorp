@@ -17,8 +17,11 @@ namespace eFMS.API.Documentation.DL.Services
 {
     public class CsManifestService : RepositoryBase<CsManifest, CsManifestModel>, ICsManifestService
     {
-        public CsManifestService(IContextBase<CsManifest> repository, IMapper mapper) : base(repository, mapper)
+        readonly IContextBase<CsTransactionDetail> transactionDetailRepository;
+        public CsManifestService(IContextBase<CsManifest> repository, IMapper mapper,
+            IContextBase<CsTransactionDetail> transactionDetailRepo) : base(repository, mapper)
         {
+            transactionDetailRepository = transactionDetailRepo;
         }
 
         public HandleState AddOrUpdateManifest(CsManifestEditModel model)
@@ -50,9 +53,11 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         item.DatetimeModified = DateTime.Now;
                         item.UserModified = manifest.UserCreated;
-                        ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Update(item);
+                        var tranDetail = mapper.Map<CsTransactionDetailAddManifest>(item);
+                        transactionDetailRepository.Update(tranDetail, x => x.Id == tranDetail.Id);
                     }
-                    ((eFMSDataContext)DataContext.DC).SaveChanges();
+                    transactionDetailRepository.SubmitChanges();
+                    DataContext.SubmitChanges();
                 }
 
                 return hs;
