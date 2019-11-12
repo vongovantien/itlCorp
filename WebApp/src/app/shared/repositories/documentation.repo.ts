@@ -245,8 +245,8 @@ export class DocumentationRepo {
         );
     }
 
-    getChargesByPartner(id: any, partnerId: any) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GroupByListHB`, { Id: id, partnerID: partnerId, IsHouseBillID: true }).pipe(
+    getChargesByPartner(id: any, partnerId: any, isHouseBillID: any, cdNoteCode: any) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GroupByListHB`, { Id: id, partnerID: partnerId, IsHouseBillID: isHouseBillID, cdNoteCode: cdNoteCode }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -268,6 +268,17 @@ export class DocumentationRepo {
 
     deleteCdNote(cdNoteId: string) {
         return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/Delete`, { cdNoteId: cdNoteId }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    addCdNote(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/Add`, body);
+    }
+
+    updateCdNote(body: any) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/Update`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

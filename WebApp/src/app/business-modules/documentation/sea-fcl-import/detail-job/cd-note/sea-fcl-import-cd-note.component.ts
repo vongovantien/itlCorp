@@ -21,7 +21,7 @@ export class SeaFCLImportCDNoteComponent extends AppList {
     @ViewChild(CdNoteDetailPopupComponent, { static: false }) cdNoteDetailPopupComponent: CdNoteDetailPopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
-    idMasterBill: string = '11033e5a-01a6-400a-8798-5d23ecf26a4d';
+    idMasterBill: string = '8F74BE7E-87E9-4D58-9FAF-422EBF24FE18';//'11033e5a-01a6-400a-8798-5d23ecf26a4d';
     cdNoteGroups: any[] = [];
     deleteMessage: string = '';
     selectedCdNoteId: string = '';
@@ -59,25 +59,25 @@ export class SeaFCLImportCDNoteComponent extends AppList {
 
     openPopupAdd() {
         this.cdNoteAddPopupComponent.action = 'create';
-        //this.cdNoteAddPopupComponent.advanceNo = this.advanceNo;
         this.cdNoteAddPopupComponent.show();
     }
 
     openPopupDetail(jobId: string, cdNote: string){
         console.log(jobId)
         console.log(cdNote)
-        this.cdNoteDetailPopupComponent.jobId = 'C79E1D6C-888F-48D2-8870-776DADE208BE';
-        this.cdNoteDetailPopupComponent.cdNote = 'LGDN191000006';
-        this.cdNoteDetailPopupComponent.getDetailCdNote('C79E1D6C-888F-48D2-8870-776DADE208BE','LGDN191000006');
+        this.cdNoteDetailPopupComponent.jobId = jobId;//'C79E1D6C-888F-48D2-8870-776DADE208BE';
+        this.cdNoteDetailPopupComponent.cdNote = cdNote;//'LGDN191000006';
+        //this.cdNoteDetailPopupComponent.getDetailCdNote('C79E1D6C-888F-48D2-8870-776DADE208BE','LGDN191000006');
+        this.cdNoteDetailPopupComponent.getDetailCdNote(jobId,cdNote);
         this.cdNoteDetailPopupComponent.show();
     }
 
     getListCdNote(id: string) {
         //getListCdNoteByMasterBill
+        //getListCDNoteByHouseBill
         this._documentationRepo.getListCDNoteByHouseBill(id)
             .pipe(
                 catchError(this.catchError),
-
             ).subscribe(
                 (res: any) => {
                     console.log('list cd note')
@@ -134,10 +134,13 @@ export class SeaFCLImportCDNoteComponent extends AppList {
     }
 
     onRequestCdNoteChange(dataRequest: any){
-        console.log(dataRequest)
+        this.getListCdNote(this.idMasterBill);
     }
 
-    onUpdateCdNote(dataRequest: any){
-        console.log(dataRequest)
+
+    onDeletedCdNote(data: any){
+        console.log(data)
+        console.log(this.idMasterBill)
+        this.getListCdNote(this.idMasterBill);
     }
 }

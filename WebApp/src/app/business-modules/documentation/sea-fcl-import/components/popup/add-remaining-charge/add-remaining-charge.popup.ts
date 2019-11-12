@@ -1,6 +1,5 @@
 import { Component, Output, EventEmitter } from "@angular/core";
 import { PopupBase } from "src/app/popup.base";
-import { DocumentationRepo } from "src/app/shared/repositories";
 import { ChargeCdNote } from "src/app/shared/models/document/chargeCdNote.model";
 
 @Component({
@@ -15,9 +14,7 @@ export class CdNoteAddRemainingChargePopupComponent extends PopupBase {
     listChargePartnerAddMore: ChargeCdNote[] = [];
     listChargePartner: ChargeCdNote[] = [];
     partner: string = "";
-    constructor(
-        private _documentationRepo: DocumentationRepo,
-    ) {
+    constructor() {
         super();
     }
 
@@ -77,11 +74,9 @@ export class CdNoteAddRemainingChargePopupComponent extends PopupBase {
         this.closePopup();
     }
 
-
     closePopup() {
         this.isCheckAllCharge = false;
-        this.hide();
-        
+        this.hide();       
     }
 
     checkUncheckAllCharge() {

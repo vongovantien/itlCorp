@@ -2,7 +2,7 @@
     <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content" *ngIf="CdNoteDetail">
             <div class="modal-header">
-                <h5 class="modal-title">Detail<span class="m--margin-left-5">Credit Note</span> No: CdNoteDetail.soa.code</h5>
+                <h5 class="modal-title">Detail<span class="m--margin-left-5">{{CdNoteDetail.cdNote.type === 'CREDIT' ? '"Credit Note"': CdNoteDetail.cdNote.type === 'DEBIT' ? '"Debit Note"' : '"Invoice"'}}</span> No: {{CdNoteDetail.cdNote.code}}</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closePopup()">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -143,7 +143,7 @@
                                             <span class="m--font-bolder">
                                                 SOA:
                                             </span>
-                                            <span>CdNoteDetail.soa.code</span>
+                                            <span>{{CdNoteDetail.soaNo}}</span>
                                         </div>
                                         <div class="m--margin-bottom-10">
                                             <span class="m--font-bolder">
@@ -207,15 +207,15 @@
                         <div class="m-alert m-alert--square alert alert-info m--align-right m--marginless">
                             <div class="row">
                                 <div class="col">
-                                    <strong>Total Credit:</strong><span class="m--margin-left-5">123456789</span>
+                                    <strong>Total Credit:</strong><span class="m--margin-left-5">{{totalCredit}}</span>
                                 </div>
                                 <div class="col-md-auto">
-                                    <strong>Total Dedit:</strong> <span class="m--margin-left-5">123456789</span>
+                                    <strong>Total Dedit:</strong> <span class="m--margin-left-5">{{totalDebit}}</span>
                                 </div>
                             </div>
                         </div>
                         <div class="m-alert m-alert--square alert alert-brand m--align-right m--marginless">
-                            <strong>Balance Amount:</strong><span class="m--margin-left-5">Total Dedit - Total Credit</span>
+                            <strong>Balance Amount:</strong><span class="m--margin-left-5">{{balanceAmount}}</span>
                         </div>
                     </div>
                     <!--end::m-portlet -->
@@ -223,7 +223,7 @@
                 <!--end::Form-->
             </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="deleteCdNote()">
+                <button class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="checkDeleteCdNote(CdNoteDetail.cdNote.id)">
                     <span>
                         <i class="la la-trash"></i>
                         <span>
@@ -252,5 +252,8 @@
     </div>
 </div>
 
-<cd-note-add-popup (onRequest)="onRequestCdNoteChange($event)"
-(onUpdate)="onUpdateCdNote($event)"></cd-note-add-popup>
+<cd-note-add-popup (onUpdate)="onUpdateCdNote($event)"></cd-note-add-popup>
+
+<confirm-popup (onSubmit)="onDeleteCdNote()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>
+
+<info-popup [body]="'You can not delete this Credit/Debit Note. Please recheck!'"></info-popup>

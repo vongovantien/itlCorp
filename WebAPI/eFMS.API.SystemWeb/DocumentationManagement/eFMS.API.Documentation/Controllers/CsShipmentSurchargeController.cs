@@ -64,12 +64,13 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="Id"></param>
         /// <param name="partnerID"></param>
         /// <param name="IsHouseBillID"></param>
+        /// <param name="cdNoteCode"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("GroupByListHB")]
-        public List<GroupChargeModel> GetByListHouseBill(Guid Id, string partnerID, bool IsHouseBillID)
+        public List<GroupChargeModel> GetByListHouseBill(Guid Id, string partnerID, bool IsHouseBillID, string cdNoteCode)
         {
-            return csShipmentSurchargeService.GroupChargeByHB(Id, partnerID, IsHouseBillID);
+            return csShipmentSurchargeService.GroupChargeByHB(Id, partnerID, IsHouseBillID, cdNoteCode);
         }
 
         /// <summary>
@@ -264,7 +265,7 @@ namespace eFMS.API.Documentation.Controllers
         [HttpPost("GroupByListHBNotExistsCDNote")]
         public List<GroupChargeModel> GroupByListHBNotExists(GroupByListHBCriteria criteria)
         {
-            var dataSearch = csShipmentSurchargeService.GroupChargeByHB(criteria.Id, criteria.partnerID, criteria.IsHouseBillID);
+            var dataSearch = csShipmentSurchargeService.GroupChargeByHB(criteria.Id, criteria.partnerID, criteria.IsHouseBillID, string.Empty);
             var dataTmp = dataSearch;
             //Ds idcharge Param            
             List<Guid> chargeIdParam = new List<Guid>();

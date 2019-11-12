@@ -1,4 +1,5 @@
 import { CsShipmentSurcharge } from "./csShipmentSurcharge";
+import { TransactionTypeEnum } from "../../enums/transaction-type.enum";
 
 export class AcctCDNote {
   id: String = "00000000-0000-0000-0000-000000000000";
@@ -40,4 +41,5 @@ export class AcctCDNote {
   trackingTransportBill: String = null;
   trackingTransportDate: String = null;
   listShipmentSurcharge: CsShipmentSurcharge[] = [];
+  transactionTypeEnum: TransactionTypeEnum = 0;
 }

@@ -2,11 +2,14 @@ import { PopupBase } from "src/app/popup.base";
 import { Component, Input, ViewChild, EventEmitter, Output } from "@angular/core";
 import { OpsTransaction } from "src/app/shared/models/document/OpsTransaction.model";
 import { DocumentationRepo } from "src/app/shared/repositories";
-import { catchError, tap, map } from "rxjs/operators";
+import { catchError, map } from "rxjs/operators";
 import { ConfirmPopupComponent, InfoPopupComponent } from "src/app/shared/common/popup";
 import { CdNoteAddRemainingChargePopupComponent } from "../add-remaining-charge/add-remaining-charge.popup";
 import { SortService } from "src/app/shared/services";
 import { ChargeCdNote } from "src/app/shared/models/document/chargeCdNote.model";
+import { ToastrService } from "ngx-toastr";
+import { AcctCDNote } from "src/app/shared/models/document/acctCDNote.model";
+import { TransactionTypeEnum } from "src/app/shared/enums/transaction-type.enum";
 @Component({
     selector: 'cd-note-add-popup',
     templateUrl: './add-cd-note.popup.html'
@@ -14,13 +17,10 @@ import { ChargeCdNote } from "src/app/shared/models/document/chargeCdNote.model"
 export class CdNoteAddPopupComponent extends PopupBase {
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
     @Output() onUpdate: EventEmitter<any> = new EventEmitter<any>();
-
     @ViewChild('changePartnerPopup', { static: false }) changePartnerPopup: ConfirmPopupComponent;
     @ViewChild('notExistsChargePopup', { static: false }) notExistsChargePopup: InfoPopupComponent;
     @ViewChild(CdNoteAddRemainingChargePopupComponent, { static: false }) addRemainChargePopup: CdNoteAddRemainingChargePopupComponent;
     @Input() currentJob: OpsTransaction = null;
-
-    action: string = 'create';
 
     headers: CommonInterface.IHeaderTable[];
 
@@ -30,10 +30,16 @@ export class CdNoteAddPopupComponent extends PopupBase {
         { text: 'INVOICE', id: 'INVOICE' }
     ];
 
-    currentHblID: any = '8F74BE7E-87E9-4D58-9FAF-422EBF24FE18';
+    action: string = 'create';
+    cdNoteCode: string = '';
+    cdNoteId: string = '';
+
+    currentHblID: string = '8F74BE7E-87E9-4D58-9FAF-422EBF24FE18';
     selectedNoteType: string = '';
 
+    CDNote: AcctCDNote = new AcctCDNote();
     listChargePartner: ChargeCdNote[] = [];
+    initGroup: ChargeCdNote[] = [];
 
     selectedPartner: any = {};
     partnerCurrent: any = {};
@@ -53,14 +59,12 @@ export class CdNoteAddPopupComponent extends PopupBase {
     constructor(
         private _documentationRepo: DocumentationRepo,
         private _sortService: SortService,
+        private _toastService: ToastrService,
     ) {
         super();
-        //this._progressRef = this._progressService.ref();
         this.selectedNoteType = "DEBIT";
         console.log(this.selectedNoteType);
-        this.requestList = this.getListCharges;
         this.requestSort = this.sortCdNoteCharge;
-
     }
 
     ngOnInit() {
@@ -86,10 +90,12 @@ export class CdNoteAddPopupComponent extends PopupBase {
 
     closePopup() {
         this.hide();
+        //Reset popup về default
         this.selectedNoteType = "DEBIT";
         this.selectedPartner = {};
         this.partnerCurrent = {};
         this.listChargePartner = [];
+        this.initGroup = [];
     }
 
     getListSubjectPartner() {
@@ -98,8 +104,6 @@ export class CdNoteAddPopupComponent extends PopupBase {
                 catchError(this.catchError),
             ).subscribe(
                 (dataPartner: any) => {
-                    //console.log('list partner')
-                    //console.log(dataPartner);
                     this.getPartnerData(dataPartner);
                 },
             );
@@ -116,21 +120,20 @@ export class CdNoteAddPopupComponent extends PopupBase {
         this.configPartner.selectedDisplayFields = ['partnerNameEn'];
     }
 
-    getListCharges(partnerId: string) {
+    getListCharges(partnerId: string, isHouseBillID: boolean, cdNoteCode: string) {
         console.log(partnerId);
-        this._documentationRepo.getChargesByPartner(this.currentHblID, partnerId)
+        this._documentationRepo.getChargesByPartner(this.currentHblID, partnerId, isHouseBillID, cdNoteCode)
             .pipe(
                 catchError(this.catchError),
                 map((data: any) => {
-                    console.log(data);
                     return data.map((item: any) => new ChargeCdNote(item));
                 })
             ).subscribe(
                 (dataCharges: any) => {
-                    //console.log('list charges')
-                    console.log(dataCharges);
                     this.listChargePartner = dataCharges;
+                    this.initGroup = dataCharges;
                     console.log(this.listChargePartner)
+                    console.log(this.initGroup)
                     //Tính toán Amount Credit, Debit, Balance
                     this.calculatorAmount();
                 },
@@ -140,23 +143,25 @@ export class CdNoteAddPopupComponent extends PopupBase {
     onSelectDataFormInfo(data: any) {
         this.selectedPartner = { field: "id", value: data.id };
         console.log(this.selectedPartner)
-        if (this.partnerCurrent.value !== this.selectedPartner.value) {
+        if (this.partnerCurrent.value !== this.selectedPartner.value && this.listChargePartner.length > 0) {
             this.changePartnerPopup.show();
+        } else {
+            this.getListCharges(this.selectedPartner.value, true, "");
+            this.partnerCurrent = Object.assign({}, this.selectedPartner);
         }
     }
 
     onSubmitChangePartnerPopup() {
+        //this.keyword = '';
         this.isCheckAllCharge = false;
         //Gán this.selectedPartner cho this.partnerCurrent
         this.partnerCurrent = Object.assign({}, this.selectedPartner);
-        console.log(this.partnerCurrent)
-        this.getListCharges(this.partnerCurrent.value);
+        //console.log(this.partnerCurrent)
+        this.getListCharges(this.selectedPartner.value, true, "");
         this.changePartnerPopup.hide();
     }
 
     onCancelChangePartnerPopup() {
-        console.log('cancel')
-        console.log(this.partnerCurrent)
         //Gán this.partnerCurrent cho this.selectedPartner
         this.selectedPartner = Object.assign({}, this.partnerCurrent);
         console.log(this.selectedPartner)
@@ -169,7 +174,6 @@ export class CdNoteAddPopupComponent extends PopupBase {
     checkUncheckAllCharge() {
         for (const group of this.listChargePartner) {
             group.isSelected = this.isCheckAllCharge;
-
             for (const item of group.listCharges) {
                 item.isSelected = this.isCheckAllCharge;
             }
@@ -189,30 +193,82 @@ export class CdNoteAddPopupComponent extends PopupBase {
     }
 
     removeCharge() {
-        console.log(this.listChargePartner.filter(group => group.isSelected));
-        let chargesResultNotSelected = [];
-        let grpResult = [];
+        //console.log(this.listChargePartner.filter(group => group.isSelected));
+        let chargesNotSelected = [];
+        let grpNotSelectedChargeResult = [];
 
         if (this.listChargePartner.length > 0) {
             for (const charges of this.listChargePartner) {
-                console.log(charges.listCharges.filter(group => group.isSelected))
-                chargesResultNotSelected = charges.listCharges.filter(group => !group.isSelected);
-                if (chargesResultNotSelected.length > 0) {
-                    grpResult.push({ id: charges.id, hwbno: charges.hwbno, listCharges: chargesResultNotSelected });
+                //console.log(charges.listCharges.filter(group => group.isSelected))
+                chargesNotSelected = charges.listCharges.filter(group => !group.isSelected);
+                if (chargesNotSelected.length > 0) {
+                    grpNotSelectedChargeResult.push({ id: charges.id, hwbno: charges.hwbno, listCharges: chargesNotSelected });
                 }
             }
         }
 
-        this.listChargePartner = grpResult;
+        this.listChargePartner = grpNotSelectedChargeResult;
         //Tính toán Amount Credit, Debit, Balance
         this.calculatorAmount();
     }
 
-    createCDNote() {
+    saveCDNote() {
         console.log(this.selectedNoteType)
         console.log(this.listChargePartner)
+
+        //Không được phép create khi chưa có charge
         if (this.listChargePartner.length == 0) {
             this.notExistsChargePopup.show();
+        } else {
+            this.CDNote.jobId = "03EA44D1-6DC1-4BD4-AFFD-8C5A5C192D22";//this.currentHblID;
+            this.CDNote.partnerId = this.selectedPartner.value;
+            this.CDNote.type = this.selectedNoteType;
+            this.CDNote.currencyId = "USD" // in the future , this id must be local currency of each country
+            this.CDNote.transactionTypeEnum = TransactionTypeEnum.SeaFCLImport;
+            var arrayCharges = [];
+            for (const charges of this.listChargePartner) {
+                for (const charge of charges.listCharges) {
+                    arrayCharges.push(charge);
+                }
+            }
+            this.CDNote.listShipmentSurcharge = arrayCharges;
+            const _totalCredit = arrayCharges.filter(f => (f.type === 'BUY' || (f.type === 'OBH' && this.selectedPartner.value === f.payerId))).reduce((credit, charge) => credit + charge.total * charge.exchangeRate, 0);
+            const _totalDebit = arrayCharges.filter(f => (f.type === 'SELL' || (f.type === 'OBH' && this.selectedPartner.value === f.paymentObjectId))).reduce((debit, charge) => debit + charge.total * charge.exchangeRate, 0);;
+            console.log(_totalCredit);
+            console.log(_totalDebit);
+            this.CDNote.total = _totalDebit - _totalCredit;
+            console.log(this.CDNote);
+            if (this.action == "create") {
+                this._documentationRepo.addCdNote(this.CDNote)
+                    .pipe(catchError(this.catchError))
+                    .subscribe(
+                        (res: CommonInterface.IResult) => {
+                            console.log(res);
+                            if (res.status) {
+                                this._toastService.success(res.message);
+                                this.onRequest.emit();
+                                this.closePopup();
+                            } else {
+                                this._toastService.error(res.message);
+                            }
+                        }
+                    );
+            } else {
+                this._documentationRepo.updateCdNote(this.CDNote)
+                    .pipe(catchError(this.catchError))
+                    .subscribe(
+                        (res: CommonInterface.IResult) => {
+                            console.log(res);
+                            if (res.status) {
+                                this._toastService.success(res.message);
+                                this.onUpdate.emit();
+                                this.closePopup();
+                            } else {
+                                this._toastService.error(res.message);
+                            }
+                        }
+                    );
+            }
         }
     }
 
@@ -236,8 +292,8 @@ export class CdNoteAddPopupComponent extends PopupBase {
         this.balanceAmount = '';
         console.log(listCharge)
         for (const currency of uniqueCurrency) {
-            const _credit = listCharge.filter(f => (f.type === 'BUY' || (f.type === 'OBH' && this.partnerCurrent.value === f.payerId)) && f.currencyId === currency).reduce((debit, charge) => debit + charge.total, 0);
-            const _debit = listCharge.filter(f => (f.type === 'SELL' || (f.type === 'OBH' && this.partnerCurrent.value === f.paymentObjectId)) && f.currencyId === currency).reduce((credit, charge) => credit + charge.total, 0);
+            const _credit = listCharge.filter(f => (f.type === 'BUY' || (f.type === 'OBH' && this.selectedPartner.value === f.payerId)) && f.currencyId === currency).reduce((credit, charge) => credit + charge.total, 0);
+            const _debit = listCharge.filter(f => (f.type === 'SELL' || (f.type === 'OBH' && this.selectedPartner.value === f.paymentObjectId)) && f.currencyId === currency).reduce((debit, charge) => debit + charge.total, 0);
             const _balance = _debit - _credit;
             this.totalCredit += this.formatNumberCurrency(_credit) + ' ' + currency + ' | ';
             this.totalDebit += this.formatNumberCurrency(_debit) + ' ' + currency + ' | ';
@@ -259,16 +315,17 @@ export class CdNoteAddPopupComponent extends PopupBase {
     }
 
     openPopupAddCharge() {
-        console.log(this.listChargePartner);
+        //console.log(this.listChargePartner);
         this.addRemainChargePopup.partner = this.selectedPartner.value;
-        console.log(this.selectedPartner.value);
+        //console.log(this.selectedPartner.value);
         this.addRemainChargePopup.listChargePartner = this.listChargePartner;
+
         this._documentationRepo.getChargesByPartnerNotExitstCdNote(this.currentHblID, this.selectedPartner.value, this.listChargePartner)
             .pipe(
                 catchError(this.catchError),
             ).subscribe(
                 (dataCharges: any) => {
-                    console.log(dataCharges);
+                    //console.log(dataCharges);
                     this.addRemainChargePopup.listChargePartnerAddMore = dataCharges;
                     this.addRemainChargePopup.show();
                 },
@@ -285,9 +342,36 @@ export class CdNoteAddPopupComponent extends PopupBase {
 
     onAddMoreCharge(data: ChargeCdNote[]) {
         this.listChargePartner = [];
-        console.log(data);
         this.listChargePartner = data;
+        this.initGroup = data;
+        //Tính toán giá trị amount, balance
         this.calculatorAmount();
-        console.log(this.listChargePartner)
+        //console.log(this.listChargePartner);
     }
+
+    //Charge keyword search
+    onChangeKeyWord(keyword: string) {
+        this.listChargePartner = this.initGroup;
+        //TODO improve search.
+        if (!!keyword) {
+            keyword = keyword.toLowerCase();
+            // Search group
+            let dataGrp = this.listChargePartner.filter((item: any) => item.hwbno.toLowerCase().toString().search(keyword) !== -1)
+            // Không tìm thấy group thì search tiếp list con của group
+            if (dataGrp.length == 0) {
+                let arrayCharge = [];
+                for (const group of this.listChargePartner) {
+                    const data = group.listCharges.filter((item: any) => item.chargeCode.toLowerCase().toString().search(keyword) !== -1 || item.nameEn.toLowerCase().toString().search(keyword) !== -1)
+                    if (data.length > 0) {
+                        arrayCharge.push({ id: group.id, hwbno: group.hwbno, listCharges: data });
+                    }
+                }
+                dataGrp = arrayCharge;
+            }
+            return this.listChargePartner = dataGrp;
+        } else {
+            this.listChargePartner = this.initGroup;
+        }
+    }
+
 }
