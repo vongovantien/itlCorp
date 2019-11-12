@@ -354,27 +354,30 @@ namespace eFMS.API.Documentation.DL.Services
                           Mawb = detail.Mawb,
                           SaleManId = detail.SaleManId,
                           SaleManName = sale.SaleManId,
-                          CustomerId =  detail.CustomerId,
+                          CustomerId = detail.CustomerId,
                           CustomerName = cus.ShortName,
                           NotifyPartyId = detail.NotifyPartyId,
                           NotifyParty = notify.ShortName,
-                          FinalDestinationPlace = detail.FinalDestinationPlace, 
-                          Eta = detail.Eta, 
+                          FinalDestinationPlace = detail.FinalDestinationPlace,
+                          Eta = detail.Eta,
                           Etd = detail.Etd,
-                          ConsigneeId = detail.ConsigneeId, 
+                          ConsigneeId = detail.ConsigneeId,
                           ConsigneeDescription = detail.ConsigneeDescription,
                           ShipperDescription = detail.ShipperDescription,
                           ShipperId = detail.ShipperId,
                           NotifyPartyDescription = detail.NotifyPartyDescription,
                           Pod = detail.Pod,
-                          Pol = detail.Pol, 
+                          Pol = detail.Pol,
                           AlsoNotifyPartyId = detail.AlsoNotifyPartyId,
                           AlsoNotifyPartyDescription = detail.AlsoNotifyPartyDescription,
-                          Hbltype = detail.Hbltype, 
+                          Hbltype = detail.Hbltype,
                           ReferenceNo = detail.ReferenceNo,
-                          ColoaderId = detail.ColoaderId
-                         
-                          
+                          ColoaderId = detail.ColoaderId,
+                          LocalVoyNo = detail.LocalVoyNo,
+                          LocalVessel = detail.LocalVessel,
+                          OceanVessel = detail.OceanVessel, 
+                          OceanVoyNo = detail.OceanVoyNo,
+                          OriginBlnumber = detail.OriginBlnumber 
                       };
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
             results = res.ToList();

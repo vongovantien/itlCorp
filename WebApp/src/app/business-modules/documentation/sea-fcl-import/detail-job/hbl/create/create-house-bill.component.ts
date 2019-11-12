@@ -123,7 +123,14 @@ export class CreateHouseBillComponent extends AppForm {
             this.formHouseBill.shipperDescription.setValue(this.selectedHbl.shipperDescription);
             this.formHouseBill.notifyPartyDescription.setValue(this.selectedHbl.notifyPartyDescription);
             this.formHouseBill.referenceNo.setValue(this.selectedHbl.referenceNo);
+            this.formHouseBill.localVessel.setValue(this.selectedHbl.localVessel);
+            this.formHouseBill.localVoyNo.setValue(this.selectedHbl.localVoyNo);
+            this.formHouseBill.oceanVessel.setValue(this.selectedHbl.oceanVessel);
+            this.formHouseBill.oceanVoyNo.setValue(this.selectedHbl.oceanVoyNo);
 
+
+
+            this.formHouseBill.originBLNumber.setValue(this.formHouseBill.numberOfOrigins.filter(i => i.value === this.selectedHbl.originBlnumber)[0]);
             this.formHouseBill.alsonotifyPartyDescription.setValue(this.selectedHbl.alsoNotifyPartyDescription);
             this.formHouseBill.selectedCustomer = { field: 'id', value: this.selectedHbl.customerId };
             this.formHouseBill.selectedSaleman = { field: 'id', value: this.selectedHbl.saleManId };
@@ -188,7 +195,7 @@ export class CreateHouseBillComponent extends AppForm {
             alsoNotifyPartyId: !!this.formHouseBill.selectedAlsoNotifyParty.value ? this.formHouseBill.selectedAlsoNotifyParty.value : null,
             alsoNotifyPartyDescription: this.formHouseBill.alsoNotifyPartyDescriptionModel,
             hwbno: this.formHouseBill.hwbno.value,
-            hbltype: this.formHouseBill.hbltype.value.value,
+            hbltype: this.formHouseBill.hbltype.value != null ? this.formHouseBill.hbltype.value.value : null,
             etd: !!this.formHouseBill.etd.value ? formatDate(this.formHouseBill.etd.value.startDate !== undefined ? this.formHouseBill.etd.value.startDate : this.formHouseBill.etd.value, 'yyyy-MM-dd', 'en') : null,
             eta: !!this.formHouseBill.eta.value ? formatDate(this.formHouseBill.eta.value.startDate !== undefined ? this.formHouseBill.eta.value.startDate : this.formHouseBill.eta.value, 'yyyy-MM-dd', 'en') : null,
             pickupPlace: this.formHouseBill.pickupPlace.value,
