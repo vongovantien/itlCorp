@@ -272,7 +272,7 @@ namespace eFMS.API.Documentation.DL.Services
                 else
                 {
                     result.HouseBillTotalCharge.TotalOBHLocal = result.HouseBillTotalCharge.TotalOBHLocal + totalLocal;
-                    result.HouseBillTotalCharge.TotalSellingUSD = result.HouseBillTotalCharge.TotalOBHUSD + totalUSD;
+                    result.HouseBillTotalCharge.TotalOBHUSD = result.HouseBillTotalCharge.TotalOBHUSD + totalUSD;
                 }
             }
             result.ProfitLocal = result.HouseBillTotalCharge.TotalSellingLocal - result.HouseBillTotalCharge.TotalBuyingLocal;
@@ -364,6 +364,7 @@ namespace eFMS.API.Documentation.DL.Services
             foreach(var item in hblids)
             {
                 var profit = GetHouseBillTotalProfit(item.HBLID);
+                profit.HBLNo = item.HBLNo;
                 results.Add(profit);
             }
             return results;

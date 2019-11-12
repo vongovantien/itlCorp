@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Store, ActionsSubject } from '@ngrx/store';
 
 import { Router, ActivatedRoute } from '@angular/router';
@@ -28,6 +28,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
 
     id: string;
     selectedTab: TAB = 'SHIPMENT';
+    ACTION: CommonType.ACTION_FORM = 'UPDATE';
 
     fclImportDetail: any; // TODO Model.
     containers: Container[] = [];
@@ -38,7 +39,8 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
         protected _activedRoute: ActivatedRoute,
         protected _store: Store<fromStore.ISeaFCLImportState>,
         protected _actionStoreSubject: ActionsSubject,
-        protected _toastService: ToastrService
+        protected _toastService: ToastrService,
+        private cdr: ChangeDetectorRef
     ) {
         super(_router, _documentRepo, _actionStoreSubject, _toastService);
     }
@@ -56,6 +58,11 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
             tap((param: any) => {
                 this.selectedTab = !!param.tab ? param.tab.toUpperCase() : 'SHIPMENT';
                 this.id = !!param.id ? param.id : '';
+                if (param.action) {
+                    this.ACTION = (param.action).toUpperCase() || "UPDATE";
+                }
+
+                this.cdr.detectChanges();
             }),
             switchMap(() => of(this.id))
             // switchMap((param: any) => this._documentRepo.getDetailTransaction(param.id)) // ? Using Effects or common way.
@@ -201,5 +208,13 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                 this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
         }
+    }
+    duplicateConfirm() {
+        this._router.navigate([], {
+            relativeTo: this._activedRoute,
+            queryParams: {
+                action: 'copy'
+            }
+        });
     }
 }

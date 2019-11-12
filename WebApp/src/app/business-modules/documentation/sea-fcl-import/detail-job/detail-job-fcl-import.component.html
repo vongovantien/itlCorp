@@ -2,7 +2,8 @@
     <app-sub-header>
         <div class="c-button-actions">
 
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                (click)="duplicateConfirm()">
                 <span>
                     <i class="la la-search-plus"></i>
                     <span>
@@ -48,10 +49,10 @@
                     <shipment-good-summary></shipment-good-summary>
 
                 </tab>
-                <tab heading="House Bill List" (selectTab)="onSelectTab('hbl')">
+                <tab heading="House Bill List" (selectTab)="onSelectTab('hbl')" [disabled]="ACTION === 'COPY'">
                 </tab>
                 <tab heading="Debit Note & Credit Note" [active]="selectedTab === 'CDNOTE'"
-                    (selectTab)="onSelectTab('cdNote')">
+                    [disabled]="ACTION === 'COPY'" (selectTab)="onSelectTab('cdNote')">
                     <sea-fcl-import-cd-note></sea-fcl-import-cd-note>
                 </tab>
             </tabset>
