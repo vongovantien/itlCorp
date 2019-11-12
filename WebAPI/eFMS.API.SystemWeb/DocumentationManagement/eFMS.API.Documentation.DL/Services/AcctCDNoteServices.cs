@@ -172,11 +172,13 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 UpdateJobModifyTime(model.JobId);
                 var sc = DataContext.SubmitChanges();
-                surchargeRepository.SubmitChanges();
-                opstransRepository.SubmitChanges();
-                cstransRepository.SubmitChanges();
-
-                return hs;//new HandleState();
+                if (sc.Success)
+                {
+                    surchargeRepository.SubmitChanges();
+                    opstransRepository.SubmitChanges();
+                    cstransRepository.SubmitChanges();
+                }
+                return sc;
             }
             catch (Exception ex)
             {

@@ -229,10 +229,11 @@ export class CdNoteAddPopupComponent extends PopupBase {
             const _totalDebit = arrayCharges.filter(f => (f.type === 'SELL' || (f.type === 'OBH' && this.selectedPartner.value === f.paymentObjectId))).reduce((debit, charge) => debit + charge.total * charge.exchangeRate, 0);;
             console.log(_totalCredit);
             console.log(_totalDebit);
-            this.CDNote.total = _totalDebit - _totalCredit;
-            if (this.CDNote.total > 999999999999999999) {
+            const _balance = _totalDebit - _totalCredit;
+            this.CDNote.total = _balance;
+            console.log(_balance);
+            if (_balance > 99999999999999 || _balance < -99999999999999) {
                 this._toastService.error('Balance amount field exceeds numeric storage size');
-                //return;
             } else {
                 console.log(this.CDNote);
                 if (this.action == "create") {
