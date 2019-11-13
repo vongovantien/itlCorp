@@ -38,19 +38,34 @@
                     </div>
                     <div class="col-lg-4">
                         <!-- {{configSaleman.dataSource | json}} -->
-                        <div class="form-group" [ngClass]="{'m-form__group has-danger': !selectedSaleman.value }">
+                        <!-- <div class="form-group" [ngClass]="{'m-form__group has-danger': !selectedSaleman.value }">
                             <label class="form-control-label">
                                 Saleman in Charge <span class="m--font-danger">(*)</span>
                             </label>
-                            <app-combo-grid-virtual-scroll [disabled]="!selectedCustomer.value"
-                                [currentActiveItemId]="selectedSaleman"
-                                [selectedDisplayFields]="configSaleman.selectedDisplayFields"
-                                [dataSources]="configSaleman.dataSource"
-                                (itemSelected)="onSelectDataFormInfo($event, 'Saleman')"
-                                [displayFields]="configSaleman.displayFields">
-                            </app-combo-grid-virtual-scroll>
+                            <app-combo-grid [data]="saleMans" [headers]="headersSaleman"
+                                (onClick)="onSelectDataFormInfo($event,'saleMan')">
+                            </app-combo-grid>
                             <div class="form-control-feedback" *ngIf="isSubmited && !selectedSaleman.value ">
                                 Saleman in Charge is required!
+                            </div>
+                        </div> -->
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': isSubmited && (!keyword || !selectedSaleman)}">
+                            <label required>Saleman in Charge</label>
+                            <div (clickOutside)="onClickOutsideSalemanName()">
+                                <input [attr.disabled]="!selectedCustomer.value ? '' : null"
+                                    class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                    placeholder="Input keyword" (click)="isShow = !isShow"
+                                    (ngModelChange)="onSearchAutoComplete($event)" [(ngModel)]="keyword"
+                                    [ngModelOptions]="{standalone: true}">
+                                <ng-container *ngIf="isShow">
+                                    <app-combo-grid [data]="saleMans" [headers]="headersSaleman"
+                                        (onClick)="onSelectDataFormInfo($event,'saleman')">
+                                    </app-combo-grid>
+                                </ng-container>
+                            </div>
+                            <div class="form-control-feedback" *ngIf="isSubmited && (!keyword || !selectedSaleman)">
+                                SaleMan is required !
                             </div>
                         </div>
                     </div>

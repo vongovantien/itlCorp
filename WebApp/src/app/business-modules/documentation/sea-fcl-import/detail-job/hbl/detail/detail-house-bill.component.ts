@@ -155,8 +155,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                             this.shipmentGoodSummaryComponent.totalCBM = this.hblDetail.cbm;
                             this.formHouseBill.etd.setValue(res.data.etd);
                             !!this.hblDetail.etd ? this.formHouseBill.etd.setValue({ startDate: new Date(this.hblDetail.etd), endDate: new Date(this.hblDetail.etd) }) : this.formHouseBill.etd.setValue(null), // * Date;
-                                this.formHouseBill.getListSaleman(res.data.customerId);
-                            this.formHouseBill.mtBill.setValue(res.data.mawb);
+                                this.formHouseBill.mtBill.setValue(res.data.mawb);
                             this.formHouseBill.shipperDescription.setValue(res.data.shipperDescription);
                             this.formHouseBill.consigneeDescription.setValue(res.data.consigneeDescription);
                             this.formHouseBill.notifyPartyDescription.setValue(res.data.notifyPartyDescription);
@@ -191,9 +190,8 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                             this.formHouseBill.mindateEtaWareHouse = !!this.hblDetail.eta ? moment(this.hblDetail.eta) : null;
 
                             setTimeout(() => {
-
                                 this.formHouseBill.selectedCustomer = { field: 'id', value: res.data.customerId };
-                                this.formHouseBill.selectedSaleman = { field: 'id', value: res.data.saleManId };
+
                                 this.formHouseBill.selectedShipper = { field: 'id', value: res.data.shipperId };
                                 this.formHouseBill.selectedConsignee = { field: 'id', value: res.data.consigneeId };
                                 this.formHouseBill.selectedNotifyParty = { field: 'id', value: res.data.notifyPartyId };
@@ -202,6 +200,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                                 this.formHouseBill.selectedPortOfDischarge = { field: 'id', value: res.data.pod };
                                 this.formHouseBill.selectedSupplier = { field: 'id', value: res.data.coloaderId };
                                 this.formHouseBill.selectedPlaceOfIssued = { field: 'id', value: res.data.issueHblplace };
+                                this.formHouseBill.bindSalemanImport(this.hblDetail.saleManId);
 
 
                             }, 500);

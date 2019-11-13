@@ -95,7 +95,7 @@ export class CreateHouseBillComponent extends AppForm {
         if (!this.formHouseBill.formGroup.valid) {
             valid = false;
         }
-        if (this.formHouseBill.PortChargeLikePortLoading === true) {
+        if (this.formHouseBill.PortChargeLikePortLoading === true || this.formHouseBill.selectedSaleman === null) {
             valid = false;
         }
         return valid;
@@ -133,7 +133,7 @@ export class CreateHouseBillComponent extends AppForm {
             this.formHouseBill.originBLNumber.setValue(this.formHouseBill.numberOfOrigins.filter(i => i.value === this.selectedHbl.originBlnumber)[0]);
             this.formHouseBill.alsonotifyPartyDescription.setValue(this.selectedHbl.alsoNotifyPartyDescription);
             this.formHouseBill.selectedCustomer = { field: 'id', value: this.selectedHbl.customerId };
-            this.formHouseBill.selectedSaleman = { field: 'id', value: this.selectedHbl.saleManId };
+            this.formHouseBill.bindSalemanImport(this.selectedHbl.saleManId);
             this.formHouseBill.selectedShipper = { field: 'id', value: this.selectedHbl.shipperId };
             this.formHouseBill.selectedConsignee = { field: 'id', value: this.selectedHbl.consigneeId };
             this.formHouseBill.selectedNotifyParty = { field: 'id', value: this.selectedHbl.notifyPartyId };
@@ -142,6 +142,7 @@ export class CreateHouseBillComponent extends AppForm {
             this.formHouseBill.selectedAlsoNotifyParty = { field: 'id', value: this.selectedHbl.alsoNotifyPartyId };
             this.formHouseBill.hbltype.setValue(this.formHouseBill.hbOfladingTypes.filter(i => i.value === this.selectedHbl.hbltype)[0]);
             this.formHouseBill.selectedSupplier = { field: 'id', value: this.selectedHbl.coloaderId };
+
         }
     }
 
@@ -185,7 +186,7 @@ export class CreateHouseBillComponent extends AppForm {
             id: "00000000-0000-0000-0000-000000000000",
             jobId: this.jobId,
             mawb: this.formHouseBill.mtBill.value,
-            saleManId: !!this.formHouseBill.selectedSaleman.value ? this.formHouseBill.selectedSaleman.value : null,
+            saleManId: !!this.formHouseBill.selectedSaleman.id ? this.formHouseBill.selectedSaleman.id : null,
             shipperId: !!this.formHouseBill.selectedShipper.value ? this.formHouseBill.selectedShipper.value : null,
             shipperDescription: this.formHouseBill.shipperdescriptionModel !== undefined ? this.formHouseBill.shipperdescriptionModel : this.formHouseBill.shipperDescription.value,
             consigneeId: this.formHouseBill.selectedConsignee.value,

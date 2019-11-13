@@ -369,7 +369,7 @@ ICsMawbcontainerService contService) : base(repository, mapper)
                       join tran in csTransactionRepo.Get() on detail.JobId equals tran.Id
                       join customer in catPartnerRepo.Get() on detail.CustomerId equals customer.Id into customers
                       from cus in customers.DefaultIfEmpty()
-                      join saleman in catSalemanRepo.Get() on detail.SaleManId equals saleman.Id.ToString() into salemans
+                      join saleman in sysUserRepo.Get() on detail.SaleManId equals saleman.Id into salemans
                       from sale in salemans.DefaultIfEmpty()
                       join notify in catPartnerRepo.Get() on detail.NotifyPartyId equals notify.Id into notifys
                       from notify in notifys.DefaultIfEmpty()
@@ -379,7 +379,7 @@ ICsMawbcontainerService contService) : base(repository, mapper)
                           Hwbno = detail.Hwbno,
                           Mawb = detail.Mawb,
                           SaleManId = detail.SaleManId,
-                          SaleManName = sale.SaleManId,
+                          SaleManName = sale.Username,
                           CustomerId =  detail.CustomerId,
                           CustomerName = cus.ShortName,
                           NotifyPartyId = detail.NotifyPartyId,
