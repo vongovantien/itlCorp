@@ -82,7 +82,5 @@ namespace eFMS.API.Documentation.Service.Models
         public string DosentTo1 { get; set; }
         public string DosentTo2 { get; set; }
         public string Dofooter { get; set; }
-
-        public virtual CsTransaction Job { get; set; }
     }
 }

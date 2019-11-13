@@ -32,6 +32,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<SysEmployee> sysEmployeeRepo;
         readonly IContextBase<CsTransaction> transactionRepository;
         readonly IContextBase<CatCurrencyExchange> currencyExchangeRepository;
+        readonly ICsMawbcontainerService containerService;
 
         public CsTransactionService(IContextBase<CsTransaction> repository,
             IMapper mapper,
@@ -44,7 +45,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysUser> sysUser,
             IContextBase<SysEmployee> sysEmployee,
             IContextBase<CsTransaction> transactionRepo,
-            IContextBase<CatCurrencyExchange> currencyExchangeRepo) : base(repository, mapper)
+            IContextBase<CatCurrencyExchange> currencyExchangeRepo,
+            ICsMawbcontainerService contService) : base(repository, mapper)
         {
             currentUser = user;
             csTransactionDetailRepo = csTransactionDetail;
@@ -56,6 +58,7 @@ namespace eFMS.API.Documentation.DL.Services
             sysEmployeeRepo = sysEmployee;
             transactionRepository = transactionRepo;
             currencyExchangeRepository = currencyExchangeRepo;
+            containerService = contService;
         }
 
         #region -- INSERT & UPDATE --
@@ -103,8 +106,8 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
             }
             var currentShipment = DataContext.Get(x => x.TransactionType == transactionType
-                                                    && x.CreatedDate.Value.Month == DateTime.Now.Month
-                                                    && x.CreatedDate.Value.Year == DateTime.Now.Year)
+                                                    && x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                    && x.DatetimeCreated.Value.Year == DateTime.Now.Year)
                                                     .OrderByDescending(x => x.JobNo)
                                                     .FirstOrDefault();
             if (currentShipment != null)
@@ -123,8 +126,16 @@ namespace eFMS.API.Documentation.DL.Services
                     return new { model = new object { }, result = new HandleState("Not found type transaction") };
                 var transaction = mapper.Map<CsTransaction>(model);
                 transaction.Id = Guid.NewGuid();
+                if (model.CsMawbcontainers.Count > 0)
+                {
+                    var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, transaction.Id, null);
+                    if (checkDuplicateCont.Success == false)
+                    {
+                        return checkDuplicateCont;
+                    }
+                }
                 transaction.JobNo = CreateJobNoByTransactionType(model.TransactionTypeEnum, model.TransactionType);
-                transaction.CreatedDate = transaction.ModifiedDate = DateTime.Now;
+                transaction.DatetimeCreated = transaction.DatetimeModified = DateTime.Now;
                 transaction.Active = true;
                 transaction.UserModified = transaction.UserCreated;
                 transaction.IsLocked = false;
@@ -154,31 +165,6 @@ namespace eFMS.API.Documentation.DL.Services
                             var hsContMBL = csMawbcontainerRepo.Add(container);
                         }
                     }
-                    //if (model.CsTransactionDetails != null && model.CsTransactionDetails.Count > 0)
-                    //{
-                    //    foreach (var item in model.CsTransactionDetails)
-                    //    {
-                    //        var transDetail = mapper.Map<CsTransactionDetail>(item);
-                    //        transDetail.Id = Guid.NewGuid();
-                    //        transDetail.JobId = transaction.Id;
-                    //        transDetail.Active = true;
-                    //        transDetail.UserCreated = transaction.UserModified = transaction.UserCreated;
-                    //        transDetail.DatetimeCreated = transaction.ModifiedDate = DateTime.Now;
-                    //        var hsHBL = csTransactionDetailRepo.Add(transDetail);
-                    //        if (item.CsMawbcontainers == null) continue;
-                    //        else
-                    //        {
-                    //            foreach (var x in item.CsMawbcontainers)
-                    //            {
-                    //                x.Id = Guid.NewGuid();
-                    //                x.Hblid = transDetail.Id;
-                    //                x.UserModified = transaction.UserCreated;
-                    //                x.DatetimeModified = DateTime.Now;
-                    //                var hsContHBL = csMawbcontainerRepo.Add(x);
-                    //            }
-                    //        }
-                    //    }
-                    //}
                 }
                 var result = hsTrans;
                 return new { model = transaction, result };
@@ -194,8 +180,16 @@ namespace eFMS.API.Documentation.DL.Services
         {
             try
             {
+                if (model.CsMawbcontainers.Count > 0)
+                {
+                    var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, model.Id, null);
+                    if (checkDuplicateCont.Success == false)
+                    {
+                        return checkDuplicateCont;
+                    }
+                }
                 var transaction = mapper.Map<CsTransaction>(model);
-                transaction.ModifiedDate = DateTime.Now;
+                transaction.DatetimeModified = DateTime.Now;
                 if (transaction.IsLocked.HasValue)
                 {
                     if (transaction.IsLocked == true)
@@ -408,9 +402,9 @@ namespace eFMS.API.Documentation.DL.Services
                             UserCreated = masterBill.UserCreated,
                             IsLocked = masterBill.IsLocked,
                             LockedDate = masterBill.LockedDate,
-                            CreatedDate = masterBill.CreatedDate,
+                            DatetimeCreated = masterBill.DatetimeCreated,
                             UserModified = masterBill.UserModified,
-                            ModifiedDate = masterBill.ModifiedDate,
+                            DatetimeModified = masterBill.DatetimeModified,
                             Active = masterBill.Active,
                             InactiveOn = masterBill.InactiveOn,
                             SupplierName = coloader.ShortName,
@@ -475,9 +469,9 @@ namespace eFMS.API.Documentation.DL.Services
                             UserCreated = masterBill.UserCreated,
                             IsLocked = masterBill.IsLocked,
                             LockedDate = masterBill.LockedDate,
-                            CreatedDate = masterBill.CreatedDate,
+                            DatetimeCreated = masterBill.DatetimeCreated,
                             UserModified = masterBill.UserModified,
-                            ModifiedDate = masterBill.ModifiedDate,
+                            DatetimeModified = masterBill.DatetimeModified,
                             Active = masterBill.Active,
                             InactiveOn = masterBill.InactiveOn,
                             SupplierName = coloader.ShortName,
@@ -670,7 +664,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             //return query.Select(x => x.transaction).Distinct();
             var jobNos = query.Select(s => s.transaction.JobNo).Distinct();
-            var result = listData.Where(x => jobNos.Contains(x.JobNo)).OrderByDescending(x => x.ModifiedDate);
+            var result = listData.Where(x => jobNos.Contains(x.JobNo)).OrderByDescending(x => x.DatetimeModified);
             return result;
         }
 
@@ -759,7 +753,7 @@ namespace eFMS.API.Documentation.DL.Services
                 //query = query.OrderByDescending(x => x.transaction.ModifiedDate);
             }
             var jobNos = query.Select(s => s.transaction.JobNo).Distinct();
-            var result = listData.Where(x => jobNos.Contains(x.JobNo)).OrderByDescending(x => x.ModifiedDate);
+            var result = listData.Where(x => jobNos.Contains(x.JobNo)).OrderByDescending(x => x.DatetimeModified);
             return result;
         }
 
@@ -843,10 +837,10 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var transaction = mapper.Map<CsTransaction>(model);
                 transaction.Id = Guid.NewGuid();
-                int countNumberJob = transactionRepository.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
+                int countNumberJob = transactionRepository.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
                 transaction.JobNo = GenerateID.GenerateJobID(Constants.SEF_SHIPMENT, countNumberJob);
                 transaction.UserCreated = currentUser.UserID;
-                transaction.CreatedDate = transaction.ModifiedDate = DateTime.Now;
+                transaction.DatetimeCreated = transaction.DatetimeModified = DateTime.Now;
                 transaction.UserModified = model.UserCreated;
                 transaction.Active = true;
                 var hsTrans = transactionRepository.Add(transaction, false);

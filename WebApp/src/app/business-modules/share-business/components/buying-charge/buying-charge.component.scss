@@ -18,6 +18,7 @@
                 .form-group {
                     .form-control {
                         font-size: 11px;
+                        color: #000;
                     }
                 }
             }
@@ -64,7 +65,7 @@
                 }
                 .e--combogrid {
                     .form-control {
-                        border: unset;
+                        // border: unset;
                         background: inherit;
                         padding: 4px 8px;
                     }

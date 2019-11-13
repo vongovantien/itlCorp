@@ -22,13 +22,13 @@ export enum SurchargeActionTypes {
     GET_OBH_FAIL = '[OBH CHARGE] Get Fail',
     ADD_OBH = '[OBH CHARGE] Add',
     DELETE_OBH = '[OBH CHARGE] Delete',
-    SAVE_OBH = '[OBH CHARGE] SAVE'
+    SAVE_OBH = '[OBH CHARGE] SAVE',
 }
 
 /* BUYING */
 export class GetBuyingSurchargeAction implements Action {
     readonly type = SurchargeActionTypes.GET_BUYING;
-    constructor(public payload: any) { }
+    constructor(public payload?: any) { }
 }
 export class GetBuyingSurchargeSuccessAction implements Action {
     readonly type = SurchargeActionTypes.GET_BUYING_SUCCESS;

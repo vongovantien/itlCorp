@@ -26,7 +26,7 @@ export class TariffListChargeComponent extends AppList {
 
     ngOnInit(): void {
         this.headers = [
-            { title: 'Charge Name', field: 'chargeName', sortable: true, dataType: 'LINK' },
+            { title: 'Charge Name', field: 'chargeName', sortable: true, dataType: "LINK" },
             { title: 'Charge Code', field: 'chargeCode', sortable: true },
             { title: 'Route', field: 'route', sortable: true },
             { title: 'Comondities Group', field: 'commodityName', sortable: true, width: 150 },
@@ -65,7 +65,7 @@ export class TariffListChargeComponent extends AppList {
         }
     }
 
-    viewDetailTariffCharge(tariffCharge: TariffCharge, index: number, action: CommonType.ACTION_FORM = 'UPDATE') {
+    viewDetailTariffCharge(tariffCharge: TariffCharge, index: number, action: CommonType.ACTION_FORM = <CommonType.ACTION_FORM>CommonType.ACTION.UPDATE) {
         this.selectedIndex = index;
         this.selectedTariffCharge = tariffCharge;
 

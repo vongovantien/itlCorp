@@ -14,6 +14,7 @@ using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Common.NoSql;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models.ReportResults;
+using eFMS.API.Documentation.DL.Common;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -27,6 +28,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatUnit> catUnitRepo;
         readonly IContextBase<CatCommodity> catCommodityRepo;
         readonly IContextBase<CatSaleman> catSalemanRepo;
+        readonly ICsMawbcontainerService containerService;
         readonly IContextBase<CsTransactionDetail> csTransactionDetailRepo;
 
         readonly IContextBase<CsShipmentSurcharge> surchareRepository;
@@ -41,7 +43,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatUnit> catUnit,
             IContextBase<CatCommodity> catCommodity,
             IContextBase<CatSaleman> catSaleman,
-            IContextBase<CsShipmentSurcharge> surchareRepo , IContextBase<CsTransactionDetail> csTransactiondetail) : base(repository, mapper)
+            IContextBase<CsShipmentSurcharge> surchareRepo , IContextBase<CsTransactionDetail> csTransactiondetail,
+ICsMawbcontainerService contService) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
             csMawbcontainerRepo = csMawbcontainer;
@@ -52,6 +55,7 @@ namespace eFMS.API.Documentation.DL.Services
             catCommodityRepo = catCommodity;
             surchareRepository = surchareRepo;
             catSalemanRepo = catSaleman;
+            containerService = contService;
             csTransactionDetailRepo = csTransactiondetail;
         }
 
@@ -60,6 +64,14 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var detail = mapper.Map<CsTransactionDetail>(model);
             detail.Id = Guid.NewGuid();
+            if (model.CsMawbcontainers.Count > 0)
+            {
+                var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, null, detail.Id);
+                if (checkDuplicateCont.Success == false)
+                {
+                    return checkDuplicateCont;
+                }
+            }
             detail.UserModified = detail.UserCreated;
             detail.DatetimeModified = detail.DatetimeCreated = DateTime.Now;
             detail.Active = true;
@@ -74,10 +86,8 @@ namespace eFMS.API.Documentation.DL.Services
                         var cont = mapper.Map<CsMawbcontainerModel>(x);
                         cont.Id = Guid.NewGuid();
                         cont.Hblid = detail.Id;
-                        cont.Mblid = Guid.Empty;
                         cont.UserModified = detail.UserModified;
                         cont.DatetimeModified = DateTime.Now;
-                        //((eFMSDataContext)DataContext.DC).CsMawbcontainer.Add(cont);
                         var hsContainer = csMawbcontainerRepo.Add(cont);
                     }
                 }
@@ -98,7 +108,16 @@ namespace eFMS.API.Documentation.DL.Services
                 var hb = DataContext.Where(x => x.Id == model.Id).FirstOrDefault();
                 if (hb == null)
                 {
-                    new HandleState("Housebill not found !");
+                    return new HandleState("Housebill not found !");
+                }
+
+                if (model.CsMawbcontainers.Count > 0)
+                {
+                    var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, null, model.Id);
+                    if (checkDuplicateCont.Success == false)
+                    {
+                        return checkDuplicateCont;
+                    }
                 }
                 hb.UserModified = ChangeTrackerHelper.currentUser;
                 hb.DatetimeModified = DateTime.Now;
@@ -109,21 +128,18 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     if (model.CsMawbcontainers.Count > 0)
                     {
-                        //var listConts = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == hb.Id).ToList();
                         var listConts = csMawbcontainerRepo.Get(x => x.Hblid == hb.Id).ToList();
                         foreach (var item in listConts)
                         {
                             var isExist = model.CsMawbcontainers.Where(x => x.Id == item.Id).FirstOrDefault();
                             if (isExist == null)
                             {
-                                //((eFMSDataContext)DataContext.DC).CsMawbcontainer.Remove(item);
                                 var hsContainerDetele = csMawbcontainerRepo.Delete(x => x.Id == item.Id);
                             }
                         }
 
                         foreach (var item in model.CsMawbcontainers)
                         {
-                            //var cont = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Id == item.Id).FirstOrDefault();               
                             var cont = mapper.Map<CsMawbcontainer>(item);
 
                             if (cont.Id == Guid.Empty)
@@ -132,7 +148,6 @@ namespace eFMS.API.Documentation.DL.Services
                                 cont.Hblid = hb.Id;
                                 cont.UserModified = hb.UserModified;
                                 cont.DatetimeModified = DateTime.Now;
-                                //((eFMSDataContext)DataContext.DC).CsMawbcontainer.Add(cont);
                                 var hsContainerAdd = csMawbcontainerRepo.Add(cont);
                             }
                             else
@@ -140,23 +155,19 @@ namespace eFMS.API.Documentation.DL.Services
                                 cont.Hblid = hb.Id;
                                 cont.UserModified = hb.UserModified;
                                 cont.DatetimeModified = DateTime.Now;
-                                //((eFMSDataContext)DataContext.DC).CsMawbcontainer.Update(cont);
                                 var hsContainerUpdate = csMawbcontainerRepo.Update(cont, x => x.Id == cont.Id);
                             }
                         }                        
                     }
                     else
                     {
-                        //var conts = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == hb.Id).ToList();
                         var conts = csMawbcontainerRepo.Get(x => x.Hblid == hb.Id).ToList();
                         foreach (var item in conts)
                         {
-                            //((eFMSDataContext)DataContext.DC).CsMawbcontainer.Remove(item);
                             var hsContainerDetele = csMawbcontainerRepo.Delete(x => x.Id == item.Id);
                         }
                     }
                 }
-                //((eFMSDataContext)DataContext.DC).SaveChanges();
                 return isUpdateDone;
             }
             catch (Exception ex)
@@ -170,7 +181,7 @@ namespace eFMS.API.Documentation.DL.Services
         public CsTransactionDetailModel GetHbDetails(Guid JobId, Guid HbId)
         {
             var listHB = GetByJob(new CsTransactionDetailCriteria { JobId = JobId });
-            var returnHB = listHB.Where(x => x.Id == HbId).FirstOrDefault();
+            var returnHB = listHB.FirstOrDefault(x => x.Id == HbId);
             return returnHB;
 
         }
@@ -178,11 +189,6 @@ namespace eFMS.API.Documentation.DL.Services
         public List<CsTransactionDetailModel> GetByJob(CsTransactionDetailCriteria criteria)
         {
             var results = QueryDetail(criteria).ToList();
-            //var containers = ((eFMSDataContext)DataContext.DC).CsMawbcontainer
-            //    .Join(((eFMSDataContext)DataContext.DC).CatUnit,
-            //        container => container.ContainerTypeId,
-            //        unit => unit.Id, (container, unit) => new { container, unit })
-            //        .ToList();
             var containers = (from container in ((eFMSDataContext)DataContext.DC).CsMawbcontainer
                               join unit in ((eFMSDataContext)DataContext.DC).CatUnit on container.ContainerTypeId equals unit.Id
                               join unitMeasure in ((eFMSDataContext)DataContext.DC).CatUnit on container.UnitOfMeasureId equals unitMeasure.Id into grMeasure
@@ -203,7 +209,6 @@ namespace eFMS.API.Documentation.DL.Services
             if (containers.Count() == 0) return results;
             results.ForEach(detail =>
             {
-                //detail.ContainerNames = string.Empty;
                 detail.PackageTypes = string.Empty;
                 detail.CBM = 0;
                 var containerHouses = containers.Where(x => x.container.Hblid == detail.Id);
@@ -212,7 +217,6 @@ namespace eFMS.API.Documentation.DL.Services
                     detail.CsMawbcontainers = new List<CsMawbcontainerModel>();
                     foreach (var item in containerHouses)
                     {
-                        //detail.ContainerNames = detail.ContainerNames + item.container.Quantity + "x" + item.unit.UnitNameEn + ((item.container.ContainerNo.Length > 0) ? ";" : "");
                         if (item.container.PackageQuantity != null && item.container.PackageTypeId != null)
                         {
                             detail.PackageTypes += item.container.PackageQuantity + "x" + item.PackageTypeName + ", ";
@@ -230,10 +234,6 @@ namespace eFMS.API.Documentation.DL.Services
                         detail.CsMawbcontainers.Add(container);
                     }
                 }
-                //if (detail.ContainerNames.Length > 0 && detail.ContainerNames.ElementAt(detail.ContainerNames.Length - 1) == ';')
-                //{
-                //    detail.ContainerNames = detail.ContainerNames.Substring(0, detail.ContainerNames.Length - 1);
-                //}
                 if (detail.PackageTypes.Length > 0 && detail.PackageTypes.ElementAt(detail.PackageTypes.Length - 1) == ';')
                 {
                     detail.PackageTypes = detail.PackageTypes.Substring(0, detail.PackageTypes.Length - 1);
@@ -245,17 +245,21 @@ namespace eFMS.API.Documentation.DL.Services
         public IQueryable<CsTransactionDetailModel> QueryDetail(CsTransactionDetailCriteria criteria)
         {
             List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
-            var details = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == criteria.JobId);
+            //var details = ((eFMSDataContext)DataContext.DC).CsTransactionDetail.Where(x => x.JobId == criteria.JobId);
+            var details = DataContext.Get(x => x.JobId == criteria.JobId);
+            var partners = catPartnerRepo.Get();
+            var places = catPlaceRepo.Get();
+            var salemans = catSalemanRepo.Get();
             var query = (from detail in details
-                         join customer in ((eFMSDataContext)DataContext.DC).CatPartner on detail.CustomerId equals customer.Id into detailCustomers
+                         join customer in partners on detail.CustomerId equals customer.Id into detailCustomers
                          from y in detailCustomers.DefaultIfEmpty()
-                         join noti in ((eFMSDataContext)DataContext.DC).CatPartner on detail.NotifyPartyId equals noti.Id into detailNotis
+                         join noti in partners on detail.NotifyPartyId equals noti.Id into detailNotis
                          from noti in detailNotis.DefaultIfEmpty()
-                         join port in ((eFMSDataContext)DataContext.DC).CatPlace on detail.Pod equals port.Id into portDetail
+                         join port in places on detail.Pod equals port.Id into portDetail
                          from pod in portDetail.DefaultIfEmpty()
-                         join fwd in ((eFMSDataContext)DataContext.DC).CatPartner on detail.ForwardingAgentId equals fwd.Id into forwarding
+                         join fwd in partners on detail.ForwardingAgentId equals fwd.Id into forwarding
                          from f in forwarding.DefaultIfEmpty()
-                         join saleman in ((eFMSDataContext)DataContext.DC).CatSaleman on detail.SaleManId equals saleman.Id.ToString() into prods
+                         join saleman in salemans on detail.SaleManId equals saleman.Id.ToString() into prods
                          from x in prods.DefaultIfEmpty()
                          select new { detail, customer = y, notiParty = noti, saleman = x, agent = f, pod });
             if (query == null) return null;
@@ -320,12 +324,12 @@ namespace eFMS.API.Documentation.DL.Services
                     detail.SaleManId = resultSaleman?.Id.ToString();
                     detail.NotifyParty = resultNoti?.PartnerNameEn;
                     return detail;
-                }
             }
+        }
             catch (Exception ex)
             {
 
-            }
+        }
             return null;
 
         }
@@ -376,7 +380,7 @@ namespace eFMS.API.Documentation.DL.Services
                           Mawb = detail.Mawb,
                           SaleManId = detail.SaleManId,
                           SaleManName = sale.SaleManId,
-                          CustomerId = detail.CustomerId,
+                          CustomerId =  detail.CustomerId,
                           CustomerName = cus.ShortName,
                           NotifyPartyId = detail.NotifyPartyId,
                           NotifyParty = notify.ShortName,
@@ -481,10 +485,8 @@ namespace eFMS.API.Documentation.DL.Services
                 eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 var detail = mapper.Map<CsTransactionDetail>(model);
                 detail.Id = Guid.NewGuid();
-                //int countDetail = dc.CsTransactionDetail.Count(x => x.JobId == model.JobId);
-                //detail.Hwbno = "SEF" + GenerateID.GenerateJobID("HB", countDetail);
                 detail.Active = true;
-                detail.UserCreated = model.UserCreated;  //ChangeTrackerHelper.currentUser;
+                detail.UserCreated = model.UserCreated;
                 detail.DatetimeCreated = DateTime.Now;
                 detail.DesOfGoods = null;
                 detail.Commodity = null;

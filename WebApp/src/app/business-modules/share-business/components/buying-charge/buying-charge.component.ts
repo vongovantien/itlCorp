@@ -1,4 +1,4 @@
-import { Component, Input, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, ChangeDetectorRef, ViewChild } from '@angular/core';
 
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, CsTransactionDetail } from 'src/app/shared/models';
@@ -16,6 +16,8 @@ import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { GetBuyingSurchargeAction } from './../../store';
 
 enum QUANTITY_TYPE {
     GW = 'gw',
@@ -32,6 +34,8 @@ enum QUANTITY_TYPE {
 
 })
 export class ShareBussinessBuyingChargeComponent extends AppList {
+
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
 
     @Input() containers: Container[] = [];
     @Input() shipment: any;
@@ -60,7 +64,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     isDuplicateChargeCode: boolean = false;
     isDuplicateInvoice: boolean = false;
 
-
+    selectedSurcharge: CsShipmentSurcharge;
     constructor(
         protected _catalogueRepo: CatalogueRepo,
         protected _store: Store<fromStore.IShareBussinessState>,
@@ -70,33 +74,19 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     ) {
         super();
         this.requestSort = this.sortSurcharge;
+
+        this._store.select(fromStore.getBuyingSurChargeState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (buyings: CsShipmentSurcharge[]) => {
+                    this.charges = buyings;
+                    console.log("get buying charge from store", this.charges);
+                }
+            );
     }
 
     ngOnInit(): void {
-        this.headers = [
-            { title: 'Partner Name', field: 'partnerName', required: true, sortable: true, width: 200 },
-            { title: 'Charge Name', field: 'chargeId', required: true, sortable: true, width: 400 },
-            { title: 'Quantity', field: 'quantity', required: true, sortable: true, width: 200 },
-            { title: 'Unit', field: 'unitId', required: true, sortable: true },
-            { title: 'Unit Price', field: 'unitPrice', required: true, sortable: true },
-            { title: 'Currency', field: 'currencyId', required: true, sortable: true },
-            { title: 'VAT', field: 'vatrate', required: true, sortable: true },
-            { title: 'Total', field: 'total', sortable: true },
-            { title: 'Note', field: 'notes', sortable: true },
-            { title: 'Invoice No', field: 'invoiceNo', sortable: true },
-            { title: 'Series No', field: 'seriesNo', sortable: true },
-            { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
-            { title: 'Exchange Rate Date', field: 'exchangeDate', sortable: true },
-            { title: 'KB', field: 'kickBack', sortable: true },
-            { title: 'SOA', field: 'soano', sortable: true },
-            { title: 'Credit/Debit Note', field: 'cdno', sortable: true },
-            { title: 'Settle Payment', field: 'settlementCode', sortable: true },
-            { title: 'Voucher ID', field: 'voucherId', sortable: true },
-            { title: 'Voucher ID Date', field: 'voucherIddate', sortable: true },
-            { title: 'Voucher IDRE', field: 'voucherIdre', sortable: true },
-            { title: 'Voucher IDRE Date', field: 'voucherIdredate', sortable: true },
-            { title: 'Final Exchange Rate', field: 'finalExchangeRate', sortable: true },
-        ];
+        this.configHeader();
 
         this.headerPartner = [
             { title: 'Name', field: 'partnerNameEn' },
@@ -129,14 +119,34 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
         this.getMasterData();
 
-        this._store.select(fromStore.getBuyingSurChargeState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (buyings: CsShipmentSurcharge[]) => {
-                    this.charges = buyings;
-                    console.log("get buying charge from store", this.charges);
-                }
-            );
+
+    }
+
+    configHeader() {
+        this.headers = [
+            { title: 'Partner Name', field: 'partnerName', required: true, sortable: true, width: 200 },
+            { title: 'Charge Name', field: 'chargeId', required: true, sortable: true, width: 400 },
+            { title: 'Quantity', field: 'quantity', required: true, sortable: true, width: 200 },
+            { title: 'Unit', field: 'unitId', required: true, sortable: true, width: 200 },
+            { title: 'Unit Price', field: 'unitPrice', required: true, sortable: true },
+            { title: 'Currency', field: 'currencyId', required: true, sortable: true },
+            { title: 'VAT', field: 'vatrate', required: true, sortable: true },
+            { title: 'Total', field: 'total', sortable: true },
+            { title: 'Note', field: 'notes', sortable: true },
+            { title: 'Invoice No', field: 'invoiceNo', sortable: true },
+            { title: 'Series No', field: 'seriesNo', sortable: true },
+            { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
+            { title: 'Exchange Rate Date', field: 'exchangeDate', sortable: true },
+            { title: 'KB', field: 'kickBack', sortable: true },
+            { title: 'SOA', field: 'soano', sortable: true },
+            { title: 'Credit/Debit Note', field: 'cdno', sortable: true },
+            { title: 'Settle Payment', field: 'settlementCode', sortable: true },
+            { title: 'Voucher ID', field: 'voucherId', sortable: true },
+            { title: 'Voucher ID Date', field: 'voucherIddate', sortable: true },
+            { title: 'Voucher IDRE', field: 'voucherIdre', sortable: true },
+            { title: 'Voucher IDRE Date', field: 'voucherIdredate', sortable: true },
+            { title: 'Final Exchange Rate', field: 'finalExchangeRate', sortable: true },
+        ];
     }
 
     getMasterData() {
@@ -182,7 +192,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
     }
 
-    addCharge() {
+    addCharge(type: CommonEnum.SurchargeTypeEnum | string) {
         this.isSubmitted = false;
         const newSurCharge: CsShipmentSurcharge = new CsShipmentSurcharge();
         newSurCharge.currencyId = "USD"; // * Set default.
@@ -190,9 +200,20 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         newSurCharge.quantityType = null;
         newSurCharge.exchangeDate = { startDate: new Date(), endDate: new Date() };
         newSurCharge.invoiceDate = null;
-        // this.charges.push(newSurCharge);
 
-        this._store.dispatch(new fromStore.AddBuyingSurchargeAction(newSurCharge));
+        switch (type) {
+            case CommonEnum.SurchargeTypeEnum.BUYING_RATE:
+                this._store.dispatch(new fromStore.AddBuyingSurchargeAction(newSurCharge));
+                break;
+            case CommonEnum.SurchargeTypeEnum.SELLING_RATE:
+                this._store.dispatch(new fromStore.AddSellingSurchargeAction(newSurCharge));
+                break;
+            case CommonEnum.SurchargeTypeEnum.OBH:
+                this._store.dispatch(new fromStore.AddOBHSurchargeAction(newSurCharge));
+                break;
+            default:
+                break;
+        }
     }
 
     duplicate(index: number) {
@@ -205,8 +226,62 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     }
 
-    deleteCharge(index: number) {
-        this._store.dispatch(new fromStore.DeleteBuyingSurchargeAction(index));
+    deleteCharge(charge: CsShipmentSurcharge, index: number, type: CommonEnum.SurchargeTypeEnum | string) {
+        if (charge.id === SystemConstants.EMPTY_GUID) {
+            switch (type) {
+                case CommonEnum.SurchargeTypeEnum.BUYING_RATE:
+                    this._store.dispatch(new fromStore.DeleteBuyingSurchargeAction(index));
+                    break;
+                case CommonEnum.SurchargeTypeEnum.SELLING_RATE:
+                    this._store.dispatch(new fromStore.DeleteSellingSurchargeAction(index));
+                    break;
+                case CommonEnum.SurchargeTypeEnum.OBH:
+                    this._store.dispatch(new fromStore.DeleteOBHSurchargeAction(index));
+                    break;
+                default:
+                    break;
+            }
+        } else if (
+            !!charge.soano
+            || !!charge.cdno
+            || !!charge.settlementCode
+            || !!charge.voucherId
+            || !!charge.voucherIddate
+            || !!charge.voucherIdre
+        ) { return; } else {
+            this.selectedSurcharge = new CsShipmentSurcharge(charge);
+            this.confirmDeletePopup.show();
+        }
+    }
+
+    onDeleteShipmentSurcharge(type: CommonEnum.SurchargeTypeEnum | string) {
+        this.confirmDeletePopup.hide();
+        if (!!this.selectedSurcharge && this.selectedSurcharge.id !== SystemConstants.EMPTY_GUID) {
+            this._documentRepo.deleteShipmentSurcharge(this.selectedSurcharge.id)
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success(res.message);
+                            switch (type) {
+                                case CommonEnum.SurchargeTypeEnum.BUYING_RATE:
+                                    this._store.dispatch(new GetBuyingSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.BUYING_RATE, hblId: this.hbl.id }));
+                                    break;
+                                case CommonEnum.SurchargeTypeEnum.SELLING_RATE:
+                                    this._store.dispatch(new GetBuyingSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.SELLING_RATE, hblId: this.hbl.id }));
+                                    break;
+                                case CommonEnum.SurchargeTypeEnum.OBH:
+                                    this._store.dispatch(new GetBuyingSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.OBH, hblId: this.hbl.id }));
+                                    break;
+                                default:
+                                    break;
+                            }
+                        } else {
+                            this._toastService.error(res.message);
+                        }
+                    }
+                )
+        }
     }
 
     onChangeVat(vat: number, chargeItem: CsShipmentSurcharge) {
@@ -221,25 +296,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         chargeItem.total = this.utility.calculateTotalAmountWithVat(chargeItem.vatrate, quantity, chargeItem.unitPrice);
     }
 
-    saveBuyingCharge() {
-        // * Update data 
-        this.isSubmitted = true;
-        if (!this.checkValidate()) {
-            return;
-        }
-        if (this.utility.checkDuplicateInObject("chargeId", this.charges)) {
-            this.isDuplicateChargeCode = true;
-            return;
-        } else {
-            this.isDuplicateChargeCode = false;
-        }
-        if (this.utility.checkDuplicateInObject("invoiceNo", this.charges)) {
-            this.isDuplicateInvoice = true;
-            return;
-        } else {
-            this.isDuplicateInvoice = false;
-        }
-
+    updateSurchargeField(type: CommonEnum.SurchargeTypeEnum) {
         for (const charge of this.charges) {
             if (!!charge.exchangeDate && !!charge.exchangeDate.startDate) {
                 charge.exchangeDate = formatDate(charge.exchangeDate.startDate, 'yyyy-MM-dd', 'en');
@@ -253,8 +310,21 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
             // Update HBL ID,Type
             charge.hblid = this.hbl.id;
-            charge.type = this.TYPE;
+            charge.type = type;
         }
+
+    }
+
+    saveBuyingCharge() {
+        this.isSubmitted = true;
+        if (!this.checkValidate()) {
+            return;
+        }
+        if (!this.checkDuplicate()) {
+            return;
+        }
+
+        this.updateSurchargeField(CommonEnum.SurchargeTypeEnum.BUYING_RATE);
 
         this._documentRepo.addShipmentSurcharges(this.charges)
             .pipe(catchError(this.catchError))
@@ -262,7 +332,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        // this._store.dispatch(new fromStore.SaveBuyingSurchargeAction(this.charges));
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -330,7 +399,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             default:
                 break;
         }
-
     }
 
     checkValidate() {
@@ -340,6 +408,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 !charge.paymentObjectId
                 || !charge.chargeId
                 || !charge.chargeCode
+                || !charge.unitId
                 || !charge.partnerName
                 || charge.unitPrice === null
                 || charge.unitPrice < 0
@@ -352,6 +421,31 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
 
         return valid;
+    }
+
+    checkDuplicate() {
+        let valid: boolean = true;
+        if (this.utility.checkDuplicateInObject("chargeId", this.charges)) {
+            this.isDuplicateChargeCode = true;
+            valid = false;
+            this._toastService.warning("The Charge code is duplicated");
+            return;
+        } else {
+            valid = true;
+            this.isDuplicateChargeCode = false;
+        }
+        if (this.utility.checkDuplicateInObject("invoiceNo", this.charges)) {
+            valid = false;
+            this._toastService.warning("The Invoice is duplicated");
+            this.isDuplicateInvoice = true;
+            return;
+        } else {
+            valid = true;
+            this.isDuplicateInvoice = false;
+        }
+
+        return valid;
+
     }
 
 

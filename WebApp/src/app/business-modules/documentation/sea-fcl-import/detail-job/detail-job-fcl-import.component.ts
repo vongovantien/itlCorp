@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Store, ActionsSubject } from '@ngrx/store';
 
 import { Router, ActivatedRoute } from '@angular/router';
@@ -13,6 +13,7 @@ import { map, tap, switchMap, skip, catchError, takeUntil } from 'rxjs/operators
 import { ToastrService } from 'ngx-toastr';
 
 import * as fromStore from './../store';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 
 type TAB = 'SHIPMENT' | 'CDNOTE';
@@ -25,12 +26,15 @@ type TAB = 'SHIPMENT' | 'CDNOTE';
 export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobComponent {
 
     @ViewChild(SeaFClImportFormCreateComponent, { static: false }) formCreateComponent: SeaFClImportFormCreateComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
 
     id: string;
     selectedTab: TAB = 'SHIPMENT';
+    ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
 
     fclImportDetail: any; // TODO Model.
     containers: Container[] = [];
+    action: any = {};
 
     constructor(
         protected _router: Router,
@@ -38,7 +42,8 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
         protected _activedRoute: ActivatedRoute,
         protected _store: Store<fromStore.ISeaFCLImportState>,
         protected _actionStoreSubject: ActionsSubject,
-        protected _toastService: ToastrService
+        protected _toastService: ToastrService,
+        private cdr: ChangeDetectorRef
     ) {
         super(_router, _documentRepo, _actionStoreSubject, _toastService);
     }
@@ -56,6 +61,11 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
             tap((param: any) => {
                 this.selectedTab = !!param.tab ? param.tab.toUpperCase() : 'SHIPMENT';
                 this.id = !!param.id ? param.id : '';
+                if (param.action) {
+                    this.ACTION = param.action;
+                }
+
+                this.cdr.detectChanges();
             }),
             switchMap(() => of(this.id))
             // switchMap((param: any) => this._documentRepo.getDetailTransaction(param.id)) // ? Using Effects or common way.
@@ -64,6 +74,8 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                 this.id = jobId;
                 this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(jobId));
                 this._store.dispatch(new fromStore.GetContainerAction({ mblid: jobId }));
+                this._store.dispatch(new fromStore.SeaFCLImportGetProfitAction(jobId));
+
 
                 this.getDetailSeaFCLImport();
                 this.getListContainer();
@@ -89,11 +101,11 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                     this.shipmentGoodSummaryComponent.totalChargeWeight = this.fclImportDetail.chargeWeight;
                     this.shipmentGoodSummaryComponent.totalCBM = this.fclImportDetail.cbm;
 
-                    console.log("detail sea fcl import", this.fclImportDetail);
+                    // console.log("detail sea fcl import", this.fclImportDetail);
 
-                    // setTimeout(() => {
-                    this.updateForm();
-                    // }, 500);
+                    setTimeout(() => {
+                        this.updateForm();
+                    }, 200);
 
                     // this.formCreateComponent.fclImportDetail = this.fclImportDetail;
                     // this.formCreateComponent.initFormUpdate();
@@ -164,8 +176,31 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
         modelUpdate.transactionType = this.fclImportDetail.transactionType;
         modelUpdate.jobNo = this.fclImportDetail.jobNo;
         modelUpdate.datetimeCreated = this.fclImportDetail.modifiedDate;
+        if (this.ACTION === 'UPDATE') {
+            this.updateJob(modelUpdate);
+        } else {
+            this.duplicateJob(modelUpdate);
+        }
+    }
+    duplicateJob(body: any) {
+        this._documenRepo.importCSTransaction(body)
+            .pipe(
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
 
-        this.updateJob(modelUpdate);
+                        // * get detail & container list.
+                        this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(this.id));
+
+                        this._store.dispatch(new fromStore.GetContainerAction({ mblid: this.id }));
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                }
+            );
     }
 
     updateJob(body: any) {
@@ -195,11 +230,29 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                 this._router.navigate([`home/documentation/sea-fcl-import/${this.id}/hbl`]);
                 break;
             case 'shipment':
-                this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: { tab: 'SHIPMENT' } });
+                this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action) });
                 break;
             case 'cdNote':
                 this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
+            case 'assignment':
+                this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: { tab: 'ASIGNMENT' } });
+                break;
         }
+    }
+
+    duplicateConfirm() {
+        this.action = { action: 'copy' };
+        this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], {
+            queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
+        });
+    }
+
+    deleteJob() {
+        this.confirmDeletePopup.show();
+    }
+
+    onDeleteJob() {
+        this.confirmDeletePopup.hide();
     }
 }
