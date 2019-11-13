@@ -18,6 +18,7 @@ using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Common;
+using Microsoft.Extensions.Localization;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -34,10 +35,12 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CsTransaction> transactionRepository;
         readonly IContextBase<CatCurrencyExchange> currencyExchangeRepository;
         readonly ICsMawbcontainerService containerService;
+        private readonly IStringLocalizer stringLocalizer;
 
         public CsTransactionService(IContextBase<CsTransaction> repository,
             IMapper mapper,
             ICurrentUser user,
+            IStringLocalizer<LanguageSub> localizer,
             IContextBase<CsTransactionDetail> csTransactionDetail,
             IContextBase<CsMawbcontainer> csMawbcontainer,
             IContextBase<CsShipmentSurcharge> csShipmentSurcharge,
@@ -50,6 +53,7 @@ namespace eFMS.API.Documentation.DL.Services
             ICsMawbcontainerService contService) : base(repository, mapper)
         {
             currentUser = user;
+            stringLocalizer = localizer;
             csTransactionDetailRepo = csTransactionDetail;
             csMawbcontainerRepo = csMawbcontainer;
             csShipmentSurchargeRepo = csShipmentSurcharge;
@@ -138,6 +142,7 @@ namespace eFMS.API.Documentation.DL.Services
                 transaction.UserModified = transaction.UserCreated;
                 transaction.IsLocked = false;
                 transaction.LockedDate = null;
+                transaction.CurrentStatus = TermData.Processing; //Mặc định gán CurrentStatus = Processing
                 var employeeId = sysUserRepo.Get(x => x.Id == transaction.UserCreated).FirstOrDefault()?.EmployeeId;
                 if (!string.IsNullOrEmpty(employeeId))
                 {
@@ -271,7 +276,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         public HandleState DeleteCSTransaction(Guid jobId)
         {
-            ChangeTrackerHelper.currentUser = "admin";//currentUser.UserID;
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = new HandleState();
             try
             {
@@ -308,6 +313,33 @@ namespace eFMS.API.Documentation.DL.Services
             return hs;
         }
 
+        public HandleState SoftDeleteJob(Guid jobId)
+        {
+            //Xóa mềm hiện tại chỉ cập nhật CurrentStatus = Canceled cho Shipment Documment.
+            ChangeTrackerHelper.currentUser = currentUser.UserID;
+            var hs = new HandleState();
+            try
+            {
+                var job = DataContext.First(x => x.Id == jobId && x.CurrentStatus != TermData.Canceled);
+                if (job == null)
+                {
+                    hs = new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
+                }
+                else
+                {
+                    job.CurrentStatus = TermData.Canceled;
+                    job.DatetimeModified = DateTime.Now;
+                    job.UserModified = currentUser.UserID;
+                    hs = DataContext.Update(job, x => x.Id == jobId);                    
+                }
+            }
+            catch (Exception ex)
+            {
+                hs = new HandleState(ex.Message);
+            }
+            return hs;
+        }
+
         #endregion -- DELETE --
 
         #region -- DETAILS --
@@ -328,18 +360,9 @@ namespace eFMS.API.Documentation.DL.Services
         #endregion -- DETAILS --
 
         #region -- LIST & PAGING --
-        private List<sp_GetTransaction> GetView(string transactionType)
-        {
-            var parameters = new[]{
-                new SqlParameter(){ ParameterName="@transactionType", Value = transactionType }
-            };
-            var list = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetTransaction>(parameters);
-            return list;
-        }
-
         private IQueryable<CsTransactionModel> GetTransaction(string transactionType, bool isSearch)
         {
-            var masterBills = DataContext.Get();
+            var masterBills = DataContext.Get(x => x.TransactionType == transactionType && x.CurrentStatus != TermData.Canceled);
             
             var coloaders = catPartnerRepo.Get();
             var agents = catPartnerRepo.Get();
@@ -363,7 +386,6 @@ namespace eFMS.API.Documentation.DL.Services
                         from pol in pol2.DefaultIfEmpty()
                         join creator in creators on masterBill.UserCreated equals creator.Id into creator2
                         from creator in creator2.DefaultIfEmpty()
-                        where masterBill.TransactionType == transactionType
                         select new CsTransactionModel
                         {
                             Id = masterBill.Id,
@@ -430,7 +452,6 @@ namespace eFMS.API.Documentation.DL.Services
                         from pol in pol2.DefaultIfEmpty()
                         join creator in creators on masterBill.UserCreated equals creator.Id into creator2
                         from creator in creator2.DefaultIfEmpty()
-                        where masterBill.TransactionType == transactionType
                         select new CsTransactionModel
                         {
                             Id = masterBill.Id,
@@ -522,19 +543,19 @@ namespace eFMS.API.Documentation.DL.Services
             switch (criteria.TransactionType)
             {
                 case TransactionTypeEnum.InlandTrucking:
-                    //results = QueryIT(criteria, list);
+                    //results = QueryIT(criteria, listSearch, listData);
                     break;
                 case TransactionTypeEnum.AirExport:
-                    //results = QueryAE(criteria, list);
+                    //results = QueryAE(criteria, listSearch, listData);
                     break;
                 case TransactionTypeEnum.AirImport:
-                    //results = QueryAI(criteria, list);
+                    //results = QueryAI(criteria, listSearch, listData);
                     break;
                 case TransactionTypeEnum.SeaConsolExport:
-                    //results = QuerySEC(criteria, list);
+                    //results = QuerySEC(criteria, listSearch, listData);
                     break;
                 case TransactionTypeEnum.SeaConsolImport:
-                    //results = QuerySIC(criteria, list);
+                    //results = QuerySIC(criteria, listSearch, listData);
                     break;
                 case TransactionTypeEnum.SeaFCLExport:
                     results = QuerySEF(criteria, listSearch, listData);
@@ -543,10 +564,10 @@ namespace eFMS.API.Documentation.DL.Services
                     results = QuerySIF(criteria, listSearch, listData);
                     break;
                 case TransactionTypeEnum.SeaLCLExport:
-                    //results = QuerySEL(criteria, list);
+                    //results = QuerySEL(criteria, listSearch, listData);
                     break;
                 case TransactionTypeEnum.SeaLCLImport:
-                    //results = QuerySIL(criteria, list);
+                    //results = QuerySIL(criteria, listSearch, listData);
                     break;
                 default:
                     break;
@@ -560,7 +581,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="criteria"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        private IQueryable<CsTransactionModel> QueryIT(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> list)
+        private IQueryable<CsTransactionModel> QueryIT(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch, IQueryable<CsTransactionModel> listData)
         {
             return null;
         }
@@ -571,7 +592,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="criteria"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        private IQueryable<CsTransactionModel> QueryAE(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> list)
+        private IQueryable<CsTransactionModel> QueryAE(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch, IQueryable<CsTransactionModel> listData)
         {
             return null;
         }
@@ -582,7 +603,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="criteria"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        private IQueryable<CsTransactionModel> QueryAI(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> list)
+        private IQueryable<CsTransactionModel> QueryAI(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch, IQueryable<CsTransactionModel> listData)
         {
             return null;
         }
@@ -593,7 +614,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="criteria"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        private IQueryable<CsTransactionModel> QuerySEC(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> list)
+        private IQueryable<CsTransactionModel> QuerySEC(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch, IQueryable<CsTransactionModel> listData)
         {
             return null;
         }
@@ -604,7 +625,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="criteria"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        private IQueryable<CsTransactionModel> QuerySIC(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> list)
+        private IQueryable<CsTransactionModel> QuerySIC(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch, IQueryable<CsTransactionModel> listData)
         {
             return null;
         }
@@ -761,7 +782,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="criteria"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        private IQueryable<CsTransactionModel> QuerySEL(CsTransactionCriteria criteria, List<sp_GetTransaction> list)
+        private IQueryable<CsTransactionModel> QuerySEL(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch, IQueryable<CsTransactionModel> listData)
         {
             return null;
         }
@@ -772,7 +793,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="criteria"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        private IQueryable<CsTransactionModel> QuerySIL(CsTransactionCriteria criteria, List<sp_GetTransaction> list)
+        private IQueryable<CsTransactionModel> QuerySIL(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch, IQueryable<CsTransactionModel> listData)
         {
             return null;
         }

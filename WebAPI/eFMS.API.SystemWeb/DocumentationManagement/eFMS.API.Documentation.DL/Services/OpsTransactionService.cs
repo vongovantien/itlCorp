@@ -516,6 +516,8 @@ namespace eFMS.API.Documentation.DL.Services
             else
             {
                 job.CurrentStatus = TermData.Canceled;
+                job.DatetimeModified = DateTime.Now;
+                job.UserModified = currentUser.UserID;
                 result = DataContext.Update(job, x => x.Id == id, false);
                 if (result.Success)
                 {
