@@ -3,7 +3,7 @@
         <div class="c-button-actions">
 
             <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                (click)="duplicateConfirm()">
+                (click)="duplicateConfirm()" [disabled]="ACTION === 'copy'">
                 <span>
                     <i class="la la-search-plus"></i>
                     <span>
@@ -52,10 +52,10 @@
                     <grant-total-profit></grant-total-profit>
 
                 </tab>
-                <tab heading="House Bill List" (selectTab)="onSelectTab('hbl')" [disabled]="ACTION === 'COPY'">
+                <tab heading="House Bill List" (selectTab)="onSelectTab('hbl')" [disabled]="ACTION === 'copy'">
                 </tab>
                 <tab heading="Debit Note & Credit Note" (selectTab)="onSelectTab('cdNote')"
-                    [active]="selectedTab === 'CDNOTE'" [disabled]="ACTION === 'COPY'">
+                    [active]="selectedTab === 'CDNOTE'" [disabled]="ACTION === 'copy'">
                     <ng-container *ngIf="selectedTab === 'CDNOTE'" loadModule="cd">
                     </ng-container>
                 </tab>

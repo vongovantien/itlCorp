@@ -228,4 +228,9 @@ export class SeaFCLImportHBLComponent extends AppList {
             }
         }
     }
+    duplicateConfirm() {
+        this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], {
+            queryParams: Object.assign({}, { tab: 'SHIPMENT' }, { action: 'copy' })
+        });
+    }
 }

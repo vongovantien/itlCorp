@@ -53,6 +53,11 @@ export class DocumentationRepo {
         return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction`, body);
     }
 
+    importCSTransaction(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction/Import`, body);
+    }
+
+
     addOPSJob(body: any = {}) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/Add`, body);
     }
@@ -293,8 +298,8 @@ export class DocumentationRepo {
         );
     }
 
-    getChargesByPartnerNotExitstCdNote(id: any, partnerId: any, isHouseBillID: boolean, listData: any[]){
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GroupByListHBNotExistsCDNote`,{ Id: id, partnerID: partnerId, IsHouseBillID: isHouseBillID, listData: listData}).pipe(
+    getChargesByPartnerNotExitstCdNote(id: any, partnerId: any, isHouseBillID: boolean, listData: any[]) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GroupByListHBNotExistsCDNote`, { Id: id, partnerID: partnerId, IsHouseBillID: isHouseBillID, listData: listData }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

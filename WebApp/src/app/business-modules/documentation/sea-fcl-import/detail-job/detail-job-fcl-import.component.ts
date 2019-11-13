@@ -32,6 +32,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
 
     fclImportDetail: any; // TODO Model.
     containers: Container[] = [];
+    action: any = {};
 
     constructor(
         protected _router: Router,
@@ -59,7 +60,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                 this.selectedTab = !!param.tab ? param.tab.toUpperCase() : 'SHIPMENT';
                 this.id = !!param.id ? param.id : '';
                 if (param.action) {
-                    this.ACTION = (param.action).toUpperCase() || "UPDATE";
+                    this.ACTION = param.action;
                 }
 
                 this.cdr.detectChanges();
@@ -173,8 +174,31 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
         modelUpdate.transactionType = this.fclImportDetail.transactionType;
         modelUpdate.jobNo = this.fclImportDetail.jobNo;
         modelUpdate.datetimeCreated = this.fclImportDetail.modifiedDate;
+        if (this.ACTION === 'UPDATE') {
+            this.updateJob(modelUpdate);
+        } else {
+            this.duplicateJob(modelUpdate);
+        }
+    }
+    duplicateJob(body: any) {
+        this._documenRepo.importCSTransaction(body)
+            .pipe(
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
 
-        this.updateJob(modelUpdate);
+                        // * get detail & container list.
+                        this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(this.id));
+
+                        this._store.dispatch(new fromStore.GetContainerAction({ mblid: this.id }));
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                }
+            );
     }
 
     updateJob(body: any) {
@@ -204,19 +228,18 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                 this._router.navigate([`home/documentation/sea-fcl-import/${this.id}/hbl`]);
                 break;
             case 'shipment':
-                this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: { tab: 'SHIPMENT' } });
+                this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action) });
                 break;
             case 'cdNote':
                 this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
         }
     }
+
     duplicateConfirm() {
-        this._router.navigate([], {
-            relativeTo: this._activedRoute,
-            queryParams: {
-                action: 'copy'
-            }
+        this.action = { action: 'copy' };
+        this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], {
+            queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
         });
     }
 }
