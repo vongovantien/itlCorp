@@ -222,10 +222,10 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Import(CsTransactionEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            string checkExistMessage = CheckExist(model.Id, model);
+            string checkExistMessage = CheckExist(Guid.Empty, model);
             if (checkExistMessage.Length > 0)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+                return Ok(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             model.UserCreated = currentUser.UserID;
             var result = csTransactionService.ImportCSTransaction(model);
@@ -244,9 +244,12 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return "MBL is required!";
             }
+            model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
+            if (model.TransactionType == string.Empty)
+                message = "Not found type transaction";
             if (id == Guid.Empty)
             {
-                if (csTransactionService.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower()))
+                if (csTransactionService.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.TransactionType == model.TransactionType))
                 {
                     message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
                 }
@@ -263,16 +266,14 @@ namespace eFMS.API.Documentation.Controllers
             {
                 message = "Shipment container list must have at least 1 row of data!";
             }
-
+            if (message.Length > 0) return message;
             var resultMessage = string.Empty;
             if (model.TransactionTypeEnum == TransactionTypeEnum.SeaFCLImport)
             {
                 resultMessage = CheckExistsSIF(id, model);
             }
 
-            message = resultMessage.Length == 0 ? message : resultMessage;
-
-            return message;
+            return resultMessage;
         }
 
         private string CheckExistsSIF(Guid id, CsTransactionEditModel model)

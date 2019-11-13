@@ -854,10 +854,12 @@ namespace eFMS.API.Documentation.DL.Services
         {
             try
             {
+                model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
+                if (model.TransactionType == string.Empty)
+                    return new ResultHandle { Status = false, Message = "Not found type transaction" };
                 var transaction = mapper.Map<CsTransaction>(model);
                 transaction.Id = Guid.NewGuid();
-                int countNumberJob = transactionRepository.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
-                transaction.JobNo = GenerateID.GenerateJobID(Constants.SEF_SHIPMENT, countNumberJob);
+                transaction.JobNo = CreateJobNoByTransactionType(model.TransactionTypeEnum, model.TransactionType);
                 transaction.UserCreated = currentUser.UserID;
                 transaction.DatetimeCreated = transaction.DatetimeModified = DateTime.Now;
                 transaction.UserModified = model.UserCreated;
