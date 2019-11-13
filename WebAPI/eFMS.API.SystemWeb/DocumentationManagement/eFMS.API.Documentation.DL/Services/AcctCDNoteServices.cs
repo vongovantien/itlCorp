@@ -3,22 +3,16 @@ using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
-using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Models.ReportResults;
-using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
-using eFMS.API.Documentation.Service.ViewModels;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
-using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -35,6 +29,9 @@ namespace eFMS.API.Documentation.DL.Services
         IContextBase<CatCurrency> currencyRepository;
         IContextBase<CatUnit> unitRepository;
         IContextBase<CatPlace> placeRepository;
+        IContextBase<CatCurrencyExchange> catCurrencyExchangeRepository;
+        IContextBase<CatCountry> countryRepository;
+        IContextBase<CsMawbcontainer> csMawbcontainerRepository;
         ICsShipmentSurchargeService surchargeService;
 
         public AcctCDNoteServices(IStringLocalizer<LanguageSub> localizer,
@@ -48,6 +45,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatCurrency> currencyRepo,
             IContextBase<CatUnit> unitRepo,
             IContextBase<CatPlace> placeRepo,
+            IContextBase<CatCurrencyExchange> catCurrencyExchangeRepo,
+            IContextBase<CatCountry> countryRepo,
+            IContextBase<CsMawbcontainer> csMawbcontainerRepo,
             ICsShipmentSurchargeService surcharge) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -61,14 +61,15 @@ namespace eFMS.API.Documentation.DL.Services
             currencyRepository = currencyRepo;
             unitRepository = unitRepo;
             placeRepository = placeRepo;
+            catCurrencyExchangeRepository = catCurrencyExchangeRepo;
+            countryRepository = countryRepo;
+            csMawbcontainerRepository = csMawbcontainerRepo;
             surchargeService = surcharge;
         }
 
         private string CreateCode(string typeCDNote, TransactionTypeEnum typeEnum)
         {
-            string code = "";// "LG";
-            var shipment = string.Empty;
-            //int countNumberJob = 0;
+            string code = string.Empty;
             switch (typeEnum)
             {
                 case TransactionTypeEnum.CustomLogistic:
@@ -174,9 +175,9 @@ namespace eFMS.API.Documentation.DL.Services
                 var sc = DataContext.SubmitChanges();
                 if (sc.Success)
                 {
-                    surchargeRepository.SubmitChanges();
-                    opstransRepository.SubmitChanges();
-                    cstransRepository.SubmitChanges();
+                    var hsSc = surchargeRepository.SubmitChanges();
+                    var hsOt = opstransRepository.SubmitChanges();
+                    var hsCt = cstransRepository.SubmitChanges();
                 }
                 return sc;
             }
@@ -253,12 +254,11 @@ namespace eFMS.API.Documentation.DL.Services
                     UpdateJobModifyTime(model.Id);
                 }
                 var hsSc = DataContext.SubmitChanges();
-                surchargeRepository.SubmitChanges();
-                opstransRepository.SubmitChanges();
-                cstransRepository.SubmitChanges();
+                var hsSurSc = surchargeRepository.SubmitChanges();
+                var hsOtSc = opstransRepository.SubmitChanges();
+                var hsCtSc = cstransRepository.SubmitChanges();
 
-                return stt;//new HandleState();
-
+                return hsSc;
             }
             catch (Exception ex)
             {
@@ -366,10 +366,8 @@ namespace eFMS.API.Documentation.DL.Services
                         returnList.Add(obj);
                     }
 
-
                 }
                 return returnList;
-
             }
             catch (Exception ex)
             {
@@ -466,13 +464,13 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item);
                 var hb = trandetailRepositoty.Get(x => x.Id == item.Hblid).FirstOrDefault();
-                var catCharge = ((eFMSDataContext)DataContext.DC).CatCharge.First(x => x.Id == charge.ChargeId);
-                var exchangeRate = ((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == item.ExchangeDate.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == "VND" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                var catCharge = catchargeRepository.First(x => x.Id == charge.ChargeId);//((eFMSDataContext)DataContext.DC).CatCharge.First(x => x.Id == charge.ChargeId);
+                var exchangeRate = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == item.ExchangeDate.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == "VND" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();//((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == item.ExchangeDate.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == "VND" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
 
-                charge.Currency = ((eFMSDataContext)DataContext.DC).CatCurrency.First(x => x.Id == charge.CurrencyId).CurrencyName;
+                charge.Currency = currencyRepository.First(x => x.Id == charge.CurrencyId).CurrencyName;//((eFMSDataContext)DataContext.DC).CatCurrency.First(x => x.Id == charge.CurrencyId).CurrencyName;
                 charge.ExchangeRate = (exchangeRate != null && exchangeRate.Rate != 0) ? exchangeRate.Rate : 1;
                 charge.Hwbno = hb != null ? hb.Hwbno : opsTransaction?.Hwbno;
-                charge.Unit = ((eFMSDataContext)DataContext.DC).CatUnit.First(x => x.Id == charge.UnitId).UnitNameEn;
+                charge.Unit = unitRepository.First(x => x.Id == charge.UnitId).UnitNameEn;//((eFMSDataContext)DataContext.DC).CatUnit.First(x => x.Id == charge.UnitId).UnitNameEn;
                 charge.ChargeCode = catCharge.Code;
                 charge.NameEn = catCharge.ChargeNameEn;
                 listSurcharges.Add(charge);
@@ -488,7 +486,10 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (transaction != null)
             {
-                hbOfLadingNo = transaction?.Mawb;
+                //hbOfLadingNo = transaction?.Mawb;
+                soaDetails.MbLadingNo = transaction?.Mawb;
+                hbOfLadingNo = string.Join(",", HBList.OrderByDescending(x => x.Hwbno).Select(x => x.Hwbno).Distinct());
+                soaDetails.HbLadingNo = hbOfLadingNo;
             }
             else
             {
@@ -504,18 +505,17 @@ namespace eFMS.API.Documentation.DL.Services
             decimal? volum = 0;
             foreach (var item in HBList)
             {
-                hbOfLadingNo += (item.Hwbno + ", ");
-                var conts = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == item.Id).ToList();
+                //hbOfLadingNo += (item.Hwbno + ", ");
+                var conts = csMawbcontainerRepository.Get(x => x.Hblid == item.Id).ToList();//((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == item.Id).ToList();
                 foreach (var cont in conts)
                 {
                     volum += cont.Cbm == null ? 0 : cont.Cbm;
-                    var contUnit = ((eFMSDataContext)DataContext.DC).CatUnit.Where(x => x.Id == cont.ContainerTypeId).FirstOrDefault();
+                    var contUnit = unitRepository.Get(x => x.Id == cont.ContainerTypeId).FirstOrDefault();//((eFMSDataContext)DataContext.DC).CatUnit.Where(x => x.Id == cont.ContainerTypeId).FirstOrDefault();
                     hbConstainers += (cont.Quantity + "x" + contUnit.UnitNameEn + ",");
                 }
-
             }
 
-            var countries = ((eFMSDataContext)DataContext.DC).CatCountry.ToList();
+            var countries = countryRepository.Get().ToList();//((eFMSDataContext)DataContext.DC).CatCountry.ToList();
             soaDetails.PartnerNameEn = partner?.PartnerNameEn;
             soaDetails.PartnerShippingAddress = partner?.AddressShippingEn;
             soaDetails.PartnerTel = partner?.Tel;
@@ -526,12 +526,14 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.JobId = transaction != null ? transaction.Id : opsTransaction.Id;
             soaDetails.JobNo = transaction != null ? transaction.JobNo : opsTransaction?.JobNo;
             soaDetails.Pol = pol?.NameEn;
-            if (soaDetails.PolCountry != null)
+            //if (soaDetails.PolCountry != null)
+            if (soaDetails.Pol != null)
             {
                 soaDetails.PolCountry = pol == null ? null : countries.FirstOrDefault(x => x.Id == pol.CountryId)?.NameEn;
             }
             soaDetails.Pod = pod?.NameEn;
-            if (countries != null)
+            //if (countries != null)
+            if (soaDetails.Pod != null)
             {
                 soaDetails.PodCountry = pod == null ? null : countries.FirstOrDefault(x => x.Id == pod.CountryId)?.NameEn;
             }
@@ -548,7 +550,6 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.SoaNo = String.Join(",", charges.Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct()); ;
 
             return soaDetails;
-
         }
 
         public HandleState DeleteCDNote(Guid idSoA)
@@ -629,14 +630,14 @@ namespace eFMS.API.Documentation.DL.Services
                             if (jobOpsTrans != null)
                             {
                                 jobOpsTrans.UserModified = currentUser.UserID;
-                                jobOpsTrans.ModifiedDate = DateTime.Now;
+                                jobOpsTrans.DatetimeModified = DateTime.Now;
                                 opstransRepository.Update(jobOpsTrans, x => x.Id == jobOpsTrans.Id, false);//((eFMSDataContext)DataContext.DC).OpsTransaction.Update(jobOpsTrans);
                             }
                             var jobCSTrans = cstransRepository.Get(x => x.Id == cdNote.JobId).FirstOrDefault(); //((eFMSDataContext)DataContext.DC).CsTransaction.FirstOrDefault();
                             if (jobCSTrans != null)
                             {
                                 jobCSTrans.UserModified = currentUser.UserID;
-                                jobCSTrans.ModifiedDate = DateTime.Now;
+                                jobCSTrans.DatetimeModified = DateTime.Now;
                                 cstransRepository.Update(jobCSTrans, x => x.Id == jobCSTrans.Id, false);//((eFMSDataContext)DataContext.DC).CsTransaction.Update(jobCSTrans);
                             }
                         }
@@ -797,14 +798,14 @@ namespace eFMS.API.Documentation.DL.Services
             if (jobOpsTrans != null)
             {
                 jobOpsTrans.UserModified = currentUser.UserID;
-                jobOpsTrans.ModifiedDate = DateTime.Now;
+                jobOpsTrans.DatetimeModified = DateTime.Now;
                 opstransRepository.Update(jobOpsTrans, x => x.Id == jobId, false);
             }
             var jobCSTrans = cstransRepository.First(x => x.Id == jobId);
             if (jobCSTrans != null)
             {
                 jobCSTrans.UserModified = currentUser.UserID;
-                jobCSTrans.ModifiedDate = DateTime.Now;
+                jobCSTrans.DatetimeModified = DateTime.Now;
                 cstransRepository.Update(jobCSTrans, x => x.Id == jobId, false);
             }
         }

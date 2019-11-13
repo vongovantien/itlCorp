@@ -56,7 +56,7 @@ namespace eFMS.API.Documentation.Controllers
         [HttpGet("CountJobByDate/{{date}}")]
         public IActionResult CountJob(DateTime date)
         {
-            var result = csTransactionService.Count(x => x.CreatedDate == date);
+            var result = csTransactionService.Count(x => x.DatetimeCreated == date);
             return Ok(result);
         }
 
@@ -199,7 +199,8 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_NOT_ALLOW_DELETED].Value });
             }
-            var hs = csTransactionService.DeleteCSTransaction(id);
+            //var hs = csTransactionService.DeleteCSTransaction(id);
+            var hs = csTransactionService.SoftDeleteJob(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -221,10 +222,10 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Import(CsTransactionEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            string checkExistMessage = CheckExist(model.Id, model);
+            string checkExistMessage = CheckExist(Guid.Empty, model);
             if (checkExistMessage.Length > 0)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+                return Ok(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             model.UserCreated = currentUser.UserID;
             var result = csTransactionService.ImportCSTransaction(model);
@@ -234,27 +235,30 @@ namespace eFMS.API.Documentation.Controllers
         #region -- METHOD PRIVATE --
         private string CheckExist(Guid id, CsTransactionEditModel model)
         {
+            model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
+            if (model.TransactionType == string.Empty)
+                return "Not found type transaction";
             string message = string.Empty;
 
             if (string.IsNullOrEmpty(model.Mawb))
             {
-                message = "MBL is required!";
+                return "MBL is required!";
+            }
+            model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
+            if (model.TransactionType == string.Empty)
+                message = "Not found type transaction";
+            if (id == Guid.Empty)
+            {
+                if (csTransactionService.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.TransactionType == model.TransactionType && x.CurrentStatus != TermData.Canceled))
+                {
+                    message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
+                }
             }
             else
             {
-                if (id == Guid.Empty)
+                if (csTransactionService.Any(x => (x.Mawb.ToLower() == model.Mawb.ToLower() && x.Id != id && x.CurrentStatus != TermData.Canceled)))
                 {
-                    if (csTransactionService.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower()))
-                    {
-                        message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
-                    }
-                }
-                else
-                {
-                    if (csTransactionService.Any(x => (x.Mawb.ToLower() == model.Mawb.ToLower() && x.Id != id)))
-                    {
-                        message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
-                    }
+                    message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
                 }
             }
 
@@ -262,16 +266,14 @@ namespace eFMS.API.Documentation.Controllers
             {
                 message = "Shipment container list must have at least 1 row of data!";
             }
-
+            if (message.Length > 0) return message;
             var resultMessage = string.Empty;
             if (model.TransactionTypeEnum == TransactionTypeEnum.SeaFCLImport)
             {
                 resultMessage = CheckExistsSIF(id, model);
             }
 
-            message = resultMessage.Length == 0 ? message : resultMessage;
-
-            return message;
+            return resultMessage;
         }
 
         private string CheckExistsSIF(Guid id, CsTransactionEditModel model)

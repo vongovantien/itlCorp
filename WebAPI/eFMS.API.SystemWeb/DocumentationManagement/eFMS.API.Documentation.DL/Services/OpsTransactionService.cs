@@ -72,9 +72,9 @@ namespace eFMS.API.Documentation.DL.Services
         public override HandleState Add(OpsTransactionModel model)
         {
             model.Id = Guid.NewGuid();
-            model.CreatedDate = DateTime.Now;
+            model.DatetimeCreated = DateTime.Now;
             model.UserCreated = currentUser.UserID;
-            model.ModifiedDate = model.CreatedDate;
+            model.DatetimeModified = model.DatetimeCreated;
             model.UserModified = model.UserCreated;
             //model.CurrentStatus = "InSchedule";
             var dayStatus = (int)(model.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
@@ -86,7 +86,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 model.CurrentStatus = TermData.Processing;
             }
-            int countNumberJob = DataContext.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
+            int countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
             model.JobNo = GenerateID.GenerateOPSJobID(Constants.OPS_SHIPMENT, countNumberJob);
             var entity = mapper.Map<OpsTransaction>(model);
             return DataContext.Add(entity);
@@ -164,7 +164,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (rowsCount == 0) return null;
             if (size > 1)
             {
-                data = data.OrderByDescending(x => x.ModifiedDate);
+                data = data.OrderByDescending(x => x.DatetimeModified);
                 if (page < 1)
                 {
                     page = 1;
@@ -258,7 +258,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 && (x.ShipmentMode == criteria.ShipmentMode || string.IsNullOrEmpty(criteria.ShipmentMode))
                                 && ((x.ServiceDate ?? null) >= criteria.ServiceDateFrom || criteria.ServiceDateFrom == null)
                                 && ((x.ServiceDate ?? null) <= criteria.ServiceDateTo || criteria.ServiceDateTo == null)
-                            ).OrderByDescending(x => x.ModifiedDate);
+                            ).OrderByDescending(x => x.DatetimeModified);
             }
             else
             {
@@ -271,7 +271,7 @@ namespace eFMS.API.Documentation.DL.Services
                                    || (x.FieldOpsID == criteria.All || string.IsNullOrEmpty(criteria.All))
                                    || (x.ShipmentMode == criteria.All || string.IsNullOrEmpty(criteria.All))
                                && ((x.ServiceDate ?? null) >= (criteria.ServiceDateFrom ?? null) && (x.ServiceDate ?? null) <= (criteria.ServiceDateTo ?? null))
-                               ).OrderByDescending(x => x.ModifiedDate);
+                               ).OrderByDescending(x => x.DatetimeModified);
             }
             results = mapper.Map<List<OpsTransactionModel>>(datajoin);
             return results.AsQueryable();
@@ -374,12 +374,12 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     model.OpsTransaction.Id = Guid.NewGuid();
                     model.OpsTransaction.Hblid = Guid.NewGuid();
-                    model.OpsTransaction.CreatedDate = DateTime.Now;
+                    model.OpsTransaction.DatetimeCreated = DateTime.Now;
                     model.OpsTransaction.UserCreated = currentUser.UserID; //currentUser.UserID;
-                    model.OpsTransaction.ModifiedDate = DateTime.Now;
+                    model.OpsTransaction.DatetimeModified = DateTime.Now;
                     model.OpsTransaction.UserModified = currentUser.UserID;
                     model.OpsTransaction.ProductService = productService;
-                    int countNumberJob = DataContext.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
+                    int countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
                     model.OpsTransaction.JobNo = GenerateID.GenerateOPSJobID(Constants.OPS_SHIPMENT, countNumberJob);
                     var dayStatus = (int)(model.OpsTransaction.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
                     if (dayStatus > 0)
@@ -457,11 +457,11 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         item.OpsTransaction.Id = Guid.NewGuid();
                         item.OpsTransaction.Hblid = Guid.NewGuid();
-                        item.OpsTransaction.CreatedDate = DateTime.Now;
+                        item.OpsTransaction.DatetimeCreated = DateTime.Now;
                         item.OpsTransaction.UserCreated = currentUser.UserID; //currentUser.UserID;
-                        item.OpsTransaction.ModifiedDate = DateTime.Now;
+                        item.OpsTransaction.DatetimeModified = DateTime.Now;
                         item.OpsTransaction.UserModified = currentUser.UserID;
-                        int countNumberJob = DataContext.Count(x => x.CreatedDate.Value.Month == DateTime.Now.Month && x.CreatedDate.Value.Year == DateTime.Now.Year);
+                        int countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
                         item.OpsTransaction.JobNo = GenerateID.GenerateOPSJobID(Constants.OPS_SHIPMENT, (countNumberJob + i));
                         var dayStatus = (int)(item.OpsTransaction.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
                         if (dayStatus > 0)
@@ -516,6 +516,8 @@ namespace eFMS.API.Documentation.DL.Services
             else
             {
                 job.CurrentStatus = TermData.Canceled;
+                job.DatetimeModified = DateTime.Now;
+                job.UserModified = currentUser.UserID;
                 result = DataContext.Update(job, x => x.Id == id, false);
                 if (result.Success)
                 {
@@ -610,7 +612,7 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         COSTING = "COSTING Test",
                         TransID = shipment.JobNo,
-                        TransDate = (DateTime)shipment.CreatedDate,
+                        TransDate = (DateTime)shipment.DatetimeCreated,
                         HWBNO = shipment.Hwbno,
                         MAWB = shipment.Mblno,
                         PartnerName = "PartnerName",

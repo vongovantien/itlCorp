@@ -5,11 +5,6 @@ namespace eFMS.API.Documentation.Service.Models
 {
     public partial class CsTransaction
     {
-        public CsTransaction()
-        {
-            CsTransactionDetail = new HashSet<CsTransactionDetail>();
-        }
-
         public Guid Id { get; set; }
         public Guid BranchId { get; set; }
         public string JobNo { get; set; }
@@ -41,15 +36,14 @@ namespace eFMS.API.Documentation.Service.Models
         public decimal? Cbm { get; set; }
         public string Notes { get; set; }
         public string TransactionType { get; set; }
+        public string CurrentStatus { get; set; }
         public string UserCreated { get; set; }
         public bool? IsLocked { get; set; }
         public DateTime? LockedDate { get; set; }
-        public DateTime? CreatedDate { get; set; }
+        public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
-        public DateTime? ModifiedDate { get; set; }
+        public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
-
-        public virtual ICollection<CsTransactionDetail> CsTransactionDetail { get; set; }
     }
 }

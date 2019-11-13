@@ -34,8 +34,8 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public Nullable<int> SumPackages { get; set; }
         public string UserCreated { get; set; }
         public string UserModified { get; set; }
-        public Nullable<DateTime> CreatedDate { get; set; }
-        public Nullable<DateTime> ModifiedDate { get; set; }
+        public Nullable<DateTime> DatetimeCreated { get; set; }
+        public Nullable<DateTime> DatetimeModified { get; set; }
         public string POLName { get; set; }
         public string PODName { get; set; }
         public string CurrentStatus { get; set; }

@@ -191,7 +191,7 @@ namespace eFMS.API.Documentation.DL.Services
                             opstrans.SumCbm = opstrans.SumChargeWeight = opstrans.SumGrossWeight = opstrans.SumNetWeight = opstrans.SumPackages = opstrans.SumContainers = null;
                             opstrans.ContainerDescription = null;
                         }
-                        opstrans.ModifiedDate = DateTime.Now;
+                        opstrans.DatetimeModified = DateTime.Now;
                         opstrans.UserModified = currentUser.UserID;
                         opsTransRepository.Update(opstrans, x => x.Id == masterId, false);
                         DataContext.SubmitChanges();
@@ -452,8 +452,8 @@ namespace eFMS.API.Documentation.DL.Services
 
                 foreach (var item in csMawbcontainers)
                 {
-                    bool existedItems = containerShipments.Any(cont => cont.ContainerTypeId == item.ContainerTypeId && cont.Quantity == item.Quantity && cont.ContainerNo == item.ContainerNo && cont.PackageTypeId == item.PackageTypeId && cont.Mblid == mblId);
-                    if (existedItems)
+                    var existedItems = containerShipments.Count(cont => cont.ContainerTypeId == item.ContainerTypeId && cont.Quantity == item.Quantity && cont.ContainerNo == item.ContainerNo && cont.PackageTypeId == item.PackageTypeId && cont.Mblid == mblId);
+                    if (existedItems > 1)
                     {
                         return new HandleState(stringLocalizer[LanguageSub.MSG_MAWBCONTAINER_EXISTED].Value);
                     }
