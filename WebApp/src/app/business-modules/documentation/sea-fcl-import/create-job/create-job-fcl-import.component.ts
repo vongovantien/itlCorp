@@ -15,6 +15,7 @@ import { InfoPopupComponent } from 'src/app/shared/common/popup';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { Container } from 'src/app/shared/models/document/container.model';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 
 @Component({
@@ -96,7 +97,7 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
         };
 
         const fclImportAddModel = new FCLImportAddModel(formData);
-        fclImportAddModel.transactionTypeEnum = TransactionTypeEnum.SeaFCLImport;
+        fclImportAddModel.transactionTypeEnum = CommonEnum.TransactionTypeEnum.SeaFCLImport;
 
         return fclImportAddModel;
 

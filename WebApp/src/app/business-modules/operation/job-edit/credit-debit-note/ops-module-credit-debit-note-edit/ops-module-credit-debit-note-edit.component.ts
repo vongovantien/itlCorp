@@ -27,7 +27,7 @@ export class OpsModuleCreditDebitNoteEditComponent extends PopupBase implements 
     isDisplay: boolean = true;
     EditingCDNote: AcctCDNote = new AcctCDNote();
     checkAllCharge: boolean = false;
-    currentCDNo: String = '';
+    currentCDNo: string = '';
     currentJob: OpsTransaction;
     // currentPartnerId: String = '';
 

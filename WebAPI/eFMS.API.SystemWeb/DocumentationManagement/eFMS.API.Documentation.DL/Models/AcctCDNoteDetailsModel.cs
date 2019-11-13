@@ -43,5 +43,6 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal? SumPackages { get; set; }
         public string WarehouseName { get; set; }
         public string CreatedDate { get; set; }
+        public string SoaNo { get; set; }
     }
 }

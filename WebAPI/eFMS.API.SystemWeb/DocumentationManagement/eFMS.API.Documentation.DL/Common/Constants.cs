@@ -6,6 +6,7 @@ namespace eFMS.API.Documentation.DL.Common
 {
     public static class Constants
     {
+        public static readonly string LG_SHIPMENT = "LG";// Custom Logistic
         public static readonly string SEF_SHIPMENT = "SEF"; //Sea FCL Export
         public static readonly string SIF_SHIPMENT = "SIF"; //Sea FCL Import
         public static readonly string SEL_SHIPMENT = "SEL"; //Sea LCL Export
@@ -15,6 +16,7 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string AE_SHIPMENT = "AE"; //Sea Air Export
         public static readonly string AI_SHIPMENT = "AI"; //Sea Air Import
         //public static readonly string T_SHIPMENT = "T"; //Trucking
+        
 
         public static readonly string SEF_HBL = "HBL";
         public static readonly string OPS_SHIPMENT = "LOG";

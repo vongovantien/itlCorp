@@ -192,7 +192,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
     }
 
-    addCharge(type: CommonEnum.SurchargeTypeEnum) {
+    addCharge(type: CommonEnum.SurchargeTypeEnum | string) {
         this.isSubmitted = false;
         const newSurCharge: CsShipmentSurcharge = new CsShipmentSurcharge();
         newSurCharge.currencyId = "USD"; // * Set default.
@@ -226,7 +226,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     }
 
-    deleteCharge(charge: CsShipmentSurcharge, index: number, type: CommonEnum.SurchargeTypeEnum) {
+    deleteCharge(charge: CsShipmentSurcharge, index: number, type: CommonEnum.SurchargeTypeEnum | string) {
         if (charge.id === SystemConstants.EMPTY_GUID) {
             switch (type) {
                 case CommonEnum.SurchargeTypeEnum.BUYING_RATE:
@@ -254,7 +254,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
     }
 
-    onDeleteShipmentSurcharge(type: CommonEnum.SurchargeTypeEnum) {
+    onDeleteShipmentSurcharge(type: CommonEnum.SurchargeTypeEnum | string) {
         this.confirmDeletePopup.hide();
         if (!!this.selectedSurcharge && this.selectedSurcharge.id !== SystemConstants.EMPTY_GUID) {
             this._documentRepo.deleteShipmentSurcharge(this.selectedSurcharge.id)
