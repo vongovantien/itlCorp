@@ -191,7 +191,7 @@ namespace eFMS.API.Documentation.DL.Services
                             opstrans.SumCbm = opstrans.SumChargeWeight = opstrans.SumGrossWeight = opstrans.SumNetWeight = opstrans.SumPackages = opstrans.SumContainers = null;
                             opstrans.ContainerDescription = null;
                         }
-                        opstrans.ModifiedDate = DateTime.Now;
+                        opstrans.DatetimeModified = DateTime.Now;
                         opstrans.UserModified = currentUser.UserID;
                         opsTransRepository.Update(opstrans, x => x.Id == masterId, false);
                         DataContext.SubmitChanges();
