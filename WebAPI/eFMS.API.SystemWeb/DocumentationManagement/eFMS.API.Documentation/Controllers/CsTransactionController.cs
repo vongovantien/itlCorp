@@ -221,10 +221,10 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Import(CsTransactionEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            string checkExistMessage = CheckExist(model.Id, model);
+            string checkExistMessage = CheckExist(Guid.Empty, model);
             if (checkExistMessage.Length > 0)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+                return Ok(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             model.UserCreated = currentUser.UserID;
             var result = csTransactionService.ImportCSTransaction(model);
@@ -242,9 +242,12 @@ namespace eFMS.API.Documentation.Controllers
             }
             else
             {
+                model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
+                if (model.TransactionType == string.Empty)
+                    message = "Not found type transaction";
                 if (id == Guid.Empty)
                 {
-                    if (csTransactionService.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower()))
+                    if (csTransactionService.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.TransactionType == model.TransactionType))
                     {
                         message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
                     }
