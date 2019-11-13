@@ -1,1 +1,53 @@
-asignment work!
+<div class="m-portlet">
+    <div class="m-portlet__body">
+        <div class="row" *ngIf="!!data">
+            <div class="col-md-4 m--margin-bottom-10">
+                <span class="m--font-bolder">Estimated Begin Date:</span>
+                <span class="m--font-brand m--margin-left-5">{{data.serviceDate | date:'dd/MM/yyyy'}}</span>
+            </div>
+            <div class="col-md-4 m--margin-bottom-10">
+                <span class="m--font-bolder">Estimated Finish Date:</span>
+                <span
+                    class="m--font-brand m--margin-left-5">{{!!data.finishDate ? (data.finishDate | date: 'dd/MM/yyyy') : '-'}}</span>
+            </div>
+            <div class="col-md-4 m--margin-bottom-10">
+                <span class="m--font-bolder">Job Status:</span>
+                <span class="m--font-brand m--margin-left-5">{{!!data.currentStatus ? data.currentStatus : '-'}}</span>
+            </div>
+        </div>
+        <div class="m-form m-form--label-align-right m--margin-bottom-5">
+            <div class="row align-items-center">
+                <div class="col-lg-4 order-2 order-lg-1">
+                    <div class="form-group">
+                        <div class="m-input-icon m-input-icon--left">
+                            <input type="text" class="form-control m-input m-input--square" placeholder="Search..."
+                                [(ngModel)]="keyword" name="keyword">
+                            <span class="m-input-icon__icon m-input-icon__icon--left">
+                                <span>
+                                    <i class="la la-search"></i>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
+                    <div class="row">
+                        <div class="col">
+                            <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase"
+                                appLoadingButton [state]="!!data && data.isLocked">
+                                <span>
+                                    <i class="la la-plus"></i>
+                                    <span>
+                                        Assign
+                                    </span>
+                                </span>
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
