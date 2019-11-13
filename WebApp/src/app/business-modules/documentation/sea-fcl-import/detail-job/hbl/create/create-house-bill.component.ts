@@ -22,7 +22,6 @@ import { SystemConstants } from 'src/constants/system.const';
 @Component({
     selector: 'app-create-house-bill',
     templateUrl: './create-house-bill.component.html',
-    styleUrls: ['./create-house-bill.component.scss']
 })
 export class CreateHouseBillComponent extends AppForm {
     @ViewChild(FormAddHouseBillComponent, { static: false }) formHouseBill: FormAddHouseBillComponent;

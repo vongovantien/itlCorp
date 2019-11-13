@@ -26,7 +26,6 @@ enum HBL_TAB {
 @Component({
     selector: 'app-detail-house-bill',
     templateUrl: './detail-house-bill.component.html',
-    styleUrls: ['./detail-house-bill.component.scss']
 })
 export class DetailHouseBillComponent extends CreateHouseBillComponent {
 

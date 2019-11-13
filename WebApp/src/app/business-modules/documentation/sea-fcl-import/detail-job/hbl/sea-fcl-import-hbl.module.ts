@@ -14,6 +14,7 @@ import { ShareBussinessModule } from 'src/app/business-modules/share-business/sh
 import { ImportHouseBillDetailComponent } from './popup/import-house-bill-detail/import-house-bill-detail.component';
 import { SelectModule } from 'ng2-select';
 import { FormSearchHouseBillComponent } from './components/form-search-house-bill/form-search-house-bill.component';
+import { SeaFClImportArrivalNoteComponent } from './components/arrival-note/arrival-note.component';
 
 const routing: Routes = [
     {
@@ -38,6 +39,7 @@ const routing: Routes = [
         DetailHouseBillComponent,
         ImportHouseBillDetailComponent,
         FormSearchHouseBillComponent,
+        SeaFClImportArrivalNoteComponent
     ],
     imports: [
         CommonModule,

@@ -60,9 +60,9 @@
                     <ng-container *ngIf="selectedTab === 'CDNOTE'" loadModule="cd">
                     </ng-container>
                 </tab>
-                <tab heading="Asignment" (selectTab)="onSelectTab('assignment')" [active]="selectedTab === 'ASIGNMENT'"
+                <tab heading="Asignment" (selectTab)="onSelectTab('assignment')" [active]="selectedTab === 'ASSIGNMENT'"
                     [disabled]="ACTION === 'copy'">
-                    <ng-container *ngIf="selectedTab === 'ASIGNMENT'" loadModule="asignment">
+                    <ng-container *ngIf="selectedTab === 'ASSIGNMENT'" loadModule="assignment">
                     </ng-container>
                 </tab>
             </tabset>

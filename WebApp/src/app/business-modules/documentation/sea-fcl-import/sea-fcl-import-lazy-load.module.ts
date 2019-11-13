@@ -3,7 +3,7 @@ import { LAZY_MODULES_MAP, ILazyModules } from "src/app/load-module-map";
 
 export const lazyModulesFClMap: ILazyModules = {
     cd: () => import('./detail-job/cd-note/sea-fcl-import-cd-note.module').then(m => m.SeaFCLImportCDNoteModule),
-    asignment: () => import('./detail-job/asignment/sea-fcl-import-asignment.module').then(m => m.SeaFCLImportAsignmentModule)
+    assignment: () => import('./detail-job/asignment/sea-fcl-import-asignment.module').then(m => m.SeaFCLImportAsignmentModule)
 };
 
 @NgModule({

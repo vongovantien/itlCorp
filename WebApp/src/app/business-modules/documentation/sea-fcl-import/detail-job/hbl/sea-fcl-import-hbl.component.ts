@@ -17,7 +17,6 @@ import * as fromStore from './../../store';
 import * as fromShareBussiness from './../../../../share-business/store';
 
 import { catchError, finalize, takeUntil, switchMap, tap } from 'rxjs/operators';
-import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'app-sea-fcl-import-hbl',
@@ -112,6 +111,9 @@ export class SeaFCLImportHBLComponent extends AppList {
                 break;
             case 'cdNote':
                 this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
+                break;
+            case 'assignment':
+                this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
                 break;
         }
     }

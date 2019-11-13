@@ -4,38 +4,30 @@
             <app-default-button (click)="onUpdateHblDetail()" [buttonSetting]="saveButtonSetting"></app-default-button>
             <app-default-button (click)="combackToHBLList()" [buttonSetting]="cancelButtonSetting"></app-default-button>
         </div>
-
     </app-sub-header>
     <div class="m-content">
         <div class="m-portlet__body">
             <tabset class="custom-class-tab">
                 <tab heading="HBl Detail" (selectTab)="onSelectTab('DETAIL')">
-                    <ng-container *ngIf="selectedTab === 'DETAIL'">
-
+                    <ng-container>
                         <app-form-add-house-bill> </app-form-add-house-bill>
 
                         <shipment-good-summary></shipment-good-summary>
-
                     </ng-container>
                 </tab>
                 <tab heading="Arrival Note" (selectTab)="onSelectTab('ARRIVAL')">
                     <ng-container *ngIf="selectedTab === 'ARRIVAL'">
-                        arirval note work!
+                        <sea-fcl-import-hbl-arrival-note></sea-fcl-import-hbl-arrival-note>>
                     </ng-container>
                 </tab>
                 <tab heading="Delivery Order (D/O)" (selectTab)="onSelectTab('DELIVERY')">
                     <ng-container *ngIf="selectedTab === 'DELIVERY'">
                         Delivery work!
                     </ng-container>
-
                 </tab>
             </tabset>
-
-
         </div>
     </div>
-
-
 </div>
 <info-popup [body]="'Opps, It looks like your missed something, Please recheck the highlighted field below.'"
     [title]="'Cannot Create HBL'"></info-popup>
