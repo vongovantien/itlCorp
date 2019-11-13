@@ -134,7 +134,7 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
 
-            model.ModifiedDate = DateTime.Now;
+            model.DatetimeModified = DateTime.Now;
             model.UserModified = currentUser.UserID;
             var hs = transactionService.Update(model,x=>x.Id==model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);

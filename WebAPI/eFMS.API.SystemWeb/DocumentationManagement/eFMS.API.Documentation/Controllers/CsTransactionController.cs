@@ -56,7 +56,7 @@ namespace eFMS.API.Documentation.Controllers
         [HttpGet("CountJobByDate/{{date}}")]
         public IActionResult CountJob(DateTime date)
         {
-            var result = csTransactionService.Count(x => x.CreatedDate == date);
+            var result = csTransactionService.Count(x => x.DatetimeCreated == date);
             return Ok(result);
         }
 
@@ -234,14 +234,15 @@ namespace eFMS.API.Documentation.Controllers
         #region -- METHOD PRIVATE --
         private string CheckExist(Guid id, CsTransactionEditModel model)
         {
+            model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
+            if (model.TransactionType == string.Empty)
+                return "Not found type transaction";
             string message = string.Empty;
 
             if (string.IsNullOrEmpty(model.Mawb))
             {
-                message = "MBL is required!";
+                return "MBL is required!";
             }
-            else
-            {
                 model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
                 if (model.TransactionType == string.Empty)
                     message = "Not found type transaction";
@@ -259,7 +260,6 @@ namespace eFMS.API.Documentation.Controllers
                         message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
                     }
                 }
-            }
 
             if (model.CsMawbcontainers == null || model.CsMawbcontainers.Count == 0)
             {

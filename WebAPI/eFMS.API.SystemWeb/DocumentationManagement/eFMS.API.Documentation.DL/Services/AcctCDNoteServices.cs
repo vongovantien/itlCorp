@@ -66,9 +66,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         private string CreateCode(string typeCDNote, TransactionTypeEnum typeEnum)
         {
-            string code = "";// "LG";
-            var shipment = string.Empty;
-            //int countNumberJob = 0;
+            string code = string.Empty;
             switch (typeEnum)
             {
                 case TransactionTypeEnum.CustomLogistic:
@@ -174,9 +172,9 @@ namespace eFMS.API.Documentation.DL.Services
                 var sc = DataContext.SubmitChanges();
                 if (sc.Success)
                 {
-                    surchargeRepository.SubmitChanges();
-                    opstransRepository.SubmitChanges();
-                    cstransRepository.SubmitChanges();
+                    var hsSc = surchargeRepository.SubmitChanges();
+                    var hsOt = opstransRepository.SubmitChanges();
+                    var hsCt = cstransRepository.SubmitChanges();
                 }
                 return sc;
             }
@@ -253,12 +251,11 @@ namespace eFMS.API.Documentation.DL.Services
                     UpdateJobModifyTime(model.Id);
                 }
                 var hsSc = DataContext.SubmitChanges();
-                surchargeRepository.SubmitChanges();
-                opstransRepository.SubmitChanges();
-                cstransRepository.SubmitChanges();
+                var hsSurSc = surchargeRepository.SubmitChanges();
+                var hsOtSc = opstransRepository.SubmitChanges();
+                var hsCtSc = cstransRepository.SubmitChanges();
 
-                return stt;//new HandleState();
-
+                return hsSc;
             }
             catch (Exception ex)
             {
@@ -488,7 +485,10 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (transaction != null)
             {
-                hbOfLadingNo = transaction?.Mawb;
+                //hbOfLadingNo = transaction?.Mawb;
+                soaDetails.MbLadingNo = transaction?.Mawb;
+                hbOfLadingNo = string.Join(",", HBList.OrderByDescending(x => x.Hwbno).Select(x => x.Hwbno).Distinct());
+                soaDetails.HbLadingNo = hbOfLadingNo;
             }
             else
             {
@@ -504,7 +504,7 @@ namespace eFMS.API.Documentation.DL.Services
             decimal? volum = 0;
             foreach (var item in HBList)
             {
-                hbOfLadingNo += (item.Hwbno + ", ");
+                //hbOfLadingNo += (item.Hwbno + ", ");
                 var conts = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == item.Id).ToList();
                 foreach (var cont in conts)
                 {
@@ -514,7 +514,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
 
             }
-
+            
             var countries = ((eFMSDataContext)DataContext.DC).CatCountry.ToList();
             soaDetails.PartnerNameEn = partner?.PartnerNameEn;
             soaDetails.PartnerShippingAddress = partner?.AddressShippingEn;
@@ -629,14 +629,14 @@ namespace eFMS.API.Documentation.DL.Services
                             if (jobOpsTrans != null)
                             {
                                 jobOpsTrans.UserModified = currentUser.UserID;
-                                jobOpsTrans.ModifiedDate = DateTime.Now;
+                                jobOpsTrans.DatetimeModified = DateTime.Now;
                                 opstransRepository.Update(jobOpsTrans, x => x.Id == jobOpsTrans.Id, false);//((eFMSDataContext)DataContext.DC).OpsTransaction.Update(jobOpsTrans);
                             }
                             var jobCSTrans = cstransRepository.Get(x => x.Id == cdNote.JobId).FirstOrDefault(); //((eFMSDataContext)DataContext.DC).CsTransaction.FirstOrDefault();
                             if (jobCSTrans != null)
                             {
                                 jobCSTrans.UserModified = currentUser.UserID;
-                                jobCSTrans.ModifiedDate = DateTime.Now;
+                                jobCSTrans.DatetimeModified = DateTime.Now;
                                 cstransRepository.Update(jobCSTrans, x => x.Id == jobCSTrans.Id, false);//((eFMSDataContext)DataContext.DC).CsTransaction.Update(jobCSTrans);
                             }
                         }
@@ -797,14 +797,14 @@ namespace eFMS.API.Documentation.DL.Services
             if (jobOpsTrans != null)
             {
                 jobOpsTrans.UserModified = currentUser.UserID;
-                jobOpsTrans.ModifiedDate = DateTime.Now;
+                jobOpsTrans.DatetimeModified = DateTime.Now;
                 opstransRepository.Update(jobOpsTrans, x => x.Id == jobId, false);
             }
             var jobCSTrans = cstransRepository.First(x => x.Id == jobId);
             if (jobCSTrans != null)
             {
                 jobCSTrans.UserModified = currentUser.UserID;
-                jobCSTrans.ModifiedDate = DateTime.Now;
+                jobCSTrans.DatetimeModified = DateTime.Now;
                 cstransRepository.Update(jobCSTrans, x => x.Id == jobId, false);
             }
         }
