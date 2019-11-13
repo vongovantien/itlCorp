@@ -835,7 +835,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
                 if (model.TransactionType == string.Empty)
-                    return new { model = new object { }, result = new HandleState("Not found type transaction") };
+                    return new ResultHandle { Status = false, Message = "Not found type transaction" };
                 var transaction = mapper.Map<CsTransaction>(model);
                 transaction.Id = Guid.NewGuid();
                 transaction.JobNo = CreateJobNoByTransactionType(model.TransactionTypeEnum, model.TransactionType);

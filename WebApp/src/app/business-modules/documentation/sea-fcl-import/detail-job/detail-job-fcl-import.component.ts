@@ -9,7 +9,7 @@ import { SeaFClImportFormCreateComponent } from '../components/form-create/form-
 import { Container } from 'src/app/shared/models/document/container.model';
 
 import { combineLatest, of } from 'rxjs';
-import { map, tap, switchMap, skip, catchError, takeUntil } from 'rxjs/operators';
+import { map, tap, switchMap, skip, catchError, takeUntil, finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 
 import * as fromStore from './../store';
@@ -26,7 +26,8 @@ type TAB = 'SHIPMENT' | 'CDNOTE';
 export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobComponent {
 
     @ViewChild(SeaFClImportFormCreateComponent, { static: false }) formCreateComponent: SeaFClImportFormCreateComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild("deleteConfirmTemplate", { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
 
     id: string;
     selectedTab: TAB = 'SHIPMENT';
@@ -240,18 +241,37 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
         }
     }
 
-    duplicateConfirm() {
-        this.action = { action: 'copy' };
-        this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], {
-            queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
-        });
-    }
-
     deleteJob() {
         this.confirmDeletePopup.show();
     }
 
     onDeleteJob() {
-        this.confirmDeletePopup.hide();
+        this._progressRef.start();
+        this._documenRepo.deleteMasterBill(this.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                    this.confirmDeletePopup.hide();
+                })
+            ).subscribe(
+                (respone: CommonInterface.IResult) => {
+                    if (respone.status) {
+                        this._toastService.success(respone.message, 'Delete Success !');
+                    }
+                },
+            );
+    }
+
+    showDuplicateConfirm() {
+        this.confirmDuplicatePopup.show();
+    }
+    duplicateConfirm() {
+
+        this.action = { action: 'copy' };
+        this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], {
+            queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
+        });
+        this.confirmDuplicatePopup.hide();
     }
 }

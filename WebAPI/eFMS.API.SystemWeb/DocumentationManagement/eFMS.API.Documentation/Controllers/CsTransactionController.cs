@@ -243,38 +243,36 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return "MBL is required!";
             }
-                model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
-                if (model.TransactionType == string.Empty)
-                    message = "Not found type transaction";
-                if (id == Guid.Empty)
+            model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
+            if (model.TransactionType == string.Empty)
+                message = "Not found type transaction";
+            if (id == Guid.Empty)
+            {
+                if (csTransactionService.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.TransactionType == model.TransactionType))
                 {
-                    if (csTransactionService.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.TransactionType == model.TransactionType))
-                    {
-                        message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
-                    }
+                    message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
                 }
-                else
+            }
+            else
+            {
+                if (csTransactionService.Any(x => (x.Mawb.ToLower() == model.Mawb.ToLower() && x.Id != id)))
                 {
-                    if (csTransactionService.Any(x => (x.Mawb.ToLower() == model.Mawb.ToLower() && x.Id != id)))
-                    {
-                        message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
-                    }
+                    message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
                 }
+            }
 
             if (model.CsMawbcontainers == null || model.CsMawbcontainers.Count == 0)
             {
                 message = "Shipment container list must have at least 1 row of data!";
             }
-
+            if (message.Length > 0) return message;
             var resultMessage = string.Empty;
             if (model.TransactionTypeEnum == TransactionTypeEnum.SeaFCLImport)
             {
                 resultMessage = CheckExistsSIF(id, model);
             }
 
-            message = resultMessage.Length == 0 ? message : resultMessage;
-
-            return message;
+            return resultMessage;
         }
 
         private string CheckExistsSIF(Guid id, CsTransactionEditModel model)
