@@ -1,4 +1,4 @@
-export class ExtendData{
-    public static listHbId : String[]= [];
-    public static currentJobID : String = null;
+export class ExtendData {
+    public static listHbId: string[] = [];
+    public static currentJobID: string = null;
 }
