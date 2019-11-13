@@ -58,7 +58,6 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             { title: 'Series No', field: 'seriesNo', sortable: true },
             { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
             { title: 'Exchange Rate Date', field: 'exchangeDate', sortable: true },
-            { title: 'KB', field: 'kickBack', sortable: true },
             { title: 'SOA', field: 'soano', sortable: true },
             { title: 'Credit/Debit Note', field: 'cdno', sortable: true },
             { title: 'Settle Payment', field: 'settlementCode', sortable: true },

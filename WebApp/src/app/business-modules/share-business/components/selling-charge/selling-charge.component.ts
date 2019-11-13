@@ -40,6 +40,32 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
             );
     }
 
+    configHeader() {
+        this.headers = [
+            { title: 'Partner Name', field: 'partnerName', required: true, sortable: true, width: 200 },
+            { title: 'Charge Name', field: 'chargeId', required: true, sortable: true, width: 400 },
+            { title: 'Quantity', field: 'quantity', required: true, sortable: true, width: 200 },
+            { title: 'Unit', field: 'unitId', required: true, sortable: true, width: 200 },
+            { title: 'Unit Price', field: 'unitPrice', required: true, sortable: true },
+            { title: 'Currency', field: 'currencyId', required: true, sortable: true },
+            { title: 'VAT', field: 'vatrate', required: true, sortable: true },
+            { title: 'Total', field: 'total', sortable: true },
+            { title: 'Note', field: 'notes', sortable: true },
+            { title: 'Invoice No', field: 'invoiceNo', sortable: true },
+            { title: 'Series No', field: 'seriesNo', sortable: true },
+            { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
+            { title: 'Exchange Rate Date', field: 'exchangeDate', sortable: true },
+            { title: 'SOA', field: 'soano', sortable: true },
+            { title: 'Credit/Debit Note', field: 'cdno', sortable: true },
+            { title: 'Settle Payment', field: 'settlementCode', sortable: true },
+            { title: 'Voucher ID', field: 'voucherId', sortable: true },
+            { title: 'Voucher ID Date', field: 'voucherIddate', sortable: true },
+            { title: 'Voucher IDRE', field: 'voucherIdre', sortable: true },
+            { title: 'Voucher IDRE Date', field: 'voucherIdredate', sortable: true },
+            { title: 'Final Exchange Rate', field: 'finalExchangeRate', sortable: true },
+        ];
+    }
+
     duplicate(index: number) {
         this.isSubmitted = false;
         const newCharge = this.charges[index];

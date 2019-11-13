@@ -1,18 +1,27 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { AppForm } from 'src/app/app.form';
-import { FormAddHouseBillComponent } from '../components/form-add-house-bill/form-add-house-bill.component';
-import { ITransactionDetail, CreateHouseBillComponent } from '../create/create-house-bill.component';
+import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { NgProgress } from '@ngx-progressbar/core';
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { catchError, finalize, tap, combineLatest, takeUntil } from 'rxjs/operators';
-import { Container } from 'src/app/shared/models/document/container.model';
-import * as fromStore from './../../../store';
 import { Store, ActionsSubject } from '@ngrx/store';
+import { NgProgress } from '@ngx-progressbar/core';
+
+import { FormAddHouseBillComponent } from '../components/form-add-house-bill/form-add-house-bill.component';
+import { CreateHouseBillComponent } from '../create/create-house-bill.component';
+import { DocumentationRepo } from 'src/app/shared/repositories';
+import { Container } from 'src/app/shared/models/document/container.model';
 import { SeaFCLImportShipmentGoodSummaryComponent } from '../../../components/shipment-good-summary/shipment-good-summary.component';
-import { ToastrService } from 'ngx-toastr';
-import moment from 'moment';
 import { InfoPopupComponent } from 'src/app/shared/common/popup';
+
+import { catchError, finalize, tap, takeUntil } from 'rxjs/operators';
+import { ToastrService } from 'ngx-toastr';
+
+import * as fromStore from './../../../store';
+import moment from 'moment/moment';
+
+
+enum HBL_TAB {
+    DETAIL = 'DETAIL',
+    ARRIVAL = 'ARRIVAL',
+    DELIVERY = 'DELIVERY'
+}
 
 @Component({
     selector: 'app-detail-house-bill',
@@ -20,12 +29,17 @@ import { InfoPopupComponent } from 'src/app/shared/common/popup';
     styleUrls: ['./detail-house-bill.component.scss']
 })
 export class DetailHouseBillComponent extends CreateHouseBillComponent {
+
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(FormAddHouseBillComponent, { static: false }) formHouseBill: FormAddHouseBillComponent;
     @ViewChild(SeaFCLImportShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: SeaFCLImportShipmentGoodSummaryComponent;
+
     hblId: string;
     containers: Container[] = [];
-    hblDetail: any;
+    hblDetail: any; // TODO model here!!
+
+    selectedTab: string = HBL_TAB.DETAIL;
+
     constructor(
         protected _progressService: NgProgress,
         protected _documentationRepo: DocumentationRepo,
@@ -36,9 +50,6 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
         protected _store: Store<fromStore.ISeaFCLImportState>,
     ) {
         super(_progressService, _documentationRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store);
-
-
-
     }
 
     ngOnInit() {
@@ -48,23 +59,9 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                 this.getDetailHbl(this.hblId);
 
             } else {
-
+                // TODO handle error. 
             }
         });
-        this._actionStoreSubject
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe(
-                (action: fromStore.ContainerAction) => {
-                    if (action.type === fromStore.ContainerActionTypes.SAVE_CONTAINER) {
-                        this.fclImportAddModel.csMawbcontainers = [];
-                        this.fclImportAddModel.csMawbcontainers = action.payload;
-
-
-                        console.log("list container add success", this.fclImportAddModel.csMawbcontainers);
-                    }
-                });
     }
 
     getListContainer() {
@@ -217,6 +214,10 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
 
                 },
             );
+    }
+
+    onSelectTab(tabName: HBL_TAB | string) {
+        this.selectedTab = tabName;
     }
 
 }

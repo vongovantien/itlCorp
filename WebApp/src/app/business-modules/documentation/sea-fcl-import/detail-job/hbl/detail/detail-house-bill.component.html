@@ -1,14 +1,6 @@
 <div class="sea-fcl-detail-hbl-page">
     <app-sub-header>
         <div class="c-button-actions">
-            <!-- <button type="button" (click)="showCreatePpoup()" style="float:right;"
-                    class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span> Save </span>
-                    </span>
-                </button> -->
-
             <app-default-button (click)="onUpdateHblDetail()" [buttonSetting]="saveButtonSetting"></app-default-button>
             <app-default-button (click)="combackToHBLList()" [buttonSetting]="cancelButtonSetting"></app-default-button>
         </div>
@@ -16,10 +8,29 @@
     </app-sub-header>
     <div class="m-content">
         <div class="m-portlet__body">
-            <app-form-add-house-bill>
+            <tabset class="custom-class-tab">
+                <tab heading="HBl Detail" (selectTab)="onSelectTab('DETAIL')">
+                    <ng-container *ngIf="selectedTab === 'DETAIL'">
 
-            </app-form-add-house-bill>
-            <shipment-good-summary></shipment-good-summary>
+                        <app-form-add-house-bill> </app-form-add-house-bill>
+
+                        <shipment-good-summary></shipment-good-summary>
+
+                    </ng-container>
+                </tab>
+                <tab heading="Arrival Note" (selectTab)="onSelectTab('ARRIVAL')">
+                    <ng-container *ngIf="selectedTab === 'ARRIVAL'">
+                        arirval note work!
+                    </ng-container>
+                </tab>
+                <tab heading="Delivery Order (D/O)" (selectTab)="onSelectTab('DELIVERY')">
+                    <ng-container *ngIf="selectedTab === 'DELIVERY'">
+                        Delivery work!
+                    </ng-container>
+
+                </tab>
+            </tabset>
+
 
         </div>
     </div>

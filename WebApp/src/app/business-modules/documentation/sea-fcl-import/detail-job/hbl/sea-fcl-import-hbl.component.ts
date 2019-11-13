@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -48,6 +48,7 @@ export class SeaFCLImportHBLComponent extends AppList {
         private _toastService: ToastrService,
         private _progressService: NgProgress,
         private _store: Store<fromStore.ISeaFCLImportState>,
+        private cdr: ChangeDetectorRef
     ) {
         super();
         this.requestSort = this.sortLocal;
@@ -97,6 +98,11 @@ export class SeaFCLImportHBLComponent extends AppList {
             );
 
         this.getGoodSumaryOfHbl();
+    }
+
+    ngAfterViewInit() {
+        this.cdr.detectChanges();
+
     }
 
     onSelectTab(tabName: string) {
