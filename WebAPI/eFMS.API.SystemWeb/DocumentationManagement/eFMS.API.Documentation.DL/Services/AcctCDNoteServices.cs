@@ -488,7 +488,8 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (transaction != null)
             {
-                hbOfLadingNo = transaction?.Mawb;
+                //hbOfLadingNo = transaction?.Mawb;
+                soaDetails.MbLadingNo = transaction?.Mawb;
             }
             else
             {
@@ -514,7 +515,10 @@ namespace eFMS.API.Documentation.DL.Services
                 }
 
             }
-
+            if (transaction != null)
+            {
+                soaDetails.HbLadingNo = hbOfLadingNo;
+            }
             var countries = ((eFMSDataContext)DataContext.DC).CatCountry.ToList();
             soaDetails.PartnerNameEn = partner?.PartnerNameEn;
             soaDetails.PartnerShippingAddress = partner?.AddressShippingEn;
