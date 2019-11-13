@@ -63,6 +63,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                 this.id = !!param.id ? param.id : '';
                 if (param.action) {
                     this.ACTION = param.action;
+                    console.log(this.ACTION);
                 }
 
                 this.cdr.detectChanges();
@@ -104,7 +105,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                     // console.log("detail sea fcl import", this.fclImportDetail);
 
                     setTimeout(() => {
-                    this.updateForm();
+                        this.updateForm();
                     }, 200);
 
                     // this.formCreateComponent.fclImportDetail = this.fclImportDetail;
@@ -153,6 +154,10 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
         this.formCreateComponent.selectedAgent = { field: 'id', value: this.fclImportDetail.agentId };
         this.formCreateComponent.selectedSupplier = { field: 'id', value: this.fclImportDetail.coloaderId };
 
+        if (this.ACTION === 'COPY') {
+            this.fclImportDetail.jobNo = null;
+            this.formCreateComponent.formCreate.controls['jobId'].setValue(this.fclImportDetail.jobNo);
+        }
     }
 
     onUpdateShipmenetDetail() {
