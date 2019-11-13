@@ -30,7 +30,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
 
     id: string;
     selectedTab: TAB = 'SHIPMENT';
-    ACTION: CommonType.ACTION_FORM = 'UPDATE';
+    ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
 
     fclImportDetail: any; // TODO Model.
     containers: Container[] = [];
@@ -104,7 +104,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                     // console.log("detail sea fcl import", this.fclImportDetail);
 
                     setTimeout(() => {
-                    this.updateForm();
+                        this.updateForm();
                     }, 200);
 
                     // this.formCreateComponent.fclImportDetail = this.fclImportDetail;
@@ -234,6 +234,9 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                 break;
             case 'cdNote':
                 this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: { tab: 'CDNOTE' } });
+                break;
+            case 'assignment':
+                this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: { tab: 'ASIGNMENT' } });
                 break;
         }
     }
