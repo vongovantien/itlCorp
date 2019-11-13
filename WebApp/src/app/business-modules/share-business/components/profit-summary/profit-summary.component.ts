@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
 
-import * as fromStore from './../../../../store';
+import * as fromStore from './../../store';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { map } from 'rxjs/operators';
@@ -11,22 +11,28 @@ import { map } from 'rxjs/operators';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class ProfitSummaryHBLComponent extends AppPage {
+export class ShareBussinessProfitSummaryComponent extends AppPage {
 
-    hblProfit$: Observable<fromStore.IHBLProfit>;
+    hblProfit$: Observable<fromStore.IProfit>;
     totalUSD$: Observable<number>;
     totalVND$: Observable<number>;
 
     headers: CommonInterface.IHeaderTable[];
 
     constructor(
-        private _store: Store<fromStore.HBlActions>
+        private _store: Store<fromStore.SurchargeAction>
     ) {
         super();
+
+        this._store.select(fromStore.getProfitState).subscribe(
+            (res: any) => {
+                console.log(res);
+            }
+        )
     }
 
     ngOnInit() {
-        this.hblProfit$ = this._store.select(fromStore.getHBLProfitState);
+        this.hblProfit$ = this._store.select(fromStore.getProfitState);
         this.totalUSD$ = this.hblProfit$.pipe(
             map(data => data.profitUSD)
         );

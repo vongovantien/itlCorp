@@ -160,7 +160,7 @@
                                             </div>
                                             <div class="form-group">
                                                 Container:
-                                                <span
+                                                <span *ngIf="!!goodSummary.containers"
                                                     class="m-badge m-badge--primary m-badge--wide">{{goodSummary.containers}}
                                                 </span>
 
@@ -175,15 +175,12 @@
                                             </div>
                                             <div class="form-group">
                                                 Commodities:
-                                                <span
+                                                <span *ngIf="!!goodSummary.commodities"
                                                     class="m-badge m-badge--primary m-badge--wide">{{goodSummary.commodities}}
                                                 </span>
                                             </div>
                                         </div>
-
                                     </div>
-
-
                                 </div>
                             </div>
 
@@ -201,12 +198,6 @@
                                                         [shipment]="selectedShipment" [hbl]="selectedHbl">
                                                     </buying-charge>
                                                 </ng-container>
-                                                <ng-template #placeholder>
-                                                    <div class="no-data">
-                                                        <i class="flaticon-coins"></i>
-                                                        <span class="no-data-text">No records found</span>
-                                                    </div>
-                                                </ng-template>
                                             </ng-container>
                                         </tab>
                                         <tab heading="Selling" (selectTab)="onSelectTabSurcharge('SELL')">
@@ -217,13 +208,6 @@
                                                         [shipment]="selectedShipment" [hbl]="selectedHbl">
                                                     </selling-charge>
                                                 </ng-container>
-
-                                                <ng-template #placeholder>
-                                                    <div class="no-data">
-                                                        <i class="flaticon-coins"></i>
-                                                        <span class="no-data-text">No records found</span>
-                                                    </div>
-                                                </ng-template>
                                             </ng-container>
                                         </tab>
                                         <tab heading="OBH" (selectTab)="onSelectTabSurcharge('OBH')">
@@ -234,19 +218,14 @@
                                                         [hbl]="selectedHbl">
                                                     </obh-charge>
                                                 </ng-container>
-
-                                                <ng-template #placeholder>
-                                                    <div class="no-data">
-                                                        <i class="flaticon-coins"></i>
-                                                        <span class="no-data-text">No records found</span>
-                                                    </div>
-                                                </ng-template>
                                             </ng-container>
                                         </tab>
                                     </tabset>
                                 </div>
                             </div>
+
                             <hbl-profit-summary></hbl-profit-summary>
+
                         </div>
                     </div>
                 </tab>
@@ -261,3 +240,10 @@
     [body]="'Are you sure you want to delete this House Bill, All related charges added to this House Bill will be lost'"
     [labelCancel]="'No'" (onSubmit)="onDeleteHbl()">
 </confirm-popup>
+
+<ng-template #placeholder>
+    <div class="no-data">
+        <i class="flaticon-coins"></i>
+        <span class="no-data-text">No records found</span>
+    </div>
+</ng-template>

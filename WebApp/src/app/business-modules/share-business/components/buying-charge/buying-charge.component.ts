@@ -332,6 +332,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
+
+                        // * Get Profit
+                        this._store.dispatch(new fromStore.GetProfitAction(this.hbl.id));
                     } else {
                         this._toastService.error(res.message);
                     }

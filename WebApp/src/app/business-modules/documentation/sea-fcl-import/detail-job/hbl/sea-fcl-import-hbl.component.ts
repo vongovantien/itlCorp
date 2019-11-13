@@ -175,8 +175,11 @@ export class SeaFCLImportHBLComponent extends AppList {
             (res: any) => {
                 this.houseBill = res;
                 if (!!this.houseBill.length) {
-                    this.selectHBL(this.houseBill[0])
+                    this.selectHBL(this.houseBill[0]);
                 }
+
+                // this._store.dispatch(new fromShareBussiness.GetProfitAction(''));
+
             },
         );
     }
@@ -187,7 +190,8 @@ export class SeaFCLImportHBLComponent extends AppList {
         // * Get container, Job detail, Surcharge with hbl id, JobId.
         this._store.dispatch(new fromStore.GetContainerAction({ hblid: hbl.id }));
         this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(hbl.jobId));
-        this._store.dispatch(new fromStore.GetProfitHBLAction(this.selectedHbl.id));
+        this._store.dispatch(new fromShareBussiness.GetProfitAction(this.selectedHbl.id));
+
 
         switch (this.selectedTabSurcharge) {
             case 'BUY':
@@ -211,7 +215,7 @@ export class SeaFCLImportHBLComponent extends AppList {
         if (!!this.selectedHbl) {
             this._store.dispatch(new fromStore.GetContainerAction({ hblid: this.selectedHbl.id }));
             this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(this.selectedHbl.jobId));
-            this._store.dispatch(new fromStore.GetProfitHBLAction(this.selectedHbl.id));
+            this._store.dispatch(new fromShareBussiness.GetProfitAction(this.selectedHbl.id));
 
             switch (this.selectedTabSurcharge) {
                 case 'BUY':

@@ -23,6 +23,10 @@ export enum SurchargeActionTypes {
     ADD_OBH = '[OBH CHARGE] Add',
     DELETE_OBH = '[OBH CHARGE] Delete',
     SAVE_OBH = '[OBH CHARGE] SAVE',
+
+    GET_PROFIT = '[HBL] Get Profit',
+    GET_PROFIT_SUCCESS = '[HBL] Get Profit Success',
+    GET_PROFIT_FAIL = '[HBL] Get Profit Fail',
 }
 
 /* BUYING */
@@ -103,6 +107,23 @@ export class SaveOBHSurchargeAction implements Action {
     constructor(public payload: CsShipmentSurcharge[]) { }
 }
 
+/* Profit */
+export class GetProfitAction implements Action {
+    readonly type = SurchargeActionTypes.GET_PROFIT;
+
+    constructor(public payload: any) { }
+}
+export class GetProfitSuccessAction implements Action {
+    readonly type = SurchargeActionTypes.GET_PROFIT_SUCCESS;
+
+    constructor(public payload: any) { }
+}
+export class GetProfitFailFailAction implements Action {
+    readonly type = SurchargeActionTypes.GET_PROFIT_FAIL;
+
+    constructor(public payload: any) { }
+}
+
 export type SurchargeAction =
     GetBuyingSurchargeAction
     | GetBuyingSurchargeSuccessAction
@@ -121,7 +142,10 @@ export type SurchargeAction =
     | GetOBHSurchargeFailAction
     | AddOBHSurchargeAction
     | DeleteOBHSurchargeAction
-    | SaveOBHSurchargeAction;
+    | SaveOBHSurchargeAction
+    | GetProfitAction
+    | GetProfitSuccessAction
+    | GetProfitFailFailAction;
 
 
 

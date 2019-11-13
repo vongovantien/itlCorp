@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { Action } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { SeaFCLImportActionTypes, SeaFCLImportGetDetailSuccessAction, SeaFCLImportGetDetailFailAction, SeaFCLImportActions, ContainerActionTypes, ContainerAction, GetContainerSuccessAction, GetContainerFailAction, SeaFCLImportUpdateSuccessAction, SeaFCLImportUpdateFailAction, HouseBillActionTypes, GetDetailHBLSuccessAction, GetDetailHBLFailAction, SeaFCLImportGetProfitSuccessAction, SeaFCLImportGetProfitFailFailAction, GetProfitHBLSuccessAction, GetProfitHBLFailAction } from '../actions';
+import { SeaFCLImportActionTypes, SeaFCLImportGetDetailSuccessAction, SeaFCLImportGetDetailFailAction, SeaFCLImportActions, ContainerActionTypes, ContainerAction, GetContainerSuccessAction, GetContainerFailAction, SeaFCLImportUpdateSuccessAction, SeaFCLImportUpdateFailAction, HouseBillActionTypes, GetDetailHBLSuccessAction, GetDetailHBLFailAction, SeaFCLImportGetProfitSuccessAction, SeaFCLImportGetProfitFailFailAction } from '../actions';
 import { map, switchMap, catchError } from 'rxjs/operators';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { IProfit } from '../reducers';
@@ -85,19 +85,6 @@ export class SeaFCLImportEffects {
             )
         );
 
-    @Effect()
-    getHBLProfit$: Observable<Action> = this.actions$
-        .pipe(
-            ofType<ContainerAction>(HouseBillActionTypes.GET_PROFIT),
-            map((payload: any) => payload.payload),
-            switchMap(
-                (hblid: string) => this._documentRepo.getHBLTotalProfit(hblid)
-                    .pipe(
-                        map((data: any) => new GetProfitHBLSuccessAction(data)),
-                        catchError(err => of(new GetProfitHBLFailAction(err)))
-                    )
-            )
-        );
 
 }
 
