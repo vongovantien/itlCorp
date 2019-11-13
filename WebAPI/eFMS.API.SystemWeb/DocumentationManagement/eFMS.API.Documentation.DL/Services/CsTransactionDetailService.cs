@@ -314,7 +314,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var resultPartner = catPartnerRepo.Get(x => x.Id == detail.CustomerId).FirstOrDefault();
                     var resultNoti = catPartnerRepo.Get(x => x.Id == detail.NotifyPartyId).FirstOrDefault();
-                    var resultSaleman = catSalemanRepo.Get(x => x.Id.ToString() == detail.SaleManId).FirstOrDefault();
+                    var resultSaleman = sysUserRepo.Get(x => x.Id.ToString() == detail.SaleManId).FirstOrDefault();
                     detail.CustomerName = resultPartner?.PartnerNameEn;
                     detail.CustomerNameVn = resultPartner?.PartnerNameVn;
                     detail.SaleManId = resultSaleman?.Id.ToString();
@@ -330,14 +330,6 @@ namespace eFMS.API.Documentation.DL.Services
 
         }
 
-
-
-        //public CsTransactionDetailModel GetById(CsTransactionDetailCriteria criteria)
-        //{
-        //    var result = QueryById(criteria).ToList();
-        //    return results.FirstOrDefault();
-        //}
-
         #region -- LIST & PAGING HOUSEBILLS --
         public List<CsTransactionDetailModel> Query(CsTransactionDetailCriteria criteria)
         {
@@ -345,7 +337,7 @@ namespace eFMS.API.Documentation.DL.Services
                          join tran in csTransactionRepo.Get() on detail.JobId equals tran.Id
                          join customer in catPartnerRepo.Get() on detail.CustomerId equals customer.Id into customers
                          from cus in customers.DefaultIfEmpty()
-                         join saleman in catSalemanRepo.Get() on detail.SaleManId equals saleman.Id.ToString() into salemans
+                         join saleman in sysUserRepo.Get() on detail.SaleManId equals saleman.Id.ToString() into salemans
                          from sale in salemans.DefaultIfEmpty()
                          select new { detail, tran, cus, sale });
             if (criteria.All == null)
@@ -356,7 +348,7 @@ namespace eFMS.API.Documentation.DL.Services
                                     && (x.cus.PartnerNameEn.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     && (x.detail.Eta >= criteria.FromDate || criteria.FromDate == null)
                                     && (x.detail.Eta <= criteria.ToDate || criteria.ToDate == null)
-                                    && (x.sale.SaleManId.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    && (x.sale.Id.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                     );
             }
             else
@@ -365,7 +357,7 @@ namespace eFMS.API.Documentation.DL.Services
                                       || (x.tran.Mawb.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                                       || (x.detail.Hwbno.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                                       || (x.cus.PartnerNameEn.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                                      || (x.sale.SaleManId.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0))
+                                      || (x.sale.Id.IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0))
                                       && ((x.tran.Etd ?? null) >= (criteria.FromDate ?? null) && (x.tran.Etd ?? null) <= (criteria.ToDate ?? null))
                                     );
             }
