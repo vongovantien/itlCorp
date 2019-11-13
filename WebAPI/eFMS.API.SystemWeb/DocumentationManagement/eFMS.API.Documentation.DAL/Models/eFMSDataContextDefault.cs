@@ -2648,7 +2648,15 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Commodity).HasMaxLength(1600);
 
-                entity.Property(e => e.CreatedDate)
+                entity.Property(e => e.CurrentStatus)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DatetimeCreated)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DatetimeModified)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
@@ -2684,10 +2692,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("MBLType")
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.Property(e => e.ModifiedDate)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.NetWeight).HasColumnType("decimal(18, 4)");
 
@@ -2962,12 +2966,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.WarehouseNotice).HasMaxLength(500);
-
-                entity.HasOne(d => d.Job)
-                    .WithMany(p => p.CsTransactionDetail)
-                    .HasForeignKey(d => d.JobId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_csTransactionDetail_csTransaction");
             });
 
             modelBuilder.Entity<CustomsDeclaration>(entity =>
@@ -3093,7 +3091,11 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Comment).HasMaxLength(200);
 
-                entity.Property(e => e.CreatedDate)
+                entity.Property(e => e.DatetimeCreated)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DatetimeModified)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
@@ -3106,10 +3108,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.MainPersonInCharge)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.Property(e => e.ModifiedDate)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.Name).HasMaxLength(200);
 
@@ -3154,10 +3152,6 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.ContainerDescription).HasMaxLength(200);
 
-                entity.Property(e => e.CreatedDate)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getdate())");
-
                 entity.Property(e => e.CurrentStatus)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -3166,6 +3160,14 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("CustomerID")
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.DatetimeCreated)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DatetimeModified)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.FieldOpsId)
                     .HasColumnName("FieldOpsID")
@@ -3194,10 +3196,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("MBLNO")
                     .HasMaxLength(200)
                     .IsUnicode(false);
-
-                entity.Property(e => e.ModifiedDate)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.PackageTypeId).HasColumnName("PackageTypeID");
 
