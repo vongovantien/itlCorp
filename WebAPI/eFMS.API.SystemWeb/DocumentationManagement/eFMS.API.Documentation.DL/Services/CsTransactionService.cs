@@ -17,6 +17,7 @@ using System.Data.SqlClient;
 using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
+using eFMS.API.Common;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -121,9 +122,6 @@ namespace eFMS.API.Documentation.DL.Services
         {
             try
             {
-                model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
-                if (model.TransactionType == string.Empty)
-                    return new { model = new object { }, result = new HandleState("Not found type transaction") };
                 var transaction = mapper.Map<CsTransaction>(model);
                 transaction.Id = Guid.NewGuid();
                 if (model.CsMawbcontainers.Count > 0)
@@ -831,7 +829,7 @@ namespace eFMS.API.Documentation.DL.Services
             return returnList;
         }
 
-        public object ImportCSTransaction(CsTransactionEditModel model)
+        public ResultHandle ImportCSTransaction(CsTransactionEditModel model)
         {
             try
             {
@@ -923,6 +921,9 @@ namespace eFMS.API.Documentation.DL.Services
                                 charge.DatetimeCreated = DateTime.Now;
                                 charge.Hblid = item.Id;
                                 charge.Soano = null;
+                                charge.PaySoano = null;
+                                charge.CreditNo = null;
+                                charge.DebitNo = null;
                                 charge.Soaclosed = null;
                                 charge.SoaadjustmentRequestor = null;
                                 charge.SoaadjustmentRequestedDate = null;
@@ -939,13 +940,12 @@ namespace eFMS.API.Documentation.DL.Services
                 transactionRepository.SubmitChanges();
                 csMawbcontainerRepo.SubmitChanges();
                 csShipmentSurchargeRepo.SubmitChanges();
-                var result = new HandleState();
-                return new { model = transaction, result };
+                return new ResultHandle { Status = true, Message = "Import successfully!!!", Data = transaction };
             }
             catch (Exception ex)
             {
                 var result = new HandleState(ex.Message);
-                return new { model = new object { }, result };
+                return new ResultHandle { Data = new object { }, Message = ex.Message, Status = true };
             }
         }
 

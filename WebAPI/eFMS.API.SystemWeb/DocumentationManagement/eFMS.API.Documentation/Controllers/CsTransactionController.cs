@@ -234,27 +234,27 @@ namespace eFMS.API.Documentation.Controllers
         #region -- METHOD PRIVATE --
         private string CheckExist(Guid id, CsTransactionEditModel model)
         {
+            model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
+            if (model.TransactionType == string.Empty)
+                return "Not found type transaction";
             string message = string.Empty;
 
             if (string.IsNullOrEmpty(model.Mawb))
             {
-                message = "MBL is required!";
+                return "MBL is required!";
+            }
+            if (id == Guid.Empty)
+            {
+                if (csTransactionService.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower()))
+                {
+                    message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
+                }
             }
             else
             {
-                if (id == Guid.Empty)
+                if (csTransactionService.Any(x => (x.Mawb.ToLower() == model.Mawb.ToLower() && x.Id != id)))
                 {
-                    if (csTransactionService.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower()))
-                    {
-                        message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
-                    }
-                }
-                else
-                {
-                    if (csTransactionService.Any(x => (x.Mawb.ToLower() == model.Mawb.ToLower() && x.Id != id)))
-                    {
-                        message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
-                    }
+                    message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
                 }
             }
 

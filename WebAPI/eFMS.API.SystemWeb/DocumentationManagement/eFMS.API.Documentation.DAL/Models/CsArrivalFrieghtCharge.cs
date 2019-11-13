@@ -10,6 +10,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string Description { get; set; }
         public Guid? ChargeId { get; set; }
         public decimal? Quantity { get; set; }
+        public string QuantityType { get; set; }
         public short? UnitId { get; set; }
         public decimal? UnitPrice { get; set; }
         public string CurrencyId { get; set; }
