@@ -79,5 +79,8 @@ const LIB = [
     ],
     exports: [],
     providers: [],
+    bootstrap: [
+        SeaFCLImportManagementComponent,
+    ]
 })
 export class SeaFCLImportModule { }

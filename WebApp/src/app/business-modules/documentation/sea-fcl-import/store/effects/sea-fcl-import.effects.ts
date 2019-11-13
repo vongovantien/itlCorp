@@ -65,7 +65,7 @@ export class SeaFCLImportEffects {
             switchMap(
                 (id: string) => this._documentRepo.getDetailHbl(id)
                     .pipe(
-                        map((data: CommonInterface.IResult) => new GetDetailHBLSuccessAction(data.data)),
+                        map((data: CommonInterface.IResult) => new GetDetailHBLSuccessAction(data)),
                         catchError(err => of(new GetDetailHBLFailAction(err)))
                     )
             )

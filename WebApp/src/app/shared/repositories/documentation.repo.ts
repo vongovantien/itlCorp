@@ -342,7 +342,6 @@ export class DocumentationRepo {
     }
 
     getHBLTotalProfit(hblId: string) {
-        console.log(hblId);
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GetHouseBillTotalProfit`, { hblid: hblId }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)

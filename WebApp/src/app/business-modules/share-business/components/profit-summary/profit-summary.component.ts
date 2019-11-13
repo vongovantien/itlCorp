@@ -23,12 +23,6 @@ export class ShareBussinessProfitSummaryComponent extends AppPage {
         private _store: Store<fromStore.SurchargeAction>
     ) {
         super();
-
-        this._store.select(fromStore.getProfitState).subscribe(
-            (res: any) => {
-                console.log(res);
-            }
-        )
     }
 
     ngOnInit() {

@@ -4,18 +4,17 @@ import { Store } from '@ngrx/store';
 import { PopupBase } from 'src/app/popup.base';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { CatalogueRepo } from 'src/app/shared/repositories';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { Unit } from 'src/app/shared/models';
 
-import { catchError, takeUntil, map, tap, switchMap } from 'rxjs/operators';
-import { forkJoin, combineLatest, of } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
 
 import * as fromStore from './../../../store';
 import { Commodity } from 'src/app/shared/models/catalogue/commodity.model';
 import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { ShareContainerImportComponent } from 'src/app/business-modules/share-business';
-import { ActivatedRoute } from '@angular/router';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 
 @Component({
@@ -23,12 +22,14 @@ import { ActivatedRoute } from '@angular/router';
     templateUrl: './container-list.popup.html',
 })
 export class SeaFCLImportContainerListPopupComponent extends PopupBase {
+
     @ViewChild(ShareContainerImportComponent, { static: false }) containerImportPopup: ShareContainerImportComponent;
+
     mblid: string = null;
     hblid: string = null;
     containers: any[] = [];
 
-    headers: CommonInterface.IHeaderTable[];
+    headers: CommonInterface.IHeaderTable[] = [];
 
     containerUnits: Unit[] = new Array<Unit>();
     packageUnits: Unit[] = new Array<Unit>();

@@ -19,6 +19,7 @@ export * from './document/csShipmentSurcharge';
 export * from './document/csTransaction';
 export * from './document/csTransactionDetail';
 export * from './document/fcl-import';
+export * from './document/arrival-freight-charge';
 
 export * from './tool-setting/tariff';
 

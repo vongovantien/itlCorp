@@ -59,8 +59,6 @@ export class CreateHouseBillComponent extends AppForm {
                     if (action.type === fromStore.ContainerActionTypes.SAVE_CONTAINER) {
                         this.fclImportAddModel.csMawbcontainers = [];
                         this.fclImportAddModel.csMawbcontainers = action.payload;
-
-                        console.log("list container add success", this.fclImportAddModel.csMawbcontainers);
                     }
                 });
     }

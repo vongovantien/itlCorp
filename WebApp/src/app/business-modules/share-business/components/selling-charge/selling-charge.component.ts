@@ -8,10 +8,10 @@ import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
 
 import * as fromStore from './../../store';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { takeUntil, catchError } from 'rxjs/operators';
 import { CsShipmentSurcharge } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 @Component({
     selector: 'selling-charge',

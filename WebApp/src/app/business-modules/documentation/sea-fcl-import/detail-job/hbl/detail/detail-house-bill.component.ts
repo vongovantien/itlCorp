@@ -10,7 +10,7 @@ import { Container } from 'src/app/shared/models/document/container.model';
 import { SeaFCLImportShipmentGoodSummaryComponent } from '../../../components/shipment-good-summary/shipment-good-summary.component';
 import { InfoPopupComponent } from 'src/app/shared/common/popup';
 
-import { catchError, finalize, tap, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, tap, takeUntil, skip } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 
 import * as fromStore from './../../../store';
@@ -51,11 +51,15 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
         super(_progressService, _documentationRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store);
     }
 
-    ngOnInit() {
+    ngAfterViewInit() {
         this._activedRoute.params.subscribe((param: Params) => {
             if (param.hblId) {
                 this.hblId = param.hblId;
-                this.getDetailHbl(this.hblId);
+                this.jobId = param.id;
+
+                this._store.dispatch(new fromStore.GetDetailHBLAction(this.hblId));
+
+                this.getDetailHbl();
 
             } else {
                 // TODO handle error. 
@@ -131,84 +135,85 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
         this.updateHbl(modelUpdate);
     }
 
-    getDetailHbl(id: any) {
+    getDetailHbl() {
         this._progressRef.start();
-        this._documentationRepo.getDetailHbl(id)
+        this._store.select(fromStore.getHBLState)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete()),
-                tap(
-                    (res: CommonInterface.IResult) => {
-                        if (res) {
-                            this.hblDetail = res.data;
-                            console.log(this.hblDetail);
-                            this.shipmentGoodSummaryComponent.containerDetail = this.hblDetail.packageContainer;
-                            this.shipmentGoodSummaryComponent.commodities = this.hblDetail.commodity;
-                            this.shipmentGoodSummaryComponent.description = this.hblDetail.desOfGoods;
-                            this.shipmentGoodSummaryComponent.grossWeight = this.hblDetail.grossWeight;
-                            this.shipmentGoodSummaryComponent.netWeight = this.hblDetail.netWeight;
-                            this.shipmentGoodSummaryComponent.totalChargeWeight = this.hblDetail.chargeWeight;
-                            this.shipmentGoodSummaryComponent.totalCBM = this.hblDetail.cbm;
-                            this.formHouseBill.etd.setValue(res.data.etd);
-                            !!this.hblDetail.etd ? this.formHouseBill.etd.setValue({ startDate: new Date(this.hblDetail.etd), endDate: new Date(this.hblDetail.etd) }) : this.formHouseBill.etd.setValue(null), // * Date;
-                                this.formHouseBill.getListSaleman(res.data.customerId);
-                            this.formHouseBill.mtBill.setValue(res.data.mawb);
-                            this.formHouseBill.shipperDescription.setValue(res.data.shipperDescription);
-                            this.formHouseBill.consigneeDescription.setValue(res.data.consigneeDescription);
-                            this.formHouseBill.notifyPartyDescription.setValue(res.data.notifyPartyDescription);
-                            this.formHouseBill.alsonotifyPartyDescription.setValue(res.data.alsoNotifyPartyDescription);
-
-                            this.formHouseBill.hwbno.setValue(res.data.hwbno);
-                            this.formHouseBill.pickupPlace.setValue(res.data.pickupPlace);
-                            // this.formHouseBill.eta.setValue(res.data.eta);
-                            !!this.hblDetail.eta ? this.formHouseBill.eta.setValue({ startDate: new Date(this.hblDetail.eta), endDate: new Date(this.hblDetail.eta) }) : this.formHouseBill.eta.setValue(null), // * Date;
-                                this.formHouseBill.finalDestinationPlace.setValue(res.data.finalDestinationPlace);
-
-                            this.formHouseBill.selectedShipper = { field: 'shortName', value: res.data.shipperId };
-                            this.formHouseBill.hbltype.setValue(this.formHouseBill.hbOfladingTypes.filter(i => i.value === res.data.hbltype)[0]);
-                            this.formHouseBill.localVessel.setValue(res.data.localVessel);
-                            this.formHouseBill.localVoyNo.setValue(res.data.localVoyNo);
-                            this.formHouseBill.oceanVessel.setValue(res.data.oceanVessel);
-                            this.formHouseBill.oceanVoyNo.setValue(res.data.oceanVoyNo);
-                            !!this.hblDetail.documentDate ? this.formHouseBill.documentDate.setValue({ startDate: new Date(this.hblDetail.documentDate), endDate: new Date(this.hblDetail.documentDate) }) : this.formHouseBill.documentDate.setValue(null), // * Date;
-
-                                this.formHouseBill.documentNo.setValue(res.data.documentNo);
-                            !!this.hblDetail.etawarehouse ? this.formHouseBill.etawarehouse.setValue({ startDate: new Date(this.hblDetail.etawarehouse), endDate: new Date(this.hblDetail.etawarehouse) }) : this.formHouseBill.etawarehouse.setValue(null), // * Date;
-                                // this.formHouseBill.etawarehouse.setValue(res.data.etawarehouse);
-                                this.formHouseBill.warehouseNotice.setValue(res.data.warehouseNotice);
-                            this.formHouseBill.shippingMark.setValue(res.data.shippingMark);
-                            this.formHouseBill.remark.setValue(res.data.remark);
-                            // this.formHouseBill.issueHBLDate.setValue(res.data.issueHbldate);
-                            !!this.hblDetail.issueHbldate ? this.formHouseBill.issueHBLDate.setValue({ startDate: new Date(this.hblDetail.issueHbldate), endDate: new Date(this.hblDetail.issueHbldate) }) : this.formHouseBill.issueHBLDate.setValue(null), // * Date;
-
-                                this.formHouseBill.referenceNo.setValue(res.data.referenceNo);
-                            this.formHouseBill.originBLNumber.setValue(this.formHouseBill.numberOfOrigins.filter(i => i.value === res.data.originBlnumber)[0]);
-                            this.formHouseBill.mindateEta = !!this.formHouseBill.mindateEta ? moment(this.hblDetail.etd) : null;
-                            this.formHouseBill.mindateEtaWareHouse = !!this.hblDetail.eta ? moment(this.hblDetail.eta) : null;
-
-                            setTimeout(() => {
-
-                                this.formHouseBill.selectedCustomer = { field: 'id', value: res.data.customerId };
-                                this.formHouseBill.selectedSaleman = { field: 'id', value: res.data.saleManId };
-                                this.formHouseBill.selectedShipper = { field: 'id', value: res.data.shipperId };
-                                this.formHouseBill.selectedConsignee = { field: 'id', value: res.data.consigneeId };
-                                this.formHouseBill.selectedNotifyParty = { field: 'id', value: res.data.notifyPartyId };
-                                this.formHouseBill.selectedAlsoNotifyParty = { field: 'id', value: res.data.alsoNotifyPartyId };
-                                this.formHouseBill.selectedPortOfLoading = { field: 'id', value: res.data.pol };
-                                this.formHouseBill.selectedPortOfDischarge = { field: 'id', value: res.data.pod };
-                                this.formHouseBill.selectedSupplier = { field: 'id', value: res.data.coloaderId };
-                                this.formHouseBill.selectedPlaceOfIssued = { field: 'id', value: res.data.issueHblplace };
-
-
-                            }, 500);
-
-                        }
-                    })
+                skip(1),
+                takeUntil(this.ngUnsubscribe)
             )
-
             .subscribe(
-                (res: any) => {
-                    this._store.dispatch(new fromStore.SaveContainerAction(res.data.csMawbcontainers));
+                (res: CommonInterface.IResult) => {
+                    this._progressRef.complete();
+                    if (res.status) {
+                        this.hblDetail = res.data;
+                        this.shipmentGoodSummaryComponent.containerDetail = this.hblDetail.packageContainer;
+                        this.shipmentGoodSummaryComponent.commodities = this.hblDetail.commodity;
+                        this.shipmentGoodSummaryComponent.description = this.hblDetail.desOfGoods;
+                        this.shipmentGoodSummaryComponent.grossWeight = this.hblDetail.grossWeight;
+                        this.shipmentGoodSummaryComponent.netWeight = this.hblDetail.netWeight;
+                        this.shipmentGoodSummaryComponent.totalChargeWeight = this.hblDetail.chargeWeight;
+                        this.shipmentGoodSummaryComponent.totalCBM = this.hblDetail.cbm;
+                        this.formHouseBill.etd.setValue(res.data.etd);
+                        !!this.hblDetail.etd ? this.formHouseBill.etd.setValue({ startDate: new Date(this.hblDetail.etd), endDate: new Date(this.hblDetail.etd) }) : this.formHouseBill.etd.setValue(null), // * Date;
+                            this.formHouseBill.getListSaleman(res.data.customerId);
+                        this.formHouseBill.mtBill.setValue(res.data.mawb);
+                        this.formHouseBill.shipperDescription.setValue(res.data.shipperDescription);
+                        this.formHouseBill.consigneeDescription.setValue(res.data.consigneeDescription);
+                        this.formHouseBill.notifyPartyDescription.setValue(res.data.notifyPartyDescription);
+                        this.formHouseBill.alsonotifyPartyDescription.setValue(res.data.alsoNotifyPartyDescription);
+
+                        this.formHouseBill.hwbno.setValue(res.data.hwbno);
+                        this.formHouseBill.pickupPlace.setValue(res.data.pickupPlace);
+                        // this.formHouseBill.eta.setValue(res.data.eta);
+                        !!this.hblDetail.eta ? this.formHouseBill.eta.setValue({ startDate: new Date(this.hblDetail.eta), endDate: new Date(this.hblDetail.eta) }) : this.formHouseBill.eta.setValue(null), // * Date;
+                            this.formHouseBill.finalDestinationPlace.setValue(res.data.finalDestinationPlace);
+
+                        this.formHouseBill.selectedShipper = { field: 'shortName', value: res.data.shipperId };
+                        this.formHouseBill.hbltype.setValue(this.formHouseBill.hbOfladingTypes.filter(i => i.value === res.data.hbltype)[0]);
+                        this.formHouseBill.localVessel.setValue(res.data.localVessel);
+                        this.formHouseBill.localVoyNo.setValue(res.data.localVoyNo);
+                        this.formHouseBill.oceanVessel.setValue(res.data.oceanVessel);
+                        this.formHouseBill.oceanVoyNo.setValue(res.data.oceanVoyNo);
+                        !!this.hblDetail.documentDate ? this.formHouseBill.documentDate.setValue({ startDate: new Date(this.hblDetail.documentDate), endDate: new Date(this.hblDetail.documentDate) }) : this.formHouseBill.documentDate.setValue(null), // * Date;
+
+                            this.formHouseBill.documentNo.setValue(res.data.documentNo);
+                        !!this.hblDetail.etawarehouse ? this.formHouseBill.etawarehouse.setValue({ startDate: new Date(this.hblDetail.etawarehouse), endDate: new Date(this.hblDetail.etawarehouse) }) : this.formHouseBill.etawarehouse.setValue(null), // * Date;
+                            // this.formHouseBill.etawarehouse.setValue(res.data.etawarehouse);
+                            this.formHouseBill.warehouseNotice.setValue(res.data.warehouseNotice);
+                        this.formHouseBill.shippingMark.setValue(res.data.shippingMark);
+                        this.formHouseBill.remark.setValue(res.data.remark);
+                        // this.formHouseBill.issueHBLDate.setValue(res.data.issueHbldate);
+                        !!this.hblDetail.issueHbldate ? this.formHouseBill.issueHBLDate.setValue({ startDate: new Date(this.hblDetail.issueHbldate), endDate: new Date(this.hblDetail.issueHbldate) }) : this.formHouseBill.issueHBLDate.setValue(null), // * Date;
+
+                            this.formHouseBill.referenceNo.setValue(res.data.referenceNo);
+                        this.formHouseBill.originBLNumber.setValue(this.formHouseBill.numberOfOrigins.filter(i => i.value === res.data.originBlnumber)[0]);
+                        this.formHouseBill.mindateEta = !!this.formHouseBill.mindateEta ? moment(this.hblDetail.etd) : null;
+                        this.formHouseBill.mindateEtaWareHouse = !!this.hblDetail.eta ? moment(this.hblDetail.eta) : null;
+
+                        setTimeout(() => {
+                            this.formHouseBill.selectedCustomer = { field: 'id', value: res.data.customerId };
+                            this.formHouseBill.selectedSaleman = { field: 'id', value: res.data.saleManId };
+                            this.formHouseBill.selectedShipper = { field: 'id', value: res.data.shipperId };
+                            this.formHouseBill.selectedConsignee = { field: 'id', value: res.data.consigneeId };
+                            this.formHouseBill.selectedNotifyParty = { field: 'id', value: res.data.notifyPartyId };
+                            this.formHouseBill.selectedAlsoNotifyParty = { field: 'id', value: res.data.alsoNotifyPartyId };
+                            this.formHouseBill.selectedPortOfLoading = { field: 'id', value: res.data.pol };
+                            this.formHouseBill.selectedPortOfDischarge = { field: 'id', value: res.data.pod };
+                            this.formHouseBill.selectedSupplier = { field: 'id', value: res.data.coloaderId };
+                            this.formHouseBill.selectedPlaceOfIssued = { field: 'id', value: res.data.issueHblplace };
+                        }, 500);
+                    }
+
+                    // * Dispatch to save containers.
+                    this._store.dispatch(new fromStore.SaveContainerAction(res.data.csMawbcontainers || []));
+
+                    // * Dispatch to get container's shipment.
+                    this._store.dispatch(new fromStore.GetContainerAction({ mblid: this.jobId }));
+
+                    // * Get container to update model
                     this.getListContainer();
 
                 },

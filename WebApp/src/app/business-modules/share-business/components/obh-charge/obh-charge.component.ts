@@ -7,12 +7,12 @@ import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
 
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { takeUntil, catchError } from 'rxjs/operators';
 import { CsShipmentSurcharge, Partner } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
 
 import * as fromStore from './../../store';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 @Component({
     selector: 'obh-charge',

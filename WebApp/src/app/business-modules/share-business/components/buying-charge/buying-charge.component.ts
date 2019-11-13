@@ -1,9 +1,8 @@
-import { Component, Input, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, CsTransactionDetail } from 'src/app/shared/models';
 import { Container } from 'src/app/shared/models/document/container.model';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { AppList } from 'src/app/app.list';
 
 
@@ -18,15 +17,8 @@ import { SortService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { GetBuyingSurchargeAction } from './../../store';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
-enum QUANTITY_TYPE {
-    GW = 'gw',
-    NW = 'nw',
-    CW = 'cw',
-    CBM = 'cbm',
-    PACKAGE = 'package',
-    CONT = 'cont'
-}
 @Component({
     selector: 'buying-charge',
     templateUrl: './buying-charge.component.html',
@@ -51,7 +43,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     listPartner: Partner[] = new Array<Partner>();
 
     configComboGridCharge: Partial<CommonInterface.IComboGirdConfig> = {};
-    selectedCharge: Partial<CommonInterface.IComboGridData> = {};
 
     quantityHints: CommonInterface.IValueDisplay[];
     selectedQuantityHint: CommonInterface.IValueDisplay = null;
@@ -103,12 +94,12 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }, { selectedDisplayFields: ['chargeNameEn'], });
 
         this.quantityHints = [
-            { displayName: 'G.W', value: QUANTITY_TYPE.GW },
-            { displayName: 'C.W', value: QUANTITY_TYPE.CW },
-            { displayName: 'CBM', value: QUANTITY_TYPE.CBM },
-            { displayName: 'P.K', value: QUANTITY_TYPE.PACKAGE },
-            { displayName: 'Cont', value: QUANTITY_TYPE.CONT },
-            { displayName: 'N.W', value: QUANTITY_TYPE.NW },
+            { displayName: 'G.W', value: CommonEnum.QUANTITY_TYPE.GW },
+            { displayName: 'C.W', value: CommonEnum.QUANTITY_TYPE.CW },
+            { displayName: 'CBM', value: CommonEnum.QUANTITY_TYPE.CBM },
+            { displayName: 'P.K', value: CommonEnum.QUANTITY_TYPE.PACKAGE },
+            { displayName: 'Cont', value: CommonEnum.QUANTITY_TYPE.CONT },
+            { displayName: 'N.W', value: CommonEnum.QUANTITY_TYPE.NW },
         ];
 
         this.partnerType = [
@@ -344,19 +335,22 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     onChangeQuantityHint(hintType: string, chargeItem: CsShipmentSurcharge) {
         switch (hintType) {
-            case QUANTITY_TYPE.GW:
-                chargeItem.quantity = this.calculateContainer(this.containers, QUANTITY_TYPE.GW);
+            case CommonEnum.QUANTITY_TYPE.GW:
+                chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.GW);
                 break;
-            case QUANTITY_TYPE.NW:
-                chargeItem.quantity = this.calculateContainer(this.containers, QUANTITY_TYPE.NW);
+            case CommonEnum.QUANTITY_TYPE.NW:
+                chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.NW);
                 break;
-            case QUANTITY_TYPE.CBM:
-                chargeItem.quantity = this.calculateContainer(this.containers, QUANTITY_TYPE.CBM);
+            case CommonEnum.QUANTITY_TYPE.CBM:
+                chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.CBM);
                 break;
-            case QUANTITY_TYPE.CW:
+            case CommonEnum.QUANTITY_TYPE.CONT:
+                chargeItem.quantity = this.calculateContainer(this.containers, 'quantity');
+                break;
+            case CommonEnum.QUANTITY_TYPE.CW:
                 chargeItem.quantity = this.calculateContainer(this.containers, 'chargeAbleWeight');
                 break;
-            case QUANTITY_TYPE.PACKAGE:
+            case CommonEnum.QUANTITY_TYPE.PACKAGE:
                 chargeItem.quantity = this.calculateContainer(this.containers, 'packageQuantity');
                 break;
             default:

@@ -6,7 +6,7 @@ import { UtilityHelper } from "src/helper";
 import { NgProgressRef } from "@ngx-progressbar/core";
 import { ButtonModalSetting } from "./shared/models/layout/button-modal-setting.model";
 import { ButtonType } from "./shared/enums/type-button.enum";
-import moment from "moment";
+import moment from "moment/moment";
 import { debounceTime, distinctUntilChanged, switchMap, takeUntil, skip } from "rxjs/operators";
 
 export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit {
