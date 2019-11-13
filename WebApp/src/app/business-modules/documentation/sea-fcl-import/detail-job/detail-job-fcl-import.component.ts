@@ -30,7 +30,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
     @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
 
     id: string;
-    selectedTab: TAB = 'SHIPMENT';
+    selectedTab: TAB | string = 'SHIPMENT';
     ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
 
     fclImportDetail: any; // TODO Model.
@@ -196,7 +196,8 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
 
                         this._store.dispatch(new fromStore.GetContainerAction({ mblid: this.id }));
                         // * get detail & container list.
-                        this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`]);
+                        this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
+                        this.ACTION = 'SHIPMENT';
                     } else {
                         this._toastService.error(res.message);
                     }
