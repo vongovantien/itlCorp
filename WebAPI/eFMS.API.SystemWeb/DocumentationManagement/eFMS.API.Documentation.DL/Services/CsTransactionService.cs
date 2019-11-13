@@ -854,9 +854,6 @@ namespace eFMS.API.Documentation.DL.Services
         {
             try
             {
-                model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
-                if (model.TransactionType == string.Empty)
-                    return new ResultHandle { Status = false, Message = "Not found type transaction" };
                 var transaction = mapper.Map<CsTransaction>(model);
                 transaction.Id = Guid.NewGuid();
                 transaction.JobNo = CreateJobNoByTransactionType(model.TransactionTypeEnum, model.TransactionType);
@@ -891,7 +888,7 @@ namespace eFMS.API.Documentation.DL.Services
                         container.Mblid = transaction.Id;
                         container.UserModified = transaction.UserCreated;
                         container.DatetimeModified = DateTime.Now;
-                        csMawbcontainerRepo.Add(container);
+                        csMawbcontainerRepo.Add(container, false);
                     }
                 }
                 var detailTrans = csTransactionDetailRepo.Get(x => x.JobId == model.Id);
@@ -917,7 +914,7 @@ namespace eFMS.API.Documentation.DL.Services
                         item.Active = true;
                         item.UserCreated = transaction.UserCreated;  //ChangeTrackerHelper.currentUser;
                         item.DatetimeCreated = DateTime.Now;
-                        csTransactionDetailRepo.Add(item);
+                        csTransactionDetailRepo.Add(item, false);
                         var houseContainers = csMawbcontainerRepo.Get(x => x.Hblid == houseId);
                         if (houseContainers != null)
                         {
@@ -931,7 +928,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 x.MarkNo = string.Empty;
                                 x.UserModified = transaction.UserCreated;
                                 x.DatetimeModified = DateTime.Now;
-                                csMawbcontainerRepo.Add(x);
+                                csMawbcontainerRepo.Add(x, false);
                             }
                         }
                         var charges = csShipmentSurchargeRepo.Get(x => x.Hblid == houseId);
@@ -955,12 +952,13 @@ namespace eFMS.API.Documentation.DL.Services
                                 charge.UnlockedSoadirectorDate = null;
                                 charge.UnlockedSoadirectorStatus = null;
                                 charge.UnlockedSoasaleMan = null;
-                                csShipmentSurchargeRepo.Add(charge);
+                                csShipmentSurchargeRepo.Add(charge, false);
                             }
                         }
                     }
                 }
                 transactionRepository.SubmitChanges();
+                csTransactionDetailRepo.SubmitChanges();
                 csMawbcontainerRepo.SubmitChanges();
                 csShipmentSurchargeRepo.SubmitChanges();
                 return new ResultHandle { Status = true, Message = "Import successfully!!!", Data = transaction };

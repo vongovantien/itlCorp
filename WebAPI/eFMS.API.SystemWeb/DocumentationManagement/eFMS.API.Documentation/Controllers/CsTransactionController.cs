@@ -249,14 +249,14 @@ namespace eFMS.API.Documentation.Controllers
                 message = "Not found type transaction";
             if (id == Guid.Empty)
             {
-                if (csTransactionService.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.TransactionType == model.TransactionType))
+                if (csTransactionService.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.TransactionType == model.TransactionType && x.CurrentStatus != TermData.Canceled))
                 {
                     message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
                 }
             }
             else
             {
-                if (csTransactionService.Any(x => (x.Mawb.ToLower() == model.Mawb.ToLower() && x.Id != id)))
+                if (csTransactionService.Any(x => (x.Mawb.ToLower() == model.Mawb.ToLower() && x.Id != id && x.CurrentStatus != TermData.Canceled)))
                 {
                     message = stringLocalizer[LanguageSub.MSG_MAWB_EXISTED].Value;
                 }

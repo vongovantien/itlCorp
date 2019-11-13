@@ -191,11 +191,12 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-
-                        // * get detail & container list.
+                        this.id = res.data.id;
                         this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(this.id));
 
                         this._store.dispatch(new fromStore.GetContainerAction({ mblid: this.id }));
+                        // * get detail & container list.
+                        this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`]);
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -267,7 +268,6 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
         this.confirmDuplicatePopup.show();
     }
     duplicateConfirm() {
-
         this.action = { action: 'copy' };
         this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], {
             queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
