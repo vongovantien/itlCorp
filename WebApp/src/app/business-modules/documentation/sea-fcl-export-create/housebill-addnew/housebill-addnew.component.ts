@@ -16,7 +16,7 @@ import { BaseService } from 'src/app/shared/services/base.service';
 import cloneDeep from 'lodash/cloneDeep';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 
- declare var $: any;
+declare var $: any;
 
 @Component({
   selector: 'app-housebill-addnew',
@@ -42,7 +42,7 @@ export class HousebillAddnewComponent implements OnInit {
     if (_masterBilData != null) {
       this.MasterBillData = _masterBilData;
       this.HouseBillWorking.jobId = this.MasterBillData.id;
-      this.HouseBillWorking.mawb = this.HouseBillWorking.mawb==null? this.MasterBillData.mawb: this.HouseBillWorking.mawb;
+      this.HouseBillWorking.mawb = this.HouseBillWorking.mawb == null ? this.MasterBillData.mawb : this.HouseBillWorking.mawb;
       this.HouseBillWorking.jobNo = this.MasterBillData.jobNo;
       this.HouseBillWorking.oceanVoyNo = this.MasterBillData.voyNo + "" + this.MasterBillData.flightVesselName;
       this.HouseBillWorking.customsBookingNo = this.MasterBillData.bookingNo;
@@ -95,13 +95,13 @@ export class HousebillAddnewComponent implements OnInit {
     this.getHouseBillContainers(this.HouseBillWorking.id);
     this.HouseBillWorking.sailingDate = this.HouseBillWorking.sailingDate == null ? this.HouseBillWorking.sailingDate : { startDate: moment(this.HouseBillWorking.sailingDate), endDate: moment(this.HouseBillWorking.sailingDate) };
     this.HouseBillWorking.closingDate = this.HouseBillWorking.closingDate == null ? this.HouseBillWorking.closingDate : { startDate: moment(this.HouseBillWorking.closingDate), endDate: moment(this.HouseBillWorking.closingDate) };
-    this.HouseBillWorking.mawb = this.HouseBillWorking.mawb==null? this.MasterBillData.mawb: this.HouseBillWorking.mawb;
+    this.HouseBillWorking.mawb = this.HouseBillWorking.mawb == null ? this.MasterBillData.mawb : this.HouseBillWorking.mawb;
     this.HouseBillWorking.jobNo = this.MasterBillData.jobNo;
   }
 
 
 
-  getHouseBillContainers(hblid: String) {
+  getHouseBillContainers(hblid: string) {
     this.baseServices.post(this.api_menu.Documentation.CsMawbcontainer.query, { "hblid": hblid }).subscribe((res: any) => {
       this.lstHouseBillContainers = res;
       this.calculateHbWeight();
@@ -199,7 +199,7 @@ export class HousebillAddnewComponent implements OnInit {
     } else {
       key = search_key;
     }
-    this.baseServices.post(this.api_menu.Catalogue.PartnerData.query , { partnerGroup: PartnerGroupEnum.CUSTOMER, inactive: false, all: key }).subscribe(res => {
+    this.baseServices.post(this.api_menu.Catalogue.PartnerData.query, { partnerGroup: PartnerGroupEnum.CUSTOMER, inactive: false, all: key }).subscribe(res => {
       this.listCustomers = res;
     });
   }
@@ -285,7 +285,7 @@ export class HousebillAddnewComponent implements OnInit {
     } else {
       key = search_key;
     }
-    this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, {placeType: PlaceTypeEnum.Port, modeOfTransport: "sea", inactive: false, all: key }).subscribe(res => {
+    this.baseServices.post(this.api_menu.Catalogue.CatPlace.query, { placeType: PlaceTypeEnum.Port, modeOfTransport: "sea", inactive: false, all: key }).subscribe(res => {
       this.listPort = res;
     });
   }
@@ -466,12 +466,12 @@ export class HousebillAddnewComponent implements OnInit {
       }
 
       this.getListContsOfAllHB();
-    }else{
+    } else {
       $("#alert-cannot-create-hbl").modal('show');
     }
   }
 
-  closeAlert(){
+  closeAlert() {
     $("#alert-cannot-create-hbl").modal('hide');
   }
 
@@ -494,7 +494,7 @@ export class HousebillAddnewComponent implements OnInit {
   weightMesurements: any[] = [];
   packageTypes: any[] = [];
   commodities: any[] = [];
-  @ViewChild('containerListForm',{static:false}) containerListForm: NgForm;
+  @ViewChild('containerListForm', { static: false }) containerListForm: NgForm;
   async getContainerTypes() {
     let responses = await this.baseServices.postAsync(this.api_menu.Catalogue.Unit.getAllByQuery, { unitType: "Container", inactive: false }, false, false);
     if (responses != null) {
@@ -624,12 +624,12 @@ export class HousebillAddnewComponent implements OnInit {
     return returnSummary;
   }
 
-  refreshHBLSummary(){
-      this.totalGrossWeight = 0;
-      this.totalNetWeight = 0;
-      this.totalCharWeight = 0;
-      this.totalCBM = 0;
-      this.HouseBillWorking.packageContainer = '';
+  refreshHBLSummary() {
+    this.totalGrossWeight = 0;
+    this.totalNetWeight = 0;
+    this.totalCharWeight = 0;
+    this.totalCBM = 0;
+    this.HouseBillWorking.packageContainer = '';
     for (var i = 0; i < this.lstHouseBillContainers.length; i++) {
       this.HouseBillWorking.commodity = this.getCommoditySummary();
       this.HouseBillWorking.desOfGoods = this.getDescriptionOfGoodSummary();
