@@ -5,14 +5,15 @@
                 <div class="m-portlet__body">
                     <div class="row form-arrival-note m-form m-form--state">
                         <div class="col-md-4">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': isSubmitted && !hblArrivalNote.arrivalNo}">
                                 <label required>Arrival No</label>
                                 <input type="text" class="form-control" [(ngModel)]="hblArrivalNote.arrivalNo">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label required>First Notice</label>
+                                <label>First Notice</label>
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [minDate]="minDate"
@@ -29,7 +30,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label required>Second Notice</label>
+                                <label>Second Notice</label>
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [minDate]="minDate"
@@ -54,7 +55,7 @@
                 <div class="m-portlet__body">
                     <div class="row">
                         <div class="table-wrapper table-editable m--margin-top-20">
-                            <table class="table table-bordered">
+                            <table class="table table-bordered dataTable">
                                 <thead app-table-header [headers]="headers"
                                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                                     <th class="m--w-90 first table-actions-col fixed-side">
@@ -70,7 +71,7 @@
                                                         class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only text-white"
                                                         title="Duplicate"><i class="la la-copy"></i>
                                                     </button>
-                                                    <button type="button" (click)="deleteFreightCharge(i)"
+                                                    <button type="button" (click)="deleteFreightCharge(i,charge)"
                                                         class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                         title="Remove">
                                                         <i class="la la-trash"></i>
@@ -78,14 +79,18 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <app-combo-grid-virtual-scroll
-                                                    [currentActiveItemId]="{field:'id', value:charge.chargeId}"
-                                                    (itemSelected)="onSelectCharge($event,charge)"
-                                                    [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
-                                                    [dataSources]="listCharges"
-                                                    [displayFields]="configComboGridCharge.displayFields"
-                                                    [height]="200">
-                                                </app-combo-grid-virtual-scroll>
+                                                <div class="form-group"
+                                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.chargeId}">
+                                                    <app-combo-grid-virtual-scroll
+                                                        [currentActiveItemId]="{field:'id', value:charge.chargeId}"
+                                                        (itemSelected)="onSelectCharge($event,charge)"
+                                                        [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
+                                                        [dataSources]="listCharges"
+                                                        [displayFields]="configComboGridCharge.displayFields"
+                                                        [height]="200">
+                                                    </app-combo-grid-virtual-scroll>
+                                                </div>
+
                                             </td>
                                             <td>
                                                 <div class="form-group">
@@ -99,10 +104,11 @@
                                                             <select class="form-control border"
                                                                 [(ngModel)]="charge.quantityType"
                                                                 (ngModelChange)="onChangeQuantityType($event, charge)">
-                                                                <option value="null" disabled></option>
                                                                 <option *ngFor="let type of quantityTypes"
                                                                     [ngValue]="type.value">
                                                                     {{type.displayName}}</option>
+                                                                <option value="null" disabled>Select type</option>
+
                                                             </select>
                                                         </div>
                                                     </div>
@@ -117,7 +123,8 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <div class="form-group">
+                                                <div class="form-group"
+                                                    [ngClass]="{'m-form__group has-danger': isSubmitted && charge.unitPrice < 0}">
                                                     <input type="text" class="form-control"
                                                         [(ngModel)]="charge.unitPrice"
                                                         (ngModelChange)="onChangeUnitPrice($event,charge)">
@@ -133,7 +140,8 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <div class="form-group">
+                                                <div class="form-group"
+                                                    [ngClass]="{'m-form__group has-danger': isSubmitted && charge.unitPrice > 100}">
                                                     <input type="number" class="form-control"
                                                         [(ngModel)]="charge.vatrate"
                                                         (ngModelChange)="onChangeVat($event,charge)">

@@ -1,10 +1,10 @@
 import { ArrivalFreightCharge } from "./arrival-freight-charge";
 
 export class HBLArrivalNote {
-    hblId: string = null;
+    hblid: string = null;
     arrivalNo: string = null;
-    arrivalFirstNotice: string = null;
-    arrivalSecondNotice: string = null;
+    arrivalFirstNotice: any = null;
+    arrivalSecondNotice: any = null;
     arrivalHeader: string = null;
     arrivalFooter: string = null;
 
@@ -21,7 +21,6 @@ export class HBLArrivalNote {
             if (!!self.csArrivalFrieghtCharges) {
                 self.csArrivalFrieghtCharges = object.csArrivalFrieghtCharges.map((i: ArrivalFreightCharge) => new ArrivalFreightCharge(i));
             }
-
         }
     }
 }

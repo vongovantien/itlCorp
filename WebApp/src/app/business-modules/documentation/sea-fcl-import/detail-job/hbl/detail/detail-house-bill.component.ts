@@ -9,8 +9,9 @@ import { DocumentationRepo } from 'src/app/shared/repositories';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { SeaFCLImportShipmentGoodSummaryComponent } from '../../../components/shipment-good-summary/shipment-good-summary.component';
 import { InfoPopupComponent } from 'src/app/shared/common/popup';
+import { SeaFClImportArrivalNoteComponent } from '../components/arrival-note/arrival-note.component';
 
-import { catchError, finalize, tap, takeUntil, skip } from 'rxjs/operators';
+import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 
 import * as fromStore from './../../../store';
@@ -32,6 +33,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(FormAddHouseBillComponent, { static: false }) formHouseBill: FormAddHouseBillComponent;
     @ViewChild(SeaFCLImportShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: SeaFCLImportShipmentGoodSummaryComponent;
+    @ViewChild(SeaFClImportArrivalNoteComponent, { static: false }) arrivalNoteComponent: SeaFClImportArrivalNoteComponent;
 
     hblId: string;
     containers: Container[] = [];
@@ -80,24 +82,42 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     }
 
     updateHbl(body: any) {
-        if (this.formHouseBill.formGroup.valid) {
-            this._progressRef.start();
-            this._documentationRepo.updateHbl(body)
-                .pipe(
-                    catchError(this.catchError),
-                    finalize(() => this._progressRef.complete())
-                )
-                .subscribe(
-                    (res: CommonInterface.IResult) => {
-                        if (res.status) {
-                            this._toastService.success(res.message, '');
-                        } else {
+        switch (this.selectedTab) {
+            case HBL_TAB.DETAIL:
+                if (this.formHouseBill.formGroup.valid) {
+                    this._progressRef.start();
+                    this._documentationRepo.updateHbl(body)
+                        .pipe(
+                            catchError(this.catchError),
+                            finalize(() => this._progressRef.complete())
+                        )
+                        .subscribe(
+                            (res: CommonInterface.IResult) => {
+                                if (res.status) {
+                                    this._toastService.success(res.message);
+                                } else {
+                                    this._toastService.error(res.message);
+                                }
+                            }
+                        );
+                }
+                break;
 
-                        }
-                    }
-                );
+            // * Update Arrival Note.    
+            case HBL_TAB.ARRIVAL: {
+                this.arrivalNoteComponent.isSubmitted = true;
+                if (!this.arrivalNoteComponent.checkValidate()) {
+                    return;
+                } else if (!!this.arrivalNoteComponent.hblArrivalNote.arrivalNo) {
+                    this.arrivalNoteComponent.saveArrivalNote();
+                } else {
+                    return;
+                }
+                break;
+            }
+            default:
+                break;
         }
-
     }
 
     combackToHBLList() {
