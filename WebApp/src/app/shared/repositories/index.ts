@@ -5,6 +5,7 @@ export * from './catalogue.repo';
 export * from './documentation.repo';
 export * from './export.repo';
 export * from './setting.repo';
+export * from './identity.repo';
 
 
 

@@ -1693,6 +1693,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
                 entity.Property(e => e.Dofooter).HasColumnName("DOFooter");
 
                 entity.Property(e => e.Doheader1)
@@ -1702,6 +1704,10 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.Doheader2)
                     .HasColumnName("DOHeader2")
                     .HasMaxLength(250);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<CsArrivalFrieghtCharge>(entity =>
@@ -3997,19 +4003,15 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("Address_VN")
                     .HasMaxLength(4000);
 
-                entity.Property(e => e.BankAccountName)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
+                entity.Property(e => e.BankAccountName).HasMaxLength(1000);
 
                 entity.Property(e => e.BankAccountUsd)
                     .HasColumnName("BankAccount_USD")
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
+                    .HasMaxLength(500);
 
                 entity.Property(e => e.BankAccountVnd)
                     .HasColumnName("BankAccount_VND")
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
+                    .HasMaxLength(500);
 
                 entity.Property(e => e.BankAddress).HasMaxLength(4000);
 
@@ -4035,13 +4037,9 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
-                entity.Property(e => e.Email)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.Email).IsUnicode(false);
 
-                entity.Property(e => e.Fax)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.Fax).HasMaxLength(500);
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
@@ -4056,13 +4054,9 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.SwiftCode)
-                    .HasMaxLength(400)
-                    .IsUnicode(false);
+                entity.Property(e => e.SwiftCode).HasMaxLength(4000);
 
-                entity.Property(e => e.Taxcode)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.Taxcode).HasMaxLength(4000);
 
                 entity.Property(e => e.Tel)
                     .HasMaxLength(50)
