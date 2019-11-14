@@ -64,11 +64,11 @@ namespace eFMS.IdentityServer.Infrastructure
                     builder =>
                     {
                         builder
-                            .AllowAnyOrigin()
+                            //.AllowAnyOrigin()
                             .AllowAnyHeader()
                             .AllowAnyMethod()
-                            .AllowCredentials();
-                            //.WithOrigins(appConfig.CrosConfig.Urls);
+                            .AllowCredentials()//;
+                            .WithOrigins(appConfig.CrosConfig.Urls);
                     });
             });
             services.AddMvc();
@@ -93,8 +93,8 @@ namespace eFMS.IdentityServer.Infrastructure
             })
             .AddIdentityServerAuthentication(options =>
             {
-                options.Authority = "https://localhost:44369/";
-                options.RequireHttpsMetadata = true;
+                options.Authority = appConfig.AuthConfig.Issuer;
+                options.RequireHttpsMetadata = appConfig.AuthConfig.RequireHttps;
                 options.ApiName = "efms_api";
                 options.ApiSecret = "secret";
             });
