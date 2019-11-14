@@ -8,7 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
 
 import * as fromStore from './../../store';
-import { takeUntil, catchError } from 'rxjs/operators';
+import { takeUntil, catchError, finalize } from 'rxjs/operators';
 import { CsShipmentSurcharge } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
@@ -100,6 +100,27 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                         this._store.dispatch(new fromStore.GetProfitAction(this.hbl.id));
                     } else {
                         this._toastService.error(res.message);
+                    }
+                }
+            );
+    }
+
+    syncFreightCharge() {
+        this._progressRef.start();
+        this._documentRepo.getArrivalInfo(this.hbl.id, CommonEnum.TransactionTypeEnum.SeaFCLImport)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        for (const freightCharge of res.csArrivalFrieghtCharges) {
+                            const newSurCharge: CsShipmentSurcharge = new CsShipmentSurcharge(freightCharge);
+                            newSurCharge.id = SystemConstants.EMPTY_GUID;
+
+                            newSurCharge.exchangeDate = { startDate: new Date(), endDate: new Date() };
+                            newSurCharge.invoiceDate = null;
+
+                            this._store.dispatch(new fromStore.AddSellingSurchargeAction(newSurCharge));
+                        }
                     }
                 }
             );
