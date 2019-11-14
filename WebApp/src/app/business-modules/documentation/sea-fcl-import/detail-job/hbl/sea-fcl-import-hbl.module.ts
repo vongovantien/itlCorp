@@ -16,6 +16,7 @@ import { SelectModule } from 'ng2-select';
 import { FormSearchHouseBillComponent } from './components/form-search-house-bill/form-search-house-bill.component';
 import { SeaFClImportArrivalNoteComponent } from './components/arrival-note/arrival-note.component';
 import { FroalaViewModule, FroalaEditorModule } from 'angular-froala-wysiwyg';
+import { SeaFClImportDeliveryOrderComponent } from './components/delivery-order/delivery-order.component';
 
 const routing: Routes = [
     {
@@ -51,7 +52,8 @@ const LIB = [
         DetailHouseBillComponent,
         ImportHouseBillDetailComponent,
         FormSearchHouseBillComponent,
-        SeaFClImportArrivalNoteComponent
+        SeaFClImportArrivalNoteComponent,
+        SeaFClImportDeliveryOrderComponent
     ],
     imports: [
         CommonModule,

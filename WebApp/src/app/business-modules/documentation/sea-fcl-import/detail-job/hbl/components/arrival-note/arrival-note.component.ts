@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 
 import { AppList } from 'src/app/app.list';
-import { ArrivalFreightCharge, Surcharge, Unit, Currency, Charge } from 'src/app/shared/models';
+import { ArrivalFreightCharge, Surcharge, Unit, Currency, Charge, User } from 'src/app/shared/models';
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { DataService, SortService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
@@ -32,7 +32,8 @@ export class SeaFClImportArrivalNoteComponent extends AppList {
     hblArrivalNote: HBLArrivalNote = new HBLArrivalNote();
 
     headers: CommonInterface.IHeaderTable[];
-    optionEditor: any = ''; // * Config Editor.
+
+    userLogged: User = new User();
 
     freightCharges: ArrivalFreightCharge[] = new Array<ArrivalFreightCharge>();
     listCharges: Charge[] = [];
@@ -63,6 +64,9 @@ export class SeaFClImportArrivalNoteComponent extends AppList {
         this._progressRef = this._ngProgress.ref();
 
         this.requestSort = this.sortFreightCharge;
+
+        this.userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
+
     }
 
     ngOnInit() {
@@ -117,27 +121,6 @@ export class SeaFClImportArrivalNoteComponent extends AppList {
                 { field: 'code', label: 'Code' },
             ]
         }, { selectedDisplayFields: ['chargeNameEn'], });
-
-        /* Config Text Editor. */
-        this.optionEditor = {
-            htmlExecuteScripts: false,
-            heightMin: 150,
-            charCounterCount: false,
-            theme: 'royal',
-            fontFamily: {
-                "Roboto,sans-serif": 'Roboto',
-                "Oswald,sans-serif": 'Oswald',
-                "Montserrat,sans-serif": 'Montserrat',
-                "'Open Sans Condensed',sans-serif": 'Open Sans Condensed',
-                "'Arial',sans-serif,": 'Arial',
-                "Time new Roman": 'Time new Roman',
-                "Tahoma": 'Tahoma'
-            },
-            toolbarButtons: ['fullscreen', 'bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', '|', 'fontFamily', 'fontSize', 'color', 'inlineClass', 'inlineStyle', 'paragraphStyle', 'lineHeight', '|', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', '-', 'insertLink', 'insertTable', '|', 'emoticons', 'fontAwesome', 'specialCharacters', 'insertHR', 'selectAll', 'clearFormatting', '|', 'spellChecker', 'help', 'html', '|', 'undo', 'redo'],
-            quickInsertButtons: ['table', 'ul', 'ol', 'hr'],
-            fontFamilySelection: true,
-            language: 'vi',
-        };
 
         this.headers = [
             { title: 'Charge', field: 'chargeId', sortable: true, width: 300 },
@@ -293,6 +276,57 @@ export class SeaFClImportArrivalNoteComponent extends AppList {
             );
     }
 
+    setDefaultHeadeFooter() {
+        const body: IArrivalDefault = {
+            transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport,
+            userDefault: this.userLogged.id,
+            arrivalFooter: this.hblArrivalNote.arrivalFooter,
+            arrivalHeader: this.hblArrivalNote.arrivalHeader
+        };
+
+        this._progressRef.start();
+
+        this._documentRepo.updateArrivalInfo(body)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                }
+            );
+    }
+
+    setDefaultFreightCharge() {
+        const body: IArrivalFreightChargeDefault = {
+            userDefault: this.userLogged.id,
+            transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport,
+            csArrivalFrieghtChargeDefaults: this.hblArrivalNote.csArrivalFrieghtCharges
+        };
+
+        this._progressRef.start();
+
+        this._documentRepo.setArrivalFreightChargeDefault(body)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                }
+            );
+    }
+
     onChangeQuantity(quantity: number, chargeItem: ArrivalFreightCharge) {
         chargeItem.total = this.utility.calculateTotalAmountWithVat(chargeItem.vatrate, quantity, chargeItem.unitPrice);
     }
@@ -367,10 +401,21 @@ export class SeaFClImportArrivalNoteComponent extends AppList {
 
 }
 
-export interface IExchangeRate {
+interface IExchangeRate {
     id: number;
     currencyFromID: string;
     rate: number;
     currencyToID: string;
 }
+interface IArrivalDefault {
+    transactionType: number;
+    userDefault: string;
+    arrivalHeader: string;
+    arrivalFooter: string;
+}
 
+interface IArrivalFreightChargeDefault {
+    transactionType: number;
+    userDefault: string;
+    csArrivalFrieghtChargeDefaults: ArrivalFreightCharge[];
+}

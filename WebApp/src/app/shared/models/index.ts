@@ -20,6 +20,7 @@ export * from './document/csTransaction';
 export * from './document/csTransactionDetail';
 export * from './document/fcl-import';
 export * from './document/arrival-freight-charge';
+export * from './document/delivery-order';
 
 export * from './tool-setting/tariff';
 

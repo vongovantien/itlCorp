@@ -1,56 +1,64 @@
 <div class="arrival-note-wrapper">
     <div class="m-portlet">
         <div class="m-portlet__body">
-            <div class="m-portlet">
-                <div class="m-portlet__body">
-                    <div class="row form-arrival-note m-form m-form--state">
-                        <div class="col-md-4">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted && !hblArrivalNote.arrivalNo}">
-                                <label required>Arrival No</label>
-                                <input type="text" class="form-control" [(ngModel)]="hblArrivalNote.arrivalNo">
-                            </div>
+            <div class="row form-arrival-note m-form m-form--state m--margin-bottom-20">
+                <div class="col-md-4">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger': isSubmitted && !hblArrivalNote.arrivalNo}">
+                        <label required>Arrival No</label>
+                        <input type="text" class="form-control" [(ngModel)]="hblArrivalNote.arrivalNo">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>First Notice</label>
+                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                            <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [minDate]="minDate"
+                                name="daterange" placeholder="Please Select" readonly [autoApply]="true"
+                                [singleDatePicker]="true" [alwaysShowCalendars]="true"
+                                [(ngModel)]="hblArrivalNote.arrivalFirstNotice" />
+                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                <span>
+                                    <i class="la la-calendar"></i>
+                                </span>
+                            </span>
                         </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>First Notice</label>
-                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                        [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [minDate]="minDate"
-                                        name="daterange" placeholder="Please Select" readonly [autoApply]="true"
-                                        [singleDatePicker]="true" [alwaysShowCalendars]="true"
-                                        [(ngModel)]="hblArrivalNote.arrivalFirstNotice" />
-                                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                                        <span>
-                                            <i class="la la-calendar"></i>
-                                        </span>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Second Notice</label>
-                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                        [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [minDate]="minDate"
-                                        name="daterange" placeholder="Please Select" readonly [autoApply]="true"
-                                        [singleDatePicker]="true" [alwaysShowCalendars]="true"
-                                        [(ngModel)]="hblArrivalNote.arrivalSecondNotice" />
-                                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                                        <span>
-                                            <i class="la la-calendar"></i>
-                                        </span>
-                                    </span>
-                                </div>
-                            </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Second Notice</label>
+                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                            <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [minDate]="minDate"
+                                name="daterange" placeholder="Please Select" readonly [autoApply]="true"
+                                [singleDatePicker]="true" [alwaysShowCalendars]="true"
+                                [(ngModel)]="hblArrivalNote.arrivalSecondNotice" />
+                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                <span>
+                                    <i class="la la-calendar"></i>
+                                </span>
+                            </span>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="m-portlet">
                 <div class="alert-block__heading">
-                    <h3 class="alert-block__title">Freight Charge</h3>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="alert-block__title">
+                            Freight Charge
+                        </h3>
+                        <div>
+                            <button type="button" class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase"
+                                (click)="setDefaultFreightCharge()">
+                                <span><i class="la la-save"></i>
+                                    <span> Set Default </span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="m-portlet__body">
                     <div class="row">
@@ -194,7 +202,19 @@
             </div>
             <div class="m-portlet">
                 <div class="alert-block__heading">
-                    <h3 class="alert-block__title">Header</h3>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="alert-block__title">
+                            Header
+                        </h3>
+                        <div>
+                            <button type="button" class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase"
+                                (click)="setDefaultHeadeFooter()">
+                                <span><i class="la la-save"></i>
+                                    <span> Set Default </span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="m-portlet__body">
                     <div class="row">
@@ -206,7 +226,19 @@
             </div>
             <div class="m-portlet">
                 <div class="alert-block__heading">
-                    <h3 class="alert-block__title">Footer</h3>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="alert-block__title">
+                            Footer
+                        </h3>
+                        <div>
+                            <button type="button" class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase"
+                                (click)="setDefaultHeadeFooter()">
+                                <span><i class="la la-save"></i>
+                                    <span> Set Default </span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="m-portlet__body">
                     <div class="row">
