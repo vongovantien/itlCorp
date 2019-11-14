@@ -250,6 +250,8 @@ namespace eFMS.API.Documentation.DL.Services
                 result.Doheader1 = data.DosentTo1;
                 result.Doheader2 = data.DosentTo2;
                 result.Dofooter = data.Dofooter;
+                result.DeliveryOrderNo = data.DeliveryOrderNo;
+                result.DeliveryOrderPrintedDate = data.DeliveryOrderPrintedDate;
             }
             else
             {
