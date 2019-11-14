@@ -91,6 +91,7 @@ export class SeaFCLImportAsignmentComponent extends AppList {
 
     openPopUpAssignStage() {
         this.assignStagePopup.jobId = this.jobId;
+        this.assignStagePopup.isAsignment = true;
         this.assignStagePopup.show();
     }
 

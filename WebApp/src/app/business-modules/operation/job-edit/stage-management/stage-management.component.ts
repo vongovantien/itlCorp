@@ -87,6 +87,7 @@ export class OpsModuleStageManagementComponent extends AppList {
 
     openPopUpAssignStage() {
         this.assignStagePopup.jobId = this.jobId;
+        this.assignStagePopup.isAsignment = false;
         this.assignStagePopup.show();
     }
 

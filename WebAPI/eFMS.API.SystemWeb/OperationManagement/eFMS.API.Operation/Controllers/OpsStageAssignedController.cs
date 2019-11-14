@@ -152,7 +152,7 @@ namespace eFMS.API.Operation.Controllers
         /// <param name="model">model to update</param>
         /// <returns></returns>
         [HttpPut("Update")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Update(OpsStageAssignedEditModel model)
         {
             //var assigned = mapper.Map<OpsStageAssignedModel>(model);

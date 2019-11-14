@@ -21,7 +21,7 @@
                     <div class="form-group">
                         <div class="m-input-icon m-input-icon--left">
                             <input type="text" class="form-control m-input m-input--square" placeholder="Search..."
-                                [(ngModel)]="keyword" name="keyword">
+                                [(ngModel)]="keyword" name="keyword" (ngModelChange)="onSearching($event)">
                             <span class="m-input-icon__icon m-input-icon__icon--left">
                                 <span>
                                     <i class="la la-search"></i>

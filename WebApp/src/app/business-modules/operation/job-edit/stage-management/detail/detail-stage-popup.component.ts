@@ -159,8 +159,8 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             deadLineDate: !!this.data.deadline ? { startDate: new Date(this.data.deadline), endDate: new Date(this.data.deadline) } : null
         });
 
-        this.selectedMainPersonInCharge = Object.assign({}, { field: 'username', value: this.data.mainPersonInCharge });
-        this.selectedRealPersonInCharge = Object.assign({}, { field: 'username', value: this.data.realPersonInCharge });
+        this.selectedMainPersonInCharge = Object.assign({}, { field: 'id', value: this.data.mainPersonInCharge });
+        this.selectedRealPersonInCharge = Object.assign({}, { field: 'id', value: this.data.realPersonInCharge });
 
         if (!!this.data.status) {
             this.statusStageActive = this.statusStage.filter((item: any) => item.id.trim() === this.data.status.trim());
