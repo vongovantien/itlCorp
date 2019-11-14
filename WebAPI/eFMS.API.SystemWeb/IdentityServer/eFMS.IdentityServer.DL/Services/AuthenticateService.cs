@@ -15,6 +15,7 @@ using Microsoft.Extensions.Options;
 using System.DirectoryServices;
 using System.Security.Cryptography;
 using System.IO;
+using System.Net;
 
 namespace eFMS.IdentityServer.DL.Services
 {
@@ -195,8 +196,12 @@ namespace eFMS.IdentityServer.DL.Services
         }
         private void LogUserLogin(SysUser user, Guid? workplaceId)
         {
+            IPHostEntry ipEntry = Dns.GetHostEntry("");
+            string ComputerName = ipEntry.HostName;
             var userLog = new SysUserLogModel
             {
+                Ip = ipEntry.AddressList[1].ToString(),
+                ComputerName = ComputerName,
                 LoggedInOn = DateTime.Now,
                 UserId = user.Id,
                 WorkPlaceId = workplaceId

@@ -8,7 +8,10 @@ using eFMS.IdentityServer.DL.Services;
 using IdentityServer4.Services;
 using IdentityServer4.Validation;
 using ITL.NetCore.Connection.EF;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
@@ -21,6 +24,7 @@ namespace eFMS.IdentityServer.Infrastructure
     {
         public static void Register(IServiceCollection services)
         {
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<IAuthenUserService, AuthenticateService>();
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
 
@@ -60,11 +64,11 @@ namespace eFMS.IdentityServer.Infrastructure
                     builder =>
                     {
                         builder
-                            //.AllowAnyOrigin()
+                            .AllowAnyOrigin()
                             .AllowAnyHeader()
                             .AllowAnyMethod()
-                            .AllowCredentials()
-                            .WithOrigins(appConfig.CrosConfig.Urls);
+                            .AllowCredentials();
+                            //.WithOrigins(appConfig.CrosConfig.Urls);
                     });
             });
             services.AddMvc();
@@ -82,7 +86,18 @@ namespace eFMS.IdentityServer.Infrastructure
                 .AddInMemoryPersistedGrants()
                 .AddSigningCredential(cert)
                 .AddValidationKey(cert);
-
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddIdentityServerAuthentication(options =>
+            {
+                options.Authority = "https://localhost:44369/";
+                options.RequireHttpsMetadata = true;
+                options.ApiName = "efms_api";
+                options.ApiSecret = "secret";
+            });
             return services;
         }
     }
