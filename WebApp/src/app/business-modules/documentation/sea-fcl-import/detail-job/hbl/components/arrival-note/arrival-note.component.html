@@ -55,7 +55,7 @@
                 <div class="m-portlet__body">
                     <div class="row">
                         <div class="table-wrapper table-editable m--margin-top-20">
-                            <table class="table table-bordered dataTable">
+                            <table class="table table-bordered dataTable-edit">
                                 <thead app-table-header [headers]="headers"
                                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                                     <th class="m--w-90 first table-actions-col fixed-side">
@@ -198,7 +198,8 @@
                 </div>
                 <div class="m-portlet__body">
                     <div class="row">
-                        <div [froalaEditor]="optionEditor" [(froalaModel)]="hblArrivalNote.arrivalHeader">{{ header }}
+                        <div [froalaEditor]="optionEditor" [(froalaModel)]="hblArrivalNote.arrivalHeader">
+                            {{ hblArrivalNote.arrivalHeader }}
                         </div>
                     </div>
                 </div>
@@ -209,7 +210,8 @@
                 </div>
                 <div class="m-portlet__body">
                     <div class="row">
-                        <div [froalaEditor]="optionEditor" [(froalaModel)]="hblArrivalNote.arrivalFooter">{{ footer }}
+                        <div [froalaEditor]="optionEditor" [(froalaModel)]="hblArrivalNote.arrivalFooter">
+                            {{ hblArrivalNote.arrivalFooter }}
                         </div>
                     </div>
                 </div>

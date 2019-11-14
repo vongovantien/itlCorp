@@ -10,8 +10,17 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-4">
-                        <input type="text" class="form-control w-100" [(ngModel)]="keyword" name="keyword"
-                            placeholder="">
+                        <div class="form-group">
+                            <div class="m-input-icon m-input-icon--right">
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Search"
+                                    [(ngModel)]="keyword" name=keyword>
+                                <span class="m-input-icon__icon m-input-icon__icon--right">
+                                    <span>
+                                        <i class="la la-search"></i>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-8 text-right">
                         <button class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
@@ -35,18 +44,17 @@
                     </div>
                 </div>
                 <div class="table-wrapper table-scrollable table-editable m--margin-top-20">
-                    <table class="table dataTable table-bordered">
+                    <table class="table table-bordered dataTable-edit">
                         <thead app-table-header [headers]="headers"
                             (onClick)="sortBy($event.sortField ? $event.sortField : '')">
-                            <th class="m--w-50 first table-actions-col">
-                                Action
+                            <th class="m--w-50 first table-actions-col fixed-side">
                             </th>
                         </thead>
                         <tbody>
                             <ng-container *ngIf="!!containers.length">
                                 <tr class="text-center m-form m-form--state"
-                                    *ngFor="let container of containers; let i = index; trackBy: trackByFn">
-                                    <td class="table-actions-col">
+                                    *ngFor="let container of containers | filter: keyword: ['containerTypeId','seaNo','markNo']; let i = index; trackBy: trackByFn">
+                                    <td class="table-actions-col fixed-side">
                                         <div class="table-actions">
                                             <button type="button" (click)="deleteContainerItem(i)"
                                                 class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"

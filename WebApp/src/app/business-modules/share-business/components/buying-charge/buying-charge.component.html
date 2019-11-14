@@ -29,7 +29,7 @@
             </div>
         </div>
         <div class="table-wrapper table-editable m--margin-top-20" [class.h]="!!charges.length">
-            <table class="table table-bordered">
+            <table class="table table-bordered dataTable-edit">
                 <thead app-table-header [headers]="headers"
                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                     <th class="m--w-90 first table-actions-col fixed-side">
