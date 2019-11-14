@@ -1741,6 +1741,10 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Quantity).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.QuantityType)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Total).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.UnitId).HasColumnName("UnitID");

@@ -258,7 +258,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 && (x.ShipmentMode == criteria.ShipmentMode || string.IsNullOrEmpty(criteria.ShipmentMode))
                                 && ((x.ServiceDate ?? null) >= criteria.ServiceDateFrom || criteria.ServiceDateFrom == null)
                                 && ((x.ServiceDate ?? null) <= criteria.ServiceDateTo || criteria.ServiceDateTo == null)
-                            ).OrderByDescending(x => x.ModifiedDate);
+                            ).OrderByDescending(x => x.DatetimeModified);
             }
             else
             {
@@ -271,7 +271,7 @@ namespace eFMS.API.Documentation.DL.Services
                                    || (x.FieldOpsID == criteria.All || string.IsNullOrEmpty(criteria.All))
                                    || (x.ShipmentMode == criteria.All || string.IsNullOrEmpty(criteria.All))
                                && ((x.ServiceDate ?? null) >= (criteria.ServiceDateFrom ?? null) && (x.ServiceDate ?? null) <= (criteria.ServiceDateTo ?? null))
-                               ).OrderByDescending(x => x.ModifiedDate);
+                               ).OrderByDescending(x => x.DatetimeModified);
             }
             results = mapper.Map<List<OpsTransactionModel>>(datajoin);
             return results.AsQueryable();
@@ -516,6 +516,8 @@ namespace eFMS.API.Documentation.DL.Services
             else
             {
                 job.CurrentStatus = TermData.Canceled;
+                job.DatetimeModified = DateTime.Now;
+                job.UserModified = currentUser.UserID;
                 result = DataContext.Update(job, x => x.Id == id, false);
                 if (result.Success)
                 {
