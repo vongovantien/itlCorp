@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Routes, RouterModule } from '@angular/router';
 
 import { SharedModule } from 'src/app/shared/shared.module';
-import { TabsModule, PaginationModule, ModalModule, CollapseModule, AccordionModule } from 'ngx-bootstrap';
+import { TabsModule, PaginationModule, ModalModule, CollapseModule } from 'ngx-bootstrap';
 import { SelectModule } from 'ng2-select';
 import { SeaFCLImportManagementComponent } from './sea-fcl-import-management.component';
 import { SeaFCLImportCreateJobComponent } from './create-job/create-job-fcl-import.component';
@@ -64,7 +64,6 @@ const LIB = [
         SeaFCLImportDetailJobComponent,
     ],
     imports: [
-        NgxDaterangepickerMd,
         FCLImportShareModule,
         CommonModule,
         SharedModule,
@@ -74,7 +73,7 @@ const LIB = [
         ...LIB,
         StoreModule.forFeature('seaFClImport', reducers),
         EffectsModule.forFeature(effects),
-        SeaFCLImportLazyLoadModule // ?  Lazy loading module with  tab component (CD Note).
+        SeaFCLImportLazyLoadModule // ?  Lazy loading module with  tab component (CD Note, Assignment).
 
     ],
     exports: [],
