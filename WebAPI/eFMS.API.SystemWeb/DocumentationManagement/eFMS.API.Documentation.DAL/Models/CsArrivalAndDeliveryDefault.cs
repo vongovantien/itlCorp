@@ -12,5 +12,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string Doheader1 { get; set; }
         public string Doheader2 { get; set; }
         public string Dofooter { get; set; }
+        public string UserModified { get; set; }
+        public DateTime? DatetimeModified { get; set; }
     }
 }

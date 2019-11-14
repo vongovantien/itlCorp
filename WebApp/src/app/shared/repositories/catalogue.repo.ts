@@ -383,4 +383,15 @@ export class CatalogueRepo {
                 map((data: any) => data)
             );
     }
+
+    convertExchangeRate(date: string, fromCurrency: string, localCurrency: string = 'VND') {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCurrencyExchange/ConvertRate`, {
+            date: date,
+            localCurrency: localCurrency,
+            fromCurrency: fromCurrency
+        })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
 }

@@ -238,7 +238,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                 this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
             case 'assignment':
-                this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: { tab: 'ASIGNMENT' } });
+                this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: { tab: 'ASSIGNMENT' } });
                 break;
         }
     }

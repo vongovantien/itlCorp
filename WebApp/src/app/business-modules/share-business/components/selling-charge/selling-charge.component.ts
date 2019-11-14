@@ -8,19 +8,10 @@ import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
 
 import * as fromStore from './../../store';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { takeUntil, catchError } from 'rxjs/operators';
 import { CsShipmentSurcharge } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
-
-enum QUANTITY_TYPE {
-    GW = 'gw',
-    NW = 'nw',
-    CW = 'cw',
-    CBM = 'cbm',
-    PACKAGE = 'package',
-    CONT = 'cont'
-}
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 @Component({
     selector: 'selling-charge',
@@ -47,6 +38,32 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                     console.log("get selling charge from store", this.charges);
                 }
             );
+    }
+
+    configHeader() {
+        this.headers = [
+            { title: 'Partner Name', field: 'partnerName', required: true, sortable: true, width: 200 },
+            { title: 'Charge Name', field: 'chargeId', required: true, sortable: true, width: 400 },
+            { title: 'Quantity', field: 'quantity', required: true, sortable: true, width: 200 },
+            { title: 'Unit', field: 'unitId', required: true, sortable: true, width: 200 },
+            { title: 'Unit Price', field: 'unitPrice', required: true, sortable: true },
+            { title: 'Currency', field: 'currencyId', required: true, sortable: true },
+            { title: 'VAT', field: 'vatrate', required: true, sortable: true },
+            { title: 'Total', field: 'total', sortable: true },
+            { title: 'Note', field: 'notes', sortable: true },
+            { title: 'Invoice No', field: 'invoiceNo', sortable: true },
+            { title: 'Series No', field: 'seriesNo', sortable: true },
+            { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
+            { title: 'Exchange Rate Date', field: 'exchangeDate', sortable: true },
+            { title: 'SOA', field: 'soano', sortable: true },
+            { title: 'Credit/Debit Note', field: 'cdno', sortable: true },
+            { title: 'Settle Payment', field: 'settlementCode', sortable: true },
+            { title: 'Voucher ID', field: 'voucherId', sortable: true },
+            { title: 'Voucher ID Date', field: 'voucherIddate', sortable: true },
+            { title: 'Voucher IDRE', field: 'voucherIdre', sortable: true },
+            { title: 'Voucher IDRE Date', field: 'voucherIdredate', sortable: true },
+            { title: 'Final Exchange Rate', field: 'finalExchangeRate', sortable: true },
+        ];
     }
 
     duplicate(index: number) {
@@ -78,6 +95,9 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
+
+                        // * Get Profit
+                        this._store.dispatch(new fromStore.GetProfitAction(this.hbl.id));
                     } else {
                         this._toastService.error(res.message);
                     }

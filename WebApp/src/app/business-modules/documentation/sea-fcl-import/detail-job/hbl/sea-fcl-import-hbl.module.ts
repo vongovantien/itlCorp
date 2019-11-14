@@ -14,7 +14,8 @@ import { ShareBussinessModule } from 'src/app/business-modules/share-business/sh
 import { ImportHouseBillDetailComponent } from './popup/import-house-bill-detail/import-house-bill-detail.component';
 import { SelectModule } from 'ng2-select';
 import { FormSearchHouseBillComponent } from './components/form-search-house-bill/form-search-house-bill.component';
-import { ProfitSummaryHBLComponent } from './components/profit-summary/profit-summary.component';
+import { SeaFClImportArrivalNoteComponent } from './components/arrival-note/arrival-note.component';
+import { FroalaViewModule, FroalaEditorModule } from 'angular-froala-wysiwyg';
 
 const routing: Routes = [
     {
@@ -31,6 +32,17 @@ const routing: Routes = [
     }
 ];
 
+const LIB = [
+    PaginationModule.forRoot(),
+    ModalModule.forRoot(),
+    SelectModule,
+    FroalaEditorModule.forRoot(),
+    FroalaViewModule.forRoot(),
+    NgxDaterangepickerMd,
+    TabsModule.forRoot(),
+];
+
+
 @NgModule({
     declarations: [
         SeaFCLImportHBLComponent,
@@ -39,24 +51,23 @@ const routing: Routes = [
         DetailHouseBillComponent,
         ImportHouseBillDetailComponent,
         FormSearchHouseBillComponent,
-        ProfitSummaryHBLComponent
+        SeaFClImportArrivalNoteComponent
     ],
     imports: [
         CommonModule,
         SharedModule,
         ShareBussinessModule,
         FormsModule,
-        TabsModule.forRoot(),
         ReactiveFormsModule,
         RouterModule.forChild(routing),
-        NgxDaterangepickerMd,
         FCLImportShareModule,
-        PaginationModule.forRoot(),
-        ModalModule.forRoot(),
-        SelectModule
+        ...LIB
 
     ],
     exports: [],
     providers: [],
+    bootstrap: [
+        SeaFCLImportHBLComponent
+    ]
 })
 export class SeaFCLImportHBLModule { }

@@ -92,6 +92,8 @@ namespace AuthServer
             //         + "Check working: " + url
             //         + @".well-known/openid-configuration");
             //});
+
+            app.UseMvc();
             app.Run(async (context) =>
             {
                 string url = string.Concat(

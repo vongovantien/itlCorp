@@ -3,6 +3,10 @@ import { PageSidebarComponent } from './page-sidebar/page-sidebar.component';
 import { Router } from '@angular/router';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { BaseService } from 'src/app/shared/services/base.service';
+import { IdentityRepo } from '../shared/repositories/identity.repo';
+import { ApiService } from '../shared/services';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -25,6 +29,7 @@ export class MasterPageComponent implements OnInit, AfterViewInit {
         private router: Router,
         private cdRef: ChangeDetectorRef,
         private oauthService: OAuthService,
+        private http: HttpClient
     ) { }
 
     ngOnInit() {
@@ -32,9 +37,17 @@ export class MasterPageComponent implements OnInit, AfterViewInit {
         setInterval(() => {
             const remainingMinutes: number = this.baseServices.remainingExpireTimeToken();
 
-            if (!this.baseServices.checkLoginSession()) {
-                this.router.navigate(['/login', { isEndSession: true, url: this.router.url }]);
-            }
+            // if (!this.baseServices.checkLoginSession()) {
+            //     this.http.get(`${environment.HOST.INDENTITY_SERVER_URL}/api/Account/Signout`).toPromise()
+            //         .then(
+            //             () => {
+            //                 this.oauthService.logOut(true);
+            //                 this.router.navigateByUrl("/login");
+            //                 localStorage.clear();
+            //             }
+            //         );
+
+            // }
 
             if (remainingMinutes <= 3 && remainingMinutes > 0) {
                 this.baseServices.warningToast("Phiên đăng nhập sẽ hết hạn sau " + remainingMinutes + " phút nữa, hãy lưu công việc hiện tại hoặc đăng nhập lại để tiếp tục công việc.", "Cảnh Báo !")
@@ -50,9 +63,15 @@ export class MasterPageComponent implements OnInit, AfterViewInit {
     }
 
     logout() {
-        this.oauthService.logOut(true);
-        this.router.navigateByUrl("/login");
-        localStorage.clear();
+        this.http.get(`${environment.HOST.INDENTITY_SERVER_URL}/api/Account/Signout`).toPromise()
+            .then(
+                () => {
+                    this.oauthService.logOut(true);
+                    this.router.navigateByUrl("/login");
+                    localStorage.clear();
+                }
+            );
+
     }
 
 

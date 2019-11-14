@@ -4,18 +4,17 @@ import { Store } from '@ngrx/store';
 import { PopupBase } from 'src/app/popup.base';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { CatalogueRepo } from 'src/app/shared/repositories';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { Unit } from 'src/app/shared/models';
 
-import { catchError, takeUntil, map, tap, switchMap } from 'rxjs/operators';
-import { forkJoin, combineLatest, of } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
 
 import * as fromStore from './../../../store';
 import { Commodity } from 'src/app/shared/models/catalogue/commodity.model';
-import { DataService } from 'src/app/shared/services';
+import { DataService, SortService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { ShareContainerImportComponent } from 'src/app/business-modules/share-business';
-import { ActivatedRoute } from '@angular/router';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 
 @Component({
@@ -23,12 +22,14 @@ import { ActivatedRoute } from '@angular/router';
     templateUrl: './container-list.popup.html',
 })
 export class SeaFCLImportContainerListPopupComponent extends PopupBase {
+
     @ViewChild(ShareContainerImportComponent, { static: false }) containerImportPopup: ShareContainerImportComponent;
+
     mblid: string = null;
     hblid: string = null;
     containers: any[] = [];
 
-    headers: CommonInterface.IHeaderTable[];
+    headers: CommonInterface.IHeaderTable[] = [];
 
     containerUnits: Unit[] = new Array<Unit>();
     packageUnits: Unit[] = new Array<Unit>();
@@ -43,27 +44,30 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
         private _catalogueRepo: CatalogueRepo,
         private _store: Store<fromStore.IContainerState>,
         private cdRef: ChangeDetectorRef,
-        private _dataService: DataService
+        private _dataService: DataService,
+        private _sortService: SortService
     ) {
         super();
+
+        this.requestSort = this.sortContainer;
     }
 
     ngOnInit(): void {
         this.headers = [
-            { title: 'Cont Type', field: '', sortable: true, required: true },
-            { title: 'Cont Q`Ty', field: '', required: true },
-            { title: 'Container No', field: '' },
-            { title: 'Seal No', field: '' },
-            { title: 'Mark No', field: '' },
-            { title: 'Commodity', field: '' },
-            { title: 'Package Type', field: '' },
-            { title: 'Package Q`Ty', field: '' },
-            { title: 'Description', field: '' },
-            { title: 'G.W', field: '' },
-            { title: 'N.W', field: '' },
-            { title: 'C.W', field: '' },
-            { title: 'Unit', field: '' },
-            { title: 'CBM', field: '' },
+            { title: 'Cont Type', field: 'containerTypeId', sortable: true, required: true },
+            { title: 'Cont Q`Ty', field: 'quantity', required: true, sortable: true },
+            { title: 'Container No', field: 'containerNo', sortable: true, },
+            { title: 'Seal No', field: 'sealNo', sortable: true, },
+            { title: 'Mark No', field: 'markNo', sortable: true, },
+            { title: 'Commodity', field: 'commodityId', sortable: true, },
+            { title: 'Package Type', field: 'packageTypeId', sortable: true, },
+            { title: 'Package Q`Ty', field: 'packageQuantity', sortable: true, },
+            { title: 'Description', field: 'description', sortable: true, },
+            { title: 'G.W', field: 'gw', sortable: true, },
+            { title: 'N.W', field: 'nw', sortable: true, },
+            { title: 'C.W', field: 'chargeAbleWeight', sortable: true, },
+            { title: 'Unit', field: 'unitOfMeasure', sortable: true, },
+            { title: 'CBM', field: 'cbm', sortable: true, },
         ];
         this.cdRef.detectChanges(); // * tell ChangeDetect update view in app-table-header (field required).
         this.getMasterData();
@@ -186,6 +190,7 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
         this.isSubmitted = false;
         this.hide();
     }
+
     showImportPopup() {
         this.containerImportPopup.mblid = this.mblid;
         this.containerImportPopup.hblid = this.hblid;
@@ -207,5 +212,9 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
                     }
                 );
         }
+    }
+
+    sortContainer(sortField: string) {
+        this.containers = this._sortService.sort(this.containers, sortField, this.order);
     }
 }

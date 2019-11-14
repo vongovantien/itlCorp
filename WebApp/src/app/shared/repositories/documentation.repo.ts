@@ -349,11 +349,39 @@ export class DocumentationRepo {
     }
 
     getHBLTotalProfit(hblId: string) {
-        console.log(hblId);
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/GetHouseBillTotalProfit`, { hblid: hblId }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
+
+    updateArrivalInfo(body: any = {}) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/UpdateArrival`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    setArrivalFreightChargeDefault(body: any = {}) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/SetArrivalChargeDefault`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    setArrivalHeaderFooterDefault(body: any = {}) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/SetArrivalHeaderFooterDefault`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    getArrivalInfo(hblId: string, type: number) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/GetArrival`, { hblid: hblId, type: type }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
 
 }

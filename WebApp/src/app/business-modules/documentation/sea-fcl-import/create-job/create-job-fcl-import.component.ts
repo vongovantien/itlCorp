@@ -7,7 +7,6 @@ import { AppForm } from 'src/app/app.form';
 import { FCLImportAddModel } from 'src/app/shared/models';
 import { SeaFClImportFormCreateComponent } from '../components/form-create/form-create-sea-fcl-import.component';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { TransactionTypeEnum } from 'src/app/shared/enums';
 
 import * as fromStore from './../store/index';
 import { SeaFCLImportShipmentGoodSummaryComponent } from '../components/shipment-good-summary/shipment-good-summary.component';

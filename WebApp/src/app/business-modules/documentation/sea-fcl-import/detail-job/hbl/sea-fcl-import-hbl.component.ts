@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -17,7 +17,6 @@ import * as fromStore from './../../store';
 import * as fromShareBussiness from './../../../../share-business/store';
 
 import { catchError, finalize, takeUntil, switchMap, tap } from 'rxjs/operators';
-import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'app-sea-fcl-import-hbl',
@@ -48,6 +47,7 @@ export class SeaFCLImportHBLComponent extends AppList {
         private _toastService: ToastrService,
         private _progressService: NgProgress,
         private _store: Store<fromStore.ISeaFCLImportState>,
+        private cdr: ChangeDetectorRef
     ) {
         super();
         this.requestSort = this.sortLocal;
@@ -99,6 +99,11 @@ export class SeaFCLImportHBLComponent extends AppList {
         this.getGoodSumaryOfHbl();
     }
 
+    ngAfterViewInit() {
+        this.cdr.detectChanges();
+
+    }
+
     onSelectTab(tabName: string) {
         switch (tabName) {
             case 'shipment':
@@ -106,6 +111,9 @@ export class SeaFCLImportHBLComponent extends AppList {
                 break;
             case 'cdNote':
                 this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
+                break;
+            case 'assignment':
+                this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
                 break;
         }
     }
@@ -175,8 +183,11 @@ export class SeaFCLImportHBLComponent extends AppList {
             (res: any) => {
                 this.houseBill = res;
                 if (!!this.houseBill.length) {
-                    this.selectHBL(this.houseBill[0])
+                    this.selectHBL(this.houseBill[0]);
                 }
+
+                // this._store.dispatch(new fromShareBussiness.GetProfitAction(''));
+
             },
         );
     }
@@ -187,7 +198,8 @@ export class SeaFCLImportHBLComponent extends AppList {
         // * Get container, Job detail, Surcharge with hbl id, JobId.
         this._store.dispatch(new fromStore.GetContainerAction({ hblid: hbl.id }));
         this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(hbl.jobId));
-        this._store.dispatch(new fromStore.GetProfitHBLAction(this.selectedHbl.id));
+        this._store.dispatch(new fromShareBussiness.GetProfitAction(this.selectedHbl.id));
+
 
         switch (this.selectedTabSurcharge) {
             case 'BUY':
@@ -211,7 +223,7 @@ export class SeaFCLImportHBLComponent extends AppList {
         if (!!this.selectedHbl) {
             this._store.dispatch(new fromStore.GetContainerAction({ hblid: this.selectedHbl.id }));
             this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(this.selectedHbl.jobId));
-            this._store.dispatch(new fromStore.GetProfitHBLAction(this.selectedHbl.id));
+            this._store.dispatch(new fromShareBussiness.GetProfitAction(this.selectedHbl.id));
 
             switch (this.selectedTabSurcharge) {
                 case 'BUY':

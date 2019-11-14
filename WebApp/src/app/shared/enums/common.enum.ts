@@ -66,5 +66,15 @@ export namespace CommonEnum {
         DELETE = 'DELETE'
     }
 
+    export enum QUANTITY_TYPE {
+        GW = 'gw',
+        NW = 'nw',
+        CW = 'cw',
+        CBM = 'cbm',
+        PACKAGE = 'package',
+        CONT = 'cont'
+    }
+
 }
+
 
