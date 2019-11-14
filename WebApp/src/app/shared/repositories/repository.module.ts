@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CatalogueRepo, AccountingRepo, OperationRepo, SystemRepo, DocumentationRepo, ExportRepo } from '.';
 import { SettingRepo } from './setting.repo';
+import { API_MENU } from 'src/constants/api-menu.const';
 
 @NgModule({
     providers: [
@@ -10,7 +11,8 @@ import { SettingRepo } from './setting.repo';
         CatalogueRepo,
         DocumentationRepo,
         ExportRepo,
-        SettingRepo
+        SettingRepo,
+        API_MENU
     ],
 })
 export class RepositoryModule {
