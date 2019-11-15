@@ -42,12 +42,12 @@ export class StageManagementComponent {
     condition = "or";
     search_key = "";
     searchObject = {
+        all: null,
         id: 0,
-        code: "",
-        stageNameVn: "",
-        stageNameEn: "",
-        condition: "OR",
-        departmentName: ""
+        code: null,
+        stageNameVn: null,
+        stageNameEn: null,
+        departmentName: null
     };
 
     value: any = {};
@@ -66,6 +66,7 @@ export class StageManagementComponent {
     }
 
     async ngOnInit() {
+        this.pager.totalItems = 0;
         this.getDepartments();
         await this.setPage(this.pager);
     }
@@ -107,27 +108,22 @@ export class StageManagementComponent {
     async edit_stage(index: number, action: string, form: NgForm) {
 
         console.log(this.StageToUpdate);
-        if (action == "confirm") {
+        if (action === "confirm") {
 
             this.index_stage_edit = index;
             const currentStage = this.ListStages[this.index_stage_edit];
             this.index_current_department = _findIndex(this.ListDepartment, function (d) {
-                return d['id'] == currentStage.departmentId;
+                return d['id'] === currentStage.departmentId;
             });
 
         } else {
-            if (form.form.status != "INVALID") {
+            if (form.form.status !== "INVALID") {
                 this.StageToUpdate = this.ListStages[this.index_stage_edit];
                 const res = await this.baseServices.putAsync(this.api_menu.Catalogue.Stage_Management.update, this.StageToUpdate, true, true);
                 if (res) {
                     this.StageToUpdate = new StageModel();
                     $('#edit-stage-management-modal').modal('hide');
-
-                    // this.pager.currentPage = 1;
-                    // this.child.setPage(this.pager.currentPage);
                     this.pager.totalItems = 0;
-                    // this.getStages(this.pager);
-                    // await this.getStages(this.pager);
                     await this.setPage(this.pager);
                 }
             }
@@ -154,17 +150,10 @@ export class StageManagementComponent {
                     this.pager.currentPage = 1;
                     this.pager.totalItems = 0;
                     this.ListStages = await this.getStages(this.pager);
-                    // this.child.setPage(this.pager.currentPage);
 
                     this.resetNgSelect();
                     form.onReset();
                 }
-                // await this.getStages(this.pager);
-                // this.child.setPage(this.pager.currentPage);
-                // if (this.pager.currentPage < this.pager.totalPages) {
-                //     this.pager.currentPage = this.pager.totalPages;
-                //     this.child.setPage(this.pager.currentPage);
-                // }
             }
         } else {
             this.resetNgSelect();
@@ -177,50 +166,44 @@ export class StageManagementComponent {
 
     select_filter(filter, event) {
         this.searchObject = {
+            all: null,
             id: 0,
             code: "",
             stageNameVn: "",
             stageNameEn: "",
-            condition: "OR",
             departmentName: ""
         };
         this.selected_filter = filter;
         const id_element = document.getElementById(event.target.id);
-        if ($(id_element).hasClass("active") == false) {
+        if ($(id_element).hasClass("active") === false) {
             $(id_element).siblings().removeClass('active');
             id_element.classList.add("active");
         }
     }
 
     async search_stage() {
-
-        if (this.selected_filter == "All") {
-            this.searchObject.code = this.search_key.trim() == "" ? "" : this.search_key.trim();
-            this.searchObject.condition = "OR";
-            this.searchObject.departmentName = this.search_key.trim() == "" ? "" : this.search_key.trim();
-            this.searchObject.id = (this.search_key.trim() == "" || isNaN(Number(this.search_key)) ? 0 : parseInt(this.search_key));
-            this.searchObject.stageNameEn = this.search_key.trim() == "" ? "" : this.search_key.trim();
-            this.searchObject.stageNameVn = this.search_key.trim() == "" ? "" : this.search_key.trim();
+        this.searchObject = {
+            all: null,
+            id: 0,
+            code: null,
+            stageNameVn: null,
+            stageNameEn: null,
+            departmentName: null
+        };
+        if (this.selected_filter === "All") {
+            this.searchObject.all = this.search_key.trim() === "" ? "" : this.search_key.trim();
         }
-        // if (this.selected_filter == "Stage ID") {
-        //     this.searchObject.condition = "AND";
-        //     this.searchObject.id = (this.search_key.trim() == "" || isNaN(Number(this.search_key)) ? 0 : parseInt(this.search_key));
-        // }
-        if (this.selected_filter == "Department") {
-            this.searchObject.condition = "AND";
-            this.searchObject.departmentName = this.search_key.trim() == "" ? "" : this.search_key.trim();
+        if (this.selected_filter === "Department") {
+            this.searchObject.departmentName = this.search_key.trim() === "" ? "" : this.search_key.trim();
         }
-        if (this.selected_filter == "Name (EN)") {
-            this.searchObject.condition = "AND";
-            this.searchObject.stageNameEn = this.search_key.trim() == "" ? "" : this.search_key.trim();
+        if (this.selected_filter === "Name (EN)") {
+            this.searchObject.stageNameEn = this.search_key.trim() === "" ? "" : this.search_key.trim();
         }
-        if (this.selected_filter == "Name (Local)") {
-            this.searchObject.condition = "AND";
-            this.searchObject.stageNameVn = this.search_key.trim() == "" ? "" : this.search_key.trim();
+        if (this.selected_filter === "Name (Local)") {
+            this.searchObject.stageNameVn = this.search_key.trim() === "" ? "" : this.search_key.trim();
         }
-        if (this.selected_filter == "Code") {
-            this.searchObject.condition = "AND";
-            this.searchObject.code = this.search_key.trim() == "" ? "" : this.search_key.trim();
+        if (this.selected_filter === "Code") {
+            this.searchObject.code = this.search_key.trim() === "" ? "" : this.search_key.trim();
         }
 
         await this.setPage(this.pager);
@@ -230,11 +213,11 @@ export class StageManagementComponent {
 
     async reset_search() {
         this.searchObject = {
+            all: null,
             id: 0,
             code: "",
             stageNameVn: "",
             stageNameEn: "",
-            condition: "OR",
             departmentName: ""
         };
         this.search_key = "";
@@ -254,11 +237,11 @@ export class StageManagementComponent {
 
     public selected(value: any, action): void {
 
-        if (action == 'add') {
+        if (action === 'add') {
             this.StageToAdd.departmentId = value.id;
         }
 
-        if (action == 'edit') {
+        if (action === 'edit') {
             this.ListStages[this.index_stage_edit].stage.departmentId = value.id;
         }
 
@@ -285,14 +268,6 @@ export class StageManagementComponent {
     sort(property: any) {
         this.sortKey = property;
         this.isDesc = !this.isDesc;
-        // if (property === 'deptName') {
-        //     this.ListStages = this.sortService.sort(this.ListStages, property, this.isDesc);
-        // } else {
-        //     const temp = this.ListStages.map(x => Object.assign({}, x));
-        //     this.ListStages = this.sortService.sort(this.ListStages.map(x => Object.assign({}, x.stage)), property, this.isDesc);
-        //     const getDept = this.getDepartmentname;
-        //     this.ListStages = this.ListStages.map(x => ({ stage: x, deptName: getDept(x.id, temp) }));
-        // }
         this.ListStages = this.sortService.sort(this.ListStages, property, this.isDesc);
     }
 
