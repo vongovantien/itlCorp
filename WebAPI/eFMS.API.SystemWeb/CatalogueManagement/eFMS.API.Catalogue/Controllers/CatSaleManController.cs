@@ -120,6 +120,29 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         /// <summary>
+        /// check existed office and service
+        /// </summary>
+        /// <param name="model">object to check</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("CheckExisted")]
+        public IActionResult CheckExisted(CatSaleManEditModel model)
+        {
+      
+            string messageDuplicate = string.Empty;
+            bool checkExist = catSaleManService.Any(x => x.Service == model.Service && x.Office == model.Office);
+            if (checkExist)
+            {
+                messageDuplicate = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
+                return BadRequest(new ResultHandle { Status = false, Message = messageDuplicate });
+            }
+            ResultHandle result = new ResultHandle { Data = false };
+            return Ok(result);
+        }
+
+
+
+        /// <summary>
         /// update an existed item
         /// </summary>
         /// <param name="id">id of data that need to update</param>

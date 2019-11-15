@@ -42,7 +42,7 @@
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': isSave && saleManToAdd.office.trim().length==0 }">
+                                [ngClass]="{ 'm-form__group has-danger': isSave && (!strOfficeCurrent || !strOfficeCurrent.value )}">
                                 <label>Office <span class="m--font-danger">(*)</span></label>
                                 <app-combo-grid-virtual-scroll [selectedDisplayFields]="['abbrCompany']"
                                     [currentActiveItemId]="strOfficeCurrent" (itemSelected)="onSelectOffice($event)"
@@ -50,7 +50,7 @@
                                     [displayFields]="[{'field':'shortName','label':'Office Name Abbr'},{'field':'abbrCompany','label':'Company Name Abbr'}]">
                                 </app-combo-grid-virtual-scroll>
                                 <div class="form-control-feedback"
-                                    *ngIf=" isSave &&  saleManToAdd.office.trim().length==0">
+                                    *ngIf=" isSave && (!strOfficeCurrent || !strOfficeCurrent.value )">
                                     Office is required
                                 </div>
                             </div>
@@ -143,10 +143,13 @@
                                     Effective Date
                                 </label>
                                 <div class="m-input-icon m-input-icon--right down">
-                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                        [autoApply]="true" [(ngModel)]="saleManToView.effectDate"
-                                        [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
-                                        name="singledater" readonly />
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        [(ngModel)]="saleManToView.effectDate" name="singledater" readonly />
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
                                 </div>
                             </div>
                             <div class="m--margin-top-10 m--margin-bottom-5" *ngIf="isDetail">

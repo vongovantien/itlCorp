@@ -16,7 +16,7 @@ import * as fromStore from './../store';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 
-type TAB = 'SHIPMENT' | 'CDNOTE';
+type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
 @Component({
     selector: 'app-detail-job-fcl-import',

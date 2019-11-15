@@ -59,14 +59,9 @@
                             <span>{{item.datetimeModified | date: 'h:mm'}}</span> &nbsp;
                             <span>{{item.datetimeModified | date: 'dd/MM/yyyy'}}</span>
                         </td>
-                        <td>
-                            <span>
-                                <label class="m-checkbox m-checkbox--state-primary m-checkbox--bold">
-                                    <input type="checkbox" disabled [checked]="item.active">
-                                    <span></span>
-                                </label>
-                            </span>
-                        </td>
+
+                        <td [ngClass]="item.active ? 'text-success' : 'text-danger'">
+                            {{item.active ? 'Active' : 'Inactive'}}</td>
                     </tr>
 
                     <tr class="collapse-toggle-row" class="collapse-panel-row" app-table-collapse-row
@@ -76,7 +71,7 @@
                             </thead>
                             <tbody>
                                 <ng-container>
-                                    <tr *ngFor="let sale of saleMans; let j = index;" class="text-center">
+                                    <tr *ngFor="let sale of saleMans; let j = index;">
                                         <td><span>{{j + 1}}</span></td>
                                         <td>
                                             <span>{{sale.service}}</span>
@@ -87,9 +82,8 @@
                                         <td>
                                             <span>{{sale.company}}</span>
                                         </td>
-                                        <td>
-                                            <span>{{sale.status}}</span>
-                                        </td>
+                                        <td [ngClass]="sale.status ? 'text-success' : 'text-danger'">
+                                            {{sale.status ? 'Active' : 'Inactive'}}</td>
                                         <td>
                                             <span>{{sale.createDate | date: 'dd/MM/yyyy'}}</span>
                                         </td>

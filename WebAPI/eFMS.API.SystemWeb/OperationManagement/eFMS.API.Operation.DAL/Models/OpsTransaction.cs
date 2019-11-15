@@ -37,10 +37,11 @@ namespace eFMS.API.Operation.Service.Models
         public int? SumPackages { get; set; }
         public short? PackageTypeId { get; set; }
         public string CurrentStatus { get; set; }
+        public short? CommodityGroupId { get; set; }
         public bool? IsLocked { get; set; }
         public string UserCreated { get; set; }
         public string UserModified { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public DateTime? ModifiedDate { get; set; }
+        public DateTime? DatetimeCreated { get; set; }
+        public DateTime? DatetimeModified { get; set; }
     }
 }

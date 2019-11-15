@@ -34,6 +34,7 @@ export class AssignStagePopupComponent extends PopupBase {
 
     isSubmitted: boolean = false;
     jobId: string = '';
+    isAsignment: boolean = false;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,

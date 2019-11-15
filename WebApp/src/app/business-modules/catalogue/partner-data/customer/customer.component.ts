@@ -35,6 +35,7 @@ export class CustomerComponent extends AppList {
     saleMans: any[] = [];
     headerSaleman: CommonInterface.IHeaderTable[];
     headers: CommonInterface.IHeaderTable[];
+    services: any[] = [];
     @ViewChild(AppPaginationComponent, { static: false }) child;
     @Output() deleteConfirm = new EventEmitter<Partner>();
     @Output() detail = new EventEmitter<any>();
@@ -72,9 +73,10 @@ export class CustomerComponent extends AppList {
             { title: 'Fax', field: 'fax', sortable: true },
             { title: 'Creator', field: 'userCreatedName', sortable: true },
             { title: 'Modify', field: 'datetimeModified', sortable: true },
-            { title: 'Inactive', field: 'inactive', sortable: true },
+            { title: 'Status', field: 'active', sortable: true },
 
         ];
+        this.getService();
     }
     async getPartnerData(pager: PagerSetting, criteria?: any) {
         if (criteria != undefined) {
@@ -92,9 +94,21 @@ export class CustomerComponent extends AppList {
         this.detail.emit(item);
     }
 
+    replaceService() {
+        for (const item of this.saleMans) {
+
+            this.services.forEach(itemservice => {
+                if (item.service === itemservice.id) {
+                    item.service = itemservice.text;
+                }
+            });
+        }
+    }
+
     showSaleman(partnerId: string, indexs: number) {
         if (!!this.customers[indexs].saleManRequests.length) {
             this.saleMans = this.customers[indexs].saleManRequests;
+            this.replaceService();
         } else {
             this._progressRef.start();
             this._catalogueRepo.getListSaleman(partnerId)
@@ -104,17 +118,8 @@ export class CustomerComponent extends AppList {
                 ).subscribe(
                     (res: Saleman[]) => {
                         this.saleMans = res || [];
-                        if (this.saleMans.length > 0) {
-                            for (let item of this.saleMans) {
-                                if (item.status === true) {
-                                    item.status = "actived";
-                                }
-                                else {
-                                    item.status = "active";
-                                }
-                            }
-                        }
                         this.customers[indexs].saleManRequests = this.saleMans;
+                        this.replaceService();
                     }
                 );
         }
@@ -186,6 +191,17 @@ export class CustomerComponent extends AppList {
         this.excelService.generateExcel(exportModel);
     }
 
+    getService() {
+        this._catalogueRepo.getListService()
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.services = this.utility.prepareNg2SelectData(res, 'value', 'displayName');
+                    }
+                },
+            );
+    }
 
     sortCustomers(sort: string): void {
         this.customers = this.sortService.sort(this.customers, sort, this.order);

@@ -534,7 +534,7 @@
                         </div>
                         <div class="col-lg-2">
                             <div class="form-group">
-                                <label class="form-control-label">Inactive</label>
+                                <label class="form-control-label">Active</label>
 
                                 <div class="m-checkbox-inline">
                                     <label class="m-checkbox"><input type="checkbox" name="inactiveCheckbox"
@@ -619,11 +619,10 @@
                                         <td>
                                             <span>{{sale.company}}</span>
                                         </td>
+                                        <td [ngClass]="sale.status ? 'text-success' : 'text-danger'">
+                                            {{sale.status ? 'Active' : 'Inactive'}}</td>
                                         <td>
-                                            <span>{{sale.statusstr}}</span>
-                                        </td>
-                                        <td>
-                                            <span>{{sale.modifiedDate  | date: 'dd/MM/yyyy'}}</span>
+                                            <span>{{sale.createDate  | date: 'dd/MM/yyyy'}}</span>
                                         </td>
                                     </tr>
 

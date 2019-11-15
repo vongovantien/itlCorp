@@ -668,11 +668,10 @@
                                         <td>
                                             <span>{{sale.company}}</span>
                                         </td>
+                                        <td [ngClass]="sale.status ? 'text-success' : 'text-danger'">
+                                            {{sale.status ? 'Active' : 'Inactive'}}</td>
                                         <td>
-                                            <span>{{sale.status}}</span>
-                                        </td>
-                                        <td>
-                                            <span>{{sale.modifiedDate  | date: 'dd/MM/yyyy'}}</span>
+                                            <span>{{sale.createDate  | date: 'dd/MM/yyyy'}}</span>
                                         </td>
                                     </tr>
 

@@ -25,6 +25,8 @@ namespace eFMS.API.Operation.DL.Services
         private readonly ICurrentUser currentUser;
         private readonly ICatDepartmentApiService catDepartmentApi;
         private readonly IContextBase<OpsTransaction> opsTransRepository;
+        private readonly IContextBase<CsTransaction> csTransactionReporsitory;
+
         private readonly IContextBase<SysUser> userRepository;
 
         public OpsStageAssignedService(IContextBase<OpsStageAssigned> repository, IMapper mapper,
@@ -32,13 +34,14 @@ namespace eFMS.API.Operation.DL.Services
             ICurrentUser user,
             ICatDepartmentApiService departmentApi,
             IContextBase<OpsTransaction> opsTransRepo,
-            IContextBase<SysUser> userRepo) : base(repository, mapper)
+            IContextBase<SysUser> userRepo, IContextBase<CsTransaction> csTransactionRepo) : base(repository, mapper)
         {
             catStageApi = stageApi;
             currentUser = user;
             catDepartmentApi = departmentApi;
             opsTransRepository = opsTransRepo;
             userRepository = userRepo;
+            csTransactionReporsitory = csTransactionRepo;
         }
 
         public HandleState Add(OpsStageAssignedEditModel model)
@@ -47,8 +50,8 @@ namespace eFMS.API.Operation.DL.Services
             assignedItem.Id = Guid.NewGuid();
             assignedItem.Status = Constants.InSchedule;
             assignedItem.RealPersonInCharge = assignedItem.MainPersonInCharge;
-            assignedItem.CreatedDate = assignedItem.ModifiedDate = DateTime.Now;
-            assignedItem.UserCreated = currentUser.UserID;
+            assignedItem.DatetimeCreated = assignedItem.DatetimeModified = DateTime.Now;
+            //assignedItem.UserCreated = currentUser.UserID;
             var orderNumberProcess = DataContext.Count(x => x.JobId == model.JobId);
             assignedItem.OrderNumberProcessed = orderNumberProcess + 1;
             var hs = DataContext.Add(assignedItem);
@@ -79,7 +82,7 @@ namespace eFMS.API.Operation.DL.Services
                     assignedItem.JobId = jobId;
                     assignedItem.Deadline = item.Deadline ?? null;
                     assignedItem.Status = Constants.InSchedule;
-                    assignedItem.CreatedDate = assignedItem.ModifiedDate = DateTime.Now;
+                    assignedItem.DatetimeCreated = assignedItem.DatetimeModified = DateTime.Now;
                     assignedItem.UserCreated = currentUser.UserID;
                     DataContext.Add(assignedItem, false);
                 }
@@ -87,7 +90,7 @@ namespace eFMS.API.Operation.DL.Services
                 {
                     var assignedToUpdate = DataContext.First(x => x.Id == item.Id);
                     assignedToUpdate.UserModified = currentUser.UserID;
-                    assignedToUpdate.ModifiedDate = DateTime.Now;
+                    assignedToUpdate.DatetimeModified = DateTime.Now;
                     assignedToUpdate.OrderNumberProcessed = item.OrderNumberProcessed;
                     DataContext.Update(assignedToUpdate, x => x.Id == assignedToUpdate.Id, false);
                 }
@@ -154,26 +157,52 @@ namespace eFMS.API.Operation.DL.Services
         {
             var assigned = mapper.Map<OpsStageAssigned>(model);
             assigned.UserModified = currentUser.UserID;
-            assigned.ModifiedDate = DateTime.Now;
+            assigned.DatetimeModified = DateTime.Now;
             var stageAssigneds = DataContext.Get(x => x.JobId == model.JobId);
             var job = opsTransRepository.First(x => x.Id == model.JobId);
-            if (job.CurrentStatus != Constants.Deleted && job.CurrentStatus != Constants.Finish)
+            var jobCsTransaction = csTransactionReporsitory.First(x => x.Id == model.JobId);
+            if (job == null)
             {
-                if (assigned.Status?.Trim() == DataTypeEx.GetStageStatus(StageEnum.Overdue))
+                if (jobCsTransaction.CurrentStatus != Constants.Deleted && jobCsTransaction.CurrentStatus != Constants.Finish)
                 {
-                    job.CurrentStatus = Constants.Overdue;
-                }
-                if (assigned.Status.Contains(DataTypeEx.GetStageStatus(StageEnum.Done)))
-                {
-                    var others = stageAssigneds.Where(x => x.Id != model.Id);
-                    if(others.All(x => x.Status.Contains(Constants.Done)))
+                    if (assigned.Status?.Trim() == DataTypeEx.GetStageStatus(StageEnum.Overdue))
                     {
-                        job.CurrentStatus = Constants.Finish;
+                        jobCsTransaction.CurrentStatus = Constants.Overdue;
+                    }
+                    if (assigned.Status.Contains(DataTypeEx.GetStageStatus(StageEnum.Done)))
+                    {
+                        var others = stageAssigneds.Where(x => x.Id != model.Id);
+                        if (others.All(x => x.Status.Contains(Constants.Done)))
+                        {
+                            jobCsTransaction.CurrentStatus = Constants.Finish;
+                        }
+                    }
+                    if (jobCsTransaction.CurrentStatus?.Trim() == Constants.InSchedule && assigned.Status.Trim() == Constants.Processing)
+                    {
+                        jobCsTransaction.CurrentStatus = Constants.Processing;
                     }
                 }
-                if(job.CurrentStatus?.Trim() == Constants.InSchedule && assigned.Status.Trim() == Constants.Processing)
+            }
+            else
+            {
+                if (job.CurrentStatus != Constants.Deleted && job.CurrentStatus != Constants.Finish)
                 {
-                    job.CurrentStatus = Constants.Processing;
+                    if (assigned.Status?.Trim() == DataTypeEx.GetStageStatus(StageEnum.Overdue))
+                    {
+                        job.CurrentStatus = Constants.Overdue;
+                    }
+                    if (assigned.Status.Contains(DataTypeEx.GetStageStatus(StageEnum.Done)))
+                    {
+                        var others = stageAssigneds.Where(x => x.Id != model.Id);
+                        if (others.All(x => x.Status.Contains(Constants.Done)))
+                        {
+                            job.CurrentStatus = Constants.Finish;
+                        }
+                    }
+                    if (job.CurrentStatus?.Trim() == Constants.InSchedule && assigned.Status.Trim() == Constants.Processing)
+                    {
+                        job.CurrentStatus = Constants.Processing;
+                    }
                 }
             }
             var result = new HandleState();
@@ -183,8 +212,17 @@ namespace eFMS.API.Operation.DL.Services
                 SubmitChanges();
                 if (result.Success)
                 {
-                    opsTransRepository.Update(job, x => x.Id == job.Id);
-                    opsTransRepository.SubmitChanges();
+                    if(job == null)
+                    {
+                        csTransactionReporsitory.Update(jobCsTransaction, x => x.Id == jobCsTransaction.Id);
+                        csTransactionReporsitory.SubmitChanges();
+                    }
+                    else
+                    {
+                        opsTransRepository.Update(job, x => x.Id == job.Id);
+                        opsTransRepository.SubmitChanges();
+                    }
+                  
                 }
             }
             catch (Exception ex)
@@ -208,7 +246,7 @@ namespace eFMS.API.Operation.DL.Services
                 assignedItem.StageNameEN = stage?.StageNameEn;
                 assignedItem.Status = assignedItem.Status?.Trim();
                 assignedItem.DepartmentName = stage == null? null: departments?.FirstOrDefault(x => x.Id == stage.DepartmentId)?.DeptName;
-                assignedItem.DoneDate = item.Status?.Trim() == DataTypeEx.GetStageStatus(StageEnum.Done) ? item.ModifiedDate : null;
+                assignedItem.DoneDate = item.Status?.Trim() == DataTypeEx.GetStageStatus(StageEnum.Done) ? item.DatetimeModified : null;
                 assignedItem.Description = assignedItem.Description ?? stages.FirstOrDefault(x => x.Id == item.StageId).DescriptionEn;
                 assignedItem.MainPersonInCharge = assignedItem.MainPersonInCharge != null ? users.FirstOrDefault(x => x.Id == assignedItem.MainPersonInCharge)?.Username : assignedItem.MainPersonInCharge;
                 assignedItem.RealPersonInCharge = assignedItem.RealPersonInCharge != null ? users.FirstOrDefault(x => x.Id == assignedItem.RealPersonInCharge)?.Username : assignedItem.RealPersonInCharge;
