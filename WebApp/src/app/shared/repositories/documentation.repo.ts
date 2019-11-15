@@ -349,4 +349,9 @@ export class DocumentationRepo {
         );
     }
 
+    previewSIFCdNote(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/PreviewSIFCdNote`, body).pipe(
+            map((data: any) => data)
+        );
+    }
 }
