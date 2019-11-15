@@ -104,62 +104,12 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatUnitModel> Query(CatUnitCriteria criteria)
         {
-            //IQueryable<CatUnit> data = RedisCacheHelper.Get<CatUnit>(cache, Templates.CatUnit.NameCaching.ListName);
-            //IQueryable<CatUnit> list = null;
-            //Expression<Func<CatUnit, bool>> query = null;
-            //if (criteria.All == null)
-            //{
-            //    query = x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
-            //                            && (x.UnitNameVn ?? "").IndexOf(criteria.UnitNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
-            //                            && (x.UnitNameEn ?? "").IndexOf(criteria.UnitNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
-            //                            && (x.UnitType ?? "").IndexOf(criteria.UnitType ?? "", StringComparison.OrdinalIgnoreCase) > -1
-            //                            && (x.Active == criteria.Active || criteria.Active == null);
-            //    //);
-            //}
-            //else
-            //{
-            //    query = x => ((x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-            //                                                    || (x.UnitNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-            //                                                    || (x.UnitNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-            //                                                    || (x.UnitType ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-            //                                                    && (x.Active == criteria.Active || criteria.Active == null);
-            //}
-            //list = Query(data, query);
-            //return list;
-            //Expression<Func<CatUnit, bool>> query = null;
-            //if (criteria.All == null)
-            //{
-            //    query = x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
-            //                            && (x.UnitNameVn ?? "").IndexOf(criteria.UnitNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
-            //                            && (x.UnitNameEn ?? "").IndexOf(criteria.UnitNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
-            //                            && (x.UnitType ?? "").IndexOf(criteria.UnitType ?? "", StringComparison.OrdinalIgnoreCase) > -1
-            //                            && (x.Active == criteria.Active || criteria.Active == null);
-            //    //);
-            //}
-            //else
-            //{
-            //    query = x => ((x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-            //                                                    || (x.UnitNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-            //                                                    || (x.UnitNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-            //                                                    || (x.UnitType ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-            //                                                    && (x.Active == criteria.Active || criteria.Active == null);
-            //}
             var data = GetBy(criteria);
             if (data == null) return null;
             return data.ProjectTo<CatUnitModel>(mapper.ConfigurationProvider);
         }
         private IQueryable<CatUnit> GetBy(CatUnitCriteria criteria)
         {
-            //if (dataFromCache == null)
-            //{
-            //    RedisCacheHelper.SetObject(cache, Templates.CatUnit.NameCaching.ListName, DataContext.Get());
-            //    return DataContext.Get(query);
-            //}
-            //else
-            //{
-            //    return dataFromCache.Where(query);
-            //}
-            //var data = GetAll().Where(query);
             Expression<Func<CatUnit, bool>> query = null;
             if (criteria.All == null)
             {

@@ -92,10 +92,13 @@ namespace eFMS.API.Catalogue.DL.Services
                 foreach(var item in data)                {
                     var charge = charges.FirstOrDefault(x => x.Code == item.ChargeCode);
                     var listChargeDefaultAcc = chargeDefaults.Where(x => x.ChargeId == charge.Id).ToList();
+                    bool active = !string.IsNullOrEmpty(item.Status) && (item.Status.ToLower() == "active");
+                    DateTime? inactiveDate = active == false ? (DateTime?)DateTime.Now : null;
                     var defaultAccount = new CatChargeDefaultAccount
                     {
                         ChargeId = charge.Id,
-                        Active = (item.Status==null)?false:item.Status.ToString().ToLower() == "active" ? false : true,
+                        Active = active,
+                        InactiveOn = inactiveDate,
                         UserCreated = currentUser.UserID,
                         UserModified = currentUser.UserID,
                         DatetimeCreated = DateTime.Now,                        

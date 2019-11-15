@@ -320,7 +320,7 @@ namespace eFMS.API.Catalogue.Controllers
                     CountryName = worksheet.Cells[row, 5].Value?.ToString().Trim(),
                     ProvinceName = worksheet.Cells[row, 6].Value?.ToString().Trim(),
                     DistrictName = worksheet.Cells[row, 7].Value?.ToString().Trim(),
-                    Status = worksheet.Cells[row, 8].Value?.ToString()
+                    Status = worksheet.Cells[row, 8].Value?.ToString().Trim()
                 };
                 list.Add(warehouse);
             }

@@ -12,7 +12,6 @@ using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Common.Globals;
 using Microsoft.Extensions.Localization;
 using eFMS.API.Catalogue.DL.Common;
-using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Common.NoSql;
 using Microsoft.Extensions.Caching.Distributed;
 using eFMS.API.Common.Helpers;
@@ -23,10 +22,16 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly IDistributedCache cache;
-        public CatStageService(IContextBase<CatStage> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer, IDistributedCache distributedCache) : base(repository, mapper)
+        private readonly IContextBase<CatDepartment> departmentRepository;
+        public CatStageService(IContextBase<CatStage> repository, 
+            IMapper mapper, 
+            IStringLocalizer<LanguageSub> localizer, 
+            IDistributedCache distributedCache,
+            IContextBase<CatDepartment> departmentRepo) : base(repository, mapper)
         {
             stringLocalizer = localizer;
             cache = distributedCache;
+            departmentRepository = departmentRepo;
             SetChildren<OpsStageAssigned>("Id", "StageId");
         }        
         
@@ -54,48 +59,52 @@ namespace eFMS.API.Catalogue.DL.Services
         public List<CatStageModel> GetStages(CatStageCriteria criteria, int page, int size, out int rowsCount)
         {
             List<CatStageModel> returnList = new List<CatStageModel>();
-            var result = new List<CatStage>();
             var departmentList = new List<CatDepartment>();
+            IQueryable<CatStage> stages = null;
+            IQueryable<CatDepartment> departments = null;
             if (criteria.condition == SearchCondition.AND)
             {
-                var s = DataContext.Get(stage => (stage.Id == criteria.Id || criteria.Id == 0)
-                                    && ((stage.StageNameEn ?? "").IndexOf(criteria.StageNameEn ?? "") >= 0)
-                                    && ((stage.StageNameVn ?? "").IndexOf(criteria.StageNameVn ?? "") >= 0)
-                                    && ((stage.Code ?? "").IndexOf(criteria.Code ?? "") >= 0)
+                stages = DataContext.Get(stage => (stage.Id == criteria.Id || criteria.Id == 0)
+                                    && (stage.StageNameEn ?? "").IndexOf(criteria.StageNameEn ?? "", StringComparison.Ordinal) > -1
+                                    && (stage.StageNameVn ?? "").IndexOf(criteria.StageNameVn ?? "", StringComparison.Ordinal) > -1
+                                    && (stage.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.Ordinal) > -1
                                     && (stage.Active == criteria.Active || criteria.Active == null))
                                     .OrderByDescending(x => x.DatetimeModified);
 
-                var t = ((eFMSDataContext)DataContext.DC).CatDepartment.Where(x => (x.DeptName ?? "").IndexOf(criteria.DepartmentName ?? "") >= 0);
-                result = (from i in s
+                departments = departmentRepository.Get(x => (x.DeptName ?? "").IndexOf(criteria.DepartmentName ?? "", StringComparison.Ordinal) > -1);
+                //var result = (from i in stages
 
-                          join department in t on i.DepartmentId equals department.Id
-                          select i).ToList();
+                //              join department in departments on i.DepartmentId equals department.Id
+                //          select new { stage = i, department });
             
             }
             else
             {
-                var s = DataContext.Get().OrderByDescending(x => x.DatetimeModified);
-                var t = ((eFMSDataContext)DataContext.DC).CatDepartment;
-                
-                 result = s.Join(t, stage => stage.DepartmentId, department => department.Id, (stage, department) => new { stage, department }).Where(x => 
-                    ((x.department.DeptName ?? "").IndexOf(criteria.DepartmentName ?? "") >= 0
-                    || (x.stage.StageNameEn ?? "").IndexOf(criteria.StageNameEn ?? "") >= 0
-                    || (x.stage.StageNameVn ?? "").IndexOf(criteria.StageNameVn ?? "") >= 0
-                    || (x.stage.Code ?? "").IndexOf(criteria.Code ?? "")>=0
-                    || (x.stage.Id == criteria.Id)))
-                    .Select(x => x.stage).ToList();              
+                stages = DataContext.Get(x => (x.StageNameEn ?? "").IndexOf(criteria.StageNameEn ?? "", StringComparison.Ordinal) > -1
+                                           || (x.StageNameVn ?? "").IndexOf(criteria.StageNameVn ?? "", StringComparison.Ordinal) > -1
+                                           || (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.Ordinal) > -1
+                                           || (x.Id == criteria.Id)).OrderByDescending(x => x.DatetimeModified);
+                departments = departmentRepository.Get(x => (x.DeptName ?? "").IndexOf(criteria.DepartmentName ?? "", StringComparison.Ordinal) > -1);
+                //results = stages.Join(departments, stage => stage.DepartmentId, department => department.Id, (stage, department) => new { stage, department })
+                //    .Where(x => 
+                //    ((x.department.DeptName ?? "").IndexOf(criteria.DepartmentName ?? "", StringComparison.Ordinal) > -1
+                //    || (x.stage.StageNameEn ?? "").IndexOf(criteria.StageNameEn ?? "", StringComparison.Ordinal) > -1
+                //    || (x.stage.StageNameVn ?? "").IndexOf(criteria.StageNameVn ?? "", StringComparison.Ordinal) > -1
+                //    || (x.stage.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.Ordinal) > -1
+                //    || (x.stage.Id == criteria.Id)))
+                //    .Select(x => x.stage);
             }
+            var results = stages.Join(departments, x => x.DepartmentId, y => y.Id, (x, y) => new { Stage = x, department = y });
 
-            rowsCount = result.Count;
+            rowsCount = results.Count();
             
-            foreach(var stage in result)
+            foreach(var item in results)
             {
-                var department = ((eFMSDataContext)DataContext.DC).CatDepartment.Where(x => x.Id == stage.DepartmentId).FirstOrDefault();
-                //var returnStage = new { stage, department?.DeptName,department?.Code };
-                CatStageModel item = mapper.Map<CatStageModel>(stage);
-                item.DeptName = department?.DeptName;
-                item.DeptCode = department?.Code;
-                returnList.Add(item);               
+                //var department = departmentRepository.Get(x => x.Id == stage.DepartmentId)?.FirstOrDefault();
+                CatStageModel stage = mapper.Map<CatStageModel>(item.Stage);
+                stage.DeptName = item.department?.DeptName;
+                stage.DeptCode = item.department?.Code;
+                returnList.Add(stage);               
             }
 
             if (size > 1)
@@ -120,11 +129,12 @@ namespace eFMS.API.Catalogue.DL.Services
             if (criteria.condition == SearchCondition.AND)
             {
                 var s = DataContext.Get(stage => (stage.Id == criteria.Id || criteria.Id == 0)
-                                    && ((stage.StageNameEn ?? "").IndexOf(criteria.StageNameEn ?? "") >= 0)
-                                    && ((stage.StageNameVn ?? "").IndexOf(criteria.StageNameVn ?? "") >= 0)
-                                    && ((stage.Code ?? "").IndexOf(criteria.Code ?? "") >= 0));
+                                    && (stage.StageNameEn ?? "").IndexOf(criteria.StageNameEn ?? "", StringComparison.Ordinal) > -1
+                                    && (stage.StageNameVn ?? "").IndexOf(criteria.StageNameVn ?? "", StringComparison.Ordinal) > -1
+                                    && (stage.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.Ordinal) > -1
+                                    );
 
-                var t = ((eFMSDataContext)DataContext.DC).CatDepartment.Where(x => (x.DeptName ?? "").IndexOf(criteria.DepartmentName ?? "") >= 0);
+                var t = departmentRepository.Get(x => (x.DeptName ?? "").IndexOf(criteria.DepartmentName ?? "", StringComparison.Ordinal) >-1);
                 result = (from i in s
 
                           join department in t on i.DepartmentId equals department.Id
@@ -134,20 +144,19 @@ namespace eFMS.API.Catalogue.DL.Services
             else
             {
                 var s = DataContext.Get();
-                var t = ((eFMSDataContext)DataContext.DC).CatDepartment;
+                var t = departmentRepository.Get();
 
                 result = s.Join(t, stage => stage.DepartmentId, department => department.Id, (stage, department) => new { stage, department }).Where(x => ((x.department.DeptName ?? "").IndexOf(criteria.DepartmentName ?? "") >= 0)
-                   || ((x.stage.StageNameEn ?? "").IndexOf(criteria.StageNameEn ?? "") >= 0)
-                   || ((x.stage.StageNameVn ?? "").IndexOf(criteria.StageNameVn ?? "") >= 0)
-                   || ((x.stage.Code ?? "").IndexOf(criteria.Code ?? "") >= 0)
+                   || (x.stage.StageNameEn ?? "").IndexOf(criteria.StageNameEn ?? "", StringComparison.Ordinal) > -1
+                   || (x.stage.StageNameVn ?? "").IndexOf(criteria.StageNameVn ?? "", StringComparison.Ordinal) > -1
+                   || (x.stage.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.Ordinal) > -1
                    || (x.stage.Id == criteria.Id))
                    .Select(x => x.stage).ToList();
             }         
 
             foreach (var stage in result)
             {
-                var department = ((eFMSDataContext)DataContext.DC).CatDepartment.Where(x => x.Id == stage.DepartmentId).FirstOrDefault();
-                //var returnStage = new { stage, department?.DeptName, department?.Code };
+                var department = departmentRepository.Get(x => x.Id == stage.DepartmentId)?.FirstOrDefault();
                 var item = mapper.Map<CatStageModel>(stage);
                 item.DeptName = department?.DeptName;
                 item.DeptCode = department?.Code;
@@ -164,8 +173,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatStageImportModel> CheckValidImport(List<CatStageImportModel> list)
         {
-            eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
-            var stages = dc.CatStage.ToList();
+            var stages = DataContext.Get().ToList();
             list.ForEach(item =>
             {
                
@@ -212,9 +220,10 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             try
             {
-                eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 foreach(var item in data)
                 {
+                    bool active = !string.IsNullOrEmpty(item.Status) && (item.Status.ToLower() == "active");
+                    DateTime? inactiveDate = active == false ? (DateTime?)DateTime.Now : null;
                     var stage = new CatStage
                     {
                         Code = item.Code,
@@ -225,11 +234,12 @@ namespace eFMS.API.Catalogue.DL.Services
                         DescriptionVn = item.DescriptionVn,
                         DatetimeCreated = DateTime.Now,
                         UserCreated = ChangeTrackerHelper.currentUser,
-                        Active = item.Status.ToString().ToLower()=="active"?false:true
+                        Active = active,
+                        InactiveOn = inactiveDate
                     };
-                    dc.CatStage.Add(stage);
+                    DataContext.Add(stage, false);
                 }
-                dc.SaveChanges();
+                DataContext.SubmitChanges();
 
                 cache.Remove(Templates.CatStage.NameCaching.ListName);
                 return new HandleState();
