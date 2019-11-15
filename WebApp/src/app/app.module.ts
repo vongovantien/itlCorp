@@ -33,7 +33,9 @@ import { AuthInterceptor } from "./auth.interceptor";
 import { AppRoutingModule } from "./app-routing.module";
 import { StoreDevtoolsModule } from "@ngrx/store-devtools";
 import { environment } from "src/environments/environment";
-import { IdentityRepo } from "./shared/repositories";
+
+import { StoreRouterConnectingModule, RouterStateSerializer } from '@ngrx/router-store';
+import { reducers, CustomSerializer } from "./store";
 
 
 @NgModule({
@@ -69,12 +71,13 @@ import { IdentityRepo } from "./shared/repositories";
         HighchartsChartModule,
         NgProgressModule,
 
-        StoreModule.forRoot({}),
+        StoreModule.forRoot(reducers),
         EffectsModule.forRoot([]),
         StoreDevtoolsModule.instrument({
             maxAge: 25, // Retains last 25 states
             logOnly: !environment.production, // Restrict extension to log-only mode
         }),
+        StoreRouterConnectingModule.forRoot(),
 
     ],
     providers: [
@@ -85,6 +88,9 @@ import { IdentityRepo } from "./shared/repositories";
             useClass: AuthInterceptor,
             multi: true,
         },
+        {
+            provide: RouterStateSerializer, useClass: CustomSerializer
+        }
     ],
 
     bootstrap: [AppComponent],
