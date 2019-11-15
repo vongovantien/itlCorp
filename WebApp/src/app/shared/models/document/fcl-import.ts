@@ -1,6 +1,6 @@
 import { BaseModel } from "../base.model";
-import { CommonEnum } from "../../enums/common.enum";
 import { Container } from "./container.model";
+import { CommonEnum } from "../../enums/common.enum";
 
 export class FCLImportAddModel extends BaseModel {
     transactionTypeEnum: CommonEnum.TransactionTypeEnum = 7;

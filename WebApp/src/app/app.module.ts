@@ -33,6 +33,7 @@ import { AuthInterceptor } from "./auth.interceptor";
 import { AppRoutingModule } from "./app-routing.module";
 import { StoreDevtoolsModule } from "@ngrx/store-devtools";
 import { environment } from "src/environments/environment";
+import { IdentityRepo } from "./shared/repositories";
 
 
 @NgModule({

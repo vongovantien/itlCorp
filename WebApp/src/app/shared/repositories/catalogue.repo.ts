@@ -294,6 +294,15 @@ export class CatalogueRepo {
         );
     }
 
+
+    checkExistedSaleman(service: string, office: string) {
+        const body = { service: service, office: office };
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/CheckExisted`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+
     getListSaleManDetail(page?: number, size?: number, body: any = {}) {
         if (!!page && !!size) {
             return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/paging`, body, {
@@ -370,6 +379,17 @@ export class CatalogueRepo {
     }
     getDetailCountry(id: number) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCountry/getById/` + id)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    convertExchangeRate(date: string, fromCurrency: string, localCurrency: string = 'VND') {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCurrencyExchange/ConvertRate`, {
+            date: date,
+            localCurrency: localCurrency,
+            fromCurrency: fromCurrency
+        })
             .pipe(
                 map((data: any) => data)
             );

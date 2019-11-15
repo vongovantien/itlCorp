@@ -15,6 +15,7 @@ export const getSurchargeState = createSelector(shareBussinessState, (state: ISh
 export const getBuyingSurChargeState = createSelector(shareBussinessState, (state: IShareBussinessState) => state.surcharge.buyings);
 export const getSellingSurChargeState = createSelector(shareBussinessState, (state: IShareBussinessState) => state.surcharge.sellings);
 export const getOBHSurChargeState = createSelector(shareBussinessState, (state: IShareBussinessState) => state.surcharge.obhs);
+export const getProfitState = createSelector(shareBussinessState, (state: IShareBussinessState) => state.surcharge.profit);
 
 
 

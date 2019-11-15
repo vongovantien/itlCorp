@@ -16,7 +16,19 @@
             </div>
             <div class="col-md-8">
                 <div class="m--align-right">
-                    <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase"
+                    <ng-container *ngIf="!charges.length">
+                        <button type="button"
+                            class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase m--margin-right-20"
+                            (click)="syncFreightCharge()">
+                            <span>
+                                <i class="la la-cloud-download"></i>
+                                <span>
+                                    Sync Freight Charge
+                                </span>
+                            </span>
+                        </button>
+                    </ng-container>
+                    <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase "
                         (click)="saveSellingSurCharge()">
                         <span>
                             <i class="la la-save"></i>
@@ -25,11 +37,12 @@
                             </span>
                         </span>
                     </button>
+
                 </div>
             </div>
         </div>
         <div class="table-wrapper table-editable m--margin-top-20" [class.h]="!!charges.length">
-            <table class="table table-bordered">
+            <table class="table table-bordered dataTable-edit">
                 <thead app-table-header [headers]="headers"
                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                     <th class="m--w-90 first table-actions-col fixed-side">
@@ -200,55 +213,46 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>
-                                <app-switch [(toggle)]="charge.kickBack">
-                                </app-switch>
-                            </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="text" class="form-control" [(ngModel)]="charge.soano" disabled
-                                        placeholder="SOA">
+                                    <input type="text" class="form-control" [(ngModel)]="charge.soano" disabled>
                                 </div>
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="text" class="form-control" [(ngModel)]="charge.cdno" disabled
-                                        placeholder="CD Note">
+                                    <input type="text" class="form-control" [(ngModel)]="charge.cdno" disabled>
                                 </div>
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
                                     <input type="text" class="form-control" [(ngModel)]="charge.settlementCode" disabled
-                                        readonly placeholder="Settlement">
+                                        readonly>
                                 </div>
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="text" class="form-control" disabled placeholder="Voucher ID"
-                                        [(ngModel)]="charge.voucherId">
+                                    <input type="text" class="form-control" disabled [(ngModel)]="charge.voucherId">
                                 </div>
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="text" class="form-control" disabled placeholder="Voucher ID Date"
-                                        [(ngModel)]="charge.voucherIddate">
+                                    <input type="text" class="form-control" disabled [(ngModel)]="charge.voucherIddate">
                                 </div>
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="text" class="form-control" disabled placeholder="Voucher IDRE"
-                                        [(ngModel)]="charge.voucherIdre">
+                                    <input type="text" class="form-control" disabled [(ngModel)]="charge.voucherIdre">
                                 </div>
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="text" class="form-control" disabled placeholder="Voucher IDRE Date"
+                                    <input type="text" class="form-control" disabled
                                         [(ngModel)]="charge.voucherIdredate">
                                 </div>
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="text" class="form-control" disabled placeholder="Final Exchange Date"
+                                    <input type="text" class="form-control" disabled
                                         [(ngModel)]="charge.finalExchangeRate">
                                 </div>
                             </td>

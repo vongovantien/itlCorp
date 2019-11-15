@@ -137,7 +137,7 @@ export class PartnerDataDetailComponent extends AppList {
             { title: 'Office', field: 'office', sortable: true },
             { title: 'Company', field: 'company', sortable: true },
             { title: 'Status', field: 'status', sortable: true },
-            { title: 'ModifiedDate', field: 'modifiedDate', sortable: true }
+            { title: 'CreatedDate', field: 'createDate', sortable: true }
         ];
 
         this.route.params.subscribe(async (prams: any) => {
@@ -529,11 +529,16 @@ export class PartnerDataDetailComponent extends AppList {
                     if (this.saleMandetail.length > 0) {
                         for (let it of this.saleMandetail) {
                             if (it.status === true) {
-                                it.status = "Active";
+                                it.statusString = "Active";
                             }
                             else {
-                                it.status = "InActive";
+                                it.statusString = "InActive";
                             }
+                            this.services.forEach(item => {
+                                if (it.service === item.id) {
+                                    it.service = item.text;
+                                }
+                            });
                         }
                     }
                     this.totalItems = res.totalItems || 0;
@@ -543,14 +548,15 @@ export class PartnerDataDetailComponent extends AppList {
 
 
     onCreateSaleman(ngform: NgForm) {
-        if (this.strSalemanCurrent.length > 0) {
+
+        if (this.strSalemanCurrent.length > 0 && this.strOfficeCurrent.length > 0) {
             this.baseService.spinnerShow();
             const body = {
                 saleman_Id: this.strSalemanCurrent,
                 office: this.strOfficeCurrent,
                 company: this.strOfficeCurrent,
                 partnerId: this.partner.id,
-                effectdate: this.saleManToAdd.effectDate == null ? null : formatDate(this.saleManToAdd.effectDate.startDate, 'yyyy-MM-dd', 'en'),
+                effectdate: this.saleManToAdd.effectDate.startDate === null ? null : formatDate(this.saleManToAdd.effectDate.startDate, 'yyyy-MM-dd', 'en'),
                 description: this.saleManToAdd.description,
                 status: this.selectedStatus.value,
                 service: this.selectedService.id

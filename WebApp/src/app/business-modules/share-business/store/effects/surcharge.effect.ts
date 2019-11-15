@@ -4,7 +4,7 @@ import { Action } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { map, switchMap, catchError, finalize } from 'rxjs/operators';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { SurchargeActionTypes, GetBuyingSurchargeSuccessAction, SurchargeAction, GetBuyingSurchargeFailAction, GetSellingSurchargeSuccessAction, GetSellingSurchargeFailAction, GetOBHSurchargeSuccessAction, GetOBHSurchargeFailAction } from '../actions';
+import { SurchargeActionTypes, GetBuyingSurchargeSuccessAction, SurchargeAction, GetBuyingSurchargeFailAction, GetSellingSurchargeSuccessAction, GetSellingSurchargeFailAction, GetOBHSurchargeSuccessAction, GetOBHSurchargeFailAction, GetProfitSuccessAction, GetProfitFailFailAction } from '../actions';
 import { NgxSpinnerService } from 'ngx-spinner';
 
 @Injectable()
@@ -54,6 +54,20 @@ export class SurchargeEffects {
                     .pipe(
                         map((data: any) => new GetOBHSurchargeSuccessAction(data)),
                         catchError(err => of(new GetOBHSurchargeFailAction(err)))
+                    )
+            )
+        );
+
+    @Effect()
+    getHBLProfit$: Observable<Action> = this.actions$
+        .pipe(
+            ofType<SurchargeAction>(SurchargeActionTypes.GET_PROFIT),
+            map((payload: any) => payload.payload),
+            switchMap(
+                (hblid: string) => this._documentRepo.getHBLTotalProfit(hblid)
+                    .pipe(
+                        map((data: any) => new GetProfitSuccessAction(data)),
+                        catchError(err => of(new GetProfitFailFailAction(err)))
                     )
             )
         );

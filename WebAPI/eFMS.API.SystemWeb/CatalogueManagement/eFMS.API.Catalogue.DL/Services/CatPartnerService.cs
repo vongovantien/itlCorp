@@ -260,19 +260,19 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
         {
             try
             {
-                //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 foreach (var item in data)
                 {
+                    bool active = !string.IsNullOrEmpty(item.Status) && (item.Status.ToLower() == "active");
+                    DateTime? inactiveDate = active == false ? (DateTime?)DateTime.Now : null;
                     var partner = mapper.Map<CatPartner>(item);
                     partner.UserCreated = currentUser.UserID;
                     partner.DatetimeModified = DateTime.Now;
                     partner.DatetimeCreated = DateTime.Now;
                     partner.Id = partner.AccountNo = partner.TaxCode;
-                    partner.Active = true;
-                    //dc.CatPartner.Add(partner);
+                    partner.Active = active;
+                    partner.InactiveOn = inactiveDate;
                     DataContext.Add(partner, false);
                 }
-                //dc.SaveChanges();
                 DataContext.SubmitChanges();
                 cache.Remove(Templates.CatPartner.NameCaching.ListName);
                 return new HandleState();
@@ -284,7 +284,6 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
         }
         public List<CatPartnerImportModel> CheckValidImport(List<CatPartnerImportModel> list)
         {
-            //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var partners = GetPartners()?.ToList();
             var users = sysUserRepository.Get().ToList();
             var countries = RedisCacheHelper.GetObject<List<CatCountry>>(cache, Templates.CatCountry.NameCaching.ListName)?.AsQueryable();

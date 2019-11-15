@@ -93,25 +93,60 @@ export class PartnerDataAddnewComponent extends AppList {
     closepp(param: SalemanAdd) {
         this.saleManToAdd = param;
         this.poupSaleman.isDetail = false;
-        this.isDup = this.saleMandetail.some((saleMane: Saleman) => (saleMane.service === this.saleManToAdd.service && saleMane.office === this.saleManToAdd.office));
-
-        if (this.isDup) {
-            console.log("dup");
-            this.toastr.error('Duplicate service, office with sale man!');
-        } else {
-            this.saleMandetail.push(this.saleManToAdd);
-            this.poupSaleman.hide();
-            console.log(this.saleMandetail);
+        if (this.saleMandetail.length > 0) {
             for (let it of this.saleMandetail) {
-                if (it.status === true) {
-                    it.statusstr = "Active";
-                }
-                else {
-                    it.statusstr = "InActive";
-                }
+                this.services.forEach(item => {
+                    if (it.service === item.text) {
+                        it.service = item.id;
+                    }
+                });
             }
-
         }
+        this.isDup = this.saleMandetail.some((saleMane: Saleman) => (saleMane.service === this.saleManToAdd.service && saleMane.office === this.saleManToAdd.office));
+        if (this.isDup) {
+            for (let it of this.saleMandetail) {
+                this.services.forEach(item => {
+                    if (it.service === item.id) {
+                        it.service = item.text;
+                    }
+                });
+            }
+        }
+        if (this.saleManToAdd.service !== null && this.saleManToAdd.office !== null) {
+            this._catalogueRepo.checkExistedSaleman(this.saleManToAdd.service, this.saleManToAdd.office)
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (res: any) => {
+                        if (!!res) {
+                            if (this.isDup) {
+                                console.log("dup");
+                                this.toastr.error('Duplicate service, office with sale man!');
+                            } else {
+                                this.saleMandetail.push(this.saleManToAdd);
+                                this.poupSaleman.hide();
+                                console.log(this.saleMandetail);
+                                for (let it of this.saleMandetail) {
+                                    if (it.status === true) {
+                                        it.statusstr = "Active";
+                                    }
+                                    else {
+                                        it.statusstr = "InActive";
+                                    }
+                                    this.services.forEach(item => {
+                                        if (it.service === item.id) {
+                                            it.service = item.text;
+                                        }
+                                    });
+                                }
+
+                            }
+                        }
+
+                    },
+                );
+        }
+
+
     }
 
     closeppAndDeleteSaleman(index: any) {
@@ -154,7 +189,7 @@ export class PartnerDataAddnewComponent extends AppList {
             { title: 'Office', field: 'office', sortable: true },
             { title: 'Company', field: 'company', sortable: true },
             { title: 'Status', field: 'status', sortable: true },
-            { title: 'ModifiedDate', field: 'modifiedDate', sortable: true }
+            { title: 'CreatedDate', field: 'createDate', sortable: true }
         ];
         this.route.params.subscribe(prams => {
             console.log({ param: prams });
@@ -365,6 +400,22 @@ export class PartnerDataAddnewComponent extends AppList {
                 if (this.isShowSaleMan) {
                     this.toastr.error('Please add saleman and service for customer!');
                     return;
+                }
+            }
+
+            if (this.saleMandetail.length > 0) {
+                for (let it of this.saleMandetail) {
+                    if (it.status === true) {
+                        it.statusstr = "Active";
+                    }
+                    else {
+                        it.statusstr = "InActive";
+                    }
+                    this.services.forEach(item => {
+                        if (it.service === item.text) {
+                            it.service = item.id;
+                        }
+                    });
                 }
             }
 
@@ -665,7 +716,6 @@ export class PartnerDataAddnewComponent extends AppList {
     }
 
     showDetailSaleMan(saleman: Saleman, index: any) {
-        this.poupSaleman.show();
         this.poupSaleman.index = index;
         const saleMane: any = {
             description: saleman.description,
@@ -679,16 +729,8 @@ export class PartnerDataAddnewComponent extends AppList {
 
         };
         this.poupSaleman.showSaleman(saleMane);
-        // this.saleMantoView.description = saleman.description;
-        // this.saleMantoView.effectDate = saleman.effectDate == null ? null : formatDate(saleman.effectDate, 'yyyy-MM-dd', 'en');
-        // this.saleMantoView.statusString = saleman.status === true ? 'Active' : 'Inactive';
-        // this.saleMantoView.office = saleman.office;
-        // this.saleMantoView.service = saleman.service;
-        // this.saleMantoView.saleman_ID = saleman.saleman_ID;
-        // this.saleMantoView.id = saleman.id;
-        // this.saleMantoView.createDate = saleman.createDate;
-        // this.saleMantoView.userCreated = saleman.userCreated;
-        // this.saleMantoView.userCreated = saleman.userCreated;
+
+        this.poupSaleman.show();
     }
 
     sortBySaleMan(sortData: CommonInterface.ISortData): void {
