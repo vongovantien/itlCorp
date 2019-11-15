@@ -37,35 +37,21 @@
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <!-- {{configSaleman.dataSource | json}} -->
-                        <!-- <div class="form-group" [ngClass]="{'m-form__group has-danger': !selectedSaleman.value }">
-                            <label class="form-control-label">
-                                Saleman in Charge <span class="m--font-danger">(*)</span>
-                            </label>
-                            <app-combo-grid [data]="saleMans" [headers]="headersSaleman"
-                                (onClick)="onSelectDataFormInfo($event,'saleMan')">
-                            </app-combo-grid>
-                            <div class="form-control-feedback" *ngIf="isSubmited && !selectedSaleman.value ">
-                                Saleman in Charge is required!
-                            </div>
-                        </div> -->
-                        <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': isSubmited && (!keyword || !selectedSaleman)}">
+                        <div class="form-group dropdown-saleman" (clickOutside)="isShowSaleMan = false"
+                            [ngClass]="{'m-form__group has-danger': !selectedSaleman.id }">
                             <label required>Saleman in Charge</label>
-                            <div (clickOutside)="onClickOutsideSalemanName()">
-                                <input [attr.disabled]="!selectedCustomer.value ? '' : null"
-                                    class="form-control m-input m-input--square dropdown-toggle" type="text"
-                                    placeholder="Input keyword" (click)="isShow = !isShow"
-                                    (ngModelChange)="onSearchAutoComplete($event)" [(ngModel)]="keyword"
-                                    [ngModelOptions]="{standalone: true}">
-                                <ng-container *ngIf="isShow">
-                                    <app-combo-grid [data]="saleMans" [headers]="headersSaleman"
-                                        (onClick)="onSelectDataFormInfo($event,'saleman')">
-                                    </app-combo-grid>
-                                </ng-container>
-                            </div>
-                            <div class="form-control-feedback" *ngIf="isSubmited && (!keyword || !selectedSaleman)">
-                                SaleMan is required !
+                            <input type="text" class="dropdown-toggle form-control" readonly placeholder="Please Select"
+                                (click)="isShowSaleMan = !isShowSaleMan" [(ngModel)]="selectedSaleman.username"
+                                [ngModelOptions]="{standalone: true}"
+                                [attr.disabled]="!selectedCustomer.value ? '' : null">
+                            <ng-container *ngIf="isShowSaleMan">
+                                <app-combo-grid [data]="saleMans" [headers]="headersSaleman"
+                                    [active]="selectedSaleman.id" (onClick)="onSelectDataFormInfo($event,'saleman')"
+                                    [fields]="['username']">
+                                </app-combo-grid>
+                            </ng-container>
+                            <div class="form-control-feedback" *ngIf="isSubmited && !selectedSaleman.id">
+                                Saleman is required !
                             </div>
                         </div>
                     </div>
@@ -82,7 +68,7 @@
                                 (itemSelected)="onSelectDataFormInfo($event, 'Shipper')"
                                 [displayFields]="configShipper.displayFields">
                             </app-combo-grid-virtual-scroll>
-                            <textarea rows="3" class="form-control m-input m-input--square"
+                            <textarea rows="6" class="form-control m-input m-input--square"
                                 formControlName="ShipperDescription"></textarea>
                         </div>
 
@@ -99,7 +85,7 @@
                                 (itemSelected)="onSelectDataFormInfo($event, 'Consignee')"
                                 [displayFields]="configConsignee.displayFields">
                             </app-combo-grid-virtual-scroll>
-                            <textarea rows="3" class="form-control m-input m-input--square"
+                            <textarea rows="6" class="form-control m-input m-input--square"
                                 formControlName="ConsigneeDescription"></textarea>
                             <div class="form-control-feedback" *ngIf="isSubmited && !selectedConsignee.value ">
                                 Consignee is required!
@@ -118,7 +104,7 @@
                                 (itemSelected)="onSelectDataFormInfo($event, 'NotifyParty')"
                                 [displayFields]="configNotifyParty.displayFields">
                             </app-combo-grid-virtual-scroll>
-                            <textarea rows="3" class="form-control m-input m-input--square"
+                            <textarea rows="6" class="form-control m-input m-input--square"
                                 formControlName="NotifyPartyDescription"></textarea>
                         </div>
                     </div>
@@ -135,7 +121,7 @@
                                 (itemSelected)="onSelectDataFormInfo($event, 'AlsoNotifyParty')"
                                 [displayFields]="configAlsoNotifyParty.displayFields">
                             </app-combo-grid-virtual-scroll>
-                            <textarea rows="3" class="form-control m-input m-input--square"
+                            <textarea rows="6" class="form-control m-input m-input--square"
                                 formControlName="AlsoNotifyPartyDescription"></textarea>
                         </div>
                     </div>

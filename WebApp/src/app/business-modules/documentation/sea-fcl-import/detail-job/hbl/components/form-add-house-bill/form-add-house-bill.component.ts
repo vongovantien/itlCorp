@@ -40,12 +40,9 @@ export class FormAddHouseBillComponent extends AppForm {
     notifyPartyDescription: AbstractControl;
     alsonotifyPartyDescription: AbstractControl;
     term$ = new BehaviorSubject<string>('');
-    isShow: boolean = false;
-
-
+    isShowSaleMan: boolean = false;
+    isShowConsignee: boolean = false;
     oceanVoyNo: AbstractControl;
-
-
     configCustomer: CommonInterface.IComboGirdConfig | any = {};
     configSaleman: CommonInterface.IComboGirdConfig | any = {};
     configShipper: CommonInterface.IComboGirdConfig | any = {};
@@ -59,7 +56,7 @@ export class FormAddHouseBillComponent extends AppForm {
 
 
     selectedCustomer: Partial<CommonInterface.IComboGridData | any> = {};
-    selectedSaleman: any = null;
+    selectedSaleman: any = {};
     selectedShipper: Partial<CommonInterface.IComboGridData | any> = {};
     selectedConsignee: Partial<CommonInterface.IComboGridData | any> = {};
     selectedNotifyParty: Partial<CommonInterface.IComboGridData | any> = {};
@@ -87,8 +84,7 @@ export class FormAddHouseBillComponent extends AppForm {
     saleMans: any = [];
     headersSaleman: CommonInterface.IHeaderTable[];
     saleManInCustomerFilter: any = {};
-
-
+    isDetail: boolean = false;
     hbOfladingTypes: CommonInterface.ICommonTitleValue[] = [
         { title: 'Copy', value: 'Copy' },
         { title: 'Original', value: 'Original' },
@@ -113,7 +109,7 @@ export class FormAddHouseBillComponent extends AppForm {
     }
 
     ngOnInit() {
-
+        this.getListSaleman();
         this.headersSaleman = [
             { title: 'User Name', field: 'username' },
         ];
@@ -206,44 +202,12 @@ export class FormAddHouseBillComponent extends AppForm {
         }, { selectedDisplayFields: ['name_EN'], });
 
         this.initForm();
-        this.term$.pipe(
-            distinctUntilChanged(),
-            this.autocomplete(500, ((keyword: string = '') => {
-                if (!!keyword) {
-                    this.isShow = true;
-                }
-                return this.getListSaleman();
-            }))
-        ).subscribe(
-            (res: any) => {
-                this.saleMans = res;
-            },
-        );
-        // this.getListSaleman();
-
-        this.$isShowAutoComplete
-            .pipe(
-                takeUntil(this.ngUnsubscribe),
-            )
-            .subscribe((isShow: boolean) => {
-                this.isShow = isShow;
-
-                // * set again.
-                this.keyword = !!this.selectedSaleman ? this.selectedSaleman.username : null;
-
-            });
 
 
     }
 
-    onClickOutsideSalemanName() {
-        this._isShowAutoComplete.next(false);
-    }
 
 
-    onSearchAutoComplete(keyword: string = '') {
-        this.term$.next(keyword);
-    }
 
     update(formdata: any) {
         // this.formGroup.patchValue(formdata);
@@ -343,7 +307,7 @@ export class FormAddHouseBillComponent extends AppForm {
 
         this.getListCustomer();
         this.getListShipper();
-        this.getListConsignee();
+        // this.getListConsignee();
         this.getListPort();
         this.getListSupplier();
         this.getListProvince();
@@ -355,8 +319,8 @@ export class FormAddHouseBillComponent extends AppForm {
     bindDescriptionModel(data: any, key: string) {
         switch (key) {
             case 'Customer':
-                const checkConsigneeExistence = idParam => this.configConsignee.dataSource.some(({ id }) => id === idParam);
-                if (this.selectedConsignee.value === undefined && checkConsigneeExistence(this.selectedCustomer.data.id)) {
+                // const checkConsigneeExistence = idParam => this.configConsignee.dataSource.some(({ id }) => id === idParam);
+                if (this.selectedConsignee.value !== undefined) {
                     this.selectedConsignee = { field: 'id', value: data.id, data: data };
                     this.consigneedescriptionModel = this.selectedConsignee.data.partnerNameEn + "\n" +
                         this.selectedConsignee.data.addressShippingEn + "\n" +
@@ -373,18 +337,17 @@ export class FormAddHouseBillComponent extends AppForm {
     onSelectDataFormInfo(data: any, key: string) {
         switch (key) {
             case 'saleman':
-                this._isShowAutoComplete.next(false);
                 this.selectedSaleman = data;
-                this.keyword = this.selectedSaleman.username;
+
+                this.isShowSaleMan = false;
                 break;
 
             case 'Customer':
                 this.selectedCustomer = { field: 'id', value: data.id, data: data };
-                this.bindDescriptionModel(data, 'Customer');
-                // if (this.countChangePartner === 0) {
-                //     this.selectedConsignee = { field: 'shortName', value: data.id, data: data };
-                // }
-                // this.countChangePartner++;
+                if (this.selectedConsignee.value === undefined) {
+                    this.selectedConsignee = { field: 'id', value: data.id, data: data };
+                    this.bindDescriptionModel(data, 'Customer');
+                }
                 this.saleMans.forEach(item => {
                     if (item.id === this.selectedCustomer.data.salePersonId) {
                         this.selectedSaleman = item;
@@ -471,6 +434,7 @@ export class FormAddHouseBillComponent extends AppForm {
         this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.CUSTOMER })
             .subscribe((res: any) => {
                 this.configCustomer.dataSource = res;
+                this.getListConsignee();
             });
     }
 
@@ -481,7 +445,17 @@ export class FormAddHouseBillComponent extends AppForm {
 
     getListConsignee() {
         this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.CONSIGNEE })
-            .subscribe((res: any) => { this.configConsignee.dataSource = res; this.configNotifyParty.dataSource = res; this.configAlsoNotifyParty.dataSource = res; });
+            .subscribe((res: any) => {
+                this.configConsignee.dataSource = res;
+                this.configNotifyParty.dataSource = res;
+                this.configAlsoNotifyParty.dataSource = res;
+                const result = this.configCustomer.dataSource.concat(this.configConsignee.dataSource).filter(function (value, index, self) {
+                    return self.indexOf(value) === index;
+                });
+                console.log(result);
+                this.configConsignee.dataSource = result;
+
+            });
     }
 
     getListSupplier() {
@@ -501,7 +475,7 @@ export class FormAddHouseBillComponent extends AppForm {
         this._systemRepo.getListSystemUser().subscribe((res: any) => {
             if (!!res) {
                 this.saleMans = res;
-                this.isShow = true;
+
             }
             else {
                 this.saleMans = [];

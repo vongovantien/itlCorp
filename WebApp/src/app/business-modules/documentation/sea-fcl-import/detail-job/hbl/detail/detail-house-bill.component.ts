@@ -169,6 +169,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     }
 
     getDetailHbl() {
+        this.formHouseBill.isDetail = true;
         this._progressRef.start();
         this._store.select(fromStore.getHBLState)
             .pipe(
@@ -227,8 +228,25 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                         this.formHouseBill.mindateEtaWareHouse = !!this.hblDetail.eta ? moment(this.hblDetail.eta) : null;
 
                         setTimeout(() => {
+                            this.formHouseBill.saleMans.forEach(item => {
+                                if (item.id === this.hblDetail.saleManId) {
+                                    this.formHouseBill.selectedSaleman = item;
+                                    return;
+                                }
+                            });
+
+                            // const saleman = this.formHouseBill.saleMans.filter((sm) => {
+                            //     return sm.id === this.hblDetail.saleManId;
+                            // });
+                            // if (!!saleman) {
+                            //     this.formHouseBill.selectedSaleman = saleman;
+
+                            // }
+
+
+
                             this.formHouseBill.selectedCustomer = { field: 'id', value: res.data.customerId };
-                            this.formHouseBill.selectedSaleman = { field: 'id', value: res.data.saleManId };
+                            // this.formHouseBill.selectedSaleman = { field: 'id', value: res.data.saleManId };
                             this.formHouseBill.selectedShipper = { field: 'id', value: res.data.shipperId };
                             this.formHouseBill.selectedConsignee = { field: 'id', value: res.data.consigneeId };
                             this.formHouseBill.selectedNotifyParty = { field: 'id', value: res.data.notifyPartyId };
