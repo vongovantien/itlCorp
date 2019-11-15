@@ -16,7 +16,19 @@
             </div>
             <div class="col-md-8">
                 <div class="m--align-right">
-                    <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase"
+                    <ng-container *ngIf="!charges.length">
+                        <button type="button"
+                            class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase m--margin-right-20"
+                            (click)="syncFreightCharge()">
+                            <span>
+                                <i class="la la-cloud-download"></i>
+                                <span>
+                                    Sync Freight Charge
+                                </span>
+                            </span>
+                        </button>
+                    </ng-container>
+                    <button type="button" class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase "
                         (click)="saveSellingSurCharge()">
                         <span>
                             <i class="la la-save"></i>
@@ -25,6 +37,7 @@
                             </span>
                         </span>
                     </button>
+
                 </div>
             </div>
         </div>

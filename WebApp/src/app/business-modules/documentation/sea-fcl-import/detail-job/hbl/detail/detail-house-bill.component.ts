@@ -16,6 +16,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import * as fromStore from './../../../store';
 import moment from 'moment/moment';
+import { SeaFClImportDeliveryOrderComponent } from '../components/delivery-order/delivery-order.component';
 
 
 enum HBL_TAB {
@@ -34,6 +35,8 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     @ViewChild(FormAddHouseBillComponent, { static: false }) formHouseBill: FormAddHouseBillComponent;
     @ViewChild(SeaFCLImportShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: SeaFCLImportShipmentGoodSummaryComponent;
     @ViewChild(SeaFClImportArrivalNoteComponent, { static: false }) arrivalNoteComponent: SeaFClImportArrivalNoteComponent;
+    @ViewChild(SeaFClImportDeliveryOrderComponent, { static: false }) deliveryComponent: SeaFClImportDeliveryOrderComponent;
+
 
     hblId: string;
     containers: Container[] = [];
@@ -110,6 +113,16 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                     return;
                 } else if (!!this.arrivalNoteComponent.hblArrivalNote.arrivalNo) {
                     this.arrivalNoteComponent.saveArrivalNote();
+                } else {
+                    return;
+                }
+                break;
+            }
+            // * Update Delivery Order.
+            case HBL_TAB.DELIVERY: {
+                this.deliveryComponent.isSubmitted = true;
+                if (!!this.deliveryComponent.deliveryOrder.deliveryOrderNo) {
+                    this.deliveryComponent.saveDeliveryOrder();
                 } else {
                     return;
                 }

@@ -13,16 +13,17 @@
                         <app-form-add-house-bill> </app-form-add-house-bill>
 
                         <shipment-good-summary></shipment-good-summary>
+
                     </ng-container>
                 </tab>
                 <tab heading="Arrival Note" (selectTab)="onSelectTab('ARRIVAL')" [active]="selectedTab === 'ARRIVAL'">
                     <ng-container *ngIf="selectedTab === 'ARRIVAL'">
-                        <sea-fcl-import-hbl-arrival-note></sea-fcl-import-hbl-arrival-note>>
+                        <sea-fcl-import-hbl-arrival-note></sea-fcl-import-hbl-arrival-note>
                     </ng-container>
                 </tab>
                 <tab heading="Delivery Order (D/O)" (selectTab)="onSelectTab('DELIVERY')">
                     <ng-container *ngIf="selectedTab === 'DELIVERY'">
-                        Delivery work!
+                        <sea-fcl-import-hbl-delivery-order></sea-fcl-import-hbl-delivery-order>
                     </ng-container>
                 </tab>
             </tabset>

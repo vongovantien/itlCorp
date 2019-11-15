@@ -14,12 +14,6 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
     ngUnsubscribe: Subject<any> = new Subject();
     keyword: string = '';
     ranges: any = {
-        // "Today": [moment(), moment()],
-        // Yesterday: [moment().subtract(1, "days"), moment().subtract(1, "days")],
-        // "Last 7 Days": [moment().subtract(6, "days"), moment()],
-        // "Last 30 Days": [moment().subtract(29, "days"), moment()],
-        // "This Month": [moment().startOf("month"), moment().endOf("month")],
-        // "Last Month": [moment().subtract(1, "month").startOf("month"), moment().subtract(1, "month").endOf("month")]
         "Today": [new Date(), new Date()],
         "Yesterday": [new Date(new Date().setDate(new Date().getDate() - 1)), new Date(new Date().setDate(new Date().getDate() - 1))],
         "Last 7 Days": [new Date(new Date().setDate(new Date().getDate() - 6)), new Date()],
@@ -76,6 +70,26 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
         displayFields: [],
         dataSource: [],
         selectedDisplayFields: [],
+    };
+
+    optionEditor = {
+        htmlExecuteScripts: false,
+        heightMin: 150,
+        charCounterCount: false,
+        theme: 'royal',
+        fontFamily: {
+            "Roboto,sans-serif": 'Roboto',
+            "Oswald,sans-serif": 'Oswald',
+            "Montserrat,sans-serif": 'Montserrat',
+            "'Open Sans Condensed',sans-serif": 'Open Sans Condensed',
+            "'Arial',sans-serif,": 'Arial',
+            "Time new Roman": 'Time new Roman',
+            "Tahoma": 'Tahoma'
+        },
+        toolbarButtons: ['fullscreen', 'bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', '|', 'fontFamily', 'fontSize', 'color', 'inlineClass', 'inlineStyle', 'paragraphStyle', 'lineHeight', '|', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', '-', 'insertLink', 'insertTable', '|', 'emoticons', 'fontAwesome', 'specialCharacters', 'insertHR', 'selectAll', 'clearFormatting', '|', 'spellChecker', 'help', 'html', '|', 'undo', 'redo'],
+        quickInsertButtons: ['table', 'ul', 'ol', 'hr'],
+        fontFamilySelection: true,
+        language: 'vi',
     };
 
     ngOnInit(): void { }
