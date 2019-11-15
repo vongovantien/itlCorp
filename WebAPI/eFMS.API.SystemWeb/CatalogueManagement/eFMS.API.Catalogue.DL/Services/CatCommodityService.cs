@@ -170,24 +170,24 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             try
             {
-                //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
                 foreach (var item in data)
                 {
+                    bool active = !string.IsNullOrEmpty(item.Status) && (item.Status.ToLower() == "active");
+                    DateTime? inactiveDate = active == false ? (DateTime?)DateTime.Now : null;
                     var commodity = new CatCommodity
                     {
                         CommodityNameEn = item.CommodityNameEn,
                         CommodityNameVn = item.CommodityNameVn,
                         CommodityGroupId = item.CommodityGroupId,
                         Code = item.Code,
-                        Active = item.Status.ToLower() != "active",
+                        Active = active,
+                        InactiveOn = inactiveDate,
                         DatetimeCreated = DateTime.Now,
                         DatetimeModified = DateTime.Now,
                         UserCreated = currentUser.UserID
                     };
-                    DataContext.Add(commodity);
-                    //dc.CatCommodity.Add(commodity);
+                    DataContext.Add(commodity, false);
                 }
-                //dc.SaveChanges();
                 DataContext.SubmitChanges();
                 cache.Remove(Templates.CatCommodity.NameCaching.ListName);
                 return new HandleState();
@@ -199,7 +199,6 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         public List<CommodityImportModel> CheckValidImport(List<CommodityImportModel> list)
         {
-            //eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var commodities = DataContext.Get().ToList();
             var commodityGroups = catCommonityGroupRepo.Get().ToList();
             list.ForEach(item =>

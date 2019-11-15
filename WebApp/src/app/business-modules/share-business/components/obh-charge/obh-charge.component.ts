@@ -7,22 +7,12 @@ import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
 
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { takeUntil, catchError } from 'rxjs/operators';
 import { CsShipmentSurcharge, Partner } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
 
 import * as fromStore from './../../store';
-
-
-enum QUANTITY_TYPE {
-    GW = 'gw',
-    NW = 'nw',
-    CW = 'cw',
-    CBM = 'cbm',
-    PACKAGE = 'package',
-    CONT = 'cont'
-}
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 @Component({
     selector: 'obh-charge',
@@ -68,7 +58,6 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             { title: 'Series No', field: 'seriesNo', sortable: true },
             { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
             { title: 'Exchange Rate Date', field: 'exchangeDate', sortable: true },
-            { title: 'KB', field: 'kickBack', sortable: true },
             { title: 'SOA', field: 'soano', sortable: true },
             { title: 'Credit/Debit Note', field: 'cdno', sortable: true },
             { title: 'Settle Payment', field: 'settlementCode', sortable: true },
@@ -171,6 +160,9 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
+
+                        // * Get Profit
+                        this._store.dispatch(new fromStore.GetProfitAction(this.hbl.id));
                     } else {
                         this._toastService.error(res.message);
                     }

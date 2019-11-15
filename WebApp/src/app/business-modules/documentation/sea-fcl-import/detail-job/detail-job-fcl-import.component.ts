@@ -16,7 +16,7 @@ import * as fromStore from './../store';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 
-type TAB = 'SHIPMENT' | 'CDNOTE';
+type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
 @Component({
     selector: 'app-detail-job-fcl-import',
@@ -238,7 +238,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                 this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: { tab: 'CDNOTE' } });
                 break;
             case 'assignment':
-                this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: { tab: 'ASIGNMENT' } });
+                this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], { queryParams: { tab: 'ASSIGNMENT' } });
                 break;
         }
     }

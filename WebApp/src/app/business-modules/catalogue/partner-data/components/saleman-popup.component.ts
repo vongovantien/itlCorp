@@ -62,6 +62,9 @@ export class SalemanPopupComponent extends PopupBase {
     showSaleman(saleman: Saleman) {
         this.isDetail = true;
         this.saleManToView = saleman;
+        if (this.saleManToView.effectDate.startDate !== undefined) {
+            this.saleManToView.effectDate = this.saleManToView.effectDate.startDate;
+        }
         console.log(this.saleManToView);
     }
 
@@ -159,19 +162,22 @@ export class SalemanPopupComponent extends PopupBase {
         this.selectedDataOffice = office;
     }
     OnCreate() {
-        const salemaneffectdate = this.saleManToAdd.effectDate == null ? null : formatDate(this.saleManToAdd.effectDate.startDate, 'yyyy-MM-dd', 'en');
+        if (this.strOfficeCurrent.value !== undefined && this.strSalemanCurrent.value !== undefined) {
+            const salemaneffectdate = this.saleManToAdd.effectDate.startDate == null ? null : formatDate(this.saleManToAdd.effectDate.startDate, 'yyyy-MM-dd', 'en');
+            const saleMane: any = {
+                company: this.saleManToAdd.office,
+                office: this.saleManToAdd.office,
+                effectDate: salemaneffectdate,
+                status: this.selectedStatus.value,
+                partnerId: null,
+                saleman_ID: this.selectedDataSaleMan.username,
+                service: this.selectedService.id,
+                createDate: new Date()
+            };
+            this.saleManToAdd = new Saleman(saleMane);
 
-        const saleMane: any = {
-            company: this.saleManToAdd.office,
-            office: this.saleManToAdd.office,
-            effectDate: salemaneffectdate,
-            status: this.selectedStatus.value,
-            partnerId: null,
-            saleman_ID: this.selectedDataSaleMan.username,
-            service: this.selectedService.id,
-            createDate: new Date()
-        };
-        this.saleManToAdd = new Saleman(saleMane);
-        this.onCreate.emit(this.saleManToAdd);
+            this.onCreate.emit(this.saleManToAdd);
+        }
+
     }
 }
