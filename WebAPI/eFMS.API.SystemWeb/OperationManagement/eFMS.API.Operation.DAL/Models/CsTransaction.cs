@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace eFMS.API.Documentation.Service.ViewModels
+namespace eFMS.API.Operation.Service.Models
 {
-    public class sp_GetTransaction
+    public partial class CsTransaction
     {
         public Guid Id { get; set; }
         public Guid BranchId { get; set; }
@@ -16,7 +15,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public DateTime? ServiceDate { get; set; }
         public string Mbltype { get; set; }
         public string ColoaderId { get; set; }
-        public string SubColoaderId { get; set; }
+        public string SubColoader { get; set; }
         public string BookingNo { get; set; }
         public string AgentId { get; set; }
         public Guid? Pol { get; set; }
@@ -37,25 +36,14 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public decimal? Cbm { get; set; }
         public string Notes { get; set; }
         public string TransactionType { get; set; }
+        public string CurrentStatus { get; set; }
         public string UserCreated { get; set; }
         public bool? IsLocked { get; set; }
         public DateTime? LockedDate { get; set; }
-        public DateTime? CreatedDate { get; set; }
+        public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
-        public DateTime? ModifiedDate { get; set; }
+        public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
-        public string SupplierName { get; set; }
-        public string AgentName { get; set; }
-        public string HWBNo { get; set; }
-        public string CustomerId { get; set; }
-        public string NotifyPartyId { get; set; }
-        public string SaleManId { get; set; }
-        public string PODName { get; set; }
-        public string POLName { get; set; }
-        public string CreatorName { get; set; }
-        public Nullable<int> SumCont { get; set; }
-        public Nullable<decimal> SumCBM { get; set; }
-        public Guid HblId { get; set; }
     }
 }

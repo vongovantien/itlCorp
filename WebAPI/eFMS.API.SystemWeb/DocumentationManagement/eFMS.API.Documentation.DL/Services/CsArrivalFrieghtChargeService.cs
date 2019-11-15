@@ -189,6 +189,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         public HandleState SetArrivalChargeDefault(CsArrivalFrieghtChargeDefaultEditModel model)
         {
+            model.TransactionType = DataTypeEx.GetType(model.Type);
             var charges = freightChargeDefaultRepository.Get(x => x.UserDefault == model.UserDefault && x.TransactionType == model.TransactionType);
             if (charges != null)
             {
@@ -211,6 +212,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         public HandleState SetArrivalHeaderFooterDefault(CsArrivalDefaultModel model)
         {
+            model.TransactionType = DataTypeEx.GetType(model.Type);
             var result = new HandleState();
             var data = arrivalDeliveryDefaultRepository.Get(x => x.UserDefault == model.UserDefault && x.TransactionType == model.TransactionType)?.FirstOrDefault();
             if (data != null)
@@ -250,6 +252,8 @@ namespace eFMS.API.Documentation.DL.Services
                 result.Doheader1 = data.DosentTo1;
                 result.Doheader2 = data.DosentTo2;
                 result.Dofooter = data.Dofooter;
+                result.DeliveryOrderNo = data.DeliveryOrderNo;
+                result.DeliveryOrderPrintedDate = data.DeliveryOrderPrintedDate;
             }
             else
             {
@@ -282,6 +286,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         public HandleState SetDeliveryOrderHeaderFooterDefault(CsDeliveryOrderDefaultModel model)
         {
+            model.TransactionType = DataTypeEx.GetType(model.Type);
             var result = new HandleState();
             var data = arrivalDeliveryDefaultRepository.Get(x => x.UserDefault == model.UserDefault && x.TransactionType == model.TransactionType);
             if (data != null)
@@ -289,7 +294,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var doDefault = data.FirstOrDefault();
                 doDefault.Doheader1 = model.Doheader1;
                 doDefault.Doheader2 = model.Doheader2;
-                doDefault.ArrivalFooter = model.Dofooter;
+                doDefault.Dofooter = model.Dofooter;
                 result = arrivalDeliveryDefaultRepository.Update(doDefault, x => x.UserDefault == model.UserDefault && x.TransactionType == model.TransactionType);
             }
             else

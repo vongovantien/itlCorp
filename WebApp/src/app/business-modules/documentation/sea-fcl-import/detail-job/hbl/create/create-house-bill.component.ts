@@ -1,25 +1,27 @@
 import { Component, ViewChild } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { AppForm } from 'src/app/app.form';
-import { formatDate } from '@angular/common';
-import { catchError, takeUntil } from 'rxjs/operators';
-import { finalize } from 'rxjs/internal/operators/finalize';
-import { FormAddHouseBillComponent } from '../components/form-add-house-bill/form-add-house-bill.component';
-import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { FCLImportAddModel } from 'src/app/shared/models';
+import { formatDate } from '@angular/common';
 import { ActionsSubject, Store } from '@ngrx/store';
-import * as fromStore from '../../../store/index';
+
+import { DocumentationRepo } from 'src/app/shared/repositories';
+import { AppForm } from 'src/app/app.form';
+import { FormAddHouseBillComponent } from '../components/form-add-house-bill/form-add-house-bill.component';
+import { FCLImportAddModel } from 'src/app/shared/models';
 import { InfoPopupComponent, ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { SeaFCLImportShipmentGoodSummaryComponent } from '../../../components/shipment-good-summary/shipment-good-summary.component';
 import { ImportHouseBillDetailComponent } from '../popup/import-house-bill-detail/import-house-bill-detail.component';
 
+import { ToastrService } from 'ngx-toastr';
+import { finalize } from 'rxjs/internal/operators/finalize';
+import { catchError, takeUntil } from 'rxjs/operators';
+
+import * as fromStore from '../../../store';
+import { SystemConstants } from 'src/constants/system.const';
+
 @Component({
     selector: 'app-create-house-bill',
     templateUrl: './create-house-bill.component.html',
-    styleUrls: ['./create-house-bill.component.scss']
 })
 export class CreateHouseBillComponent extends AppForm {
     @ViewChild(FormAddHouseBillComponent, { static: false }) formHouseBill: FormAddHouseBillComponent;
@@ -30,8 +32,9 @@ export class CreateHouseBillComponent extends AppForm {
 
     fclImportAddModel: FCLImportAddModel = new FCLImportAddModel();
     jobId: string = '';
-    shipmentDetail: any = {};
-    selectedHbl: any = {};
+
+    shipmentDetail: any = {}; // TODO model.
+    selectedHbl: any = {}; // TODO model.
 
     constructor(
         protected _progressService: NgProgress,
@@ -46,13 +49,7 @@ export class CreateHouseBillComponent extends AppForm {
     ) {
         super();
         this._progressRef = this._progressService.ref();
-    }
-    ngOnInit() {
-        this._activedRoute.params.subscribe((param: Params) => {
-            if (param.id) {
-                this.jobId = param.id;
-            }
-        });
+
         this._actionStoreSubject
             .pipe(
                 takeUntil(this.ngUnsubscribe)
@@ -62,16 +59,21 @@ export class CreateHouseBillComponent extends AppForm {
                     if (action.type === fromStore.ContainerActionTypes.SAVE_CONTAINER) {
                         this.fclImportAddModel.csMawbcontainers = [];
                         this.fclImportAddModel.csMawbcontainers = action.payload;
-
-
-                        console.log("list container add success", this.fclImportAddModel.csMawbcontainers);
                     }
                 });
+    }
+
+    ngOnInit() {
+        this._activedRoute.params.subscribe((param: Params) => {
+            if (param.id) {
+                this.jobId = param.id;
+            }
+        });
+
 
         this._store.select(fromStore.seaFCLImportTransactionState)
             .subscribe(
                 (res: any) => {
-                    console.log(res);
                     this.shipmentDetail = res;
                 }
             );
@@ -183,7 +185,7 @@ export class CreateHouseBillComponent extends AppForm {
 
     onsubmitData() {
         const body: ITransactionDetail = {
-            id: "00000000-0000-0000-0000-000000000000",
+            id: SystemConstants.EMPTY_GUID,
             jobId: this.jobId,
             mawb: this.formHouseBill.mtBill.value,
             saleManId: !!this.formHouseBill.selectedSaleman.id ? this.formHouseBill.selectedSaleman.id : null,

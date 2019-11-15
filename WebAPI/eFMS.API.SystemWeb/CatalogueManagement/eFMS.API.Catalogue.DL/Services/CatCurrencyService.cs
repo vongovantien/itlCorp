@@ -77,12 +77,10 @@ namespace eFMS.API.Catalogue.DL.Services
                         {
                             item.IsDefault = false;
                             item.DatetimeModified = DateTime.Now;
-                            //DataContext.DC.Update(item);
                             DataContext.Update(item, x => x.Id == item.Id, false);
                         }
                     }
                 }
-                //((eFMSDataContext)DataContext.DC).SaveChanges();
                 DataContext.SubmitChanges();
                 cache.Remove(Templates.CatCurrency.NameCaching.ListName);
                 RedisCacheHelper.SetObject(cache, Templates.CatCurrency.NameCaching.ListName, DataContext.Get());
