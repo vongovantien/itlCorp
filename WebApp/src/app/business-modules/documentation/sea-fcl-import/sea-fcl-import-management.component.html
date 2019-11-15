@@ -18,7 +18,7 @@
             <div class="m-portlet__body">
                 <div class="table-wrapper table-scrollable" id="masterbill-list-table">
                     <table class="table table-hover table-brand dataTable">
-                        <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
+                        <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                             <th class="table-actions-col no-sorting first">Actions</th>
                         </thead>
                         <tbody class="tbody-group">
@@ -88,7 +88,7 @@
                                             <span>{{item.creatorName}}</span>
                                         </td>
                                         <td>
-                                            <span>{{item.modifiedDate | date: 'dd/MM/yyyy'}}</span>
+                                            <span>{{item.datetimeModified | date: 'dd/MM/yyyy'}}</span>
                                         </td>
                                     </tr>
                                     <tr class="collapse-panel-row" app-table-collapse-row [id]="'cs-shipment-00' + i"

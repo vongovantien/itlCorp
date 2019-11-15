@@ -467,9 +467,9 @@ export class SeaFclExportCreateComponent implements OnInit {
         this.shipment.jobNo = null;
         this.shipment.mawb = null;
         this.isImport = true;
-        this.shipment.createdDate = null;
+        this.shipment.datetimeCreated = null;
         this.shipment.userCreated = null;
-        this.shipment.modifiedDate = null;
+        this.shipment.datetimeModified = null;
         this.shipment.userModified = null;
         this.housebillTabviewHref = '#';//'#confirm-create-job-modal';
         this.housebillRoleToggle = 'modal';
