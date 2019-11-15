@@ -65,7 +65,6 @@ export class BreadcrumbComponent implements OnInit, AfterViewInit {
                 url = encodeURI('/home/' + this.ActiveRoute[0].path + '/' + this.ActiveRoute[index].path);
             } else {
                 url = encodeURI(this.mapParamUrl(this.ActiveRoute, index));
-                //url = encodeURI('/home/' + this.ActiveRoute[0].path + '/' + this.ActiveRoute[index - 1].path + '/' + this.ActiveRoute[index].path);
             }
             this.router.navigateByUrl(url);
         } else {
@@ -76,8 +75,13 @@ export class BreadcrumbComponent implements OnInit, AfterViewInit {
     mapParamUrl(params: any[], index: number) {
         let url: string = '/home';
         for (let i = 0; i <= index; i++) {
-            url += '/' + params[i].path;
+            url += '/' + this.getPathFromUrl(params[i].path);
+
         }
         return url;
+    }
+
+    getPathFromUrl(url: string) {
+        return url.split(/[?#]/)[0];
     }
 }
