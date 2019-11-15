@@ -262,12 +262,15 @@ IContextBase<CatSaleman> salemanRepo) : base(repository, mapper)
             {
                 foreach (var item in data)
                 {
+                    bool active = !string.IsNullOrEmpty(item.Status) && (item.Status.ToLower() == "active");
+                    DateTime? inactiveDate = active == false ? (DateTime?)DateTime.Now : null;
                     var partner = mapper.Map<CatPartner>(item);
                     partner.UserCreated = currentUser.UserID;
                     partner.DatetimeModified = DateTime.Now;
                     partner.DatetimeCreated = DateTime.Now;
                     partner.Id = partner.AccountNo = partner.TaxCode;
-                    partner.Active = true;
+                    partner.Active = active;
+                    partner.InactiveOn = inactiveDate;
                     DataContext.Add(partner, false);
                 }
                 DataContext.SubmitChanges();
