@@ -1,0 +1,31 @@
+DONo	String	50	
+DateConfirm	Date		
+FlightDate	Date		
+LocalVessel	String	150	
+ContSealNo	String	255	
+ForCarrier	String	255	
+ATTN	String	255	
+Consignee	String	250	
+Notify	String	255	
+HandlingInfo	String	250	
+ExecutedOn	String	50	
+OceanVessel	String	150	
+DepartureAirport	String	150	
+PortofDischarge	String	50	
+PlaceDelivery	String	150	
+HWBNO	String	50	
+ShippingMarkImport	Memo		
+SpecialNote	String	255	
+Description	Memo		
+TotalPackages	String	50	
+NoPieces	String	150	
+GrossWeight	Number		
+Unit	String	50	
+CBM	Number		
+SeaLCL	Boolean		
+DatePackage	Date		
+DeliveryOrderNote	Memo		
+FirstDestination	String	255	
+SecondDestination	String	255	
+BillType	String	255	
+ArrivalNote	String	255	

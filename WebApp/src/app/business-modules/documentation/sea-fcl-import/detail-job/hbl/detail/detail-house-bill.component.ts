@@ -256,5 +256,9 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     onSelectTab(tabName: HBL_TAB | string) {
         this.selectedTab = tabName;
     }
+    onPreview() {
+        if (this.selectedTab == HBL_TAB.DELIVERY) {
 
+        }
+    }
 }

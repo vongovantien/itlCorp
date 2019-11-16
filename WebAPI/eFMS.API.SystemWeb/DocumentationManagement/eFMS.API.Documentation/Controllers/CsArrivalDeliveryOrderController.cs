@@ -187,5 +187,10 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+
+        public IActionResult PreviewDeliveryOrder()
+        {
+            return Ok();
+        }
     }
 }
