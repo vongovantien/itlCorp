@@ -69,10 +69,10 @@ export class SettlementFormCopyPopupComponent extends PopupBase {
         ];
 
         this.searchOptions = [
-            { title: 'Job No', value: 'JOBNO' },
-            { title: 'HBL/HAWB', value: 'HBL' },
-            { title: 'MBL/MAWB', value: 'MBL' },
-            { title: 'Custom No', value: 'CUSTOMNO' },
+            { title: 'Job No', value: 'JobNo' },
+            { title: 'HBL/HAWB', value: 'Hwbno' },
+            { title: 'MBL/MAWB', value: 'Mawb' },
+            { title: 'Custom No', value: 'ClearanceNo' },
         ];
         this.selectedOption = this.searchOptions[0];
     }

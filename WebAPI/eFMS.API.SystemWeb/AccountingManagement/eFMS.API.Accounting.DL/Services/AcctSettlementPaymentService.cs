@@ -1007,20 +1007,20 @@ namespace eFMS.API.Accounting.DL.Services
                        select new AscSettlementPaymentRequestReportParams
                        {
                            JobId = (opst.JobNo == null ? cst.JobNo : opst.JobNo),
-                           AdvDate = (!string.IsNullOrEmpty(advance.StatusApproval) && advance.StatusApproval == Constants.STATUS_APPROVAL_DONE ? advance.DatetimeModified.Value.ToString("dd/MM/yyyy") : ""),
+                           AdvDate = (!string.IsNullOrEmpty(advance.StatusApproval) && advance.StatusApproval == Constants.STATUS_APPROVAL_DONE ? advance.DatetimeModified.Value.ToString("dd/MM/yyyy") : string.Empty),
                            SettlementNo = settlementNo,
-                           Customer = cus.PartnerNameVn != null ? cus.PartnerNameVn : "",
-                           Consignee = cnee.PartnerNameVn != null ? cnee.PartnerNameVn : "",
-                           Consigner = cner.PartnerNameVn != null ? cner.PartnerNameVn : "",
-                           ContainerQty = opst.SumContainers.HasValue ? opst.SumContainers.Value.ToString() + "/" : "",
+                           Customer = cus.PartnerNameVn != null ? cus.PartnerNameVn : string.Empty,
+                           Consignee = cnee.PartnerNameVn != null ? cnee.PartnerNameVn : string.Empty,
+                           Consigner = cner.PartnerNameVn != null ? cner.PartnerNameVn : string.Empty,
+                           ContainerQty = opst.SumContainers.HasValue ? opst.SumContainers.Value.ToString() + "/" : string.Empty,
                            GW = opst.SumGrossWeight.HasValue ? opst.SumGrossWeight.Value : 0,
                            NW = opst.SumNetWeight.HasValue ? opst.SumNetWeight.Value : 0,
-                           CustomsId = (sur.ClearanceNo == null ? "" : sur.ClearanceNo),
+                           CustomsId = (sur.ClearanceNo == null ? string.Empty : sur.ClearanceNo),
                            PSC = opst.SumPackages.HasValue ? opst.SumPackages.Value : 0,
                            CBM = opst.SumCbm.HasValue ? opst.SumCbm.Value : 0,
                            HBL = (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno),
                            MBL = (opst.Mblno == null ? cstd.Mawb : opst.Mblno),
-                           StlCSName = ""
+                           StlCSName = string.Empty
                        };
 
             return data.OrderByDescending(x => x.JobId).FirstOrDefault();
@@ -1051,68 +1051,68 @@ namespace eFMS.API.Accounting.DL.Services
                        {
                            AdvID = settlementNo,
                            AdvDate = DateTime.Now,
-                           AdvContact = "",
-                           AdvAddress = "",
-                           StlDescription = "",
-                           AdvanceNo = "",
+                           AdvContact = string.Empty,
+                           AdvAddress = string.Empty,
+                           StlDescription = string.Empty,
+                           AdvanceNo = string.Empty,
                            AdvValue = 0,
-                           AdvCurrency = "",
+                           AdvCurrency = string.Empty,
                            Remains = 0,
                            AdvanceDate = DateTime.Now,
                            No = 0,
-                           CustomsID = "",
+                           CustomsID = string.Empty,
                            JobID = (opst.JobNo == null ? cst.JobNo : opst.JobNo),
                            HBL = (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno),
                            Description = cat.ChargeNameEn,
-                           InvoiceNo = sur.InvoiceNo == null ? "" : sur.InvoiceNo,
+                           InvoiceNo = sur.InvoiceNo == null ? string.Empty : sur.InvoiceNo,
                            Amount = (sur.Total != null ? sur.Total : 0) * GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, currency),
                            Debt = false,
-                           Currency = "",
+                           Currency = string.Empty,
                            Note = sur.Notes,
-                           AdvDpManagerID = "",
+                           AdvDpManagerID = string.Empty,
                            AdvDpManagerStickDeny = true,
                            AdvDpManagerStickApp = true,
-                           AdvDpManagerName = "",
+                           AdvDpManagerName = string.Empty,
                            AdvDpSignDate = DateTime.Now,
-                           AdvAcsDpManagerID = "",
+                           AdvAcsDpManagerID = string.Empty,
                            AdvAcsDpManagerStickDeny = true,
                            AdvAcsDpManagerStickApp = true,
-                           AdvAcsDpManagerName = "",
+                           AdvAcsDpManagerName = string.Empty,
                            AdvAcsSignDate = DateTime.Now,
-                           AdvBODID = "",
+                           AdvBODID = string.Empty,
                            AdvBODStickDeny = true,
                            AdvBODStickApp = true,
-                           AdvBODName = "",
+                           AdvBODName = string.Empty,
                            AdvBODSignDate = DateTime.Now,
-                           SltAcsCashierName = "",
+                           SltAcsCashierName = string.Empty,
                            SltCashierDate = DateTime.Now,
                            Saved = true,
                            ClearStatus = true,
-                           Status = "",
+                           Status = string.Empty,
                            AcsApproval = true,
-                           SltDpComment = "",
-                           Shipper = "",
-                           ShipmentInfo = "",
+                           SltDpComment = string.Empty,
+                           Shipper = string.Empty,
+                           ShipmentInfo = string.Empty,
                            MBLNO = (opst.Mblno == null ? cstd.Mawb : opst.Mblno),
                            VAT = 0,
                            BFVATAmount = 0,
-                           ContainerQty = "",
+                           ContainerQty = string.Empty,
                            Noofpieces = 0,
-                           UnitPieaces = "",
+                           UnitPieaces = string.Empty,
                            GrossWeight = 0,
                            NW = 0,
                            CBM = 0,
-                           ShipperHBL = "",
-                           ConsigneeHBL = "",
-                           ModeSettle = "",
+                           ShipperHBL = string.Empty,
+                           ConsigneeHBL = string.Empty,
+                           ModeSettle = string.Empty,
                            STT = 0,
-                           Series = "",
+                           Series = string.Empty,
                            InvoiceDate = DateTime.Now,
-                           Inword = "",
-                           InvoiceID = "",
-                           Commodity = "",
-                           ServiceType = "",
-                           SltCSName = "",
+                           Inword = string.Empty,
+                           InvoiceID = string.Empty,
+                           Commodity = string.Empty,
+                           ServiceType = string.Empty,
+                           SltCSName = string.Empty,
                            SltCSStickDeny = true,
                            SltCSStickApp = true,
                            SltCSSignDate = DateTime.Now,
@@ -1133,16 +1133,16 @@ namespace eFMS.API.Accounting.DL.Services
 
             var parameter = new AscSettlementPaymentRequestReportParams();
             parameter = GetFirstShipmentOfSettlement(settlementNo);
-            parameter.SettleRequester = settlement != null && !string.IsNullOrEmpty(settlement.Requester) ? GetEmployeeByUserId(settlement.Requester).EmployeeNameVn : "";
-            parameter.SettleRequestDate = settlement.RequestDate != null ? settlement.RequestDate.Value.ToString("dd/MM/yyyy") : "";
+            parameter.SettleRequester = settlement != null && !string.IsNullOrEmpty(settlement.Requester) ? GetEmployeeByUserId(settlement.Requester).EmployeeNameVn : string.Empty;
+            parameter.SettleRequestDate = settlement.RequestDate != null ? settlement.RequestDate.Value.ToString("dd/MM/yyyy") : string.Empty;
 
             //Lấy thông tin các User Approve Settlement
             var infoSettleAprove = GetInfoApproveSettlementNoCheckBySettlementNo(settlementNo);
-            parameter.StlDpManagerName = infoSettleAprove != null ? infoSettleAprove.ManagerName : "";
-            parameter.StlDpManagerSignDate = infoSettleAprove != null && infoSettleAprove.ManagerAprDate.HasValue ? infoSettleAprove.ManagerAprDate.Value.ToString("dd/MM/yyyy") : "";
-            parameter.StlAscDpManagerName = infoSettleAprove != null ? infoSettleAprove.AccountantName : "";
-            parameter.StlAscDpManagerSignDate = infoSettleAprove != null && infoSettleAprove.AccountantAprDate.HasValue ? infoSettleAprove.AccountantAprDate.Value.ToString("dd/MM/yyyy") : "";
-            parameter.StlBODSignDate = infoSettleAprove != null && infoSettleAprove.BuheadAprDate.HasValue ? infoSettleAprove.BuheadAprDate.Value.ToString("dd/MM/yyyy") : "";
+            parameter.StlDpManagerName = infoSettleAprove != null ? infoSettleAprove.ManagerName : string.Empty;
+            parameter.StlDpManagerSignDate = infoSettleAprove != null && infoSettleAprove.ManagerAprDate.HasValue ? infoSettleAprove.ManagerAprDate.Value.ToString("dd/MM/yyyy") : string.Empty;
+            parameter.StlAscDpManagerName = infoSettleAprove != null ? infoSettleAprove.AccountantName : string.Empty;
+            parameter.StlAscDpManagerSignDate = infoSettleAprove != null && infoSettleAprove.AccountantAprDate.HasValue ? infoSettleAprove.AccountantAprDate.Value.ToString("dd/MM/yyyy") : string.Empty;
+            parameter.StlBODSignDate = infoSettleAprove != null && infoSettleAprove.BuheadAprDate.HasValue ? infoSettleAprove.BuheadAprDate.Value.ToString("dd/MM/yyyy") : string.Empty;
 
             parameter.CompanyName = Constants.COMPANY_NAME;
             parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
@@ -1157,12 +1157,12 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 advanceAmount += GetAdvanceAmountByShipmentAndCurrency(item.JobID, item.MBLNO, item.HBL, settlement.SettlementCurrency);
             }
-            parameter.AdvValue = advanceAmount > 0 ? String.Format("{0:n}", advanceAmount) : "";
-            parameter.AdvCurrency = advanceAmount > 0 ? settlement.SettlementCurrency : "";
+            parameter.AdvValue = advanceAmount > 0 ? String.Format("{0:n}", advanceAmount) : string.Empty;
+            parameter.AdvCurrency = advanceAmount > 0 ? settlement.SettlementCurrency : string.Empty;
 
             //Chuyển tiền Amount thành chữ
             decimal _amount = advanceAmount > 0 ? advanceAmount : 0;
-            var _inword = "";
+            var _inword = string.Empty;
             if (_amount > 0)
             {
                 var _currency = settlement.SettlementCurrency == Constants.CURRENCY_LOCAL ?
@@ -1208,11 +1208,14 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                 }
 
+                //Lấy ra brandId của user 
+                var brandOfUser = GetEmployeeByUserId(userCurrent).WorkPlaceId;
+
                 //Lấy ra các user Leader, Manager Dept của user requester, user Accountant, BUHead(nếu có) của user requester
                 acctApprove.Leader = GetLeaderIdOfUser(userCurrent);
-                acctApprove.Manager = GetManagerIdOfUser(userCurrent);
-                acctApprove.Accountant = GetAccountantId();
-                acctApprove.Buhead = GetBUHeadId();
+                acctApprove.Manager = GetManagerIdOfUser(userCurrent, brandOfUser.ToString());
+                acctApprove.Accountant = GetAccountantId(brandOfUser.ToString());
+                acctApprove.Buhead = GetBUHeadId(brandOfUser.ToString());
 
 
                 var checkExistsApproveBySettlementNo = acctApproveSettlementRepo.Get(x => x.SettlementNo == acctApprove.SettlementNo && x.IsDeputy == false).FirstOrDefault();
@@ -1234,8 +1237,8 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 dc.SaveChanges();
 
-                var emailLeaderOrManager = "";
-                var userLeaderOrManager = "";
+                var emailLeaderOrManager = string.Empty;
+                var userLeaderOrManager = string.Empty;
                 //Send mail đề nghị approve đến Leader(Nếu có) nếu không có thì send tới Manager Dept
                 //Lấy ra Leader của User & Manager Dept của User Requester
                 if (string.IsNullOrEmpty(acctApprove.Leader))
@@ -1271,8 +1274,8 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var userCurrent = currentUser.UserID;
 
-            var userAprNext = "";
-            var emailUserAprNext = "";
+            var userAprNext = string.Empty;
+            var emailUserAprNext = string.Empty;
 
             eFMSDataContext dc = (eFMSDataContext)DataContext.DC;
             var settlement = DataContext.Get(x => x.Id == settlementId).FirstOrDefault();
@@ -1283,8 +1286,13 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (approve == null) return new HandleState("Not Found Settlement Approval by SettlementNo is " + settlement.SettlementNo);
 
+            //Lấy ra brandId của user requester
+            var brandOfUserRequest = GetEmployeeByUserId(settlement.Requester).WorkPlaceId;
+            //Lấy ra brandId của userId
+            var brandOfUserId = GetEmployeeByUserId(userCurrent).WorkPlaceId;
+
             //Lấy ra dept code của userApprove dựa vào userApprove
-            var deptCodeOfUser = GetInfoDeptOfUser(userCurrent).Code;
+            var deptCodeOfUser = GetInfoDeptOfUser(userCurrent, brandOfUserId.ToString()).Code;
 
 
             //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
@@ -1298,22 +1306,22 @@ namespace eFMS.API.Accounting.DL.Services
                     approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Approve của Leader
 
                     //Lấy email của Department Manager
-                    userAprNext = GetManagerIdOfUser(userCurrent);
+                    userAprNext = GetManagerIdOfUser(userCurrent, brandOfUserId.ToString());
                     var userAprNextId = GetEmployeeIdOfUser(userAprNext);
                     emailUserAprNext = GetEmployeeByEmployeeId(userAprNextId).Email;
                 }
-                else if (userCurrent == GetManagerIdOfUser(settlement.Requester) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                else if (userCurrent == GetManagerIdOfUser(settlement.Requester, brandOfUserRequest.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                 {
                     settlement.StatusApproval = Constants.STATUS_APPROVAL_DEPARTMENTAPPROVED;
                     approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Approve của Manager
                     approve.ManagerApr = userCurrent;
 
                     //Lấy email của Accountant Manager
-                    userAprNext = GetAccountantId();
+                    userAprNext = GetAccountantId(brandOfUserId.ToString());
                     var userAprNextId = GetEmployeeIdOfUser(userAprNext);
                     emailUserAprNext = GetEmployeeByEmployeeId(userAprNextId).Email;
                 }
-                else if (userCurrent == GetAccountantId() || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                 {
                     settlement.StatusApproval = Constants.STATUS_APPROVAL_DONE;
                     approve.AccountantAprDate = approve.BuheadAprDate = DateTime.Now;//Cập nhật ngày Approve của Accountant & BUHead
@@ -1332,7 +1340,7 @@ namespace eFMS.API.Accounting.DL.Services
                 dc.SaveChanges();
             }
 
-            if (userCurrent == GetAccountantId())
+            if (userCurrent == GetAccountantId(brandOfUserId.ToString()))
             {
                 return new HandleState();
             }
@@ -1359,8 +1367,13 @@ namespace eFMS.API.Accounting.DL.Services
             var approve = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo && x.IsDeputy == false).FirstOrDefault();
             if (approve == null) return new HandleState("Not Found Approve Settlement by SettlementNo " + settlement.SettlementNo);
 
+            //Lấy ra brandId của user requester
+            var brandOfUserRequest = GetEmployeeByUserId(settlement.Requester).WorkPlaceId;
+            //Lấy ra brandId của userId
+            var brandOfUserId = GetEmployeeByUserId(userCurrent).WorkPlaceId;
+
             //Lấy ra dept code của userApprove dựa vào userApprove
-            var deptCodeOfUser = GetInfoDeptOfUser(userCurrent).Code;
+            var deptCodeOfUser = GetInfoDeptOfUser(userCurrent, brandOfUserId.ToString()).Code;
 
             //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
             var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(settlement.SettlementNo, userCurrent, deptCodeOfUser);
@@ -1371,12 +1384,12 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Denie của Leader
                 }
-                else if (userCurrent == GetManagerIdOfUser(settlement.Requester) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                else if (userCurrent == GetManagerIdOfUser(settlement.Requester, brandOfUserRequest.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                 {
                     approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Denie của Manager
                     approve.ManagerApr = userCurrent; //Cập nhật user manager denie                   
                 }
-                else if (userCurrent == GetAccountantId() || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
+                else if (userCurrent == GetAccountantId(brandOfUserId.ToString()) || GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent))
                 {
                     approve.AccountantAprDate = DateTime.Now;//Cập nhật ngày Denie của Accountant
                     approve.AccountantApr = userCurrent; //Cập nhật user accountant denie
@@ -1537,7 +1550,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         private decimal GetRateCurrencyExchange(List<CatCurrencyExchange> currencyExchange, string currencyFrom, string currencyTo)
         {
-            if (currencyExchange.Count == 0) return 0;
+            if (currencyExchange.Count == 0 || string.IsNullOrEmpty(currencyFrom)) return 0;
 
             currencyFrom = currencyFrom.Trim();
             currencyTo = currencyTo.Trim();
@@ -1688,7 +1701,8 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         //Lấy Info Dept của User
-        private CatDepartment GetInfoDeptOfUser(string userId, string idBranch = "27d26acb-e247-47b7-961e-afa7b3d7e11e")
+        //BrandId = "27d26acb-e247-47b7-961e-afa7b3d7e11e"
+        private CatDepartment GetInfoDeptOfUser(string userId, string idBranch)
         {
             var deptIdOfUser = GetInfoGroupOfUser(userId).DepartmentId;
             var deptOfUser = catDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Id == deptIdOfUser).FirstOrDefault();
@@ -1704,7 +1718,8 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         //Lấy ra ManagerId của User
-        private string GetManagerIdOfUser(string userId, string idBranch = "27d26acb-e247-47b7-961e-afa7b3d7e11e")
+        //BrandId  = "27d26acb-e247-47b7-961e-afa7b3d7e11e"
+        private string GetManagerIdOfUser(string userId, string idBranch)
         {
             //Lấy ra deptId của User
             var deptIdOfUser = GetInfoGroupOfUser(userId).DepartmentId;
@@ -1715,7 +1730,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         //Lấy ra AccountantManagerId của Dept Accountant
         //Đang gán cứng BrandId của Branch ITL HCM (27d26acb-e247-47b7-961e-afa7b3d7e11e)
-        private string GetAccountantId(string idBranch = "27d26acb-e247-47b7-961e-afa7b3d7e11e")
+        private string GetAccountantId(string idBranch)
         {
             var accountantManagerId = catDepartmentRepo.Get(x => x.BranchId == Guid.Parse(idBranch) && x.Code == Constants.DEPT_CODE_ACCOUNTANT).FirstOrDefault().ManagerId;
             return accountantManagerId;
@@ -1723,7 +1738,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         //Lấy ra BUHeadId của BUHead
         //Đang gán cứng BrandId của Branch ITL HCM (27d26acb-e247-47b7-961e-afa7b3d7e11e)
-        private string GetBUHeadId(string idBranch = "27d26acb-e247-47b7-961e-afa7b3d7e11e")
+        private string GetBUHeadId(string idBranch)
         {
             var buHeadId = sysOfficeRepo.Get(x => x.Id == Guid.Parse(idBranch)).FirstOrDefault().ManagerId;
             return buHeadId;
@@ -1784,13 +1799,17 @@ namespace eFMS.API.Accounting.DL.Services
                 return result;
             }
 
+            //Lấy ra brandId của user requester
+            var brandOfUserRequest = GetEmployeeByUserId(settlement.Requester).WorkPlaceId;
+            //Lấy ra brandId của userId
+            var brandOfUserId = GetEmployeeByUserId(userId).WorkPlaceId;
 
             //Trường hợp không có Leader
             if (string.IsNullOrEmpty(acctApprove.Leader))
             {
                 //Manager Department Approve
                 //Kiểm tra user có phải là dept manager hoặc có phải là user được ủy quyền duyệt hay không
-                if (userId == GetManagerIdOfUser(settlement.Requester) || GetListUserDeputyByDept(deptOfUser).Contains(userId))
+                if (userId == GetManagerIdOfUser(settlement.Requester, brandOfUserRequest.ToString()) || GetListUserDeputyByDept(deptOfUser).Contains(userId))
                 {
                     //Kiểm tra User Approve có thuộc cùng dept với User Requester hay
                     //Nếu không cùng thì không cho phép Approve (đối với Dept Manager)
@@ -1824,7 +1843,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                 //Accountant Approve
                 //Kiểm tra user có phải là Accountant Manager hoặc có phải là user được ủy quyền duyệt hay không
-                if (userId == GetAccountantId() || GetListUserDeputyByDept(deptOfUser).Contains(userId))
+                if (userId == GetAccountantId(brandOfUserId.ToString()) || GetListUserDeputyByDept(deptOfUser).Contains(userId))
                 {
                     //Check group DepartmentManager đã được Approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Manager)
@@ -1885,7 +1904,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
 
                 //Manager Department Approve
-                if (userId == GetManagerIdOfUser(settlement.Requester) || GetListUserDeputyByDept(deptOfUser).Contains(userId))
+                if (userId == GetManagerIdOfUser(settlement.Requester, brandOfUserRequest.ToString()) || GetListUserDeputyByDept(deptOfUser).Contains(userId))
                 {
                     //Kiểm tra User Approve có thuộc cùng dept với User Requester hay
                     //Nếu không cùng thì không cho phép Approve (đối với Dept Manager)
@@ -1922,7 +1941,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                 //Accountant Approve
                 //Kiểm tra user có phải là Accountant Manager hoặc có phải là user được ủy quyền duyệt hay không
-                if (userId == GetAccountantId() || GetListUserDeputyByDept(deptOfUser).Contains(userId))
+                if (userId == GetAccountantId(brandOfUserId.ToString()) || GetListUserDeputyByDept(deptOfUser).Contains(userId))
                 {
                     //Check group DepartmentManager đã được Approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Manager)
@@ -1967,13 +1986,14 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Lấy ra thông tin JobId dựa vào SettlementNo
             var listJobId = GetJobIdBySettlementNo(settlementNo);
-            string jobIds = "";
-            foreach (var jobId in listJobId)
-            {
-                jobIds += !string.IsNullOrEmpty(jobId) ? jobId + "; " : "";
-            }
-            jobIds += ")";
-            jobIds = jobIds.Replace("; )", "").Replace(")", "");
+            string jobIds = string.Empty;
+            //foreach (var jobId in listJobId)
+            //{
+            //    jobIds += !string.IsNullOrEmpty(jobId) ? jobId + "; " : string.Empty;
+            //}
+            //jobIds += ")";
+            //jobIds = jobIds.Replace("; )", string.Empty).Replace(")", string.Empty);
+            jobIds = String.Join("; ", listJobId.ToList());
 
             var totalAmount = surcharge
                 .Where(x => x.SettlementCode == settlementNo)
@@ -1983,7 +2003,7 @@ namespace eFMS.API.Accounting.DL.Services
             //Lấy ra list shipment(JobId,MBL,HBL) dựa vào SettlementNo
             var shipments = GetShipmentBySettlementNo(settlementNo);
             //Lấy ra list AdvanceNo dựa vào Shipment(JobId,MBL,HBL)
-            string advanceNos = "";
+            string advanceNos = string.Empty;
             if (shipments != null && shipments.Count() > 0)
             {
                 foreach (var shipment in shipments)
@@ -1991,11 +2011,12 @@ namespace eFMS.API.Accounting.DL.Services
                     var listAdvanceNo = GetAdvanceNoByShipment(shipment.JobId, shipment.MBL, shipment.HBL);
                     foreach (var advanceNo in listAdvanceNo)
                     {
-                        advanceNos += !string.IsNullOrEmpty(advanceNo) ? advanceNo + "; " : "";
+                        advanceNos += !string.IsNullOrEmpty(advanceNo) ? advanceNo + "; " : string.Empty;
                     }
                 }
                 advanceNos += ")";
-                advanceNos = advanceNos.Replace("; )", "").Replace(")", "");
+                //advanceNos = advanceNos.Replace("; )", string.Empty).Replace(")", string.Empty);
+                advanceNos = advanceNos != ")" ? advanceNos.Replace("; )", string.Empty) : string.Empty;
             }
 
             //Mail Info
@@ -2025,8 +2046,10 @@ namespace eFMS.API.Accounting.DL.Services
                 emailRequester
             };
 
+            //Lấy ra brandId của userId
+            var brandOfUserIReciver = GetEmployeeByUserId(userReciver).WorkPlaceId;
             //Lấy ra email của các User được ủy quyền của group của User Approve
-            var deptCodeOfUserReciver = GetInfoDeptOfUser(userReciver).Code;
+            var deptCodeOfUserReciver = GetInfoDeptOfUser(userReciver, brandOfUserIReciver.ToString()).Code;
             var usersDeputy = GetListUserDeputyByDept(deptCodeOfUserReciver);
             if (usersDeputy.Count > 0)
             {
@@ -2061,13 +2084,14 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Lấy ra thông tin JobId dựa vào SettlementNo
             var listJobId = GetJobIdBySettlementNo(settlementNo);
-            string jobIds = "";
-            foreach (var jobId in listJobId)
-            {
-                jobIds += !string.IsNullOrEmpty(jobId) ? jobId + "; " : "";
-            }
-            jobIds += ")";
-            jobIds = jobIds.Replace("; )", "").Replace(")", "");
+            string jobIds = string.Empty;
+            //foreach (var jobId in listJobId)
+            //{
+            //    jobIds += !string.IsNullOrEmpty(jobId) ? jobId + "; " : string.Empty;
+            //}
+            //jobIds += ")";
+            //jobIds = jobIds.Replace("; )", string.Empty).Replace(")", string.Empty);
+            jobIds = String.Join("; ", listJobId.ToList());
 
             var totalAmount = surcharge
                 .Where(x => x.SettlementCode == settlementNo)
@@ -2077,7 +2101,7 @@ namespace eFMS.API.Accounting.DL.Services
             //Lấy ra list shipment(JobId,MBL,HBL) dựa vào SettlementNo
             var shipments = GetShipmentBySettlementNo(settlementNo);
             //Lấy ra list AdvanceNo dựa vào Shipment(JobId,MBL,HBL)
-            string advanceNos = "";
+            string advanceNos = string.Empty;
             if (shipments != null && shipments.Count() > 0)
             {
                 foreach (var shipment in shipments)
@@ -2085,11 +2109,12 @@ namespace eFMS.API.Accounting.DL.Services
                     var listAdvanceNo = GetAdvanceNoByShipment(shipment.JobId, shipment.MBL, shipment.HBL);
                     foreach (var advanceNo in listAdvanceNo)
                     {
-                        advanceNos += !string.IsNullOrEmpty(advanceNo) ? advanceNo + "; " : "";
+                        advanceNos += !string.IsNullOrEmpty(advanceNo) ? advanceNo + "; " : string.Empty;
                     }
                 }
                 advanceNos += ")";
-                advanceNos = advanceNos.Replace("; )", "").Replace(")", "");
+                //advanceNos = advanceNos.Replace("; )", string.Empty).Replace(")", string.Empty);
+                advanceNos = advanceNos != ")" ? advanceNos.Replace("; )", string.Empty) : string.Empty;
             }
 
             //Mail Info
@@ -2138,13 +2163,14 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Lấy ra thông tin JobId dựa vào SettlementNo
             var listJobId = GetJobIdBySettlementNo(settlementNo);
-            string jobIds = "";
-            foreach (var jobId in listJobId)
-            {
-                jobIds += !string.IsNullOrEmpty(jobId) ? jobId + "; " : "";
-            }
-            jobIds += ")";
-            jobIds = jobIds.Replace("; )", "").Replace(")", "");
+            string jobIds = string.Empty;
+            //foreach (var jobId in listJobId)
+            //{
+            //    jobIds += !string.IsNullOrEmpty(jobId) ? jobId + "; " : string.Empty;
+            //}
+            //jobIds += ")";
+            //jobIds = jobIds.Replace("; )", string.Empty).Replace(")", string.Empty);
+            jobIds = String.Join("; ", listJobId.ToList());
 
             var totalAmount = surcharge
                 .Where(x => x.SettlementCode == settlementNo)
@@ -2154,7 +2180,7 @@ namespace eFMS.API.Accounting.DL.Services
             //Lấy ra list shipment(JobId,MBL,HBL) dựa vào SettlementNo
             var shipments = GetShipmentBySettlementNo(settlementNo);
             //Lấy ra list AdvanceNo dựa vào Shipment(JobId,MBL,HBL)
-            string advanceNos = "";
+            string advanceNos = string.Empty;
             if (shipments != null && shipments.Count() > 0)
             {
                 foreach (var shipment in shipments)
@@ -2162,11 +2188,12 @@ namespace eFMS.API.Accounting.DL.Services
                     var listAdvanceNo = GetAdvanceNoByShipment(shipment.JobId, shipment.MBL, shipment.HBL);
                     foreach (var advanceNo in listAdvanceNo)
                     {
-                        advanceNos += !string.IsNullOrEmpty(advanceNo) ? advanceNo + "; " : "";
+                        advanceNos += !string.IsNullOrEmpty(advanceNo) ? advanceNo + "; " : string.Empty;
                     }
                 }
                 advanceNos += ")";
-                advanceNos = advanceNos.Replace("; )", "").Replace(")", "");
+                //advanceNos = advanceNos.Replace("; )", string.Empty).Replace(")", string.Empty);
+                advanceNos = advanceNos != ")" ? advanceNos.Replace("; )", string.Empty) : string.Empty;
             }
 
             //Mail Info

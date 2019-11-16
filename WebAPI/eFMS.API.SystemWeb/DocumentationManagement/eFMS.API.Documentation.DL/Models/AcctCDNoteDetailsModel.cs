@@ -26,6 +26,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string PodCountry { get; set; }
         public string Vessel { get; set; }
         public string HbConstainers { get; set; }
+        public string HbPackages { get; set; }
         public DateTime? Etd { get; set; }
         public DateTime? Eta { get; set; }
         public bool IsLocked { get; set; }
@@ -44,5 +45,9 @@ namespace eFMS.API.Documentation.DL.Models
         public string WarehouseName { get; set; }
         public string CreatedDate { get; set; }
         public string SoaNo { get; set; }
+        public string HbSealNo { get; set; }
+        public decimal? HbGrossweight { get; set; }
+        public string HbShippers { get; set; }
+        public string HbConsignees { get; set; }
     }
 }

@@ -74,7 +74,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("getAll/{pageNumber}/{pageSize}")]
         public IActionResult Get(CatStageCriteria criteria,int pageNumber,int pageSize)
         {
-            var data = catStageService.GetStages(criteria, pageNumber, pageSize, out int rowCount);
+            var data = catStageService.Paging(criteria, pageNumber, pageSize, out int rowCount);
             var result = new { data, totalItems = rowCount, pageNumber, pageSize };
             return Ok(result);
         }

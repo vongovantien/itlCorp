@@ -116,5 +116,13 @@ namespace eFMS.API.Documentation.Controllers
         {
             return Ok(cdNoteServices.CheckAllowDelete(cdNoteId));
         }
+
+        [HttpPost]
+        [Route("PreviewSIFCdNote")]
+        public IActionResult PreviewSIFCdNote(PreviewCdNoteCriteria criteria)
+        {
+            var result = cdNoteServices.PreviewSIF(criteria);
+            return Ok(result);
+        }
     }
 }

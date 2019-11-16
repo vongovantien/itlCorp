@@ -13,8 +13,8 @@ namespace eFMS.API.Catalogue.DL.IService
     public interface ICatStageService : IRepositoryBase<CatStage, CatStageModel>
     {
         IQueryable<CatStageModel> GetAll();
-        List<CatStageModel> GetStages(CatStageCriteria criteria, int page, int size, out int rowsCount);
-        List<CatStageModel> Query(CatStageCriteria criteria);
+        IQueryable<CatStageModel> Paging(CatStageCriteria criteria, int page, int size, out int rowsCount);
+        IQueryable<CatStageModel> Query(CatStageCriteria criteria);
         HandleState AddStage(CatStageModel catStage);
         HandleState UpdateStage(CatStageModel catStage);
         HandleState DeleteStage(int id);
