@@ -58,19 +58,6 @@ export class SeaFCLImportHBLComponent extends AppList {
     }
 
     ngOnInit(): void {
-
-        // this._store.select(fromRoot.getParamsRouterState)
-        //     .pipe(takeUntil(this.ngUnsubscribe))
-        //     .subscribe(
-        //         (param: any) => {
-        //             console.log(param);
-        //             if (param.id) {
-        //                 this.jobId = param.id;
-        //                 this.getHourseBill(this.jobId);
-
-        //             }
-        //         }
-        //     )
         this._activedRoute.params.subscribe((param: Params) => {
             if (param.id) {
                 this.jobId = param.id;

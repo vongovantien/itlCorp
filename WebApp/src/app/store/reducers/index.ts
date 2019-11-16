@@ -42,5 +42,8 @@ export const getRouterState = createSelector(routerState, (state: fromRouter.Rou
 export const getQueryParamsRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state.queryParams);
 export const getParamsRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state.params);
 export const getUrlRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state.url);
-
+export const selectRouterParamByKey = createSelector(
+    routerState,
+    (state: fromRouter.RouterReducerState<IRouterStateUrl>, { field }: { field: string }) => !!state.state.params[field] ? state.state.params[field] : null
+);
 
