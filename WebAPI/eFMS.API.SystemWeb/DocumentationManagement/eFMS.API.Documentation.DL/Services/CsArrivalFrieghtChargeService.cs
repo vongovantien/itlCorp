@@ -331,7 +331,7 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        public Crystal Preview(Guid hblid)
+        public Crystal PreviewDeliveryOrder(Guid hblid)
         {
             var detail = detailTransactionRepository.First(x => x.Id == hblid);
             var parameter = new SeaDeliveryCommandParam {
@@ -357,16 +357,16 @@ namespace eFMS.API.Documentation.DL.Services
                     OceanVessel = detail.OceanVessel,
                     DepartureAirport = polName,
                     PortofDischarge = podName,
-                    PlaceDelivery = "",
+                    PlaceDelivery = detail.DeliveryPlace,
                     HWBNO = detail.Hwbno,
                     ShippingMarkImport = detail.ShippingMark,
                     SpecialNote = "",
                     Description = "",
                     ContSealNo = cont.SealNo, //continue
-                    TotalPackages = cont.Quantity + "X" + unitRepository.Get(x => x.Id ==  cont.ContainerTypeId).FirstOrDefault().UnitNameEn,
-                    NoPieces = cont.PackageQuantity + " " + unitRepository.Get(x => x.Id == cont.PackageTypeId).FirstOrDefault().UnitNameEn,
+                    TotalPackages = cont.Quantity + "X" + unitRepository.Get(x => x.Id ==  cont.ContainerTypeId)?.FirstOrDefault()?.UnitNameEn,
+                    NoPieces = cont.PackageQuantity + " " + unitRepository.Get(x => x.Id == cont.PackageTypeId)?.FirstOrDefault()?.UnitNameEn,
                     GrossWeight = (decimal)cont.Gw,
-                    Unit = "",
+                    Unit = unitRepository.Get(x => x.Id == cont.UnitOfMeasureId)?.FirstOrDefault()?.UnitNameEn,
                     CBM = (decimal)cont.Cbm,
                     DeliveryOrderNote = "",
                     FirstDestination = detail.DosentTo1,

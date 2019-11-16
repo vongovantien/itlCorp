@@ -20,6 +20,6 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState SetArrivalChargeDefault(CsArrivalFrieghtChargeDefaultEditModel model);
         HandleState SetArrivalHeaderFooterDefault(CsArrivalDefaultModel model);
         HandleState SetDeliveryOrderHeaderFooterDefault(CsDeliveryOrderDefaultModel model);
-        Crystal Preview(Guid hblid);
+        Crystal PreviewDeliveryOrder(Guid hblid);
     }
 }

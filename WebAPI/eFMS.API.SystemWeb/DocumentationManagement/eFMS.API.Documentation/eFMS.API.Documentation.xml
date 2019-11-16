@@ -82,6 +82,12 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.PreviewDeliveryOrder(System.Guid)">
+            <summary>
+            return data source of deliver order report
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsManifestController">
             <summary>
             

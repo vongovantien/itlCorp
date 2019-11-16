@@ -188,9 +188,15 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
-        public IActionResult PreviewDeliveryOrder()
+        /// <summary>
+        /// return data source of deliver order report
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("PreviewDeliveryOrder")]
+        public IActionResult PreviewDeliveryOrder(Guid hblid)
         {
-            return Ok();
+            var data = arrivalFreightChargeServices.PreviewDeliveryOrder(hblid);
+            return Ok(data);
         }
     }
 }
