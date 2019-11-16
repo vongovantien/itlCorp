@@ -9,7 +9,6 @@ import { SortService } from 'src/app/shared/services';
 
 import { takeUntil, catchError } from 'rxjs/operators';
 import { CsShipmentSurcharge, Partner } from 'src/app/shared/models';
-import { SystemConstants } from 'src/constants/system.const';
 
 import * as fromStore from './../../store';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
@@ -21,7 +20,7 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 })
 
 export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingChargeComponent {
-
+    charges: any;
     constructor(
         protected _catalogueRepo: CatalogueRepo,
         protected _store: Store<fromStore.IShareBussinessState>,
@@ -31,6 +30,9 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
     ) {
         super(_catalogueRepo, _store, _documentRepo, _toastService, _sortService);
 
+    }
+
+    getSurcharge() {
         this._store.select(fromStore.getOBHSurChargeState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
@@ -39,7 +41,6 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                     console.log("get obh charge from store", this.charges);
                 }
             );
-
     }
 
     configHeader() {
@@ -67,16 +68,6 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             { title: 'Voucher IDRE Date', field: 'voucherIdredate', sortable: true },
             { title: 'Final Exchange Rate', field: 'finalExchangeRate', sortable: true },
         ];
-    }
-
-    duplicate(index: number) {
-        this.isSubmitted = false;
-        const newCharge = this.charges[index];
-        newCharge.id = SystemConstants.EMPTY_GUID;
-        const newSurCharge: CsShipmentSurcharge = new CsShipmentSurcharge(newCharge);
-
-        this._store.dispatch(new fromStore.AddOBHSurchargeAction(newSurCharge));
-
     }
 
     selectPartnerTypes(partnerType: CommonInterface.IValueDisplay, chargeItem: CsShipmentSurcharge, type: string) {
@@ -193,5 +184,4 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
 
         return valid;
     }
-
 }

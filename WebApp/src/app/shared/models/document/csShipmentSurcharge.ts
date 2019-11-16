@@ -69,6 +69,8 @@ export class CsShipmentSurcharge {
     finalExchangeRate: string = null;
 
     quantityType: any = null;
+    creditNo: string = null;
+    debitNo: string = null;
 
     constructor(object?: any) {
         const self = this;

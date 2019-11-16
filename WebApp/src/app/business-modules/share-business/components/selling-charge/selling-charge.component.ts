@@ -30,6 +30,10 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
     ) {
         super(_catalogueRepo, _store, _documentRepo, _toastService, _sortService);
 
+
+    }
+
+    getSurcharge() {
         this._store.select(fromStore.getSellingSurChargeState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
@@ -64,16 +68,6 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
             { title: 'Voucher IDRE Date', field: 'voucherIdredate', sortable: true },
             { title: 'Final Exchange Rate', field: 'finalExchangeRate', sortable: true },
         ];
-    }
-
-    duplicate(index: number) {
-        this.isSubmitted = false;
-        const newCharge = this.charges[index];
-        newCharge.id = SystemConstants.EMPTY_GUID;
-        const newSurCharge: CsShipmentSurcharge = new CsShipmentSurcharge(newCharge);
-
-        this._store.dispatch(new fromStore.AddSellingSurchargeAction(newSurCharge));
-
     }
 
     saveSellingSurCharge() {
