@@ -117,7 +117,7 @@ namespace eFMS.API.Documentation.DL.Services
                                                     .FirstOrDefault();
             if (currentShipment != null)
             {
-                countNumberJob = Convert.ToInt32(currentShipment.JobNo.Substring(shipment.Length + 4, 5));
+                countNumberJob = Convert.ToInt32(currentShipment.JobNo.Substring(shipment.Length + 5, 5));
             }
             return GenerateID.GenerateJobID(shipment, countNumberJob);
         }

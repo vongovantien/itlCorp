@@ -21,5 +21,6 @@ namespace eFMS.API.Documentation.DL.IService
         AcctCDNoteDetailsModel GetCDNoteDetails(Guid JobId, string cdNo);
         Crystal Preview(AcctCDNoteDetailsModel model);
         bool CheckAllowDelete(Guid cdNoteId);
+        Crystal PreviewSIF(PreviewCdNoteCriteria criteria);
     }
 }

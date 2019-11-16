@@ -32,6 +32,9 @@ namespace eFMS.API.Documentation.DL.Services
         IContextBase<CatCurrencyExchange> catCurrencyExchangeRepository;
         IContextBase<CatCountry> countryRepository;
         IContextBase<CsMawbcontainer> csMawbcontainerRepository;
+        IContextBase<SysUser> sysUserRepo;
+        IContextBase<SysEmployee> sysEmployeeRepo;
+        IContextBase<SysOffice> sysOfficeRepo;
         ICsShipmentSurchargeService surchargeService;
 
         public AcctCDNoteServices(IStringLocalizer<LanguageSub> localizer,
@@ -48,6 +51,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatCurrencyExchange> catCurrencyExchangeRepo,
             IContextBase<CatCountry> countryRepo,
             IContextBase<CsMawbcontainer> csMawbcontainerRepo,
+            IContextBase<SysUser> sysUser,
+            IContextBase<SysEmployee> sysEmployee,
+            IContextBase<SysOffice> sysOffice,
             ICsShipmentSurchargeService surcharge) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -64,6 +70,9 @@ namespace eFMS.API.Documentation.DL.Services
             catCurrencyExchangeRepository = catCurrencyExchangeRepo;
             countryRepository = countryRepo;
             csMawbcontainerRepository = csMawbcontainerRepo;
+            sysUserRepo = sysUser;
+            sysEmployeeRepo = sysEmployee;
+            sysOfficeRepo = sysOffice;
             surchargeService = surcharge;
         }
 
@@ -464,13 +473,13 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item);
                 var hb = trandetailRepositoty.Get(x => x.Id == item.Hblid).FirstOrDefault();
-                var catCharge = catchargeRepository.First(x => x.Id == charge.ChargeId);//((eFMSDataContext)DataContext.DC).CatCharge.First(x => x.Id == charge.ChargeId);
+                var catCharge = catchargeRepository.First(x => x.Id == charge.ChargeId);
                 var exchangeRate = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == item.ExchangeDate.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == "VND" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();//((eFMSDataContext)DataContext.DC).CatCurrencyExchange.Where(x => (x.DatetimeCreated.Value.Date == item.ExchangeDate.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == "VND" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
 
-                charge.Currency = currencyRepository.First(x => x.Id == charge.CurrencyId).CurrencyName;//((eFMSDataContext)DataContext.DC).CatCurrency.First(x => x.Id == charge.CurrencyId).CurrencyName;
+                charge.Currency = currencyRepository.First(x => x.Id == charge.CurrencyId).CurrencyName;
                 charge.ExchangeRate = (exchangeRate != null && exchangeRate.Rate != 0) ? exchangeRate.Rate : 1;
                 charge.Hwbno = hb != null ? hb.Hwbno : opsTransaction?.Hwbno;
-                charge.Unit = unitRepository.First(x => x.Id == charge.UnitId).UnitNameEn;//((eFMSDataContext)DataContext.DC).CatUnit.First(x => x.Id == charge.UnitId).UnitNameEn;
+                charge.Unit = unitRepository.First(x => x.Id == charge.UnitId).UnitNameEn;
                 charge.ChargeCode = catCharge.Code;
                 charge.NameEn = catCharge.ChargeNameEn;
                 listSurcharges.Add(charge);
@@ -488,7 +497,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 //hbOfLadingNo = transaction?.Mawb;
                 soaDetails.MbLadingNo = transaction?.Mawb;
-                hbOfLadingNo = string.Join(",", HBList.OrderByDescending(x => x.Hwbno).Select(x => x.Hwbno).Distinct());
+                hbOfLadingNo = string.Join(", ", HBList.OrderByDescending(x => x.Hwbno).Select(x => x.Hwbno).Distinct());
                 soaDetails.HbLadingNo = hbOfLadingNo;
             }
             else
@@ -502,20 +511,57 @@ namespace eFMS.API.Documentation.DL.Services
                 soaDetails.SumPackages = opsTransaction?.SumPackages;
             }
             var hbConstainers = string.Empty;
+            var hbPackages = string.Empty;
+            var sealsNo = string.Empty;
             decimal? volum = 0;
+            decimal? hbGw = 0;
+            var hbShippers = string.Empty;
+            var hbConsignees = string.Empty;
             foreach (var item in HBList)
             {
                 //hbOfLadingNo += (item.Hwbno + ", ");
-                var conts = csMawbcontainerRepository.Get(x => x.Hblid == item.Id).ToList();//((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == item.Id).ToList();
+                var conts = csMawbcontainerRepository.Get(x => x.Hblid == item.Id).ToList();
                 foreach (var cont in conts)
                 {
-                    volum += cont.Cbm == null ? 0 : cont.Cbm;
-                    var contUnit = unitRepository.Get(x => x.Id == cont.ContainerTypeId).FirstOrDefault();//((eFMSDataContext)DataContext.DC).CatUnit.Where(x => x.Id == cont.ContainerTypeId).FirstOrDefault();
-                    hbConstainers += (cont.Quantity + "x" + contUnit.UnitNameEn + ",");
+                    //volum += cont.Cbm == null ? 0 : cont.Cbm;
+                    var contUnit = unitRepository.Get(x => x.Id == cont.ContainerTypeId).FirstOrDefault();
+                    if (contUnit != null)
+                    {
+                        hbConstainers += (cont.Quantity + "x" + contUnit.UnitNameEn + ", ");
+                    }
+                    var packageUnit = unitRepository.Get(x => x.Id == cont.PackageTypeId).FirstOrDefault();
+                    if (packageUnit != null)
+                    {
+                        hbPackages += (cont.Quantity + "x" + packageUnit.UnitNameEn + ", ");
+                    }
+                    sealsNo += !string.IsNullOrEmpty(cont.SealNo) ? cont.SealNo + ", " : "";
+                    //hbGw += cont.Gw == null ? 0 : cont.Gw;   
                 }
-            }
+                volum += conts.Sum(s => s.Cbm);
+                hbGw += conts.Sum(s => s.Gw);
 
-            var countries = countryRepository.Get().ToList();//((eFMSDataContext)DataContext.DC).CatCountry.ToList();
+                //var shipper = partnerRepositoty.Get(x => x.Id == item.ShipperId).FirstOrDefault();
+                //if(shipper != null)
+                //{
+                //    hbShippers += shipper.PartnerNameEn + ",";
+                //}
+                //var consignee = partnerRepositoty.Get(x => x.Id == item.ConsigneeId).FirstOrDefault();
+                //if(consignee != null)
+                //{
+                //    hbConsignees += consignee.PartnerNameEn + ",";
+                //}
+            }
+            hbConstainers += ".";
+            hbConstainers = hbConstainers != "." ? hbConstainers.Replace(", .", ""): string.Empty;
+            hbPackages += ".";
+            hbPackages = hbPackages != "." ? hbPackages.Replace(", .", "") : string.Empty;
+            sealsNo += ".";
+            sealsNo = sealsNo != "." ? sealsNo.Replace(", .", "") : string.Empty;
+
+            hbShippers = String.Join(", ", partnerRepositoty.Get(x => HBList.Select(s => s.ShipperId).Contains(x.Id)).Select(s => s.PartnerNameEn).Distinct().ToList());
+            hbConsignees = String.Join(", ", partnerRepositoty.Get(x => HBList.Select(s => s.ConsigneeId).Contains(x.Id)).Select(s => s.PartnerNameEn).Distinct().ToList());
+
+            var countries = countryRepository.Get().ToList();
             soaDetails.PartnerNameEn = partner?.PartnerNameEn;
             soaDetails.PartnerShippingAddress = partner?.AddressShippingEn;
             soaDetails.PartnerTel = partner?.Tel;
@@ -538,7 +584,8 @@ namespace eFMS.API.Documentation.DL.Services
                 soaDetails.PodCountry = pod == null ? null : countries.FirstOrDefault(x => x.Id == pod.CountryId)?.NameEn;
             }
             soaDetails.Vessel = transaction != null ? transaction.FlightVesselName : opsTransaction.FlightVessel;
-            soaDetails.HbConstainers = hbConstainers;
+            soaDetails.HbConstainers = hbConstainers; //Container Quantity
+            soaDetails.HbPackages = hbPackages; // Package Quantity
             soaDetails.Etd = transaction != null ? transaction.Etd : opsTransaction.ServiceDate;
             soaDetails.Eta = transaction != null ? transaction.Eta : opsTransaction.FinishDate;
             soaDetails.IsLocked = false;
@@ -548,6 +595,10 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.ProductService = opsTransaction?.ProductService;
             soaDetails.ServiceMode = opsTransaction?.ServiceMode;
             soaDetails.SoaNo = String.Join(",", charges.Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct()); ;
+            soaDetails.HbSealNo = sealsNo;
+            soaDetails.HbGrossweight = hbGw;
+            soaDetails.HbShippers = hbShippers; //Shipper
+            soaDetails.HbConsignees = hbConsignees; //Consignee
 
             return soaDetails;
         }
@@ -821,5 +872,160 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return true;
         }
+
+        #region -- PREVIEW CD NOTE --
+        /// <summary>
+        /// Preview CD Note - Sea FCL Import
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        public Crystal PreviewSIF(PreviewCdNoteCriteria criteria)
+        {
+            Crystal result = null;
+            var _currentUser = currentUser.UserID;
+
+            var listCharge = new List<SeaDebitAgentsNewReport>();
+            var data = GetCDNoteDetails(criteria.JobId, criteria.CreditDebitNo);
+            //Loop qua ds charge từ detail cdnote
+            foreach (var item in data.ListSurcharges)
+            {
+                //Exchange Rate theo Currency truyền vào
+                var exchangeRate = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == item.ExchangeDate.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == criteria.Currency && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                //decimal? _exchangeRate = (exchangeRate != null && exchangeRate.Rate != 0) ? exchangeRate.Rate : 1;
+                decimal? _exchangeRate;
+                if ((exchangeRate != null && exchangeRate.Rate != 0))
+                {
+                    _exchangeRate = exchangeRate.Rate;
+                }
+                else
+                {
+                    //Exchange Rate ngược
+                    var exchangeRateReverse = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == item.ExchangeDate.Value.Date && x.CurrencyFromId == criteria.Currency && x.CurrencyToId == item.CurrencyId && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                    _exchangeRate = (exchangeRateReverse != null && exchangeRateReverse.Rate != 0) ? 1/exchangeRateReverse.Rate : 1;
+                }
+
+                var charge = new SeaDebitAgentsNewReport();
+                //Thông tin Partner
+                charge.PartnerID = data.PartnerId;
+                charge.PartnerName = data.PartnerNameEn;
+                charge.Address = data.PartnerShippingAddress;
+                charge.Workphone = data.PartnerTel;
+                charge.Fax = data.PartnerFax;
+                charge.Taxcode = data.PartnerTaxcode;
+                charge.PersonalContact = data.PartnerPersonalContact;
+
+                //Thông tin Shipment
+                charge.TransID = data.JobNo;
+                charge.DepartureAirport = data.Pol + ", " + data.PolCountry; //POL
+                charge.PlaceDelivery = data.Pod + ", " + data.PodCountry; //POD
+                charge.LoadingDate = data.Etd.Value; //ETD
+                charge.ETA = data.Eta.Value; //ETA
+                charge.ATTN = data.HbShippers;//Shipper -- lấy từ Housebill
+                charge.LocalVessel = data.Vessel;//Vessel
+                charge.MAWB = data.MbLadingNo; //MBLNO
+                charge.Consignee = data.HbConsignees;//Consignee -- lấy từ Housebill
+                charge.ContainerSize = data.HbPackages; //Quantity Cont
+                charge.GrossWeight = data.HbGrossweight.Value;//Total GW of HBL
+                charge.CBM = data.Volum.Value; //Total CBM of HBL
+                charge.SealNo = data.HbSealNo; //Cont/Seal No
+                charge.HWBNO = data.HbLadingNo; //HBLNOs
+
+                //Thông tin list charge
+                charge.Subject = "LOCAL CHARGES";
+                charge.Description = item.NameEn;//Charge name
+                charge.Quantity = item.Quantity;
+                charge.Unit = item.Unit;
+                charge.UnitPrice = item.UnitPrice * _exchangeRate; //Unit Price đã được Exchange Rate theo Currency
+                charge.VAT = item.Vatrate;
+                charge.Credit = (item.Type == Constants.CHARGE_BUY_TYPE || (item.Type == Constants.CHARGE_OBH_TYPE && data.PartnerId == item.PayerId)) ? item.Total * _exchangeRate : 0;
+                charge.Debit = (item.Type == Constants.CHARGE_SELL_TYPE || (item.Type == Constants.CHARGE_OBH_TYPE && data.PartnerId == item.PaymentObjectId)) ? item.Total * _exchangeRate : 0;
+                listCharge.Add(charge);
+            }
+
+            var parameter = new SeaDebitAgentsNewReportParams();
+            parameter.CompanyName = Constants.COMPANY_NAME;
+            parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
+            parameter.CompanyAddress2 = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎";
+            parameter.Website = Constants.COMPANY_WEBSITE;
+            parameter.Contact = _currentUser;//Get user login
+            parameter.CompanyDescription = string.Empty;
+
+            parameter.DebitNo = criteria.CreditDebitNo;
+            parameter.IssuedDate = data.CDNote.DatetimeCreated.Value.ToString("dd/MM/yyyy");//Lấy ngày tạo CDNote
+            parameter.DBTitle = data.CDNote.Type == "CREDIT" ? "CREDIT NOTE" : data.CDNote.Type == "DEBIT" ? "DEBIT NOTE" : "INVOICE";
+            parameter.ReviseNotice = "Revised: " + DateTime.Now.ToString("dd/MM/yyyy");
+
+            //Chuyển tiền Amount thành chữ
+            decimal? _amount = listCharge.Sum(x => x.Debit) - listCharge.Sum(x => x.Credit);
+            decimal _balanceAmount = Math.Abs(_amount.Value);
+            var _inword = string.Empty;
+            if (_balanceAmount > 0)
+            {
+                var _currency = criteria.Currency == Constants.CURRENCY_LOCAL ?
+                           (_balanceAmount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
+                        :
+                        criteria.Currency;
+
+                _inword = InWordCurrency.ConvertNumberCurrencyToString(_balanceAmount, _currency);
+            }
+            parameter.InwordVND = _inword;
+            parameter.IssueInv = string.Empty; //Tạm thời để trống
+            parameter.InvoiceInfo = string.Empty;//Tạm thời để trống
+            parameter.OtherRef = string.Empty;//Tạm thời để trống
+
+            //Lấy thông tin Office của User Login
+            var _accountName = string.Empty;
+            var _bankName = string.Empty;
+            var _bankAddress = string.Empty;
+            var _swiftAccs = string.Empty;
+            var _accsUsd = string.Empty;
+            var _accsVnd = string.Empty;
+            var officeOfUser = GetInfoBankOfOfficeByUserId(_currentUser);
+            if (officeOfUser != null)
+            {
+                _accountName = officeOfUser.BankAccountName;
+                _bankName = officeOfUser.BankName;
+                _bankAddress = officeOfUser.BankAddress;
+                _swiftAccs = officeOfUser.SwiftCode;
+                _accsUsd = officeOfUser.BankAccountUsd;
+                _accsVnd = officeOfUser.BankAccountVnd;
+            }
+            //Thông tin Bank
+            parameter.AccountName = _accountName != null ? _accountName : string.Empty;
+            parameter.BankName = _bankName != null ? _bankName : string.Empty;
+            parameter.BankAddress = _bankAddress != null ? _bankAddress : string.Empty;
+            parameter.SwiftAccs = _swiftAccs != null ? _swiftAccs : string.Empty;
+            parameter.AccsUSD = _accsUsd != null ? _accsUsd : string.Empty;
+            parameter.AccsVND = _accsVnd != null ? _accsVnd : string.Empty;
+
+            parameter.Currency = criteria.Currency;
+
+            result = new Crystal
+            {
+                ReportName = "SeaDebitAgentsNewVND.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddDataSource(listCharge);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameter);
+            return result;
+        }
+
+        private SysOffice GetInfoBankOfOfficeByUserId(string userId)
+        {
+            SysOffice result = null;
+            var employeeId = sysUserRepo.Get(x => x.Id == userId).FirstOrDefault()?.EmployeeId;
+            if (!string.IsNullOrEmpty(employeeId))
+            {
+                var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault().WorkPlaceId;
+                if (branchOfUser != null)
+                {
+                    result = sysOfficeRepo.Get(x => x.Id == branchOfUser).FirstOrDefault();
+                }
+            }
+            return result;
+        }
+        #endregion -- PREVIEW CD NOTE --
     }
 }

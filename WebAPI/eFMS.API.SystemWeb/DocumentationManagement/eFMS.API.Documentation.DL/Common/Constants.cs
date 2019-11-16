@@ -32,5 +32,15 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string CHARGE_BUY_TYPE = "BUY";
         public static readonly string CHARGE_SELL_TYPE = "SELL";
         public static readonly string CHARGE_OBH_TYPE = "OBH";
+
+        #region -- INFO COMPANY --
+        public static readonly string COMPANY_NAME = "INDO TRANS LOGISTICS CORPORATION";
+        public static readonly string COMPANY_ADDRESS1 = "52‎-‎54‎-‎56 ‎Truong Son St‎.‎, ‎Tan Binh Dist‎.‎, ‎HCM City‎, ‎Vietnam‎";
+        public static readonly string COMPANY_ADDRESS2 = "";
+        public static readonly string COMPANY_WEBSITE = "www‎.‎itlvn‎.‎com‎";
+        public static readonly string COMPANY_CONTACT = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎";
+        #endregion
+        public static readonly string CURRENCY_LOCAL = "VND";
+        public static readonly string CURRENCY_USD = "USD";
     }
 }

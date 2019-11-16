@@ -37,7 +37,7 @@ export class ReportPreviewComponent extends PopupBase {
         }
     }
     get scr() {
-        // http://localhost:51830/Default.aspx
+        // http://localhost:53717/Default.aspx
         return this.sanitizer.bypassSecurityTrustResourceUrl(this.api_menu.Report);
     }
 }

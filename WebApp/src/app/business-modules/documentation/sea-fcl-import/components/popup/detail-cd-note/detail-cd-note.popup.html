@@ -9,14 +9,17 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <div class="modal-actions c-button-actions">
-                    <button class="btn btn-sm btn-default m-btn--square m-btn--icon" (click)="previewCdNote()">
+                    <!-- <button class="btn btn-sm btn-default m-btn--square m-btn--icon" (click)="previewCdNote()">
                         <span>
                             <i class="la la-file-text-o"></i>
                             <span>
                                 Preview
                             </span>
                         </span>
-                    </button>
+                    </button> -->
+                    <select class="form-control" [(ngModel)] = "selectedPreviewMode" (ngModelChange)="onChangePreviewMode($event)">
+                        <option [disabled]="mode.isDisabled" *ngFor="let mode of previewModes" [ngValue]="mode">{{mode.title}}</option>
+                    </select>
                 </div>
             </div>
             <div class="modal-body">
@@ -137,7 +140,7 @@
                                             <span class="m--font-bolder">
                                                 Package Quantity:
                                             </span>
-                                            <span>{{CdNoteDetail.hbConstainers}}</span>
+                                            <span>{{CdNoteDetail.hbPackages}}</span>
                                         </div>
                                     </div>
                                     <div class="col-xl-6">
@@ -263,3 +266,7 @@
 <confirm-popup (onSubmit)="onDeleteCdNote()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>
 
 <info-popup [body]="'You can not delete this Credit/Debit Note. Please recheck!'"></info-popup>
+
+<ng-container *ngIf="dataReport">
+    <app-report-preview [data]="dataReport"></app-report-preview>
+</ng-container>
