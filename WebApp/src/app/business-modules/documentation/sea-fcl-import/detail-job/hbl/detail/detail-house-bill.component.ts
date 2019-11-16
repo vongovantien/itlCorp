@@ -169,6 +169,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     }
 
     getDetailHbl() {
+        this.formHouseBill.isDetail = true;
         this._progressRef.start();
         this._store.select(fromStore.getHBLState)
             .pipe(
@@ -191,7 +192,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                         this.shipmentGoodSummaryComponent.totalCBM = this.hblDetail.cbm;
                         this.formHouseBill.etd.setValue(res.data.etd);
                         !!this.hblDetail.etd ? this.formHouseBill.etd.setValue({ startDate: new Date(this.hblDetail.etd), endDate: new Date(this.hblDetail.etd) }) : this.formHouseBill.etd.setValue(null), // * Date;
-                            this.formHouseBill.getListSaleman(res.data.customerId);
+                            this.formHouseBill.getListSaleman();
                         this.formHouseBill.mtBill.setValue(res.data.mawb);
                         this.formHouseBill.shipperDescription.setValue(res.data.shipperDescription);
                         this.formHouseBill.consigneeDescription.setValue(res.data.consigneeDescription);
@@ -227,8 +228,25 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                         this.formHouseBill.mindateEtaWareHouse = !!this.hblDetail.eta ? moment(this.hblDetail.eta) : null;
 
                         setTimeout(() => {
+                            this.formHouseBill.saleMans.forEach(item => {
+                                if (item.id === this.hblDetail.saleManId) {
+                                    this.formHouseBill.selectedSaleman = item;
+                                    return;
+                                }
+                            });
+
+                            // const saleman = this.formHouseBill.saleMans.filter((sm) => {
+                            //     return sm.id === this.hblDetail.saleManId;
+                            // });
+                            // if (!!saleman) {
+                            //     this.formHouseBill.selectedSaleman = saleman;
+
+                            // }
+
+
+
                             this.formHouseBill.selectedCustomer = { field: 'id', value: res.data.customerId };
-                            this.formHouseBill.selectedSaleman = { field: 'id', value: res.data.saleManId };
+                            // this.formHouseBill.selectedSaleman = { field: 'id', value: res.data.saleManId };
                             this.formHouseBill.selectedShipper = { field: 'id', value: res.data.shipperId };
                             this.formHouseBill.selectedConsignee = { field: 'id', value: res.data.consigneeId };
                             this.formHouseBill.selectedNotifyParty = { field: 'id', value: res.data.notifyPartyId };
