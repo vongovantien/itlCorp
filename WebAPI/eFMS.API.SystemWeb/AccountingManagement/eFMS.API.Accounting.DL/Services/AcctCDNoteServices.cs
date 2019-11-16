@@ -89,14 +89,14 @@ namespace eFMS.API.Accounting.DL.Services
                     if (jobOpsTrans != null)
                     {
                         jobOpsTrans.UserModified = model.UserModified;
-                        jobOpsTrans.ModifiedDate = DateTime.Now;
+                        jobOpsTrans.DatetimeModified = DateTime.Now;
                         ((eFMSDataContext)DataContext.DC).OpsTransaction.Update(jobOpsTrans);
                     }
                     var jobCSTrans = ((eFMSDataContext)DataContext.DC).CsTransaction.FirstOrDefault();
                     if (jobCSTrans != null)
                     {
                         jobCSTrans.UserModified = model.UserModified;
-                        jobCSTrans.ModifiedDate = DateTime.Now;
+                        jobCSTrans.DatetimeModified = DateTime.Now;
                         ((eFMSDataContext)DataContext.DC).CsTransaction.Update(jobCSTrans);
                     }
                 }
@@ -136,14 +136,14 @@ namespace eFMS.API.Accounting.DL.Services
                     if(jobOpsTrans != null)
                     {
                         jobOpsTrans.UserModified = model.UserModified;
-                        jobOpsTrans.ModifiedDate = DateTime.Now;
+                        jobOpsTrans.DatetimeModified = DateTime.Now;
                         ((eFMSDataContext)DataContext.DC).OpsTransaction.Update(jobOpsTrans);
                     }
                     var jobCSTrans = ((eFMSDataContext)DataContext.DC).CsTransaction.FirstOrDefault();
                     if(jobCSTrans != null)
                     {
                         jobCSTrans.UserModified = model.UserModified;
-                        jobCSTrans.ModifiedDate = DateTime.Now;
+                        jobCSTrans.DatetimeModified = DateTime.Now;
                         ((eFMSDataContext)DataContext.DC).CsTransaction.Update(jobCSTrans);
                     }
                     ((eFMSDataContext)DataContext.DC).SaveChanges();
@@ -301,7 +301,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 pol = ((eFMSDataContext)DataContext.DC).CatPlace.FirstOrDefault(x => x.Id == transaction.Pol);
                 pod = ((eFMSDataContext)DataContext.DC).CatPlace.FirstOrDefault(x => x.Id == transaction.Pod);
-                warehouseId = transaction.WareHouseId ?? null;
+                //warehouseId = transaction.WareHouseId ?? null;
             }
             else
             {
@@ -368,7 +368,7 @@ namespace eFMS.API.Accounting.DL.Services
             foreach(var item in HBList)
             {
                 hbOfLadingNo += (item.Hwbno + ", ");
-                mbOfLadingNo += (item.JobNo + ", ");
+                //mbOfLadingNo += (item.JobNo + ", ");
                 var conts = ((eFMSDataContext)DataContext.DC).CsMawbcontainer.Where(x => x.Hblid == item.Id).ToList();
                 foreach(var cont in conts)
                 {
@@ -478,14 +478,14 @@ namespace eFMS.API.Accounting.DL.Services
                             if (jobOpsTrans != null)
                             {
                                 //jobOpsTrans.UserModified = model.UserModified;
-                                jobOpsTrans.ModifiedDate = DateTime.Now;
+                                jobOpsTrans.DatetimeModified = DateTime.Now;
                                 ((eFMSDataContext)DataContext.DC).OpsTransaction.Update(jobOpsTrans);
                             }
                             var jobCSTrans = ((eFMSDataContext)DataContext.DC).CsTransaction.FirstOrDefault();
                             if (jobCSTrans != null)
                             {
                                 //jobCSTrans.UserModified = model.UserModified;
-                                jobCSTrans.ModifiedDate = DateTime.Now;
+                                jobCSTrans.DatetimeModified = DateTime.Now;
                                 ((eFMSDataContext)DataContext.DC).CsTransaction.Update(jobCSTrans);
                             }
                         }

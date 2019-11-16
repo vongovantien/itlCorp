@@ -438,7 +438,7 @@ namespace eFMS.API.Accounting.DL.Services
                                    CustomerID = sur.PaymentObjectId,
                                    ServiceDate = ops.Hblid == sur.Hblid ? ops.ServiceDate :
                                    (cst.TransactionType == "AI" || cst.TransactionType == "SFI" || cst.TransactionType == "SLI" || cst.TransactionType == "SCI" ? cst.Eta : cst.Etd),
-                                   CreatedDate = ops.Hblid == sur.Hblid ? ops.CreatedDate : cst.CreatedDate,
+                                   CreatedDate = ops.Hblid == sur.Hblid ? ops.DatetimeCreated : cst.DatetimeCreated,
                                    InvoiceIssuedDate = sur.Type == Constants.TYPE_CHARGE_SELL ? debitN.DatetimeCreated : creditN.DatetimeCreated,
                                    TransactionType = cst.TransactionType,
                                    UserCreated = ops.Hblid == sur.Hblid ? ops.UserCreated : cst.UserCreated,
@@ -492,7 +492,7 @@ namespace eFMS.API.Accounting.DL.Services
                                    CustomerID = sur.PaymentObjectId,
                                    ServiceDate = ops.Hblid == sur.Hblid ? ops.ServiceDate :
                                    (cst.TransactionType == "AI" || cst.TransactionType == "SFI" || cst.TransactionType == "SLI" || cst.TransactionType == "SCI" ? cst.Eta : cst.Etd),
-                                   CreatedDate = ops.Hblid == sur.Hblid ? ops.CreatedDate : cst.CreatedDate,
+                                   CreatedDate = ops.Hblid == sur.Hblid ? ops.DatetimeCreated : cst.DatetimeCreated,
                                    InvoiceIssuedDate = debitN.DatetimeCreated,
                                    TransactionType = cst.TransactionType,
                                    UserCreated = ops.Hblid == sur.Hblid ? ops.UserCreated : cst.UserCreated,
@@ -547,7 +547,7 @@ namespace eFMS.API.Accounting.DL.Services
                                   CustomerID = sur.PayerId,
                                   ServiceDate = ops.Hblid == sur.Hblid ? ops.ServiceDate :
                                   (cst.TransactionType == "AI" || cst.TransactionType == "SFI" || cst.TransactionType == "SLI" || cst.TransactionType == "SCI" ? cst.Eta : cst.Etd),
-                                  CreatedDate = ops.Hblid == sur.Hblid ? ops.CreatedDate : cst.CreatedDate,
+                                  CreatedDate = ops.Hblid == sur.Hblid ? ops.DatetimeCreated : cst.DatetimeCreated,
                                   InvoiceIssuedDate = creditN.DatetimeCreated,
                                   TransactionType = cst.TransactionType,
                                   UserCreated = ops.Hblid == sur.Hblid ? ops.UserCreated : cst.UserCreated,
