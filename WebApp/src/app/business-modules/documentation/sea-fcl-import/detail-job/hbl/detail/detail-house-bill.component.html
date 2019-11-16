@@ -1,6 +1,15 @@
 <div class="sea-fcl-detail-hbl-page">
     <app-sub-header>
         <div class="c-button-actions">
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                (click)="onPreview()">
+                <span>
+                    <i class="la la-print"></i>
+                    <span>
+                        Preview
+                    </span>
+                </span>
+            </button>
             <app-default-button (click)="onUpdateHblDetail()" [buttonSetting]="saveButtonSetting"></app-default-button>
             <app-default-button (click)="combackToHBLList()" [buttonSetting]="cancelButtonSetting"></app-default-button>
         </div>
@@ -32,3 +41,6 @@
 </div>
 <info-popup [body]="'Opps, It looks like your missed something, Please recheck the highlighted field below.'"
     [title]="'Cannot Create HBL'"></info-popup>
+<ng-container *ngIf="dataReport">
+    <app-report-preview [data]="dataReport"></app-report-preview>
+</ng-container>

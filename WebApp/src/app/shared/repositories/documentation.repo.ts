@@ -354,7 +354,12 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
-
+    updateArrivalInfo(body: any = {}) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/UpdateArrival`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
     previewSIFCdNote(body: any) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/PreviewSIFCdNote`, body).pipe(
             map((data: any) => data)
@@ -402,6 +407,7 @@ export class DocumentationRepo {
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
+	}
     }
 
     updateArrivalInfo(body: any = {}) {
@@ -410,4 +416,13 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+    previewDeliveryOrder(hblId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/PreviewDeliveryOrder`, { hblid: hblId }).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
 }
