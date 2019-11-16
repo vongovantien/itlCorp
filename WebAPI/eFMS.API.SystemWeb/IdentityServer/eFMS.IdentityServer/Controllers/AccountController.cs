@@ -29,7 +29,7 @@ namespace eFMS.IdentityServer.Controllers
         [HttpGet("Signout")]
         public IActionResult SignoutAsync()
         {
-            var userId = User.Claims.FirstOrDefault(wh => wh.Type == "id").Value;
+            var userId = User.Claims.FirstOrDefault(wh => wh.Type == "id")?.Value;
             var uLogs = userLogService.Get(x => x.UserId == userId && x.LoggedOffOn == null).OrderByDescending(x => x.LoggedInOn);
             if (uLogs.Count() > 0)
             {

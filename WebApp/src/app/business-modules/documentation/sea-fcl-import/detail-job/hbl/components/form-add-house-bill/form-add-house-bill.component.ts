@@ -1,12 +1,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
-import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, DocumentationRepo, SystemRepo } from 'src/app/shared/repositories';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { catchError, distinctUntilChanged, map, takeUntil, tap } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
 import { SeaFClImportFormCreateComponent } from '../../../../components/form-create/form-create-sea-fcl-import.component';
 import { SeaFCLImportCreateJobComponent } from '../../../../create-job/create-job-fcl-import.component';
+import { BehaviorSubject } from 'rxjs';
+import { User } from 'src/app/shared/models';
 
 @Component({
     selector: 'app-form-add-house-bill',
@@ -37,11 +39,10 @@ export class FormAddHouseBillComponent extends AppForm {
     shipperDescription: AbstractControl;
     notifyPartyDescription: AbstractControl;
     alsonotifyPartyDescription: AbstractControl;
-
-
+    term$ = new BehaviorSubject<string>('');
+    isShowSaleMan: boolean = false;
+    isShowConsignee: boolean = false;
     oceanVoyNo: AbstractControl;
-
-
     configCustomer: CommonInterface.IComboGirdConfig | any = {};
     configSaleman: CommonInterface.IComboGirdConfig | any = {};
     configShipper: CommonInterface.IComboGirdConfig | any = {};
@@ -55,7 +56,7 @@ export class FormAddHouseBillComponent extends AppForm {
 
 
     selectedCustomer: Partial<CommonInterface.IComboGridData | any> = {};
-    selectedSaleman: Partial<CommonInterface.IComboGridData | any> = {};
+    selectedSaleman: any = {};
     selectedShipper: Partial<CommonInterface.IComboGridData | any> = {};
     selectedConsignee: Partial<CommonInterface.IComboGridData | any> = {};
     selectedNotifyParty: Partial<CommonInterface.IComboGridData | any> = {};
@@ -77,9 +78,13 @@ export class FormAddHouseBillComponent extends AppForm {
     isSubmited: boolean = false;
     PortChargeLikePortLoading: boolean = false;
     countChangePort: number = 0;
+    countChangePartner: number = 0;
     mindateEta: any = null;
     mindateEtaWareHouse: any = null;
-
+    saleMans: any = [];
+    headersSaleman: CommonInterface.IHeaderTable[];
+    saleManInCustomerFilter: any = {};
+    isDetail: boolean = false;
     hbOfladingTypes: CommonInterface.ICommonTitleValue[] = [
         { title: 'Copy', value: 'Copy' },
         { title: 'Original', value: 'Original' },
@@ -97,13 +102,17 @@ export class FormAddHouseBillComponent extends AppForm {
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _documentationRepo: DocumentationRepo,
+        private _systemRepo: SystemRepo
 
     ) {
         super();
     }
 
     ngOnInit() {
-
+        this.getListSaleman();
+        this.headersSaleman = [
+            { title: 'User Name', field: 'username' },
+        ];
 
         this.configCustomer = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
@@ -117,9 +126,9 @@ export class FormAddHouseBillComponent extends AppForm {
 
         this.configSaleman = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
-                { field: 'saleMan_ID', label: 'Sale Man' },
+                { field: 'username', label: 'Username' },
             ],
-        }, { selectedDisplayFields: ['saleMan_ID'], });
+        }, { selectedDisplayFields: ['username'], });
 
         this.configShipper = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
@@ -191,11 +200,14 @@ export class FormAddHouseBillComponent extends AppForm {
                 { field: 'code', label: 'Code' }
             ],
         }, { selectedDisplayFields: ['name_EN'], });
+
         this.initForm();
 
 
-
     }
+
+
+
 
     update(formdata: any) {
         // this.formGroup.patchValue(formdata);
@@ -295,7 +307,7 @@ export class FormAddHouseBillComponent extends AppForm {
 
         this.getListCustomer();
         this.getListShipper();
-        this.getListConsignee();
+        // this.getListConsignee();
         this.getListPort();
         this.getListSupplier();
         this.getListProvince();
@@ -307,8 +319,8 @@ export class FormAddHouseBillComponent extends AppForm {
     bindDescriptionModel(data: any, key: string) {
         switch (key) {
             case 'Customer':
-                const checkConsigneeExistence = idParam => this.configConsignee.dataSource.some(({ id }) => id === idParam);
-                if (this.selectedConsignee.value === undefined && checkConsigneeExistence(this.selectedCustomer.data.id)) {
+                // const checkConsigneeExistence = idParam => this.configConsignee.dataSource.some(({ id }) => id === idParam);
+                if (this.selectedConsignee.value !== undefined) {
                     this.selectedConsignee = { field: 'id', value: data.id, data: data };
                     this.consigneedescriptionModel = this.selectedConsignee.data.partnerNameEn + "\n" +
                         this.selectedConsignee.data.addressShippingEn + "\n" +
@@ -324,15 +336,27 @@ export class FormAddHouseBillComponent extends AppForm {
 
     onSelectDataFormInfo(data: any, key: string) {
         switch (key) {
+            case 'saleman':
+                this.selectedSaleman = data;
+
+                this.isShowSaleMan = false;
+                break;
+
             case 'Customer':
                 this.selectedCustomer = { field: 'id', value: data.id, data: data };
-                this.bindDescriptionModel(data, 'Customer');
+                if (this.selectedConsignee.value === undefined) {
+                    this.selectedConsignee = { field: 'id', value: data.id, data: data };
+                    this.bindDescriptionModel(data, 'Customer');
+                }
+                this.saleMans.forEach(item => {
+                    if (item.id === this.selectedCustomer.data.salePersonId) {
+                        this.selectedSaleman = item;
+                    }
+                });
 
-                this.getListSaleman(this.selectedCustomer.data.id);
+
                 break;
-            case 'Saleman':
-                this.selectedSaleman = { field: 'id', value: data.id, data: data };
-                break;
+
             case 'Shipper':
                 this.selectedShipper = { field: 'shortName', value: data.id, data: data };
                 this.shipperdescriptionModel = this.selectedShipper.data.partnerNameEn + "\n" +
@@ -394,6 +418,14 @@ export class FormAddHouseBillComponent extends AppForm {
         }
     }
 
+    bindSalemanImport(data: string) {
+
+        this.saleMans.forEach(item => {
+            if (item.id === data) {
+                this.selectedSaleman = item;
+            }
+        });
+    }
 
 
 
@@ -402,6 +434,7 @@ export class FormAddHouseBillComponent extends AppForm {
         this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.CUSTOMER })
             .subscribe((res: any) => {
                 this.configCustomer.dataSource = res;
+                this.getListConsignee();
             });
     }
 
@@ -412,7 +445,17 @@ export class FormAddHouseBillComponent extends AppForm {
 
     getListConsignee() {
         this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.CONSIGNEE })
-            .subscribe((res: any) => { this.configConsignee.dataSource = res; this.configNotifyParty.dataSource = res; this.configAlsoNotifyParty.dataSource = res; });
+            .subscribe((res: any) => {
+                this.configConsignee.dataSource = res;
+                this.configNotifyParty.dataSource = res;
+                this.configAlsoNotifyParty.dataSource = res;
+                const result = this.configCustomer.dataSource.concat(this.configConsignee.dataSource).filter(function (value, index, self) {
+                    return self.indexOf(value) === index;
+                });
+                console.log(result);
+                this.configConsignee.dataSource = result;
+
+            });
     }
 
     getListSupplier() {
@@ -428,13 +471,14 @@ export class FormAddHouseBillComponent extends AppForm {
         this._catalogueRepo.getAllProvinces().subscribe((res: any) => { this.configPlaceOfIssued.dataSource = res; });
     }
 
-    getListSaleman(id: any) {
-        this._catalogueRepo.getListSaleman(id).subscribe((res: any) => {
+    getListSaleman() {
+        this._systemRepo.getListSystemUser().subscribe((res: any) => {
             if (!!res) {
-                this.configSaleman.dataSource = res;
+                this.saleMans = res;
+
             }
             else {
-                this.configSaleman.dataSource = [];
+                this.saleMans = [];
             }
 
         });

@@ -6,6 +6,7 @@ import { catchError, finalize } from "rxjs/operators";
 import { SortService } from "src/app/shared/services";
 import { ToastrService } from "ngx-toastr";
 import { ConfirmPopupComponent, InfoPopupComponent } from "src/app/shared/common/popup";
+import { ReportPreviewComponent } from "src/app/shared/common";
 
 @Component({
     selector: 'cd-note-detail-popup',
@@ -15,6 +16,7 @@ export class CdNoteDetailPopupComponent extends PopupBase {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteCdNotePopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteCdNotePopup: InfoPopupComponent;
     @ViewChild(CdNoteAddPopupComponent, { static: false }) cdNoteEditPopupComponent: CdNoteAddPopupComponent;
+    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     @Output() onDeleted: EventEmitter<any> = new EventEmitter<any>();
 
     jobId: string = null;
@@ -28,6 +30,17 @@ export class CdNoteDetailPopupComponent extends PopupBase {
     totalCredit: string = '';
     totalDebit: string = '';
     balanceAmount: string = '';
+
+    dataReport: any = null;
+
+    previewModes: any[] = 
+    [
+        { title: 'Preview', value: "", isDisabled: true },
+        { title: 'Preview with USD', value: "USD", isDisabled: false },
+        { title: 'Preview with Local', value: "VND", isDisabled: false },
+        { title: 'Preview with Original', value: "USD", isDisabled: false }
+    ];
+    selectedPreviewMode: any;//CommonInterface.ICommonTitleValue;
 
     constructor(
         private _documentationRepo: DocumentationRepo,
@@ -52,6 +65,7 @@ export class CdNoteDetailPopupComponent extends PopupBase {
             { title: "Debit Value (Local)", field: 'total', sortable: true },
             { title: 'Note', field: 'notes', sortable: true }
         ];
+        this.selectedPreviewMode = this.previewModes[0];
     }
 
     getDetailCdNote(jobId: string, cdNote: string) {
@@ -90,6 +104,7 @@ export class CdNoteDetailPopupComponent extends PopupBase {
     }
 
     closePopup() {
+        this.selectedPreviewMode = this.previewModes[0];
         this.hide();
     }
 
@@ -137,10 +152,6 @@ export class CdNoteDetailPopupComponent extends PopupBase {
         this.cdNoteEditPopupComponent.show();
     }
 
-    previewCdNote() {
-        console.log('preview cd note')
-    }
-
     onUpdateCdNote(dataRequest: any) {
         this.onDeleted.emit();
         this.getDetailCdNote(this.jobId, this.cdNote);
@@ -150,6 +161,20 @@ export class CdNoteDetailPopupComponent extends PopupBase {
         if (this.CdNoteDetail) {
             this.CdNoteDetail.listSurcharges = this._sortService.sort(this.CdNoteDetail.listSurcharges, sort, this.order);
         }
+    }
+
+    onChangePreviewMode(data: any){
+        this._documentationRepo.previewSIFCdNote({jobId: this.jobId, creditDebitNo: this.cdNote, currency: data.value})
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    setTimeout(() => {
+                        this.previewPopup.frm.nativeElement.submit();
+                        this.previewPopup.show();
+                    }, 1000);
+                },
+            );
     }
 
 }

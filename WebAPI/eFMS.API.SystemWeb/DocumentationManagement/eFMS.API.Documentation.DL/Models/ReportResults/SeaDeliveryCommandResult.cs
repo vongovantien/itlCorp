@@ -8,7 +8,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
     {
         public string DONo { get; set; }
         public DateTime DateConfirm { get; set; }
-        public DateTime FlightDate { get; set; }
+        public DateTime? FlightDate { get; set; }
         public string  LocalVessel { get; set; }	
         public string ContSealNo { get; set; }
         public string ForCarrier { get; set; }

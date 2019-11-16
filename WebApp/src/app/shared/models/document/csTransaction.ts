@@ -44,9 +44,9 @@ export class CsTransaction {
     isLocked: boolean = null;
     lockedDate: string = null;
     userCreated: string = null;
-    createdDate: string = null;
+    datetimeCreated: string = null;
     userModified: string = null;
-    modifiedDate: string = null;
+    datetimeModified: string = null;
     active: boolean = true;
     inactiveOn: string = null;
 

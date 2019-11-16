@@ -327,6 +327,8 @@ namespace eFMS.API.Documentation.DL.Services
             detailTransaction.DosentTo1 = model.Doheader1;
             detailTransaction.DosentTo2 = model.Doheader2;
             detailTransaction.Dofooter = model.Dofooter;
+            detailTransaction.DeliveryOrderNo = model.DeliveryOrderNo;
+            detailTransaction.DeliveryOrderPrintedDate = model.DeliveryOrderPrintedDate;
             var result = detailTransactionRepository.Update(detailTransaction, x => x.Id == model.HBLID);
             return result;
         }
@@ -335,7 +337,10 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var detail = detailTransactionRepository.First(x => x.Id == hblid);
             var parameter = new SeaDeliveryCommandParam {
+                Consignee = "s",
+                No = "s",
                 CompanyName = "Công ty IndoTrans",
+                CompanyDescription = "Company Description",
                 CompanyAddress1 = "52 Trường Sơn, Phường 2, Tân Bình",
                 CompanyAddress2 = "52 Trường Sơn, Phường 2, Tân Bình",
                 Website = "itlvn.com.vn",
@@ -357,21 +362,22 @@ namespace eFMS.API.Documentation.DL.Services
                     OceanVessel = detail.OceanVessel,
                     DepartureAirport = polName,
                     PortofDischarge = podName,
-                    PlaceDelivery = detail.DeliveryPlace,
+                    PlaceDelivery = podName,
                     HWBNO = detail.Hwbno,
                     ShippingMarkImport = detail.ShippingMark,
                     SpecialNote = "",
-                    Description = "",
+                    Description = cont.Description,
                     ContSealNo = cont.SealNo, //continue
                     TotalPackages = cont.Quantity + "X" + unitRepository.Get(x => x.Id ==  cont.ContainerTypeId)?.FirstOrDefault()?.UnitNameEn,
                     NoPieces = cont.PackageQuantity + " " + unitRepository.Get(x => x.Id == cont.PackageTypeId)?.FirstOrDefault()?.UnitNameEn,
                     GrossWeight = (decimal)cont.Gw,
                     Unit = unitRepository.Get(x => x.Id == cont.UnitOfMeasureId)?.FirstOrDefault()?.UnitNameEn,
                     CBM = (decimal)cont.Cbm,
-                    DeliveryOrderNote = "",
+                    DeliveryOrderNote = detail.Dofooter,
                     FirstDestination = detail.DosentTo1,
                     SecondDestination = detail.DosentTo2,
-                    ArrivalNote = detail.ArrivalNo
+                    ArrivalNote = detail.ArrivalNo,
+                    FlightDate = detail.Eta
                 };
                 dataSources.Add(item);
             }

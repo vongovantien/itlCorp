@@ -51,7 +51,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="type"></param>
         /// <returns></returns>
         [HttpGet("GetArrival")]
-        [Authorize]
+        //[Authorize]
         public IActionResult GetArrival(Guid hblid, TransactionTypeEnum type)
         {
             string transactionType = DataTypeEx.GetType(type);
@@ -66,7 +66,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="type"></param>
         /// <returns></returns>
         [HttpGet("GetDeliveryOrder")]
-        [Authorize]
+        //[Authorize]
         public IActionResult GetDeliveryOrder(Guid hblid, TransactionTypeEnum type)
         {
             string transactionType = DataTypeEx.GetType(type);
