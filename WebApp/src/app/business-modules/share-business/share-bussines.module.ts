@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ModalModule, BsDropdownModule, PaginationModule } from 'ngx-bootstrap';
+import { ModalModule, BsDropdownModule, PaginationModule, TooltipModule } from 'ngx-bootstrap';
 import { FormsModule } from '@angular/forms';
 import { CommonComponentModule } from 'src/app/shared/common/common.module';
 import { DirectiveModule } from 'src/app/shared/directives/directive.module';
@@ -50,6 +50,7 @@ const customCurrencyMaskConfig = {
         PipeModule,
         PaginationModule.forRoot(),
         BsDropdownModule.forRoot(),
+        TooltipModule.forRoot(),
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
         StoreModule.forFeature('share-bussiness', reducers),
         EffectsModule.forFeature(effects),

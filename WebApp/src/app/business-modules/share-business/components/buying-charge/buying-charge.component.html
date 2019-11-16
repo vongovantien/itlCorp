@@ -41,14 +41,15 @@
                             class="m-form m-form--state">
                             <td class="table-actions-col fixed-side">
                                 <div class="table-actions">
-                                    <button (click)="duplicate(i)"
+                                    <button (click)="duplicate(i,'BUY')"
                                         class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only text-white"
                                         title="Duplicate"><i class="la la-copy"></i>
                                     </button>
                                     <button type="button" (click)="deleteCharge(charge,i, 'BUY')" appLoadingButton
                                         [state]="
                                     !!charge.soano 
-                                    || !!charge.cdno
+                                    || !!charge.creditno
+                                    || !!charge.debitno
                                     || !!charge.settlementCode
                                     || !!charge.voucherId
                                     || !!charge.voucherIddate
@@ -79,7 +80,7 @@
                                 </div>
                             </td>
                             <td>
-                                <div class="form-group"
+                                <div class="form-group" [tooltip]="charge.chargeNameEn"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.chargeId || isDuplicateChargeCode)}">
                                     <app-combo-grid-virtual-scroll
                                         [currentActiveItemId]="{field:'id', value:charge.chargeId}"
@@ -94,12 +95,12 @@
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (charge.quantity < 0)}">
                                     <div class="row quantity-hint">
-                                        <div class="col-md-8 p-r-none">
+                                        <div class="col-md-6 p-r-none">
                                             <input type="text" class="form-control" [(ngModel)]="charge.quantity"
                                                 currencyMask placeholder="Quantity"
                                                 (ngModelChange)="onChangeQuantity($event, charge)">
                                         </div>
-                                        <div class="col-md-4 p-l-none">
+                                        <div class="col-md-6 p-l-none">
                                             <select class="form-control border" [(ngModel)]="charge.quantityType"
                                                 (ngModelChange)="onChangeQuantityHint($event, charge)">
                                                 <option value="null" disabled></option>
@@ -211,8 +212,9 @@
                                 </div>
                             </td>
                             <td class="disabled">
-                                <div class="form-group ">
-                                    <input type="text" class="form-control" [(ngModel)]="charge.cdno" disabled>
+                                <div class="form-group">
+                                    <input type="text" class="form-control text-primary" disabled
+                                        [value]="(!!charge.creditNo ? charge.creditNo + ' /' : '_/') + (!!charge.debitNo ? charge.debitNo : '_ ')">
                                 </div>
                             </td>
                             <td class="disabled">

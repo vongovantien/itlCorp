@@ -103,12 +103,12 @@
                                             <td>
                                                 <div class="form-group">
                                                     <div class="row quantity-hint">
-                                                        <div class="col-md-8 p-r-none">
+                                                        <div class="col-md-6 p-r-none">
                                                             <input type="number" class="form-control"
                                                                 [(ngModel)]="charge.quantity" placeholder="Quantity"
                                                                 (ngModelChange)="onChangeQuantity($event, charge)">
                                                         </div>
-                                                        <div class="col-md-4 p-l-none">
+                                                        <div class="col-md-6 p-l-none">
                                                             <select class="form-control border"
                                                                 [(ngModel)]="charge.quantityType"
                                                                 (ngModelChange)="onChangeQuantityType($event, charge)">

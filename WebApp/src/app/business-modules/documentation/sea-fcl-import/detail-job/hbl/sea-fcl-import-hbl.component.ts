@@ -14,9 +14,11 @@ import { Container } from 'src/app/shared/models/document/container.model';
 import { CsShipmentSurcharge } from 'src/app/shared/models';
 
 import * as fromStore from './../../store';
+import * as fromRoot from 'src/app/store';
 import * as fromShareBussiness from './../../../../share-business/store';
 
-import { catchError, finalize, takeUntil, switchMap, tap } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { Observable, pipe } from 'rxjs';
 
 @Component({
     selector: 'app-sea-fcl-import-hbl',
@@ -31,7 +33,7 @@ export class SeaFCLImportHBLComponent extends AppList {
     goodSummary: any = {};
 
 
-    containers: Container[] = new Array<Container>();
+    containers: Observable<Container[]>;
     selectedShipment: any; // TODO model.
     selectedHbl: CsTransactionDetail;
 
@@ -75,26 +77,8 @@ export class SeaFCLImportHBLComponent extends AppList {
             { title: 'CBM', field: 'cbm', sortable: true }
         ];
 
-        this._store.select(fromStore.getContainerSaveState)
-            .pipe(
-                takeUntil(this.ngUnsubscribe),
-                tap(
-                    (containers: Container[]) => {
-                        this.containers = (containers || []).map(contaienr => new Container(contaienr));
-                    }
-                ),
-                switchMap(
-                    () => this._store.select(fromStore.seaFCLImportTransactionState)
-                        .pipe(
-                            takeUntil(this.ngUnsubscribe),
-                        )
-                )
-            )
-            .subscribe(
-                (shipment: any) => {
-                    this.selectedShipment = shipment;
-                }
-            );
+        this.containers = this._store.select(fromStore.getContainerSaveState);
+        this.selectedShipment = this._store.select(fromStore.seaFCLImportTransactionState);
 
         this.getGoodSumaryOfHbl();
     }
@@ -199,7 +183,6 @@ export class SeaFCLImportHBLComponent extends AppList {
         this._store.dispatch(new fromStore.GetContainerAction({ hblid: hbl.id }));
         this._store.dispatch(new fromStore.SeaFCLImportGetDetailAction(hbl.jobId));
         this._store.dispatch(new fromShareBussiness.GetProfitAction(this.selectedHbl.id));
-
 
         switch (this.selectedTabSurcharge) {
             case 'BUY':
