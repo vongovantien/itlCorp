@@ -83,32 +83,24 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="form-group">
-                                            <input type="text" class="form-control" [(ngModel)]="container.containerNo"
-                                                name="containerNo">
+                                        <div class="form-group"
+                                            [ngClass]="{'m-form__group has-danger': isSubmitted && !!container.gw && container.gw < 0}">
+                                            <input type="number" class="form-control" [(ngModel)]="container.gw"
+                                                name="gw">
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="form-group">
-                                            <input type="text" class="form-control" [(ngModel)]="container.sealNo"
-                                                name="sealNo">
+                                        <div class="form-group"
+                                            [ngClass]="{'m-form__group has-danger': isSubmitted && !!container.chargeAbleWeight && container.chargeAbleWeight < 0}">
+                                            <input type="number" class="form-control"
+                                                [(ngModel)]="container.chargeAbleWeight" name="chargeAbleWeight">
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="form-group">
-                                            <input type="text" class="form-control" [(ngModel)]="container.markNo"
-                                                name="markNo">
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="form-group">
-                                            <select class="form-control" [(ngModel)]="container.commodityId"
-                                                name="commidityId">
-                                                <option value="null">Please select</option>
-                                                <option *ngFor="let commodity of commodities" [ngValue]="commodity.id">
-                                                    {{commodity.commodityNameEn}}
-                                                </option>
-                                            </select>
+                                        <div class="form-group"
+                                            [ngClass]="{'m-form__group has-danger': isSubmitted && !!container.cbm && container.cbm < 0}">
+                                            <input type="number" class="form-control" [(ngModel)]="container.cbm"
+                                                name="cbm">
                                         </div>
                                     </td>
                                     <td>
@@ -131,17 +123,50 @@
                                     </td>
                                     <td>
                                         <div class="form-group">
+                                            <input type="text" class="form-control" [(ngModel)]="container.containerNo"
+                                                name="containerNo">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" [(ngModel)]="container.sealNo"
+                                                name="sealNo">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" [(ngModel)]="container.markNo"
+                                                name="markNo">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <!-- <select class="form-control" [(ngModel)]="container.commodityId"
+                                                name="commidityId">
+                                                <option value="null">Please select</option>
+                                                <option *ngFor="let commodity of commodities" [ngValue]="commodity.id">
+                                                    {{commodity.commodityNameEn}}
+                                                </option>
+                                            </select> -->
+
+                                            <app-combo-grid-virtual-scroll
+                                                [currentActiveItemId]="{field: 'id', value: container.commodityId}"
+                                                (itemSelected)="container.commodityId = $event.id"
+                                                [selectedDisplayFields]="['commodityNameEn']"
+                                                [dataSources]="commodities"
+                                                [displayFields]="[{'field':'commodityNameEn','label':'Name En'},{'field':'commodityNameVn','label':'Name VN'},{'field':'commodityGroupNameEn','label':'Group'}]"
+                                                [height]="150">
+                                            </app-combo-grid-virtual-scroll>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="form-group">
                                             <input type="text" class="form-control" [(ngModel)]="container.description"
                                                 name="description">
                                         </div>
                                     </td>
-                                    <td>
-                                        <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger': isSubmitted && !!container.gw && container.gw < 0}">
-                                            <input type="number" class="form-control" [(ngModel)]="container.gw"
-                                                name="gw">
-                                        </div>
-                                    </td>
+
                                     <td>
                                         <div class="form-group"
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && !!container.nw && container.nw < 0}">
@@ -149,26 +174,14 @@
                                                 name="nw">
                                         </div>
                                     </td>
-                                    <td>
-                                        <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger': isSubmitted && !!container.chargeAbleWeight && container.chargeAbleWeight < 0}">
-                                            <input type="number" class="form-control"
-                                                [(ngModel)]="container.chargeAbleWeight" name="chargeAbleWeight">
-                                        </div>
-                                    </td>
+
                                     <td>
                                         <div class="form-group">
                                             <input type="text" class="form-control" [(ngModel)]="unitOfMeasure"
                                                 name="unitOfMeasureId" readonly disabled>
                                         </div>
                                     </td>
-                                    <td>
-                                        <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger': isSubmitted && !!container.cbm && container.cbm < 0}">
-                                            <input type="number" class="form-control" [(ngModel)]="container.cbm"
-                                                name="cbm">
-                                        </div>
-                                    </td>
+
                                 </tr>
                             </ng-container>
                             <tr *ngIf="!containers.length" app-table-none-record [colspan]="headers.length  + 1">

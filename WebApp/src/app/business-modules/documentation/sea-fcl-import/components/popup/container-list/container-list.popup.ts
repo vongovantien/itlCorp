@@ -56,18 +56,18 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
         this.headers = [
             { title: 'Cont Type', field: 'containerTypeId', sortable: true, required: true },
             { title: 'Cont Q`Ty', field: 'quantity', required: true, sortable: true },
+            { title: 'G.W', field: 'gw', sortable: true, },
+            { title: 'C.W', field: 'chargeAbleWeight', sortable: true, },
+            { title: 'CBM', field: 'cbm', sortable: true, },
+            { title: 'Package Q`Ty', field: 'packageQuantity', sortable: true, },
+            { title: 'Package Type', field: 'packageTypeId', sortable: true, },
             { title: 'Container No', field: 'containerNo', sortable: true, },
             { title: 'Seal No', field: 'sealNo', sortable: true, },
             { title: 'Mark No', field: 'markNo', sortable: true, },
             { title: 'Commodity', field: 'commodityId', sortable: true, },
-            { title: 'Package Type', field: 'packageTypeId', sortable: true, },
-            { title: 'Package Q`Ty', field: 'packageQuantity', sortable: true, },
             { title: 'Description', field: 'description', sortable: true, },
-            { title: 'G.W', field: 'gw', sortable: true, },
             { title: 'N.W', field: 'nw', sortable: true, },
-            { title: 'C.W', field: 'chargeAbleWeight', sortable: true, },
             { title: 'Unit', field: 'unitOfMeasure', sortable: true, },
-            { title: 'CBM', field: 'cbm', sortable: true, },
         ];
         this.cdRef.detectChanges(); // * tell ChangeDetect update view in app-table-header (field required).
         this.getMasterData();
@@ -195,23 +195,6 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
         this.containerImportPopup.mblid = this.mblid;
         this.containerImportPopup.hblid = this.hblid;
         this.containerImportPopup.show();
-    }
-    importSuccess(event) {
-        if (event) {
-            this._store.select(fromStore.getContainerSaveState)
-                .pipe(takeUntil(this.ngUnsubscribe))
-                .subscribe(
-                    (res: fromStore.IContainerState | any) => {
-                        this.containers = res;
-                        for (const container of this.containers) {
-                            container.commodityName = this.getCommodityName(container.commodityId);
-                            container.containerTypeName = this.getContainerTypeName(container.containerTypeId);
-                            container.packageTypeName = this.getPackageTypeName(container.packageTypeId);
-                        }
-                        this._store.dispatch(new fromStore.SaveContainerAction(this.containers));
-                    }
-                );
-        }
     }
 
     sortContainer(sortField: string) {
