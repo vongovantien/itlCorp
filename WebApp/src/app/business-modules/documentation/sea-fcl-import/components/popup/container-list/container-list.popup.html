@@ -65,9 +65,9 @@
                                     </td>
                                     <td>
                                         <div class="form-group "
-                                            [ngClass]="{'m-form__group has-danger': isSubmitted && !container.containerTypeId}">
+                                            [ngClass]="{'m-form__group has-danger': isSubmitted && (!container.containerTypeId || isDuplicateContPakage )}">
                                             <select class="form-control" [(ngModel)]="container.containerTypeId"
-                                                name=containerTypeId>
+                                                (ngModelChange)="onChangeDataFormTable()" name=containerTypeId>
                                                 <option value="null">Please select</option>
                                                 <option *ngFor="let unit of containerUnits" [ngValue]="unit.id">
                                                     {{unit.unitNameEn}}
@@ -79,7 +79,7 @@
                                         <div class="form-group"
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && !container.quantity}">
                                             <input type="number" class="form-control" [(ngModel)]="container.quantity"
-                                                name="quantity">
+                                                (ngModelChange)="onChangeDataFormTable()" name="quantity">
                                         </div>
                                     </td>
                                     <td>
@@ -104,9 +104,10 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="form-group">
+                                        <div class="form-group"
+                                            [ngClass]="{'m-form__group has-danger': isSubmitted && isDuplicateContPakage }">
                                             <select class="form-control" [(ngModel)]="container.packageTypeId"
-                                                name="packageTypeId">
+                                                (ngModelChange)="onChangeDataFormTable()" name="packageTypeId">
                                                 <option value="null">Please select</option>
 
                                                 <option *ngFor="let unit of packageUnits" [ngValue]="unit.id">
@@ -116,15 +117,18 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="form-group">
+                                        <div class="form-group"
+                                            [ngClass]="{'m-form__group has-danger': isSubmitted && isDuplicateContPakage }">
                                             <input type="number" class="form-control"
-                                                [(ngModel)]="container.packageQuantity" name="packageQuantity">
+                                                [(ngModel)]="container.packageQuantity" name="packageQuantity"
+                                                (ngModelChange)="onChangeDataFormTable()">
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="form-group">
+                                        <div class="form-group"
+                                            [ngClass]="{'m-form__group has-danger': isSubmitted && isDuplicateContPakage }">
                                             <input type="text" class="form-control" [(ngModel)]="container.containerNo"
-                                                name="containerNo">
+                                                (ngModelChange)="onChangeDataFormTable()" name="containerNo">
                                         </div>
                                     </td>
                                     <td>
@@ -141,14 +145,6 @@
                                     </td>
                                     <td>
                                         <div class="form-group">
-                                            <!-- <select class="form-control" [(ngModel)]="container.commodityId"
-                                                name="commidityId">
-                                                <option value="null">Please select</option>
-                                                <option *ngFor="let commodity of commodities" [ngValue]="commodity.id">
-                                                    {{commodity.commodityNameEn}}
-                                                </option>
-                                            </select> -->
-
                                             <app-combo-grid-virtual-scroll
                                                 [currentActiveItemId]="{field: 'id', value: container.commodityId}"
                                                 (itemSelected)="container.commodityId = $event.id"
@@ -197,7 +193,7 @@
                         <div class="m--align-center m--margin-top-20">
                             <button
                                 class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                title="Save" (click)="onSaveContainerList()">
+                                title="Save" (click)="onSaveContainerList()" [disabled]="!containers.length">
                                 <span>
                                     <i class="la la-save"></i>
                                     <span>

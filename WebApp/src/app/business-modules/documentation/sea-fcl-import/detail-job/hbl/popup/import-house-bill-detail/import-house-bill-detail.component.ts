@@ -1,11 +1,8 @@
-import { Component, OnInit, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
-import moment from 'moment';
-import { ActivatedRoute, Params } from '@angular/router';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { SortService } from 'src/app/shared/services';
-import { AppList } from 'src/app/app.list';
 import { formatDate } from '@angular/common';
 @Component({
     selector: 'popup-import-house-bill-detail',
@@ -23,7 +20,6 @@ export class ImportHouseBillDetailComponent extends PopupBase {
     isCheckHbl: boolean = false;
 
     constructor(
-        private _activedRoute: ActivatedRoute,
         private _documentRepo: DocumentationRepo,
         private _sortService: SortService,
     ) {
@@ -73,8 +69,7 @@ export class ImportHouseBillDetailComponent extends PopupBase {
                     this.houseBill = res.data;
                     this.totalItems = res.totalItems || 0;
                     console.log(this.houseBill);
-                }
-                else {
+                } else {
                     this.totalItems = 0;
                     this.houseBill = [];
                 }
@@ -87,8 +82,7 @@ export class ImportHouseBillDetailComponent extends PopupBase {
         if (this.selected === -1) {
             this.isCheckHbl = false;
             return;
-        }
-        else {
+        } else {
             this.isCheckHbl = true;
             this.selectedHbl = this.houseBill[this.selected];
             this.onImport.emit(this.selectedHbl);

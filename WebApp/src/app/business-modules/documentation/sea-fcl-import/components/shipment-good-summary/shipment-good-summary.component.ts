@@ -20,12 +20,11 @@ import { getParamsRouterState } from 'src/app/store';
 })
 export class SeaFCLImportShipmentGoodSummaryComponent extends AppForm {
 
-    mblid: string = null;
-    hblid: string = null;
-
     @ViewChild(SeaFCLImportContainerListPopupComponent, { static: false }) containerPopup: SeaFCLImportContainerListPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmRefresh: ConfirmPopupComponent;
 
+    mblid: string = null;
+    hblid: string = null;
     description: string = null;
     commodities: string = null;
     containerDetail: string = '';
@@ -49,7 +48,7 @@ export class SeaFCLImportShipmentGoodSummaryComponent extends AppForm {
                 this.hblid = p['hblId'];
                 this.mblid = p['id'];
             }
-        )
+        );
 
         this._actionStoreSubject
             .pipe(
