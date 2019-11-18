@@ -79,10 +79,11 @@ export class SeaFCLImportCDNoteComponent extends AppList {
     }
 
     getListCdNote(id: string) {
-        //getListCDNoteByHouseBill
+        this.isLoading = true;
         this._documentationRepo.getListCdNoteByMasterBill(id)
             .pipe(
                 catchError(this.catchError),
+                finalize(() => { this.isLoading = false; }),
             ).subscribe(
                 (res: any) => {
                     this.cdNoteGroups = res;

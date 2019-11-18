@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
@@ -26,6 +28,8 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatCharge> chargeRepository;
         private readonly IContextBase<CatUnit> unitRepository;
         private readonly IStringLocalizer stringLocalizer;
+        private readonly IContextBase<CatPlace> placeRepository;
+        private readonly IContextBase<CsMawbcontainer> containerRepository;
 
         public CsArrivalFrieghtChargeService(IStringLocalizer<LanguageSub> localizer,
             IContextBase<CsArrivalFrieghtCharge> repository, 
@@ -36,7 +40,9 @@ namespace eFMS.API.Documentation.DL.Services
             ICurrentUser currUser,
             IContextBase<CsTransaction> transactionRepo,
             IContextBase<CatCharge> chargeRepo,
-            IContextBase<CatUnit> unitRepo
+            IContextBase<CatUnit> unitRepo,
+            IContextBase<CatPlace> placeRepo,
+            IContextBase<CsMawbcontainer> containerRepo
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -47,6 +53,8 @@ namespace eFMS.API.Documentation.DL.Services
             transactionRepository = transactionRepo;
             chargeRepository = chargeRepo;
             unitRepository = unitRepo;
+            placeRepository = placeRepo;
+            containerRepository = containerRepo;
         }
 
         #region Arrival
@@ -319,7 +327,69 @@ namespace eFMS.API.Documentation.DL.Services
             detailTransaction.DosentTo1 = model.Doheader1;
             detailTransaction.DosentTo2 = model.Doheader2;
             detailTransaction.Dofooter = model.Dofooter;
+            detailTransaction.DeliveryOrderNo = model.DeliveryOrderNo;
+            detailTransaction.DeliveryOrderPrintedDate = model.DeliveryOrderPrintedDate;
             var result = detailTransactionRepository.Update(detailTransaction, x => x.Id == model.HBLID);
+            return result;
+        }
+
+        public Crystal PreviewDeliveryOrder(Guid hblid)
+        {
+            var detail = detailTransactionRepository.First(x => x.Id == hblid);
+            var parameter = new SeaDeliveryCommandParam {
+                Consignee = "s",
+                No = "s",
+                CompanyName = "Công ty IndoTrans",
+                CompanyDescription = "Company Description",
+                CompanyAddress1 = "52 Trường Sơn, Phường 2, Tân Bình",
+                CompanyAddress2 = "52 Trường Sơn, Phường 2, Tân Bình",
+                Website = "itlvn.com.vn",
+                MAWB = detail.Mawb,
+                Contact = "admin",
+                DecimalNo = 2
+            };
+            var polName= placeRepository.Get(x => x.Id == detail.Pol).FirstOrDefault().NameEn;
+            var podName = placeRepository.Get(x => x.Id == detail.Pod).FirstOrDefault().NameEn;
+            var dataSources = new List<SeaDeliveryCommandResult>();
+            var containers = containerRepository.Get(x => x.Hblid == hblid);
+            foreach(var cont in containers)
+            {
+                var item = new SeaDeliveryCommandResult
+                {
+                    DONo = detail.DeliveryOrderNo,
+                    LocalVessel = detail.LocalVessel,
+                    Consignee = detail.ConsigneeDescription,
+                    OceanVessel = detail.OceanVessel,
+                    DepartureAirport = polName,
+                    PortofDischarge = podName,
+                    PlaceDelivery = podName,
+                    HWBNO = detail.Hwbno,
+                    ShippingMarkImport = detail.ShippingMark,
+                    SpecialNote = "",
+                    Description = cont.Description,
+                    ContSealNo = cont.SealNo, //continue
+                    TotalPackages = cont.Quantity + "X" + unitRepository.Get(x => x.Id ==  cont.ContainerTypeId)?.FirstOrDefault()?.UnitNameEn,
+                    NoPieces = cont.PackageQuantity + " " + unitRepository.Get(x => x.Id == cont.PackageTypeId)?.FirstOrDefault()?.UnitNameEn,
+                    GrossWeight = (decimal)cont.Gw,
+                    Unit = unitRepository.Get(x => x.Id == cont.UnitOfMeasureId)?.FirstOrDefault()?.UnitNameEn,
+                    CBM = (decimal)cont.Cbm,
+                    DeliveryOrderNote = detail.Dofooter,
+                    FirstDestination = detail.DosentTo1,
+                    SecondDestination = detail.DosentTo2,
+                    ArrivalNote = detail.ArrivalNo,
+                    FlightDate = detail.Eta
+                };
+                dataSources.Add(item);
+            }
+            var result = new Crystal
+            {
+                ReportName = "SeaDeliveryCommand.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddDataSource(dataSources);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameter);
             return result;
         }
         #endregion

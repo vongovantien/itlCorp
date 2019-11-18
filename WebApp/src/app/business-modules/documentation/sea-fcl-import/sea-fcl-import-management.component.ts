@@ -26,11 +26,12 @@ export class SeaFCLImportManagementComponent extends AppList {
         { title: 'Dynamic Title 3', content: 'Dynamic content 3', removable: true }
     ];
     headers: CommonInterface.IHeaderTable[];
-    houseBill: CsTransactionDetail[] = [];
     headerHouseBills: CommonInterface.IHeaderTable[];
 
     masterbills: CsTransaction[] = [];
     housebills: CsTransactionDetail[] = [];
+    tmpHouseBills: CsTransactionDetail[] = [];
+    tmpIndex: number = -1;
 
     selectedMasterBill: CsTransaction = null;
     deleteMessage: string = '';
@@ -89,10 +90,12 @@ export class SeaFCLImportManagementComponent extends AppList {
             };
         }
         this._progressRef.start();
+        this.isLoading = true;
         this._documentationRepo.getListShipmentDocumentation(this.page, this.pageSize, Object.assign({}, dataSearch))
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
+                    this.isLoading = false;
                     this._progressRef.complete();
                 }),
                 map((data: any) => {
@@ -110,18 +113,26 @@ export class SeaFCLImportManagementComponent extends AppList {
             );
     }
 
-    showHblList(jobId: string) {
+    showHblList(jobId: string, index: number) {
+        if (this.tmpIndex == index) {
+            this.housebills = this.tmpHouseBills;
+        } else {
         this._progressRef.start();
         this._documentationRepo.getListHouseBillOfJob({ jobId: jobId })
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); this.isLoading = false; })
+                finalize(() => { 
+                    this._progressRef.complete(); 
+                 })
             ).subscribe(
                 (res: CsTransactionDetail[]) => {
                     this.housebills = (res || []).map((item: CsTransactionDetail) => new CsTransactionDetail(item));
                     console.log(this.housebills);
+                    this.tmpHouseBills = this.housebills;
+                    this.tmpIndex = index;
                 },
             );
+        }
     }
 
 
@@ -156,7 +167,6 @@ export class SeaFCLImportManagementComponent extends AppList {
                 (res: any) => {
                     if (res) {
                         this.selectedMasterBill = new CsTransaction(masterbill);
-                        //console.log(this.selectedMasterBill)
                         this.deleteMessage = `Are you sure you want to delete this Job?`;
                         this.confirmDeleteJobPopup.show();
                     } else {
@@ -179,7 +189,6 @@ export class SeaFCLImportManagementComponent extends AppList {
                 (respone: CommonInterface.IResult) => {
                     if (respone.status) {
                         this._toastService.success(respone.message, 'Delete Success !');
-                        //console.log(this.dataSearch);
                         this.searchList(this.dataSearch);
                     }
                 },

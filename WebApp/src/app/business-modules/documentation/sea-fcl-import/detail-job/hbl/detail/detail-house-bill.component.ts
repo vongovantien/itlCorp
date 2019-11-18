@@ -17,6 +17,8 @@ import { ToastrService } from 'ngx-toastr';
 import * as fromStore from './../../../store';
 import moment from 'moment/moment';
 import { SeaFClImportDeliveryOrderComponent } from '../components/delivery-order/delivery-order.component';
+import { Crystal } from 'src/app/shared/models/report/crystal.model';
+import { ReportPreviewComponent } from 'src/app/shared/common';
 
 
 enum HBL_TAB {
@@ -36,11 +38,13 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     @ViewChild(SeaFCLImportShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: SeaFCLImportShipmentGoodSummaryComponent;
     @ViewChild(SeaFClImportArrivalNoteComponent, { static: false }) arrivalNoteComponent: SeaFClImportArrivalNoteComponent;
     @ViewChild(SeaFClImportDeliveryOrderComponent, { static: false }) deliveryComponent: SeaFClImportDeliveryOrderComponent;
+    @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
 
 
     hblId: string;
     containers: Container[] = [];
     hblDetail: any; // TODO model here!!
+    dataReport: Crystal;
 
     selectedTab: string = HBL_TAB.DETAIL;
 
@@ -274,5 +278,22 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     onSelectTab(tabName: HBL_TAB | string) {
         this.selectedTab = tabName;
     }
+    onPreview() {
+        if (this.selectedTab === HBL_TAB.DELIVERY) {
+            this._documentationRepo.previewDeliveryOrder(this.hblId)
+                .pipe(
+                    catchError(this.catchError),
+                    finalize(() => { })
+                )
+                .subscribe(
+                    (res: any) => {
+                        this.dataReport = res;
+                        setTimeout(() => {
+                            this.reportPopup.show();
+                        }, 1000);
 
+                    },
+                );
+        }
+    }
 }

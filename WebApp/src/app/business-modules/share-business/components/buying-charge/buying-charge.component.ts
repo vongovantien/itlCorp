@@ -66,6 +66,10 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         super();
         this.requestSort = this.sortSurcharge;
 
+        this.getSurcharge();
+    }
+
+    getSurcharge() {
         this._store.select(fromStore.getBuyingSurChargeState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
@@ -115,10 +119,10 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     configHeader() {
         this.headers = [
-            { title: 'Partner Name', field: 'partnerName', required: true, sortable: true, width: 200 },
-            { title: 'Charge Name', field: 'chargeId', required: true, sortable: true, width: 400 },
-            { title: 'Quantity', field: 'quantity', required: true, sortable: true, width: 200 },
-            { title: 'Unit', field: 'unitId', required: true, sortable: true, width: 200 },
+            { title: 'Partner Name', field: 'partnerName', required: true, sortable: true, width: 150 },
+            { title: 'Charge Name', field: 'chargeId', required: true, sortable: true, width: 250 },
+            { title: 'Quantity', field: 'quantity', required: true, sortable: true },
+            { title: 'Unit', field: 'unitId', required: true, sortable: true },
             { title: 'Unit Price', field: 'unitPrice', required: true, sortable: true },
             { title: 'Currency', field: 'currencyId', required: true, sortable: true },
             { title: 'VAT', field: 'vatrate', required: true, sortable: true },
@@ -185,12 +189,20 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     addCharge(type: CommonEnum.SurchargeTypeEnum | string) {
         this.isSubmitted = false;
+
         const newSurCharge: CsShipmentSurcharge = new CsShipmentSurcharge();
         newSurCharge.currencyId = "USD"; // * Set default.
+        newSurCharge.exchangeDate = { startDate: new Date(), endDate: new Date() };
         newSurCharge.quantity = 0;
         newSurCharge.quantityType = null;
-        newSurCharge.exchangeDate = { startDate: new Date(), endDate: new Date() };
         newSurCharge.invoiceDate = null;
+        newSurCharge.creditNo = null;
+        newSurCharge.debitNo = null;
+        newSurCharge.settlementCode = null;
+        newSurCharge.voucherId = null;
+        newSurCharge.voucherIddate = null;
+        newSurCharge.voucherIdre = null;
+        newSurCharge.voucherIdredate = null;
 
         switch (type) {
             case CommonEnum.SurchargeTypeEnum.BUYING_RATE:
@@ -207,13 +219,34 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
     }
 
-    duplicate(index: number) {
+    duplicate(index: number, type: CommonEnum.SurchargeTypeEnum | string) {
         this.isSubmitted = false;
+
         const newCharge = this.charges[index];
-        newCharge.id = SystemConstants.EMPTY_GUID;
         const newSurCharge: CsShipmentSurcharge = new CsShipmentSurcharge(newCharge);
 
-        this._store.dispatch(new fromStore.AddBuyingSurchargeAction(newSurCharge));
+        newSurCharge.id = SystemConstants.EMPTY_GUID;
+        newSurCharge.creditNo = null;
+        newSurCharge.debitNo = null;
+        newSurCharge.settlementCode = null;
+        newSurCharge.voucherId = null;
+        newSurCharge.voucherIddate = null;
+        newSurCharge.voucherIdre = null;
+        newSurCharge.voucherIdredate = null;
+
+        switch (type) {
+            case CommonEnum.SurchargeTypeEnum.BUYING_RATE:
+                this._store.dispatch(new fromStore.AddBuyingSurchargeAction(newSurCharge));
+                break;
+            case CommonEnum.SurchargeTypeEnum.SELLING_RATE:
+                this._store.dispatch(new fromStore.AddSellingSurchargeAction(newSurCharge));
+                break;
+            case CommonEnum.SurchargeTypeEnum.OBH:
+                this._store.dispatch(new fromStore.AddOBHSurchargeAction(newSurCharge));
+                break;
+            default:
+                break;
+        }
 
     }
 
@@ -234,7 +267,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             }
         } else if (
             !!charge.soano
-            || !!charge.cdno
+            || !!charge.creditNo
+            || !!charge.debitNo
             || !!charge.settlementCode
             || !!charge.voucherId
             || !!charge.voucherIddate

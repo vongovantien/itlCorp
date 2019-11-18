@@ -7,8 +7,8 @@ namespace eFMS.API.Accounting.Service.Models
     {
         public short Id { get; set; }
         public string Code { get; set; }
-        public string NameEN { get; set; }
-        public string NameVN { get; set; }
+        public string NameEn { get; set; }
+        public string NameVn { get; set; }
         public int? DepartmentId { get; set; }
         public short ParentId { get; set; }
         public string ManagerId { get; set; }

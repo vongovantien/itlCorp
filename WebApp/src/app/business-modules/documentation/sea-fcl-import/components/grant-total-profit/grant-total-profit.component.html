@@ -18,7 +18,7 @@
                     <tbody>
                         <ng-container *ngIf="!!(shipmentProfits$ | async)?.length">
                             <tr *ngFor="let profit of (shipmentProfits$ | async); let i = index; trackBy: trackByFn">
-                                <td>House Bill {{i+1}}</td>
+                                <td>{{profit.hblNo}}</td>
                                 <td *ngFor="let header of headers; let j = index; trackBy: trackByFn">
                                     <app-table-cell [item]="profit" [type]="header.dataType" [field]="header.field">
                                     </app-table-cell>

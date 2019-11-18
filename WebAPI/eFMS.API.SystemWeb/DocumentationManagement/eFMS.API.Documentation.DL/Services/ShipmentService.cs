@@ -160,13 +160,13 @@ namespace eFMS.API.Documentation.DL.Services
                                     join cus in catPartnerRepo.Get() on ops.CustomerId equals cus.Id into cus2
                                     from cus in cus2.DefaultIfEmpty()
                                     where
-                                        searchOption.Equals("JOBNO") ? keywords.Contains(ops.JobNo) : true
+                                        searchOption.Equals("JobNo") ? keywords.Contains(ops.JobNo) : true
                                     &&
-                                        searchOption.Equals("HBL") ? keywords.Contains(ops.Hwbno) : true
+                                        searchOption.Equals("Hwbno") ? keywords.Contains(ops.Hwbno) : true
                                     &&
-                                        searchOption.Equals("MBL") ? keywords.Contains(ops.Mblno) : true
+                                        searchOption.Equals("Mblno") ? keywords.Contains(ops.Mblno) : true
                                     &&
-                                        searchOption.Equals("CUSTOMNO") ? keywords.Contains(sur.ClearanceNo) : true
+                                        searchOption.Equals("ClearanceNo") ? keywords.Contains(sur.ClearanceNo) : true
                                     select new ShipmentsCopy
                                     {
                                         JobId = ops.JobNo,
@@ -187,13 +187,13 @@ namespace eFMS.API.Documentation.DL.Services
                               join cus in catPartnerRepo.Get() on cstd.CustomerId equals cus.Id into cus2
                               from cus in cus2.DefaultIfEmpty()
                               where
-                                    searchOption.Equals("JOBNO") ? keywords.Contains(cst.JobNo) : true
+                                    searchOption.Equals("JobNo") ? keywords.Contains(cst.JobNo) : true
                                 &&
-                                    searchOption.Equals("HBL") ? keywords.Contains(cstd.Hwbno) : true
+                                    searchOption.Equals("Hwbno") ? keywords.Contains(cstd.Hwbno) : true
                                 &&
-                                    searchOption.Equals("MBL") ? keywords.Contains(cstd.Mawb) : true
+                                    searchOption.Equals("Mawb") ? keywords.Contains(cstd.Mawb) : true
                                 &&
-                                    searchOption.Equals("CUSTOMNO") ? keywords.Contains(sur.ClearanceNo) : true
+                                    searchOption.Equals("ClearanceNo") ? keywords.Contains(sur.ClearanceNo) : true
                               select new ShipmentsCopy
                               {
                                   JobId = cst.JobNo,

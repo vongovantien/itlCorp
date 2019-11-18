@@ -27,7 +27,12 @@ import { AssignStagePopupComponent } from './assign-stage/assign-stage.popup';
         NgxDaterangepickerMd,
 
     ],
-    exports: [],
+    exports: [
+        OpsModuleStageManagementComponent,
+        OpsModuleStageManagementDetailComponent,
+        OpsModuleStageManagementAddStagePopupComponent,
+        AssignStagePopupComponent
+    ],
     providers: [],
     entryComponents: [
         OpsModuleStageManagementComponent

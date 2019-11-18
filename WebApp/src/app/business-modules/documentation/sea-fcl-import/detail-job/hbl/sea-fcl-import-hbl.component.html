@@ -127,63 +127,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="m-portlet">
-                                <div class="alert-block__heading">
-                                    <h3 class="alert-block__title">Good Summary Of All HBL</h3>
-                                </div>
-                                <div class="m-portlet__body">
-
-                                    <div class="row">
-
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                Total Gross Weight:
-                                                <span
-                                                    class="m-badge m-badge--primary m-badge--wide">{{goodSummary.totalGW}}
-                                                    Kgs</span>
-                                            </div>
-
-                                            <div class="form-group">
-                                                Total CBM:
-                                                <span
-                                                    class="m-badge m-badge--primary m-badge--wide">{{goodSummary.totalCbm}}
-                                                    CBM</span>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                Total Net Weight:
-                                                <span
-                                                    class="m-badge m-badge--primary m-badge--wide">{{goodSummary.totalNW}}
-                                                    Kgs</span>
-                                            </div>
-                                            <div class="form-group">
-                                                Container:
-                                                <span *ngIf="!!goodSummary.containers"
-                                                    class="m-badge m-badge--primary m-badge--wide">{{goodSummary.containers}}
-                                                </span>
-
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                Total Chargeable Weight:
-                                                <span
-                                                    class="m-badge m-badge--primary m-badge--wide">{{goodSummary.totalNW}}
-                                                    KGS</span>
-                                            </div>
-                                            <div class="form-group">
-                                                Commodities:
-                                                <span *ngIf="!!goodSummary.commodities"
-                                                    class="m-badge m-badge--primary m-badge--wide">{{goodSummary.commodities}}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
                             <div class="m-portlet">
                                 <div class="alert-block__heading">
                                     <h3 class="alert-block__title">Profit Per House Bill</h3>
@@ -191,33 +134,28 @@
                                 <div class="m-portlet__body">
                                     <tabset class="custom-class-tab">
                                         <tab heading="Buying" (selectTab)="onSelectTabSurcharge('BUY')">
-                                            <ng-container *ngIf="selectedTabSurcharge === 'BUY'">
-                                                <ng-container
-                                                    *ngIf="!!selectedShipment && !!selectedHbl && !!containers; else placeholder">
-                                                    <buying-charge [containers]="containers"
-                                                        [shipment]="selectedShipment" [hbl]="selectedHbl">
-                                                    </buying-charge>
-                                                </ng-container>
+
+                                            <ng-container
+                                                *ngIf="!!(selectedShipment |async ) && !!selectedHbl && !!(containers | async); else placeholder">
+                                                <buying-charge [containers]="containers | async"
+                                                    [shipment]="selectedShipment | async" [hbl]="selectedHbl">
+                                                </buying-charge>
                                             </ng-container>
                                         </tab>
                                         <tab heading="Selling" (selectTab)="onSelectTabSurcharge('SELL')">
-                                            <ng-container *ngIf="selectedTabSurcharge === 'SELL'">
-                                                <ng-container
-                                                    *ngIf="!!selectedShipment && !!selectedHbl && !!containers; else placeholder">
-                                                    <selling-charge [containers]="containers"
-                                                        [shipment]="selectedShipment" [hbl]="selectedHbl">
-                                                    </selling-charge>
-                                                </ng-container>
+                                            <ng-container
+                                                *ngIf="!!(selectedShipment |async ) && !!selectedHbl && !!(containers | async); else placeholder">
+                                                <selling-charge [containers]="containers | async"
+                                                    [shipment]="selectedShipment | async" [hbl]="selectedHbl">
+                                                </selling-charge>
                                             </ng-container>
                                         </tab>
                                         <tab heading="OBH" (selectTab)="onSelectTabSurcharge('OBH')">
-                                            <ng-container *ngIf="selectedTabSurcharge === 'OBH'">
-                                                <ng-container
-                                                    *ngIf="!!selectedShipment && !!selectedHbl && !!containers; else placeholder">
-                                                    <obh-charge [containers]="containers" [shipment]="selectedShipment"
-                                                        [hbl]="selectedHbl">
-                                                    </obh-charge>
-                                                </ng-container>
+                                            <ng-container
+                                                *ngIf="!!(selectedShipment |async ) && !!selectedHbl && !!(containers | async); else placeholder">
+                                                <obh-charge [containers]="containers | async"
+                                                    [shipment]="selectedShipment | async" [hbl]="selectedHbl">
+                                                </obh-charge>
                                             </ng-container>
                                         </tab>
                                     </tabset>

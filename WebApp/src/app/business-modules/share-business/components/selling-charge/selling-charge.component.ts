@@ -30,6 +30,10 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
     ) {
         super(_catalogueRepo, _store, _documentRepo, _toastService, _sortService);
 
+
+    }
+
+    getSurcharge() {
         this._store.select(fromStore.getSellingSurChargeState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
@@ -42,10 +46,10 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
 
     configHeader() {
         this.headers = [
-            { title: 'Partner Name', field: 'partnerName', required: true, sortable: true, width: 200 },
-            { title: 'Charge Name', field: 'chargeId', required: true, sortable: true, width: 400 },
-            { title: 'Quantity', field: 'quantity', required: true, sortable: true, width: 200 },
-            { title: 'Unit', field: 'unitId', required: true, sortable: true, width: 200 },
+            { title: 'Partner Name', field: 'partnerName', required: true, sortable: true, width: 150 },
+            { title: 'Charge Name', field: 'chargeId', required: true, sortable: true, width: 250 },
+            { title: 'Quantity', field: 'quantity', required: true, sortable: true },
+            { title: 'Unit', field: 'unitId', required: true, sortable: true },
             { title: 'Unit Price', field: 'unitPrice', required: true, sortable: true },
             { title: 'Currency', field: 'currencyId', required: true, sortable: true },
             { title: 'VAT', field: 'vatrate', required: true, sortable: true },
@@ -64,16 +68,6 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
             { title: 'Voucher IDRE Date', field: 'voucherIdredate', sortable: true },
             { title: 'Final Exchange Rate', field: 'finalExchangeRate', sortable: true },
         ];
-    }
-
-    duplicate(index: number) {
-        this.isSubmitted = false;
-        const newCharge = this.charges[index];
-        newCharge.id = SystemConstants.EMPTY_GUID;
-        const newSurCharge: CsShipmentSurcharge = new CsShipmentSurcharge(newCharge);
-
-        this._store.dispatch(new fromStore.AddSellingSurchargeAction(newSurCharge));
-
     }
 
     saveSellingSurCharge() {

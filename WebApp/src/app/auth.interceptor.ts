@@ -31,27 +31,41 @@ export class AuthInterceptor implements HttpInterceptor {
                         // window.location.href = '#/login';
                         break;
                 }
-                let errorMessage = '';
-                let title = '';
-                if (error.error instanceof ErrorEvent) {
-                    errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
-                    title = error.statusText;
-                } else if (error.error != null) {
-                    if (!!error.error.message) {
-                        errorMessage = `${error.error.message}`;
-                    } else if (error.error.error_description) {
-                        errorMessage = `${error.error.error_description}`;
-                    } else if (error.error.error.Message) {
-                        errorMessage = `${error.error.error.Message}`;
+                let message: string = '';
+
+                if (!!error.error) {
+                    if (!!error.error.error) {
+                        message = error.error.error.Message;
+                    } else if (!!error.error.message) {
+                        message = `${error.error.message}`;
                     } else {
-                        errorMessage = `Something wrong!`;
+                        message = `Something wrong!`;
                     }
-                    title = error.statusText;
                 } else {
-                    errorMessage = ` ${error.message}`;
-                    title = error.statusText;
+                    message = `Something wrong!`;
                 }
-                this._toastService.error(errorMessage);
+                // if (error.error instanceof ErrorEvent) {
+                //     errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+                //     title = error.statusText;
+                // } else if (error.error != null) {
+                //     if (!!error.error.error) {
+                //         errorMessage = `${error.error.error.Message}`;
+                //     } else
+                //         if (!!error.error.message) {
+                //             errorMessage = `${error.error.message}`;
+                //         } else if (error.error.error_description) {
+                //             errorMessage = `${error.error.error_description}`;
+                //         } else if (error.error.error.Message) {
+                //             errorMessage = `${error.error.error.Message}`;
+                //         } else {
+                //             errorMessage = `Something wrong!`;
+                //         }
+                //     title = error.statusText;
+                // } else {
+                //     errorMessage = ` ${error.message}`;
+                //     title = error.statusText;
+                // }
+                this._toastService.error(message);
                 return throwError(error);
             })
         );

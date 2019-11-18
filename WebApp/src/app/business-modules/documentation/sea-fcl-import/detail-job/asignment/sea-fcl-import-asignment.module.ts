@@ -10,6 +10,7 @@ import { OpsModuleStageManagementComponent } from 'src/app/business-modules/oper
 import { OpsModuleStageManagementDetailComponent } from 'src/app/business-modules/operation/job-edit/stage-management/detail/detail-stage-popup.component';
 import { OpsModuleStageManagementAddStagePopupComponent } from 'src/app/business-modules/operation/job-edit/stage-management/add/add-stage.popup.component';
 import { AssignStagePopupComponent } from 'src/app/business-modules/operation/job-edit/stage-management/assign-stage/assign-stage.popup';
+import { StateManagmentModule } from 'src/app/business-modules/operation/job-edit/stage-management/stage-management.module';
 
 
 @NgModule({
@@ -21,14 +22,13 @@ import { AssignStagePopupComponent } from 'src/app/business-modules/operation/jo
         SelectModule,
         ModalModule,
         NgxDaterangepickerMd,
+        StateManagmentModule
+
     ],
     exports: [],
     declarations: [
         SeaFCLImportAsignmentComponent,
-        OpsModuleStageManagementComponent,
-        OpsModuleStageManagementDetailComponent,
-        OpsModuleStageManagementAddStagePopupComponent,
-        AssignStagePopupComponent
+
 
     ],
     providers: [],

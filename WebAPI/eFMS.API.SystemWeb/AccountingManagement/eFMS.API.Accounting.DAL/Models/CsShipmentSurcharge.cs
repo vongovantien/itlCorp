@@ -10,6 +10,7 @@ namespace eFMS.API.Accounting.Service.Models
         public string Type { get; set; }
         public Guid ChargeId { get; set; }
         public decimal Quantity { get; set; }
+        public string QuantityType { get; set; }
         public short UnitId { get; set; }
         public decimal? UnitPrice { get; set; }
         public string CurrencyId { get; set; }
@@ -63,5 +64,11 @@ namespace eFMS.API.Accounting.Service.Models
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
+        public string VoucherId { get; set; }
+        public DateTime? VoucherIddate { get; set; }
+        public string VoucherIdre { get; set; }
+        public DateTime? VoucherIdredate { get; set; }
+        public decimal? FinalExchangeRate { get; set; }
+        public bool? Kb { get; set; }
     }
 }

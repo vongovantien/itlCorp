@@ -123,8 +123,8 @@ export class SeaFClImportArrivalNoteComponent extends AppList {
         }, { selectedDisplayFields: ['chargeNameEn'], });
 
         this.headers = [
-            { title: 'Charge', field: 'chargeId', sortable: true, width: 300 },
-            { title: 'Quantity', field: 'quantity', sortable: true, width: 200 },
+            { title: 'Charge', field: 'chargeId', sortable: true, width: 250 },
+            { title: 'Quantity', field: 'quantity', sortable: true },
             { title: 'Unit', field: 'unitId', sortable: true },
             { title: 'Unit Price', field: 'unitPrice', sortable: true },
             { title: 'Currency', field: 'currencyId', sortable: true },

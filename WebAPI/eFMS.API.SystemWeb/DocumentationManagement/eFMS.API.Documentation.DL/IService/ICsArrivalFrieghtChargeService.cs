@@ -1,4 +1,5 @@
-﻿using eFMS.API.Documentation.DL.Models;
+﻿using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -19,5 +20,6 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState SetArrivalChargeDefault(CsArrivalFrieghtChargeDefaultEditModel model);
         HandleState SetArrivalHeaderFooterDefault(CsArrivalDefaultModel model);
         HandleState SetDeliveryOrderHeaderFooterDefault(CsDeliveryOrderDefaultModel model);
+        Crystal PreviewDeliveryOrder(Guid hblid);
     }
 }

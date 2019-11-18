@@ -1,23 +1,15 @@
 :host /deep/ {
     .buying-charge-wrapper {
-        // position: relative;
-        // height: 500px;
-        // overflow: auto;
         .buying-charge-content {
-            // position: absolute;
-            // z-index: 9;
-            // width: 100%;
-            // left: 0;
-            // height: 100%;
             .table-wrapper {
-                padding-bottom: 180px !important;
+                padding-bottom: 60px !important;
                 &.h {
-                    min-height: 330px;
-                    padding-bottom: 175px;
+                    max-height: 510px;
+                    // padding-bottom: 175px;
                 }
                 .form-group {
                     .form-control {
-                        font-size: 11px;
+                        font-size: 12px;
                         color: #000;
                     }
                 }

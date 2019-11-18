@@ -11,6 +11,7 @@ namespace eFMS.API.Accounting.Service.Models
         public string EmployeeNameVn { get; set; }
         public string EmployeeNameEn { get; set; }
         public string Position { get; set; }
+        public string Title { get; set; }
         public DateTime? Birthday { get; set; }
         public string ExtNo { get; set; }
         public string Tel { get; set; }
@@ -22,6 +23,7 @@ namespace eFMS.API.Accounting.Service.Models
         public string EmpPhotoSize { get; set; }
         public decimal? SaleTarget { get; set; }
         public decimal? Bonus { get; set; }
+        public string StaffCode { get; set; }
         public string SaleResource { get; set; }
         public Guid? LdapObjectGuid { get; set; }
         public string UserCreated { get; set; }
