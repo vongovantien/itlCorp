@@ -366,7 +366,7 @@ export class CommodityComponent implements OnInit {
   async exportCom() {
     var commodities = await this.baseService.postAsync(this.api_menu.Catalogue.Commodity.query, this.criteria);
     if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-      commodities = lodash.map(commodities, function (com, index) {
+      commodities = _map(commodities, function (com, index) {
         return [
           index + 1,
           com['code'],
@@ -379,7 +379,7 @@ export class CommodityComponent implements OnInit {
     }
 
     if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-      commodities = lodash.map(commodities, function (com, index) {
+      commodities = _map(commodities, function (com, index) {
         return [
           index + 1,
           com['code'],
