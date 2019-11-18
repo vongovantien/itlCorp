@@ -13,7 +13,7 @@ import { SortService } from 'src/app/shared/services/sort.service';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { SystemConstants } from 'src/constants/system.const';
-import * as lodash from 'lodash';
+import _map from 'lodash/map';
 
 @Component({
   selector: 'app-shipper',
@@ -60,7 +60,7 @@ export class ShipperComponent implements OnInit {
   async exportShippers() {
     var shippers = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.query, this.criteria);
     if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-      shippers = lodash.map(shippers, function (ship, index) {
+      shippers = _map(shippers, function (ship, index) {
         return [
           index + 1,
           ship['id'],
@@ -77,7 +77,7 @@ export class ShipperComponent implements OnInit {
       });
     }
     if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-      shippers = lodash.map(shippers, function (ship, index) {
+      shippers = _map(shippers, function (ship, index) {
         return [
           index + 1,
           ship['id'],

@@ -13,7 +13,7 @@ import { AppPaginationComponent } from 'src/app/shared/common/pagination/paginat
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { SystemConstants } from 'src/constants/system.const';
-import * as lodash from 'lodash';
+import _map from 'lodash/map';
 
 @Component({
   selector: 'app-agent',
@@ -62,7 +62,7 @@ export class AgentComponent implements OnInit {
   async exportAgents() {
     var agents = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.query, this.criteria);
     if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-      agents = lodash.map(agents, function (ag, index) {
+      agents = _map(agents, function (ag, index) {
         return [
           index + 1,
           ag['id'],
@@ -79,7 +79,7 @@ export class AgentComponent implements OnInit {
       });
     }
     if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-      agents = lodash.map(agents, function (ag, index) {
+      agents = _map(agents, function (ag, index) {
         return [
           index + 1,
           ag['id'],

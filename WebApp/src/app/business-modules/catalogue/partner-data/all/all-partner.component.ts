@@ -13,7 +13,7 @@ import { BaseService } from 'src/app/shared/services/base.service';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { SystemConstants } from 'src/constants/system.const';
-import * as lodash from 'lodash';
+import _map from 'lodash/map';
 
 @Component({
   selector: 'app-all-partner',
@@ -64,7 +64,7 @@ export class AllPartnerComponent implements OnInit {
   async exportAll() {
     var partnerdata = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.query, this.criteria);
     if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-      partnerdata = lodash.map(partnerdata, function (pd, index) {
+      partnerdata = _map(partnerdata, function (pd, index) {
         return [
           index + 1,
           pd['id'],
@@ -81,7 +81,7 @@ export class AllPartnerComponent implements OnInit {
       });
     }
     if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-      partnerdata = lodash.map(partnerdata, function (pd, index) {
+      partnerdata = _map(partnerdata, function (pd, index) {
         return [
           index + 1,
           pd['id'],

@@ -17,7 +17,7 @@ import { COMMODITYCOLUMNSETTING } from './commodity.column';
 import { SelectComponent } from 'ng2-select';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { ExcelService } from 'src/app/shared/services/excel.service';
-import * as lodash from 'lodash';
+import _map from 'lodash/map';
 import { SystemConstants } from 'src/constants/system.const';
 import { SearchOptionsComponent } from '../../../shared/common/search-options/search-options.component';
 declare var $: any;
@@ -411,7 +411,7 @@ export class CommodityComponent implements OnInit {
   async exportComGroup() {
     var commodities_group = await this.baseService.postAsync(this.api_menu.Catalogue.CommodityGroup.query, this.criteria);
     if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-      commodities_group = lodash.map(commodities_group, function (com_group, index) {
+      commodities_group = _map(commodities_group, function (com_group, index) {
         return [
           index + 1,
           com_group['groupNameEn'],
@@ -422,7 +422,7 @@ export class CommodityComponent implements OnInit {
     }
 
     if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-      commodities_group = lodash.map(commodities_group, function (com_group, index) {
+      commodities_group = _map(commodities_group, function (com_group, index) {
         return [
           index + 1,
           com_group['groupNameEn'],

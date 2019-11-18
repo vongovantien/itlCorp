@@ -7,7 +7,7 @@ import { NgForm } from '@angular/forms';
 import { Unit } from 'src/app/shared/models/catalogue/catUnit.model';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PAGINGSETTING } from 'src/constants/paging.const';
-import * as lodash from 'lodash';
+import _map from 'lodash/map';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { SystemConstants } from 'src/constants/system.const';
@@ -206,7 +206,7 @@ export class UnitComponent implements OnInit {
 
     if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
 
-      units = lodash.map(units, function (unit, index) {
+      units = _map(units, function (unit, index) {
         return [
           index + 1,
           unit.code,
@@ -219,7 +219,7 @@ export class UnitComponent implements OnInit {
       });
     }
     if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-      units = lodash.map(units, function (unit, index) {
+      units = _map(units, function (unit, index) {
         return [
           index + 1,
           unit.code,

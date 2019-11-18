@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-// import * as lodash from 'lodash';
 import filter from 'lodash/filter';
 import moment from 'moment/moment';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';

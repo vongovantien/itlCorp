@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
-import * as lodash from 'lodash';
+import _findIndex from 'lodash/findIndex';
+import _map from 'lodash/map';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
@@ -402,7 +403,7 @@ export class LocationComponent implements OnInit, AfterViewInit {
 				finalize(() => {
 					if (provinceCityToUpdate != null) {
 						const countryId = provinceCityToUpdate.countryId;
-						const indexCurrentCountry = lodash.findIndex(this.ngSelectDataCountries, function (o) {
+						const indexCurrentCountry = _findIndex(this.ngSelectDataCountries, function (o) {
 							return o['id'] === countryId;
 						});
 						if (indexCurrentCountry > -1) {
@@ -484,13 +485,13 @@ export class LocationComponent implements OnInit, AfterViewInit {
 						const countryId = districtToUpdate.countryId;
 						const provinceId = districtToUpdate.provinceId;
 						this.editDistrictPopup.getProvinceByCountry(countryId);
-						const indexCurrentCountry = lodash.findIndex(this.ngSelectDataCountries, function (o) {
+						const indexCurrentCountry = _findIndex(this.ngSelectDataCountries, function (o) {
 							return o['id'] === countryId;
 						});
 						if (indexCurrentCountry > -1) {
 							this.editDistrictPopup.currentActiveCountry = [this.ngSelectDataCountries[indexCurrentCountry]];
 						}
-						const indexCurrentProvince = lodash.findIndex(this.editDistrictPopup.ngSelectDataProvinces, function (o) {
+						const indexCurrentProvince = _findIndex(this.editDistrictPopup.ngSelectDataProvinces, function (o) {
 							return o['id'] === provinceId;
 						});
 						if (indexCurrentProvince > -1) {
@@ -632,21 +633,21 @@ export class LocationComponent implements OnInit, AfterViewInit {
 						const provinceId = wardToUpdate.provinceId;
 						const districtId = wardToUpdate.districtId;
 
-						const indexCurrentCountry = lodash.findIndex(this.ngSelectDataCountries, function (o) {
+						const indexCurrentCountry = _findIndex(this.ngSelectDataCountries, function (o) {
 							return o['id'] === countryId;
 						});
 						if (indexCurrentCountry > -1) {
 							this.editWardPopup.currentActiveCountry = [this.ngSelectDataCountries[indexCurrentCountry]];
 						}
 						this.editWardPopup.getProvinceByCountry(countryId);
-						var indexCurrentProvince = lodash.findIndex(this.editWardPopup.ngSelectDataProvinces, function (o) {
+						var indexCurrentProvince = _findIndex(this.editWardPopup.ngSelectDataProvinces, function (o) {
 							return o['id'] == provinceId;
 						});
 						if (indexCurrentProvince > -1) {
 							this.editWardPopup.currentActiveProvince = [this.editWardPopup.ngSelectDataProvinces[indexCurrentProvince]];
 						}
 						this.editWardPopup.getWardByProvince(provinceId);
-						var indexCurrentDistrict = lodash.findIndex(this.editWardPopup.ngSelectDataDistricts, function (o) {
+						var indexCurrentDistrict = _findIndex(this.editWardPopup.ngSelectDataDistricts, function (o) {
 							return o['id'] == districtId;
 						});
 						if (indexCurrentDistrict > -1) {
@@ -722,7 +723,7 @@ export class LocationComponent implements OnInit, AfterViewInit {
 	async exportCountry() {
 		var countries = await this.baseServices.postAsync(this.api_menu.Catalogue.Country.query, this.searchObject);
 		if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-			countries = lodash.map(countries, function (country, index) {
+			countries = _map(countries, function (country, index) {
 				return [
 					index + 1,
 					country['code'],
@@ -734,7 +735,7 @@ export class LocationComponent implements OnInit, AfterViewInit {
 		}
 
 		if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-			countries = lodash.map(countries, function (country, index) {
+			countries = _map(countries, function (country, index) {
 				return [
 					index + 1,
 					country['code'],
@@ -768,7 +769,7 @@ export class LocationComponent implements OnInit, AfterViewInit {
 		this.searchObject.placeType = PlaceTypeEnum.Province;
 		var provinces = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, this.searchObject);
 		if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-			provinces = lodash.map(provinces, function (province, index) {
+			provinces = _map(provinces, function (province, index) {
 				return [
 					index + 1,
 					province['code'],
@@ -781,7 +782,7 @@ export class LocationComponent implements OnInit, AfterViewInit {
 		}
 
 		if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-			provinces = lodash.map(provinces, function (province, index) {
+			provinces = _map(provinces, function (province, index) {
 				return [
 					index + 1,
 					province['code'],
@@ -817,7 +818,7 @@ export class LocationComponent implements OnInit, AfterViewInit {
 		this.searchObject.placeType = PlaceTypeEnum.District;
 		var districts = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, this.searchObject);
 		if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-			districts = lodash.map(districts, function (dist, index) {
+			districts = _map(districts, function (dist, index) {
 				return [
 					index + 1,
 					dist['code'],
@@ -831,7 +832,7 @@ export class LocationComponent implements OnInit, AfterViewInit {
 		}
 
 		if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-			districts = lodash.map(districts, function (dist, index) {
+			districts = _map(districts, function (dist, index) {
 				return [
 					index + 1,
 					dist['code'],
@@ -870,7 +871,7 @@ export class LocationComponent implements OnInit, AfterViewInit {
 		this.searchObject.placeType = PlaceTypeEnum.Ward;
 		var wards = await this.baseServices.postAsync(this.api_menu.Catalogue.CatPlace.query, this.searchObject);
 		if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-			wards = lodash.map(wards, function (ward, index) {
+			wards = _map(wards, function (ward, index) {
 				return [
 					index + 1,
 					ward['code'],
@@ -885,7 +886,7 @@ export class LocationComponent implements OnInit, AfterViewInit {
 		}
 
 		if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-			wards = lodash.map(wards, function (ward, index) {
+			wards = _map(wards, function (ward, index) {
 				return [
 					index + 1,
 					ward['code'],

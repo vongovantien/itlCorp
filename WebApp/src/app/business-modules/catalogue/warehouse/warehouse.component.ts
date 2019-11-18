@@ -16,7 +16,7 @@ import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 declare var $: any;
-import * as lodash from 'lodash';
+import _map from 'lodash/map';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { language } from 'src/languages/language.en';
 import * as dataHelper from 'src/helper/data.helper';
@@ -405,7 +405,7 @@ export class WarehouseComponent extends AppList implements OnInit {
         var warehouseData = await this.baseService.postAsync(this.api_menu.Catalogue.CatPlace.query, this.criteria);
         console.log(warehouseData);
         if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) == SystemConstants.LANGUAGES.ENGLISH_API) {
-            warehouseData = lodash.map(warehouseData, function (item, index) {
+            warehouseData = _map(warehouseData, function (item, index) {
                 return [
                     index + 1,
                     item['code'],
@@ -420,7 +420,7 @@ export class WarehouseComponent extends AppList implements OnInit {
             });
         }
         if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) == SystemConstants.LANGUAGES.VIETNAM_API) {
-            warehouseData = lodash.map(warehouseData, function (item, index) {
+            warehouseData = _map(warehouseData, function (item, index) {
                 return [
                     index + 1,
                     item['code'],
