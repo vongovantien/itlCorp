@@ -1,8 +1,8 @@
 HWBNO	String	50	
 ArrivalNo	String	50	
 ReferrenceNo	String	50	
-Issued	String	255	
-Attn	String	255	
+ISSUED 	String	255	 
+ATTN 	String	255	 
 Consignee	String	250	
 Notify	String	255	
 HandlingInfo	String	250	
@@ -10,14 +10,14 @@ ExecutedOn	String	50
 OceanVessel	String	150	
 TotalPackages	String	50	
 ShippingMarkImport	Memo		
-Osi	Memo		
-FlightDate			
-DateConfirm			
-DatePackage			
+OSI	Memo		
+FlightDate	DateTime		
+DateConfirm	DateTime		
+DatePackage	DateTime		
 LocalVessel	String	150	
 ContSealNo	String	255	
 ForCarrier	String	255	
-DeparetureAirport	String	150	
+DepartureAirport	String	150	
 PortofDischarge	String	50	
 PlaceDelivery	String	150	
 ArrivalNote	String	150	
@@ -41,12 +41,12 @@ SeaFCL	Boolean
 MaskNos	Memo		
 DlvCustoms	String	255	
 insurAmount	String	255	
-Mawb	String	255	
-ExHDate			
+MAWB 	String	255	
+ExHDate	DateTime		
 ReceivedName	String	150	
 ReceivedAddress	String	255	
 ReceivedContactName	String	50	
-CussignedDate			
+CussignedDate	DateTime		
 TimeAm	String	50	
 SpecialInstruction	String	255	
 BillType	String	255	

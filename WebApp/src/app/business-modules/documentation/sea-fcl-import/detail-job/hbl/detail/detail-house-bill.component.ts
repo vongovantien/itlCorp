@@ -25,6 +25,7 @@ enum HBL_TAB {
     DETAIL = 'DETAIL',
     ARRIVAL = 'ARRIVAL',
     DELIVERY = 'DELIVERY'
+
 }
 
 @Component({
@@ -238,19 +239,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                                     return;
                                 }
                             });
-
-                            // const saleman = this.formHouseBill.saleMans.filter((sm) => {
-                            //     return sm.id === this.hblDetail.saleManId;
-                            // });
-                            // if (!!saleman) {
-                            //     this.formHouseBill.selectedSaleman = saleman;
-
-                            // }
-
-
-
                             this.formHouseBill.selectedCustomer = { field: 'id', value: res.data.customerId };
-                            // this.formHouseBill.selectedSaleman = { field: 'id', value: res.data.saleManId };
                             this.formHouseBill.selectedShipper = { field: 'id', value: res.data.shipperId };
                             this.formHouseBill.selectedConsignee = { field: 'id', value: res.data.consigneeId };
                             this.formHouseBill.selectedNotifyParty = { field: 'id', value: res.data.notifyPartyId };
@@ -295,5 +284,22 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                     },
                 );
         }
+        if (this.selectedTab === HBL_TAB.DETAIL) {
+            this._documentationRepo.previewProofofDelivery(this.hblDetail.id)
+                .pipe(
+                    catchError(this.catchError),
+                    finalize(() => { })
+                )
+                .subscribe(
+                    (res: any) => {
+                        this.dataReport = res;
+                        setTimeout(() => {
+                            this.reportPopup.show();
+                        }, 1000);
+
+                    },
+                );
+        }
+
     }
 }

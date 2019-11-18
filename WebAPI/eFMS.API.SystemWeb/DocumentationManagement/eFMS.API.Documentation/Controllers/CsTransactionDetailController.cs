@@ -225,11 +225,11 @@ namespace eFMS.API.Documentation.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("PreviewProofOfDelivery")]
-        public IActionResult ReviewProofOfDelivery(Guid Id)
+        public IActionResult ReviewProofOfDelivery(Guid id)
         {
-            var result = csTransactionDetailService.PreviewProofOfDelivery(Id);
+            var result = csTransactionDetailService.PreviewProofOfDelivery(id);
             return Ok(result);
         }
 

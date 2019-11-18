@@ -6,11 +6,11 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
 {
     public class ProofOfDeliveryReport
     {
-        public string Hwbno { get; set; }
+        public string HWBNO { get; set; }
         public string ArrivalNo { get; set; }
         public string ReferrenceNo { get; set; }
         public string Issued { get; set; }
-        public string Attn { get; set; }
+        public string ATTN { get; set; }
         public string Consignee { get; set; }
         public string Notify { get; set; }
         public string HandlingInfo { get; set; }
@@ -49,7 +49,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string MaskNos { get; set; }
         public string DlvCustoms { get; set; }
         public string InsurAmount { get; set; }
-        public string Mawb { get; set; }
+        public string MAWB { get; set; }
         public DateTime ExhDate { get; set; }
         public string ReceivedName { get; set; }
         public string ReceivedAddress { get; set; }
@@ -63,7 +63,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public decimal DecimalNo { get; set; }
         public decimal CurrDecimalNo { get; set; }
         public string PlaceOfReceipt { get; set; }
-        public decimal NoOfPieces{ get; set; }
+        public decimal NoofPieces{ get; set; }
         public string UnitPieaces { get; set; }
         public decimal GW { get; set; }
         public decimal NW { get; set; }

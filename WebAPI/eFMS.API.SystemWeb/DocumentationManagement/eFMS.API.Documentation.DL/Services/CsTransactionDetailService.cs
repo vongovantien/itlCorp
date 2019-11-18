@@ -643,13 +643,17 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
                 var dataPOD = catPlaceRepo.First(x => x.Id == data.Pod);
                 var dataPOL = catPlaceRepo.First(x => x.Id == data.Pol);
                 var dataATTN = catPartnerRepo.First(x => x.Id == data.AlsoNotifyPartyId);
+                var dataConsignee = catPartnerRepo.First(x => x.Id == data.ConsigneeId);
+
                 var proofOfDelivery = new ProofOfDeliveryReport();
-                proofOfDelivery.Mawb = data.Mawb;
-                proofOfDelivery.Hwbno = data.Hwbno;
+                proofOfDelivery.MAWB = data.Mawb;
+                proofOfDelivery.HWBNO = data.Hwbno;
                 proofOfDelivery.PortofDischarge = dataPOD?.NameEn;
                 proofOfDelivery.DepartureAirport = dataPOL?.NameEn;
                 proofOfDelivery.ShippingMarkImport = data.ShippingMark;
-                proofOfDelivery.Attn = dataATTN?.PartnerNameEn;
+                proofOfDelivery.Consignee = dataConsignee.PartnerNameEn;
+                proofOfDelivery.ATTN = dataATTN?.PartnerNameEn;
+                proofOfDelivery.TotalValue = 0;
                 var csMawbcontainers = csMawbcontainerRepo.Get(x => x.Hblid == data.Id);
                 foreach (var item in csMawbcontainers)
                 {
@@ -667,6 +671,7 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
             var parameter = new ProofOfDeliveryReportParams();
             parameter.CompanyName = Constants.COMPANY_NAME;
             parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
+            parameter.CompanyDescription = string.Empty;
             parameter.CompanyAddress2 = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎";
             parameter.Website = Constants.COMPANY_WEBSITE;
             parameter.Contact = string.Empty;//Get user login
