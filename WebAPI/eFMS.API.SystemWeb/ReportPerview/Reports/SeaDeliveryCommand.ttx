@@ -24,7 +24,7 @@ Unit	String	50
 CBM	Number		
 SeaLCL	Boolean		
 DatePackage	Date		
-DeliveryOrderNote	Memo		
+DeliveryOrderNote	Memo	
 FirstDestination	String	255	
 SecondDestination	String	255	
 BillType	String	255	
