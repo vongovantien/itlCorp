@@ -62,6 +62,7 @@
                             </td>
                             <td>
                                 <div class="form-group col-md-12 dropdown-partner" dropdown
+                                    [tooltip]="charge.receiverName"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.receiverName }">
                                     <input type="text" class="dropdown-toggle form-control" dropdownToggle readonly
                                         [(ngModel)]="charge.receiverName" placeholder="Partner Name">
@@ -80,7 +81,7 @@
                                 </div>
                             </td>
                             <td>
-                                <div class="form-group col-md-12 dropdown-partner" dropdown
+                                <div class="form-group col-md-12 dropdown-partner" dropdown [tooltip]="charge.payerName"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.payerName }">
                                     <input type="text" class="dropdown-toggle form-control" dropdownToggle readonly
                                         [(ngModel)]="charge.payerName" placeholder="Partner Name">
@@ -99,7 +100,7 @@
                                 </div>
                             </td>
                             <td>
-                                <div class="form-group"
+                                <div class="form-group" [tooltip]="charge.chargeNameEn"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.chargeId || isDuplicateChargeCode)}">
                                     <app-combo-grid-virtual-scroll
                                         [currentActiveItemId]="{field:'id', value:charge.chargeId}"
@@ -204,22 +205,6 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>
-                                <div class="form-group table-date">
-                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                            [minDate]="minDate" name="daterange" placeholder="Please Select" readonly
-                                            [autoApply]="true" [singleDatePicker]="true" [alwaysShowCalendars]="true"
-                                            [(ngModel)]="charge.exchangeDate" />
-                                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                                            <span>
-                                                <i class="la la-calendar"></i>
-                                            </span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </td>
                             <td class="disabled">
                                 <div class="form-group ">
                                     <input type="text" class="form-control" [(ngModel)]="charge.soano" disabled>
@@ -235,6 +220,22 @@
                                 <div class="form-group ">
                                     <input type="text" class="form-control" [(ngModel)]="charge.settlementCode" disabled
                                         readonly>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group table-date">
+                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                            [minDate]="minDate" name="daterange" placeholder="Please Select" readonly
+                                            [autoApply]="true" [singleDatePicker]="true" [alwaysShowCalendars]="true"
+                                            [(ngModel)]="charge.exchangeDate" />
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
+                                        </span>
+                                    </div>
                                 </div>
                             </td>
                             <td class="disabled">
