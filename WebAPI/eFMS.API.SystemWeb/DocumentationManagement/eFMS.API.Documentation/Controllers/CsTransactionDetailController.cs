@@ -220,5 +220,19 @@ namespace eFMS.API.Documentation.Controllers
             var result = csTransactionDetailService.GetGoodSummaryOfAllHBLByJobId(jobId);
             return Ok(result);
         }
+        /// <summary>
+        /// preview proof
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("PreviewProofOfDelivery")]
+        public IActionResult ReviewProofOfDelivery(Guid Id)
+        {
+            var result = csTransactionDetailService.PreviewProofOfDelivery(Id);
+            return Ok(result);
+        }
+
+
     }
 }
