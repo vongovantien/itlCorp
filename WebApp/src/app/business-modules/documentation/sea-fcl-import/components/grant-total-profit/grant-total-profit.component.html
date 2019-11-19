@@ -19,15 +19,16 @@
                         <ng-container *ngIf="!!(shipmentProfits$ | async)?.length">
                             <tr *ngFor="let profit of (shipmentProfits$ | async); let i = index; trackBy: trackByFn">
                                 <td>{{profit.hblNo}}</td>
-                                <td *ngFor="let header of headers; let j = index; trackBy: trackByFn">
+                                <td *ngFor="let header of headers; let j = index; trackBy: trackByFn"
+                                    class="text-right">
                                     <app-table-cell [item]="profit" [type]="header.dataType" [field]="header.field">
                                     </app-table-cell>
                                 </td>
                             </tr>
                             <tr class=" font-weight-bold">
                                 <td class="font-16">Total</td>
-                                <td>{{totalUSD$ | async | number: '.0-3'}} USD</td>
-                                <td>{{totalVND$ | async | number: '.0-3'}} VND</td>
+                                <td class="text-right">{{totalUSD$ | async | number: '.0-3'}} USD</td>
+                                <td class="text-right">{{totalVND$ | async | number: '.0-3'}} VND</td>
                             </tr>
                         </ng-container>
                         <tr app-table-none-record *ngIf="!(shipmentProfits$ | async)?.length"></tr>

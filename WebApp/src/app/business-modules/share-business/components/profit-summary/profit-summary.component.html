@@ -19,35 +19,35 @@
                         <ng-container *ngIf="!!(hblProfit$ | async)">
                             <tr>
                                 <td>1. Buying Rate</td>
-                                <td class="text-danger font-weight-bold">
+                                <td class="text-danger font-weight-bold text-right">
                                     {{(hblProfit$ | async)?.houseBillTotalCharge.totalBuyingUSD | number :'.0-3'}}
                                 </td>
-                                <td class="text-danger font-weight-bold">
+                                <td class="text-danger font-weight-bold text-right">
                                     {{(hblProfit$ | async)?.houseBillTotalCharge.totalBuyingLocal | number :'.0-3'}}
                                 </td>
                             </tr>
                             <tr>
                                 <td>2. Selling Rate</td>
-                                <td>
+                                <td class="text-right">
                                     {{(hblProfit$ | async)?.houseBillTotalCharge.totalSellingUSD | number :'.0-3'}}
                                 </td>
-                                <td>
+                                <td class="text-right">
                                     {{(hblProfit$ | async)?.houseBillTotalCharge.totalSellingLocal | number :'.0-3'}}
                                 </td>
                             </tr>
                             <tr>
                                 <td>3. OBH</td>
-                                <td>
+                                <td class="text-right">
                                     {{(hblProfit$ | async)?.houseBillTotalCharge.totalOBHUSD | number :'.0-3'}}
                                 </td>
-                                <td>
+                                <td class="text-right">
                                     {{(hblProfit$ | async)?.houseBillTotalCharge.totalOBHLocal | number :'.0-3'}}
                                 </td>
                             </tr>
                             <tr class="font-weight-bold">
                                 <td>Total</td>
-                                <td>{{(hblProfit$ | async)?.profitUSD | number: '.0-3'}} USD</td>
-                                <td>{{(hblProfit$ | async)?.profitLocal | number: '.0-3'}} VND</td>
+                                <td class="text-right">{{(hblProfit$ | async)?.profitUSD | number: '.0-3'}} USD</td>
+                                <td class="text-right">{{(hblProfit$ | async)?.profitLocal | number: '.0-3'}} VND</td>
                             </tr>
                         </ng-container>
                         <tr app-table-none-record *ngIf="!(hblProfit$ | async)"></tr>
