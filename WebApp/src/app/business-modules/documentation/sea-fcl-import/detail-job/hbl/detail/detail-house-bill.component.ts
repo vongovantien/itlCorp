@@ -212,6 +212,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
 
                         this.formHouseBill.selectedShipper = { field: 'shortName', value: res.data.shipperId };
                         this.formHouseBill.hbltype.setValue(this.formHouseBill.hbOfladingTypes.filter(i => i.value === res.data.hbltype)[0]);
+                        this.formHouseBill.servicetype.setValue(this.formHouseBill.serviceTypes.filter(i => i.value === res.data.serviceType)[0]);
                         this.formHouseBill.localVessel.setValue(res.data.localVessel);
                         this.formHouseBill.localVoyNo.setValue(res.data.localVoyNo);
                         this.formHouseBill.oceanVessel.setValue(res.data.oceanVessel);
@@ -220,11 +221,9 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
 
                             this.formHouseBill.documentNo.setValue(res.data.documentNo);
                         !!this.hblDetail.etawarehouse ? this.formHouseBill.etawarehouse.setValue({ startDate: new Date(this.hblDetail.etawarehouse), endDate: new Date(this.hblDetail.etawarehouse) }) : this.formHouseBill.etawarehouse.setValue(null), // * Date;
-                            // this.formHouseBill.etawarehouse.setValue(res.data.etawarehouse);
                             this.formHouseBill.warehouseNotice.setValue(res.data.warehouseNotice);
                         this.formHouseBill.shippingMark.setValue(res.data.shippingMark);
                         this.formHouseBill.remark.setValue(res.data.remark);
-                        // this.formHouseBill.issueHBLDate.setValue(res.data.issueHbldate);
                         !!this.hblDetail.issueHbldate ? this.formHouseBill.issueHBLDate.setValue({ startDate: new Date(this.hblDetail.issueHbldate), endDate: new Date(this.hblDetail.issueHbldate) }) : this.formHouseBill.issueHBLDate.setValue(null), // * Date;
 
                             this.formHouseBill.referenceNo.setValue(res.data.referenceNo);

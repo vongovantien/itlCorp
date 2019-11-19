@@ -82,6 +82,10 @@ export class CreateHouseBillComponent extends AppForm {
     ngAfterViewInit() {
         this.shipmentGoodSummaryComponent.initContainer();
         this.formHouseBill.mtBill.setValue(this.shipmentDetail.mawb);
+        if (this.shipmentDetail.typeOfService != null) {
+            this.formHouseBill.servicetype.setValue(this.formHouseBill.serviceTypes.filter(i => i.value === this.shipmentDetail.typeOfService)[0]);
+
+        }
 
     }
 
@@ -199,6 +203,7 @@ export class CreateHouseBillComponent extends AppForm {
             alsoNotifyPartyDescription: this.formHouseBill.alsoNotifyPartyDescriptionModel !== undefined ? this.formHouseBill.alsoNotifyPartyDescriptionModel : this.formHouseBill.alsonotifyPartyDescription.value,
             hwbno: this.formHouseBill.hwbno.value,
             hbltype: this.formHouseBill.hbltype.value != null ? this.formHouseBill.hbltype.value.value : null,
+            servicetype: this.formHouseBill.servicetype.value != null ? this.formHouseBill.servicetype.value.value : null,
             etd: !!this.formHouseBill.etd.value ? formatDate(this.formHouseBill.etd.value.startDate !== undefined ? this.formHouseBill.etd.value.startDate : this.formHouseBill.etd.value, 'yyyy-MM-dd', 'en') : null,
             eta: !!this.formHouseBill.eta.value ? formatDate(this.formHouseBill.eta.value.startDate !== undefined ? this.formHouseBill.eta.value.startDate : this.formHouseBill.eta.value, 'yyyy-MM-dd', 'en') : null,
             pickupPlace: this.formHouseBill.pickupPlace.value,
@@ -251,6 +256,7 @@ export interface ITransactionDetail {
     alsoNotifyPartyDescription: string;
     hwbno: string;
     hbltype: string;
+    servicetype: string;
     etd: string;
     eta: string;
     pickupPlace: string;
