@@ -26,6 +26,8 @@ import { getParamsRouterState } from 'src/app/store';
 })
 export class SeaFCLImportHBLComponent extends AppList {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
+
 
     jobId: string = '';
     headers: CommonInterface.IHeaderTable[];
@@ -203,9 +205,39 @@ export class SeaFCLImportHBLComponent extends AppList {
             }
         }
     }
+
     duplicateConfirm() {
         this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], {
             queryParams: Object.assign({}, { tab: 'SHIPMENT' }, { action: 'copy' })
         });
+    }
+
+    gotoList() {
+        this._router.navigate(["home/documentation/sea-fcl-import"]);
+    }
+
+    deleteJob() {
+        this.confirmDeleteJobPopup.show();
+    }
+
+    onDeleteJob() {
+        this._progressRef.start();
+        this._documentRepo.deleteMasterBill(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                    this.confirmDeleteJobPopup.hide();
+                })
+            ).subscribe(
+                (respone: CommonInterface.IResult) => {
+                    if (respone.status) {
+
+                        this._toastService.success(respone.message, 'Delete Success !');
+
+                        this.gotoList();
+                    }
+                },
+            );
     }
 }
