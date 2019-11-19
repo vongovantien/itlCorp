@@ -1,5 +1,7 @@
 
-import * as lodash from 'lodash';
+
+import _uniq from 'lodash/uniq';
+import _filter from 'lodash/filter';
 
 /**
  * Author: Thor The
@@ -18,11 +20,11 @@ export function PrepareListFieldSearch(current_list_fields_search = null, list_f
 
     var list_fields_search: any[] = [];
     if (condition == 'and' || condition == 'AND') {
-        list_fields_search =  PrepareListFieldsSearchWithAndCondition(current_list_fields_search, list_fields, key_search);
+        list_fields_search = PrepareListFieldsSearchWithAndCondition(current_list_fields_search, list_fields, key_search);
     }
 
     if (condition == 'or' || condition == 'OR') {
-        list_fields_search =  PrepareListFieldsSearchWithOrCondition(list_fields, key_search);
+        list_fields_search = PrepareListFieldsSearchWithOrCondition(list_fields, key_search);
     }
 
     return list_fields_search;
@@ -38,10 +40,10 @@ export function PrepareListFieldSearch(current_list_fields_search = null, list_f
 export function SearchEngine(list_keys_search: any[], reference_source: any[], condition) {
     var list_result: any[] = [];
     if (condition == 'and' || condition == 'AND') {
-        list_result =  SearchWithAndCondition(list_keys_search, reference_source);
+        list_result = SearchWithAndCondition(list_keys_search, reference_source);
     }
     if (condition == 'or' || condition == 'OR') {
-        list_result =  SearchWithOrCondition(list_keys_search, reference_source);
+        list_result = SearchWithOrCondition(list_keys_search, reference_source);
     }
 
     return list_result;
@@ -58,7 +60,7 @@ function SearchWithAndCondition(list_keys_search: any[], reference_source: any[]
         if (list_keys_search.length == 0) {
             ReturnList = reference_source;
         } else {
-            ReturnList = lodash.filter(reference_source, function (o) {
+            ReturnList = _filter(reference_source, function (o) {
 
                 var result = false;
                 var list_result: any[] = []
@@ -88,7 +90,7 @@ function SearchWithAndCondition(list_keys_search: any[], reference_source: any[]
 
 
                 }
-                if (lodash.uniq(list_result).length == 1 && list_result[0] == true) {
+                if (_uniq(list_result).length == 1 && list_result[0] == true) {
                     result = true;
                 } else {
                     result = false;
@@ -112,7 +114,7 @@ function SearchWithOrCondition(list_keys_search: any[], reference_source: any[])
         if (list_keys_search.length == 0) {
             ReturnList = reference_source;
         } else {
-            ReturnList = lodash.filter(reference_source, function (o) {
+            ReturnList = _filter(reference_source, function (o) {
                 var result = false;
                 for (var k = 0; k < list_keys_search.length; k++) {
                     var key = Object.keys(list_keys_search[k])[0];

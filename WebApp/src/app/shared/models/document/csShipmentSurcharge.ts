@@ -3,6 +3,7 @@ export class CsShipmentSurcharge {
     hblid: string = null;
     type: string = null;
     chargeId: string = null;
+    chargeNameEn: string = null;
     quantity: number = 1;
     unitId: number = null;
     unitPrice: number = null;

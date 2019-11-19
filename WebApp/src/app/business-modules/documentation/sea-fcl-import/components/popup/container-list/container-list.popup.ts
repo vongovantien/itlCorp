@@ -15,6 +15,7 @@ import { DataService, SortService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { ShareContainerImportComponent } from 'src/app/business-modules/share-business';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -27,7 +28,7 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
 
     mblid: string = null;
     hblid: string = null;
-    containers: any[] = [];
+    containers: Container[] = [];
 
     headers: CommonInterface.IHeaderTable[] = [];
 
@@ -40,12 +41,15 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
 
     unitOfMeasure: string = 'Kgs';
 
+    isDuplicateContPakage: boolean = false;
+
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _store: Store<fromStore.IContainerState>,
         private cdRef: ChangeDetectorRef,
         private _dataService: DataService,
-        private _sortService: SortService
+        private _sortService: SortService,
+        private _toastService: ToastrService
     ) {
         super();
 
@@ -56,18 +60,18 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
         this.headers = [
             { title: 'Cont Type', field: 'containerTypeId', sortable: true, required: true },
             { title: 'Cont Q`Ty', field: 'quantity', required: true, sortable: true },
+            { title: 'G.W', field: 'gw', sortable: true, },
+            { title: 'C.W', field: 'chargeAbleWeight', sortable: true, },
+            { title: 'CBM', field: 'cbm', sortable: true, },
+            { title: 'Package Q`Ty', field: 'packageQuantity', sortable: true, },
+            { title: 'Package Type', field: 'packageTypeId', sortable: true, },
             { title: 'Container No', field: 'containerNo', sortable: true, },
             { title: 'Seal No', field: 'sealNo', sortable: true, },
             { title: 'Mark No', field: 'markNo', sortable: true, },
             { title: 'Commodity', field: 'commodityId', sortable: true, },
-            { title: 'Package Type', field: 'packageTypeId', sortable: true, },
-            { title: 'Package Q`Ty', field: 'packageQuantity', sortable: true, },
             { title: 'Description', field: 'description', sortable: true, },
-            { title: 'G.W', field: 'gw', sortable: true, },
             { title: 'N.W', field: 'nw', sortable: true, },
-            { title: 'C.W', field: 'chargeAbleWeight', sortable: true, },
             { title: 'Unit', field: 'unitOfMeasure', sortable: true, },
-            { title: 'CBM', field: 'cbm', sortable: true, },
         ];
         this.cdRef.detectChanges(); // * tell ChangeDetect update view in app-table-header (field required).
         this.getMasterData();
@@ -124,20 +128,24 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
 
     onSaveContainerList() {
         this.isSubmitted = true;
-        if (this.checkValidateContainer()) {
-            // * DISPATCH SAVE ACTION
-
-            for (const container of this.containers) {
-                container.commodityName = this.getCommodityName(container.commodityId);
-                container.containerTypeName = this.getContainerTypeName(container.containerTypeId);
-                container.packageTypeName = this.getPackageTypeName(container.packageTypeId);
-            }
-            this._store.dispatch(new fromStore.SaveContainerAction(this.containers));
-
-            this.isSubmitted = false;
-            this.hide();
+        if (!this.containers.length) {
+            return;
         }
 
+        if (this.checkValidateContainer()) {
+            // * DISPATCH SAVE ACTION
+            if (this.checkDuplicate()) {
+                for (const container of this.containers) {
+                    container.commodityName = this.getCommodityName(container.commodityId);
+                    container.containerTypeName = this.getContainerTypeName(container.containerTypeId);
+                    container.packageTypeName = this.getPackageTypeName(container.packageTypeId);
+                }
+                this._store.dispatch(new fromStore.SaveContainerAction(this.containers));
+
+                this.isSubmitted = false;
+                this.hide();
+            }
+        }
     }
 
     checkValidateContainer() {
@@ -159,7 +167,26 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
         return valid;
     }
 
-    getCommodityName(id: string) {
+    checkDuplicate() {
+        let valid: boolean = true;
+        if (
+            this.utility.checkDuplicateInObject("containerTypeId", this.containers)
+            && this.utility.checkDuplicateInObject("packageTypeId", this.containers)
+            && this.utility.checkDuplicateInObject("packageQuantity", this.containers)
+            && this.utility.checkDuplicateInObject("containerNo", this.containers)
+        ) {
+            this.isDuplicateContPakage = true;
+            valid = false;
+            return;
+        } else {
+            valid = true;
+            this.isDuplicateContPakage = false;
+        }
+
+        return valid;
+    }
+
+    getCommodityName(id: string | number) {
         const commodities: Commodity[] = this.commodities.filter(c => c.id === id);
         if (!!commodities.length) {
             return commodities[0].commodityNameEn;
@@ -168,7 +195,7 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
         }
     }
 
-    getContainerTypeName(containerId: string) {
+    getContainerTypeName(containerId: string | number) {
         const containers: Unit[] = this.containerUnits.filter(c => c.id === containerId);
         if (!!containers.length) {
             return containers[0].unitNameEn;
@@ -177,7 +204,7 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
         }
     }
 
-    getPackageTypeName(packageId: string) {
+    getPackageTypeName(packageId: string | number) {
         const packages: Unit[] = this.packageUnits.filter(c => c.id === packageId);
         if (!!packages.length) {
             return packages[0].unitNameEn;
@@ -196,25 +223,13 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
         this.containerImportPopup.hblid = this.hblid;
         this.containerImportPopup.show();
     }
-    importSuccess(event) {
-        if (event) {
-            this._store.select(fromStore.getContainerSaveState)
-                .pipe(takeUntil(this.ngUnsubscribe))
-                .subscribe(
-                    (res: fromStore.IContainerState | any) => {
-                        this.containers = res;
-                        for (const container of this.containers) {
-                            container.commodityName = this.getCommodityName(container.commodityId);
-                            container.containerTypeName = this.getContainerTypeName(container.containerTypeId);
-                            container.packageTypeName = this.getPackageTypeName(container.packageTypeId);
-                        }
-                        this._store.dispatch(new fromStore.SaveContainerAction(this.containers));
-                    }
-                );
-        }
-    }
 
     sortContainer(sortField: string) {
         this.containers = this._sortService.sort(this.containers, sortField, this.order);
     }
+
+    onChangeDataFormTable() {
+        this.isDuplicateContPakage = false;
+    }
+
 }

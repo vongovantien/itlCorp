@@ -8,9 +8,11 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
     {
         public string TransID { get; set; }
         public string HBL { get; set; }
+        public string ArrivalNo { get; set; }
+        public string ReferrenceNo { get; set; }
         public string Marks { get; set; }
         public string Nofpiece { get; set; }
-        public decimal GrossWeight { get; set; }
+        public decimal GW { get; set; }
         public decimal SeaCBM { get; set; }
         public decimal NoOfAWB { get; set; }
         public string Destination { get; set; }
@@ -23,6 +25,8 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string MaskNos { get; set; }
         public string TranShipmentTo { get; set; }
         public string BillType { get; set; }
+        public decimal NW { get; set; }
+        public string PortofDischarge { get; set; }
     }
     public class SeaCargoManifestParameter
     {

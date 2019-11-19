@@ -13,7 +13,7 @@ import { SortService } from 'src/app/shared/services/sort.service';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { SystemConstants } from 'src/constants/system.const';
-import * as lodash from 'lodash';
+import _map from 'lodash/map';
 
 @Component({
   selector: 'app-air-ship-sup',
@@ -65,7 +65,7 @@ export class AirShipSupComponent implements OnInit {
   async exportAirShipSup() {
     var airShipSup = await this.baseService.postAsync(this.api_menu.Catalogue.PartnerData.query, this.criteria);
     if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-      airShipSup = lodash.map(airShipSup, function (ashs, index) {
+      airShipSup = _map(airShipSup, function (ashs, index) {
         return [
           index + 1,
           ashs['id'],
@@ -82,7 +82,7 @@ export class AirShipSupComponent implements OnInit {
       });
     }
     if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-      airShipSup = lodash.map(airShipSup, function (ashs, index) {
+      airShipSup = _map(airShipSup, function (ashs, index) {
         return [
           index + 1,
           ashs['id'],

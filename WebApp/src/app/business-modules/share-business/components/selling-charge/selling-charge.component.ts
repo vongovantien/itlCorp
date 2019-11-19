@@ -55,17 +55,14 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
             { title: 'VAT', field: 'vatrate', required: true, sortable: true },
             { title: 'Total', field: 'total', sortable: true },
             { title: 'Note', field: 'notes', sortable: true },
-            { title: 'Invoice No', field: 'invoiceNo', sortable: true },
-            { title: 'Series No', field: 'seriesNo', sortable: true },
-            { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
-            { title: 'Exchange Rate Date', field: 'exchangeDate', sortable: true },
             { title: 'SOA', field: 'soano', sortable: true },
             { title: 'Credit/Debit Note', field: 'cdno', sortable: true },
             { title: 'Settle Payment', field: 'settlementCode', sortable: true },
+            { title: 'Exchange Rate Date', field: 'exchangeDate', sortable: true },
+            { title: 'Invoice No', field: 'invoiceNo', sortable: true },
+            { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
             { title: 'Voucher ID', field: 'voucherId', sortable: true },
             { title: 'Voucher ID Date', field: 'voucherIddate', sortable: true },
-            { title: 'Voucher IDRE', field: 'voucherIdre', sortable: true },
-            { title: 'Voucher IDRE Date', field: 'voucherIdredate', sortable: true },
             { title: 'Final Exchange Rate', field: 'finalExchangeRate', sortable: true },
         ];
     }
@@ -119,5 +116,4 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                 }
             );
     }
-
 }

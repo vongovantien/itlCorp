@@ -1,14 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { AppList } from 'src/app/app.list';
+import { Component } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { CatalogueRepo, DocumentationRepo, SystemRepo } from 'src/app/shared/repositories';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { catchError, distinctUntilChanged, map, takeUntil, tap } from 'rxjs/operators';
+import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
-import { SeaFClImportFormCreateComponent } from '../../../../components/form-create/form-create-sea-fcl-import.component';
-import { SeaFCLImportCreateJobComponent } from '../../../../create-job/create-job-fcl-import.component';
 import { BehaviorSubject } from 'rxjs';
-import { User } from 'src/app/shared/models';
 
 @Component({
     selector: 'app-form-add-house-bill',
@@ -452,7 +448,6 @@ export class FormAddHouseBillComponent extends AppForm {
                 const result = this.configCustomer.dataSource.concat(this.configConsignee.dataSource).filter(function (value, index, self) {
                     return self.indexOf(value) === index;
                 });
-                console.log(result);
                 this.configConsignee.dataSource = result;
 
             });

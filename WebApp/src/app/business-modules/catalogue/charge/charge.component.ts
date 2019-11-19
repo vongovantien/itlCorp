@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import * as lodash from 'lodash';
+import _map from 'lodash/map';
 import { BaseService } from 'src/app/shared/services/base.service';
 import { API_MENU } from 'src/constants/api-menu.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
@@ -125,7 +125,7 @@ export class ChargeComponent extends AppList implements OnInit {
     async export() {
         let charges = await this.baseServices.postAsync(this.api_menu.Catalogue.Charge.query, this.searchObject);
         if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-            charges = lodash.map(charges, function (chrg, index) {
+            charges = _map(charges, function (chrg, index) {
                 return [
                     index + 1,
                     chrg['code'],
@@ -138,7 +138,7 @@ export class ChargeComponent extends AppList implements OnInit {
         }
 
         if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-            charges = lodash.map(charges, function (chrg, index) {
+            charges = _map(charges, function (chrg, index) {
                 return [
                     index + 1,
                     chrg['code'],

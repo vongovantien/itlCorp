@@ -456,7 +456,7 @@ namespace eFMS.API.Documentation.DL.Services
                 CompanyAddress2 = "52 Trường Sơn, Phường 2, Tân Bình",
                 Website = "itlvn.com.vn",
                 MAWB = detail.Mawb,
-                Contact = "admin",
+                Contact = currentUser.UserName,
                 DecimalNo = 2
             };
             var polName = placeRepository.Get(x => x.Id == detail.Pol).FirstOrDefault().NameEn;

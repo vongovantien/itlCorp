@@ -4,6 +4,7 @@ import { ContainerActionTypes, ContainerAction } from "../actions/container.acti
 
 export interface IContainerState {
     containers: Container[];
+    isSave?: boolean;
 }
 
 export const initialState: IContainerState = {
@@ -20,13 +21,13 @@ export function ContainerReducer(state = initialState, action: ContainerAction):
 
         case ContainerActionTypes.GET_CONTAINER_SUCESS: {
             return {
-                containers: action.payload
+                containers: action.payload,
             };
         }
 
         case ContainerActionTypes.ADD_CONTAINER: {
             return {
-                containers: [...state.containers, action.payload]
+                containers: [...state.containers, action.payload],
             };
         }
 
@@ -37,12 +38,13 @@ export function ContainerReducer(state = initialState, action: ContainerAction):
         }
 
         case ContainerActionTypes.DELETE_CONTAINER: {
-            return { ...state, ...state.containers.splice(action.payload, 1) };
+            // return { ...state, ...state.containers.splice(action.payload, 1) };
+            return { ...state, containers: [...state.containers.slice(0, action.payload), ...state.containers.slice(action.payload + 1)] };
         }
 
         case ContainerActionTypes.SAVE_CONTAINER: {
             return {
-                containers: action.payload
+                containers: action.payload,
             };
         }
 

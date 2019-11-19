@@ -11,7 +11,7 @@ import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-se
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { NgForm } from '@angular/forms';
 import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
-import * as lodash from 'lodash';
+import _map from 'lodash/map';
 import { ExcelService } from 'src/app/shared/services/excel.service';
 import { ExportExcel } from 'src/app/shared/models/layout/exportExcel.models';
 import { SystemConstants } from 'src/constants/system.const';
@@ -189,7 +189,7 @@ export class CurrencyComponent implements OnInit {
   async export() {
     var currenciesList = await this.baseService.postAsync(this.api_menu.Catalogue.Currency.getAllByQuery, this.criteria);
     if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.ENGLISH_API) {
-      currenciesList = lodash.map(currenciesList, function (currency, index) {
+      currenciesList = _map(currenciesList, function (currency, index) {
         return [
           index + 1,
           currency['id'],
@@ -201,7 +201,7 @@ export class CurrencyComponent implements OnInit {
     }
 
     if (localStorage.getItem(SystemConstants.CURRENT_LANGUAGE) === SystemConstants.LANGUAGES.VIETNAM_API) {
-      currenciesList = lodash.map(currenciesList, function (currency, index) {
+      currenciesList = _map(currenciesList, function (currency, index) {
         return [
           index + 1,
           currency['id'],

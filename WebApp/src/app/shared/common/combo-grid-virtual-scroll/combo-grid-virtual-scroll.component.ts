@@ -35,8 +35,10 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     Disabled: boolean = false;
 
 
-    constructor(private cdr: ChangeDetectorRef,
-        private sortService: SortService) {
+    constructor(
+        private cdr: ChangeDetectorRef,
+        private sortService: SortService,
+    ) {
         super();
     }
 
@@ -123,7 +125,7 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
             //     return val === data.value;
             // });
 
-            const itemIndex = this.ConstDataSources.findIndex(i => i[data.field] === data.value); // TODO key = id
+            const itemIndex = this.ConstDataSources.findIndex(i => i[data.field] === data.value);
 
             if (itemIndex !== -1) {
                 this.indexSelected = itemIndex;

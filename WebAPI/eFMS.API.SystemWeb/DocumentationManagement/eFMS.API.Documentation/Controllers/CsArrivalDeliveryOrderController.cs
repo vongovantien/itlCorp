@@ -194,6 +194,7 @@ namespace eFMS.API.Documentation.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("PreviewDeliveryOrder")]
+        [Authorize]
         public IActionResult PreviewDeliveryOrder(Guid hblid)
         {
             var data = arrivalFreightChargeServices.PreviewDeliveryOrder(hblid);

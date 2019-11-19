@@ -123,6 +123,8 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
             .subscribe(
                 (containers: any) => {
                     this.containers = containers || [];
+
+                    this.shipmentGoodSummaryComponent.containers = this.containers;
                 }
             );
     }
@@ -172,10 +174,11 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
         modelUpdate.csMawbcontainers = this.containers;
         modelUpdate.id = this.id;
         modelUpdate.branchId = this.fclImportDetail.branchId;
-        modelUpdate.userCreated = this.fclImportDetail.userCreated;
         modelUpdate.transactionType = this.fclImportDetail.transactionType;
         modelUpdate.jobNo = this.fclImportDetail.jobNo;
-        modelUpdate.datetimeCreated = this.fclImportDetail.modifiedDate;
+        modelUpdate.datetimeCreated = this.fclImportDetail.datetimeCreated;
+        modelUpdate.userCreated = this.fclImportDetail.userCreated;
+
         if (this.ACTION === 'UPDATE') {
             this.updateJob(modelUpdate);
         } else {

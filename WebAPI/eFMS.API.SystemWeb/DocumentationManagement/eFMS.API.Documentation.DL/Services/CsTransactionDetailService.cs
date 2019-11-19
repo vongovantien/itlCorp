@@ -15,6 +15,7 @@ using eFMS.API.Common.NoSql;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.DL.Common;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -30,8 +31,9 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatSaleman> catSalemanRepo;
         readonly ICsMawbcontainerService containerService;
         readonly IContextBase<CsTransactionDetail> csTransactionDetailRepo;
-
         readonly IContextBase<CsShipmentSurcharge> surchareRepository;
+        private readonly ICurrentUser currentUser;
+
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
             IMapper mapper,
@@ -44,7 +46,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatCommodity> catCommodity,
             IContextBase<CatSaleman> catSaleman,
             IContextBase<CsShipmentSurcharge> surchareRepo , IContextBase<CsTransactionDetail> csTransactiondetail,
-ICsMawbcontainerService contService) : base(repository, mapper)
+ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
             csMawbcontainerRepo = csMawbcontainer;
@@ -57,6 +59,7 @@ ICsMawbcontainerService contService) : base(repository, mapper)
             catSalemanRepo = catSaleman;
             containerService = contService;
             csTransactionDetailRepo = csTransactiondetail;
+            currentUser = user;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -628,6 +631,63 @@ ICsMawbcontainerService contService) : base(repository, mapper)
             result.AddSubReport("Freightcharges", freightCharges);
             result.SetParameter(parameter);
             return result;
+        }
+        public Crystal PreviewProofOfDelivery(Guid Id)
+        {
+            var data = GetById(Id);
+            var listProof = new List<ProofOfDeliveryReport>();
+            Crystal result = null;
+            var _currentUser = currentUser.UserID;
+            if (data != null)
+            { 
+                var dataPOD = catPlaceRepo.First(x => x.Id == data.Pod);
+                var dataPOL = catPlaceRepo.First(x => x.Id == data.Pol);
+                var dataATTN = catPartnerRepo.First(x => x.Id == data.AlsoNotifyPartyId);
+                var dataConsignee = catPartnerRepo.First(x => x.Id == data.ConsigneeId);
+
+                var proofOfDelivery = new ProofOfDeliveryReport();
+                proofOfDelivery.MAWB = data.Mawb;
+                proofOfDelivery.HWBNO = data.Hwbno;
+                proofOfDelivery.PortofDischarge = dataPOD?.NameEn;
+                proofOfDelivery.DepartureAirport = dataPOL?.NameEn;
+                proofOfDelivery.ShippingMarkImport = data.ShippingMark;
+                proofOfDelivery.Consignee = dataConsignee.PartnerNameEn;
+                proofOfDelivery.ATTN = dataATTN?.PartnerNameEn;
+                proofOfDelivery.TotalValue = 0;
+                var csMawbcontainers = csMawbcontainerRepo.Get(x => x.Hblid == data.Id);
+                foreach (var item in csMawbcontainers)
+                {
+                    proofOfDelivery.Description += item.Description  + string.Join(",",  data.Commodity);
+                }
+                if(csMawbcontainers.Count() > 0)
+                {
+                    proofOfDelivery.NoPieces = csMawbcontainers.Sum(x => x.Quantity) ?? 0;
+                    proofOfDelivery.GW = csMawbcontainers.Sum(x => x.Gw) ?? 0;
+                    proofOfDelivery.NW = csMawbcontainers.Sum(x => x.Nw) ?? 0;
+                }
+                listProof.Add(proofOfDelivery);
+            }
+
+            var parameter = new ProofOfDeliveryReportParams();
+            parameter.CompanyName = Constants.COMPANY_NAME;
+            parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
+            parameter.CompanyDescription = string.Empty;
+            parameter.CompanyAddress2 = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎";
+            parameter.Website = Constants.COMPANY_WEBSITE;
+            parameter.Contact = _currentUser;//Get user login
+            parameter.DecimalNo = 0; // set 0  temporary
+            parameter.CurrDecimalNo = 0; //set 0 temporary
+            result = new Crystal
+            {
+                ReportName = "SeaImpProofofDelivery.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddDataSource(listProof);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameter);
+            return result;
+
         }
 
     }
