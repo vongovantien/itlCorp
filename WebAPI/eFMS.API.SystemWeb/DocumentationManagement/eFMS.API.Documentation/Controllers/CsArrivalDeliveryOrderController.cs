@@ -7,6 +7,7 @@ using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Shipment.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
@@ -196,6 +197,17 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult PreviewDeliveryOrder(Guid hblid)
         {
             var data = arrivalFreightChargeServices.PreviewDeliveryOrder(hblid);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// return data source of arrival notice report
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("PreviewArrivalNotice")]
+        public IActionResult PreviewArrivalNotice(PreviewArrivalNoticeCriteria criteria)
+        {
+            var data = arrivalFreightChargeServices.PreviewArrivalNoticeSIF(criteria);
             return Ok(data);
         }
     }

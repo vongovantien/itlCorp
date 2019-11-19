@@ -4,6 +4,7 @@ using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
@@ -31,9 +32,11 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IStringLocalizer stringLocalizer;
         private readonly IContextBase<CatPlace> placeRepository;
         private readonly IContextBase<CsMawbcontainer> containerRepository;
+        IContextBase<CatPartner> partnerRepositoty;
+        ICsTransactionDetailService houseBills;
 
         public CsArrivalFrieghtChargeService(IStringLocalizer<LanguageSub> localizer,
-            IContextBase<CsArrivalFrieghtCharge> repository, 
+            IContextBase<CsArrivalFrieghtCharge> repository,
             IMapper mapper,
             IContextBase<CsTransactionDetail> detailTransaction,
             IContextBase<CsArrivalFrieghtChargeDefault> freightChargeDefault,
@@ -43,7 +46,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatCharge> chargeRepo,
             IContextBase<CatUnit> unitRepo,
             IContextBase<CatPlace> placeRepo,
-            IContextBase<CsMawbcontainer> containerRepo
+            IContextBase<CsMawbcontainer> containerRepo,
+            IContextBase<CatPartner> partnerRepo,
+            ICsTransactionDetailService houseBill
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -56,6 +61,8 @@ namespace eFMS.API.Documentation.DL.Services
             unitRepository = unitRepo;
             placeRepository = placeRepo;
             containerRepository = containerRepo;
+            partnerRepositoty = partnerRepo;
+            houseBills = houseBill;
         }
 
         #region Arrival
@@ -245,6 +252,108 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
+        public Crystal PreviewArrivalNoticeSIF(PreviewArrivalNoticeCriteria criteria)
+        {
+            Crystal result = null;
+            var _currentUser = currentUser.UserID;
+            var listCharge = new List<SeaArrivalNotesReport>();
+
+            var arrival = GetArrival(criteria.HblId, string.Empty);
+            var houserBill = houseBills.GetById(criteria.HblId);
+            if (arrival == null || houserBill == null) return result;
+            var containers = containerRepository.Get(x => x.Hblid == criteria.HblId);
+
+            var polName = placeRepository.Get(x => x.Id == houserBill.Pol).FirstOrDefault().NameEn;
+            var podName = placeRepository.Get(x => x.Id == houserBill.Pod).FirstOrDefault().NameEn;
+
+            foreach (var frieght in arrival.CsArrivalFrieghtCharges)
+            {
+                var charge = new SeaArrivalNotesReport();
+                charge.HWBNO = houserBill.Hwbno;
+                charge.ArrivalNo = arrival.ArrivalNo;
+                charge.ReferrenceNo = houserBill.ReferenceNo;
+                charge.ISSUED = DateTime.Now.ToString("dd/MM/yyyy");//Issued Date
+                charge.ATTN = houserBill.NotifyPartyDescription;
+                charge.Consignee = houserBill.ConsigneeDescription;//partnerRepositoty.Get(x => x.Id == houserBill.ConsigneeId).FirstOrDefault()?.PartnerNameEn;
+                charge.Notify = houserBill.NotifyPartyDescription;
+                charge.HandlingInfo = "HandlingInfo";
+                charge.ExecutedOn = "ExecutedOn";
+                charge.OceanVessel = houserBill.OceanVessel;
+                
+                charge.OSI = "";//Để trống
+                charge.FlightDate = houserBill.Eta.Value; //ETA
+                charge.DateConfirm = DateTime.Now;
+                charge.DatePackage = DateTime.Now;
+                charge.LocalVessel = houserBill.LocalVessel;//Local Vessel of HBL
+                charge.ContSealNo = houserBill.LocalVoyNo;// Local Voy No of HBL
+                charge.ForCarrier = "ForCarrier";
+                charge.DepartureAirport = polName;//POL of HBL
+                charge.PortofDischarge = podName;//POD of HBL
+                charge.PlaceDelivery = podName;//POD of HBL
+                charge.ArrivalNote = houserBill.Remark;//Remark of HBL
+
+                charge.ShippingMarkImport = houserBill.ShippingMark;//ShippingMark of HBL
+                if (containers.Count() > 0)
+                {
+                    var container = containers.ToList()[0];
+                    charge.TotalPackages = container.Quantity.ToString();// Quantity of container                    
+                    charge.Description = container.Description;// Description of container
+                    charge.NoPieces = container.PackageQuantity.ToString();
+                    charge.GrossWeight = container.Gw.Value; //GrossWeight of container
+                    charge.CBM = container.Cbm.Value; //CBM of container
+                    charge.Unit = unitRepository.Get(x => x.Id == container.UnitOfMeasureId)?.FirstOrDefault()?.UnitNameEn; //Unit name of container
+                }
+
+                charge.blnShow = frieght.IsShow.Value; //isShow of charge arrival
+                charge.blnStick = frieght.IsTick.Value;//isStick of charge arrival
+                charge.blnRoot = frieght.IsFull.Value; //isRoot of charge arrival
+                charge.FreightCharges = chargeRepository.Get(x => x.Id == frieght.ChargeId).FirstOrDefault()?.ChargeNameEn;//Charge name of charge arrival
+                charge.Qty = frieght.Quantity.Value;//Quantity of charge arrival
+                charge.QUnit = frieght.UnitName;//Unit name of charge arrival
+                charge.TotalValue = frieght.UnitPrice.Value;//Unit price of charge arrival
+                charge.Curr = frieght.CurrencyId; //Currency of charge arrival
+                charge.VAT = frieght.Vatrate.Value; //VAT of charge arrival
+                charge.Notes = frieght.Notes;//Note of charge arrival
+                charge.ArrivalFooterNoitice = arrival.ArrivalFooter;//Footer of arrival
+                charge.SeaFCL = true; //Đang gán cứng lấy hàng nguyên công
+                charge.MaskNos = "MaskNos";
+                charge.DlvCustoms = "DlvCustoms";
+                charge.insurAmount = "insurAmount";
+                charge.BillType = houserBill.Hbltype; // House Bill of Lading Type
+                charge.DOPickup = DateTime.Now;
+                charge.ExVND = frieght.ExchangeRate.Value;
+                charge.DecimalSymbol = ",";//Dấu phân cách phần ngàn
+                charge.DigitSymbol = ".";//Dấu phân cách phần thập phân
+                charge.DecimalNo = 0;
+                charge.CurrDecimalNo = 0;
+
+                listCharge.Add(charge);
+            }
+
+            var parameter = new SeaArrivalNotesReportParams();
+            parameter.No = "No";
+            parameter.ShipperName = "ShipperName";
+            parameter.CompanyName = Constants.COMPANY_NAME;
+            parameter.CompanyDescription = "CompanyDescription";
+            parameter.CompanyAddress1 = Constants.COMPANY_ADDRESS1;
+            parameter.CompanyAddress2 = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎";
+            parameter.Website = Constants.COMPANY_WEBSITE;
+            parameter.MAWB = houserBill.Mawb;
+            parameter.Contact = _currentUser;
+            parameter.DecimalNo = 0;
+            parameter.CurrDecimalNo = 0;
+
+            result = new Crystal
+            {
+                ReportName = criteria.Currency == "VND" ? "SeaArrivalNotes.rpt" : "SeaArrivalNotesOG.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddDataSource(listCharge);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameter);
+            return result;
+        }
         #endregion
 
         #region Delivery Order
@@ -337,7 +446,8 @@ namespace eFMS.API.Documentation.DL.Services
         public Crystal PreviewDeliveryOrder(Guid hblid)
         {
             var detail = detailTransactionRepository.First(x => x.Id == hblid);
-            var parameter = new SeaDeliveryCommandParam {
+            var parameter = new SeaDeliveryCommandParam
+            {
                 Consignee = "s",
                 No = "s",
                 CompanyName = "Công ty IndoTrans",
@@ -349,11 +459,11 @@ namespace eFMS.API.Documentation.DL.Services
                 Contact = "admin",
                 DecimalNo = 2
             };
-            var polName= placeRepository.Get(x => x.Id == detail.Pol).FirstOrDefault().NameEn;
+            var polName = placeRepository.Get(x => x.Id == detail.Pol).FirstOrDefault().NameEn;
             var podName = placeRepository.Get(x => x.Id == detail.Pod).FirstOrDefault().NameEn;
             var dataSources = new List<SeaDeliveryCommandResult>();
             var containers = containerRepository.Get(x => x.Hblid == hblid);
-            foreach(var cont in containers)
+            foreach (var cont in containers)
             {
                 var item = new SeaDeliveryCommandResult
                 {
@@ -369,7 +479,7 @@ namespace eFMS.API.Documentation.DL.Services
                     SpecialNote = "",
                     Description = cont.Description,
                     ContSealNo = cont.SealNo, //continue
-                    TotalPackages = cont.Quantity + "X" + unitRepository.Get(x => x.Id ==  cont.ContainerTypeId)?.FirstOrDefault()?.UnitNameEn,
+                    TotalPackages = cont.Quantity + "X" + unitRepository.Get(x => x.Id == cont.ContainerTypeId)?.FirstOrDefault()?.UnitNameEn,
                     NoPieces = cont.PackageQuantity + " " + unitRepository.Get(x => x.Id == cont.PackageTypeId)?.FirstOrDefault()?.UnitNameEn,
                     GrossWeight = (decimal)cont.Gw,
                     Unit = unitRepository.Get(x => x.Id == cont.UnitOfMeasureId)?.FirstOrDefault()?.UnitNameEn,
