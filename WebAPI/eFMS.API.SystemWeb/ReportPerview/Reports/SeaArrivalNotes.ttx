@@ -1,0 +1,50 @@
+HWBNO	String	50	
+ArrivalNo	String	50	
+ReferrenceNo	String	50	
+ISSUED	String	255	
+ATTN	String	255	
+Consignee	String	250	
+Notify	String	255	
+HandlingInfo	String	250	
+ExecutedOn	String	50	
+OceanVessel	String	150	
+TotalPackages	String	50	
+ShippingMarkImport	Memo		
+OSI	Memo		
+FlightDate	Date		
+DateConfirm	Date		
+DatePackage	Date		
+LocalVessel	String	150	
+ContSealNo	String	255	
+ForCarrier	String	255	
+DepartureAirport	String	150	
+PortofDischarge	String	50	
+PlaceDelivery	String	150	
+ArrivalNote	String	150	
+Description	Memo		
+NoPieces	String	150	
+GrossWeight	Number		
+CBM	Number		
+Unit	String	50	
+blnShow	Boolean		
+blnStick	Boolean		
+blnRoot	Boolean		
+FreightCharges	String	255	
+Qty	Number		
+QUnit	String	50	
+TotalValue	Number		
+Curr	String	50	
+VAT	Number		
+Notes	String	255	
+ArrivalFooterNoitice	Memo		
+SeaFCL	Boolean		
+MaskNos	Memo		
+DlvCustoms	String	255	
+insurAmount	String	255	
+BillType	String	255	
+DOPickup	Date		
+ExVND	Number		
+DecimalSymbol	String	255	
+DigitSymbol	String	255	
+DecimalNo	Number		
+CurrDecimalNo	Number		
