@@ -267,8 +267,9 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     onSelectTab(tabName: HBL_TAB | string) {
         this.selectedTab = tabName;
     }
-    onPreview() {
-        if (this.selectedTab === HBL_TAB.DELIVERY) {
+    onPreview(type: string) {
+        //Preview Delivery Order
+        if (type === 'DELIVERY_ORDER') {
             this._documentationRepo.previewDeliveryOrder(this.hblId)
                 .pipe(
                     catchError(this.catchError),
@@ -285,8 +286,11 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                     },
                 );
         }
-        if (this.selectedTab === HBL_TAB.DETAIL) {
-            this._documentationRepo.previewProofofDelivery(this.hblDetail.id)
+
+        //Preview Arrival Notice
+        if(type === 'ARRIVAL_ORIGINAL' || type === 'ARRIVAL_VND'){
+            const _currency = type === 'ARRIVAL_VND' ? 'VND' : 'ORIGINAL';
+            this._documentationRepo.previewArrivalNotice({hblId: this.hblId, currency: _currency})
                 .pipe(
                     catchError(this.catchError),
                     finalize(() => { })
@@ -295,9 +299,9 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                     (res: any) => {
                         this.dataReport = res;
                         setTimeout(() => {
+                            this.reportPopup.frm.nativeElement.submit();
                             this.reportPopup.show();
                         }, 1000);
-
                     },
                 );
         }

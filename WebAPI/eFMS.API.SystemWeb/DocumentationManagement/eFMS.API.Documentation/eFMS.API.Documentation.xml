@@ -88,6 +88,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.PreviewArrivalNotice(eFMS.API.Documentation.DL.Models.Criteria.PreviewArrivalNoticeCriteria)">
+            <summary>
+            return data source of arrival notice report
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsManifestController">
             <summary>
             
