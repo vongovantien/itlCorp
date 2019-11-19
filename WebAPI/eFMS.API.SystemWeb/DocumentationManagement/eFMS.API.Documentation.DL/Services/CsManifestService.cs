@@ -167,9 +167,11 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         //TransID = item.JobNo,
                         HBL = item.Hwbno,
+                        //ArrivalNo = item.ArrivalNo,
+                        //ReferrenceNo = item.ReferenceNo,
                         Marks = item.ShippingMark,
                         Nofpiece = item.PackageContainer,
-                        GrossWeight = item.GW ?? (decimal)item.GW,
+                        GW = item.GW ?? (decimal)item.GW,
                         SeaCBM = item.CBM ?? (decimal)item.CBM,
                         NoOfAWB = 0,
                         Destination = item.FinalDestinationPlace ?? string.Empty,
@@ -181,7 +183,15 @@ namespace eFMS.API.Documentation.DL.Services
                         OnboardNote = item.OnBoardStatus ?? string.Empty,
                         MaskNos = string.Empty,
                         TranShipmentTo = item.PlaceFreightPay ?? string.Empty,
-                        BillType = item.ServiceType ?? string.Empty
+                        BillType = item.ServiceType ?? string.Empty,
+                        NW = item.NetWeight ?? (decimal)item.NetWeight,
+                        PortofDischarge = item.PODName, 
+                        
+                        
+
+                        
+
+                        
                     };
                     manifests.Add(manifest);
                 }
