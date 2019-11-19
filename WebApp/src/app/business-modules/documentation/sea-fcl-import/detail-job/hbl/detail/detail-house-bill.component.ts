@@ -278,6 +278,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                     (res: any) => {
                         this.dataReport = res;
                         setTimeout(() => {
+                            this.reportPopup.frm.nativeElement.submit();
                             this.reportPopup.show();
                         }, 1000);
 
