@@ -40,8 +40,6 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
     isSubmitted: boolean = false;
     isAdd: boolean = false;
 
-    unitOfMeasure: string = 'Kgs';
-
     isDuplicateContPakage: boolean = false;
 
 
@@ -72,7 +70,7 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
             { title: 'Commodity', field: 'commodityId', sortable: true, },
             { title: 'Description', field: 'description', sortable: true, },
             { title: 'N.W', field: 'nw', sortable: true, },
-            { title: 'Unit', field: 'unitOfMeasure', sortable: true, },
+            { title: 'Unit', field: 'unitOfMeasureId', sortable: true, },
         ];
         this.cdRef.detectChanges(); // * tell ChangeDetect update view in app-table-header (field required).
         this.getMasterData();
@@ -93,7 +91,7 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
 
     addNewContainer() {
         this.isSubmitted = false;
-        this._store.dispatch(new fromStore.AddContainerAction(new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: 119 }))); // * DISPATCH Add ACTION 
+        this._store.dispatch(new fromStore.AddContainerAction(new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: 119, unitOfMeasureName: 'Kilogram' }))); // * DISPATCH Add ACTION 
     }
 
     deleteContainerItem(index: number) {
