@@ -68,9 +68,9 @@ namespace eFMS.API.System.DL.Services
             data = DataContext.Get(x => (x.Name ?? "").IndexOf(criteria.Name ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.RoleId == criteria.RoleId || criteria.RoleId == null)
                                 && (x.Active == criteria.Active || criteria.Active == null)
-                            );
+                            ).OrderByDescending(x => x.DatetimeModified);
             if (data == null) return null;
-            var roles = roleRepository.Get();
+            var roles = roleRepository.Get().OrderByDescending(x => x.DatetimeModified);
             var results = data.Join(roles, x => x.RoleId, y => y.Id, (x, y) => new SysPermissionSampleModel {
                                     Id = x.Id,
                                     Name = x.Name,

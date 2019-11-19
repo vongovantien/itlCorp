@@ -57,88 +57,64 @@ export class CustomClearanceEditComponent implements OnInit {
     }
 
     async getCustomCleanranceById(id) {
-        // this.baseServices.get(this.api_menu.Operation.CustomClearance.details + id).subscribe((res: any) => {
-        //     console.log(res);
-        //     this.customDeclaration = res;           
-        // }, err => {
-        //     this.customDeclaration = {};
-        //     this.baseServices.handleError(err);
-        // });
         const res = await this.baseServices.getAsync(this.api_menu.Operation.CustomClearance.details + id, true, true);
         console.log(res);
         this.customDeclaration = res;
         const _customer = find(this.listCustomer, { 'taxCode': this.customDeclaration.partnerTaxCode });
-        this.strCustomerCurrent = _customer != undefined ? _customer.taxCode : '';
-        //console.log('strCustomerCurrent: ' + this.strCustomerCurrent);
-
-        //this.customDeclaration.clearanceDate = this.customDeclaration.clearanceDate == null ? this.customDeclaration.clearanceDate : { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate) };
+        this.strCustomerCurrent = _customer !== undefined ? _customer.taxCode : '';
         this._clearanceDate = this.customDeclaration.clearanceDate == null ? this.customDeclaration.clearanceDate : { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate) };
 
         const _serviceType = find(this.serviceTypes, { 'id': this.customDeclaration.serviceType });
-        this.serviceTypeCurrent = _serviceType != undefined ? [_serviceType.id] : [];
-        //console.log('serviceTypeCurrent: ' + this.serviceTypeCurrent);
+        this.serviceTypeCurrent = _serviceType !== undefined ? [_serviceType.id] : [];
 
         const _port = find(this.listPort, { 'code': this.customDeclaration.gateway });
-        this.strPortCurrent = _port != undefined ? _port.code : '';
-        //console.log('portCurrent: ' + this.strPortCurrent);
+        this.strPortCurrent = _port !== undefined ? _port.code : '';
 
         const _typeClearance = find(this.typeClearance, { 'id': this.customDeclaration.type });
-        this.typeClearanceCurrent = _typeClearance != undefined ? [_typeClearance.id] : [];
-        //console.log('typeClearanceCurrent: ' + this.typeClearanceCurrent);
+        this.typeClearanceCurrent = _typeClearance !== undefined ? [_typeClearance.id] : [];
 
         const _routeClearance = find(this.routeClearance, { 'id': this.customDeclaration.route });
-        this.routeClearanceCurrent = _routeClearance != undefined ? [_routeClearance.id] : [];
-        //console.log('routeClearanceCurrent: ' + this.routeClearanceCurrent);
+        this.routeClearanceCurrent = _routeClearance !== undefined ? [_routeClearance.id] : [];
 
         const _cargoType = find(this.cargoTypes, { 'id': this.customDeclaration.cargoType });
-        this.cargoTypeCurrent = _cargoType != undefined ? [_cargoType.id] : [];
-        //console.log('cargoTypeCurrent: ' + this.cargoTypeCurrent);
+        this.cargoTypeCurrent = _cargoType !== undefined ? [_cargoType.id] : [];
 
         const _countryExport = find(this.listCountry, { 'code': this.customDeclaration.exportCountryCode });
-        this.strCountryExportCurrent = _countryExport != undefined ? _countryExport.code : '';
-        //console.log('strCountryExportCurrent: ' + this.strCountryExportCurrent);
+        this.strCountryExportCurrent = _countryExport !== undefined ? _countryExport.code : '';
 
         const _countryImport = find(this.listCountry, { 'code': this.customDeclaration.importCountryCode });
-        this.strCountryImportCurrent = _countryImport != undefined ? _countryImport.code : '';
-        //console.log('strCountryImportCurrent: ' + this.strCountryImportCurrent);
+        this.strCountryImportCurrent = _countryImport !== undefined ? _countryImport.code : '';
 
         const _commodity = find(this.listCommodity, { 'code': this.customDeclaration.commodityCode });
-        this.strCommodityCurrent = _commodity != undefined ? _commodity.code : '';
-        //console.log('strCommodityCurrent: ' + this.strCommodityCurrent);
+        this.strCommodityCurrent = _commodity !== undefined ? _commodity.code : '';
 
         const _unit = find(this.listUnit, { 'code': this.customDeclaration.unitCode });
-        this.strUnitCurrent = _unit != undefined ? _unit.code : '';
-        //console.log('strUnitCurrent: ' + this.strUnitCurrent);
+        this.strUnitCurrent = _unit !== undefined ? _unit.code : '';
     }
 
     async updateCustomClearance(formUpdate: NgForm) {
-        if (this.strCustomerCurrent == '' || this.strPortCurrent == '') return;
-        if (this.serviceTypeCurrent[0] != 'Air' && this.serviceTypeCurrent[0] != 'Express') {
-            if (this.cargoTypeCurrent.length == 0) return;
+        if (this.strCustomerCurrent === '' || this.strPortCurrent === '') { return; }
+        if (this.serviceTypeCurrent[0] !== 'Air' && this.serviceTypeCurrent[0] !== 'Express') {
+            if (this.cargoTypeCurrent.length === 0) { return; }
         }
-        if (formUpdate.form.status != "INVALID" && this._clearanceDate.endDate != null) {
+        if (formUpdate.form.status !== "INVALID" && this._clearanceDate.endDate != null) {
             this.customDeclaration.partnerTaxCode = this.strCustomerCurrent;
-            //this.customDeclaration.clearanceDate = moment(this.customDeclaration.clearanceDate.endDate._d).format('YYYY-MM-DD');
             this.customDeclaration.clearanceDate = moment(this._clearanceDate.endDate._d).format('YYYY-MM-DD');
             this.customDeclaration.serviceType = this.serviceTypeCurrent[0];
             this.customDeclaration.gateway = this.strPortCurrent;
             this.customDeclaration.type = this.typeClearanceCurrent[0];
             this.customDeclaration.route = this.routeClearanceCurrent[0];
-            this.customDeclaration.cargoType = (this.serviceTypeCurrent[0] == 'Air' || this.serviceTypeCurrent[0] == 'Express') ? null : this.cargoTypeCurrent[0];
+            this.customDeclaration.cargoType = (this.serviceTypeCurrent[0] === 'Air' || this.serviceTypeCurrent[0] === 'Express') ? null : this.cargoTypeCurrent[0];
             this.customDeclaration.exportCountryCode = this.strCountryExportCurrent;
             this.customDeclaration.importCountryCode = this.strCountryImportCurrent;
             this.customDeclaration.commodityCode = this.strCommodityCurrent;
             this.customDeclaration.unitCode = this.strUnitCurrent;
-            console.log(this.customDeclaration);
 
             const respone = await this.baseServices.putAsync(this.api_menu.Operation.CustomClearance.update, this.customDeclaration, true, true);
-            console.log(respone);
             if (respone.status) {
                 this.getCustomCleanranceById(this.customDeclaration.id);
                 this.mapClearanceToShipment();
             } else {
-                //reset lại _clearanceDate
-                //this.customDeclaration.clearanceDate = this.customDeclaration.clearanceDate == null ? this.customDeclaration.clearanceDate : { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate) };
                 this._clearanceDate = this.customDeclaration.clearanceDate == null ? this.customDeclaration.clearanceDate : { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate) };
             }
         }
@@ -153,7 +129,6 @@ export class CustomClearanceEditComponent implements OnInit {
         }
         if (formUpdate.form.status !== "INVALID" && this._clearanceDate.endDate != null) {
             this.customDeclaration.partnerTaxCode = this.strCustomerCurrent;
-            // this.customDeclaration.clearanceDate = moment(this.customDeclaration.clearanceDate.endDate._d).format('YYYY-MM-DD');
             this.customDeclaration.clearanceDate = moment(this._clearanceDate.endDate._d).format('YYYY-MM-DD');
             this.customDeclaration.serviceType = this.serviceTypeCurrent[0];
             this.customDeclaration.gateway = this.strPortCurrent;
@@ -171,7 +146,6 @@ export class CustomClearanceEditComponent implements OnInit {
                 this.getCustomCleanranceById(this.customDeclaration.id);
             } else {
                 // reset lại _clearanceDate
-                // this.customDeclaration.clearanceDate = this.customDeclaration.clearanceDate == null ? this.customDeclaration.clearanceDate : { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate) };
                 this._clearanceDate = this.customDeclaration.clearanceDate == null ? this.customDeclaration.clearanceDate : { startDate: moment(this.customDeclaration.clearanceDate), endDate: moment(this.customDeclaration.clearanceDate) };
             }
         }
