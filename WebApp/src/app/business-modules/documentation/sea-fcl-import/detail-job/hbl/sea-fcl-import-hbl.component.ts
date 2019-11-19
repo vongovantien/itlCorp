@@ -1,5 +1,5 @@
 import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { Router, ActivatedRoute, Params } from '@angular/router';
+import { Router, Params } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -14,11 +14,11 @@ import { Container } from 'src/app/shared/models/document/container.model';
 import { CsShipmentSurcharge } from 'src/app/shared/models';
 
 import * as fromStore from './../../store';
-import * as fromRoot from 'src/app/store';
 import * as fromShareBussiness from './../../../../share-business/store';
 
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
-import { Observable, pipe } from 'rxjs';
+import { catchError, finalize } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { getParamsRouterState } from 'src/app/store';
 
 @Component({
     selector: 'app-sea-fcl-import-hbl',
@@ -30,8 +30,6 @@ export class SeaFCLImportHBLComponent extends AppList {
     jobId: string = '';
     headers: CommonInterface.IHeaderTable[];
     houseBill: CsTransactionDetail[] = [];
-    goodSummary: any = {};
-
 
     containers: Observable<Container[]>;
     selectedShipment: any; // TODO model.
@@ -45,7 +43,6 @@ export class SeaFCLImportHBLComponent extends AppList {
         private _router: Router,
         private _sortService: SortService,
         private _documentRepo: DocumentationRepo,
-        private _activedRoute: ActivatedRoute,
         private _toastService: ToastrService,
         private _progressService: NgProgress,
         private _store: Store<fromStore.ISeaFCLImportState>,
@@ -58,7 +55,7 @@ export class SeaFCLImportHBLComponent extends AppList {
     }
 
     ngOnInit(): void {
-        this._activedRoute.params.subscribe((param: Params) => {
+        this._store.select(getParamsRouterState).subscribe((param: Params) => {
             if (param.id) {
                 this.jobId = param.id;
                 this.getHourseBill(this.jobId);
@@ -79,8 +76,6 @@ export class SeaFCLImportHBLComponent extends AppList {
 
         this.containers = this._store.select(fromStore.getContainerSaveState);
         this.selectedShipment = this._store.select(fromStore.seaFCLImportTransactionState);
-
-        this.getGoodSumaryOfHbl();
     }
 
     ngAfterViewInit() {
@@ -142,21 +137,6 @@ export class SeaFCLImportHBLComponent extends AppList {
         this.confirmDeletePopup.hide();
         this.deleteHbl(this.selectedHbl.id);
     }
-
-
-    getGoodSumaryOfHbl() {
-        this.isLoading = true;
-        this._documentRepo.getGoodSummaryOfAllHbl(this.jobId).pipe(
-            catchError(this.catchError),
-            finalize(() => { this.isLoading = false; }),
-        ).subscribe(
-            (res: any) => {
-
-                this.goodSummary = res;
-            },
-        );
-    }
-
 
     getHourseBill(id: string) {
         this.isLoading = true;

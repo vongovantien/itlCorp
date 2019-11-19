@@ -47,7 +47,7 @@ export class SeaFClImportDeliveryOrderComponent extends AppForm {
                 catchError(this.catchError),
                 takeUntil(this.ngUnsubscribe),
                 switchMap((hblDetail: any) => {
-                    return this._documentRepo.getDeliveryOrder(hblDetail.data.id || SystemConstants.EMPTY_GUID, CommonEnum.TransactionTypeEnum.SeaFCLImport)
+                    return this._documentRepo.getDeliveryOrder(hblDetail.data.id || SystemConstants.EMPTY_GUID, CommonEnum.TransactionTypeEnum.SeaFCLImport);
 
                 }) // * Get deliveryOrder info.
             )
@@ -57,8 +57,6 @@ export class SeaFClImportDeliveryOrderComponent extends AppForm {
                         this.deliveryOrder = new DeliveryOrder(res);
                         this.deliveryOrder.userDefault = this.userLogged.id;
                         this.deliveryOrder.transactionType = CommonEnum.TransactionTypeEnum.SeaFCLImport;
-
-                        console.log(this.deliveryOrder);
                     }
                 }
             );

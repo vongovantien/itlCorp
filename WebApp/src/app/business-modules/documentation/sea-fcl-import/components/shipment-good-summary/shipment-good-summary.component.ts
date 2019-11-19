@@ -1,4 +1,4 @@
-import { Component, ViewChild, Input } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { SeaFCLImportContainerListPopupComponent } from '../popup/container-list/container-list.popup';
 
@@ -9,23 +9,24 @@ import { Container } from 'src/app/shared/models/document/container.model';
 import _uniqBy from 'lodash/uniqBy';
 import _groupBy from 'lodash/groupBy';
 import { takeUntil } from 'rxjs/operators';
-import { ActivatedRoute } from '@angular/router';
+import { Params } from '@angular/router';
+import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { getParamsRouterState } from 'src/app/store';
 
 
 @Component({
     selector: 'shipment-good-summary',
     templateUrl: './shipment-good-summary.component.html',
-
-
 })
 export class SeaFCLImportShipmentGoodSummaryComponent extends AppForm {
+
+    @ViewChild(SeaFCLImportContainerListPopupComponent, { static: false }) containerPopup: SeaFCLImportContainerListPopupComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmRefresh: ConfirmPopupComponent;
+
     mblid: string = null;
     hblid: string = null;
-    @ViewChild(SeaFCLImportContainerListPopupComponent, { static: false }) containerPopup: SeaFCLImportContainerListPopupComponent;
-
-    // parentId: string = ''; // housebillId or jobId
-    description: string = '';
-    commodities: string = '';
+    description: string = null;
+    commodities: string = null;
     containerDetail: string = '';
 
     grossWeight: number = null;
@@ -33,18 +34,22 @@ export class SeaFCLImportShipmentGoodSummaryComponent extends AppForm {
     totalChargeWeight: number = null;
     totalCBM: number = null;
 
+    containers: Container[] = [];
+
     constructor(
         private _actionStoreSubject: ActionsSubject,
         private _store: Store<fromStore.IContainerState>,
-        private _activedRoute: ActivatedRoute
     ) {
         super();
     }
     ngOnInit(): void {
-        this._activedRoute.params.subscribe(p => {
-            this.hblid = p['hblId'];
-            this.mblid = p['id'];
-        });
+        this._store.select(getParamsRouterState).subscribe(
+            (p: Params) => {
+                this.hblid = p['hblId'];
+                this.mblid = p['id'];
+            }
+        );
+
         this._actionStoreSubject
             .pipe(
                 takeUntil(this.ngUnsubscribe)
@@ -52,62 +57,8 @@ export class SeaFCLImportShipmentGoodSummaryComponent extends AppForm {
             .subscribe(
                 (action: fromStore.ContainerAction) => {
                     if (action.type === fromStore.ContainerActionTypes.SAVE_CONTAINER) {
-
-                        // * Description, Commondity.
-                        this.description = (action.payload || []).reduce((acc: string, curr: Container) => acc += curr.description + "\n", '');
-                        this.commodities = (action.payload || []).reduce((acc: string, curr: any) => acc += !!curr.commodityName ? curr.commodityName + ', ' : '', '');
-
-                        // * GW, Nw, CW, CBM
-                        this.grossWeight = (action.payload || []).reduce((acc: string, curr: Container) => acc += curr.gw, 0);
-                        this.netWeight = (action.payload || []).reduce((acc: string, curr: Container) => acc += curr.nw, 0);
-                        this.totalChargeWeight = (action.payload || []).reduce((acc: string, curr: Container) => acc += curr.chargeAbleWeight, 0);
-                        this.totalCBM = (action.payload || []).reduce((acc: string, curr: Container) => acc += curr.cbm, 0);
-
-                        // * Container, Package.
-                        this.containerDetail = '';
-
-                        const contObject: any[] = (action.payload || []).map((container: Container | any) => ({
-                            cont: container.containerTypeName,
-                            quantity: container.quantity
-                        }));
-
-                        const contData = [];
-                        for (const item of Object.keys(_groupBy(contObject, 'cont'))) {
-                            contData.push({
-                                cont: item,
-                                quantity: _groupBy(contObject, 'cont')[item].map(i => i.quantity).reduce((a: any, b: any) => a += b)
-                            });
-                        }
-
-                        for (const item of contData) {
-                            this.containerDetail += this.handleStringCont(item);
-                        }
-
-                        let packageObject: any[] = (action.payload || []).map((container: Container | any) => {
-                            if (container.packageTypeName && container.packageQuantity) {
-                                return {
-                                    package: container.packageTypeName,
-                                    quantity: container.packageQuantity
-                                };
-                            }
-                        });
-
-                        // ? If has PackageType & Quantity Package
-                        if (!!packageObject.filter(i => Boolean(i)).length) {
-                            packageObject = packageObject.filter(i => Boolean(i)); // * Filtering truly and valid value
-
-                            const packageData = [];
-                            for (const item of Object.keys(_groupBy(packageObject, 'package'))) {
-                                packageData.push({
-                                    package: item,
-                                    quantity: _groupBy(packageObject, 'package')[item].map(i => i.quantity).reduce((a: any, b: any) => a += b)
-                                });
-                            }
-
-                            for (const item of packageData) {
-                                this.containerDetail += this.handleStringPackage(item);
-                            }
-                        }
+                        this.containers = action.payload;
+                        this.updateData(action.payload);
                     }
                 }
             );
@@ -129,5 +80,80 @@ export class SeaFCLImportShipmentGoodSummaryComponent extends AppForm {
         this.containerPopup.mblid = this.mblid;
         this.containerPopup.hblid = this.hblid;
         this.containerPopup.show();
+    }
+
+    refresh() {
+        this.confirmRefresh.show();
+    }
+
+    updateData(containers: Container[] | any) {
+        // * Description, Commondity.
+        if (this.description != null) {
+            this.description = (containers || []).filter((c: Container) => Boolean(c.description)).reduce((acc: string, curr: Container) => acc += curr.description + "\n", '');
+        }
+
+        if (this.commodities != null) {
+            this.commodities = (containers || []).reduce((acc: string, curr: any) => acc += !!curr.commodityName ? curr.commodityName + ', ' : '', '');
+        }
+
+        // * GW, Nw, CW, CBM
+        this.grossWeight = (containers || []).reduce((acc: string, curr: Container) => acc += curr.gw, 0);
+        this.netWeight = (containers || []).reduce((acc: string, curr: Container) => acc += curr.nw, 0);
+        this.totalChargeWeight = (containers || []).reduce((acc: string, curr: Container) => acc += curr.chargeAbleWeight, 0);
+        this.totalCBM = (containers || []).reduce((acc: string, curr: Container) => acc += curr.cbm, 0);
+
+        // * Container, Package.
+        this.containerDetail = '';
+
+        const contObject: any[] = (containers || []).map((container: Container | any) => ({
+            cont: container.containerTypeName,
+            quantity: container.quantity
+        }));
+
+        const contData = [];
+        for (const item of Object.keys(_groupBy(contObject, 'cont'))) {
+            contData.push({
+                cont: item,
+                quantity: _groupBy(contObject, 'cont')[item].map(i => i.quantity).reduce((a: any, b: any) => a += b)
+            });
+        }
+
+        for (const item of contData) {
+            this.containerDetail += this.handleStringCont(item);
+        }
+
+        let packageObject: any[] = (containers || []).map((container: Container | any) => {
+            if (container.packageTypeName && container.packageQuantity) {
+                return {
+                    package: container.packageTypeName,
+                    quantity: container.packageQuantity
+                };
+            }
+        });
+
+        // ? If has PackageType & Quantity Package
+        if (!!packageObject.filter(i => Boolean(i)).length) {
+            packageObject = packageObject.filter(i => Boolean(i)); // * Filtering truly and valid value
+
+            const packageData = [];
+            for (const item of Object.keys(_groupBy(packageObject, 'package'))) {
+                packageData.push({
+                    package: item,
+                    quantity: _groupBy(packageObject, 'package')[item].map(i => i.quantity).reduce((a: any, b: any) => a += b)
+                });
+            }
+
+            for (const item of packageData) {
+                this.containerDetail += this.handleStringPackage(item);
+            }
+        }
+    }
+
+    onRefresh() {
+        this.confirmRefresh.hide();
+
+        this.description = '';
+        this.commodities = '';
+        this.updateData(this.containers);
     }
 }

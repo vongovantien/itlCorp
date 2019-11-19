@@ -312,9 +312,10 @@ a {
 .table {
     font-size: 13px;
     margin-bottom: 0;
-    * {
-        white-space: pre-wrap; // to fix trim white-space
-    }
+    white-space: nowrap;
+    // * {
+    //     white-space: spa; // to fix trim white-space
+    // }
     thead,
     tbody,
     tfoot {

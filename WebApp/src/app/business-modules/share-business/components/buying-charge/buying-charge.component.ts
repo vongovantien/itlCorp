@@ -169,12 +169,13 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     onSelectDataFormInfo(data: Charge | any, type: string, chargeItem: CsShipmentSurcharge) {
 
         [this.isDuplicateChargeCode, this.isDuplicateInvoice] = [false, false];
+        console.log({ data, chargeItem });
 
         switch (type) {
             case 'charge':
                 chargeItem.chargeId = data.id;
                 chargeItem.chargeCode = data.code;
-
+                chargeItem.chargeNameEn = data.chargeNameEn;
                 // * Unit, Unit Price had value
                 if (!chargeItem.unitId || chargeItem.unitPrice == null) {
                     chargeItem.unitId = this.listUnits.filter(unit => unit.id === data.unitId)[0].id;
@@ -305,7 +306,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                             this._toastService.error(res.message);
                         }
                     }
-                )
+                );
         }
     }
 

@@ -48,8 +48,8 @@
                                     <button type="button" (click)="deleteCharge(charge,i, 'BUY')" appLoadingButton
                                         [state]="
                                     !!charge.soano 
-                                    || !!charge.creditno
-                                    || !!charge.debitno
+                                    || !!charge.creditNo
+                                    || !!charge.debitNo
                                     || !!charge.settlementCode
                                     || !!charge.voucherId
                                     || !!charge.voucherIddate
@@ -62,6 +62,7 @@
                             </td>
                             <td>
                                 <div class="form-group col-md-12 dropdown-partner" dropdown
+                                    [tooltip]="charge.partnerName"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.partnerName }">
                                     <input type="text" class="dropdown-toggle form-control" dropdownToggle readonly
                                         [(ngModel)]="charge.partnerName" placeholder="Please Select">

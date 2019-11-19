@@ -1,11 +1,12 @@
 import * as fromRouter from '@ngrx/router-store';
-import { Params, RouterStateSnapshot } from '@angular/router';
+import { Params, RouterStateSnapshot, Data } from '@angular/router';
 import { ActionReducerMap, createFeatureSelector, createSelector } from '@ngrx/store';
 
 export interface IRouterStateUrl {
     url: string;
     queryParams: Params;
     params: Params;
+    data: Data;
 }
 
 export interface IState {
@@ -28,9 +29,9 @@ export class CustomSerializer implements fromRouter.RouterStateSerializer<IRoute
         }
 
         const { url, root: { queryParams }, } = routerStateSnapshot;
-        const { params } = state;
+        const { params, data } = state;
 
-        return { url, params, queryParams };
+        return { url, params, queryParams, data };
     }
 }
 
@@ -42,6 +43,8 @@ export const getRouterState = createSelector(routerState, (state: fromRouter.Rou
 export const getQueryParamsRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state && state.state.queryParams);
 export const getParamsRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state && state.state.params);
 export const getUrlRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state && state.state.url);
+export const getDataRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state && state.state.data);
+
 export const selectRouterParamByKey = createSelector(
     routerState,
     (state: fromRouter.RouterReducerState<IRouterStateUrl>, { field }: { field: string }) => !!state.state.params[field] ? state.state.params[field] : null

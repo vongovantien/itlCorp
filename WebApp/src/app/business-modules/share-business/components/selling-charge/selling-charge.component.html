@@ -65,8 +65,7 @@
                                     || !!charge.debitNo
                                     || !!charge.settlementCode
                                     || !!charge.voucherId
-                                    || !!charge.voucherIddate
-                                    || !!charge.voucherIdre"
+                                    || !!charge.voucherIddate"
                                         class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Remove">
                                         <i class="la la-trash"></i>
@@ -75,6 +74,7 @@
                             </td>
                             <td>
                                 <div class="form-group col-md-12 dropdown-partner" dropdown
+                                    [tooltip]="charge.partnerName"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.partnerName }">
                                     <input type="text" class="dropdown-toggle form-control" dropdownToggle readonly
                                         [(ngModel)]="charge.partnerName" placeholder="Partner Name">
@@ -159,59 +159,14 @@
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="text" class="form-control" [(ngModel)]="charge.total" readonly disabled
-                                        currencyMask placeholder="Total">
+                                    <input type="number" class="form-control" [(ngModel)]="charge.total" readonly
+                                        disabled placeholder="Total">
                                 </div>
                             </td>
                             <td>
                                 <div class="form-group ">
                                     <input type="text" class="form-control" [(ngModel)]="charge.notes"
                                         placeholder="Note">
-                                </div>
-                            </td>
-                            <td>
-                                <div class="form-group "
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted && isDuplicateInvoice}">
-                                    <input type="text" class="form-control" [(ngModel)]="charge.invoiceNo"
-                                        placeholder="Invoice No" (ngModelChange)="isDuplicateInvoice = false">
-                                </div>
-                            </td>
-                            <td>
-                                <div class="form-group ">
-                                    <input type="text" class="form-control" [(ngModel)]="charge.seriesNo"
-                                        placeholder="Series No">
-                                </div>
-                            </td>
-                            <td>
-                                <div class="form-group table-date">
-                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                            [minDate]="minDate" name="daterange" placeholder="Please Select" readonly
-                                            [autoApply]="true" [singleDatePicker]="true" [alwaysShowCalendars]="true"
-                                            [(ngModel)]="charge.invoiceDate" />
-                                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                                            <span>
-                                                <i class="la la-calendar"></i>
-                                            </span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="form-group table-date">
-                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                            [minDate]="minDate" name="daterange" placeholder="Please Select" readonly
-                                            [autoApply]="true" [singleDatePicker]="true" [alwaysShowCalendars]="true"
-                                            [(ngModel)]="charge.exchangeDate" />
-                                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                                            <span>
-                                                <i class="la la-calendar"></i>
-                                            </span>
-                                        </span>
-                                    </div>
                                 </div>
                             </td>
                             <td class="disabled">
@@ -231,6 +186,46 @@
                                         readonly>
                                 </div>
                             </td>
+
+                            <td>
+                                <div class="form-group table-date">
+                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                            [minDate]="minDate" name="daterange" placeholder="Please Select" readonly
+                                            [autoApply]="true" [singleDatePicker]="true" [alwaysShowCalendars]="true"
+                                            [(ngModel)]="charge.exchangeDate" />
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group "
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && isDuplicateInvoice}">
+                                    <input type="text" class="form-control" [(ngModel)]="charge.invoiceNo"
+                                        placeholder="Invoice No" (ngModelChange)="isDuplicateInvoice = false">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group table-date">
+                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                            [minDate]="minDate" name="daterange" placeholder="Please Select" readonly
+                                            [autoApply]="true" [singleDatePicker]="true" [alwaysShowCalendars]="true"
+                                            [(ngModel)]="charge.invoiceDate" />
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
                             <td class="disabled">
                                 <div class="form-group ">
                                     <input type="text" class="form-control" disabled [(ngModel)]="charge.voucherId">
@@ -239,17 +234,6 @@
                             <td class="disabled">
                                 <div class="form-group ">
                                     <input type="text" class="form-control" disabled [(ngModel)]="charge.voucherIddate">
-                                </div>
-                            </td>
-                            <td class="disabled">
-                                <div class="form-group ">
-                                    <input type="text" class="form-control" disabled [(ngModel)]="charge.voucherIdre">
-                                </div>
-                            </td>
-                            <td class="disabled">
-                                <div class="form-group ">
-                                    <input type="text" class="form-control" disabled
-                                        [(ngModel)]="charge.voucherIdredate">
                                 </div>
                             </td>
                             <td class="disabled">

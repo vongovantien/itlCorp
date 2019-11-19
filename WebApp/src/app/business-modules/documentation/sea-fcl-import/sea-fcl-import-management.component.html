@@ -18,7 +18,8 @@
             <div class="m-portlet__body">
                 <div class="table-wrapper table-scrollable" id="masterbill-list-table">
                     <table class="table table-hover table-brand dataTable">
-                        <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                        <thead app-table-header [headers]="headers"
+                            (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                             <th class="table-actions-col no-sorting first">Actions</th>
                         </thead>
                         <tbody class="tbody-group">
@@ -39,6 +40,7 @@
                                                     [routerLink]="['/home/documentation/sea-fcl-import/' + item.id]">
                                                     <i class="la la-edit"></i>
                                                 </button>
+
                                                 <!-- <button type="button" *ngIf="item.isLocked"
                                                     class="btn btn-fault btn-sm m-btn--square m-btn--icon m-btn--icon-only">
                                                     <i class="fa fa-lock"></i>

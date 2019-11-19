@@ -271,7 +271,6 @@ export class SeaFClImportArrivalNoteComponent extends AppList {
                     if (res.status) {
                         this._toastService.success(res.message);
                     }
-                    console.log(res);
                 }
             );
     }
@@ -286,7 +285,7 @@ export class SeaFClImportArrivalNoteComponent extends AppList {
 
         this._progressRef.start();
 
-        this._documentRepo.updateArrivalInfo(body)
+        this._documentRepo.setArrivalHeaderFooterDefault(body)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
