@@ -55,6 +55,12 @@ export class SeaFClImportDeliveryOrderComponent extends AppForm {
                 (res: any) => {
                     if (!!res) {
                         this.deliveryOrder = new DeliveryOrder(res);
+
+                        this.deliveryOrder.deliveryOrderPrintedDate = {
+                            startDate: new Date(this.deliveryOrder.deliveryOrderPrintedDate),
+                            endDate: new Date(this.deliveryOrder.deliveryOrderPrintedDate),
+                        };
+
                         this.deliveryOrder.userDefault = this.userLogged.id;
                         this.deliveryOrder.transactionType = CommonEnum.TransactionTypeEnum.SeaFCLImport;
                     }

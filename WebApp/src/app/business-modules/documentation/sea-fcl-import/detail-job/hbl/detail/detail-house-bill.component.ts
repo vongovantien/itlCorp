@@ -170,6 +170,17 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
             "Tel: " + this.formHouseBill.selectedAlsoNotifyParty.data.tel + "\n" +
             "Fax: " + this.formHouseBill.selectedAlsoNotifyParty.data.fax + "\n" : this.hblDetail.alsoNotifyPartyDescription;
 
+        modelUpdate.arrivalFirstNotice = this.hblDetail.arrivalFirstNotice;
+        modelUpdate.arrivalFooter = this.hblDetail.arrivalFooter;
+        modelUpdate.arrivalHeader = this.hblDetail.arrivalHeader;
+        modelUpdate.arrivalNo = this.hblDetail.arrivalNo;
+        modelUpdate.arrivalSecondNotice = this.hblDetail.arrivalSecondNotice;
+        modelUpdate.deliveryOrderNo = this.hblDetail.deliveryOrderNo;
+        modelUpdate.deliveryOrderPrintedDate = this.hblDetail.deliveryOrderPrintedDate;
+        modelUpdate.dofooter = this.hblDetail.dofooter;
+        modelUpdate.dosentTo1 = this.hblDetail.dosentTo1;
+        modelUpdate.dosentTo2 = this.hblDetail.dosentTo2;
+
         this.updateHbl(modelUpdate);
     }
 

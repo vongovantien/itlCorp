@@ -14,6 +14,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import * as fromStore from './../store';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { NgProgress } from '@ngx-progressbar/core';
 
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
@@ -44,9 +45,12 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
         protected _store: Store<fromStore.ISeaFCLImportState>,
         protected _actionStoreSubject: ActionsSubject,
         protected _toastService: ToastrService,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+        private _ngProgressService: NgProgress
     ) {
         super(_router, _documentRepo, _actionStoreSubject, _toastService);
+
+        this._progressRef = this._ngProgressService.ref();
     }
 
     ngOnInit(): void {
@@ -101,8 +105,6 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                     this.shipmentGoodSummaryComponent.netWeight = this.fclImportDetail.netWeight;
                     this.shipmentGoodSummaryComponent.totalChargeWeight = this.fclImportDetail.chargeWeight;
                     this.shipmentGoodSummaryComponent.totalCBM = this.fclImportDetail.cbm;
-
-                    // console.log("detail sea fcl import", this.fclImportDetail);
 
                     setTimeout(() => {
                         this.updateForm();
@@ -262,7 +264,10 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
             ).subscribe(
                 (respone: CommonInterface.IResult) => {
                     if (respone.status) {
+
                         this._toastService.success(respone.message, 'Delete Success !');
+
+                        this.gotoList();
                     }
                 },
             );
@@ -271,11 +276,16 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
     showDuplicateConfirm() {
         this.confirmDuplicatePopup.show();
     }
+
     duplicateConfirm() {
         this.action = { action: 'copy' };
         this._router.navigate([`home/documentation/sea-fcl-import/${this.id}`], {
             queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
         });
         this.confirmDuplicatePopup.hide();
+    }
+
+    gotoList() {
+        this._router.navigate(["home/documentation/sea-fcl-import"]);
     }
 }

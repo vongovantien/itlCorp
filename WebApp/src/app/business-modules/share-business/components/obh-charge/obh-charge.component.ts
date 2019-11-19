@@ -12,6 +12,7 @@ import { CsShipmentSurcharge, Partner } from 'src/app/shared/models';
 
 import * as fromStore from './../../store';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
+import { ChargeConstants } from 'src/constants/charge.const';
 
 @Component({
     selector: 'obh-charge',
@@ -68,6 +69,10 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             { title: 'Voucher IDRE Date', field: 'voucherIdredate', sortable: true },
             { title: 'Final Exchange Rate', field: 'finalExchangeRate', sortable: true },
         ];
+    }
+
+    getCharge() {
+        return this._catalogueRepo.getCharges({ active: true, serviceTypeId: ChargeConstants.SFI_CODE, type: CommonEnum.CHARGE_TYPE.OBH });
     }
 
     selectPartnerTypes(partnerType: CommonInterface.IValueDisplay, chargeItem: CsShipmentSurcharge, type: string) {

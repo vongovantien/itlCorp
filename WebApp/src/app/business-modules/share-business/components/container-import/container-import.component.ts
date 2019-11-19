@@ -133,6 +133,7 @@ export class ShareContainerImportComponent extends PopupBase implements OnInit {
         if (this.totalInvalidRow > 0) {
             this.importAlert.show();
         } else {
+            console.log("container from import excel", this.data);
             this._store.dispatch(new AddContainersAction(this.data));
             this.hide();
         }

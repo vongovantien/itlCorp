@@ -75,6 +75,12 @@ export namespace CommonEnum {
         CONT = 'cont'
     }
 
+    export enum CHARGE_TYPE {
+        DEBIT = 'DEBIT',  // * BUYING - Phí chi
+        CREDIT = 'CREDIT', // * SELLING - Phí thu
+        OBH = "OBH", // * OBH - Phí thu hộ
+    }
+
 }
 
 

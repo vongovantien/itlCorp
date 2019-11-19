@@ -5,6 +5,7 @@
                 padding-bottom: 60px !important;
                 &.h {
                     max-height: 510px;
+                    min-height: 300px;
                     // padding-bottom: 175px;
                 }
                 .form-group {
@@ -17,17 +18,17 @@
             .dropdown-partner {
                 .dropdown-partner__content {
                     width: 500px;
-                    min-height: 294px;
-                    border-radius: 20px;
-                    padding: 0px 2px;
+                    // min-height: 294px;
+                    // border-radius: 20px;
+                    // padding: 0px 2px;
                     .dropdown-partner__header {
                         padding: 10px 0px;
                         border-bottom: 1px solid #dfdfdf;
                     }
                     // * Combo grid
                     .e--combogrid-content {
-                        border-bottom-left-radius: 20px;
-                        border-bottom-right-radius: 20px;
+                        // border-bottom-left-radius: 20px;
+                        // border-bottom-right-radius: 20px;
                         .table-header {
                             padding: 0;
                             th:first-child {
@@ -40,6 +41,7 @@
             .cdk-virtual-scroll-viewport {
                 overflow-y: auto;
                 overflow-x: hidden;
+                height: 150px !important;
             }
             .table-editable {
                 // * Calendar
@@ -56,6 +58,9 @@
                     }
                 }
                 .e--combogrid {
+                    table {
+                        white-space: pre-wrap;
+                    }
                     .form-control {
                         // border: unset;
                         background: inherit;
