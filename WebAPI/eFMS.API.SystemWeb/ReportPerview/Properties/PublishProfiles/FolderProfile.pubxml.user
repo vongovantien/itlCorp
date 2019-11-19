@@ -6,7 +6,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <TimeStampOfAssociatedLegacyPublishXmlFile />
-    <_PublishTargetUrl>\\192.168.7.31\inetpub\efms-api\ReportPreview</_PublishTargetUrl>
+    <_PublishTargetUrl>\\192.168.0.29\inetpub\eFMS-API\ReportPreview</_PublishTargetUrl>
   </PropertyGroup>
   <ItemGroup>
     <File Include="aspnet_client/system_web/4_7_3163/CrystalReportWebFormViewer4/css/default.css">
@@ -478,10 +478,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>01/28/2016 14:22:24</publishTime>
     </File>
     <File Include="bin/ReportPerview.dll">
-      <publishTime>11/18/2019 11:40:21</publishTime>
+      <publishTime>11/18/2019 15:31:17</publishTime>
     </File>
     <File Include="bin/ReportPerview.pdb">
-      <publishTime>11/18/2019 11:40:21</publishTime>
+      <publishTime>11/18/2019 15:31:17</publishTime>
     </File>
     <File Include="bin/Reports/FreightManifest.ttx">
       <publishTime>09/24/2019 09:35:32</publishTime>

@@ -28,6 +28,7 @@ namespace eFMS.API.Documentation.DL.IService
 
         //CsTransactionDetailModel GetById(CsTransactionDetailCriteria csTransactionDetailCriteria);
         CsTransactionDetailModel GetById(Guid Id);
+        Crystal PreviewProofOfDelivery(Guid Id);
 
 
 
