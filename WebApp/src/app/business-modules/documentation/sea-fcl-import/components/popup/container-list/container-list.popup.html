@@ -106,6 +106,14 @@
                                     <td>
                                         <div class="form-group"
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && isDuplicateContPakage }">
+                                            <input type="number" class="form-control"
+                                                [(ngModel)]="container.packageQuantity" name="packageQuantity"
+                                                (ngModelChange)="onChangeDataFormTable()">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form-group"
+                                            [ngClass]="{'m-form__group has-danger': isSubmitted && isDuplicateContPakage }">
                                             <select class="form-control" [(ngModel)]="container.packageTypeId"
                                                 (ngModelChange)="onChangeDataFormTable()" name="packageTypeId">
                                                 <option value="null">Please select</option>
@@ -114,14 +122,6 @@
                                                     {{unit.unitNameEn}}
                                                 </option>
                                             </select>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger': isSubmitted && isDuplicateContPakage }">
-                                            <input type="number" class="form-control"
-                                                [(ngModel)]="container.packageQuantity" name="packageQuantity"
-                                                (ngModelChange)="onChangeDataFormTable()">
                                         </div>
                                     </td>
                                     <td>

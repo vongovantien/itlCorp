@@ -15,7 +15,6 @@ import { DataService, SortService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { ShareContainerImportComponent } from 'src/app/business-modules/share-business';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -29,6 +28,7 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
     mblid: string = null;
     hblid: string = null;
     containers: Container[] = [];
+    initContainers: Container[] = [];
 
     headers: CommonInterface.IHeaderTable[] = [];
 
@@ -38,10 +38,12 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
     commodities: any[] = new Array<any>();
 
     isSubmitted: boolean = false;
+    isAdd: boolean = false;
 
     unitOfMeasure: string = 'Kgs';
 
     isDuplicateContPakage: boolean = false;
+
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -49,7 +51,6 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
         private cdRef: ChangeDetectorRef,
         private _dataService: DataService,
         private _sortService: SortService,
-        private _toastService: ToastrService
     ) {
         super();
 
@@ -83,6 +84,9 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
             .subscribe(
                 (res: fromStore.IContainerState | any) => {
                     this.containers = res;
+                    if (!this.initContainers.length) {
+                        this.initContainers = res;
+                    }
                 }
             );
     }
@@ -141,6 +145,8 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
                     container.packageTypeName = this.getPackageTypeName(container.packageTypeId);
                 }
                 this._store.dispatch(new fromStore.SaveContainerAction(this.containers));
+
+                this.initContainers = this.containers;
 
                 this.isSubmitted = false;
                 this.hide();
@@ -215,6 +221,11 @@ export class SeaFCLImportContainerListPopupComponent extends PopupBase {
 
     closePopup() {
         this.isSubmitted = false;
+        if (!this.isAdd) {
+            this._store.dispatch(new fromStore.GetContainerSuccessAction(this.initContainers));
+        } else {
+            // this._store.dispatch(new fromStore.GetContainerSuccessAction([]));
+        }
         this.hide();
     }
 

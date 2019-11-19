@@ -48,7 +48,6 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
                 (action: fromStore.ContainerAction) => {
                     if (action.type === fromStore.ContainerActionTypes.SAVE_CONTAINER) {
                         this.containers = action.payload;
-                        console.log("list container add success", this.containers);
                     }
                 });
     }
@@ -56,6 +55,7 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
     ngAfterViewInit() {
         // * Init container
         this.shipmentGoodSummaryComponent.initContainer();
+        this.shipmentGoodSummaryComponent.containerPopup.isAdd = true;
     }
 
     onSubmitData() {
