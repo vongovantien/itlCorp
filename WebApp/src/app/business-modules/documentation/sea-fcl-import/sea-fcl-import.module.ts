@@ -18,6 +18,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { FCLImportShareModule } from './share-fcl-import.module';
 import { SeaFCLImportGrantTotalProfitComponent } from './components/grant-total-profit/grant-total-profit.component';
 import { SeaFCLImportLazyLoadModule } from './sea-fcl-import-lazy-load.module';
+import { SeaFclImportManifestComponent } from './detail-job/manifest/sea-fcl-import-manifest.component';
 
 const routing: Routes = [
 
@@ -35,7 +36,12 @@ const routing: Routes = [
     },
     {
         path: ':id/hbl', loadChildren: () => import('./detail-job/hbl/sea-fcl-import-hbl.module').then(m => m.SeaFCLImportHBLModule),
-    }
+    },
+    {
+        path: ':id/manifest', component: SeaFclImportManifestComponent,
+        data: { name: "Manifest", path: ":id", level: 3 },
+    },
+
 
 ];
 
@@ -62,6 +68,7 @@ const LIB = [
         SeaFCLImportManagementComponent,
         SeaFCLImportCreateJobComponent,
         SeaFCLImportDetailJobComponent,
+        SeaFclImportManifestComponent
     ],
     imports: [
         FCLImportShareModule,
