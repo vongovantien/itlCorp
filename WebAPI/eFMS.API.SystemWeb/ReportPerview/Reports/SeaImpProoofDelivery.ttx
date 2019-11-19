@@ -9,7 +9,7 @@ HandlingInfo	String	250
 ExecutedOn	String	50	
 OceanVessel	String	150	
 TotalPackages	String	50	
-ShippingMarkImport	Memo		
+ShippingMarkImport	String		
 OSI	Memo		
 FlightDate	DateTime		
 DateConfirm	DateTime		

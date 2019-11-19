@@ -637,7 +637,7 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
             var data = GetById(Id);
             var listProof = new List<ProofOfDeliveryReport>();
             Crystal result = null;
-            //var _currentUser = currentUser.UserID;
+            var _currentUser = currentUser.UserID;
             if (data != null)
             { 
                 var dataPOD = catPlaceRepo.First(x => x.Id == data.Pod);
@@ -674,7 +674,7 @@ ICsMawbcontainerService contService, ICurrentUser user) : base(repository, mappe
             parameter.CompanyDescription = string.Empty;
             parameter.CompanyAddress2 = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎";
             parameter.Website = Constants.COMPANY_WEBSITE;
-            parameter.Contact = string.Empty;//Get user login
+            parameter.Contact = _currentUser;//Get user login
             parameter.DecimalNo = 0; // set 0  temporary
             parameter.CurrDecimalNo = 0; //set 0 temporary
             result = new Crystal
