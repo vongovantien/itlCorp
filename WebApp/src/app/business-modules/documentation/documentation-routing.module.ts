@@ -63,14 +63,14 @@ const routes: Routes = [
             level: 2
         }
     },
-    {
-        path: 'sea-fcl-export',
-        component: SeaFCLExportComponent,
-        data: {
-            name: "Sea FCL Export",
-            level: 2
-        }
-    },
+    // {
+    //     path: 'sea-fcl-export',
+    //     component: SeaFCLExportComponent,
+    //     data: {
+    //         name: "Sea FCL Export",
+    //         level: 2
+    //     }
+    // },
     {
         path: 'sea-fcl-export-create',
         component: SeaFclExportCreateComponent,
@@ -97,6 +97,9 @@ const routes: Routes = [
     },
     {
         path: 'sea-fcl-import', loadChildren: () => import('./sea-fcl-import/sea-fcl-import.module').then(m => m.SeaFCLImportModule),
+    },
+    {
+        path: 'sea-fcl-export', loadChildren: () => import('./sea-fcl-export/sea-fcl-export.module').then(m => m.SeaFCLExportModule),
     },
     {
         path: 'sea-lcl-export',
