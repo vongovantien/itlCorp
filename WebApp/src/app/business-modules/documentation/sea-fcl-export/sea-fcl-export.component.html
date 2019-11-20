@@ -1,13 +1,10 @@
-<!--begin:: subheader-->
 <div class="m-subheader">
     <div class="d-flex align-items-center">
         <div class="mr-auto">
-            <!--begin:: breadcrumbs-->
             <app-breadcrumb></app-breadcrumb>
-            <!--end:: breadcrumbs-->
         </div>
         <div class="c-button-actions">
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" 
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
                 routerLink="/home/documentation/sea-fcl-export-create">
                 <span>
                     <i class="la la-plus"></i>
@@ -26,15 +23,16 @@
     <div class="m-portlet">
         <div class="m-portlet__body">
             <!--begin::Form-->
-            <div class="m-form m-form--state" >
+            <div class="m-form m-form--state">
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
                                 Search text
                             </label>
-                            <input type="text" [(ngModel)]="searchString" class="form-control m-input m-input--square" autocomplete="nope"
-                                name="searchString" (change)="searchString = searchString.trim()" placeholder="Search text">
+                            <input type="text" [(ngModel)]="searchString" class="form-control m-input m-input--square"
+                                autocomplete="nope" name="searchString" (change)="searchString = searchString.trim()"
+                                placeholder="Search text">
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -42,7 +40,8 @@
                             <label class="form-control-label" for="">
                                 Select filter
                             </label>
-                            <ng-select [allowClear]="true" [items]="searchFilters" [active]="searchFilterActive" [disabled]="disabled" (data)="refreshValue($event)"
+                            <ng-select [allowClear]="true" [items]="searchFilters" [active]="searchFilterActive"
+                                [disabled]="disabled" (data)="refreshValue($event)"
                                 (selected)="selectFilter = $event.id" (removed)="selectFilter = null"
                                 placeholder="Select filter">
                             </ng-select>
@@ -54,14 +53,10 @@
                                 Shipment date: From - To
                             </label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                <input type="text" class="form-control m-input m-input--square"
-                                    ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                    [(ngModel)]="selectedRange"
-                                    [ranges]="ranges"
-                                    [maxDate]="maxDate"
-                                    [alwaysShowCalendars]="true"
-                                    name="daterange"
-                                    placeholder="From date - to date" readonly/>
+                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                    [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [(ngModel)]="selectedRange"
+                                    [ranges]="ranges" [maxDate]="maxDate" [alwaysShowCalendars]="true" name="daterange"
+                                    placeholder="From date - to date" readonly />
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
                                         <i class="la la-calendar"></i>
@@ -80,7 +75,9 @@
                                     <label class="form-control-label" for="">
                                         HBL No.
                                     </label>
-                                    <input type="text" [(ngModel)]="criteria.hwbNo" class="form-control m-input m-input--square" placeholder="Search text" autocomplete="nope">
+                                    <input type="text" [(ngModel)]="criteria.hwbNo"
+                                        class="form-control m-input m-input--square" placeholder="Search text"
+                                        autocomplete="nope">
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -88,7 +85,9 @@
                                     <label class="form-control-label" for="">
                                         Cont No.
                                     </label>
-                                    <input type="text" [(ngModel)]="criteria.containerNo" class="form-control m-input m-input--square" placeholder="Search text" autocomplete="nope">
+                                    <input type="text" [(ngModel)]="criteria.containerNo"
+                                        class="form-control m-input m-input--square" placeholder="Search text"
+                                        autocomplete="nope">
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -96,7 +95,9 @@
                                     <label class="form-control-label" for="">
                                         Seal No.
                                     </label>
-                                    <input type="text" [(ngModel)]="criteria.sealNo" class="form-control m-input m-input--square" placeholder="Search text" autocomplete="nope">
+                                    <input type="text" [(ngModel)]="criteria.sealNo"
+                                        class="form-control m-input m-input--square" placeholder="Search text"
+                                        autocomplete="nope">
                                 </div>
                             </div>
                         </div>
@@ -106,14 +107,13 @@
                                     <label class="form-control-label" for="">
                                         Customer
                                     </label>
-                                    <app-combo-grid-virtual-scroll 
-                                                    [currentActiveItemId]="{field:'id',value:criteria.customerId}"
-                                                    (itemSelected)="criteria.customerId = $event.id;"
-                                                    [selectedDisplayFields]="['partnerNameEn']"
-                                                    [dataSources]="customers" 
-                                                    [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                    <app-combo-grid-virtual-scroll
+                                        [currentActiveItemId]="{field:'id',value:criteria.customerId}"
+                                        (itemSelected)="criteria.customerId = $event.id;"
+                                        [selectedDisplayFields]="['partnerNameEn']" [dataSources]="customers"
+                                        [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                     </app-combo-grid-virtual-scroll>
-                                   
+
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -121,14 +121,13 @@
                                     <label class="form-control-label" for="">
                                         Notify party
                                     </label>
-                                    <app-combo-grid-virtual-scroll 
+                                    <app-combo-grid-virtual-scroll
                                         [currentActiveItemId]="{field:'id',value:criteria.notifyPartyId}"
                                         (itemSelected)="criteria.notifyPartyId = $event.id;"
-                                        [selectedDisplayFields]="['partnerNameEn']"
-                                        [dataSources]="notifyPartries" 
+                                        [selectedDisplayFields]="['partnerNameEn']" [dataSources]="notifyPartries"
                                         [displayFields]="[{'field':'id','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
                                     </app-combo-grid-virtual-scroll>
-                                    
+
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -136,25 +135,25 @@
                                     <label class="form-control-label" for="">
                                         Saleman
                                     </label>
-                                    <app-combo-grid-virtual-scroll 
+                                    <app-combo-grid-virtual-scroll
                                         [currentActiveItemId]="{field:'id',value:criteria.saleManID}"
                                         (itemSelected)="criteria.saleManID = $event.id;"
-                                        [selectedDisplayFields]="['employeeNameVn']"
-                                        [dataSources]="salemans" 
+                                        [selectedDisplayFields]="['employeeNameVn']" [dataSources]="salemans"
                                         [displayFields]="[{'field':'username','label':'User Name'},{'field':'employeeNameVn','label':'Full Name'}]">
                                     </app-combo-grid-virtual-scroll>
-                                    
+
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <!--end::Advance-search-->
-                <div class="form-actions" >
+                <div class="form-actions">
                     <div class="row">
                         <div class="col-lg-6">
-                            <a class="btn btn-link collapsed collapse-toggle" data-toggle="collapse" href="#advance-search-of-job"
-                                role="button" aria-expanded="false" aria-controls="advance-search-of-job">
+                            <a class="btn btn-link collapsed collapse-toggle" data-toggle="collapse"
+                                href="#advance-search-of-job" role="button" aria-expanded="false"
+                                aria-controls="advance-search-of-job">
                                 <span>
                                     <i class="la la-angle-up"></i>
                                     <span>Advance search</span>
@@ -162,7 +161,8 @@
                             </a>
                         </div>
                         <div class="col-lg-6 m--align-right">
-                            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="searchShipment()">
+                            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                                (click)="searchShipment()">
                                 <span>
                                     <i class="la la-search"></i>
                                     <span>
@@ -170,7 +170,8 @@
                                     </span>
                                 </span>
                             </button>
-                            <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" (click)="resetSearch()">
+                            <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                                (click)="resetSearch()">
                                 <span>
                                     <i class="la la-refresh"></i>
                                     <span>
@@ -255,22 +256,29 @@
                             <tr class="collapse-toggle-row">
                                 <td class="table-actions-col">
                                     <div class="table-actions" style="width: 100px">
-                                        <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" [attr.data-target]="'#id-00' + (i+1)"
+                                        <button type="button"
+                                            class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed"
+                                            data-toggle="collapse" [attr.data-target]="'#id-00' + (i+1)"
                                             title="Collapse" (click)="getShipmentDetails(item.id)">
                                             <i class="la la-angle-up"></i>
                                         </button>
-                                        <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            title="Edit" routerLink="/home/documentation/sea-fcl-export-create" (click)="showDetail(item)">
+                                        <button type="button"
+                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            title="Edit" routerLink="/home/documentation/sea-fcl-export-create"
+                                            (click)="showDetail(item)">
                                             <i class="la la-edit"></i>
                                         </button>
-                                        <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        <button type="button"
+                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                             title="Remove" (click)="confirmDelete(item)">
                                             <i class="la la-trash"></i>
                                         </button>
                                     </div>
                                 </td>
                                 <td>
-                                    <a class="btn-link" [routerLink]="['/home/documentation/sea-fcl-export-create/', { id: item.id }]"  (click)="showDetail(item)">
+                                    <a class="btn-link"
+                                        [routerLink]="['/home/documentation/sea-fcl-export-create/', { id: item.id }]"
+                                        (click)="showDetail(item)">
                                         <span>
                                             {{ item.jobNo }}
                                         </span>
@@ -317,7 +325,8 @@
                             <!-- begin collapse-panel-row -->
                             <tr class="collapse-panel-row">
                                 <td colspan="14">
-                                    <div class="detail-panel-block collapse" id="id-00{{(i+1)}}" data-parent="#sea-fcl-export-table">
+                                    <div class="detail-panel-block collapse" id="id-00{{(i+1)}}"
+                                        data-parent="#sea-fcl-export-table">
                                         <div class="table-inside-block">
                                             <perfect-scrollbar style="max-height: 180px">
                                                 <table class="table table-secondary dataTable">
@@ -404,12 +413,12 @@
                             </td>
                         </tr>
                     </ng-template>
-          
+
                 </table>
             </div>
             <!--end: Datatable -->
 
-            <!--begin::pagination-->            
+            <!--begin::pagination-->
             <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pageChange)="setPage($event)"
                 (pagerObject)="setPage($event)"></app-pagination>
             <!--end::pagination-->
@@ -461,7 +470,7 @@
 
 <!--begin::confirm-can-not-delete-job-modal-->
 <div class="modal fade" id="confirm-can-not-delete-job-modal" data-backdrop="static" role="dialog" aria-labelledby=""
-aria-hidden="true">
+    aria-hidden="true">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -476,7 +485,8 @@ aria-hidden="true">
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                    data-dismiss="modal">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -489,4 +499,3 @@ aria-hidden="true">
     </div>
 </div>
 <!--end::confirm-can-not-delete-job-modal-->
-
